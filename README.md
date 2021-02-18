@@ -1,6 +1,10 @@
 # Kafka.DotNet.ksqlDB
 Kafka.DotNet.ksqlDB is a LINQ-enabled client API for issuing ksqlDB push queries and consuming JSON payloads
 
+[Source code](https://github.com/tomasfabian/Joker/tree/master/Joker.Kafka)
+
+[Unit test](https://github.com/tomasfabian/Joker/tree/master/Tests/Joker.Kafka.Tests)
+
 This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/)
 
 ```
