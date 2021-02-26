@@ -1,10 +1,3 @@
-# Kafka.DotNet.ksqlDB
-Kafka.DotNet.ksqlDB is a LINQ-enabled client API for issuing ksqlDB push queries and consuming JSON payloads
-
-[Source code](https://github.com/tomasfabian/Joker/tree/master/Joker.Kafka)
-
-[Unit test](https://github.com/tomasfabian/Joker/tree/master/Tests/Joker.Kafka.Tests)
-
 This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/)
 
 ```
@@ -142,8 +135,10 @@ Omitting select is equivalent to SELECT *
 | BOOLEAN | bool   |
 | ```ARRAY<ElementType>``` | C#Type[]   |
 | ```MAP<ElementType, ElementType>``` | IDictionary<C#Type, C#Type>   |
+| ```STRUCT``` | struct   |
 
 Array type mapping example (available from v0.3.0):
+All of the elements in the array must be of the same type. The element type can be any valid SQL type.
 ```
 ksql: ARRAY<INTEGER>
 C#  : int[]
@@ -165,6 +160,33 @@ queryStream
 Generates the following KSQL:
 ```KSQL
 ARRAY_LENGTH(ARRAY[1, 2, 3])
+```
+
+Struct type mapping example (available from v0.5.0):
+A struct represents strongly typed structured data. A struct is an ordered collection of named fields that have a specific type. The field types can be any valid SQL type.
+```C#
+struct Point
+{
+  public int X { get; set; }
+
+  public int Y { get; set; }
+}
+
+queryStream
+  .Select(c => new Point { X = c.X, Y = 2 });
+```
+Generates the following KSQL:
+```KSQL
+SELECT STRUCT(X := X, Y := 2) FROM SstreamName EMIT CHANGES;
+```
+
+Destructure a struct:
+```C#
+queryStream
+  .Select(c => new Point { X = c.X, Y = 2 }.X);
+```
+```KSQL
+SELECT STRUCT(X := X, Y := 2)->X FROM SstreamName EMIT CHANGES;
 ```
 
 ### Where (v0.1.0)
@@ -633,7 +655,7 @@ new KSqlDBContext(@"http:\\localhost:8088").CreateQueryStream<Tweet>()
 ```
 
 ### LeftJoin - LEFT OUTER (v0.3.0)
-
+LEFT OUTER joins will contain leftRecord-NULL records in the result stream, which means that the join contains NULL values for fields selected from the right-hand stream where no match is made.
 ```C#
 var query = new KSqlDBContext(@"http:\\localhost:8088").CreateQueryStream<Movie>()
   .LeftJoin(
@@ -794,11 +816,13 @@ SELECT Id, COUNT_DISTINCT(Message) Count
 FROM Tweets GROUP BY Id EMIT CHANGES;
 ```
 
-# v0.4.0-preview (work in progress)
+# v0.4.0
 ```
-Install-Package Kafka.DotNet.ksqlDB -Version 0.4.0-rc.1
+Install-Package Kafka.DotNet.ksqlDB -Version 0.4.0
 ```
 ### Maps (v0.4.0)
+[Maps](https://docs.ksqldb.io/en/latest/how-to-guides/query-structured-data/#maps)
+are an associative data type that map keys of any type to values of any type. The types across all keys must be the same. The same rule holds for values. Destructure maps using bracket syntax ([]).
 ```C#
 var dictionary = new Dictionary<string, int>()
 {
@@ -814,7 +838,7 @@ Accessing map elements:
 ```C#
 dictionary["c"]
 ``` 
-```
+```KSQL
 MAP('c' := 2, 'd' := 4)['d'] 
 ```
 Deeply nested types:
@@ -844,7 +868,7 @@ string format = "yyyy-MM-dd";
 Expression<Func<Tweet, string>> expression = _ => KSqlFunctions.Instance.DateToString(epochDays, format);
 ```
 Generated KSQL:
-```
+```KSQL
 DATETOSTRING(18672, 'yyyy-MM-dd')
 ```
 
@@ -855,7 +879,7 @@ new KSqlDBContext(ksqlDbUrl).CreateQueryStream<Movie>()
 ```
 
 Generated KSQL:
-```
+```KSQL
 SELECT DATETOSTRING(1613503749145, 'yyyy-MM-dd''T''HH:mm:ssX')
 FROM tweets EMIT CHANGES;
 ```
@@ -863,11 +887,123 @@ FROM tweets EMIT CHANGES;
 #### date and time scalar functions (v0.4.0)
 [Date and time](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#date-and-time)
 
+
+# v0.5.0
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 0.5.0
+```
+
+### Structs (v0.5.0)
+[Structs](https://docs.ksqldb.io/en/latest/how-to-guides/query-structured-data/#structs)
+ are an associative data type that map VARCHAR keys to values of any type. Destructure structs by using arrow syntax (->).
+
+### Entries (v0.5.0)
+```C#
+bool sorted = true;
+      
+var subscription = new KSqlDBContext(@"http:\\localhost:8088")
+  .CreateQueryStream<Movie>()
+  .Select(c => new
+  {
+    Entries = KSqlFunctions.Instance.Entries(new Dictionary<string, string>()
+    {
+      {"a", "value"}
+    }, sorted)
+  })
+  .Subscribe(c =>
+  {
+    foreach (var entry in c.Entries)
+    {
+      var key = entry.K;
+
+      var value = entry.V;
+    }
+  }, error => {});
+```
+
+Generated KSQL:
+```KSQL
+SELECT ENTRIES(MAP('a' := 'value'), True) Entries 
+FROM movies_test EMIT CHANGES;
+```
+
+### Full Outer Join (v0.5.0)
+FULL OUTER joins will contain leftRecord-NULL or NULL-rightRecord records in the result stream, which means that the join contains NULL values for fields coming from a stream where no match is made.
+Define nullable primitive value types in POCOs:
+```C#
+public record Movie
+{
+  public long RowTime { get; set; }
+  public string Title { get; set; }
+  public int? Id { get; set; }
+  public int? Release_Year { get; set; }
+}
+
+public class Lead_Actor
+{
+  public string Title { get; set; }
+  public string Actor_Name { get; set; }
+}
+```
+
+```C#
+var source = new KSqlDBContext(@"http:\\localhost:8088")
+  .CreateQueryStream<Movie>()
+  .FullOuterJoin(
+    Source.Of<Lead_Actor>("Actors"),
+    movie => movie.Title,
+    actor => actor.Title,
+    (movie, actor) => new
+    {
+      movie.Id,
+      Title = movie.Title,
+      movie.Release_Year,
+      ActorTitle = actor.Title
+    }
+  );
+```
+
+Generated KSQL:
+```KSQL
+SELECT m.Id Id, m.Title Title, m.Release_Year Release_Year, l.Title ActorTitle FROM movies_test m
+FULL OUTER JOIN lead_actor_test l
+ON m.Title = l.Title
+EMIT CHANGES;
+```
+
+# v0.6.0 (WIP/not released):
+### CASE (v0.6.0)
+- Select a condition from one or more expressions.
+```C#
+var query = new KSqlDBContext(@"http:\\localhost:8088")
+  .CreateQueryStream<Tweet>()
+  .Select(c =>
+    new
+    {
+      case_result =
+        (c.Amount < 2.0) ? "small" :
+        (c.Amount < 4.1) ? "medium" : "large"
+    }
+  );
+```
+
+```KSQL
+SELECT 
+  CASE 
+    WHEN Amount < 2 THEN 'small' 
+    WHEN Amount < 4.1 THEN 'medium' 
+    ELSE 'large' 
+  END AS case_result 
+FROM Tweets EMIT CHANGES;
+```
+
+**NOTE:** Switch expressions and if-elseif-else statements are not supported at current versions
+
+# Nuget
+https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
+
 **TODO:**
-- struct type
 - missing [aggregation functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/) and [scalar functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/)
-- Left outer joins [joining streams and tables](https://docs.ksqldb.io/en/latest/developer-guide/joins/join-streams-and-tables/)
-- FULL OUTER join
 - rest of the [ksql query syntax](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/) (supported operators etc)
 - backpressure support
 
