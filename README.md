@@ -971,7 +971,7 @@ ON m.Title = l.Title
 EMIT CHANGES;
 ```
 
-# v0.6.0 (WIP/not released):
+# v0.6.0-rc1:
 ### CASE (v0.6.0)
 - Select a condition from one or more expressions.
 ```C#
@@ -998,6 +998,95 @@ FROM Tweets EMIT CHANGES;
 ```
 
 **NOTE:** Switch expressions and if-elseif-else statements are not supported at current versions
+
+### KSqlDbContextOptionsBuilder (v0.6.0)
+```C#
+public static KSqlDBContextOptions CreateQueryStreamOptions(string ksqlDbUrl)
+{
+  var contextOptions = new KSqlDbContextOptionsBuilder()
+    .UseKSqlDb(ksqlDbUrl)
+    .SetupQueryStream(options =>
+    {
+    })
+    .SetupQuery(options =>
+    {
+      options.Properties[QueryParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Latest.ToString().ToLower();
+    })
+    .Options;
+
+  return contextOptions;
+}
+```
+
+# TFM netstandard 2.0 (.Net Framework, Xamarin etc.) (v0.6.0)
+netstandard 2.0 does not support Http 2.0. Due to this ```IKSqlDBContext.CreateQueryStream<TEntity>``` is not exposed at the current version. 
+For these reasons ```IKSqlDBContext.CreateQuery<TEntity>``` was introduced to provide the same functionality via Http 1.1. 
+
+### CreateQueryStream (v0.1.0)
+[Executing pull or push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/#executing-pull-or-push-queries)
+```JSON
+POST /query-stream HTTP/2.0
+Accept: application/vnd.ksqlapi.delimited.v1
+Content-Type: application/vnd.ksqlapi.delimited.v1
+
+{
+  "sql": "SELECT * FROM movies EMIT CHANGES;",
+  "properties": {
+    "auto.offset.reset": "earliest"
+  }
+}
+```
+```C#
+using System;
+using Kafka.DotNet.ksqlDB.KSql.Linq;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.Sample.Models.Movies;
+
+var ksqlDbUrl = @"http:\\localhost:8088";
+var contextOptions = CreateQueryStreamOptions(ksqlDbUrl);
+
+await using var context = new KSqlDBContext(contextOptions);
+
+using var disposable = context.CreateQueryStream<Movie>()        
+  .Subscribe(onNext: movie =>
+  {
+    Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
+    Console.WriteLine();
+  }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
+```
+
+### CreateQuery (v0.6.0)
+[Run a query](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/query-endpoint/#post-query)
+```JSON
+POST /query HTTP/1.1
+Accept: application/vnd.ksql.v1+json
+Content-Type: application/vnd.ksql.v1+json
+
+{
+  "ksql": "SELECT * FROM movies EMIT CHANGES;",
+  "streamsProperties": {
+    "ksql.streams.auto.offset.reset": "earliest"
+  }
+}
+```
+```C#
+using System;
+using Kafka.DotNet.ksqlDB.KSql.Linq;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.Sample.Models.Movies;
+
+var ksqlDbUrl = @"http:\\localhost:8088";
+var contextOptions = CreateQueryStreamOptions(ksqlDbUrl);
+
+await using var context = new KSqlDBContext(contextOptions);
+
+using var disposable = context.CreateQuery<Movie>()        
+  .Subscribe(onNext: movie =>
+  {
+    Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
+    Console.WriteLine();
+  }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
+```
 
 # Nuget
 https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
