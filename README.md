@@ -971,7 +971,7 @@ ON m.Title = l.Title
 EMIT CHANGES;
 ```
 
-# v0.6.0-rc1:
+# v0.6.0:
 ### CASE (v0.6.0)
 - Select a condition from one or more expressions.
 ```C#
