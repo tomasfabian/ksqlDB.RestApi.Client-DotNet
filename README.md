@@ -177,7 +177,7 @@ queryStream
 ```
 Generates the following KSQL:
 ```KSQL
-SELECT STRUCT(X := X, Y := 2) FROM SstreamName EMIT CHANGES;
+SELECT STRUCT(X := X, Y := 2) FROM StreamName EMIT CHANGES;
 ```
 
 Destructure a struct:
@@ -186,7 +186,7 @@ queryStream
   .Select(c => new Point { X = c.X, Y = 2 }.X);
 ```
 ```KSQL
-SELECT STRUCT(X := X, Y := 2)->X FROM SstreamName EMIT CHANGES;
+SELECT STRUCT(X := X, Y := 2)->X FROM StreamName EMIT CHANGES;
 ```
 
 ### Where (v0.1.0)
@@ -308,7 +308,7 @@ private static IDisposable ClientSideBatching(KSqlDBContext context)
 ```
 
 ### ToQueryString (v0.1.0)
-ToQueryString is helpful for debugging purposes. Returns the generated ksql query without executing it.
+ToQueryString is helpful for debugging purposes. It returns the generated ksql query without executing it.
 ```C#
 var ksql = context.CreateQueryStream<Tweet>().ToQueryString();
 
@@ -535,6 +535,7 @@ Return the minimum/maximum value for a given column and window. Rows that have c
 var queryMin = CreateQbservable()
   .GroupBy(c => c.RegionCode)
   .Select(g => g.Min(c => c.Citizens));
+
 var queryMax = CreateQbservable()
   .GroupBy(c => c.RegionCode)
   .Select(g => g.Max(c => c.Citizens));
@@ -740,7 +741,7 @@ ROUND(Amount, 3)
 ```
 
 ### Dynamic - calling not supported ksqldb functions (v0.3.0)
-Some of the ksqldb functions have not been implemented yet. This can be circumvented by calling K.Functions.Dynamic with the apropriate function call and its paramaters. The type of the column value is set with C# **as** operator.
+Some of the ksqldb functions have not been implemented yet. This can be circumvented by calling K.Functions.Dynamic with the appropriate function call and its paramaters. The type of the column value is set with C# **as** operator.
 ```C#
 using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
 
@@ -1018,7 +1019,7 @@ public static KSqlDBContextOptions CreateQueryStreamOptions(string ksqlDbUrl)
 }
 ```
 
-# TFM netstandard 2.0 (.Net Framework, Xamarin etc.) (v0.6.0)
+# TFM netstandard 2.0 (.Net Framework, NetCoreApp 2.0 etc.) (v0.6.0)
 netstandard 2.0 does not support Http 2.0. Due to this ```IKSqlDBContext.CreateQueryStream<TEntity>``` is not exposed at the current version. 
 For these reasons ```IKSqlDBContext.CreateQuery<TEntity>``` was introduced to provide the same functionality via Http 1.1. 
 
@@ -1086,6 +1087,72 @@ using var disposable = context.CreateQuery<Movie>()
     Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
     Console.WriteLine();
   }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
+```
+
+# v0.7.0:
+- scalar collection functions: ArrayIntersect, ArrayJoin
+
+### Lexical precedence (v0.7.0)
+You can use parentheses to change the order of evaluation:
+```C#
+await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+
+var query = context.CreateQueryStream<Location>()
+  .Select(c => (c.Longitude + c.Longitude) * c.Longitude);
+```
+
+```KSQL
+SELECT (Longitude + Longitude) * Longitude FROM Locations EMIT CHANGES;
+```
+
+In Where clauses:
+```C#
+await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+
+var query = context.CreateQueryStream<Location>()
+  .Where(c => (c.Latitude == "1" || c.Latitude != "2") && c.Latitude == "3");
+```
+
+```KSQL
+SELECT * FROM Locations
+WHERE ((Latitude = '1') OR (Latitude != '2')) AND (Latitude = '3') EMIT CHANGES;
+```
+
+Redundant brackets are not reduced in the current version
+
+### Raw string KSQL query execution (v0.7.0)
+The following examples show how to execute ksql queries from strings:
+```C#
+string ksql = @"SELECT * FROM Movies
+WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
+
+QueryParameters queryParameters = new QueryParameters
+{
+  Sql = ksql,
+  [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
+};
+
+await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+
+var moviesSource = context.CreateQuery<Movie>(queryParameters)
+  .ToObservable();
+```
+
+Query stream:
+```C#
+string ksql = @"SELECT * FROM Movies
+WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
+
+QueryStreamParameters queryStreamParameters = new QueryStreamParameters
+{
+  Sql = ksql,
+  [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
+};
+
+await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+
+var source = context.CreateQueryStream<Movie>(queryStreamParameters)
+  .ToObservable();
 ```
 
 # Nuget
