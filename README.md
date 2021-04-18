@@ -1155,11 +1155,90 @@ var source = context.CreateQueryStream<Movie>(queryStreamParameters)
   .ToObservable();
 ```
 
+# KSqlDbRestApiClient (v0.8.0)
+### ExecuteStatementAsync (v0.8.0)
+[Execute a statement](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/ksql-endpoint/) - The /ksql resource runs a sequence of SQL statements. All statements, except those starting with SELECT, can be run on this endpoint. To run SELECT statements use the /query endpoint.
+
+```C#
+using Kafka.DotNet.ksqlDB.KSql.RestApi;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+
+public async Task ExecuteStatementAsync()
+{
+  var ksqlDbUrl = @"http:\\localhost:8088";
+
+  var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
+  IKSqlDbRestApiClient restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+  var statement = $@"CREATE OR REPLACE TABLE {nameof(Movies)} (
+        title VARCHAR PRIMARY KEY,
+        id INT,
+        release_year INT
+      ) WITH (
+        KAFKA_TOPIC='{nameof(Movies)}',
+        PARTITIONS=1,
+        VALUE_FORMAT = 'JSON'
+      );";
+
+  KSqlDbStatement ksqlDbStatement = new(statement);
+  var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement);
+
+  string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
+}
+
+public record Movies
+{
+  public int Id { get; set; }
+
+  public string Title { get; set; }
+
+  public int Release_Year { get; set; }
+}
+```
+
+### KSqlDbStatement (v0.8.0)
+KSqlDbStatement allows you to set the statement, content encoding and [CommandSequenceNumber](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/ksql-endpoint/#coordinate-multiple-requests). 
+
+```C#
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+
+public KSqlDbStatement CreateStatement(string statement)
+{
+  KSqlDbStatement ksqlDbStatement = new(statement) {
+    ContentEncoding = Encoding.Unicode,
+    CommandSequenceNumber = 10,
+    [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
+  };
+	
+  return ksqlDbStatement;
+}
+```
+
+### HttpResponseMessage ToStatementResponses extension (v0.8.0)
+```C#
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
+
+var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement);
+
+var responses = httpResponseMessage.ToStatementResponses();
+
+foreach (var response in responses)
+{
+	Console.WriteLine(response.CommandStatus);
+	Console.WriteLine(response.CommandId);
+}
+```
+
+
 # Nuget
 https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
 
 **TODO:**
-- missing [aggregation functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/) and [scalar functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/)
+- [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/)
+- [CREATE TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table/)
+- [CREATE STREAM AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream-as-select/)
+- [CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/)
 - rest of the [ksql query syntax](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/) (supported operators etc)
 - backpressure support
 
