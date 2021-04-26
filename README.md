@@ -1230,6 +1230,70 @@ foreach (var response in responses)
 }
 ```
 
+# v0.9.0 (WIP - preview):
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 0.9.0-rc.1
+```
+
+# CreateOrReplaceTableStatement (v.0.9.0)
+| Statement                  | Description  |
+|-------------------------------------------------------------------------------------------------------------------------|---|
+| [EXECUTE STATEMENTS](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) | CreateStatementAsync - execution of general-purpose string statements   |
+| [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/)                       |  CreateStreamStatement - Create a new materialized stream view, along with the corresponding Kafka topic, and stream the result of the query into the topic. |
+| [CREATE TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table/)                       | CreateOrReplaceStreamStatement - Create or replace a materialized stream view, along with the corresponding Kafka topic, and stream the result of the query into the topic. |
+| [CREATE STREAM AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream-as-select/) |  CreateTableStatement - Create a new ksqlDB materialized table view, along with the corresponding Kafka topic, and stream the result of the query as a changelog into the topic. |
+| [CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/)   |  CreateOrReplaceTableStatement - Create or replace a ksqlDB materialized table view, along with the corresponding Kafka topic, and stream the result of the query as a changelog into the topic.   |
+
+```C#
+using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+
+public static async Task Main(string[] args)
+{
+  await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+  await CreateOrReplaceTableStatement(context);
+}
+
+private static async Task CreateOrReplaceTableStatement(IKSqlDBStatementsContext context)
+{
+  var creationMetadata = new CreationMetadata
+  {
+    KafkaTopic = "tweetsByTitle",		
+    KeyFormat = SerializationFormats.Json,
+    ValueFormat = SerializationFormats.Json,
+    Replicas = 1,
+    Partitions = 1
+  };
+
+  var httpResponseMessage = await context.CreateOrReplaceTableStatement(tableName: "TweetsByTitle")
+    .With(creationMetadata)
+    .As<Movie>()
+    .Where(c => c.Id < 3)
+    .Select(c => new {c.Title, ReleaseYear = c.Release_Year})
+    .PartitionBy(c => c.Title)
+    .ExecuteStatementAsync();
+
+  var statementResponse = httpResponseMessage.ToStatementResponses();
+}
+```
+
+Generated KSQL statement:
+```KSQL
+CREATE OR REPLACE TABLE TweetsByTitle
+WITH ( KAFKA_TOPIC='tweetsByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
+AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
+WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
+```
+
+# PartitionBy extension method (v0.9.0)
+[Repartition a stream.](https://docs.ksqldb.io/en/0.15.0-ksqldb/developer-guide/joins/partition-data/)
+
+# ExecuteStatementAsync extension method (v0.9.0)
+
+# ToStatementString extension method (v0.9.0)
+
+# LinqPad sample
+[kafka.dotnet.ksqldb.linq](https://github.com/tomasfabian/Joker/blob/master/Samples/Kafka/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
 
 # Nuget
 https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
@@ -1237,8 +1301,8 @@ https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
 **TODO:**
 - [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/)
 - [CREATE TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table/)
-- [CREATE STREAM AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream-as-select/)
-- [CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/)
+- [CREATE STREAM AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream-as-select/) - [ WITHIN [(before TIMEUNIT, after TIMEUNIT) | N TIMEUNIT] ]
+- [CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/) - EMIT output_refinement
 - rest of the [ksql query syntax](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/) (supported operators etc)
 - backpressure support
 
