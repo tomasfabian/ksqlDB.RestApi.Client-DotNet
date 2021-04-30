@@ -1230,10 +1230,7 @@ foreach (var response in responses)
 }
 ```
 
-# v0.9.0 (WIP - preview):
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 0.9.0-rc.1
-```
+# v0.9.0:
 
 # CreateOrReplaceTableStatement (v.0.9.0)
 | Statement                  | Description  |
@@ -1285,12 +1282,144 @@ AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
 WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
 ```
 
-# PartitionBy extension method (v0.9.0)
+### PartitionBy extension method (v0.9.0)
 [Repartition a stream.](https://docs.ksqldb.io/en/0.15.0-ksqldb/developer-guide/joins/partition-data/)
 
-# ExecuteStatementAsync extension method (v0.9.0)
+### ExecuteStatementAsync extension method (v0.9.0)
+Executes arbitrary [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/#streams-and-tables):
+```C#
+async Task<HttpResponseMessage> ExecuteAsync(string statement)
+{
+	KSqlDbStatement ksqlDbStatement = new(statement);
 
-# ToStatementString extension method (v0.9.0)
+	var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement)
+		.ConfigureAwait(false);
+
+	string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
+
+	return httpResponseMessage;
+}
+```
+
+### ToStatementString extension method (v0.9.0)
+Generates ksql statement from Create(OrReplace)[Table|Stream]Statements
+```C#
+await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+
+var statement = context.CreateOrReplaceTableStatement(tableName: "TweetsByTitle")
+  .As<Movie>()
+  .Where(c => c.Id < 3)
+  .Select(c => new {c.Title, ReleaseYear = c.Release_Year})
+  .PartitionBy(c => c.Title)
+  .ToStatementString();
+```
+
+Generated KSQL:
+```KSQL
+CREATE OR REPLACE TABLE TweetsByTitle
+AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
+WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
+```
+
+# v0.10.0 (WIP):
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 0.10.0-rc.1
+```
+
+# Pull queries (v.0.10.0)
+[A pull query](https://docs.ksqldb.io/en/latest/concepts/queries/#pull) is a form of query issued by a client that retrieves a result as of "now", like a query against a traditional RDBS.
+
+```C#
+System.Net.Http
+System.Threading.Tasks
+Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries
+Kafka.DotNet.ksqlDB.KSql.Linq.Statements
+Kafka.DotNet.ksqlDB.KSql.Query.Context
+Kafka.DotNet.ksqlDB.KSql.RestApi
+Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
+
+IKSqlDbRestApiClient restApiClient;
+
+async Task Main()
+{
+	string url = @"http:\\localhost:8088";
+	await using var context = new KSqlDBContext(url);
+
+	var http = new HttpClientFactory(new Uri(url));
+	restApiClient = new KSqlDbRestApiClient(http);
+	
+	await CreateOrReplaceStreamAsync();
+	
+	var statement = context.CreateTableStatement("avg_sensor_values")
+		.As<IoTSensor>("sensor_values")
+		.GroupBy(c => c.SensorId)
+		.Select(c => new { SensorId = c.Key, AvgValue = c.Avg(g => g.Value) });
+
+	var response = await statement.ExecuteStatementAsync();
+
+	response = await InsertAsync(new IoTSensor { SensorId = "sensor-1", Value = 11 });
+
+	
+	var result = await context.CreatePullQuery<IoTSensorStats>("avg_sensor_values")
+				.Where(c => c.SensorId == "sensor-1")
+				.GetAsync();
+
+	Console.WriteLine($"{result?.SensorId} - {result?.AvgValue}");
+}
+
+async Task<HttpResponseMessage> CreateOrReplaceStreamAsync()
+{
+	const string createOrReplaceStream = 
+@"CREATE STREAM sensor_values (
+    SensorId VARCHAR KEY,
+    Value INT
+) WITH (
+    kafka_topic = 'sensor_values',
+    partitions = 2,
+    value_format = 'json'
+);";
+
+	return await ExecuteAsync(createOrReplaceStream);
+}
+
+async Task<HttpResponseMessage> InsertAsync(IoTSensor sensor)
+{
+	string insert =
+		$"INSERT INTO sensor_values (SensorId, Value) VALUES ('{sensor.SensorId}', {sensor.Value});";
+
+	return await ExecuteAsync(insert);
+}
+
+async Task<HttpResponseMessage> ExecuteAsync(string statement)
+{
+	KSqlDbStatement ksqlDbStatement = new(statement);
+
+	var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement)
+		.ConfigureAwait(false);
+
+	string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
+
+	return httpResponseMessage;
+}
+
+public record IoTSensor
+{
+	public string SensorId { get; init; }
+	public int Value { get; init; }
+}
+
+public record IoTSensorStats
+{
+	public string SensorId { get; init; }
+	public double AvgValue { get; init; }
+}
+```
+
+Execute pull query with plain string query:
+```C#
+  string ksql = "SELECT * FROM avg_sensor_values WHERE SensorId = 'sensor-1';";
+  var result = await context.ExecutePullQuery<IoTSensorStats>(ksql);
+```
 
 # LinqPad sample
 [kafka.dotnet.ksqldb.linq](https://github.com/tomasfabian/Joker/blob/master/Samples/Kafka/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
