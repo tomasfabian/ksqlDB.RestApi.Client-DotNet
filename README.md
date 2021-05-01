@@ -1326,7 +1326,7 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
 Install-Package Kafka.DotNet.ksqlDB -Version 0.10.0-rc.1
 ```
 
-# Pull queries (v.0.10.0)
+# Pull queries - `CreatePullQuery<TEntity>` (v.0.10.0)
 [A pull query](https://docs.ksqldb.io/en/latest/concepts/queries/#pull) is a form of query issued by a client that retrieves a result as of "now", like a query against a traditional RDBS.
 
 ```C#
@@ -1415,14 +1415,18 @@ public record IoTSensorStats
 }
 ```
 
-Execute pull query with plain string query:
+# Pull queries - `ExecutePullQuery` (v.0.10.0)
+
+Execute [pull query](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-pull-query/) with plain string query:
 ```C#
   string ksql = "SELECT * FROM avg_sensor_values WHERE SensorId = 'sensor-1';";
   var result = await context.ExecutePullQuery<IoTSensorStats>(ksql);
 ```
 
-# LinqPad sample
-[kafka.dotnet.ksqldb.linq](https://github.com/tomasfabian/Joker/blob/master/Samples/Kafka/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
+# LinqPad samples
+[Push Query](https://github.com/tomasfabian/Joker/blob/master/Samples/Kafka/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
+
+[Pull Query](https://github.com/tomasfabian/Joker/blob/master/Samples/Kafka/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.pull-query.linq)
 
 # Nuget
 https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
