@@ -1321,7 +1321,7 @@ AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
 WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
 ```
 
-# v0.10.0 (WIP):
+# v0.10.0:
 ```
 Install-Package Kafka.DotNet.ksqlDB -Version 0.10.0-rc.1
 ```
@@ -1342,35 +1342,34 @@ IKSqlDbRestApiClient restApiClient;
 
 async Task Main()
 {
-	string url = @"http:\\localhost:8088";
-	await using var context = new KSqlDBContext(url);
+  string url = @"http:\\localhost:8088";
+  await using var context = new KSqlDBContext(url);
 
-	var http = new HttpClientFactory(new Uri(url));
-	restApiClient = new KSqlDbRestApiClient(http);
+  var http = new HttpClientFactory(new Uri(url));
+  restApiClient = new KSqlDbRestApiClient(http);
 	
-	await CreateOrReplaceStreamAsync();
+  await CreateOrReplaceStreamAsync();
 	
-	var statement = context.CreateTableStatement("avg_sensor_values")
-		.As<IoTSensor>("sensor_values")
-		.GroupBy(c => c.SensorId)
-		.Select(c => new { SensorId = c.Key, AvgValue = c.Avg(g => g.Value) });
+  var statement = context.CreateTableStatement("avg_sensor_values")
+    .As<IoTSensor>("sensor_values")
+    .GroupBy(c => c.SensorId)
+    .Select(c => new { SensorId = c.Key, AvgValue = c.Avg(g => g.Value) });
 
-	var response = await statement.ExecuteStatementAsync();
+  var response = await statement.ExecuteStatementAsync();
 
-	response = await InsertAsync(new IoTSensor { SensorId = "sensor-1", Value = 11 });
-
+  response = await InsertAsync(new IoTSensor { SensorId = "sensor-1", Value = 11 });
 	
-	var result = await context.CreatePullQuery<IoTSensorStats>("avg_sensor_values")
-				.Where(c => c.SensorId == "sensor-1")
-				.GetAsync();
+  var result = await context.CreatePullQuery<IoTSensorStats>("avg_sensor_values")
+    .Where(c => c.SensorId == "sensor-1")
+    .GetAsync();
 
-	Console.WriteLine($"{result?.SensorId} - {result?.AvgValue}");
+  Console.WriteLine($"{result?.SensorId} - {result?.AvgValue}");
 }
 
 async Task<HttpResponseMessage> CreateOrReplaceStreamAsync()
 {
-	const string createOrReplaceStream = 
-@"CREATE STREAM sensor_values (
+  const string createOrReplaceStream = 
+    @"CREATE STREAM sensor_values (
     SensorId VARCHAR KEY,
     Value INT
 ) WITH (
@@ -1379,48 +1378,68 @@ async Task<HttpResponseMessage> CreateOrReplaceStreamAsync()
     value_format = 'json'
 );";
 
-	return await ExecuteAsync(createOrReplaceStream);
+  return await ExecuteAsync(createOrReplaceStream);
 }
 
 async Task<HttpResponseMessage> InsertAsync(IoTSensor sensor)
 {
-	string insert =
-		$"INSERT INTO sensor_values (SensorId, Value) VALUES ('{sensor.SensorId}', {sensor.Value});";
+  string insert =
+    $"INSERT INTO sensor_values (SensorId, Value) VALUES ('{sensor.SensorId}', {sensor.Value});";
 
-	return await ExecuteAsync(insert);
+  return await ExecuteAsync(insert);
 }
 
 async Task<HttpResponseMessage> ExecuteAsync(string statement)
 {
-	KSqlDbStatement ksqlDbStatement = new(statement);
+  KSqlDbStatement ksqlDbStatement = new(statement);
 
-	var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement)
-		.ConfigureAwait(false);
+  var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement)
+    .ConfigureAwait(false);
 
-	string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
+  string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
 
-	return httpResponseMessage;
+  return httpResponseMessage;
 }
 
 public record IoTSensor
 {
-	public string SensorId { get; init; }
-	public int Value { get; init; }
+  public string SensorId { get; init; }
+  public int Value { get; init; }
 }
 
 public record IoTSensorStats
 {
-	public string SensorId { get; init; }
-	public double AvgValue { get; init; }
+  public string SensorId { get; init; }
+  public double AvgValue { get; init; }
 }
+```
+
+### Window Bounds (v0.10.0)
+The WHERE clause must contain a value for each primary-key column to retrieve and may optionally include bounds on WINDOWSTART and WINDOWEND if the materialized table is windowed.
+```C#
+using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
+
+string windowStart = "2019-10-03T21:31:16";
+string windowEnd = "2025-10-03T21:31:16";
+
+var result = await context.CreatePullQuery<IoTSensorStats>(MaterializedViewName)
+  .Where(c => c.SensorId == "sensor-1")
+  .Where(c => Bounds.WindowStart > windowStart && Bounds.WindowEnd <= windowEnd)
+  .GetAsync();
+```
+
+Generated KSQL:
+```KSQL
+SELECT * FROM avg_sensor_values
+WHERE SensorId = 'sensor-1' AND (WINDOWSTART > '2019-10-03T21:31:16') AND (WINDOWEND <= '2020-10-03T21:31:16');
 ```
 
 # Pull queries - `ExecutePullQuery` (v.0.10.0)
 
 Execute [pull query](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-pull-query/) with plain string query:
 ```C#
-  string ksql = "SELECT * FROM avg_sensor_values WHERE SensorId = 'sensor-1';";
-  var result = await context.ExecutePullQuery<IoTSensorStats>(ksql);
+string ksql = "SELECT * FROM avg_sensor_values WHERE SensorId = 'sensor-1';";
+var result = await context.ExecutePullQuery<IoTSensorStats>(ksql);
 ```
 
 # LinqPad samples
