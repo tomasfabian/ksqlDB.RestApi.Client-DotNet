@@ -128,13 +128,13 @@ Omitting select is equivalent to SELECT *
 ### Supported data types mapping
 |   ksql  |   c#   |
 |:-------:|:------:|
-| STRING  | string |
+| VARCHAR | string |
 | INTEGER | int    |
 | BIGINT  | long   |
 | DOUBLE  | double |
 | BOOLEAN | bool   |
 | ```ARRAY<ElementType>``` | C#Type[]   |
-| ```MAP<ElementType, ElementType>``` | IDictionary<C#Type, C#Type>   |
+| ```MAP<KeyType, ValueType>``` | IDictionary<C#Type, C#Type>   |
 | ```STRUCT``` | struct   |
 
 Array type mapping example (available from v0.3.0):
@@ -1330,13 +1330,14 @@ Install-Package Kafka.DotNet.ksqlDB -Version 0.10.0-rc.1
 [A pull query](https://docs.ksqldb.io/en/latest/concepts/queries/#pull) is a form of query issued by a client that retrieves a result as of "now", like a query against a traditional RDBS.
 
 ```C#
-System.Net.Http
-System.Threading.Tasks
-Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries
-Kafka.DotNet.ksqlDB.KSql.Linq.Statements
-Kafka.DotNet.ksqlDB.KSql.Query.Context
-Kafka.DotNet.ksqlDB.KSql.RestApi
-Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
+using System.Net.Http;
+using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries;
+using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.KSql.RestApi;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using Kafka.DotNet.ksqlDB.KSql.Query.Windows;
 
 IKSqlDbRestApiClient restApiClient;
 
@@ -1353,6 +1354,7 @@ async Task Main()
   var statement = context.CreateTableStatement("avg_sensor_values")
     .As<IoTSensor>("sensor_values")
     .GroupBy(c => c.SensorId)
+    .WindowedBy(new TimeWindows(Duration.OfSeconds(5)).WithGracePeriod(Duration.OfHours(2)))
     .Select(c => new { SensorId = c.Key, AvgValue = c.Avg(g => g.Value) });
 
   var response = await statement.ExecuteStatementAsync();
@@ -1434,12 +1436,85 @@ SELECT * FROM avg_sensor_values
 WHERE SensorId = 'sensor-1' AND (WINDOWSTART > '2019-10-03T21:31:16') AND (WINDOWEND <= '2020-10-03T21:31:16');
 ```
 
-# Pull queries - `ExecutePullQuery` (v.0.10.0)
+### Pull queries - `ExecutePullQuery` (v.0.10.0)
 
 Execute [pull query](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-pull-query/) with plain string query:
 ```C#
 string ksql = "SELECT * FROM avg_sensor_values WHERE SensorId = 'sensor-1';";
 var result = await context.ExecutePullQuery<IoTSensorStats>(ksql);
+```
+
+# v0.11.0:
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 0.11.0-rc.1
+```
+
+### Creating streams and tables (v.0.11.0)
+- [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/) - fluent API
+```C#
+EntityCreationMetadata metadata = new()
+{
+	KafkaTopic = nameof(MyMovies),
+	Partitions = 1,
+	Replicas = 1
+};
+
+string url = @"http:\\localhost:8088";
+
+var http = new HttpClientFactory(new Uri(url));
+var restApiClient = new KSqlDbRestApiClient(http);
+
+var httpResponseMessage = await restApiClient.CreateStream<MyMovies>(metadata, ifNotExists: true);
+```
+
+```C#
+public record MyMovies
+{
+  [Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.Key]
+  public int Id { get; set; }
+
+  public string Title { get; set; }
+
+  public int Release_Year { get; set; }
+}
+```
+
+```KSQL
+CREATE STREAM MyMovies (
+  Id INT,
+  Title VARCHAR,
+  Release_Year INT
+) WITH ( KAFKA_TOPIC='MyMovies', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );
+```
+
+Create or replace alternative:
+```C#
+var httpResponseMessage = await restApiClient.CreateOrReplaceStream<MyMovies>(metadata);
+```
+ 
+- [CREATE TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table/) - fluent API
+```C#
+EntityCreationMetadata metadata = new()
+{
+	KafkaTopic = nameof(MyMovies),
+	Partitions = 2,
+	Replicas = 3
+};
+
+string url = @"http:\\localhost:8088";
+
+var http = new HttpClientFactory(new Uri(url));
+var restApiClient = new KSqlDbRestApiClient(http);
+
+var httpResponseMessage = await restApiClient.CreateTable<MyMovies>(metadata, ifNotExists: true);
+```
+
+```KSQL
+CREATE TABLE MyMovies (
+  Id INT,
+  Title VARCHAR,
+  Release_Year INT
+) WITH ( KAFKA_TOPIC='MyMovies', VALUE_FORMAT='Json', PARTITIONS='2', REPLICAS='3' );
 ```
 
 # LinqPad samples
