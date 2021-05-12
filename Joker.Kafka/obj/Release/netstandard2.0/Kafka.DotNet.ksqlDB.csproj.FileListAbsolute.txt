@@ -1,0 +1,9 @@
+C:\Github\SqlTableDependency.Extensions\Joker.Kafka\bin\Release\netstandard2.0\Kafka.DotNet.ksqlDB.deps.json
+C:\Github\SqlTableDependency.Extensions\Joker.Kafka\bin\Release\netstandard2.0\Kafka.DotNet.ksqlDB.dll
+C:\Github\SqlTableDependency.Extensions\Joker.Kafka\bin\Release\netstandard2.0\Kafka.DotNet.ksqlDB.pdb
+C:\Github\SqlTableDependency.Extensions\Joker.Kafka\obj\Release\netstandard2.0\Kafka.DotNet.ksqlDB.csprojAssemblyReference.cache
+C:\Github\SqlTableDependency.Extensions\Joker.Kafka\obj\Release\netstandard2.0\Kafka.DotNet.ksqlDB.AssemblyInfoInputs.cache
+C:\Github\SqlTableDependency.Extensions\Joker.Kafka\obj\Release\netstandard2.0\Kafka.DotNet.ksqlDB.AssemblyInfo.cs
+C:\Github\SqlTableDependency.Extensions\Joker.Kafka\obj\Release\netstandard2.0\Kafka.DotNet.ksqlDB.csproj.CoreCompileInputs.cache
+C:\Github\SqlTableDependency.Extensions\Joker.Kafka\obj\Release\netstandard2.0\Kafka.DotNet.ksqlDB.dll
+C:\Github\SqlTableDependency.Extensions\Joker.Kafka\obj\Release\netstandard2.0\Kafka.DotNet.ksqlDB.pdb
