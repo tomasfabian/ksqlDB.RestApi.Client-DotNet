@@ -1,0 +1,5 @@
+﻿<Project>
+  <ItemGroup>
+    <PackageReference Include="Ninject.MockingKernel.Moq" Version="3.3.0" />
+  </ItemGroup>
+</Project>

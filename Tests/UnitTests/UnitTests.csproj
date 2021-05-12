@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\ProjectDefinitions\Constants.csprojimport" />
+
+  <PropertyGroup>
+    <TargetFramework>$(NetStandardVersion)</TargetFramework>
+  </PropertyGroup>
+
+  <Import Project="..\..\NugetProjects\UnitTests\Microsoft.NET.Test.Sdk.csprojimport" />
+  <Import Project="..\..\NugetProjects\UnitTests\MSTest.TestAdapter.csprojimport" />
+  <Import Project="..\..\NugetProjects\UnitTests\MSTest.TestFramework.csprojimport" />
+  <Import Project="..\..\NugetProjects\UnitTests\coverlet.collector.csprojimport" />
+
+  <Import Project="..\..\NugetProjects\UnitTests\FluentAssertions.csprojimport" />
+  <Import Project="..\..\NugetProjects\UnitTests\Microsoft.Reactive.Testing.csprojimport" />
+  <Import Project="..\..\NugetProjects\UnitTests\Ninject.MockingKernel.Moq.csprojimport" />
+  <ItemGroup>
+    <PackageReference Include="Joker" Version="2.0.0" />
+  </ItemGroup>
+
+</Project>
