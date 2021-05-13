@@ -150,8 +150,18 @@ Fixes:
 - QbservableProvider
 - ```KSqldbProvider<T>``` - ksqldb REST api provider for push queries (```KSqlDbQueryProvider<T>```, ```KSqlDbQueryStreamProvider<T>```)
 
-# v0.12.0-rc.1
+# v1.0.0-rc.1
 - [Insert Into]()
+
+*Breaking changes.* The following methods were renamed in IKSqlDbRestApiClient interface
+```
+| v.0.11.0                      | v1.0.0                        |
+|-----------------------------------------------------------|---|
+| CreateTable<T>                | CreateTableAsync<T>           |
+| CreateStream<T>               | CreateStreamAsync<T>          |
+| CreateOrReplaceTable<T>       | CreateOrReplaceTableAsync<T>  |
+| CreateOrReplaceStream<T>      | CreateOrReplaceStreamAsync<T> |
+```
 
 # TODO:
 - missing scalar functions https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#date-and-time

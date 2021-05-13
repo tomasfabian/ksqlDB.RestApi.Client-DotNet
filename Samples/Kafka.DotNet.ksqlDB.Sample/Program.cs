@@ -639,10 +639,10 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
       var http = new HttpClientFactory(new Uri(url));
       var restApiClient = new KSqlDbRestApiClient(http);
       
-      var httpResponseMessage = await restApiClient.CreateStream<MovieNullableFields>(metadata, ifNotExists: true);
+      var httpResponseMessage = await restApiClient.CreateStreamAsync<MovieNullableFields>(metadata, ifNotExists: true);
 
       //OR
-      //httpResponseMessage = await restApiClient.CreateOrReplaceStream<MovieNullableFields>(metadata);
+      //httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MovieNullableFields>(metadata);
       
       string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
     }

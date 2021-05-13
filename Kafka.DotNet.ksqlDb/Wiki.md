@@ -1464,7 +1464,7 @@ string url = @"http:\\localhost:8088";
 var http = new HttpClientFactory(new Uri(url));
 var restApiClient = new KSqlDbRestApiClient(http);
 
-var httpResponseMessage = await restApiClient.CreateStream<MyMovies>(metadata, ifNotExists: true);
+var httpResponseMessage = await restApiClient.CreateStreamAsync<MyMovies>(metadata, ifNotExists: true);
 ```
 
 ```C#
@@ -1489,7 +1489,7 @@ CREATE STREAM MyMovies (
 
 Create or replace alternative:
 ```C#
-var httpResponseMessage = await restApiClient.CreateOrReplaceStream<MyMovies>(metadata);
+var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MyMovies>(metadata);
 ```
  
 - [CREATE TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table/) - fluent API
@@ -1506,7 +1506,7 @@ string url = @"http:\\localhost:8088";
 var http = new HttpClientFactory(new Uri(url));
 var restApiClient = new KSqlDbRestApiClient(http);
 
-var httpResponseMessage = await restApiClient.CreateTable<MyMovies>(metadata, ifNotExists: true);
+var httpResponseMessage = await restApiClient.CreateTableAsync<MyMovies>(metadata, ifNotExists: true);
 ```
 
 ```KSQL
@@ -1533,7 +1533,7 @@ Amount DECIMAL(2,3)
 ```
 Install-Package Kafka.DotNet.ksqlDB -Version 0.12.0-rc.1
 ```
-### Insert Into (v0.12.0)
+### Insert Into (v1.0.0)
 [Insert values](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/insert-values/) - Produce a row into an existing stream or table and its underlying topic based on explicitly specified values.
 ```C#
 string url = @"http:\\localhost:8088";
@@ -1549,6 +1549,16 @@ var response = await restApiClient.InsertIntoAsync(movie);
 Generated KSQL:
 ```KSQL
 INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);
+```
+
+Breaking changes. The following methods were renamed in IKSqlDbRestApiClient interface:
+```
+| v.0.11.0                      | v1.0.0                        |
+|-----------------------------------------------------------|---|
+| CreateTable<T>                | CreateTableAsync<T>           |
+| CreateStream<T>               | CreateStreamAsync<T>          |
+| CreateOrReplaceTable<T>       | CreateOrReplaceTableAsync<T>  |
+| CreateOrReplaceStream<T>      | CreateOrReplaceStreamAsync<T> |
 ```
 
 # LinqPad samples

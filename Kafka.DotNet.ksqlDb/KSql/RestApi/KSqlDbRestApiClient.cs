@@ -73,28 +73,28 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
     #region Creation
     
-    public Task<HttpResponseMessage> CreateStream<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false, CancellationToken cancellationToken = default)
+    public Task<HttpResponseMessage> CreateStreamAsync<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false, CancellationToken cancellationToken = default)
     {
       var ksql = StatementGenerator.CreateStream<T>(creationMetadata, ifNotExists);
 
       return ExecuteAsync<T>(ksql, cancellationToken);
     }
 
-    public Task<HttpResponseMessage> CreateOrReplaceStream<T>(EntityCreationMetadata creationMetadata, CancellationToken cancellationToken = default)
+    public Task<HttpResponseMessage> CreateOrReplaceStreamAsync<T>(EntityCreationMetadata creationMetadata, CancellationToken cancellationToken = default)
     {
       var ksql = StatementGenerator.CreateOrReplaceStream<T>(creationMetadata);
 
       return ExecuteAsync<T>(ksql, cancellationToken);
     }
     
-    public Task<HttpResponseMessage> CreateTable<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false, CancellationToken cancellationToken = default)
+    public Task<HttpResponseMessage> CreateTableAsync<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false, CancellationToken cancellationToken = default)
     {
       var ksql = StatementGenerator.CreateTable<T>(creationMetadata, ifNotExists);
 
       return ExecuteAsync<T>(ksql, cancellationToken);
     }
 
-    public Task<HttpResponseMessage> CreateOrReplaceTable<T>(EntityCreationMetadata creationMetadata, CancellationToken cancellationToken = default)
+    public Task<HttpResponseMessage> CreateOrReplaceTableAsync<T>(EntityCreationMetadata creationMetadata, CancellationToken cancellationToken = default)
     {
       var ksql = StatementGenerator.CreateOrReplaceTable<T>(creationMetadata);
 

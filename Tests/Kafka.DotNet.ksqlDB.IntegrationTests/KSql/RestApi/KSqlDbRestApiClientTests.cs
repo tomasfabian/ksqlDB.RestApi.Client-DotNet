@@ -83,7 +83,7 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
       var metadata = GetEntityCreationMetadata(nameof(MyMoviesTable));
 
       //Act
-      var httpResponseMessage = await restApiClient.CreateTable<MyMoviesTable>(metadata, ifNotExists: true);
+      var httpResponseMessage = await restApiClient.CreateTableAsync<MyMoviesTable>(metadata, ifNotExists: true);
 
       //Assert
       httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -116,7 +116,7 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
       var metadata = GetEntityCreationMetadata(nameof(MyMoviesStreamTest));
 
       //Act
-      var httpResponseMessage = await restApiClient.CreateOrReplaceStream<MyMoviesStreamTest>(metadata);
+      var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MyMoviesStreamTest>(metadata);
 
       //Assert
       httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
