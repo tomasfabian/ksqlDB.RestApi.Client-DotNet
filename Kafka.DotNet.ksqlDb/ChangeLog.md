@@ -151,7 +151,7 @@ Fixes:
 - ```KSqldbProvider<T>``` - ksqldb REST api provider for push queries (```KSqlDbQueryProvider<T>```, ```KSqlDbQueryStreamProvider<T>```)
 
 # v1.0.0-rc.1
-- [Insert Values]()
+- [Insert Values](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/README.md#insert-into-v100)
 
 **Breaking changes.** In order to improve the v1.0 release the following methods and properties were renamed:
 
