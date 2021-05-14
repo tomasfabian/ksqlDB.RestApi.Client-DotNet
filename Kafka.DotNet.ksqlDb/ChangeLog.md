@@ -151,9 +151,11 @@ Fixes:
 - ```KSqldbProvider<T>``` - ksqldb REST api provider for push queries (```KSqlDbQueryProvider<T>```, ```KSqlDbQueryStreamProvider<T>```)
 
 # v1.0.0-rc.1
-- [Insert Into]()
+- [Insert Values]()
 
-*Breaking changes.* The following methods were renamed in IKSqlDbRestApiClient interface
+**Breaking changes.** In order to improve the v1.0 release the following methods and properties were renamed:
+
+IKSqlDbRestApiClient interface:
 ```
 | v.0.11.0                      | v1.0.0                        |
 |-----------------------------------------------------------|---|
@@ -161,6 +163,22 @@ Fixes:
 | CreateStream<T>               | CreateStreamAsync<T>          |
 | CreateOrReplaceTable<T>       | CreateOrReplaceTableAsync<T>  |
 | CreateOrReplaceStream<T>      | CreateOrReplaceStreamAsync<T> |
+```
+
+KSQL documentation refers to stream or table name in FROM as [from_item](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/)
+
+```
+IKSqlDBContext.CreateQuery<TEntity>(string streamName = null)
+IKSqlDBContext.CreateQueryStream<TEntity>(string streamName = null)
+```
+streamName parameters were renamed:
+```
+IKSqlDBContext.CreateQuery<TEntity>(string fromItemName = null)
+IKSqlDBContext.CreateQueryStream<TEntity>(string fromItemName = null)
+
+QueryContext.StreamName was renamed QueryContext.FromItemName
+Source.Of parameter streamName was renamed to fromItemName
+KSqlDBContextOptions.ShouldPluralizeStreamName was renamed to ShouldPluralizeFromItemName
 ```
 
 # TODO:

@@ -107,7 +107,15 @@ new KSqlDBContext(contextOptions).CreateQueryStream<Person>();
 FROM Person
 ```
 
-Setting an arbitrary stream name:
+In v1.0 was ShouldPluralizeStreamName renamed to **ShouldPluralizeFromItemName**
+```C#
+var contextOptions = new KSqlDBContextOptions(@"http:\\localhost:8088")
+{
+  ShouldPluralizeFromItemName = false
+};
+```
+
+Setting an arbitrary stream name (from_item name):
 ```C#
 context.CreateQueryStream<Tweet>("custom_topic_name");
 ```
@@ -1551,7 +1559,9 @@ Generated KSQL:
 INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);
 ```
 
-Breaking changes. The following methods were renamed in IKSqlDbRestApiClient interface:
+**Breaking changes.** In order to improve the v1.0 release the following methods and properties were renamed:
+
+IKSqlDbRestApiClient interface:
 ```
 | v.0.11.0                      | v1.0.0                        |
 |-----------------------------------------------------------|---|
@@ -1560,6 +1570,24 @@ Breaking changes. The following methods were renamed in IKSqlDbRestApiClient int
 | CreateOrReplaceTable<T>       | CreateOrReplaceTableAsync<T>  |
 | CreateOrReplaceStream<T>      | CreateOrReplaceStreamAsync<T> |
 ```
+
+KSQL documentation refers to stream or table name in FROM as [from_item](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/)
+
+```
+IKSqlDBContext.CreateQuery<TEntity>(string streamName = null)
+IKSqlDBContext.CreateQueryStream<TEntity>(string streamName = null)
+```
+streamName parameters were renamed:
+```
+IKSqlDBContext.CreateQuery<TEntity>(string fromItemName = null)
+IKSqlDBContext.CreateQueryStream<TEntity>(string fromItemName = null)
+
+QueryContext.StreamName property was renamed to QueryContext.FromItemName
+Source.Of parameter streamName was renamed to fromItemName
+KSqlDBContextOptions.ShouldPluralizeStreamName was renamed to ShouldPluralizeFromItemName
+```
+
+Record.RowTime was decorated with IgnoreAttribute
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/Joker/blob/master/Samples/Kafka/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
