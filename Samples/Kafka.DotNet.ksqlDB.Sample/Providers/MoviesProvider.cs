@@ -72,12 +72,7 @@ namespace Kafka.DotNet.ksqlDB.Sample.Providers
 
     public async Task<HttpResponseMessage> InsertMovieAsync(Movie movie)
     {
-      string insert =
-        $"INSERT INTO {MoviesTableName} ({nameof(Movie.Id)}, {nameof(Movie.Title)}, {nameof(Movie.Release_Year)}) VALUES ({movie.Id}, '{movie.Title}', {movie.Release_Year});";
-      
-      KSqlDbStatement ksqlDbStatement = new(insert);
-
-      var result = await restApiProvider.ExecuteStatementAsync(ksqlDbStatement);      
+      var result = await restApiProvider.InsertIntoAsync(movie);      
 
       return result;
     }

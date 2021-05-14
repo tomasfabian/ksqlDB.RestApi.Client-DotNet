@@ -4,6 +4,7 @@ using FluentAssertions;
 using Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.IntegrationTests.Models.Movies;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
 
 namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
 {
@@ -85,12 +86,14 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
 
     public async Task<bool> InsertMovieAsync(Movie movie)
     {
-      string insert =
-        $"INSERT INTO {MoviesTableName} ({nameof(Movie.Id)}, {nameof(Movie.Title)}, {nameof(Movie.Release_Year)}) VALUES ({movie.Id}, '{movie.Title}', {movie.Release_Year});";
-      
-      KSqlDbStatement ksqlDbStatement = new(insert);
+      var insertProperties = new InsertProperties()
+      {
+        EntityName = MoviesTableName,
+        ShouldPluralizeEntityName = false
+      };
 
-      var result = (await restApiProvider.ExecuteStatementAsync(ksqlDbStatement)).IsSuccess();      
+      var result = (await restApiProvider.InsertIntoAsync(movie, insertProperties)).IsSuccess(); 
+
       result.Should().BeTrue();
 
       return result;
@@ -98,12 +101,14 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
 
     public async Task<bool> InsertLeadAsync(Lead_Actor actor)
     {
-      string insert =
-        $"INSERT INTO {ActorsTableName} ({nameof(Lead_Actor.Title)}, {nameof(Lead_Actor.Actor_Name)}) VALUES ('{actor.Title}', '{actor.Actor_Name}');";
+      var insertProperties = new InsertProperties()
+      {
+        EntityName = ActorsTableName,
+        ShouldPluralizeEntityName = false
+      };
       
-      KSqlDbStatement ksqlDbStatement = new(insert);
+      var result = (await restApiProvider.InsertIntoAsync(actor, insertProperties)).IsSuccess(); 
 
-      var result = (await restApiProvider.ExecuteStatementAsync(ksqlDbStatement)).IsSuccess();      
       result.Should().BeTrue();
 
       return result;
