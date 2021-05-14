@@ -191,7 +191,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
 
         var queryStreamContext = new QueryContext
         {
-          StreamName = streamName
+          FromItemName = streamName
         };
 
         return new TweetsKQueryStreamSet(serviceScopeFactory, queryStreamContext);

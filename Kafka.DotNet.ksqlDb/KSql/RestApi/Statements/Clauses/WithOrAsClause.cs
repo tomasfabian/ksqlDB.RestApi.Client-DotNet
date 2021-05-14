@@ -48,7 +48,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Clauses
       if (entityName == String.Empty)
         entityName = null;
 
-      statementContext.StreamName = entityName;
+      statementContext.FromItemName = entityName;
 
       return new CreateStatement<T>(serviceScopeFactory, statementContext);
     }

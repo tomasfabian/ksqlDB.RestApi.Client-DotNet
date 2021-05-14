@@ -24,7 +24,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
       };
     }
 
-    public bool ShouldPluralizeStreamName { get; set; } = true;
+    public bool ShouldPluralizeFromItemName { get; set; } = true;
 
     public string Url { get; }
 

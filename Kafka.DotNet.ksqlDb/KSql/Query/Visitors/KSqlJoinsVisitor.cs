@@ -52,9 +52,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
       expressions = expressions.Select(StripQuotes).ToArray();
       
       Visit(expressions[0]);
-      var outerStreamAlias = GenerateAlias(queryContext.StreamName);
+      var outerStreamAlias = GenerateAlias(queryContext.FromItemName);
 
-      var streamAlias = GenerateAlias(streamName);
+      var streamAlias = GenerateAlias(fromItemName);
 
       var lambdaExpression = expressions[3] as LambdaExpression;
       var rewrittenAliases = PredicateReWriter.Rewrite(lambdaExpression, outerStreamAlias, streamAlias);
@@ -63,7 +63,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
 
       new KSqlJoinSelectFieldsVisitor(StringBuilder).Visit(rewrittenAliases);
 
-      AppendLine($" FROM {queryContext.StreamName} {outerStreamAlias}");
+      AppendLine($" FROM {queryContext.FromItemName} {outerStreamAlias}");
 
       var joinType = methodInfo.Name switch
       {
@@ -73,7 +73,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
         _ => throw new ArgumentOutOfRangeException()
       };
 
-      AppendLine($"{joinType} JOIN {streamName} {streamAlias}");
+      AppendLine($"{joinType} JOIN {fromItemName} {streamAlias}");
       Append($"ON {outerStreamAlias}.");
       Visit(expressions[1]);
       Append($" = {streamAlias}.");
@@ -81,13 +81,13 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
       AppendLine(string.Empty);
     }
     
-    private string streamName;
+    private string fromItemName;
     
     private static readonly IPluralize EnglishPluralizationService = new Pluralizer();
 
-    protected virtual string InterceptStreamName(string value)
+    protected virtual string InterceptFromItemName(string value)
     {
-      if (contextOptions.ShouldPluralizeStreamName)
+      if (contextOptions.ShouldPluralizeFromItemName)
         return EnglishPluralizationService.Pluralize(value);
 
       return value;
@@ -99,9 +99,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
 
       if (constantExpression.Value is ISource source)
       {
-        streamName = constantExpression.Type.GenericTypeArguments[0].Name;
+        fromItemName = constantExpression.Type.GenericTypeArguments[0].Name;
 
-        streamName = source?.QueryContext?.StreamName ?? InterceptStreamName(streamName);
+        fromItemName = source?.QueryContext?.FromItemName ?? InterceptFromItemName(fromItemName);
       }
 
       return constantExpression;

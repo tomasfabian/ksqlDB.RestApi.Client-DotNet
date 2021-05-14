@@ -11,11 +11,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
   public interface IKSqlDBContext : IKSqlDBStatementsContext, IAsyncDisposable
   {
 #if !NETSTANDARD
-    IQbservable<TEntity> CreateQueryStream<TEntity>(string streamName = null);
+    IQbservable<TEntity> CreateQueryStream<TEntity>(string fromItemName = null);
     IAsyncEnumerable<TEntity> CreateQueryStream<TEntity>(QueryStreamParameters queryStreamParameters, CancellationToken cancellationToken = default);
 #endif
 
-    IQbservable<TEntity> CreateQuery<TEntity>(string streamName = null);
+    IQbservable<TEntity> CreateQuery<TEntity>(string fromItemName = null);
     IAsyncEnumerable<TEntity> CreateQuery<TEntity>(QueryParameters queryParameters, CancellationToken cancellationToken = default);
     
     IPullable<TEntity> CreatePullQuery<TEntity>(string tableName = null);

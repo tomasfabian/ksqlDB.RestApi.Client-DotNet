@@ -35,11 +35,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
 
       Visit(expression);
       
-      string finalStreamName = queryContext.StreamName ?? InterceptStreamName(streamName);
+      string finalFromItemName = queryContext.FromItemName ?? InterceptFromItemName(fromItemName);
 
       if (joinTables.Any())
       {
-        var joinsVisitor = new KSqlJoinsVisitor(kSqlVisitor.StringBuilder, options, new QueryContext { StreamName = finalStreamName });
+        var joinsVisitor = new KSqlJoinsVisitor(kSqlVisitor.StringBuilder, options, new QueryContext { FromItemName = finalFromItemName });
 
         foreach (var joinTable in joinTables)
         {
@@ -55,7 +55,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
         else
           kSqlVisitor.Append("*");
 
-        kSqlVisitor.Append($" FROM {finalStreamName}");
+        kSqlVisitor.Append($" FROM {finalFromItemName}");
       }
 
       bool isFirst = true;
@@ -114,9 +114,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       new KSqlWindowsVisitor(kSqlVisitor.StringBuilder).Visit(windowedBy);
     }
 
-    protected virtual string InterceptStreamName(string value)
+    protected virtual string InterceptFromItemName(string value)
     {
-      if (options.ShouldPluralizeStreamName)
+      if (options.ShouldPluralizeFromItemName)
         return EnglishPluralizationService.Pluralize(value);
 
       return value;
@@ -142,7 +142,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       return expression;
     }
 
-    private string streamName;
+    private string fromItemName;
 
     protected override Expression VisitConstant(ConstantExpression constantExpression)
     {
@@ -153,7 +153,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       var kStreamSetType = type.TryFindProviderAncestor();
 
       if (kStreamSetType != null)
-        streamName = ((KSet) constantExpression.Value).ElementType.Name;
+        fromItemName = ((KSet) constantExpression.Value).ElementType.Name;
 
       return constantExpression;
     }

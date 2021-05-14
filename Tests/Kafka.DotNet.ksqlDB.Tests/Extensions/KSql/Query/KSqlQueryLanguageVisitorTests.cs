@@ -35,7 +35,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query
 
     private IQbservable<Location> CreateStreamSource(bool shouldPluralizeStreamName = true)
     {
-      contextOptions.ShouldPluralizeStreamName = shouldPluralizeStreamName;
+      contextOptions.ShouldPluralizeFromItemName = shouldPluralizeStreamName;
 
       var context = new TestableDbProvider(contextOptions);
 
@@ -243,7 +243,7 @@ WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;";
     public void InjectStreamName_BuildKSql_PrintsInjectedStreamName()
     {
       //Arrange
-      queryContext.StreamName = "Custom_Stream_Name";
+      queryContext.FromItemName = "Custom_Stream_Name";
       var query = CreateStreamSource();
 
       //Act
@@ -251,7 +251,7 @@ WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;";
 
       //Assert
       string expectedKsql =
-        @$"SELECT * FROM {queryContext.StreamName} EMIT CHANGES;";
+        @$"SELECT * FROM {queryContext.FromItemName} EMIT CHANGES;";
 
       ksql.Should().BeEquivalentTo(expectedKsql);
     }

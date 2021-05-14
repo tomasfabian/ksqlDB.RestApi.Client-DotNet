@@ -53,16 +53,16 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
       return ksqlDBProvider.Run<TEntity>(queryStreamParameters, cancellationToken);
     }
 
-    public IQbservable<TEntity> CreateQueryStream<TEntity>(string streamName = null)
+    public IQbservable<TEntity> CreateQueryStream<TEntity>(string fromItemName = null)
     {
       var serviceScopeFactory = Initialize(contextOptions);
 
-      if (streamName == String.Empty)
-        streamName = null;
+      if (fromItemName == String.Empty)
+        fromItemName = null;
 
       var queryStreamContext = new QueryContext
       {
-        StreamName = streamName
+        FromItemName = fromItemName
       };
 
       return new KQueryStreamSet<TEntity>(serviceScopeFactory, queryStreamContext);
@@ -79,16 +79,16 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
       return ksqlDBProvider.Run<TEntity>(queryParameters, cancellationToken);
     }
 
-    public IQbservable<TEntity> CreateQuery<TEntity>(string streamName = null)
+    public IQbservable<TEntity> CreateQuery<TEntity>(string fromItemName = null)
     {
       var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
 
-      if (streamName == String.Empty)
-        streamName = null;
+      if (fromItemName == String.Empty)
+        fromItemName = null;
 
       var queryStreamContext = new QueryContext
       {
-        StreamName = streamName
+        FromItemName = fromItemName
       };
 
       return new KQueryStreamSet<TEntity>(serviceScopeFactory, queryStreamContext);
@@ -116,16 +116,16 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
       return CreateStatement(tableName, CreationType.CreateOrReplace, KSqlEntityType.Table);
     }
 
-    private IWithOrAsClause CreateStatement(string tableName, CreationType creationType, KSqlEntityType entityType)
+    private IWithOrAsClause CreateStatement(string fromItemName, CreationType creationType, KSqlEntityType entityType)
     {
       var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
 
-      if (tableName == String.Empty)
-        tableName = null;
+      if (fromItemName == String.Empty)
+        fromItemName = null;
 
       var statementContext = new StatementContext
       {
-        EntityName = tableName, 
+        EntityName = fromItemName, 
         CreationType = creationType, 
         KSqlEntityType = entityType
       };
@@ -146,7 +146,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
 
       var queryContext = new QueryContext
       {
-        StreamName = tableName
+        FromItemName = tableName
       };
 
       return new KPullSet<TEntity>(serviceScopeFactory, queryContext);

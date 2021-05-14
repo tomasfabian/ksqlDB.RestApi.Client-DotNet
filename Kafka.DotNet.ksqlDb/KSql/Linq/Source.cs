@@ -18,11 +18,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
   }
   public static class Source
   {
-    public static ISource<T> Of<T>(string streamName = null)
+    public static ISource<T> Of<T>(string fromItemName = null)
     {      
       var queryStreamContext = new QueryContext
       {
-        StreamName = streamName
+        FromItemName = fromItemName
       };
 
       return new Source<T>(queryStreamContext);
