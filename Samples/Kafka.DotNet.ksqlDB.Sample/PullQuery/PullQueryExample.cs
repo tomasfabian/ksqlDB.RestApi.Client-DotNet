@@ -51,7 +51,8 @@ namespace Kafka.DotNet.ksqlDB.Sample.PullQuery
         .Where(c => Bounds.WindowStart > windowStart && Bounds.WindowEnd <= windowEnd)
         .GetAsync();
 
-      Console.WriteLine($"Id: {result?.SensorId} - Avg Value: {result?.AvgValue} - Window Start {result?.WindowStart}");
+      Console.WriteLine($"Pull query result => Id: {result?.SensorId} - Avg Value: {result?.AvgValue} - Window Start {result?.WindowStart}");
+      Console.WriteLine();
 
       string ksql = "SELECT * FROM avg_sensor_values WHERE SensorId = 'sensor-1';";
 

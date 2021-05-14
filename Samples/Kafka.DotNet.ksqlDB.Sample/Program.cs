@@ -59,13 +59,21 @@ namespace Kafka.DotNet.ksqlDB.Sample
 
       await using var context = new KSqlDBContext(contextOptions);
 
-      using var disposable = context.CreateQueryStream<Movie>() // Http 2.0
-      // using var disposable = context.CreateQuery<Movie>() // Http 1.0
+      var query = context.CreateQueryStream<Movie>() // Http 2.0
+      // var query = context.CreateQuery<Movie>() // Http 1.0
         .Where(p => p.Title != "E.T.")
         .Where(c => K.Functions.Like(c.Title.ToLower(), "%hard%".ToLower()) || c.Id == 1)
-        .Where(p => p.RowTime >= 1510923225000) //AND RowTime >= 1510923225000
-        .Select(l => new { Id = l.Id, l.Title, l.Release_Year, l.RowTime })
-        .Take(2) // LIMIT 2    
+        .Where(p => p.RowTime >= 1510923225000)
+        .Select(l => new {Id = l.Id, l.Title, l.Release_Year, l.RowTime})
+        .Take(2); // LIMIT 2    
+
+      var ksql = query.ToQueryString();
+
+      Console.WriteLine("Generated ksql:");
+      Console.WriteLine(ksql);
+      Console.WriteLine();
+
+      using var disposable = query  
         .ToObservable() // client side processing starts here lazily after subscription. Switches to Rx.NET
         .ObserveOn(TaskPoolScheduler.Default)
         .Subscribe(onNext: movie =>
@@ -523,7 +531,6 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
         },
         Str = new MovieStruct { Title = c.Title, Id = c.Id },
         c.Release_Year
-        //ReleaseYear = c.Release_Year //TODO: alias
       }).ToAsyncEnumerable();
 
       await foreach (var movie in source)
