@@ -1462,9 +1462,9 @@ Install-Package Kafka.DotNet.ksqlDB -Version 0.11.0-rc.1
 ```C#
 EntityCreationMetadata metadata = new()
 {
-	KafkaTopic = nameof(MyMovies),
-	Partitions = 1,
-	Replicas = 1
+  KafkaTopic = nameof(MyMovies),
+  Partitions = 1,
+  Replicas = 1
 };
 
 string url = @"http:\\localhost:8088";
@@ -1504,9 +1504,9 @@ var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MyMovie
 ```C#
 EntityCreationMetadata metadata = new()
 {
-	KafkaTopic = nameof(MyMovies),
-	Partitions = 2,
-	Replicas = 3
+  KafkaTopic = nameof(MyMovies),
+  Partitions = 2,
+  Replicas = 3
 };
 
 string url = @"http:\\localhost:8088";
@@ -1529,17 +1529,18 @@ CREATE TABLE MyMovies (
 ```C#
 class Transaction
 {
-	[Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.Decimal(2, 3)]
-	public decimal Amount { get; set; }
+  [Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.Decimal(2, 3)]
+  public decimal Amount { get; set; }
 }
 ```
+Generated KSQL:
 ```KSQL
 Amount DECIMAL(2,3)
 ```
 
-# v0.12.0:
+# v1.0.0:
 ```
-Install-Package Kafka.DotNet.ksqlDB -Version 0.12.0-rc.1
+Install-Package Kafka.DotNet.ksqlDB -Version 1.0.0-rc.1
 ```
 ### Insert Into (v1.0.0)
 [Insert values](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/insert-values/) - Produce a row into an existing stream or table and its underlying topic based on explicitly specified values.
@@ -1564,7 +1565,7 @@ INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);
 IKSqlDbRestApiClient interface:
 ```
 | v.0.11.0                      | v1.0.0                        |
-|-----------------------------------------------------------|---|
+|---------------------------------------------------------------|
 | CreateTable<T>                | CreateTableAsync<T>           |
 | CreateStream<T>               | CreateStreamAsync<T>          |
 | CreateOrReplaceTable<T>       | CreateOrReplaceTableAsync<T>  |
@@ -1611,3 +1612,12 @@ https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
 [Aggregation functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
 [Push query](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/)
+
+# Acknowledgements:
+- [Microsoft.Extensions.DependencyInjection](https://www.nuget.org/packages/Microsoft.Extensions.DependencyInjection/)
+- [Pluralize.NET](https://www.nuget.org/packages/Pluralize.NET/)
+- [System.Interactive.Async](https://www.nuget.org/packages/System.Interactive.Async/)
+- [System.Reactive](https://www.nuget.org/packages/System.Reactive/)
+- [System.Text.Json](https://www.nuget.org/packages/System.Text.Json/)
+
+- [ksql](https://github.com/confluentinc/ksql)

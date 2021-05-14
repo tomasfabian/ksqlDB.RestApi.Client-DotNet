@@ -1612,3 +1612,12 @@ https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
 [Aggregation functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
 [Push query](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/)
+
+# Acknowledgements:
+- [Microsoft.Extensions.DependencyInjection](https://www.nuget.org/packages/Microsoft.Extensions.DependencyInjection/)
+- [Pluralize.NET](https://www.nuget.org/packages/Pluralize.NET/)
+- [System.Interactive.Async](https://www.nuget.org/packages/System.Interactive.Async/)
+- [System.Reactive](https://www.nuget.org/packages/System.Reactive/)
+- [System.Text.Json](https://www.nuget.org/packages/System.Text.Json/)
+
+- [ksql](https://github.com/confluentinc/ksql)
