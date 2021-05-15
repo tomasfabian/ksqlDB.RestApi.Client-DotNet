@@ -15,6 +15,7 @@
   <Namespace>System.Reactive.Linq</Namespace>
   <Namespace>Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions</Namespace>
   <Namespace>System.Net</Namespace>
+  <Namespace>Kafka.DotNet.ksqlDB.KSql.Linq.Statements</Namespace>
 </Query>
 
 async Task Main()
