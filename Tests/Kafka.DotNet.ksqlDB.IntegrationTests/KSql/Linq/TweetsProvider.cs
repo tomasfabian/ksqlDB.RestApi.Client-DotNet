@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.IntegrationTests.Models;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
 
 namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
 {
@@ -22,7 +23,7 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
       Message = "Hello world",
       IsRobot = true,
       Amount = 0.00042, 
-      AccountBalance = 1.2M,
+      AccountBalance = 533333333421.6332M,
     };
 
     public static readonly Tweet Tweet2 = new()
@@ -31,7 +32,7 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
       Message = "Wall-e",
       IsRobot = false,
       Amount = 1, 
-      AccountBalance = -5.6M,
+      AccountBalance = -5.6M
     };
 
     public async Task<bool> CreateTweetsStream(string streamName, string topicName)
@@ -45,23 +46,17 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
       return result.IsSuccess();
     }
 
-    public string CreateInsertTweetStatement(Tweet tweet, string streamName)
-    {
-      var amount = tweet.Amount.ToString("E1", CultureInfo.InvariantCulture);
-
-      string insert =
-        $"INSERT INTO {streamName} (id, message, isRobot, amount, accountBalance) VALUES ({tweet.Id}, '{tweet.Message}', {tweet.IsRobot}, {amount}, {tweet.AccountBalance});";
-      
-      return insert;
-    }
-
     public async Task<bool> InsertTweetAsync(Tweet tweet, string streamName)
     {
-      var insert = CreateInsertTweetStatement(tweet, streamName);
-      
-      KSqlDbStatement ksqlDbStatement = new(insert);
+      var insertProperties = new InsertProperties()
+      {
+        EntityName = streamName,
+        ShouldPluralizeEntityName = false,
+        FormatDoubleValue = value => value.ToString("E1", CultureInfo.InvariantCulture),
+        FormatDecimalValue = value => value.ToString(CultureInfo.CreateSpecificCulture("en-GB"))
+      };
 
-      var result = await restApiProvider.ExecuteStatementAsync(ksqlDbStatement);
+      var result = await restApiProvider.InsertIntoAsync(tweet, insertProperties); 
 
       return result.IsSuccess();
     }

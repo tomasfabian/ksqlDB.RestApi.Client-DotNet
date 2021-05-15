@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
 
@@ -33,10 +35,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
 
         var type = GetMemberType<T>(memberInfo);
 
-        var value = entity.GetType().GetProperty(memberInfo.Name)?.GetValue(entity);
-
-        if (type == typeof(string))
-          value = $"'{value}'";
+        var value = ExtractValue(entity, insertProperties, memberInfo, type);
 
         valuesStringBuilder.Append(value);
       }
@@ -45,6 +44,30 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
         $"INSERT INTO {entityName} ({columnsStringBuilder}) VALUES ({valuesStringBuilder});";
 			
       return insert;
+    }
+
+    private static object? ExtractValue<T>(T entity, InsertProperties insertProperties, MemberInfo memberInfo, Type type)
+    {
+      var value = entity.GetType().GetProperty(memberInfo.Name)?.GetValue(entity);
+
+      if (type == typeof(string))
+        value = $"'{value}'";
+
+      if (type == typeof(decimal) && insertProperties.FormatDecimalValue != null)
+      {
+        Debug.Assert(value != null, nameof(value) + " != null");
+
+        value = insertProperties.FormatDecimalValue((decimal) value);
+      }
+
+      if (type == typeof(double) && insertProperties.FormatDoubleValue != null)
+      {
+        Debug.Assert(value != null, nameof(value) + " != null");
+
+        value = insertProperties.FormatDoubleValue((double) value);
+      }
+
+      return value;
     }
   }
 }
