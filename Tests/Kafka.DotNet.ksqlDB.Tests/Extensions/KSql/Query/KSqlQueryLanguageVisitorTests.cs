@@ -251,6 +251,23 @@ WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;";
 
       //Assert
       string expectedKsql =
+        @$"SELECT * FROM {queryContext.FromItemName}s EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void InjectStreamName_ShouldNotPluralizeStreamName_BuildKSql_PrintsInjectedStreamName()
+    {
+      //Arrange
+      var query = CreateStreamSource(shouldPluralizeStreamName: false);
+      queryContext.FromItemName = "Custom_Stream_Name";
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
         @$"SELECT * FROM {queryContext.FromItemName} EMIT CHANGES;";
 
       ksql.Should().BeEquivalentTo(expectedKsql);

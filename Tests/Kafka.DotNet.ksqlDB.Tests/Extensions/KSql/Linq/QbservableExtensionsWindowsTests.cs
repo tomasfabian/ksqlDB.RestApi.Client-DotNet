@@ -2,6 +2,7 @@
 using System.Linq;
 using FluentAssertions;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.Query.Windows;
 using Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.Tests.Helpers;
@@ -161,7 +162,12 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Linq
     public void QueriesFromSameCreateStreamSetShouldNotAffectEachOther()
     {
       //Arrange
-      var context = new TransactionsDbProvider(TestParameters.KsqlDBUrl);
+      var options = new KSqlDBContextOptions(TestParameters.KsqlDBUrl)
+      {
+        ShouldPluralizeFromItemName = false
+      };
+
+      var context = new TransactionsDbProvider(options);
 
       var grouping1 = context.CreateQueryStream<Transaction>("authorization_attempts_1")
         .GroupBy(c => c.CardNumber)
@@ -187,6 +193,11 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Linq
     class TransactionsDbProvider : TestableDbProvider<Transaction>
     {
       public TransactionsDbProvider(string ksqlDbUrl) : base(ksqlDbUrl)
+      {
+        RegisterKSqlQueryGenerator = false;
+      }
+
+      public TransactionsDbProvider(KSqlDBContextOptions contextOptions) : base(contextOptions)
       {
         RegisterKSqlQueryGenerator = false;
       }

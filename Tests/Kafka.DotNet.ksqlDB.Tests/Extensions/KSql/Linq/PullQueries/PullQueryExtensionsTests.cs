@@ -68,7 +68,7 @@ WHERE SensorId = '{sensorId}';");
       ksql1.Should().BeEquivalentTo(ksql2);
     }
 
-    private const string MaterializedViewName = "TestView";
+    private const string MaterializedViewName = "TestViews";
 
     [TestMethod]
     public void CreatePullQuery_TableNameWasOverriden()

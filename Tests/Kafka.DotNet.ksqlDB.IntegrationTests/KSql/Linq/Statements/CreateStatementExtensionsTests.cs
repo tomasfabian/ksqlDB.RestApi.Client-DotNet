@@ -33,7 +33,7 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq.Statements
 
       //Assert
       ksql1.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
-AS SELECT * FROM {nameof(Movie)}s EMIT CHANGES;");
+AS SELECT * FROM {nameof(Movie)} EMIT CHANGES;");
 
       ksql1.Should().BeEquivalentTo(ksql2);
     }
@@ -64,7 +64,7 @@ AS SELECT * FROM {nameof(Movie)}s EMIT CHANGES;");
       //Assert
       ksql.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
  WITH ( KAFKA_TOPIC='tweetsByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
-AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
+AS SELECT Title, Release_Year AS ReleaseYear FROM Movie
 WHERE Id < 3 PARTITION BY Title EMIT CHANGES;");
     }
 
@@ -75,7 +75,7 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;");
     {
       //Arrange
       var query = Context.CreateOrReplaceTableStatement(TableName)
-        .As<Movie>();
+        .As<Movie>("Movies");
 
       //Act
       var httpResponseMessage = await query.ExecuteStatementAsync();

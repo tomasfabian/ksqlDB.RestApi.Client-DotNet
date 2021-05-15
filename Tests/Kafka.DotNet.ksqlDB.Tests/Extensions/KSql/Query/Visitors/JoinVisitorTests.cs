@@ -30,6 +30,40 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
     public void Join_BuildKSql_PrintsInnerJoin()
     {
       //Arrange
+      var joinItemName = "LeadActor";
+
+      var query = KSqlDBContext.CreateQueryStream<Movie>()
+        .Join(
+          Source.Of<Lead_Actor>(joinItemName),
+          movie => movie.Title,
+          actor => actor.Title,
+          (movie, actor) => new
+          {
+            movie.Id,
+            movie.Title,
+            movie.Release_Year,
+            ActorName = K.Functions.Trim(actor.Actor_Name),
+            UpperActorName = actor.Actor_Name.ToUpper(),
+            ActorTitle = actor.Title
+          }
+        );
+
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      var expectedQuery = @$"SELECT M.Id Id, M.Title Title, M.Release_Year Release_Year, TRIM(L.Actor_Name) ActorName, UCASE(L.Actor_Name) UpperActorName, L.Title AS ActorTitle FROM Movies M
+INNER JOIN {joinItemName}s L
+ON M.Title = L.Title
+ EMIT CHANGES;";
+      
+      ksql.Should().Be(expectedQuery);
+    }
+
+    [TestMethod]
+    public void Join_BuildKSql_PrintsInnerJoin_PluralizedJoinItem()
+    {
+      //Arrange
       var query = KSqlDBContext.CreateQueryStream<Movie>()
         .Join(
           Source.Of<Lead_Actor>(),

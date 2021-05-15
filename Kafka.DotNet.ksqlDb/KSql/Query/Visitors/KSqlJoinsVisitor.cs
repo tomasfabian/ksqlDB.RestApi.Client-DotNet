@@ -101,7 +101,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
       {
         fromItemName = constantExpression.Type.GenericTypeArguments[0].Name;
 
-        fromItemName = source?.QueryContext?.FromItemName ?? InterceptFromItemName(fromItemName);
+        fromItemName = source?.QueryContext?.FromItemName ?? fromItemName;
+
+        fromItemName = InterceptFromItemName(fromItemName);
       }
 
       return constantExpression;

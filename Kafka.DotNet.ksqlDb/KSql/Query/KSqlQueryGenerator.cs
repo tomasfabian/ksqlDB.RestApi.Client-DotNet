@@ -35,7 +35,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
 
       Visit(expression);
       
-      string finalFromItemName = queryContext.FromItemName ?? InterceptFromItemName(fromItemName);
+      string finalFromItemName = InterceptFromItemName(queryContext.FromItemName ?? fromItemName);
 
       if (joinTables.Any())
       {

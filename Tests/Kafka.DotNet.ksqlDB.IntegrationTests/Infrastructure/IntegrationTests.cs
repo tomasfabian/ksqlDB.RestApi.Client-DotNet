@@ -22,7 +22,10 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
     {
       base.TestInitialize();
 
-      ContextOptions = new KSqlDBContextOptions(KSqlDbRestApiProvider.KsqlDbUrl);
+      ContextOptions = new KSqlDBContextOptions(KSqlDbRestApiProvider.KsqlDbUrl)
+      {
+        ShouldPluralizeFromItemName = false
+      };
       
       Context = new KSqlDBContext(ContextOptions);
     }
