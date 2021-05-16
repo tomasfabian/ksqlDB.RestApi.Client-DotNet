@@ -1,3 +1,36 @@
+# v1.0.0-rc.1
+- [Insert Values](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/README.md#insert-into-v100) - Produce a row into an existing stream or table
+
+**Breaking changes.** In order to improve the v1.0 release the following methods and properties were renamed:
+
+IKSqlDbRestApiClient interface:
+```
+| v.0.11.0                      | v1.0.0                        |
+|-----------------------------------------------------------|---|
+| CreateTable<T>                | CreateTableAsync<T>           |
+| CreateStream<T>               | CreateStreamAsync<T>          |
+| CreateOrReplaceTable<T>       | CreateOrReplaceTableAsync<T>  |
+| CreateOrReplaceStream<T>      | CreateOrReplaceStreamAsync<T> |
+```
+
+KSQL documentation refers to stream or table name in FROM as [from_item](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/)
+
+```
+IKSqlDBContext.CreateQuery<TEntity>(string streamName = null)
+IKSqlDBContext.CreateQueryStream<TEntity>(string streamName = null)
+```
+streamName parameters were renamed:
+```
+IKSqlDBContext.CreateQuery<TEntity>(string fromItemName = null)
+IKSqlDBContext.CreateQueryStream<TEntity>(string fromItemName = null)
+
+QueryContext.StreamName was renamed QueryContext.FromItemName
+Source.Of parameter streamName was renamed to fromItemName
+KSqlDBContextOptions.ShouldPluralizeStreamName was renamed to ShouldPluralizeFromItemName
+```
+
+- From version 1.0.0 the overriden from item names are pluralized, too. Join items are also affected by this breaking change.
+
 # v0.11.0
 - [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/) - fluent API
 - [CREATE TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table/) - fluent API
@@ -149,37 +182,6 @@ Fixes:
 - KStreamSet, KQuerySet, KQueryStreamSet
 - QbservableProvider
 - ```KSqldbProvider<T>``` - ksqldb REST api provider for push queries (```KSqlDbQueryProvider<T>```, ```KSqlDbQueryStreamProvider<T>```)
-
-# v1.0.0-rc.1
-- [Insert Values](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/README.md#insert-into-v100) - Produce a row into an existing stream or table
-
-**Breaking changes.** In order to improve the v1.0 release the following methods and properties were renamed:
-
-IKSqlDbRestApiClient interface:
-```
-| v.0.11.0                      | v1.0.0                        |
-|-----------------------------------------------------------|---|
-| CreateTable<T>                | CreateTableAsync<T>           |
-| CreateStream<T>               | CreateStreamAsync<T>          |
-| CreateOrReplaceTable<T>       | CreateOrReplaceTableAsync<T>  |
-| CreateOrReplaceStream<T>      | CreateOrReplaceStreamAsync<T> |
-```
-
-KSQL documentation refers to stream or table name in FROM as [from_item](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/)
-
-```
-IKSqlDBContext.CreateQuery<TEntity>(string streamName = null)
-IKSqlDBContext.CreateQueryStream<TEntity>(string streamName = null)
-```
-streamName parameters were renamed:
-```
-IKSqlDBContext.CreateQuery<TEntity>(string fromItemName = null)
-IKSqlDBContext.CreateQueryStream<TEntity>(string fromItemName = null)
-
-QueryContext.StreamName was renamed QueryContext.FromItemName
-Source.Of parameter streamName was renamed to fromItemName
-KSqlDBContextOptions.ShouldPluralizeStreamName was renamed to ShouldPluralizeFromItemName
-```
 
 # TODO:
 - missing scalar functions https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#date-and-time

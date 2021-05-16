@@ -1298,14 +1298,14 @@ Executes arbitrary [statements](https://docs.ksqldb.io/en/latest/developer-guide
 ```C#
 async Task<HttpResponseMessage> ExecuteAsync(string statement)
 {
-	KSqlDbStatement ksqlDbStatement = new(statement);
+  KSqlDbStatement ksqlDbStatement = new(statement);
 
-	var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement)
-		.ConfigureAwait(false);
+  var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement)
+    .ConfigureAwait(false);
 
-	string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
+  string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
 
-	return httpResponseMessage;
+  return httpResponseMessage;
 }
 ```
 
@@ -1555,14 +1555,52 @@ var movie = new Movie() { Id = 1, Release_Year = 1988, Title = "Title" };
 var response = await restApiClient.InsertIntoAsync(movie);
 ```
 
+Properties and fields decorated with the IgnoreByInsertsAttribute are not part of the insert statements:
+```C#
+public class Movie
+{
+  [Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.Key]
+  public int Id { get; set; }
+  public string Title { get; set; }
+  public int Release_Year { get; set; }
+	
+  [Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.IgnoreByInserts]
+  public int IgnoredProperty { get; set; }
+}
+```
+
 Generated KSQL:
 ```KSQL
 INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);
 ```
 
-**Breaking changes.** In order to improve the v1.0 release the following methods and properties were renamed:
+### Insert values - FormatDoubleValue and FormatDecimalValue
+```C#
+var insertProperties = new InsertProperties()
+{
+  FormatDoubleValue = value => value.ToString("E1", CultureInfo.InvariantCulture),
+  FormatDecimalValue = value => value.ToString(CultureInfo.CreateSpecificCulture("en-GB"))
+};
 
-IKSqlDbRestApiClient interface:
+public static readonly Tweet Tweet1 = new()
+{
+  Id = 1,
+  Amount = 0.00042, 
+  AccountBalance = 533333333421.6332M
+};
+
+await restApiProvider.InsertIntoAsync(tweet, insertProperties);
+```
+
+Generated KSQL statement:
+```KSQL
+INSERT INTO tweetsTest (Id, Amount, AccountBalance) VALUES (1, 4.2E-004, 533333333421.6332);
+```
+
+# **Breaking changes.**
+In order to improve the v1.0.0 release the following methods and properties were renamed:
+
+IKSqlDbRestApiClient interface changes:
 ```
 | v.0.11.0                      | v1.0.0                        |
 |---------------------------------------------------------------|
@@ -1578,17 +1616,42 @@ KSQL documentation refers to stream or table name in FROM as [from_item](https:/
 IKSqlDBContext.CreateQuery<TEntity>(string streamName = null)
 IKSqlDBContext.CreateQueryStream<TEntity>(string streamName = null)
 ```
-streamName parameters were renamed:
+streamName parameters were renamed to fromItemName:
 ```
 IKSqlDBContext.CreateQuery<TEntity>(string fromItemName = null)
 IKSqlDBContext.CreateQueryStream<TEntity>(string fromItemName = null)
-
+```
+```
 QueryContext.StreamName property was renamed to QueryContext.FromItemName
 Source.Of parameter streamName was renamed to fromItemName
 KSqlDBContextOptions.ShouldPluralizeStreamName was renamed to ShouldPluralizeFromItemName
 ```
 
-Record.RowTime was decorated with IgnoreAttribute
+Record.RowTime was decorated with IgnoreByInsertsAttribute
+
+
+### From version 1.0.0 the overriden from item names are pluralized, too. Join items are also affected by this breaking change:
+```
+var contextOptions = new KSqlDBContextOptions(@"http:\\localhost:8088")
+{
+  //Default value:  
+  //ShouldPluralizeFromItemName = true
+};
+
+var query = new KSqlDBContext(contextOptions)
+  .CreateQueryStream<Tweet>("Tweet")
+  .ToQueryString();
+```
+
+KSQL generated since v 1.0
+```KSQL
+SELECT * FROM Tweets EMIT CHANGES;
+```
+
+KSQL generated before v 1.0
+```KSQL
+SELECT * FROM Tweet EMIT CHANGES;
+```
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/Joker/blob/master/Samples/Kafka/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
