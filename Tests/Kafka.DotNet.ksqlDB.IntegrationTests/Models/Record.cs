@@ -4,7 +4,7 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.Models
 {
   public record Record
   {
-    [Ignore]
+    [IgnoreByInserts]
     public long RowTime { get; set; }
   }
 }

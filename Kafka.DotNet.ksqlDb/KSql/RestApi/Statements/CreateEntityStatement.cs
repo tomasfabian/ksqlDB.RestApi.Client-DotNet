@@ -21,7 +21,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
         .Where(c => c.CanWrite).OfType<MemberInfo>()
         .Concat(fields);
       
-      return properties.Where(c => !c.GetCustomAttributes().OfType<IgnoreAttribute>().Any());
+      return properties.Where(c => !c.GetCustomAttributes().OfType<IgnoreByInsertsAttribute>().Any());
     }
 
     protected string GetEntityName<T>(IEntityCreationProperties metadata)

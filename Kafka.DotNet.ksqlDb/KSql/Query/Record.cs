@@ -4,7 +4,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
 {
   public class Record
   {
-    [Ignore]
+    [IgnoreByInserts]
     public long RowTime { get; set; }
   }
 }
