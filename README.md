@@ -27,18 +27,33 @@ Console.WriteLine("Press any key to stop the subscription");
 Console.ReadKey();
 ```
 
-In the above mentioned code snippet everything runs server side except of the ``` IQbservable<TEntity>.Subscribe``` method. It subscribes to your ksqlDB stream created in the following manner:
-```SQL
-CREATE STREAM tweets(id INT, message VARCHAR)
-  WITH (kafka_topic='tweetsTopic', value_format='JSON', partitions=1);
-```
-
 LINQ code written in C# from the sample is equivalent to this ksql query:
 ```SQL
 SELECT Message, Id FROM Tweets
 WHERE Message != 'Hello world' OR Id = 1 
 EMIT CHANGES 
 LIMIT 2;
+```
+
+In the above mentioned code snippet everything runs server side except of the ``` IQbservable<TEntity>.Subscribe``` method. It subscribes to your ksqlDB stream created in the following manner:
+```C#
+EntityCreationMetadata metadata = new()
+{
+  KafkaTopic = nameof(Tweet),
+  Partitions = 1,
+  Replicas = 1
+};
+
+var httpClientFactory = new HttpClientFactory(new Uri(@"http:\\localhost:8088"));
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+      
+var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<Tweet>(metadata);
+```
+```SQL
+CREATE STREAM IF NOT EXISTS Tweets (
+	Id INT,
+	Message VARCHAR
+) WITH ( KAFKA_TOPIC='Tweet', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );
 ```
 
 Run the following insert statements to stream some messages with your ksqldb-cli
@@ -49,15 +64,32 @@ docker exec -it $(docker ps -q -f name=ksqldb-cli) ksql http://localhost:8088
 INSERT INTO tweets (id, message) VALUES (1, 'Hello world');
 INSERT INTO tweets (id, message) VALUES (2, 'ksqlDB rulez!');
 ```
-Sample project can be found under [Examples/Kafka](https://github.com/tomasfabian/Joker/tree/master/Samples/Kafka/Kafka.DotNet.ksqlDB.Sample) solution folder in Joker.sln or Joker.DotNet5.sln 
 
+or insert a record from C#:
+```C#
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
+var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
+  .InsertIntoAsync(new Tweet { Id = 2, Message = "ksqlDB rulez!" });
+```
+
+Sample project can be found under [Samples](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.Sample) solution folder in Kafka.DotNet.ksqlDb.sln 
 
 
 **External dependencies:**
 - [kafka broker](https://kafka.apache.org/intro) and [ksqlDB-server](https://ksqldb.io/overview.html) 0.14.0
 
+Clone the repository
+```
+git clone https://github.com/tomasfabian/Kafka.DotNet.ksqlDB.git
+```
 
-CD to [Examples/Kafka](https://github.com/tomasfabian/Joker/tree/master/Samples/Kafka/Kafka.DotNet.ksqlDB.Sample)
+CD to [Samples](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.Sample)
+```
+CD Samples\Kafka.DotNet.ksqlDB.Sample\
+```
 
 run in command line:
 
@@ -1654,9 +1686,9 @@ SELECT * FROM Tweet EMIT CHANGES;
 ```
 
 # LinqPad samples
-[Push Query](https://github.com/tomasfabian/Joker/blob/master/Samples/Kafka/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
+[Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
 
-[Pull Query](https://github.com/tomasfabian/Joker/blob/master/Samples/Kafka/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.pull-query.linq)
+[Pull Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.pull-query.linq)
 
 # Nuget
 https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
