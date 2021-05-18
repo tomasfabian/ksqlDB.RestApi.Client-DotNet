@@ -525,42 +525,42 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
     #region EarliestByOffset
 
     /// <summary>
-    /// Return the earliest value for the specified column. The earliest value in the partition
+    /// Return the earliest value for the specified column. The earliest value in the partition. Null values are ignored.
     /// has the lowest offset.
     /// </summary>
     /// <param name="selector"></param>
     /// <returns></returns>
     string EarliestByOffset(Func<TSource, string> selector);
     /// <summary>
-    /// Return the earliest value for the specified column. The earliest value in the partition
+    /// Return the earliest value for the specified column. The earliest value in the partition. Null values are ignored.
     /// has the lowest offset.
     /// </summary>
     /// <param name="selector"></param>
     /// <returns></returns>
     int EarliestByOffset(Func<TSource, int> selector);
     /// <summary>
-    /// Return the earliest value for the specified column. The earliest value in the partition
+    /// Return the earliest value for the specified column. The earliest value in the partition. Null values are ignored.
     /// has the lowest offset.
     /// </summary>
     /// <param name="selector"></param>
     /// <returns></returns>
     long EarliestByOffset(Func<TSource, long> selector);
     /// <summary>
-    /// Return the earliest value for the specified column. The earliest value in the partition
+    /// Return the earliest value for the specified column. The earliest value in the partition. Null values are ignored.
     /// has the lowest offset.
     /// </summary>
     /// <param name="selector"></param>
     /// <returns></returns>
     float EarliestByOffset(Func<TSource, float> selector);
     /// <summary>
-    /// Return the earliest value for the specified column. The earliest value in the partition
+    /// Return the earliest value for the specified column. The earliest value in the partition. Null values are ignored.
     /// has the lowest offset.
     /// </summary>
     /// <param name="selector"></param>
     /// <returns></returns>
     double EarliestByOffset(Func<TSource, double> selector);
     /// <summary>
-    /// Return the earliest value for the specified column. The earliest value in the partition
+    /// Return the earliest value for the specified column. The earliest value in the partition. Null values are ignored.
     /// has the lowest offset.
     /// </summary>
     /// <param name="selector"></param>
@@ -569,66 +569,180 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
 
     #endregion
 
+    #region EarliestByOffsetAllowNulls
+
+    /// <summary>
+    /// Return the earliest value for the specified column. The earliest value in the partition. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <returns></returns>
     string EarliestByOffsetAllowNulls(Func<TSource, string> selector);
+    /// <summary>
+    /// Return the earliest value for the specified column. The earliest value in the partition. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <returns></returns>
     int? EarliestByOffsetAllowNulls(Func<TSource, int?> selector);
+    /// <summary>
+    /// Return the earliest value for the specified column. The earliest value in the partition. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <returns></returns>
     long? EarliestByOffsetAllowNulls(Func<TSource, long?> selector);
+    /// <summary>
+    /// Return the earliest value for the specified column. The earliest value in the partition. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <returns></returns>
     float? EarliestByOffsetAllowNulls(Func<TSource, float?> selector);
+    /// <summary>
+    /// Return the earliest value for the specified column. The earliest value in the partition. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <returns></returns>
     double? EarliestByOffsetAllowNulls(Func<TSource, double?> selector);
+    /// <summary>
+    /// Return the earliest value for the specified column. The earliest value in the partition. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <returns></returns>
     decimal? EarliestByOffsetAllowNulls(Func<TSource, decimal?> selector);
 
+    #endregion
+
+    #region EarliestByOffset
+
+    /// <summary>
+    /// Return the earliest N values for the specified column as an ARRAY. The earliest values in the partition have the lowest offsets. Null values are ignored.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="earliestN"></param>
+    /// <returns></returns>
     string[] EarliestByOffset(Func<TSource, string> selector, int earliestN);
+    /// <summary>
+    /// Return the earliest N values for the specified column as an ARRAY. The earliest values in the partition have the lowest offsets. Null values are ignored.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="earliestN"></param>
+    /// <returns></returns>
     int[] EarliestByOffset(Func<TSource, int> selector, int earliestN);
+    /// <summary>
+    /// Return the earliest N values for the specified column as an ARRAY. The earliest values in the partition have the lowest offsets. Null values are ignored.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="earliestN"></param>
+    /// <returns></returns>
     long[] EarliestByOffset(Func<TSource, long> selector, int earliestN);
+    /// <summary>
+    /// Return the earliest N values for the specified column as an ARRAY. The earliest values in the partition have the lowest offsets. Null values are ignored.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="earliestN"></param>
+    /// <returns></returns>
     float[] EarliestByOffset(Func<TSource, float> selector, int earliestN);
+    /// <summary>
+    /// Return the earliest N values for the specified column as an ARRAY. The earliest values in the partition have the lowest offsets. Null values are ignored.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="earliestN"></param>
+    /// <returns></returns>
     double[] EarliestByOffset(Func<TSource, double> selector, int earliestN);
+    /// <summary>
+    /// Return the earliest N values for the specified column as an ARRAY. The earliest values in the partition have the lowest offsets. Null values are ignored.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="earliestN"></param>
+    /// <returns></returns>
     decimal[] EarliestByOffset(Func<TSource, decimal> selector, int earliestN);
 
+    #endregion
+
+    #region EarliestByOffsetAllowNulls
+
+    /// <summary>
+    /// Return the earliest N values for the specified column as an ARRAY. The earliest values in the partition have the lowest offsets. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="earliestN"></param>
+    /// <returns></returns>
     string[] EarliestByOffsetAllowNulls(Func<TSource, string> selector, int earliestN);
+    /// <summary>
+    /// Return the earliest N values for the specified column as an ARRAY. The earliest values in the partition have the lowest offsets. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="earliestN"></param>
+    /// <returns></returns>
     int?[] EarliestByOffsetAllowNulls(Func<TSource, int?> selector, int earliestN);
+    /// <summary>
+    /// Return the earliest N values for the specified column as an ARRAY. The earliest values in the partition have the lowest offsets. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="earliestN"></param>
+    /// <returns></returns>
     long?[] EarliestByOffsetAllowNulls(Func<TSource, long?> selector, int earliestN);
+    /// <summary>
+    /// Return the earliest N values for the specified column as an ARRAY. The earliest values in the partition have the lowest offsets. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="earliestN"></param>
+    /// <returns></returns>
     float?[] EarliestByOffsetAllowNulls(Func<TSource, float?> selector, int earliestN);
+    /// <summary>
+    /// Return the earliest N values for the specified column as an ARRAY. The earliest values in the partition have the lowest offsets. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="earliestN"></param>
+    /// <returns></returns>
     double?[] EarliestByOffsetAllowNulls(Func<TSource, double?> selector, int earliestN);
+    /// <summary>
+    /// Return the earliest N values for the specified column as an ARRAY. The earliest values in the partition have the lowest offsets. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="earliestN"></param>
+    /// <returns></returns>
     decimal?[] EarliestByOffsetAllowNulls(Func<TSource, decimal?> selector, int earliestN);
+
+    #endregion
 
     #region LatestByOffset
 
     /// <summary>
-    /// Return the latest value for the specified column. The latest value in the partition
+    /// Return the latest value for the specified column. The latest value in the partition. Null values are ignored.
     /// has the largest offset.
     /// </summary>
     /// <param name="selector"></param>
     /// <returns></returns>
     string LatestByOffset(Func<TSource, string> selector);
     /// <summary>
-    /// Return the latest value for the specified column. The latest value in the partition
+    /// Return the latest value for the specified column. The latest value in the partition. Null values are ignored.
     /// has the largest offset.
     /// </summary>
     /// <param name="selector"></param>
     /// <returns></returns>
     int LatestByOffset(Func<TSource, int> selector);
     /// <summary>
-    /// Return the latest value for the specified column. The latest value in the partition
+    /// Return the latest value for the specified column. The latest value in the partition. Null values are ignored.
     /// has the largest offset.
     /// </summary>
     /// <param name="selector"></param>
     /// <returns></returns>
     long LatestByOffset(Func<TSource, long> selector);
     /// <summary>
-    /// Return the latest value for the specified column. The latest value in the partition
+    /// Return the latest value for the specified column. The latest value in the partition. Null values are ignored.
     /// has the largest offset.
     /// </summary>
     /// <param name="selector"></param>
     /// <returns></returns>
     float LatestByOffset(Func<TSource, float> selector);
     /// <summary>
-    /// Return the latest value for the specified column. The latest value in the partition
+    /// Return the latest value for the specified column. The latest value in the partition. Null values are ignored.
     /// has the largest offset.
     /// </summary>
     /// <param name="selector"></param>
     /// <returns></returns>
     double LatestByOffset(Func<TSource, double> selector);
     /// <summary>
-    /// Return the latest value for the specified column. The latest value in the partition
+    /// Return the latest value for the specified column. The latest value in the partition. Null values are ignored.
     /// has the largest offset.
     /// </summary>
     /// <param name="selector"></param>
@@ -637,25 +751,146 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
 
     #endregion
 
+    #region LatestByOffsetAllowNulls
+
+    /// <summary>
+    /// Return the latest value for the specified column. The latest value in the partition. Includes NULL values.
+    /// has the largest offset.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <returns></returns>
     string LatestByOffsetAllowNulls(Func<TSource, string> selector);
-    int? LatestByOffsetAllowNulls(Func<TSource, int?> selector);
-    long? LatestByOffsetAllowNulls(Func<TSource, long?> selector);
-    float? LatestByOffsetAllowNulls(Func<TSource, float?> selector);
-    double? LatestByOffsetAllowNulls(Func<TSource, double?> selector);
+        
+    /// <summary>
+    /// Return the latest value for the specified column. The latest value in the partition. Includes NULL values.
+    /// has the largest offset.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <returns></returns>
+    int? LatestByOffsetAllowNulls(Func<TSource, int?> selector);    
+    /// <summary>
+    /// Return the latest value for the specified column. The latest value in the partition. Includes NULL values.
+    /// has the largest offset.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <returns></returns>
+    long? LatestByOffsetAllowNulls(Func<TSource, long?> selector);    
+    /// <summary>
+    /// Return the latest value for the specified column. The latest value in the partition. Includes NULL values.
+    /// has the largest offset.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <returns></returns>
+    float? LatestByOffsetAllowNulls(Func<TSource, float?> selector);    
+    /// <summary>
+    /// Return the latest value for the specified column. The latest value in the partition. Includes NULL values.
+    /// has the largest offset.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <returns></returns>
+    double? LatestByOffsetAllowNulls(Func<TSource, double?> selector);    
+    /// <summary>
+    /// Return the latest value for the specified column. The latest value in the partition. Includes NULL values.
+    /// has the largest offset.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <returns></returns>
     decimal? LatestByOffsetAllowNulls(Func<TSource, decimal?> selector);
 
+    #endregion
+
+    #region LatestByOffset
+
+    /// <summary>
+    /// Returns the latest N values for the specified column as an ARRAY. The latest values have the largest offset. Null values are ignored.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="latestN"></param>
+    /// <returns></returns>
     string[] LatestByOffset(Func<TSource, string> selector, int latestN);
+    /// <summary>
+    /// Returns the latest N values for the specified column as an ARRAY. The latest values have the largest offset. Null values are ignored.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="latestN"></param>
+    /// <returns></returns>
     int[] LatestByOffset(Func<TSource, int> selector, int latestN);
+    /// <summary>
+    /// Returns the latest N values for the specified column as an ARRAY. The latest values have the largest offset. Null values are ignored.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="latestN"></param>
+    /// <returns></returns>
     long[] LatestByOffset(Func<TSource, long> selector, int latestN);
+    /// <summary>
+    /// Returns the latest N values for the specified column as an ARRAY. The latest values have the largest offset. Null values are ignored.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="latestN"></param>
+    /// <returns></returns>
     float[] LatestByOffset(Func<TSource, float> selector, int latestN);
+    /// <summary>
+    /// Returns the latest N values for the specified column as an ARRAY. The latest values have the largest offset. Null values are ignored.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="latestN"></param>
+    /// <returns></returns>
     double[] LatestByOffset(Func<TSource, double> selector, int latestN);
+    /// <summary>
+    /// Returns the latest N values for the specified column as an ARRAY. The latest values have the largest offset. Null values are ignored.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="latestN"></param>
+    /// <returns></returns>
     decimal[] LatestByOffset(Func<TSource, decimal> selector, int latestN);
 
-    string[] LatestByOffsetAllowNulls(Func<TSource, string> selector, int latestN);
-    int?[] LatestByOffsetAllowNulls(Func<TSource, int?> selector, int latestN);
-    long?[] LatestByOffsetAllowNulls(Func<TSource, long?> selector, int latestN);
-    float?[] LatestByOffsetAllowNulls(Func<TSource, float?> selector, int latestN);
-    double?[] LatestByOffsetAllowNulls(Func<TSource, double?> selector, int latestN);
+    #endregion
+
+    #region LatestByOffsetAllowNulls
+    
+    /// <summary>
+    /// Returns the latest N values for the specified column as an ARRAY. The latest values have the largest offset. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="latestN"></param>
+    /// <returns></returns>
+    string[] LatestByOffsetAllowNulls(Func<TSource, string> selector, int latestN);    
+    /// <summary>
+    /// Returns the latest N values for the specified column as an ARRAY. The latest values have the largest offset. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="latestN"></param>
+    /// <returns></returns>
+    int?[] LatestByOffsetAllowNulls(Func<TSource, int?> selector, int latestN);    
+    /// <summary>
+    /// Returns the latest N values for the specified column as an ARRAY. The latest values have the largest offset. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="latestN"></param>
+    /// <returns></returns>
+    long?[] LatestByOffsetAllowNulls(Func<TSource, long?> selector, int latestN);    
+    /// <summary>
+    /// Returns the latest N values for the specified column as an ARRAY. The latest values have the largest offset. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="latestN"></param>
+    /// <returns></returns>
+    float?[] LatestByOffsetAllowNulls(Func<TSource, float?> selector, int latestN);    
+    /// <summary>
+    /// Returns the latest N values for the specified column as an ARRAY. The latest values have the largest offset. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="latestN"></param>
+    /// <returns></returns>
+    double?[] LatestByOffsetAllowNulls(Func<TSource, double?> selector, int latestN);    
+    /// <summary>
+    /// Returns the latest N values for the specified column as an ARRAY. The latest values have the largest offset. Includes NULL values.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <param name="latestN"></param>
+    /// <returns></returns>
     decimal?[] LatestByOffsetAllowNulls(Func<TSource, decimal?> selector, int latestN);
+
+    #endregion
   }
 }
