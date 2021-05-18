@@ -1,5 +1,8 @@
-# v1.0.0-rc.1
+﻿# v1.0.0
 - [Insert Values](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/README.md#insert-into-v100) - Produce a row into an existing stream or table
+
+Great news are that Confluent added this package to their [documentation](https://github.com/confluentinc/ksql/pull/7520/files) as a contributed .NET client, so before wider adoption I decided to improve the API at cost of some breaking changes.
+Except of one change all of them will be catched by the compiler. For more information see Wiki. 
 
 **Breaking changes.** In order to improve the v1.0 release the following methods and properties were renamed:
 
@@ -29,7 +32,8 @@ Source.Of parameter streamName was renamed to fromItemName
 KSqlDBContextOptions.ShouldPluralizeStreamName was renamed to ShouldPluralizeFromItemName
 ```
 
-- From version 1.0.0 the overriden from item names are pluralized, too. Join items are also affected by this breaking change.
+> ⚠ From version 1.0.0 the overriden from item names are pluralized, too. Join items are also affected by this breaking change.
+This breaking change can cause runtime exceptions for users updating from lower versions. In case that you have never used custom singular from-item names, your code won't be affected.
 
 # v0.11.0
 - [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/) - fluent API

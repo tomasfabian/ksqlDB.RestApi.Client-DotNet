@@ -518,7 +518,7 @@ INNER JOIN Lead_Actor L
 ON M.Title = L.Title
 EMIT CHANGES;
 ```
-` `
+
 > ⚠ There is a known limitation in the early access versions (bellow 1.0). 
 The Key column, in this case movie.Title, has to be aliased Title = movie.Title, otherwise the deserialization won't be able to map the unknown column name M_TITLE. 
 
@@ -1629,8 +1629,8 @@ KSqlDBContextOptions.ShouldPluralizeStreamName was renamed to ShouldPluralizeFro
 
 Record.RowTime was decorated with IgnoreByInsertsAttribute
 
-
-### From version 1.0.0 the overriden from item names are pluralized, too. Join items are also affected by this breaking change:
+> ⚠  From version 1.0.0 the overriden from item names are pluralized, too. 
+Join items are also affected by this breaking change. This breaking change can cause runtime exceptions for users updating from lower versions. In case that you have never used custom singular from-item names, your code won't be affected, see the example below:
 ```
 var contextOptions = new KSqlDBContextOptions(@"http:\\localhost:8088")
 {
@@ -1662,8 +1662,6 @@ SELECT * FROM Tweet EMIT CHANGES;
 https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
 
 **TODO:**
-- [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/)
-- [CREATE TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table/)
 - [CREATE STREAM AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream-as-select/) - [ WITHIN [(before TIMEUNIT, after TIMEUNIT) | N TIMEUNIT] ]
 - [CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/) - EMIT output_refinement
 - rest of the [ksql query syntax](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/) (supported operators etc)
