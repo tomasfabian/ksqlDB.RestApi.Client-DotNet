@@ -49,8 +49,10 @@ var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
       
 var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<Tweet>(metadata);
 ```
+
+CreateOrReplaceStreamAsync executes the following statement:
 ```SQL
-CREATE STREAM IF NOT EXISTS Tweets (
+CREATE OR REPLACE STREAM Tweets (
 	Id INT,
 	Message VARCHAR
 ) WITH ( KAFKA_TOPIC='Tweet', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );
