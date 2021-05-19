@@ -48,6 +48,40 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq.PullQueries
     }
 
     [TestMethod]
+    public async Task SelectSingleColumn()
+    {
+      //Arrange
+      string sensorId = "sensor-1";
+
+      //Act
+      var result = await context.CreatePullQuery<IoTSensorStats>(SensorsPullQueryProvider.MaterializedViewName)
+        .Where(c => c.SensorId == sensorId)
+        .Select(c => c.SensorId)
+        .GetAsync();
+      
+      //Assert
+      result.Should().NotBeNull();
+      result.Should().Be(sensorId);
+    }
+
+    [TestMethod]
+    public async Task SelectColumns()
+    {
+      //Arrange
+      string sensorId = "sensor-1";
+
+      //Act
+      var result = await context.CreatePullQuery<IoTSensorStats>(SensorsPullQueryProvider.MaterializedViewName)
+        .Where(c => c.SensorId == sensorId)
+        .Select(c => new { c.SensorId, Start = c.WindowStart })
+        .GetAsync();
+      
+      //Assert
+      result.Start.Should().NotBe(null);
+      result.SensorId.Should().Be(sensorId);
+    }
+
+    [TestMethod]
     public async Task CreatePullQuery_WithBounds()
     {
       //Arrange

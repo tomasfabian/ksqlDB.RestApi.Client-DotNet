@@ -50,6 +50,23 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Linq.PullQueries
     }
 
     [TestMethod]
+    public void SelectColumns()
+    {
+      //Arrange
+      string sensorId = "sensor-1";
+
+      //Act
+      var ksql = DbProvider.CreatePullQuery<IoTSensorStats>()
+        .Where(c => c.SensorId == sensorId)
+        .Select(c => new { c.SensorId, Avg = c.AvgValue })
+        .ToQueryString();
+      
+      //Assert
+      ksql.Should().BeEquivalentTo(@$"SELECT {nameof(IoTSensorStats.SensorId)}, AvgValue AS Avg FROM {nameof(IoTSensorStats)}
+WHERE SensorId = '{sensorId}';");
+    }
+
+    [TestMethod]
     public void CreatePullQuery_ToQueryString()
     {
       //Arrange
