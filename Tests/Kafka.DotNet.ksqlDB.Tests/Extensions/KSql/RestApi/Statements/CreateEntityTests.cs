@@ -66,7 +66,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
 
     private class Transaction
     {
-      [Decimal(2,3)]
+      [Decimal(3,2)]
       public decimal Amount { get; set; }
     }
 
@@ -85,7 +85,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
 
       //Assert
       statement.Should().Be(@"CREATE STREAM Transactions (
-	Amount DECIMAL(2,3)
+	Amount DECIMAL(3,2)
 ) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );");
     }
     

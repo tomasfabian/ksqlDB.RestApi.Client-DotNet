@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using Kafka.DotNet.ksqlDB.KSql.Query;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
 
 namespace Kafka.DotNet.ksqlDB.Sample.Models
 {
@@ -12,7 +13,8 @@ namespace Kafka.DotNet.ksqlDB.Sample.Models
 
     
     public double Amount { get; set; }
-
+    
+    [Decimal(3,2)]
     public decimal AccountBalance { get; set; }
   }
 }

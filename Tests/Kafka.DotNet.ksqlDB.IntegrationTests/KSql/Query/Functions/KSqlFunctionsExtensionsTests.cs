@@ -239,5 +239,24 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Query.Functions
       actualValues.Count.Should().Be(1);
       actualValues[0].Col.Length.Should().Be(1);
     }
+    
+    [TestMethod]
+    public async Task Concat()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+      string message = "_Hello";
+
+      //Act
+      var source = Context.CreateQuery<Movie>(MoviesTableName)
+        .Select(c => new { Col = K.Functions.Concat(c.Title, message) })
+        .ToAsyncEnumerable();
+      
+      var actualValues = await CollectActualValues(source, expectedItemsCount);
+      
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+      actualValues[0].Col.Should().Be($"{MoviesProvider.Movie1.Title}{message}");
+    }
   }
 }
