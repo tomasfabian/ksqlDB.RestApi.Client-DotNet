@@ -5,7 +5,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
 {
   public static class KSqlFunctionsExtensions
   {
-    private static string ServerSideOperationErrorMessage = "Operator is not intended for client side operations";
+    internal static string ServerSideOperationErrorMessage = "Operator is not intended for client side operations";
     
     public static object Dynamic(this KSqlFunctions kSqlFunctions, string functionCall)
     {
@@ -1315,6 +1315,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
     /// <param name="input">The string to trim</param>
     /// <returns>Trimmed string</returns>
     public static string Trim(this KSqlFunctions kSqlFunctions, string input)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Concatenate two or more string expressions. Any input strings which evaluate to NULL are replaced with empty string in the output.
+    /// </summary>
+    public static string Concat(this KSqlFunctions kSqlFunctions, params string[] input)
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
