@@ -21,6 +21,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
       (selectTSourceTResult ??= new Func<IQbservable<object>, Expression<Func<object, object>>, IQbservable<object>>(Select).GetMethodInfo().GetGenericMethodDefinition())
       .MakeGenericMethod(TSource, TResult);
 
+    /// <summary>
+    /// Projects each element of a stream into a new form.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements of source.</typeparam>
+    /// <typeparam name="TResult">The type of the value returned by selector.</typeparam>
+    /// <param name="source"></param>
+    /// <param name="selector">A transform function to apply to each source element.</param>
+    /// <returns></returns>
     public static IQbservable<TResult> Select<TSource, TResult>(this IQbservable<TSource> source, Expression<Func<TSource, TResult>> selector)
     {
       if (source == null)

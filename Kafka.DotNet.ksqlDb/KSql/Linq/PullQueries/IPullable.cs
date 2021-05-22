@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries
 {
+  /// <summary>
+  /// Execute a pull query by sending an HTTP request to the ksqlDB REST API, and the API responds with a single response.
+  /// </summary>
   public interface IPullable
   {
     /// <summary>
@@ -23,8 +26,17 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries
     IPullQueryProvider Provider { get; }
   }
 
+  /// <summary>
+  /// Execute a pull query by sending an HTTP request to the ksqlDB REST API, and the API responds with a single response.
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
   public interface IPullable<T> : IPullable
   { 
+    /// <summary>
+    /// Pulls the current value from the materialized table and terminates. 
+    /// </summary>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the asynchronous operation.</param>
+    /// <returns></returns>
     ValueTask<T> GetAsync(CancellationToken cancellationToken = default);
   }
 }
