@@ -4,8 +4,16 @@ using System.Collections.Generic;
 namespace Kafka.DotNet.ksqlDB.KSql.Linq
 {
   public interface IAggregations
-  { 
-    int Count();
+  {     
+    /// <summary>
+    /// The count returned will be the total number of rows.
+    /// </summary>
+    /// <returns></returns>
+    int Count(); 
+    /// <summary>
+    /// The count returned will be the total number of rows.
+    /// </summary>
+    /// <returns></returns>
     long LongCount();
   }
 
@@ -68,12 +76,40 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
     
 
     #endregion
-    
+
+    #region Count
+
+    /// <summary>
+    /// Count the number of rows. When col1 is specified, the count returned will be the number of rows where col1 is non-null.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <returns></returns>
     int Count(Func<TSource, object> selector);
+    /// <summary>
+    /// Count the number of rows. When col1 is specified, the count returned will be the number of rows where col1 is non-null.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <returns></returns>
     long LongCount(Func<TSource, object> selector);
-   
+    
+    #endregion
+
+    #region CountDistinct
+
+    /// <summary>
+    /// Returns the approximate number of unique values of col1 in a group.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <returns></returns>
     int CountDistinct(Func<TSource, object> selector);
+    /// <summary>
+    /// Returns the approximate number of unique values of col1 in a group.
+    /// </summary>
+    /// <param name="selector"></param>
+    /// <returns></returns>
     long LongCountDistinct(Func<TSource, object> selector);
+
+    #endregion
 
     #region CollectList
 
