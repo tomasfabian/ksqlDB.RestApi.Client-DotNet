@@ -27,18 +27,35 @@ Console.WriteLine("Press any key to stop the subscription");
 Console.ReadKey();
 ```
 
-In the above mentioned code snippet everything runs server side except of the ``` IQbservable<TEntity>.Subscribe``` method. It subscribes to your ksqlDB stream created in the following manner:
-```SQL
-CREATE STREAM tweets(id INT, message VARCHAR)
-  WITH (kafka_topic='tweetsTopic', value_format='JSON', partitions=1);
-```
-
 LINQ code written in C# from the sample is equivalent to this ksql query:
 ```SQL
 SELECT Message, Id FROM Tweets
 WHERE Message != 'Hello world' OR Id = 1 
 EMIT CHANGES 
 LIMIT 2;
+```
+
+In the above mentioned code snippet everything runs server side except of the ``` IQbservable<TEntity>.Subscribe``` method. It subscribes to your ksqlDB stream created in the following manner:
+```C#
+EntityCreationMetadata metadata = new()
+{
+  KafkaTopic = nameof(Tweet),
+  Partitions = 1,
+  Replicas = 1
+};
+
+var httpClientFactory = new HttpClientFactory(new Uri(@"http:\\localhost:8088"));
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+      
+var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<Tweet>(metadata);
+```
+
+CreateOrReplaceStreamAsync executes the following statement:
+```SQL
+CREATE OR REPLACE STREAM Tweets (
+	Id INT,
+	Message VARCHAR
+) WITH ( KAFKA_TOPIC='Tweet', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );
 ```
 
 Run the following insert statements to stream some messages with your ksqldb-cli
@@ -49,15 +66,32 @@ docker exec -it $(docker ps -q -f name=ksqldb-cli) ksql http://localhost:8088
 INSERT INTO tweets (id, message) VALUES (1, 'Hello world');
 INSERT INTO tweets (id, message) VALUES (2, 'ksqlDB rulez!');
 ```
-Sample project can be found under [Examples/Kafka](https://github.com/tomasfabian/Joker/tree/master/Samples/Kafka/Kafka.DotNet.ksqlDB.Sample) solution folder in Joker.sln or Joker.DotNet5.sln 
 
+or insert a record from C#:
+```C#
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
+var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
+  .InsertIntoAsync(new Tweet { Id = 2, Message = "ksqlDB rulez!" });
+```
+
+Sample project can be found under [Samples](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.Sample) solution folder in Kafka.DotNet.ksqlDb.sln 
 
 
 **External dependencies:**
 - [kafka broker](https://kafka.apache.org/intro) and [ksqlDB-server](https://ksqldb.io/overview.html) 0.14.0
 
+Clone the repository
+```
+git clone https://github.com/tomasfabian/Kafka.DotNet.ksqlDB.git
+```
 
-CD to [Examples/Kafka](https://github.com/tomasfabian/Joker/tree/master/Samples/Kafka/Kafka.DotNet.ksqlDB.Sample)
+CD to [Samples](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.Sample)
+```
+CD Samples\Kafka.DotNet.ksqlDB.Sample\
+```
 
 run in command line:
 
@@ -1529,18 +1563,18 @@ CREATE TABLE MyMovies (
 ```C#
 class Transaction
 {
-  [Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.Decimal(2, 3)]
+  [Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.Decimal(3, 2)]
   public decimal Amount { get; set; }
 }
 ```
 Generated KSQL:
 ```KSQL
-Amount DECIMAL(2,3)
+Amount DECIMAL(3,2)
 ```
 
 # v1.0.0:
 ```
-Install-Package Kafka.DotNet.ksqlDB -Version 1.0.0-rc.1
+Install-Package Kafka.DotNet.ksqlDB -Version 1.0.0
 ```
 ### Insert Into (v1.0.0)
 [Insert values](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/insert-values/) - Produce a row into an existing stream or table and its underlying topic based on explicitly specified values.
@@ -1574,7 +1608,7 @@ Generated KSQL:
 INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);
 ```
 
-### Insert values - FormatDoubleValue and FormatDecimalValue
+### Insert values - FormatDoubleValue and FormatDecimalValue (v1.0.0)
 ```C#
 var insertProperties = new InsertProperties()
 {
@@ -1653,10 +1687,51 @@ KSQL generated before v 1.0
 SELECT * FROM Tweet EMIT CHANGES;
 ```
 
-# LinqPad samples
-[Push Query](https://github.com/tomasfabian/Joker/blob/master/Samples/Kafka/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
+# v1.1.0-rc.1 (WIP):
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 1.1.0-rc.1
+```
 
-[Pull Query](https://github.com/tomasfabian/Joker/blob/master/Samples/Kafka/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.pull-query.linq)
+### CAST - ToString (v1.1.0)
+Converts any type to its string representation.
+
+```C#
+var query = context.CreateQueryStream<Movie>()
+  .GroupBy(c => c.Title)
+  .Select(c => new { Title = c.Key, Concatenated = K.Functions.Concat(c.Count().ToString(), "_Hello") });
+```
+
+```KSQL
+SELECT Title, CONCAT(CAST(COUNT(*) AS VARCHAR), '_Hello') Concatenated FROM Movies GROUP BY Title EMIT CHANGES;
+```
+
+### CAST - convert string to numeric types (v1.1.0)
+```C#
+using System;
+using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
+
+Expression<Func<Tweet, int>> stringToInt = c => KSQLConvert.ToInt32(c.Message);
+Expression<Func<Tweet, long>> stringToLong = c => KSQLConvert.ToInt64(c.Message);
+Expression<Func<Tweet, decimal>> stringToDecimal = c => KSQLConvert.ToDecimal(c.Message, 10, 2);
+Expression<Func<Tweet, double>> stringToDouble = c => KSQLConvert.ToDouble(c.Message);
+```
+
+```KSQL
+CAST(Message AS INT)
+CAST(Message AS BIGINT)
+CAST(Message AS DECIMAL(10, 2))
+CAST(Message AS DOUBLE)
+```
+
+### Concat (v1.1.0)
+```C#
+Expression<Func<Tweet, string>> expression = c => K.Functions.Concat(c.Message, "_Value");
+```
+
+# LinqPad samples
+[Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
+
+[Pull Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.pull-query.linq)
 
 # Nuget
 https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
