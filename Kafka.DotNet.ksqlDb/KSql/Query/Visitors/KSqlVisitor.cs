@@ -215,7 +215,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
           Append("]");
         }
       }
-      
+
+      TryCast(methodCallExpression);
+
       if (methodCallExpression.Object == null
           && methodInfo.DeclaringType.Name == nameof(KSqlFunctionsExtensions))
         new KSqlFunctionVisitor(stringBuilder, useTableAlias).Visit(methodCallExpression);
@@ -243,6 +245,31 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       }
 
       return methodCallExpression;
+    }
+
+    private void TryCast(MethodCallExpression methodCallExpression)
+    {
+      var methodName = methodCallExpression.Method.Name;
+
+      if (methodName.IsOneOfFollowing(nameof(string.ToString), nameof(Convert.ToInt32), nameof(Convert.ToInt64), nameof(Convert.ToDecimal), nameof(Convert.ToDouble)))
+      {
+        Append("CAST(");
+
+        Visit(methodCallExpression.Arguments.Count >= 1
+          ? methodCallExpression.Arguments[0]
+          : methodCallExpression.Object);
+
+        string ksqlType = methodName switch
+        {
+          nameof(string.ToString) => "VARCHAR",
+          nameof(Convert.ToInt32) => "INT",
+          nameof(Convert.ToInt64) => "BIGINT",
+          nameof(KSQLConvert.ToDecimal) => $"DECIMAL({methodCallExpression.Arguments[1]},{methodCallExpression.Arguments[2]})",
+          nameof(Convert.ToDouble) => "DOUBLE",
+        };
+
+        Append($" AS {ksqlType})");
+      }
     }
 
     protected void PrintFunctionArguments(IEnumerable<Expression> expressions)
