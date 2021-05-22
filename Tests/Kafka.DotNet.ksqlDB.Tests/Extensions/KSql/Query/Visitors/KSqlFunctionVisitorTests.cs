@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.Query;
 using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
 using Kafka.DotNet.ksqlDB.KSql.Query.Visitors;
 using Kafka.DotNet.ksqlDB.Tests.Models;
@@ -626,6 +625,118 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
     }
 
     #endregion    
+
+    #region Concat
+
+    [TestMethod]
+    public void Concat_BuildKSql_PrintsTrimFunction()
+    {
+      //Arrange
+      Expression<Func<Tweet, string>> expression = c => K.Functions.Concat(c.Message, "Value");
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"CONCAT({nameof(Tweet.Message)}, 'Value')");
+    }
+
+    #endregion
+
+    #region Cast
+
+    [TestMethod]
+    public void ToInt_CastAsInt()
+    {
+      //Arrange
+      Expression<Func<Tweet, int>> expression = c => Convert.ToInt32(c.Message);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo(@$"CAST({nameof(Tweet.Message)} AS INT)");
+    }
+
+    [TestMethod]
+    public void KSQLConvertToInt_CastAsInt()
+    {
+      //Arrange
+      Expression<Func<Tweet, int>> expression = c => KSQLConvert.ToInt32(c.Message);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo(@$"CAST({nameof(Tweet.Message)} AS INT)");
+    }
+
+    [TestMethod]
+    public void ToLong_CastAsInt()
+    {
+      //Arrange
+      Expression<Func<Tweet, long>> expression = c => Convert.ToInt64(c.Message);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo(@$"CAST({nameof(Tweet.Message)} AS BIGINT)");
+    }
+
+    [TestMethod]
+    public void KSQLConvertToLong_CastAsInt()
+    {
+      //Arrange
+      Expression<Func<Tweet, long>> expression = c => KSQLConvert.ToInt64(c.Message);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo(@$"CAST({nameof(Tweet.Message)} AS BIGINT)");
+    }
+
+    [TestMethod]
+    public void ToDecimal_CastAsDecimal()
+    {
+      //Arrange
+      Expression<Func<Tweet, decimal>> expression = c => KSQLConvert.ToDecimal(c.Message, 10, 2); //DECIMAL(precision, scale)
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo(@$"CAST({nameof(Tweet.Message)} AS DECIMAL(10,2))");
+    }
+
+    [TestMethod]
+    public void ToDecimal_CastAsDouble()
+    {
+      //Arrange
+      Expression<Func<Tweet, double>> expression = c => Convert.ToDouble(c.Message);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo(@$"CAST({nameof(Tweet.Message)} AS DOUBLE)");
+    }
+
+    [TestMethod]
+    public void KSQLConvertToDecimal_CastAsDouble()
+    {
+      //Arrange
+      Expression<Func<Tweet, double>> expression = c => KSQLConvert.ToDouble(c.Message);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo(@$"CAST({nameof(Tweet.Message)} AS DOUBLE)");
+    }
+
+    #endregion
     
     #endregion
 

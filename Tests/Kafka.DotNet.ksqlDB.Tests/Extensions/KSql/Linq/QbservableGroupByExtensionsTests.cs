@@ -252,6 +252,40 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Linq
 
     #endregion
 
+    #region Cast
+    
+    [TestMethod]
+    public void ConvertToString_Cast()
+    {
+      //Arrange
+      var grouping = CreateQbservable()
+        .GroupBy(c => c.RegionCode)
+        .Select(c => new { RegionCode = c.Key, Count = Convert.ToString(c.Count()) });
+
+      //Act
+      var ksql = grouping.ToQueryString();
+
+      //Assert
+      ksql.Should().BeEquivalentTo(@"SELECT RegionCode, CAST(COUNT(*) AS VARCHAR) Count FROM Cities GROUP BY RegionCode EMIT CHANGES;");
+    }
+    
+    [TestMethod]
+    public void ToString_Cast()
+    {
+      //Arrange
+      var grouping = CreateQbservable()
+        .GroupBy(c => c.RegionCode)
+        .Select(c => new { RegionCode = c.Key, Count = c.Count().ToString() });
+
+      //Act
+      var ksql = grouping.ToQueryString();
+
+      //Assert
+      ksql.Should().BeEquivalentTo(@"SELECT RegionCode, CAST(COUNT(*) AS VARCHAR) Count FROM Cities GROUP BY RegionCode EMIT CHANGES;");
+    }
+
+    #endregion
+    
     public static async IAsyncEnumerable<int> GetTestValues()
     {
       yield return 1;
