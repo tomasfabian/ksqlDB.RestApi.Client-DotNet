@@ -87,7 +87,7 @@ namespace Kafka.DotNet.ksqlDB.Sample
       await moviesProvider.InsertMovieAsync(MoviesProvider.Movie1);
       await moviesProvider.InsertMovieAsync(MoviesProvider.Movie2);
       await moviesProvider.InsertLeadAsync(MoviesProvider.LeadActor1);
-      
+
       try
       {
         await new PullQueryExample().ExecuteAsync();
@@ -630,6 +630,15 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
           onCompleted: () => Console.WriteLine("Completed"));
 
       return disposable;
+    }
+
+    private static void Cast(IKSqlDBContext context)
+    {
+      //SELECT Id, CAST(COUNT(*) AS VARCHAR) Count, CAST('42' AS INT) TheAnswer FROM Movies GROUP BY Id EMIT CHANGES;
+      var query = context.CreateQueryStream<Movie>()
+        .GroupBy(c => c.Id)
+        .Select(c => new {Id = c.Key, Count = c.Count().ToString(), TheAnswer = KSQLConvert.ToInt32("42")})
+        .ToQueryString();
     }
 
     private static async Task CreateStreamAsync()
