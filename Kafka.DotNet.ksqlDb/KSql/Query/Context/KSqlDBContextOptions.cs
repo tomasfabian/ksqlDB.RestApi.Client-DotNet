@@ -31,5 +31,17 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
     public QueryStreamParameters QueryStreamParameters { get; internal set; }
 
     public IQueryParameters QueryParameters { get; internal set; }
+
+    internal KSqlDBContextOptions Clone()
+    {
+      var options = new KSqlDBContextOptions(Url)
+      {
+        ShouldPluralizeFromItemName = ShouldPluralizeFromItemName,
+        QueryParameters = ((QueryParameters) QueryParameters).Clone(),
+        QueryStreamParameters = QueryStreamParameters.Clone()
+      };
+
+      return options;
+    }
   }
 }

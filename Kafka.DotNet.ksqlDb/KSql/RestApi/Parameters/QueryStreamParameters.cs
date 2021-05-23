@@ -21,5 +21,18 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters
     }
 
     internal QueryType QueryType { get; } = QueryType.QueryStream;
+    
+    internal QueryStreamParameters Clone()
+    {
+      var queryParams = new QueryStreamParameters
+      {
+        Sql = Sql
+      };
+
+      foreach (var entry in Properties)
+        queryParams.Properties.Add(entry.Key, entry.Value);
+
+      return queryParams;
+    }
   }
 }

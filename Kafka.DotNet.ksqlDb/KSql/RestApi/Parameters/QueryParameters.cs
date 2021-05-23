@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 
@@ -21,5 +22,19 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters
     }
 
     internal EndpointType EndpointType { get; set; } = EndpointType.Query;
+
+    internal QueryParameters Clone()
+    {
+      var queryParams = new QueryParameters()
+      {
+        Sql = Sql,
+        EndpointType = EndpointType
+      };
+
+      foreach (var entry in Properties)
+        queryParams.Properties.Add(entry.Key, entry.Value);
+
+      return queryParams;
+    }
   }
 }
