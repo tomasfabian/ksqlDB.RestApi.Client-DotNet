@@ -1563,18 +1563,18 @@ CREATE TABLE MyMovies (
 ```C#
 class Transaction
 {
-  [Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.Decimal(2, 3)]
+  [Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.Decimal(3, 2)]
   public decimal Amount { get; set; }
 }
 ```
 Generated KSQL:
 ```KSQL
-Amount DECIMAL(2,3)
+Amount DECIMAL(3,2)
 ```
 
 # v1.0.0:
 ```
-Install-Package Kafka.DotNet.ksqlDB -Version 1.0.0-rc.1
+Install-Package Kafka.DotNet.ksqlDB -Version 1.0.0
 ```
 ### Insert Into (v1.0.0)
 [Insert values](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/insert-values/) - Produce a row into an existing stream or table and its underlying topic based on explicitly specified values.
@@ -1608,7 +1608,7 @@ Generated KSQL:
 INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);
 ```
 
-### Insert values - FormatDoubleValue and FormatDecimalValue
+### Insert values - FormatDoubleValue and FormatDecimalValue (v1.0.0)
 ```C#
 var insertProperties = new InsertProperties()
 {
@@ -1685,6 +1685,47 @@ SELECT * FROM Tweets EMIT CHANGES;
 KSQL generated before v 1.0
 ```KSQL
 SELECT * FROM Tweet EMIT CHANGES;
+```
+
+# v1.1.0-rc.1 (WIP):
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 1.1.0-rc.1
+```
+
+### CAST - ToString (v1.1.0)
+Converts any type to its string representation.
+
+```C#
+var query = context.CreateQueryStream<Movie>()
+  .GroupBy(c => c.Title)
+  .Select(c => new { Title = c.Key, Concatenated = K.Functions.Concat(c.Count().ToString(), "_Hello") });
+```
+
+```KSQL
+SELECT Title, CONCAT(CAST(COUNT(*) AS VARCHAR), '_Hello') Concatenated FROM Movies GROUP BY Title EMIT CHANGES;
+```
+
+### CAST - convert string to numeric types (v1.1.0)
+```C#
+using System;
+using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
+
+Expression<Func<Tweet, int>> stringToInt = c => KSQLConvert.ToInt32(c.Message);
+Expression<Func<Tweet, long>> stringToLong = c => KSQLConvert.ToInt64(c.Message);
+Expression<Func<Tweet, decimal>> stringToDecimal = c => KSQLConvert.ToDecimal(c.Message, 10, 2);
+Expression<Func<Tweet, double>> stringToDouble = c => KSQLConvert.ToDouble(c.Message);
+```
+
+```KSQL
+CAST(Message AS INT)
+CAST(Message AS BIGINT)
+CAST(Message AS DECIMAL(10, 2))
+CAST(Message AS DOUBLE)
+```
+
+### Concat (v1.1.0)
+```C#
+Expression<Func<Tweet, string>> expression = c => K.Functions.Concat(c.Message, "_Value");
 ```
 
 # LinqPad samples
