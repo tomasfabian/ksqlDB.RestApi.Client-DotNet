@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading;
 using Kafka.DotNet.ksqlDB.KSql.Query;
+using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.Query.Windows;
 
 namespace Kafka.DotNet.ksqlDB.KSql.Linq
@@ -42,6 +43,26 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
           null,
           SelectTSourceTResult(typeof(TSource), typeof(TResult)),
           source.Expression, Expression.Quote(selector)
+        ));
+    }
+
+    #endregion
+
+    #region WithOffsetResetPolicy
+
+    private static MethodInfo withOffsetResetPolicyTResult;
+
+    private static MethodInfo WithOffsetResetPolicyTResult(Type TSource) =>
+      (withOffsetResetPolicyTResult ??= new Func<IQbservable<object>, AutoOffsetReset, IQbservable<object>>(WithOffsetResetPolicy).GetMethodInfo().GetGenericMethodDefinition())
+      .MakeGenericMethod(TSource);
+
+    public static IQbservable<TSource> WithOffsetResetPolicy<TSource>(this IQbservable<TSource> source, AutoOffsetReset autoOffsetReset)
+    {
+      return source.Provider.CreateQuery<TSource>(
+        Expression.Call(
+          null,
+          WithOffsetResetPolicyTResult(typeof(TSource)),
+          source.Expression, Expression.Constant(autoOffsetReset)
         ));
     }
 

@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Threading;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Kafka.DotNet.ksqlDB.KSql.Query
@@ -71,8 +72,31 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       var queryParameters = dependencies.QueryStreamParameters;
       queryParameters.Sql = dependencies.KSqlQueryGenerator.BuildKSql(Expression, QueryContext);
 
+
+      queryParameters = TryOverrideAutoOffsetResetPolicy(queryParameters);
+
       return dependencies.KsqlDBProvider
         .Run<TEntity>(queryParameters, cancellationToken);
+    }
+
+    private IQueryParameters TryOverrideAutoOffsetResetPolicy(IQueryParameters queryParameters)
+    {
+      if (!QueryContext.AutoOffsetReset.HasValue) return queryParameters;
+      
+      if (queryParameters is QueryStreamParameters queryStreamParameters)
+      {
+        queryStreamParameters = queryStreamParameters.Clone();
+        queryStreamParameters[QueryStreamParameters.AutoOffsetResetPropertyName] = QueryContext.AutoOffsetReset.Value.ToString().ToLower();
+
+        queryParameters = queryStreamParameters;
+      }
+
+      if (queryParameters is not QueryParameters qp) return queryParameters;
+      
+      queryParameters = qp.Clone();
+      queryParameters.Properties[QueryParameters.AutoOffsetResetPropertyName] = QueryContext.AutoOffsetReset.Value.ToString().ToLower();
+
+      return queryParameters;
     }
 
     internal IObservable<TEntity> RunStreamAsObservable(CancellationTokenSource cancellationTokenSource)

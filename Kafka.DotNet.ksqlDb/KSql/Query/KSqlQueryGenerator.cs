@@ -8,6 +8,7 @@ using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.Query.Visitors;
 using Pluralize.NET;
 
@@ -34,9 +35,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       joinTables = new List<(MethodInfo, IEnumerable<Expression>)>();
 
       Visit(expression);
-      
+
       string finalFromItemName = InterceptFromItemName(queryContext.FromItemName ?? fromItemName);
 
+      queryContext.AutoOffsetReset = autoOffsetReset;
+    
       if (joinTables.Any())
       {
         var joinsVisitor = new KSqlJoinsVisitor(kSqlVisitor.StringBuilder, options, new QueryContext { FromItemName = finalFromItemName });
@@ -122,8 +125,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       return value;
     }
 
-    protected int? Limit;
-
     public override Expression? Visit(Expression? expression)
     {
       if (expression == null)
@@ -201,6 +202,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
         VisitChained(methodCallExpression);
       }
 
+      if (methodInfo.Name.IsOneOfFollowing(nameof(QbservableExtensions.WithOffsetResetPolicy)))
+      {
+        var arg = (ConstantExpression)methodCallExpression.Arguments[1];
+        autoOffsetReset = (AutoOffsetReset)arg.Value;
+
+        VisitChained(methodCallExpression);
+      }
+
       if (methodInfo.Name.IsOneOfFollowing(nameof(QbservableExtensions.WindowedBy), nameof(CreateStatementExtensions.WindowedBy)))
       {
         windowedBy = (ConstantExpression)StripQuotes(methodCallExpression.Arguments[1]);
@@ -249,6 +258,8 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
     private Queue<Expression> whereClauses;
     private LambdaExpression select;
     private LambdaExpression partitionBy;
+    private AutoOffsetReset? autoOffsetReset;
+    protected int? Limit;
     private ConstantExpression windowedBy;
     private LambdaExpression groupBy;
     private LambdaExpression having;
