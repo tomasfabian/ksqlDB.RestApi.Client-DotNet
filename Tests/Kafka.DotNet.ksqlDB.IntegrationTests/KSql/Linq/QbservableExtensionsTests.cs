@@ -8,6 +8,7 @@ using FluentAssertions;
 using Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.IntegrationTests.Models;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
+using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.Query.Windows;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -31,11 +32,13 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
       await InitializeDatabase();
     }
 
+    private static TweetsProvider tweetsProvider;
+
     protected static async Task InitializeDatabase()
     {
       RestApiProvider = KSqlDbRestApiProvider.Create();
 
-      var tweetsProvider = new TweetsProvider(RestApiProvider);
+      tweetsProvider = new TweetsProvider(RestApiProvider);
       var result = await tweetsProvider.CreateTweetsStream(StreamName, topicName);
       result.Should().BeTrue();
 
@@ -277,6 +280,43 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
 
       //Assert
       Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    }
+    
+    [TestMethod]
+    public async Task WithOffsetResetPolicy()
+    {
+      //Arrange
+      var semaphoreSlim = new SemaphoreSlim(0, 1);
+      var actualValues = new List<Tweet>();
+
+      var subscription = QuerySource.WithOffsetResetPolicy(AutoOffsetReset.Latest)
+        .Take(1)
+        .ToObservable()
+        .Timeout(TimeSpan.FromSeconds(2))
+        .Subscribe(c =>
+        {
+          actualValues.Add(c);
+        }, e => { semaphoreSlim.Release(); }, () => { semaphoreSlim.Release(); });   
+
+      Tweet tweet3 = new()
+      {
+        Id = 3,
+        Message = "42"
+      };
+
+      await Task.Delay(250);
+
+      //Act
+      await tweetsProvider.InsertTweetAsync(tweet3, StreamName);
+      
+      //Assert
+      await semaphoreSlim.WaitAsync();
+      var expectedValues = new List<Tweet>
+      {
+        tweet3
+      };
+      
+      CollectionAssert.AreEqual(expectedValues, actualValues);
     }
   }
 }
