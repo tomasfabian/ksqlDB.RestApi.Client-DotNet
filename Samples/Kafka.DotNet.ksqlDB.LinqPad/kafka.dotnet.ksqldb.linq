@@ -54,7 +54,7 @@ async Task Main()
 			"Completed".Dump("OnCompleted");
 		});
 
-	await InsertMovieAsync(new Movie
+	await restApiClient.InsertIntoAsync(new Movie
 	{
 		Id = 1,
 		Release_Year = 1986,
@@ -76,6 +76,24 @@ async Task Main()
 IKSqlDbRestApiClient restApiClient;
 
 string MoviesStreamName = "my_movies_stream";
+
+async Task CreateOrReplaceStreamAsync()
+{
+	EntityCreationMetadata metadata = new()
+	{
+		KafkaTopic = nameof(Movie),
+		Partitions = 1,
+		Replicas = 1,
+		EntityName = MoviesStreamName
+	};
+
+	string url = @"http:\\localhost:8088";
+
+	var http = new HttpClientFactory(new Uri(url));
+	var restApiClient = new KSqlDbRestApiClient(http);
+
+	var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<Movie>(metadata);
+}
 
 async Task CreateMoviesStreamAsync()
 {
