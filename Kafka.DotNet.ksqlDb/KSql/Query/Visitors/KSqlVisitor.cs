@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -305,6 +306,12 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       if (value is not string && value is IEnumerable enumerable)
       {
         Append(enumerable);
+      }
+
+      if (value is ListSortDirection listSortDirection)
+      {
+        string direction = listSortDirection == ListSortDirection.Ascending ? "ASC" : "DESC";
+        stringBuilder.Append($"'{direction}'");
       }
       else if (value is string)
       {

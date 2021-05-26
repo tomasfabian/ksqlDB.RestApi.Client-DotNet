@@ -1237,7 +1237,143 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
 
     #endregion
 
-    #region ARRAY_SORT
+    #region ArraySort
+
+    /// <summary>
+    /// Sort an array of primitive values, according to their natural sort order. Any NULLs in the array will be placed at the end.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">The array to sort</param>
+    /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+    /// <returns></returns>
+    public static string[] ArraySort(this KSqlFunctions kSqlFunctions, string[] input, System.ComponentModel.ListSortDirection direction)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Sort an array of primitive values, according to their natural sort order. Any NULLs in the array will be placed at the end.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">The array to sort</param>
+    /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+    /// <returns></returns>
+    public static int[] ArraySort(this KSqlFunctions kSqlFunctions, int[] input, System.ComponentModel.ListSortDirection direction)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Sort an array of primitive values, according to their natural sort order. Any NULLs in the array will be placed at the end.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">The array to sort</param>
+    /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+    /// <returns></returns>
+    public static int?[] ArraySort(this KSqlFunctions kSqlFunctions, int?[] input, System.ComponentModel.ListSortDirection direction)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Sort an array of primitive values, according to their natural sort order. Any NULLs in the array will be placed at the end.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">The array to sort</param>
+    /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+    /// <returns></returns>
+    public static long[] ArraySort(this KSqlFunctions kSqlFunctions, long[] input, System.ComponentModel.ListSortDirection direction)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Sort an array of primitive values, according to their natural sort order. Any NULLs in the array will be placed at the end.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">The array to sort</param>
+    /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+    /// <returns></returns>
+    public static long?[] ArraySort(this KSqlFunctions kSqlFunctions, long?[] input, System.ComponentModel.ListSortDirection direction)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Sort an array of primitive values, according to their natural sort order. Any NULLs in the array will be placed at the end.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">The array to sort</param>
+    /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+    /// <returns></returns>
+    public static double[] ArraySort(this KSqlFunctions kSqlFunctions, double[] input, System.ComponentModel.ListSortDirection direction)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Sort an array of primitive values, according to their natural sort order. Any NULLs in the array will be placed at the end.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">The array to sort</param>
+    /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+    /// <returns></returns>
+    public static double?[] ArraySort(this KSqlFunctions kSqlFunctions, double?[] input, System.ComponentModel.ListSortDirection direction)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Sort an array of primitive values, according to their natural sort order. Any NULLs in the array will be placed at the end.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">The array to sort</param>
+    /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+    /// <returns></returns>
+    public static decimal[] ArraySort(this KSqlFunctions kSqlFunctions, decimal[] input, System.ComponentModel.ListSortDirection direction)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Sort an array of primitive values, according to their natural sort order. Any NULLs in the array will be placed at the end.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">The array to sort</param>
+    /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+    /// <returns></returns>
+    public static decimal?[] ArraySort(this KSqlFunctions kSqlFunctions, decimal?[] input, System.ComponentModel.ListSortDirection direction)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Sort an array of primitive values, according to their natural sort order. Any NULLs in the array will be placed at the end.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">The array to sort</param>
+    /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+    /// <returns></returns>
+    public static bool[] ArraySort(this KSqlFunctions kSqlFunctions, bool[] input, System.ComponentModel.ListSortDirection direction)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Sort an array of primitive values, according to their natural sort order. Any NULLs in the array will be placed at the end.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">The array to sort</param>
+    /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+    /// <returns></returns>
+    public static bool?[] ArraySort(this KSqlFunctions kSqlFunctions, bool?[] input, System.ComponentModel.ListSortDirection direction)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    #endregion
+
+    #region ARRAY_UNION
 
     
 

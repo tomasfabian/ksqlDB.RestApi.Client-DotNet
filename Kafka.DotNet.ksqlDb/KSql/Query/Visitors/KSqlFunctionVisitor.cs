@@ -75,6 +75,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
           case nameof(KSqlFunctionsExtensions.ArrayMax):
           case nameof(KSqlFunctionsExtensions.ArrayMin):
           case nameof(KSqlFunctionsExtensions.ArrayRemove):
+          case nameof(KSqlFunctionsExtensions.ArraySort):
             Append($"{methodInfo.Name.ToKSqlFunctionName()}");
             PrintFunctionArguments(methodCallExpression.Arguments.Skip(1));
             break;
