@@ -1,4 +1,10 @@
-﻿# v1.0.0
+﻿# v1.1.0
+- Pull queries Select extension method
+- Push queries WithOffsetResetPolicy extension method
+- CAST - ToString
+- CONCAT
+ 
+# v1.0.0
 - [Insert Values](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/README.md#insert-into-v100) - Produce a row into an existing stream or table
 
 Great news are that Confluent added this package to their [documentation](https://github.com/confluentinc/ksql/pull/7520/files) as a contributed .NET client, so before wider adoption I decided to improve the API at cost of some breaking changes.
@@ -186,11 +192,6 @@ Fixes:
 - KStreamSet, KQuerySet, KQueryStreamSet
 - QbservableProvider
 - ```KSqldbProvider<T>``` - ksqldb REST api provider for push queries (```KSqlDbQueryProvider<T>```, ```KSqlDbQueryStreamProvider<T>```)
-
-# v1.1.0-rc.1
-- Pull queries Select extension method
-- CAST - ToString
-- CONCAT
 
 # TODO:
 - missing scalar functions https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#date-and-time
