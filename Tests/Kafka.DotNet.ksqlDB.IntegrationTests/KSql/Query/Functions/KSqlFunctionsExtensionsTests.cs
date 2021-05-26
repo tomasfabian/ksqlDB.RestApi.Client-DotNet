@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -238,6 +239,25 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Query.Functions
       Assert.AreEqual(expectedItemsCount, actualValues.Count);
       actualValues.Count.Should().Be(1);
       actualValues[0].Col.Length.Should().Be(1);
+    }
+    
+    [TestMethod]
+    public async Task ArraySort()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+      
+      //Act
+      var source = Context.CreateQuery<Movie>(MoviesTableName)
+        .Select(c => new { Col = K.Functions.ArraySort(new int?[]{ 3, null, 1}, ListSortDirection.Ascending)})
+        .ToAsyncEnumerable();
+      
+      var actualValues = await CollectActualValues(source, expectedItemsCount);
+      
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+      actualValues.Count.Should().Be(1);
+      CollectionAssert.AreEquivalent(actualValues[0].Col, new int?[] { 1, 3, null});
     }
     
     [TestMethod]

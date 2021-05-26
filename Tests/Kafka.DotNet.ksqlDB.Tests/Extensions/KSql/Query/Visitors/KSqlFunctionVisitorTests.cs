@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
@@ -459,7 +460,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
     #region ArrayRemove
 
     [TestMethod]
-    public void ArrayRemoveArrayJoin_BuildKSql_PrintsFunction()
+    public void ArrayRemove_BuildKSql_PrintsFunction()
     {
       //Arrange
       Expression<Func<Collection, int[]>> expression = c => K.Functions.ArrayRemove(c.Items1, 1);
@@ -520,6 +521,36 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
 
       //Assert
       query.Should().BeEquivalentTo($"ARRAY_Max({nameof(Collection.Items1)})");
+    }    
+
+    #endregion
+
+    #region ArraySort
+    
+    [TestMethod]
+    public void ArraySortNewArray_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      Expression<Func<Collection, int?[]>> expression = c => K.Functions.ArraySort(new int?[]{ 3, null, 1}, ListSortDirection.Ascending);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo("ARRAY_SORT(ARRAY[3, NULL, 1], 'ASC')");
+    } 
+
+    [TestMethod]
+    public void ArraySort_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      Expression<Func<Collection, int[]>> expression = c => K.Functions.ArraySort(c.Items1, ListSortDirection.Descending);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"ARRAY_SORT({nameof(Collection.Items1)}, 'DESC')");
     }    
 
     #endregion
