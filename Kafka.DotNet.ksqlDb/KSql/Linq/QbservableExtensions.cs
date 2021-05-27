@@ -56,6 +56,13 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
       (withOffsetResetPolicyTResult ??= new Func<IQbservable<object>, AutoOffsetReset, IQbservable<object>>(WithOffsetResetPolicy).GetMethodInfo().GetGenericMethodDefinition())
       .MakeGenericMethod(TSource);
 
+    /// <summary>
+    /// Determines what to do when there is no initial offset in Apache Kafka® or if the current offset doesn't exist on the server. The default value in ksqlDB is latest, which means all Kafka topics are read from the latest available offset.
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="autoOffsetReset">Earliest or the latest offset.</param>
+    /// <returns></returns>
     public static IQbservable<TSource> WithOffsetResetPolicy<TSource>(this IQbservable<TSource> source, AutoOffsetReset autoOffsetReset)
     {
       return source.Provider.CreateQuery<TSource>(
