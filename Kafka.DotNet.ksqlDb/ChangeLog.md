@@ -1,8 +1,8 @@
 ﻿# v1.1.0
 - Pull queries Select extension method
-- Push queries WithOffsetResetPolicy extension method
-- CAST - ToString
-- CONCAT
+- Push queries [WithOffsetResetPolicy extension method](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB#withoffsetresetpolicy---push-queries-extension-method-v110)
+- CAST - [ToString](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB#cast---tostring-v110), [string to numeric types](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB#cast---convert-string-to-numeric-types-v110)
+- scalar functions: Concat, ArraySort, ArrayUnion
  
 # v1.0.0
 - [Insert Values](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/README.md#insert-into-v100) - Produce a row into an existing stream or table
