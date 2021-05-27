@@ -307,21 +307,24 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       {
         Append(enumerable);
       }
+      else switch (value)
+      {
+        case ListSortDirection listSortDirection:
+        {
+          string direction = listSortDirection == ListSortDirection.Ascending ? "ASC" : "DESC";
+          stringBuilder.Append($"'{direction}'");
+          break;
+        }
+        case string:
+          stringBuilder.Append($"'{value}'");
+          break;
+        default:
+        {
+          var stringValue = value != null ? value.ToString() : "NULL";
 
-      if (value is ListSortDirection listSortDirection)
-      {
-        string direction = listSortDirection == ListSortDirection.Ascending ? "ASC" : "DESC";
-        stringBuilder.Append($"'{direction}'");
-      }
-      else if (value is string)
-      {
-        stringBuilder.Append($"'{value}'");
-      }
-      else
-      {
-        var stringValue = value != null ? value.ToString() : "NULL";
-
-        stringBuilder.Append(stringValue ?? "Unknown");
+          stringBuilder.Append(stringValue ?? "Unknown");
+          break;
+        }
       }
 
       return constantExpression;

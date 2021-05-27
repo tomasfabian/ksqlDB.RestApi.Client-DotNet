@@ -1373,7 +1373,143 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
 
     #endregion
 
-    #region ARRAY_UNION
+    #region ArrayUnion
+
+    /// <summary>
+    /// Returns an array of all the distinct elements from both input arrays, or NULL if either array is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="left">First array of values</param>
+    /// <param name="right">Second array of values</param>
+    /// <returns></returns>
+    public static string[] ArrayUnion(this KSqlFunctions kSqlFunctions, string[] left, string[] right)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns an array of all the distinct elements from both input arrays, or NULL if either array is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="left">First array of values</param>
+    /// <param name="right">Second array of values</param>
+    /// <returns></returns>
+    public static int[] ArrayUnion(this KSqlFunctions kSqlFunctions, int[] left, int[] right)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns an array of all the distinct elements from both input arrays, or NULL if either array is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="left">First array of values</param>
+    /// <param name="right">Second array of values</param>
+    /// <returns></returns>
+    public static int?[] ArrayUnion(this KSqlFunctions kSqlFunctions, int?[] left, int?[] right)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns an array of all the distinct elements from both input arrays, or NULL if either array is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="left">First array of values</param>
+    /// <param name="right">Second array of values</param>
+    /// <returns></returns>
+    public static long[] ArrayUnion(this KSqlFunctions kSqlFunctions, long[] left, long[] right)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns an array of all the distinct elements from both input arrays, or NULL if either array is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="left">First array of values</param>
+    /// <param name="right">Second array of values</param>
+    /// <returns></returns>
+    public static long?[] ArrayUnion(this KSqlFunctions kSqlFunctions, long?[] left, long?[] right)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns an array of all the distinct elements from both input arrays, or NULL if either array is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="left">First array of values</param>
+    /// <param name="right">Second array of values</param>
+    /// <returns></returns>
+    public static double[] ArrayUnion(this KSqlFunctions kSqlFunctions, double[] left, double[] right)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns an array of all the distinct elements from both input arrays, or NULL if either array is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="left">First array of values</param>
+    /// <param name="right">Second array of values</param>
+    /// <returns></returns>
+    public static double?[] ArrayUnion(this KSqlFunctions kSqlFunctions, double?[] left, double?[] right)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns an array of all the distinct elements from both input arrays, or NULL if either array is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="left">First array of values</param>
+    /// <param name="right">Second array of values</param>
+    /// <returns></returns>
+    public static decimal[] ArrayUnion(this KSqlFunctions kSqlFunctions, decimal[] left, decimal[] right)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns an array of all the distinct elements from both input arrays, or NULL if either array is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="left">First array of values</param>
+    /// <param name="right">Second array of values</param>
+    /// <returns></returns>
+    public static decimal?[] ArrayUnion(this KSqlFunctions kSqlFunctions, decimal?[] left, decimal?[] right)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns an array of all the distinct elements from both input arrays, or NULL if either array is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="left">First array of values</param>
+    /// <param name="right">Second array of values</param>
+    /// <returns></returns>
+    public static bool[] ArrayUnion(this KSqlFunctions kSqlFunctions, bool[] left, bool[] right)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns an array of all the distinct elements from both input arrays, or NULL if either array is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="left">First array of values</param>
+    /// <param name="right">Second array of values</param>
+    /// <returns></returns>
+    public static bool?[] ArrayUnion(this KSqlFunctions kSqlFunctions, bool?[] left, bool?[] right)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    #endregion
+
+    #region AS_MAP
 
     
 
