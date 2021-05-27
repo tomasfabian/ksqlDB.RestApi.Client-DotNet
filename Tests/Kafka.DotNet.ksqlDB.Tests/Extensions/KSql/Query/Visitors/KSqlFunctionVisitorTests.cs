@@ -555,6 +555,36 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
 
     #endregion
 
+    #region ArrayUnion
+    
+    [TestMethod]
+    public void ArrayUnionNewArray_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      Expression<Func<Collection, int?[]>> expression = c => K.Functions.ArrayUnion(new int?[]{ 3, null, 1}, new int?[]{ 3, null});
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo("ARRAY_UNION(ARRAY[3, NULL, 1], ARRAY[3, NULL])");
+    } 
+
+    [TestMethod]
+    public void ArrayUnion_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      Expression<Func<Collection, int[]>> expression = c => K.Functions.ArrayUnion(c.Items1, c.Items1);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"ARRAY_UNION({nameof(Collection.Items1)}, {nameof(Collection.Items1)})");
+    }    
+
+    #endregion
+
     #endregion
 
     #region String functions

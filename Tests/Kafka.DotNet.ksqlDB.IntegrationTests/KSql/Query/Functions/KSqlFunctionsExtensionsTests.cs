@@ -255,9 +255,24 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Query.Functions
       var actualValues = await CollectActualValues(source, expectedItemsCount);
       
       //Assert
-      Assert.AreEqual(expectedItemsCount, actualValues.Count);
-      actualValues.Count.Should().Be(1);
-      CollectionAssert.AreEquivalent(actualValues[0].Col, new int?[] { 1, 3, null});
+      CollectionAssert.AreEquivalent(new int?[] { 1, 3, null}, actualValues[0].Col);
+    }
+    
+    [TestMethod]
+    public async Task ArrayUnion()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+      
+      //Act
+      var source = Context.CreateQuery<Movie>(MoviesTableName)
+        .Select(c => new { Col = K.Functions.ArrayUnion(new int?[]{ 3, null, 1}, new int?[]{ 4, null})})
+        .ToAsyncEnumerable();
+      
+      var actualValues = await CollectActualValues(source, expectedItemsCount);
+      
+      //Assert
+      CollectionAssert.AreEquivalent(new int?[] { 3, null, 1, 4}, actualValues[0].Col);
     }
     
     [TestMethod]
