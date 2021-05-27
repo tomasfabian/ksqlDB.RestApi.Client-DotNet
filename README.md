@@ -1687,7 +1687,7 @@ KSQL generated before v 1.0
 SELECT * FROM Tweet EMIT CHANGES;
 ```
 
-# v1.1.0-rc.1 (WIP):
+# v1.1.0:
 ```
 Install-Package Kafka.DotNet.ksqlDB -Version 1.1.0-rc.1
 ```
@@ -1726,6 +1726,17 @@ CAST(Message AS DOUBLE)
 ### Concat (v1.1.0)
 ```C#
 Expression<Func<Tweet, string>> expression = c => K.Functions.Concat(c.Message, "_Value");
+```
+
+### WithOffsetResetPolicy - push queries extension method (v1.1.0)
+Overrides the AutoOffsetReset policy for the current query:
+```C#
+var subscription = context.CreateQueryStream<Movie>()
+  .WithOffsetResetPolicy(AutoOffsetReset.Latest)
+  .Subscribe(movie =>
+  {
+    Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
+  }, e => { Console.WriteLine($"Exception: {e.Message}"); });   
 ```
 
 # LinqPad samples
