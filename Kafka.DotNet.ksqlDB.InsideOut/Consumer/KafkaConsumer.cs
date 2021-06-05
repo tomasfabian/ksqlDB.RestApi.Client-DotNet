@@ -11,7 +11,7 @@ using Kafka.DotNet.ksqlDB.InsideOut.Serdes;
 
 namespace Kafka.DotNet.ksqlDB.InsideOut.Consumer
 {
-  public abstract class KafkaConsumer<TKey, TValue> : IDisposable
+  public abstract class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
   {
     #region Fields
 
