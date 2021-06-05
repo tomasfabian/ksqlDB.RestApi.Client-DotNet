@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Experimental", "Experimenta
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.Sample", "Samples\Blazor.Sample\Blazor.Sample.csproj", "{9B744296-3BDF-41A6-B720-7271C329F7BF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafka.DotNet.ksqlDB.InsideOut", "Kafka.DotNet.ksqlDB.InsideOut\Kafka.DotNet.ksqlDB.InsideOut.csproj", "{63BEFF26-D85A-477F-A474-2E2B063BC6C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{9B744296-3BDF-41A6-B720-7271C329F7BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B744296-3BDF-41A6-B720-7271C329F7BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B744296-3BDF-41A6-B720-7271C329F7BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63BEFF26-D85A-477F-A474-2E2B063BC6C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63BEFF26-D85A-477F-A474-2E2B063BC6C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63BEFF26-D85A-477F-A474-2E2B063BC6C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63BEFF26-D85A-477F-A474-2E2B063BC6C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

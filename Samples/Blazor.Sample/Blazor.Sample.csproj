@@ -15,4 +15,9 @@
     <Folder Include="Data\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Kafka.DotNet.ksqlDB.InsideOut\Kafka.DotNet.ksqlDB.InsideOut.csproj" />
+    <ProjectReference Include="..\..\Kafka.DotNet.ksqlDB\Kafka.DotNet.ksqlDB.csproj" />
+  </ItemGroup>
+
 </Project>
