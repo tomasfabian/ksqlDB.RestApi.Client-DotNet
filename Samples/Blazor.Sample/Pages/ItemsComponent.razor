@@ -1,0 +1,39 @@
+﻿@page "/items"
+
+@using Blazor.Sample.Data
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (items == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in items)
+        {
+            <tr>
+                <td>@item.Id</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+  private DomainEntity[] items;
+
+  protected override void OnInitialized()
+  {
+      items = new[] {new DomainEntity { Id = 1}};
+  }
+}

@@ -1,0 +1,68 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31229.75
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafka.DotNet.ksqlDB", "Kafka.DotNet.ksqlDB\Kafka.DotNet.ksqlDB.csproj", "{84C054D6-BAA2-44BE-AD3B-2FB2805E4305}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafka.DotNet.ksqlDB.IntegrationTests", "Tests\Kafka.DotNet.ksqlDB.IntegrationTests\Kafka.DotNet.ksqlDB.IntegrationTests.csproj", "{FC777D58-2B92-416E-B4B3-CF97DDF1D76A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "Tests\UnitTests\UnitTests.csproj", "{ED404C96-CAAA-4CAC-ACDE-F3E0D48FB2E3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{AA5681E8-1682-47E9-9159-4AE95A92E694}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafka.DotNet.ksqlDB.Sample", "Samples\Kafka.DotNet.ksqlDB.Sample\Kafka.DotNet.ksqlDB.Sample.csproj", "{24D73489-0E6F-42AF-8692-00503FE2406A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafka.DotNet.ksqlDB.Tests", "Tests\Kafka.DotNet.ksqlDB.Tests\Kafka.DotNet.ksqlDB.Tests.csproj", "{A1CC1EDB-C346-4BE5-BDC5-8288D2ECC0EC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Experimental", "Experimental", "{83B574F6-F1A1-4C8E-BC4E-90E72356AAA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.Sample", "Samples\Blazor.Sample\Blazor.Sample.csproj", "{9B744296-3BDF-41A6-B720-7271C329F7BF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{84C054D6-BAA2-44BE-AD3B-2FB2805E4305}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84C054D6-BAA2-44BE-AD3B-2FB2805E4305}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84C054D6-BAA2-44BE-AD3B-2FB2805E4305}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84C054D6-BAA2-44BE-AD3B-2FB2805E4305}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC777D58-2B92-416E-B4B3-CF97DDF1D76A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC777D58-2B92-416E-B4B3-CF97DDF1D76A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC777D58-2B92-416E-B4B3-CF97DDF1D76A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC777D58-2B92-416E-B4B3-CF97DDF1D76A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED404C96-CAAA-4CAC-ACDE-F3E0D48FB2E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED404C96-CAAA-4CAC-ACDE-F3E0D48FB2E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED404C96-CAAA-4CAC-ACDE-F3E0D48FB2E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED404C96-CAAA-4CAC-ACDE-F3E0D48FB2E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24D73489-0E6F-42AF-8692-00503FE2406A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24D73489-0E6F-42AF-8692-00503FE2406A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24D73489-0E6F-42AF-8692-00503FE2406A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24D73489-0E6F-42AF-8692-00503FE2406A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1CC1EDB-C346-4BE5-BDC5-8288D2ECC0EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1CC1EDB-C346-4BE5-BDC5-8288D2ECC0EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1CC1EDB-C346-4BE5-BDC5-8288D2ECC0EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1CC1EDB-C346-4BE5-BDC5-8288D2ECC0EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B744296-3BDF-41A6-B720-7271C329F7BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B744296-3BDF-41A6-B720-7271C329F7BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B744296-3BDF-41A6-B720-7271C329F7BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B744296-3BDF-41A6-B720-7271C329F7BF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FC777D58-2B92-416E-B4B3-CF97DDF1D76A} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}
+		{ED404C96-CAAA-4CAC-ACDE-F3E0D48FB2E3} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}
+		{24D73489-0E6F-42AF-8692-00503FE2406A} = {AA5681E8-1682-47E9-9159-4AE95A92E694}
+		{A1CC1EDB-C346-4BE5-BDC5-8288D2ECC0EC} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}
+		{9B744296-3BDF-41A6-B720-7271C329F7BF} = {83B574F6-F1A1-4C8E-BC4E-90E72356AAA2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {08C8585D-5006-4484-AC12-72B1F42058D7}
+	EndGlobalSection
+EndGlobal
