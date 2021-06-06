@@ -8,6 +8,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
+using Blazor.Sample.Data;
+using Blazor.Sample.KafkaConsumers;
+using Confluent.Kafka;
+using Kafka.DotNet.ksqlDB.InsideOut.Consumer;
 
 namespace Blazor.Sample
 {
@@ -20,8 +24,6 @@ namespace Blazor.Sample
 
     public IConfiguration Configuration { get; }
 
-    // This method gets called by the runtime. Use this method to add services to the container.
-    // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddRazorPages();
@@ -39,9 +41,26 @@ namespace Blazor.Sample
 
     protected virtual void OnRegisterTypes(ContainerBuilder builder)
     {
+      string bootstrapServers = "localhost:29092";
+
+      RegisterConsumers(builder, bootstrapServers);
     }
 
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    private static void RegisterConsumers(ContainerBuilder containerBuilder, string bootstrapServers)
+    {
+      var consumerConfig = new ConsumerConfig
+      {
+        BootstrapServers = bootstrapServers,
+        GroupId = System.Diagnostics.Process.GetCurrentProcess().ProcessName,
+      };
+
+      containerBuilder.RegisterInstance(consumerConfig);
+
+      containerBuilder.RegisterType<ItemsKafkaConsumer>()
+        .As<IKafkaConsumer<int, Item>>()
+        .WithParameter(nameof(consumerConfig), consumerConfig);
+    }
+
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
       if (env.IsDevelopment())
