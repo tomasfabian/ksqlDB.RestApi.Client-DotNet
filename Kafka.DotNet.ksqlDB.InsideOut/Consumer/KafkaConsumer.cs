@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -42,12 +41,12 @@ namespace Kafka.DotNet.ksqlDB.InsideOut.Consumer
 
     protected IConsumer<TKey, TValue> CreateConsumer()
     {
-      var producerBuilder = new ConsumerBuilder<TKey, TValue>(consumerConfig)
+      var consumerBuilder = new ConsumerBuilder<TKey, TValue>(consumerConfig)
         .SetValueDeserializer(CreateDeserializer());
 
-      InterceptConsumerBuilder(producerBuilder);
+      InterceptConsumerBuilder(consumerBuilder);
 
-      return producerBuilder.Build();
+      return consumerBuilder.Build();
     }
 
     protected virtual void InterceptConsumerBuilder(ConsumerBuilder<TKey, TValue> consumerBuilder)
@@ -83,7 +82,7 @@ namespace Kafka.DotNet.ksqlDB.InsideOut.Consumer
         try
         {
           OnConnectToTopic();
-          
+
           while (!cancellationToken.IsCancellationRequested)
           {
             Consume(cancellationToken);
@@ -98,7 +97,7 @@ namespace Kafka.DotNet.ksqlDB.InsideOut.Consumer
       }
     }
 
-    protected virtual void OnConnectToTopic()
+    private void OnConnectToTopic()
     {
       consumer.Subscribe(TopicName);
     }
@@ -152,26 +151,32 @@ namespace Kafka.DotNet.ksqlDB.InsideOut.Consumer
         return;
 
       if (disposing)
+      {
         OnDispose();
+
+        cancellationTokenSource?.Cancel();
+
+        DisposeMessagesSubject();
+
+        LastConsumedOffset = null;
+      }
 
       disposed = true;
     }
 
+    private void DisposeMessagesSubject()
+    {
+      if (messagesSubject == null) return;
+      
+      messagesSubject.OnCompleted();
+
+      messagesSubject.Dispose();
+
+      messagesSubject = null;
+    }
+
     protected virtual void OnDispose()
     {
-      cancellationTokenSource?.Cancel();
-
-      if (messagesSubject != null)
-      {
-        messagesSubject.OnCompleted();
-
-        messagesSubject.Dispose();
-
-        messagesSubject = null;
-      }
-
-      LastConsumedOffset = null;
-
     }
 
     #endregion
