@@ -1,0 +1,84 @@
+version: '3.4'
+
+networks:
+  kafkanetwork:
+    driver: bridge
+
+services:
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    ports:
+      - '2181:2181'
+    networks: 
+      - kafkanetwork
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  broker01:
+    image: 'bitnami/kafka:latest'
+    ports:
+      - '29092:29092'
+    networks: 
+      - kafkanetwork
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://broker01:9092,EXTERNAL://broker01:29092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://broker01:9092,EXTERNAL://localhost:29092
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+    depends_on:
+      - zookeeper
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop:3.27.0
+    environment:
+      - KAFKA_BROKERCONNECT=broker01:9092
+      - JVM_OPTS=-Xms32M -Xms64M
+      - SERVER_SERVLET_CONTEXTPATH=/
+    ports:
+      - "9000:9000"
+    networks: 
+      - kafkanetwork
+    depends_on:
+      - broker01
+
+  ksqldb-server:
+    image: confluentinc/ksqldb-server:0.15.0
+    hostname: ksqldb-server
+    container_name: ksqldb-server
+    ports:
+      - "8088:8088"
+    networks: 
+      - kafkanetwork
+    environment:
+      KSQL_CONFIG_DIR: "/etc/ksql"
+      KSQL_BOOTSTRAP_SERVERS: "broker01:9092"
+      KSQL_HOST_NAME: ksqldb-server
+      KSQL_LISTENERS: "http://0.0.0.0:8088"
+      KSQL_CACHE_MAX_BYTES_BUFFERING: 0
+    depends_on:
+      - broker01
+
+  ksqldb-cli:
+    image: confluentinc/ksqldb-cli:0.15.0
+    networks: 
+      - kafkanetwork
+    depends_on:
+      - broker01
+      - ksqldb-server
+    entrypoint: /bin/sh
+    tty: true
+
+  blazor.sample:
+    image: ${DOCKER_REGISTRY-}blazorsample
+    build:
+      context: .
+      dockerfile: Samples/Blazor.Sample/Dockerfile
+    networks: 
+      - kafkanetwork
+    depends_on:
+      - broker01
+      - ksqldb-server
