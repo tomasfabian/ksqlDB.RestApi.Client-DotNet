@@ -15,14 +15,17 @@ using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Configuration;
 
 namespace Blazor.Sample.Pages
 {
   partial class KafkaStreamComponent : IDisposable
   {
     [Inject]
-    private IKafkaConsumer<int, ItemStream> ItemsConsumer { get; init; }
+    private IConfiguration Configuration { get; init; }
 
+    [Inject]
+    private IKafkaConsumer<int, ItemStream> ItemsConsumer { get; init; }
 
     [Inject]
     private IKafkaProducer<int, Item> ItemsProducer { get; init; }
@@ -68,10 +71,8 @@ namespace Blazor.Sample.Pages
 
       await base.OnInitializedAsync();
     }
-
-    string bootstrapServers = "broker01:9092";
-
-    private static async Task CreateItemsStreamAsync()
+    
+    private async Task CreateItemsStreamAsync()
     {
       await using var context = new KSqlDBContext(ksqlDbUrl);
 
@@ -92,9 +93,9 @@ namespace Blazor.Sample.Pages
       }
     }
 
-    public static string ksqlDbUrl = @"http://ksqldb-server:8088";
+    public string ksqlDbUrl => Configuration["ksqlDb:Url"];
 
-    private static async Task TryCreateStreamAsync()
+    private async Task TryCreateStreamAsync()
     {
       EntityCreationMetadata metadata = new()
       {
@@ -111,10 +112,9 @@ namespace Blazor.Sample.Pages
 
     public IAdminClient GetAdminClient()
     {
-
       var config = new AdminClientConfig
       {
-        BootstrapServers = bootstrapServers
+        BootstrapServers = Configuration["Kafka:BootstrapServers"]
       };
 
       var adminClientBuilder = new AdminClientBuilder(config);

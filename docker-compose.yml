@@ -79,6 +79,8 @@ services:
       dockerfile: Samples/Blazor.Sample/Dockerfile
     networks: 
       - kafkanetwork
+    environment:
+      ksqlDb__Url: "http://ksqldb-server:8088"
     depends_on:
       - broker01
       - ksqldb-server

@@ -43,7 +43,7 @@ namespace Blazor.Sample
 
     protected virtual void OnRegisterTypes(ContainerBuilder containerBuilder)
     {
-      string bootstrapServers = "broker01:9092";
+      string bootstrapServers = Configuration["Kafka:BootstrapServers"];
 
       RegisterConsumers(containerBuilder, bootstrapServers);
 

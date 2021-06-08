@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 namespace Blazor.Sample
 {
@@ -18,6 +19,10 @@ namespace Blazor.Sample
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
           .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+          .ConfigureAppConfiguration((context, configBuilder) =>
+          {
+            configBuilder.AddEnvironmentVariables();
+          })
           .ConfigureWebHostDefaults(webBuilder =>
           {
             webBuilder.UseStartup<Startup>();

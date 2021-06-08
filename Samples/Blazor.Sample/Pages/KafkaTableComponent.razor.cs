@@ -11,11 +11,15 @@ using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Configuration;
 
 namespace Blazor.Sample.Pages
 {
   public partial class KafkaTableComponent
   {
+    [Inject]
+    private IConfiguration Configuration { get; init; }
+
     [Inject]
     private IKafkaConsumer<int, ItemTable> ItemsTableConsumer { get; init; }
 
@@ -36,9 +40,11 @@ namespace Blazor.Sample.Pages
       await base.OnInitializedAsync();
     }
 
-    private static async Task CreateTableAsync()
+    private async Task CreateTableAsync()
     {
-      await using var context = new KSqlDBContext(KafkaStreamComponent.ksqlDbUrl);
+      string ksqlDbUrl = Configuration["ksqlDb:Url"];
+
+      await using var context = new KSqlDBContext(ksqlDbUrl);
 
       var statement = context.CreateOrReplaceTableStatement(tableName: TopicNames.ItemsTable)
         .As<Item>()
