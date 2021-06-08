@@ -1,10 +1,10 @@
-﻿@page "/items"
+﻿@page "/kafkatable"
 
 @using Blazor.Sample.Data
 
-<h1>Weather forecast</h1>
+<h1>Kafka</h1>
 
-<p>This component demonstrates fetching data from a service.</p>
+<p>This component demonstrates observing data from a kafka stream.</p>
 
 @if (items == null)
 {
@@ -16,6 +16,7 @@ else
         <thead>
         <tr>
             <th>Id</th>
+            <th>Count</th>
         </tr>
         </thead>
         <tbody>
@@ -23,6 +24,7 @@ else
         {
             <tr>
                 <td>@item.Id</td>
+                <td>@item.Count</td>
             </tr>
         }
         </tbody>
@@ -30,10 +32,10 @@ else
 }
 
 @code {
-  private DomainEntity[] items;
+    private List<ItemTable> items;
 
-  protected override void OnInitialized()
-  {
-      items = new[] {new DomainEntity { Id = 1}};
-  }
+    protected override void OnInitialized()
+    {
+        items = new List<ItemTable> { new() { Count = 0 }};
+    }
 }

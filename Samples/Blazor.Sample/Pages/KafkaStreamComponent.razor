@@ -1,0 +1,41 @@
+﻿@page "/kafkastream"
+
+@using Blazor.Sample.Data
+
+<h1>Kafka</h1>
+
+<p>This component demonstrates observing data from a kafka stream.</p>
+
+@if (items == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in items)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Description</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+  private List<ItemStream> items;
+
+  protected override void OnInitialized()
+  {
+      items = new List<ItemStream> { new() { Description = "Desc 1" }};
+  }
+}
