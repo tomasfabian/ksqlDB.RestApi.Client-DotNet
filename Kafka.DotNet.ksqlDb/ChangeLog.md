@@ -14,7 +14,7 @@ Except of one change all of them will be catched by the compiler. For more infor
 
 IKSqlDbRestApiClient interface:
 ```
-| v.0.11.0                      | v1.0.0                        |
+| v0.11.0                      | v1.0.0                        |
 |---------------------------------------------------------------|
 | CreateTable<T>                | CreateTableAsync<T>           |
 | CreateStream<T>               | CreateStreamAsync<T>          |

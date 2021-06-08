@@ -1636,7 +1636,7 @@ In order to improve the v1.0.0 release the following methods and properties were
 
 IKSqlDbRestApiClient interface changes:
 ```
-| v.0.11.0                      | v1.0.0                        |
+| v0.11.0                      | v1.0.0                        |
 |---------------------------------------------------------------|
 | CreateTable<T>                | CreateTableAsync<T>           |
 | CreateStream<T>               | CreateStreamAsync<T>          |
