@@ -4,7 +4,7 @@
 - KafkaConsumer<TKey, TValue>, IKafkaConsumer<TKey, TValue>, IKafkaConsumer
 
 ### Producers:
-- 
+- KafkaProducer<TKey, TValue>, IKafkaProducer<TKey, TValue>
 
 ### Serdes:
 - KafkaJsonSerializer
