@@ -7,6 +7,7 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
+COPY ["nuget.config", "."]
 COPY ["Samples/Blazor.Sample/Blazor.Sample.csproj", "Samples/Blazor.Sample/"]
 COPY ["Kafka.DotNet.ksqlDB.InsideOut/Kafka.DotNet.ksqlDB.InsideOut.csproj", "Kafka.DotNet.ksqlDB.InsideOut/"]
 COPY ["Kafka.DotNet.ksqlDB/Kafka.DotNet.ksqlDB.csproj", "Kafka.DotNet.ksqlDB/"]
