@@ -38,16 +38,6 @@ namespace Kafka.DotNet.ksqlDB.InsideOut.Producer
       return producerBuilder.Build();
     }
 
-    protected IProducer<TKey, Null> CreateNullProducer()
-    {
-      var nullSerializer = new KafkaJsonSerializer<Null>();
-
-      var producerBuilder = new ProducerBuilder<TKey, Null>(producerConfig)
-        .SetValueSerializer(nullSerializer);
-
-      return producerBuilder.Build();
-    }
-
     protected virtual void InterceptProducerBuilder(ProducerBuilder<TKey, TValue> producerBuilder)
     {
     }

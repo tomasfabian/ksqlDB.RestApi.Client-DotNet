@@ -7,13 +7,13 @@
 		<authors>@tomasfabian</authors>
 		<owners>@tomasfabian</owners>
 		<licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
-		<projectUrl>https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Kafka.DotNet.ksqlDb</projectUrl>
+		<projectUrl>https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.ksqlDB.InsideOut</projectUrl>
 		<iconUrl>https://download-codeplex.sec.s-msft.com/Download?ProjectName=casablanca&amp;DownloadId=630102&amp;Build=20425</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
-		<description>Kafka.DotNet.ksqlDB.InsideOut is a LINQ-enabled client API for issuing ksqlDB push queries and views. 
+		<description>Kafka.DotNet.ksqlDB.InsideOut is a client API for producing and consuming kafka topics and ksqlDB push queries and views. 
     Targets .NET 5, .NET Core 3.1 and .NET Standard 2.0.
-    Documentation for the library can be found at https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.ksqlDb/Wiki.md.</description>
-		<releaseNotes>https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.ksqlDb.InsideOut/ChangeLog.md</releaseNotes>
+    Documentation for the library can be found at https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.ksqlDB.InsideOut/Wiki.md.</description>
+		<releaseNotes>https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.ksqlDB.InsideOut/ChangeLog.md</releaseNotes>
 		<copyright>Copyright 2021</copyright>
 		<tags>kafka ksql ksqlDB LINQ .NET push query</tags>
 
