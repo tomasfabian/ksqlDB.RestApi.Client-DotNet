@@ -8,9 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
-using Blazor.Sample.Data;
+using Blazor.Sample.Data.Sensors;
+using Blazor.Sample.Kafka;
 using Blazor.Sample.Kafka.Consumers;
-using Blazor.Sample.Kafka.Producers;
 using Confluent.Kafka;
 using Kafka.DotNet.ksqlDB.InsideOut.Consumer;
 using Kafka.DotNet.ksqlDB.InsideOut.Producer;
@@ -60,8 +60,9 @@ namespace Blazor.Sample
 
       containerBuilder.RegisterInstance(producerConfig);
 
-      containerBuilder.RegisterType<ItemsKafkaProducer>()
-        .As<IKafkaProducer<int, Item>>()
+      containerBuilder.RegisterType<KafkaProducer<int, IoTSensor>>()
+        .As<IKafkaProducer<int, IoTSensor>>()
+        .WithParameter("topicName", TopicNames.IotSensors)
         .WithParameter(nameof(producerConfig), producerConfig);
     }
 
@@ -76,13 +77,13 @@ namespace Blazor.Sample
 
       containerBuilder.RegisterInstance(consumerConfig);
 
-      containerBuilder.RegisterType<ItemsKafkaConsumer>()
-        .As<IKafkaConsumer<int, ItemStream>>()
+      containerBuilder.RegisterType<SensorsStreamConsumer>()
+        .As<IKafkaConsumer<string, SensorsStream>>()
         .SingleInstance()
         .WithParameter(nameof(consumerConfig), consumerConfig);
 
-      containerBuilder.RegisterType<ItemsTableKafkaConsumer>()
-        .As<IKafkaConsumer<int, ItemTable>>()
+      containerBuilder.RegisterType<SensorsTableConsumer>()
+        .As<IKafkaConsumer<string, IoTSensorStats>>()
         .SingleInstance()
         .WithParameter(nameof(consumerConfig), consumerConfig);
     }
