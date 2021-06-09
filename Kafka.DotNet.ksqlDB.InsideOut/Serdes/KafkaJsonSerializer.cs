@@ -1,5 +1,5 @@
-﻿using System.IO;
-using System.Runtime.Serialization.Json;
+﻿using System.Text;
+using System.Text.Json;
 using Confluent.Kafka;
 
 namespace Kafka.DotNet.ksqlDB.InsideOut.Serdes
@@ -8,13 +8,9 @@ namespace Kafka.DotNet.ksqlDB.InsideOut.Serdes
   {
     public byte[] Serialize(TValue data, SerializationContext context)
     {
-      var serializer = new DataContractJsonSerializer(typeof(TValue));
+      var json = JsonSerializer.Serialize(data);
 
-      using var memoryStream = new MemoryStream();
-      
-      serializer.WriteObject(memoryStream, data);
-
-      return memoryStream.ToArray();
+      return Encoding.UTF8.GetBytes(json);
     }
   }
 }

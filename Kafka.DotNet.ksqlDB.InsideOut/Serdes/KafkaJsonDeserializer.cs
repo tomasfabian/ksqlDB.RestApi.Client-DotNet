@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 using Confluent.Kafka;
 
 namespace Kafka.DotNet.ksqlDB.InsideOut.Serdes
@@ -10,9 +11,12 @@ namespace Kafka.DotNet.ksqlDB.InsideOut.Serdes
       if (isNull)
         return default;
 
-      byte[] dataBytes = data.ToArray();
+      var jsonSerializerOptions = new JsonSerializerOptions
+      {
+        PropertyNameCaseInsensitive = true
+      };
 
-      TValue result = new DataContractJsonDeserializer<TValue>().Deserialize(dataBytes);
+      TValue result = JsonSerializer.Deserialize<TValue>(data, jsonSerializerOptions);
 
       return result;
     }

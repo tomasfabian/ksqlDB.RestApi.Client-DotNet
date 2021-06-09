@@ -7,7 +7,6 @@ namespace Blazor.Sample.Data.Sensors
   {
     public string Id { get; set; }
 
-    [DataMember(Name = "VALUE")]
     public int Value { get; set; }
   }
 }
