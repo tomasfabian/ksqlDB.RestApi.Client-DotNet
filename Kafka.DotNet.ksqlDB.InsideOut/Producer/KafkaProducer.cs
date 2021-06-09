@@ -5,20 +5,28 @@ using Kafka.DotNet.ksqlDB.InsideOut.Serdes;
 
 namespace Kafka.DotNet.ksqlDB.InsideOut.Producer
 {
-  public abstract class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
+  public class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
   {
     private readonly ProducerConfig producerConfig;
 
     public IProducer<TKey, TValue> Producer { get; }
 
-    protected KafkaProducer(ProducerConfig producerConfig)
+    public KafkaProducer(string topicName, ProducerConfig producerConfig)
     {
+      if(topicName == null)
+        throw new ArgumentNullException(nameof(topicName));
+
+      if (topicName.Trim() == String.Empty)
+        throw new ArgumentException("Input cannot be empty", nameof(topicName));
+
+      TopicName = topicName;
+
       this.producerConfig = producerConfig ?? throw new ArgumentNullException(nameof(producerConfig));
 
       Producer = CreateProducer();
     }
 
-    public abstract string TopicName { get; }
+    public string TopicName { get; }
 
     protected IProducer<TKey, TValue> CreateProducer()
     {

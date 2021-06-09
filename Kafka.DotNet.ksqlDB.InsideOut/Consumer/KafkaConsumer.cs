@@ -10,7 +10,7 @@ using Kafka.DotNet.ksqlDB.InsideOut.Serdes;
 
 namespace Kafka.DotNet.ksqlDB.InsideOut.Consumer
 {
-  public abstract class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
+  public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
   {
     #region Fields
 
@@ -20,8 +20,16 @@ namespace Kafka.DotNet.ksqlDB.InsideOut.Consumer
 
     #region Constructors
 
-    protected KafkaConsumer(ConsumerConfig consumerConfig)
+    public KafkaConsumer(string topicName, ConsumerConfig consumerConfig)
     {
+      if(topicName == null)
+        throw new ArgumentNullException(nameof(topicName));
+
+      if (topicName.Trim() == String.Empty)
+        throw new ArgumentException("Input cannot be empty", nameof(topicName));
+
+      TopicName = topicName;
+
       this.consumerConfig = consumerConfig ?? throw new ArgumentNullException(nameof(consumerConfig));
     }
 
@@ -29,7 +37,7 @@ namespace Kafka.DotNet.ksqlDB.InsideOut.Consumer
 
     #region Properties
 
-    public abstract string TopicName { get; }
+    public string TopicName { get; }
 
     private IConsumer<TKey, TValue> consumer;
 
