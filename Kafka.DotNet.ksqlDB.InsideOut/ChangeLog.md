@@ -10,4 +10,8 @@
 - KafkaJsonSerializer
 - KafkaJsonDeserializer
 - KafkaRawDeserializer
-- DataContractJsonDeserializer
+- KafkaDataContractJsonSerializer
+- KafkaDataContractJsonDeserializer
+
+### Extensions :
+- ConsumerBuilderExtensions
