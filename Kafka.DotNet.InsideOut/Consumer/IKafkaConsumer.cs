@@ -2,7 +2,7 @@
 using System.Threading;
 using Confluent.Kafka;
 
-namespace Kafka.DotNet.ksqlDB.InsideOut.Consumer
+namespace Kafka.DotNet.InsideOut.Consumer
 {
   public interface IKafkaConsumer : IDisposable
   {

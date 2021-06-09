@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Experimental", "Experimenta
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Sample", "Samples\Blazor.Sample\Blazor.Sample.csproj", "{9B744296-3BDF-41A6-B720-7271C329F7BF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafka.DotNet.ksqlDB.InsideOut", "Kafka.DotNet.ksqlDB.InsideOut\Kafka.DotNet.ksqlDB.InsideOut.csproj", "{63BEFF26-D85A-477F-A474-2E2B063BC6C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafka.DotNet.InsideOut", "Kafka.DotNet.InsideOut\Kafka.DotNet.InsideOut.csproj", "{63BEFF26-D85A-477F-A474-2E2B063BC6C0}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{6543DCB7-535D-4E0E-852A-95FCC85EF3B2}"
 EndProject

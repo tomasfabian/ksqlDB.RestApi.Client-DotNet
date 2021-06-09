@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Confluent.Kafka;
-using Kafka.DotNet.ksqlDB.InsideOut.Serdes;
+using Kafka.DotNet.InsideOut.Serdes;
 
-namespace Kafka.DotNet.ksqlDB.InsideOut.Producer
+namespace Kafka.DotNet.InsideOut.Producer
 {
   public class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
   {

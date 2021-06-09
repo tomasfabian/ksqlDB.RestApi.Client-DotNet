@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Blazor.Sample.Configuration;
 using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Kafka;
-using Kafka.DotNet.ksqlDB.InsideOut.Consumer;
+using Kafka.DotNet.InsideOut.Consumer;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;

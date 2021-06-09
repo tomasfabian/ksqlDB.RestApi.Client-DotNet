@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package >
+	<metadata>
+		<id>Kafka.DotNet.InsideOut</id>
+		<title>Kafka.DotNet.InsideOut</title>
+		<version>0.1-rc.1</version>
+		<authors>@tomasfabian</authors>
+		<owners>@tomasfabian</owners>
+		<license type="expression">Apache-2.0</license>
+		<projectUrl>https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.InsideOut</projectUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+		<description>Kafka.DotNet.InsideOut is a client API for producing and consuming kafka topics and ksqlDB push queries and views. 
+    Targets .NET 5, .NET Core 3.1 and .NET Standard 2.0.
+    Documentation for the library can be found at https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.InsideOut/Wiki.md.</description>
+		<releaseNotes>https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.InsideOut/ChangeLog.md</releaseNotes>
+		<copyright>Copyright 2021</copyright>
+		<tags>kafka ksql ksqlDB LINQ .NET push query</tags>
+
+		<dependencies>
+			<group>
+				<dependency id="Confluent.Kafka" version="1.0"></dependency>
+			</group>
+		</dependencies>
+	</metadata>
+</package>

@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Confluent.Kafka;
 
-namespace Kafka.DotNet.ksqlDB.InsideOut.Serdes
+namespace Kafka.DotNet.InsideOut.Serdes
 {
   public class KafkaJsonSerializer<TValue> : ISerializer<TValue>
   {

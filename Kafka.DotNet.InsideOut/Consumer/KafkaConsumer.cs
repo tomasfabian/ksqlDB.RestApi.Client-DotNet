@@ -6,9 +6,9 @@ using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
-using Kafka.DotNet.ksqlDB.InsideOut.Serdes;
+using Kafka.DotNet.InsideOut.Serdes;
 
-namespace Kafka.DotNet.ksqlDB.InsideOut.Consumer
+namespace Kafka.DotNet.InsideOut.Consumer
 {
   public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
   {

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Kafka.DotNet.ksqlDB.InsideOut\Kafka.DotNet.ksqlDB.InsideOut.csproj" />
+    <ProjectReference Include="..\..\Kafka.DotNet.InsideOut\Kafka.DotNet.InsideOut.csproj" />
     <ProjectReference Include="..\..\Kafka.DotNet.ksqlDB\Kafka.DotNet.ksqlDB.csproj" />
   </ItemGroup>
 

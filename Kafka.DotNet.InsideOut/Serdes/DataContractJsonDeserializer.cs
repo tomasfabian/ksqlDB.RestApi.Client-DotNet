@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Runtime.Serialization.Json;
 
-namespace Kafka.DotNet.ksqlDB.InsideOut.Serdes
+namespace Kafka.DotNet.InsideOut.Serdes
 {
   public class DataContractJsonDeserializer<TValue>
   {

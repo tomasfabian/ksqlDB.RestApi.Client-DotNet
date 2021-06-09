@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Confluent.Kafka;
 
-namespace Kafka.DotNet.ksqlDB.InsideOut.Producer
+namespace Kafka.DotNet.InsideOut.Producer
 {
   public interface IKafkaProducer : IDisposable
   {

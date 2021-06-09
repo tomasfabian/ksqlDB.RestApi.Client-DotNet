@@ -1,11 +1,11 @@
-﻿Kafka.DotNet.ksqlDB.InsideOut is a client API for producing and consuming kafka topics and ksqlDB push queries and views
+﻿Kafka.DotNet.InsideOut is a client API for producing and consuming kafka topics and ksqlDB push queries and views
 
 ### Blazor Sample 
 Set docker-compose.csproj as startup project in Kafka.DotNet.ksqlDb.Experimental.sln.
 
 ### Nuget
 ```
-Install-Package Kafka.DotNet.ksqlDB.InsideOut
+Install-Package Kafka.DotNet.InsideOut
 ```
 
 # KafkaProducer (v0.1.0)
@@ -14,7 +14,7 @@ Install-Package Kafka.DotNet.ksqlDB.InsideOut
 using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Kafka;
 using Confluent.Kafka;
-using Kafka.DotNet.ksqlDB.InsideOut.Producer;
+using Kafka.DotNet.InsideOut.Producer;
 
 const string bootstrapServers = "localhost:29092";
 
@@ -46,7 +46,7 @@ using System.Threading.Tasks;
 using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Kafka;
 using Confluent.Kafka;
-using Kafka.DotNet.ksqlDB.InsideOut.Consumer;
+using Kafka.DotNet.InsideOut.Consumer;
 
 const string bootstrapServers = "localhost:29092";
 
@@ -158,8 +158,8 @@ How to override the default System.Text.Json deserializer:
 ```C#
 using Blazor.Sample.Data.Sensors;
 using Confluent.Kafka;
-using Kafka.DotNet.ksqlDB.InsideOut.Consumer;
-using Kafka.DotNet.ksqlDB.InsideOut.Serdes;
+using Kafka.DotNet.InsideOut.Consumer;
+using Kafka.DotNet.InsideOut.Serdes;
 
 public class SensorsTableConsumer : KafkaConsumer<string, IoTSensorStats>
 {
@@ -179,7 +179,7 @@ public class SensorsTableConsumer : KafkaConsumer<string, IoTSensorStats>
 How to set offset end:
 
 ```C#
-using Kafka.DotNet.ksqlDB.InsideOut.Consumer.Extensions;
+using Kafka.DotNet.InsideOut.Consumer.Extensions;
 
 public class SensorsTableConsumer : KafkaConsumer<string, IoTSensorStats>
 {

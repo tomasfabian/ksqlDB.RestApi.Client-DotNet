@@ -1,7 +1,7 @@
 ﻿using Blazor.Sample.Data.Sensors;
 using Confluent.Kafka;
-using Kafka.DotNet.ksqlDB.InsideOut.Consumer;
-using Kafka.DotNet.ksqlDB.InsideOut.Consumer.Extensions;
+using Kafka.DotNet.InsideOut.Consumer;
+using Kafka.DotNet.InsideOut.Consumer.Extensions;
 
 namespace Blazor.Sample.Kafka.Consumers
 {

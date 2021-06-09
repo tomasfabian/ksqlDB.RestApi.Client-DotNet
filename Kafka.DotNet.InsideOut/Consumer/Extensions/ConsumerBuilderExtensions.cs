@@ -2,7 +2,7 @@
 using System.Linq;
 using Confluent.Kafka;
 
-namespace Kafka.DotNet.ksqlDB.InsideOut.Consumer.Extensions
+namespace Kafka.DotNet.InsideOut.Consumer.Extensions
 {
   public static class ConsumerBuilderExtensions
   {

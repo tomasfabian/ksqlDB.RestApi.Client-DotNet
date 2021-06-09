@@ -12,8 +12,8 @@ using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Kafka;
 using Blazor.Sample.Kafka.Consumers;
 using Confluent.Kafka;
-using Kafka.DotNet.ksqlDB.InsideOut.Consumer;
-using Kafka.DotNet.ksqlDB.InsideOut.Producer;
+using Kafka.DotNet.InsideOut.Consumer;
+using Kafka.DotNet.InsideOut.Producer;
 
 namespace Blazor.Sample
 {
