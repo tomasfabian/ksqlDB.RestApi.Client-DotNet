@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Extensions.DependencyInjection;
+using Blazor.Sample.HostedServices;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Blazor.Sample
 {
@@ -23,6 +25,7 @@ namespace Blazor.Sample
           {
             configBuilder.AddEnvironmentVariables();
           })
+          .ConfigureServices(services => services.AddHostedService<IoTSimulatorService>())
           .ConfigureWebHostDefaults(webBuilder =>
           {
             webBuilder.UseStartup<Startup>();
