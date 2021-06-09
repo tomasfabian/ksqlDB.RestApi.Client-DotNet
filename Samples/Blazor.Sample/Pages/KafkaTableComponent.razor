@@ -1,10 +1,11 @@
 ﻿@page "/kafkatable"
 
 @using Blazor.Sample.Data
+@using Blazor.Sample.Data.Sensors
 
 <h1>Kafka</h1>
 
-<p>This component demonstrates observing data from a kafka stream.</p>
+<p>This component demonstrates observing data from a kafka materialized view.</p>
 
 @if (items == null)
 {
@@ -17,14 +18,16 @@ else
         <tr>
             <th>Id</th>
             <th>Count</th>
+            <th>AvgValue</th>
         </tr>
         </thead>
         <tbody>
-        @foreach (var item in items)
+        @foreach (var item in items.Values)
         {
             <tr>
-                <td>@item.Id</td>
+                <td>@item.SensorId</td>
                 <td>@item.Count</td>
+                <td>@item.AvgValue</td>
             </tr>
         }
         </tbody>
@@ -32,10 +35,10 @@ else
 }
 
 @code {
-    private List<ItemTable> items;
+    private IDictionary<string, IoTSensorStats> items;
 
     protected override void OnInitialized()
     {
-        items = new List<ItemTable> { new() { Count = 0 }};
+        items = new Dictionary<string, IoTSensorStats>();
     }
 }

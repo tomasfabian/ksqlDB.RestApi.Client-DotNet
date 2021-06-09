@@ -4,7 +4,8 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Blazor.Sample.Data;
+using Blazor.Sample.Configuration;
+using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Kafka;
 using Kafka.DotNet.ksqlDB.InsideOut.Consumer;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
@@ -21,7 +22,7 @@ namespace Blazor.Sample.Pages
     private IConfiguration Configuration { get; init; }
 
     [Inject]
-    private IKafkaConsumer<int, ItemTable> ItemsTableConsumer { get; init; }
+    private IKafkaConsumer<string, IoTSensorStats> ItemsTableConsumer { get; init; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -31,6 +32,12 @@ namespace Blazor.Sample.Pages
         .ObserveOn(SynchronizationContext.Current)
         .Subscribe(c =>
         {
+          c.Value.SensorId = c.Key;
+
+          items[c.Key] = c.Value;
+
+          StateHasChanged();
+          
           Console.WriteLine($"{c.Key} - {c.Value.Count}");
         }, error =>
         {
@@ -42,15 +49,15 @@ namespace Blazor.Sample.Pages
 
     private async Task CreateTableAsync()
     {
-      string ksqlDbUrl = Configuration["ksqlDb:Url"];
+      string ksqlDbUrl = Configuration[ConfigKeys.KSqlDb_Url];
 
       await using var context = new KSqlDBContext(ksqlDbUrl);
 
-      var statement = context.CreateOrReplaceTableStatement(tableName: TopicNames.ItemsTable)
-        .As<Item>()
-        .Where(c => c.Description != "ET")
-        .GroupBy(c => c.Id)
-        .Select(c => new {Id = c.Key, Count = c.Count(), });
+      var statement = context.CreateOrReplaceTableStatement(tableName: TopicNames.SensorsTable)
+        .As<IoTSensor>(TopicNames.IotSensors)
+        .Where(c => c.SensorId != "Sensor-5")
+        .GroupBy(c => c.SensorId)
+        .Select(c => new {SensorId = c.Key, Count = c.Count(), AvgValue = c.Avg(a => a.Value) });
 
       var httpResponseMessage = await statement.ExecuteStatementAsync();
 
