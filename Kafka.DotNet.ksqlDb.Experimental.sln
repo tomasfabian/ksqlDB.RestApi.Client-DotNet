@@ -25,6 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafka.DotNet.InsideOut", "K
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{6543DCB7-535D-4E0E-852A-95FCC85EF3B2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{DC411C68-7EC4-4104-A80D-2FFD8FA092F9}"
+	ProjectSection(SolutionItems) = preProject
+		Kafka.DotNet.InsideOut\Package.nuspec = Kafka.DotNet.InsideOut\Package.nuspec
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
