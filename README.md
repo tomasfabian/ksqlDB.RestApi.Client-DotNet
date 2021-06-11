@@ -97,6 +97,85 @@ run in command line:
 
 ```docker compose up -d```
 
+# Kafka stream processing
+[Kafka.DotNet.InsideOut](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.InsideOut/Wiki.md) is a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with Kafka.DotNet.ksqlDB
+```
+Install-Package Kafka.DotNet.InsideOut -Version 0.1.0-rc.3
+Install-Package Kafka.DotNet.ksqlDB
+```
+
+```C#
+using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
+
+private string KsqlDbUrl => "http://localhost:8088";
+
+private async Task CreateOrReplaceMaterializedTableAsync()
+{
+  string ksqlDbUrl = Configuration[ConfigKeys.KSqlDb_Url];
+
+  await using var context = new KSqlDBContext(ksqlDbUrl);
+
+  var statement = context.CreateOrReplaceTableStatement(tableName: "SENSORSTABLE")
+    .As<IoTSensor>("IotSensors")
+    .Where(c => c.SensorId != "Sensor-5")
+    .GroupBy(c => c.SensorId)
+    .Select(c => new {SensorId = c.Key, Count = c.Count(), AvgValue = c.Avg(a => a.Value) });
+
+  var httpResponseMessage = await statement.ExecuteStatementAsync();
+
+  if (httpResponseMessage.IsSuccessStatusCode)
+  {
+    var statementResponses = httpResponseMessage.ToStatementResponses();
+  }
+  else
+  {
+    var statementResponse = httpResponseMessage.ToStatementResponse();
+  }
+}
+```
+```C#
+public class SensorsTableConsumer : KafkaConsumer<string, IoTSensorStats>
+{
+  public SensorsTableConsumer(ConsumerConfig consumerConfig)
+    : base("SENSORSTABLE", consumerConfig)
+  {
+  }
+}
+
+public record IoTSensorStats
+{
+  public string SensorId { get; set; }
+  public double AvgValue { get; set; }
+  public int Count { get; set; }
+}
+```
+```C#
+using System.Reactive.Linq;
+using System.Threading.Tasks;
+using Confluent.Kafka;
+using Kafka.DotNet.InsideOut.Consumer;
+
+const string bootstrapServers = "localhost:29092";
+
+var consumerConfig = new ConsumerConfig
+{
+  BootstrapServers = bootstrapServers,
+  GroupId = System.Diagnostics.Process.GetCurrentProcess().ProcessName,
+  AutoOffsetReset = AutoOffsetReset.Latest
+};
+
+var kafkaConsumer = new SensorsTableConsumer(consumerConfig);
+
+var subscription = kafkaConsumer.ConnectToTopicAsync()
+  .Take(100)
+  .Subscribe(c => Console.WriteLine($"Value: {c.Value}"));
+```
+
+[Blazor server side example](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB) - Kafka.DotNet.ksqlDb.Experimental.sln
+
 # Setting query parameters (v0.1.0)
 Default settings:
 'auto.offset.reset' is set to 'earliest' by default. 
@@ -1636,7 +1715,7 @@ In order to improve the v1.0.0 release the following methods and properties were
 
 IKSqlDbRestApiClient interface changes:
 ```
-| v.0.11.0                      | v1.0.0                        |
+| v0.11.0                      | v1.0.0                        |
 |---------------------------------------------------------------|
 | CreateTable<T>                | CreateTableAsync<T>           |
 | CreateStream<T>               | CreateStreamAsync<T>          |
