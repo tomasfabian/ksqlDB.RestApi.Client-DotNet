@@ -6,9 +6,26 @@ Set docker-compose.csproj as startup project in Kafka.DotNet.ksqlDb.Experimental
 ### Nuget
 ```
 Install-Package Kafka.DotNet.InsideOut
+
+Install-Package Kafka.DotNet.ksqlDB
 ```
 
 # KafkaProducer (v0.1.0)
+
+```C#
+public class SensorsProducer : KafkaProducer<string, IoTSensorStats>
+{
+  public SensorsProducer(string topicName, ProducerConfig producerConfig) 
+    : base(topicName, producerConfig)
+  {
+  }
+    
+  protected override void InterceptProducerBuilder(ProducerBuilder<string, IoTSensorStats> producerBuilder)
+  {
+    base.InterceptProducerBuilder(producerBuilder);
+  }
+}
+```
 
 ```C#
 using Blazor.Sample.Data.Sensors;
@@ -20,21 +37,21 @@ const string bootstrapServers = "localhost:29092";
 
 private async Task ProduceValueAsync()
 {
-	var producerConfig = new ProducerConfig
-	{
-		BootstrapServers = bootstrapServers,
-		Acks = Acks.Leader
-	};
+  var producerConfig = new ProducerConfig
+  {
+    BootstrapServers = bootstrapServers,
+    Acks = Acks.Leader
+  };
 
-	using var kafkaProducer = new KafkaProducer<int, IoTSensor>("IotSensors", producerConfig);
+  using var kafkaProducer = new KafkaProducer<int, IoTSensor>("IotSensors", producerConfig);
 	
-	var sensor = new IoTSensor
-	{
-		SensorId = $"Sensor-1",
-		Value = 42
-	};
+  var sensor = new IoTSensor
+  {
+    SensorId = $"Sensor-1",
+    Value = 42
+  };
 
-	var deliveryResult = await kafkaProducer.ProduceMessageAsync(1, sensor);
+  var deliveryResult = await kafkaProducer.ProduceMessageAsync(1, sensor);
 }
 ```
 
@@ -68,10 +85,10 @@ var subscription = kafkaConsumer.ConnectToTopicAsync()
 
 public class SensorsTableConsumer : KafkaConsumer<string, IoTSensorStats>
 {
-	public SensorsTableConsumer(ConsumerConfig consumerConfig)
-		: base("SENSORSTABLE", consumerConfig)
-	{
-	}
+  public SensorsTableConsumer(ConsumerConfig consumerConfig)
+    : base("SENSORSTABLE", consumerConfig)
+  {
+  }
 }
 
 ```
@@ -90,24 +107,24 @@ private string KsqlDbUrl => "http://localhost:8088";
 
 private async Task CreateOrReplaceMaterializedTableAsync()
 {
-	await using var context = new KSqlDBContext(KsqlDbUrl);
+  await using var context = new KSqlDBContext(KsqlDbUrl);
 
-	var statement = context.CreateOrReplaceTableStatement(tableName: "SensorsTable")
-		.As<IoTSensor>("IotSensors")
-		.Where(c => c.SensorId != "Sensor-5")
-		.GroupBy(c => c.SensorId)
-		.Select(c => new { SensorId = c.Key, Count = c.Count(), AvgValue = c.Avg(a => a.Value) });
+  var statement = context.CreateOrReplaceTableStatement(tableName: "SensorsTable")
+    .As<IoTSensor>("IotSensors")
+    .Where(c => c.SensorId != "Sensor-5")
+    .GroupBy(c => c.SensorId)
+    .Select(c => new { SensorId = c.Key, Count = c.Count(), AvgValue = c.Avg(a => a.Value) });
 
-	var httpResponseMessage = await statement.ExecuteStatementAsync();
+  var httpResponseMessage = await statement.ExecuteStatementAsync();
 
-	if (!httpResponseMessage.IsSuccessStatusCode)
-	{
-		var statementResponse = httpResponseMessage.ToStatementResponse();
-	}
-	else
-	{
-		var statementResponses = httpResponseMessage.ToStatementResponses();
-	}
+  if (!httpResponseMessage.IsSuccessStatusCode)
+  {
+    var statementResponse = httpResponseMessage.ToStatementResponse();
+  }
+  else
+  {
+    var statementResponses = httpResponseMessage.ToStatementResponses();
+  }
 }
 ```
 
@@ -124,19 +141,19 @@ private string KsqlDbUrl => "http://localhost:8088";
 
 private async Task<HttpResponseMessage> TryCreateStreamAsync()
 {
-	EntityCreationMetadata metadata = new()
-	{
-		KafkaTopic = "IotSensors",
-		Partitions = 1,
-		Replicas = 1
-	};
+  EntityCreationMetadata metadata = new()
+  {
+    KafkaTopic = "IotSensors",
+    Partitions = 1,
+    Replicas = 1
+  };
 
-	var http = new HttpClientFactory(new Uri(KsqlDbUrl));
-	var restApiClient = new KSqlDbRestApiClient(http);
+  var http = new HttpClientFactory(new Uri(KsqlDbUrl));
+  var restApiClient = new KSqlDbRestApiClient(http);
 
-	var httpResponseMessage = await restApiClient.CreateStreamAsync<IoTSensor>(metadata, ifNotExists: true);
+  var httpResponseMessage = await restApiClient.CreateStreamAsync<IoTSensor>(metadata, ifNotExists: true);
 
-	return httpResponseMessage;
+  return httpResponseMessage;
 }
 ```
 
@@ -147,10 +164,10 @@ using System.Runtime.Serialization;
 [DataContract]
 public record SensorsStream
 {
-public string Id { get; set; }
+  public string Id { get; set; }
 
-[DataMember(Name = "VALUE")]
-public int Value { get; set; }
+  [DataMember(Name = "VALUE")]
+  public int Value { get; set; }
 }
 ```
 
@@ -203,3 +220,5 @@ drop table SENSORSTABLE delete topic;
 drop stream SENSORSSTREAM delete topic;
 drop stream IOTSENSORS delete topic;
 ```
+
+# Linqpad
