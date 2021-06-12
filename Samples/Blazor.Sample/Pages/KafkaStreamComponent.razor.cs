@@ -12,6 +12,7 @@ using Kafka.DotNet.InsideOut.Consumer;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
 
@@ -62,13 +63,13 @@ namespace Blazor.Sample.Pages
 
       var httpResponseMessage = await statement.ExecuteStatementAsync();
 
-      if (!httpResponseMessage.IsSuccessStatusCode)
+      if (httpResponseMessage.IsSuccessStatusCode)
       {
-        var statementResponse = httpResponseMessage.ToStatementResponse();
+        StatementResponse[] statementResponses = httpResponseMessage.ToStatementResponses();
       }
       else
       {
-        var statementResponses = httpResponseMessage.ToStatementResponses();
+        StatementResponse statementResponse = httpResponseMessage.ToStatementResponse();
       }
     }
 

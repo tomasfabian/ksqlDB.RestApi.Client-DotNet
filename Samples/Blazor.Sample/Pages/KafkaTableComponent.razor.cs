@@ -61,13 +61,13 @@ namespace Blazor.Sample.Pages
 
       var httpResponseMessage = await statement.ExecuteStatementAsync();
 
-      if (!httpResponseMessage.IsSuccessStatusCode)
+      if (httpResponseMessage.IsSuccessStatusCode)
       {
-        var statementResponse = httpResponseMessage.ToStatementResponse();
+        var statementResponses = httpResponseMessage.ToStatementResponses();
       }
       else
       {
-        var statementResponses = httpResponseMessage.ToStatementResponses();
+        var statementResponse = httpResponseMessage.ToStatementResponse();
       }
     }
   }
