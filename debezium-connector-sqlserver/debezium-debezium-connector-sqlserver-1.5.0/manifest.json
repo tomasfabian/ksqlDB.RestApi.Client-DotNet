@@ -1,0 +1,58 @@
+{
+  "name": "debezium-connector-sqlserver",
+  "version": "1.5.0",
+  "title": "Debezium SQL Server CDC Connector",
+  "description": "Debezium’s SQL Server Connector can monitor and record the row-level changes in the schemas of a SQL Server 2017 database. This connector was added in Debezium 0.9.0.\n\nThe first time it connects to a SQL Server database/cluster, it reads a consistent snapshot of all of the schemas. When that snapshot is complete, the connector continuously streams the changes that were committed to SQL Server and generates corresponding insert, update and delete events. All of the events for each table are recorded in a separate Kafka topic, where they can be easily consumed by applications and services.",
+  "documentation_url": "http://debezium.io/docs/connectors/sqlserver/",
+  "source_url": "https://github.com/debezium/debezium/",
+  "logo": "assets/color_debezium_256px.png",
+  "owner": {
+    "name": "Debezium Community",
+    "username": "debezium",
+    "type": "organization",
+    "url": "https://debezium.io",
+    "logo": "assets/color_debezium_256px.png"
+  },
+  "features": {
+    "confluent_control_center_integration": true,
+    "kafka_connect_api": true,
+    "single_message_transforms": true,
+    "supported_encodings": [
+      "any"
+    ]
+  },
+  "requirements": [
+    "SQL Server 2017"
+  ],
+  "docker_image": {
+    "namespace": "debezium",
+    "name": "debezium/connect",
+    "tag": "1.5.0"
+  },
+  "license": [
+    {
+      "name": "Apache 2.0",
+      "url": "https://github.com/debezium/debezium/blob/master/LICENSE.txt"
+    }
+  ],
+  "support": {
+    "provider_name": "Confluent, Inc.",
+    "summary": "Confluent supports Debezium's SQL Server connector version 0.9.3 and later, and using this connector with SQL Server 2016 SP1 or later. SQL Server on Microsoft Azure is currently not supported. Find more information Find more information <a href=\"https://docs.confluent.io/current/connect/debezium-connect-sqlserver/index.html\">here</a>.<p>This connector is <a href=\"https://www.confluent.io/subscription/\">supported by Confluent</a> as part of a\n<a href=\"https://www.confluent.io/product/confluent-platform/\">Confluent Platform</a> subscription.",
+    "url": "https://docs.confluent.io/current/",
+    "logo": "assets/confluent.png"
+  },
+  "component_types": [
+    "source"
+  ],
+  "tags": [
+    "sql",
+    "server",
+    "microsoft",
+    "rdbms",
+    "relational",
+    "change data capture",
+    "cdc",
+    "jdbc",
+    "snapshot"
+  ]
+}
