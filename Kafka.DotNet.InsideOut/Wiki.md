@@ -1,4 +1,4 @@
-﻿Kafka.DotNet.InsideOut is a client API for producing and consuming kafka topics and ksqlDB push queries and views
+﻿Kafka.DotNet.InsideOut is a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with Kafka.DotNet.ksqlDB or by other means.
 
 ### Blazor Sample 
 Set docker-compose.csproj as startup project in Kafka.DotNet.ksqlDb.Experimental.sln.
@@ -26,7 +26,14 @@ public class SensorsProducer : KafkaProducer<string, IoTSensorStats>
   }
 }
 ```
-
+```C#
+public record IoTSensorStats
+{
+  public string SensorId { get; set; }
+  public double AvgValue { get; set; }
+  public int Count { get; set; }
+}
+```
 ```C#
 using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Kafka;
@@ -222,3 +229,4 @@ drop stream IOTSENSORS delete topic;
 ```
 
 # Linqpad
+[Kafka streaming](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/ksqldb.Streaming.linq)
