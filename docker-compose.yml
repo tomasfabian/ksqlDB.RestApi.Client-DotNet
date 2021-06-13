@@ -3,8 +3,23 @@ version: '3.4'
 networks:
   kafkanetwork:
     driver: bridge
+    
+volumes:
+  sqlserver2019data:
 
 services:
+  sqlserver2019:
+    image: "mcr.microsoft.com/mssql/server:2019-latest" 
+    ports:
+      - "1433:1433"
+    networks:
+      - kafkanetwork
+    environment:
+      - "ACCEPT_EULA=Y"
+      - "SA_PASSWORD=<YourNewStrong@Passw0rd>"
+      - "MSSQL_AGENT_ENABLED=True"
+    volumes:
+      - sqlserver2019data:/var/opt/mssql
 
   zookeeper:
     image: 'bitnami/zookeeper:latest'
