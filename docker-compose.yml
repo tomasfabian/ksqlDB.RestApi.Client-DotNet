@@ -5,6 +5,7 @@ networks:
     driver: bridge
 
 services:
+
   zookeeper:
     image: 'bitnami/zookeeper:latest'
     ports:
@@ -22,10 +23,10 @@ services:
       - kafkanetwork
     environment:
       - KAFKA_BROKER_ID=1
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=CLIENT://broker01:9092,EXTERNAL://broker01:29092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://broker01:9092,EXTERNAL://localhost:29092
-      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://broker01:9092,PLAINTEXT_HOST://broker01:29092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://broker01:9092,PLAINTEXT_HOST://localhost:29092
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
@@ -45,22 +46,58 @@ services:
     depends_on:
       - broker01
 
-  ksqldb-server:
-    image: confluentinc/ksqldb-server:0.15.0
-    hostname: ksqldb-server
-    container_name: ksqldb-server
-    ports:
-      - "8088:8088"
+  schema-registry:
+    image: confluentinc/cp-schema-registry:6.0.0
     networks: 
       - kafkanetwork
+    depends_on:
+      - zookeeper
+      - broker01
+    ports:
+      - "8081:8081"
     environment:
-      KSQL_CONFIG_DIR: "/etc/ksql"
-      KSQL_BOOTSTRAP_SERVERS: "broker01:9092"
-      KSQL_HOST_NAME: ksqldb-server
-      KSQL_LISTENERS: "http://0.0.0.0:8088"
-      KSQL_CACHE_MAX_BYTES_BUFFERING: 0
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
+
+  ksqldb-server:
+    image: confluentinc/ksqldb-server:0.15.0
+    ports:
+      - "8088:8088"
+      - "8083:8083"
+    networks: 
+      - kafkanetwork
     depends_on:
       - broker01
+      - schema-registry
+    volumes:
+     - "./debezium-connector-sqlserver/:/usr/share/kafka/plugins/"
+    environment:
+      KSQL_LISTENERS: "http://0.0.0.0:8088"
+      KSQL_BOOTSTRAP_SERVERS: broker01:9092
+      KSQL_HOST_NAME: ksqldb-server
+      KSQL_KSQL_SERVICE_ID: ksql-connect-cluster
+      KSQL_KSQL_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      KSQL_KSQL_CONNECT_WORKER_CONFIG: "/etc/ksqldb/connect.properties"
+      KSQL_CONNECT_BOOTSTRAP_SERVERS: 'broker01:9092'
+      KSQL_CONNECT_REST_ADVERTISED_HOST_NAME: 'ksqldb-server'
+      KSQL_CONNECT_REST_PORT: 8083
+      KSQL_CONNECT_GROUP_ID: ksqldb-kafka-connect-group-01
+      KSQL_CONNECT_CONFIG_STORAGE_TOPIC: _ksqldb-kafka-connect-group-01-configs
+      KSQL_CONNECT_OFFSET_STORAGE_TOPIC: _ksqldb-kafka-connect-group-01-offsets
+      KSQL_CONNECT_STATUS_STORAGE_TOPIC: _ksqldb-kafka-connect-group-01-status      
+
+      KSQL_CONNECT_KEY_CONVERTER: "io.confluent.connect.avro.AvroConverter"
+      KSQL_CONNECT_VALUE_CONVERTER: "io.confluent.connect.avro.AvroConverter"
+      KSQL_CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      KSQL_CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      #KSQL_CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+
+      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
+      KSQL_CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: '1'
+      KSQL_CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: '1'
+      KSQL_CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: '1'
+      KSQL_CONNECT_PLUGIN_PATH: '/usr/share/kafka/plugins/'
 
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:0.15.0
