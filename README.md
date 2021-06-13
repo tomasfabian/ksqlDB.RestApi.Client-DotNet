@@ -100,7 +100,7 @@ run in command line:
 # Kafka stream processing
 [Kafka.DotNet.InsideOut](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.InsideOut/Wiki.md) is a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with Kafka.DotNet.ksqlDB
 ```
-Install-Package Kafka.DotNet.InsideOut -Version 0.1.0-rc.3
+Install-Package Kafka.DotNet.InsideOut
 Install-Package Kafka.DotNet.ksqlDB
 ```
 
