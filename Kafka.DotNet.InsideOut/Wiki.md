@@ -1,7 +1,7 @@
 ﻿Kafka.DotNet.InsideOut is a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with Kafka.DotNet.ksqlDB or by other means.
 
 ### Blazor Sample 
-Set docker-compose.csproj as startup project in Kafka.DotNet.ksqlDb.Experimental.sln.
+Set docker-compose.csproj as startup project in Kafka.DotNet.InsideOut.sln.
 
 ### Nuget
 ```

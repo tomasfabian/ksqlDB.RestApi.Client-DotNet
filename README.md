@@ -174,7 +174,7 @@ var subscription = kafkaConsumer.ConnectToTopicAsync()
   .Subscribe(c => Console.WriteLine($"Value: {c.Value}"));
 ```
 
-[Blazor server side example](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB) - Kafka.DotNet.ksqlDb.Experimental.sln
+[Blazor server side example](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB) - Kafka.DotNet.InsideOut.sln
 
 # Setting query parameters (v0.1.0)
 Default settings:
