@@ -10,11 +10,17 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
-     <PackageReference Include="Kafka.DotNet.InsideOut" Version="0.1.0-rc.3" /> 
-    <PackageReference Include="Kafka.DotNet.ksqlDB" Version="1.1.0-rc.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.7" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.14" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Kafka.DotNet.InsideOut" Version="0.1.0-rc.3" />
+    <PackageReference Include="Kafka.DotNet.ksqlDB" Version="1.1.0-rc.1" />
+  </ItemGroup>
+  
   <ItemGroup>
     <!--<ProjectReference Include="..\..\Kafka.DotNet.InsideOut\Kafka.DotNet.InsideOut.csproj" />
     <ProjectReference Include="..\..\Kafka.DotNet.ksqlDB\Kafka.DotNet.ksqlDB.csproj" />-->

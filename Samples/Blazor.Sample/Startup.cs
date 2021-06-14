@@ -8,12 +8,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
+using Blazor.Sample.Data;
 using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Kafka;
 using Blazor.Sample.Kafka.Consumers;
 using Confluent.Kafka;
 using Kafka.DotNet.InsideOut.Consumer;
 using Kafka.DotNet.InsideOut.Producer;
+using Microsoft.EntityFrameworkCore;
 
 namespace Blazor.Sample
 {
@@ -30,6 +32,11 @@ namespace Blazor.Sample
     {
       services.AddRazorPages();
       services.AddServerSideBlazor();
+
+      var connectionString = Configuration["ConnectionStrings:DefaultConnection"];
+
+      services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlServer(connectionString));
     }
 
     private ContainerBuilder ContainerBuilder { get; set; }
