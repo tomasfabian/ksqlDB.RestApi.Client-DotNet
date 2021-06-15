@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
@@ -66,24 +64,7 @@ namespace Kafka.DotNet.InsideOut.Consumer
       return new KafkaJsonDeserializer<TValue>();
     }
 
-    private Subject<Message<TKey, TValue>> messagesSubject;
-    private CancellationTokenSource cancellationTokenSource;
-
-    public IObservable<Message<TKey, TValue>> ConnectToTopicAsync()
-    {
-      if (messagesSubject != null)
-        return messagesSubject.AsObservable();
-
-      cancellationTokenSource = new CancellationTokenSource();
-
-      messagesSubject = new Subject<Message<TKey, TValue>>();
-
-      Task.Run(() => ConnectToTopic(cancellationTokenSource.Token), cancellationTokenSource.Token);
-
-      return messagesSubject.AsObservable();
-    }
-
-    private void ConnectToTopic(CancellationToken cancellationToken)
+    public IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic(TimeSpan? timeout, CancellationToken cancellationToken)
     {
       using (consumer = CreateConsumer())
       {
@@ -93,7 +74,17 @@ namespace Kafka.DotNet.InsideOut.Consumer
 
           while (!cancellationToken.IsCancellationRequested)
           {
-            Consume(cancellationToken);
+            ConsumeResult<TKey, TValue> consumeResult;
+
+            if (timeout.HasValue) 
+              consumeResult = consumer.Consume(timeout.Value);
+            else
+              consumeResult = consumer.Consume(cancellationToken);
+
+            yield return consumeResult;
+
+            if(consumeResult != null)
+              LastConsumedOffset = consumeResult.Offset;
           }
         }
         finally
@@ -110,30 +101,7 @@ namespace Kafka.DotNet.InsideOut.Consumer
       consumer.Subscribe(TopicName);
     }
 
-    private void Consume(CancellationToken cancellationToken)
-    {
-      var consumeResult = consumer.Consume(cancellationToken);
-
-      ConsumeResult(consumeResult);
-    }
-
     protected Offset? LastConsumedOffset { get; private set; }
-
-    private void ConsumeResult(ConsumeResult<TKey, TValue> consumeResult)
-    {
-      if (consumeResult == null)
-        return;
-
-      messagesSubject?.OnNext(consumeResult.Message);
-
-      LastConsumedOffset = consumeResult.Offset;
-
-      OnConsumeResult(consumeResult);
-    }
-
-    protected virtual void OnConsumeResult(ConsumeResult<TKey, TValue> consumeResult)
-    {
-    }
 
     private void SeekToEnd(ConsumeResult<TKey, TValue> consumeResult)
     {
@@ -162,25 +130,10 @@ namespace Kafka.DotNet.InsideOut.Consumer
       {
         OnDispose();
 
-        cancellationTokenSource?.Cancel();
-
-        DisposeMessagesSubject();
-
         LastConsumedOffset = null;
       }
 
       disposed = true;
-    }
-
-    private void DisposeMessagesSubject()
-    {
-      if (messagesSubject == null) return;
-      
-      messagesSubject.OnCompleted();
-
-      messagesSubject.Dispose();
-
-      messagesSubject = null;
     }
 
     protected virtual void OnDispose()

@@ -3,8 +3,8 @@
 	<metadata>
 		<id>Kafka.DotNet.InsideOut</id>
 		<title>Kafka.DotNet.InsideOut</title>
-		<version>0.1.0</version>
-		<authors>@tomasfabian</authors>
+		<version>1.0.0-rc.2</version>
+		<authors>Tomas Fabian</authors>
 		<owners>@tomasfabian</owners>
 		<license type="expression">Apache-2.0</license>
 		<projectUrl>https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.InsideOut</projectUrl>
@@ -18,13 +18,13 @@
 
 		<dependencies>
 			<group targetFramework=".NETCoreApp3.1">
-				<dependency id="Confluent.Kafka" version="1.0" exclude="Build,Analyzers" />
+				<dependency id="Confluent.Kafka" version="1.7" exclude="Build,Analyzers" />
 			</group>
 			<group targetFramework="net5.0">
-				<dependency id="Confluent.Kafka" version="1.0" exclude="Build,Analyzers" />
+				<dependency id="Confluent.Kafka" version="1.7" exclude="Build,Analyzers" />
 			</group>
 			<group targetFramework=".NETStandard2.0">
-				<dependency id="Confluent.Kafka" version="1.0" exclude="Build,Analyzers" />
+				<dependency id="Confluent.Kafka" version="1.7" exclude="Build,Analyzers" />
 			</group>
 		</dependencies>
 	</metadata>

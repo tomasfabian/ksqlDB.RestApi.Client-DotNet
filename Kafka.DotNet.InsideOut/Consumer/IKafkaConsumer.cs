@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Confluent.Kafka;
 
@@ -11,6 +12,6 @@ namespace Kafka.DotNet.InsideOut.Consumer
 
   public interface IKafkaConsumer<TKey, TValue> : IKafkaConsumer
   {
-    IObservable<Message<TKey, TValue>> ConnectToTopicAsync();
+    public IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic(TimeSpan? timeout, CancellationToken cancellationToken);
   }
 }

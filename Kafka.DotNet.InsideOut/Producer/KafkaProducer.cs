@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using Kafka.DotNet.InsideOut.Serdes;
@@ -47,7 +48,7 @@ namespace Kafka.DotNet.InsideOut.Producer
       return new KafkaJsonSerializer<TValue>();
     }
 
-    public async Task<DeliveryResult<TKey, TValue>> ProduceMessageAsync(TKey key, TValue value)
+    public async Task<DeliveryResult<TKey, TValue>> ProduceMessageAsync(TKey key, TValue value, CancellationToken cancellationToken = default)
     {
       var message = new Message<TKey, TValue>
       {
@@ -55,7 +56,7 @@ namespace Kafka.DotNet.InsideOut.Producer
         Value = value,
       };
 
-      var deliveryResult = await Producer.ProduceAsync(TopicName, message);
+      var deliveryResult = await Producer.ProduceAsync(TopicName, message, cancellationToken);
 
       return deliveryResult;
     }
