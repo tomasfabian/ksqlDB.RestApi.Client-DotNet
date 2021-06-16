@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,6 +28,8 @@ namespace Blazor.Sample.Pages
     private IKafkaConsumer<string, SensorsStream> ItemsConsumer { get; init; }
 
     private IDisposable topicSubscription;
+    
+    private CancellationTokenSource cancellationTokenSource = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -35,23 +38,29 @@ namespace Blazor.Sample.Pages
       var brokerMetadata = adminClient.GetMetadata(TimeSpan.FromSeconds(3));
 
       await CreateItemsStreamAsync();
+      
+      var synchronizationContext = SynchronizationContext.Current;
 
-      topicSubscription = ItemsConsumer.ConnectToTopicAsync()
-        .ObserveOn(SynchronizationContext.Current)
+      SubscribeToSensors(synchronizationContext);
+
+      await base.OnInitializedAsync();
+    }
+
+    private void SubscribeToSensors(SynchronizationContext synchronizationContext)
+    {
+      topicSubscription = ItemsConsumer.ConnectToTopic(timeout: null, cancellationToken: new CancellationToken())
+        .ToObservable()
+        .SubscribeOn(NewThreadScheduler.Default)
+        .ObserveOn(synchronizationContext)
         .Subscribe(c =>
         {
           c.Value.Id = c.Key;
 
           items.Enqueue(c.Value);
           StateHasChanged();
-        }, error =>
-        {
-
-        });
-
-      await base.OnInitializedAsync();
+        }, error => { });
     }
-    
+
     private async Task CreateItemsStreamAsync()
     {
       await using var context = new KSqlDBContext(ksqlDbUrl);
@@ -61,7 +70,7 @@ namespace Blazor.Sample.Pages
         .Select(c => new { c.SensorId, c.Value })
         .PartitionBy(c => c.SensorId);
 
-      var httpResponseMessage = await statement.ExecuteStatementAsync();
+      var httpResponseMessage = await statement.ExecuteStatementAsync(cancellationTokenSource.Token);
 
       if (httpResponseMessage.IsSuccessStatusCode)
       {
@@ -91,6 +100,9 @@ namespace Blazor.Sample.Pages
 
     public void Dispose()
     {
+      cancellationTokenSource.Cancel();
+      cancellationTokenSource.Dispose();
+
       topicSubscription?.Dispose();
     }
   }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Blazor.Sample.Pages
 {
-  public partial class KafkaTableComponent
+  public partial class KafkaTableComponent : IDisposable
   {
     [Inject]
     private IConfiguration Configuration { get; init; }
@@ -24,12 +25,27 @@ namespace Blazor.Sample.Pages
     [Inject]
     private IKafkaConsumer<string, IoTSensorStats> ItemsTableConsumer { get; init; }
 
+    private CancellationTokenSource cancellationTokenSource = new();
+
     protected override async Task OnInitializedAsync()
     {
       await CreateTableAsync();
 
-      ItemsTableConsumer.ConnectToTopicAsync()
-        .ObserveOn(SynchronizationContext.Current)
+      var synchronizationContext = SynchronizationContext.Current;
+
+      SubscribeToSensors(synchronizationContext);
+
+      await base.OnInitializedAsync();
+    }
+    
+    private IDisposable subscription;
+    
+    private void SubscribeToSensors(SynchronizationContext synchronizationContext)
+    {
+      subscription = ItemsTableConsumer.ConnectToTopic(timeout: null, cancellationToken: new CancellationToken())
+        .ToObservable()
+        .SubscribeOn(NewThreadScheduler.Default)
+        .ObserveOn(synchronizationContext)
         .Subscribe(c =>
         {
           c.Value.SensorId = c.Key;
@@ -37,14 +53,9 @@ namespace Blazor.Sample.Pages
           items[c.Key] = c.Value;
 
           StateHasChanged();
-          
+
           Console.WriteLine($"{c.Key} - {c.Value.Count}");
-        }, error =>
-        {
-
-        });
-
-      await base.OnInitializedAsync();
+        }, error => { });
     }
 
     private async Task CreateTableAsync()
@@ -59,7 +70,7 @@ namespace Blazor.Sample.Pages
         .GroupBy(c => c.SensorId)
         .Select(c => new {SensorId = c.Key, Count = c.Count(), AvgValue = c.Avg(a => a.Value) });
 
-      var httpResponseMessage = await statement.ExecuteStatementAsync();
+      var httpResponseMessage = await statement.ExecuteStatementAsync(cancellationTokenSource.Token);
 
       if (httpResponseMessage.IsSuccessStatusCode)
       {
@@ -69,6 +80,14 @@ namespace Blazor.Sample.Pages
       {
         var statementResponse = httpResponseMessage.ToStatementResponse();
       }
+    }
+
+    public void Dispose()
+    {         
+      cancellationTokenSource.Cancel();
+      cancellationTokenSource.Dispose();
+      
+      subscription?.Dispose();
     }
   }
 }
