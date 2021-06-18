@@ -78,6 +78,7 @@ namespace Blazor.Sample
       var consumerConfig = new ConsumerConfig
       {
         BootstrapServers = bootstrapServers,
+        ClientId = "Client01" + "_consumer",
         GroupId = System.Diagnostics.Process.GetCurrentProcess().ProcessName,
         AutoOffsetReset = AutoOffsetReset.Latest
       };
@@ -88,6 +89,9 @@ namespace Blazor.Sample
         .As<IKafkaConsumer<string, SensorsStream>>()
         .SingleInstance()
         .WithParameter(nameof(consumerConfig), consumerConfig);
+
+      consumerConfig.ClientId = "Client02" + "_consumer";
+      consumerConfig.GroupId = $"{nameof(IoTSensorStats)}";
 
       containerBuilder.RegisterType<SensorsTableConsumer>()
         .As<IKafkaConsumer<string, IoTSensorStats>>()

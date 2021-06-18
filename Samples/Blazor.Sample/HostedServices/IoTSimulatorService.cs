@@ -37,7 +37,7 @@ namespace Blazor.Sample.HostedServices
       await TryCreateStreamAsync(cancellationToken);
 
       timerSubscription =
-        Observable.Timer(TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(250))
+        Observable.Timer(TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(3))
           .Subscribe(async _ =>
           {
             int key = randomKey.Next(1, 10);
@@ -49,8 +49,7 @@ namespace Blazor.Sample.HostedServices
               Value = value
             };
 
-            // var deliveryResult = await kafkaProducer.DeleteMessageAsync(key);
-            var deliveryResult = await kafkaProducer.ProduceMessageAsync(key, sensor);
+            var deliveryResult = await kafkaProducer.ProduceMessageAsync(key, sensor, cancellationToken);
           });
     }
     

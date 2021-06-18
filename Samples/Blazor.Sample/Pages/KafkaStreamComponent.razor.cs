@@ -10,6 +10,7 @@ using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Kafka;
 using Confluent.Kafka;
 using Kafka.DotNet.InsideOut.Consumer;
+using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
@@ -38,32 +39,18 @@ namespace Blazor.Sample.Pages
       var brokerMetadata = adminClient.GetMetadata(TimeSpan.FromSeconds(3));
 
       await CreateItemsStreamAsync();
-      
+
       var synchronizationContext = SynchronizationContext.Current;
+
+      // await SubscribeToQuery(synchronizationContext);
 
       SubscribeToSensors(synchronizationContext);
 
       await base.OnInitializedAsync();
     }
-
-    private void SubscribeToSensors(SynchronizationContext synchronizationContext)
-    {
-      topicSubscription = ItemsConsumer.ConnectToTopic(timeout: null, cancellationToken: new CancellationToken())
-        .ToObservable()
-        .SubscribeOn(NewThreadScheduler.Default)
-        .ObserveOn(synchronizationContext)
-        .Subscribe(c =>
-        {
-          c.Value.Id = c.Key;
-
-          items.Enqueue(c.Value);
-          StateHasChanged();
-        }, error => { });
-    }
-
     private async Task CreateItemsStreamAsync()
     {
-      await using var context = new KSqlDBContext(ksqlDbUrl);
+      await using var context = new KSqlDBContext(KsqlDbUrl);
 
       var statement = context.CreateOrReplaceStreamStatement(streamName: TopicNames.SensorsStream)
         .As<IoTSensor>()
@@ -82,7 +69,43 @@ namespace Blazor.Sample.Pages
       }
     }
 
-    private string ksqlDbUrl => Configuration[ConfigKeys.KSqlDb_Url];
+    private async Task SubscribeToQuery(SynchronizationContext? synchronizationContext)
+    {
+      var options = new KSqlDBContextOptions(KsqlDbUrl)
+      {
+        ShouldPluralizeFromItemName = false
+      };
+
+      await using var context = new KSqlDBContext(options);
+
+      context.CreateQuery<SensorsStream>("SensorsStream")
+        .ToObservable()
+        .ObserveOn(synchronizationContext)
+        .Subscribe(c =>
+        {
+          c.Id = c.Id;
+
+          items.Enqueue(c);
+          StateHasChanged();
+        }, error => { });
+    }
+
+    private void SubscribeToSensors(SynchronizationContext synchronizationContext)
+    {
+      topicSubscription = ItemsConsumer.ConnectToTopic(timeout: null, cancellationTokenSource.Token)
+        .ToObservable()
+        .SubscribeOn(NewThreadScheduler.Default)
+        .ObserveOn(synchronizationContext)
+        .Subscribe(c =>
+        {
+          c.Value.Id = c.Key;
+
+          items.Enqueue(c.Value);
+          StateHasChanged();
+        }, error => { });
+    }
+
+    private string KsqlDbUrl => Configuration[ConfigKeys.KSqlDb_Url];
     
     public IAdminClient GetAdminClient()
     {

@@ -8,23 +8,20 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="kafkastream">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="oi oi-plus" aria-hidden="true"></span> Stream
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" href="kafkatable">
                 <span class="oi oi-home" aria-hidden="true"></span> Table
             </NavLink>
         </li>
-        @if (false)
-        {
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="sqlserver">
                 <span class="oi oi-plus" aria-hidden="true"></span> SqlServer-CDC
             </NavLink>
         </li>
-        }
     </ul>
 </div>
 

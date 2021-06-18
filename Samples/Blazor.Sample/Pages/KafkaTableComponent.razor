@@ -18,7 +18,8 @@ else
         <tr>
             <th>Id</th>
             <th>Count</th>
-            <th>AvgValue</th>
+            <th>Sum</th>
+            <th>Latest 2 by offset</th>
         </tr>
         </thead>
         <tbody>
@@ -27,7 +28,8 @@ else
             <tr>
                 <td>@item.SensorId</td>
                 <td>@item.Count</td>
-                <td>@item.AvgValue</td>
+                <td>@item.Sum</td>
+                <td>@item.LatestByOffsetJoined</td>
             </tr>
         }
         </tbody>
