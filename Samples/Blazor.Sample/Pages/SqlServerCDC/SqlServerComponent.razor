@@ -1,0 +1,42 @@
+﻿@page "/sqlserver"
+@using Blazor.Sample.Collections
+
+<h1>Kafka</h1>
+
+<p>This component demonstrates observing data from a Sql Server table - Change data capture.</p>
+
+@if (items == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Operation</th>
+            <th>Value Before</th>
+            <th>Value After</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in items)
+        {
+            <tr>
+                <td>@TranslateOperation(item.Op)</td>
+                <td>@item.Before</td>
+                <td>@item.After</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private FixedSizedQueue<DatabaseChangeObject> items;
+
+    protected override void OnInitialized()
+    {
+        items = new FixedSizedQueue<DatabaseChangeObject>();
+    }
+}
