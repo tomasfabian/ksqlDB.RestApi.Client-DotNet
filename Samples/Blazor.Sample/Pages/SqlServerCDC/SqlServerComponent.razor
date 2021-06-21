@@ -2,41 +2,56 @@
 @using Blazor.Sample.Collections
 
 <h1>Kafka</h1>
-
+<span><i class="fas fa-exclamation-triangle"></i> Work in progress</span>
 <p>This component demonstrates observing data from a Sql Server table - Change data capture.</p>
 
 @if (items == null)
 {
-    <p><em>Loading...</em></p>
+  <p><em>Loading...</em></p>
 }
 else
 {
-    <table class="table">
-        <thead>
+  <EditForm Model="@Model">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <br />
+
+    <div class="form-group">
+      <label for="sensorValue">Sensor Value:</label>
+      <input type="text" class="form-control" id="sensorValue" placeholder="New value..." @bind="@Model.Value">
+    </div>
+
+    <br />
+    <button class="btn btn-info" @onclick="@(async () => await SaveAsync())">Save</button>
+  </EditForm>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Operation</th>
+        <th>Value Before</th>
+        <th>Value After</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var item in items)
+      {
         <tr>
-            <th>Operation</th>
-            <th>Value Before</th>
-            <th>Value After</th>
+          <td>@TranslateOperation(item.Op)</td>
+          <td>@item.Before</td>
+          <td>@item.After</td>
         </tr>
-        </thead>
-        <tbody>
-        @foreach (var item in items)
-        {
-            <tr>
-                <td>@TranslateOperation(item.Op)</td>
-                <td>@item.Before</td>
-                <td>@item.After</td>
-            </tr>
-        }
-        </tbody>
-    </table>
+      }
+    </tbody>
+  </table>
 }
 
 @code {
-    private FixedSizedQueue<DatabaseChangeObject> items;
+  private FixedSizedQueue<DatabaseChangeObject> items;
 
-    protected override void OnInitialized()
-    {
-        items = new FixedSizedQueue<DatabaseChangeObject>();
-    }
+  protected override void OnInitialized()
+  {
+    items = new FixedSizedQueue<DatabaseChangeObject>();
+  }
+
 }

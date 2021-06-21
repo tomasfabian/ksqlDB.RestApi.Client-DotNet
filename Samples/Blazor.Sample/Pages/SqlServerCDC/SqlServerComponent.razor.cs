@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blazor.Sample.Configuration;
 using Blazor.Sample.Data;
+using Blazor.Sample.Data.Sensors;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
@@ -24,6 +25,8 @@ namespace Blazor.Sample.Pages.SqlServerCDC
 
     protected override async Task OnInitializedAsync()
     {
+      SetNewModel();
+
       var sensors = await DbContext.Sensors.ToListAsync();
 
       await CreateConnectorAsync();
@@ -128,6 +131,25 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
         "d" => "Deleted",
         "r" => "Read",
         _ => throw new ArgumentOutOfRangeException(nameof(operation), operation, null)
+      };
+    }
+
+    private IoTSensor Model { get; set; } 
+
+    private async Task SaveAsync()
+    {
+      DbContext.Add(Model);
+
+      await DbContext.SaveChangesAsync();
+      
+      SetNewModel();
+    }
+
+    private void SetNewModel()
+    {
+      Model = new IoTSensor
+      {
+        SensorId = Guid.NewGuid().ToString().Substring(0, 10)
       };
     }
   }
