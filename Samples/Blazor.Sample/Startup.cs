@@ -12,6 +12,7 @@ using Blazor.Sample.Data;
 using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Kafka;
 using Blazor.Sample.Kafka.Consumers;
+using Blazor.Sample.Providers;
 using Confluent.Kafka;
 using Kafka.DotNet.InsideOut.Consumer;
 using Kafka.DotNet.InsideOut.Producer;
@@ -50,6 +51,13 @@ namespace Blazor.Sample
 
     protected virtual void OnRegisterTypes(ContainerBuilder containerBuilder)
     {
+      string connectionString = Configuration["ConnectionStrings:DefaultConnection"];
+
+      containerBuilder.RegisterType<SqlServerChangeDataCaptureProvider>()
+        .As<ISqlServerChangeDataCaptureProvider>()
+        .SingleInstance()
+        .WithParameter(nameof(connectionString), connectionString);
+
       string bootstrapServers = Configuration["Kafka:BootstrapServers"];
 
       RegisterConsumers(containerBuilder, bootstrapServers);
