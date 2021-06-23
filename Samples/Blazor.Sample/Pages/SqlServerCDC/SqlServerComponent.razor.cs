@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net.Http;
 using System.Reactive.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Blazor.Sample.Configuration;
@@ -10,6 +11,7 @@ using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Providers;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
@@ -121,14 +123,55 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
       await using var context = new KSqlDBContext(options);
 
       context.CreateQuery<DatabaseChangeObject>("sqlserversensors")
+        .WithOffsetResetPolicy(AutoOffsetReset.Latest)
         .ToObservable()
         .ObserveOn(synchronizationContext)
-        .Subscribe(c =>
+        .Subscribe(cdc =>
         {
-          items.Enqueue(c);
+          items.Enqueue(cdc);
+
+          UpdateTable(cdc);
 
           StateHasChanged();
         }, error => { });
+    }
+
+    private void UpdateTable(DatabaseChangeObject databaseChangeObject)
+    {
+      switch (ToChangeDataCaptureType(databaseChangeObject.Op))
+      {
+        case ChangeDataCaptureType.Created:
+          var sensor = JsonSerializer.Deserialize<IoTSensor>(databaseChangeObject.After);
+          
+          var existing = sensors.FirstOrDefault(c => c.SensorId == sensor.SensorId);
+
+          if (existing == null)
+            sensors.Add(sensor);
+          break;
+
+        case ChangeDataCaptureType.Updated:
+          var sensorAfter = JsonSerializer.Deserialize<IoTSensor>(databaseChangeObject.After);
+          break;
+
+        case ChangeDataCaptureType.Deleted:
+          var sensorBefore = JsonSerializer.Deserialize<IoTSensor>(databaseChangeObject.Before);
+          var itemToRemove = sensors.FirstOrDefault(c => c.SensorId == sensorBefore.SensorId);
+          if (itemToRemove != null)
+            sensors.Remove(itemToRemove);
+          break;
+      }
+    }
+
+    private ChangeDataCaptureType ToChangeDataCaptureType(string operation)
+    {
+      return operation switch
+      {
+        "r" => ChangeDataCaptureType.Read,
+        "c" => ChangeDataCaptureType.Created,
+        "u" => ChangeDataCaptureType.Updated,
+        "d" => ChangeDataCaptureType.Deleted,
+        _ => throw new ArgumentOutOfRangeException(nameof(operation), operation, null)
+      };
     }
 
     private string TranslateOperation(string operation)
@@ -147,7 +190,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
 
     private async Task SaveAsync()
     {
-      DbContext.Add(Model);
+      DbContext.Sensors.Add(Model);
 
       await DbContext.SaveChangesAsync();
       
@@ -155,7 +198,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
     }
     private async Task DeleteAsync(IoTSensor sensor)
     {
-      DbContext.Remove(sensor);
+      DbContext.Sensors.Remove(sensor);
 
       await DbContext.SaveChangesAsync();
     }
