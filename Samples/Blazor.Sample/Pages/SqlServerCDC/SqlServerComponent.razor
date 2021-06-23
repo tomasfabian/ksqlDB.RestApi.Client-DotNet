@@ -28,27 +28,27 @@ else
 
   <div class="container">
     <div class="row align-items-start">
-        <div class="col">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Operation</th>
-                    <th>Value Before</th>
-                    <th>Value After</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach (var item in items)
-                {
-                    <tr>
-                        <td>@TranslateOperation(item.Op)</td>
-                        <td>@item.Before</td>
-                        <td>@item.After</td>
-                    </tr>
-                }
-                </tbody>
-            </table>
-        </div>
+      <div class="col">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Operation</th>
+              <th>Value Before</th>
+              <th>Value After</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach (var item in items)
+            {
+              <tr>
+                <td>@TranslateOperation(item.Op)</td>
+                <td>@item.Before</td>
+                <td>@item.After</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
 
       <div class="col">
         <table class="table">
@@ -64,6 +64,11 @@ else
               <tr>
                 <td>@sensor.SensorId</td>
                 <td>@sensor.Value</td>
+                <td>
+                  <a class="btn btn-danger" @onclick="@(async () => await DeleteAsync(sensor))">
+                    <span class="oi oi-trash" title="delete" aria-hidden="true" style="color: #fff"></span>
+                  </a>
+                </td>
               </tr>
             }
           </tbody>

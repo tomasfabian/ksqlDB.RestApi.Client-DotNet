@@ -153,6 +153,12 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
       
       SetNewModel();
     }
+    private async Task DeleteAsync(IoTSensor sensor)
+    {
+      DbContext.Remove(sensor);
+
+      await DbContext.SaveChangesAsync();
+    }
 
     private void SetNewModel()
     {
