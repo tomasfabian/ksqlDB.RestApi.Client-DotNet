@@ -30,7 +30,7 @@ namespace Blazor.Sample.Pages.SqlServerCDC
     {
       SetNewModel();
 
-      var sensors = await DbContext.Sensors.ToListAsync();
+      sensors = await DbContext.Sensors.ToListAsync();
 
       const string tableName = "Sensors";
 

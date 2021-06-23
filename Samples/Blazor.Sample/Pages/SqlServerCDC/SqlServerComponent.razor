@@ -1,5 +1,6 @@
 ﻿@page "/sqlserver"
 @using Blazor.Sample.Collections
+@using Blazor.Sample.Data.Sensors
 
 <h1>Kafka</h1>
 <span><i class="fas fa-exclamation-triangle"></i> Work in progress</span>
@@ -25,33 +26,63 @@ else
     <button class="btn btn-info" @onclick="@(async () => await SaveAsync())">Save</button>
   </EditForm>
 
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Operation</th>
-        <th>Value Before</th>
-        <th>Value After</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach (var item in items)
-      {
-        <tr>
-          <td>@TranslateOperation(item.Op)</td>
-          <td>@item.Before</td>
-          <td>@item.After</td>
-        </tr>
-      }
-    </tbody>
-  </table>
+  <div class="container">
+    <div class="row align-items-start">
+        <div class="col">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Operation</th>
+                    <th>Value Before</th>
+                    <th>Value After</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in items)
+                {
+                    <tr>
+                        <td>@TranslateOperation(item.Op)</td>
+                        <td>@item.Before</td>
+                        <td>@item.After</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+      <div class="col">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Sensor Id</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach (var sensor in sensors)
+            {
+              <tr>
+                <td>@sensor.SensorId</td>
+                <td>@sensor.Value</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
 }
 
 @code {
   private FixedSizedQueue<DatabaseChangeObject> items;
+  private IList<IoTSensor> sensors;
 
   protected override void OnInitialized()
   {
     items = new FixedSizedQueue<DatabaseChangeObject>();
+
+    sensors = new List<IoTSensor>();
   }
 
 }
