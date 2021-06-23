@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Blazor.Sample.Configuration;
 using Blazor.Sample.Data;
 using Blazor.Sample.Data.Sensors;
+using Blazor.Sample.Providers;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
@@ -23,13 +24,19 @@ namespace Blazor.Sample.Pages.SqlServerCDC
 
     [Inject] private IConfiguration Configuration { get; init; }
 
+    [Inject] private ISqlServerChangeDataCaptureProvider CdcProvider { get; init; }
+
     protected override async Task OnInitializedAsync()
     {
       SetNewModel();
 
       var sensors = await DbContext.Sensors.ToListAsync();
 
-      await CreateConnectorAsync();
+      const string tableName = "Sensors";
+
+      await CdcProvider.EnableAsync(tableName);
+
+      await CreateConnectorAsync(tableName);
 
       await CreateSensorsChangeDataCaptureStreamAsync();
 
@@ -63,20 +70,22 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
       }
     }
 
-    private async Task CreateConnectorAsync()
+    private async Task CreateConnectorAsync(string tableName, string schemaName = "dbo")
     {
-      var createConnector = @$"CREATE SOURCE CONNECTOR MSSQL_SENSORS WITH (
+      string bootstrapServers= Configuration[ConfigKeys.Kafka_BootstrapServers];
 
+      //TODO: extract database from config
+      var createConnector = @$"CREATE SOURCE CONNECTOR MSSQL_SENSORS WITH (
   'connector.class' = 'io.debezium.connector.sqlserver.SqlServerConnector',
   'database.hostname'= 'sqlserver2019', 
-  'database.port'= '1433', 
+  'database.port'= '1433',
   'database.user'= 'sa', 
   'database.password'= '<YourNewStrong@Passw0rd>', 
   'database.dbname'= 'Sensors', 
   'database.server.name'= 'sqlserver2019', 
-  'table.include.list'= 'dbo.Sensors', 
-  'database.history.kafka.bootstrap.servers'= 'broker01:9092', 
-  'database.history.kafka.topic'= 'dbhistory.sensors',
+  'table.include.list'= '{schemaName}.{tableName}', 
+  'database.history.kafka.bootstrap.servers'= '{bootstrapServers}', 
+  'database.history.kafka.topic'= 'dbhistory.{tableName}',
   'key.converter'= 'org.apache.kafka.connect.json.JsonConverter',
   'key.converter.schemas.enable'= 'false',
   'value.converter'= 'org.apache.kafka.connect.json.JsonConverter',
