@@ -26,9 +26,12 @@ else
     <button class="btn btn-info" @onclick="@(async () => await SaveAsync())">Save</button>
   </EditForm>
 
-  <div class="container">
-    <div class="row align-items-start">
+  <br />
+
+  <div class="container-fluid">
+    <div class="row">
       <div class="col">
+        <b>Change data capture notifications:</b>
         <table class="table">
           <thead>
             <tr>
@@ -51,11 +54,13 @@ else
       </div>
 
       <div class="col">
+        <b>Sensors (@TotalCount):</b>
         <table class="table">
           <thead>
             <tr>
               <th>Sensor Id</th>
               <th>Value</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>

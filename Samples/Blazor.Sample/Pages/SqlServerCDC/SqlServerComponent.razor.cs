@@ -29,6 +29,8 @@ namespace Blazor.Sample.Pages.SqlServerCDC
 
     [Inject] private ISqlServerChangeDataCaptureProvider CdcProvider { get; init; }
 
+    private int TotalCount => sensors.Count;
+
     protected override async Task OnInitializedAsync()
     {
       SetNewModel();
