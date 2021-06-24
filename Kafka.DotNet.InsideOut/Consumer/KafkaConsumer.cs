@@ -78,6 +78,9 @@ namespace Kafka.DotNet.InsideOut.Consumer
 
     private IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic(TimeSpan? timeout, CancellationToken cancellationToken = default)
     {
+      if (disposed)
+        throw new ObjectDisposedException("Cannot access a disposed object.");
+
       using (consumer = CreateConsumer())
       {
         try
