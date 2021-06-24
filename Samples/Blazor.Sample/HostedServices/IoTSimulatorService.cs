@@ -37,7 +37,7 @@ namespace Blazor.Sample.HostedServices
       await TryCreateStreamAsync(cancellationToken);
 
       timerSubscription =
-        Observable.Timer(TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(3))
+        Observable.Timer(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(3))
           .Subscribe(async _ =>
           {
             int key = randomKey.Next(1, 10);

@@ -10,6 +10,7 @@ namespace Blazor.Sample.Kafka.Consumers
     public SensorsTableConsumer(ConsumerConfig consumerConfig) 
       : base(TopicNames.SensorsTable, consumerConfig)
     {
+      consumerConfig.Debug += ",consumer";
     }
     
     protected override void InterceptConsumerBuilder(ConsumerBuilder<string, IoTSensorStats> consumerBuilder)

@@ -108,6 +108,8 @@ namespace Blazor.Sample.Pages
       cancellationTokenSource.Dispose();
       
       subscription?.Dispose();
+
+      ItemsTableConsumer.Dispose();
     }
   }
 }

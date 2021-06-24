@@ -102,7 +102,7 @@ namespace Blazor.Sample.Pages
 
           items.Enqueue(c.Value);
           StateHasChanged();
-        }, error => { });
+        }, error => { Console.WriteLine(error.Message); });
     }
 
     private string KsqlDbUrl => Configuration[ConfigKeys.KSqlDb_Url];
@@ -127,6 +127,8 @@ namespace Blazor.Sample.Pages
       cancellationTokenSource.Dispose();
 
       topicSubscription?.Dispose();
+
+      ItemsConsumer.Dispose();
     }
   }
 }

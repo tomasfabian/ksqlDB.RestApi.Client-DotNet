@@ -94,14 +94,14 @@ namespace Blazor.Sample
         BootstrapServers = bootstrapServers,
         ClientId = "Client01" + "_consumer",
         GroupId = System.Diagnostics.Process.GetCurrentProcess().ProcessName,
-        AutoOffsetReset = AutoOffsetReset.Latest
+        AutoOffsetReset = AutoOffsetReset.Latest,
+        PartitionAssignmentStrategy = PartitionAssignmentStrategy.CooperativeSticky
       };
 
       containerBuilder.RegisterInstance(consumerConfig);
 
       containerBuilder.RegisterType<SensorsStreamConsumer>()
         .As<IKafkaConsumer<string, SensorsStream>>()
-        .SingleInstance()
         .WithParameter(nameof(consumerConfig), consumerConfig);
 
       consumerConfig.ClientId = "Client02" + "_consumer";
@@ -109,7 +109,6 @@ namespace Blazor.Sample
 
       containerBuilder.RegisterType<SensorsTableConsumer>()
         .As<IKafkaConsumer<string, IoTSensorStats>>()
-        .SingleInstance()
         .WithParameter(nameof(consumerConfig), consumerConfig);
     }
 
