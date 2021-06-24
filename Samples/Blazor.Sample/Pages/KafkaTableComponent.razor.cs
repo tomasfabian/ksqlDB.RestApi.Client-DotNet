@@ -86,7 +86,7 @@ namespace Blazor.Sample.Pages
     
     private void SubscribeToSensors(SynchronizationContext synchronizationContext)
     {
-      subscription = ItemsTableConsumer.ConnectToTopic(timeout: null, cancellationTokenSource.Token)
+      subscription = ItemsTableConsumer.ConnectToTopic()
         .ToObservable()
         .SubscribeOn(NewThreadScheduler.Default)
         .ObserveOn(synchronizationContext)

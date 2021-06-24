@@ -12,6 +12,7 @@ namespace Kafka.DotNet.InsideOut.Consumer
 
   public interface IKafkaConsumer<TKey, TValue> : IKafkaConsumer
   {
-    public IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic(TimeSpan? timeout, CancellationToken cancellationToken);
+    IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic();
+    IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic(TimeSpan timeout);
   }
 }

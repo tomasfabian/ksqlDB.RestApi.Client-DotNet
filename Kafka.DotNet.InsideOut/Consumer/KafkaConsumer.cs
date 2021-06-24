@@ -64,7 +64,19 @@ namespace Kafka.DotNet.InsideOut.Consumer
       return new KafkaJsonDeserializer<TValue>();
     }
 
-    public IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic(TimeSpan? timeout, CancellationToken cancellationToken)
+    public IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic()
+    {
+      return ConnectToTopic(timeout: null, cancellationTokenSource.Token);
+    }
+
+    private readonly CancellationTokenSource cancellationTokenSource = new();
+
+    public IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic(TimeSpan timeout)
+    {
+      return ConnectToTopic(timeout, cancellationTokenSource.Token);
+    }
+
+    private IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic(TimeSpan? timeout, CancellationToken cancellationToken = default)
     {
       using (consumer = CreateConsumer())
       {
@@ -72,7 +84,7 @@ namespace Kafka.DotNet.InsideOut.Consumer
         {
           OnConnectToTopic();
 
-          while (!cancellationToken.IsCancellationRequested)
+          while (!cancellationToken.IsCancellationRequested && !disposed)
           {
             ConsumeResult<TKey, TValue> consumeResult;
 
@@ -89,8 +101,6 @@ namespace Kafka.DotNet.InsideOut.Consumer
         }
         finally
         {
-          consumer.Close();
-
           Dispose();
         }
       }
@@ -128,6 +138,10 @@ namespace Kafka.DotNet.InsideOut.Consumer
 
       if (disposing)
       {
+        cancellationTokenSource.Cancel();
+
+        consumer.Close();
+
         OnDispose();
 
         LastConsumedOffset = null;
