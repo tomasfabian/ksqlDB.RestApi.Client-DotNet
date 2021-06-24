@@ -138,11 +138,11 @@ namespace Kafka.DotNet.InsideOut.Consumer
 
       if (disposing)
       {
-        cancellationTokenSource.Cancel();
-
-        consumer.Close();
+        consumer?.Close();
 
         OnDispose();
+        
+        cancellationTokenSource.Cancel();
 
         LastConsumedOffset = null;
       }
