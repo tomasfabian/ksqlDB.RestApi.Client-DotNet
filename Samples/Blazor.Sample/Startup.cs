@@ -34,10 +34,16 @@ namespace Blazor.Sample
       services.AddRazorPages();
       services.AddServerSideBlazor();
 
-      var connectionString = Configuration["ConnectionStrings:DefaultConnection"];
+      var connectionString = Configuration.GetConnectionString("DefaultConnection");
 
-      services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(connectionString));
+      services.AddDbContextFactory<ApplicationDbContext>(options =>
+      {
+        options.UseSqlServer(connectionString);
+      });
+
+      services.AddScoped(p => 
+        p.GetRequiredService<IDbContextFactory<ApplicationDbContext>>()
+          .CreateDbContext());
     }
 
     private ContainerBuilder ContainerBuilder { get; set; }

@@ -16,13 +16,14 @@ using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Microsoft.AspNetCore.Components;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace Blazor.Sample.Pages.SqlServerCDC
 {
   public partial class SqlServerComponent
   {
-    [Inject] private ApplicationDbContext DbContext { get; init; }
+    [Inject] private IDbContextFactory<ApplicationDbContext> DbContextFactory { get; init; }
 
     [Inject] private IConfiguration Configuration { get; init; }
 
@@ -32,7 +33,9 @@ namespace Blazor.Sample.Pages.SqlServerCDC
     {
       SetNewModel();
 
-      sensors = await DbContext.Sensors.ToListAsync();
+      var dbContext = DbContextFactory.CreateDbContext();
+
+      sensors = await EntityFrameworkQueryableExtensions.ToListAsync(dbContext.Sensors);
 
       const string tableName = "Sensors";
 
@@ -190,17 +193,21 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
 
     private async Task SaveAsync()
     {
-      DbContext.Sensors.Add(Model);
+      var dbContext = DbContextFactory.CreateDbContext();
 
-      await DbContext.SaveChangesAsync();
+      dbContext.Sensors.Add(Model);
+
+      await dbContext.SaveChangesAsync();
       
       SetNewModel();
     }
     private async Task DeleteAsync(IoTSensor sensor)
     {
-      DbContext.Sensors.Remove(sensor);
+      var dbContext = DbContextFactory.CreateDbContext();
 
-      await DbContext.SaveChangesAsync();
+      dbContext.Sensors.Remove(sensor);
+
+      await dbContext.SaveChangesAsync();
     }
 
     private void SetNewModel()
