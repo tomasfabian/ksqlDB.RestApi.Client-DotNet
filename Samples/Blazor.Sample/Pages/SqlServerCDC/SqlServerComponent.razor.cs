@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Reactive.Linq;
@@ -8,26 +9,29 @@ using System.Threading.Tasks;
 using Blazor.Sample.Configuration;
 using Blazor.Sample.Data;
 using Blazor.Sample.Data.Sensors;
-using Blazor.Sample.Providers;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Generators;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using Kafka.DotNet.SqlServer.Cdc;
+using Kafka.DotNet.SqlServer.Cdc.Connectors;
+using Kafka.DotNet.SqlServer.Cdc.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace Blazor.Sample.Pages.SqlServerCDC
 {
-  public partial class SqlServerComponent
+  public partial class SqlServerComponent : IDisposable
   {
     [Inject] private IDbContextFactory<ApplicationDbContext> DbContextFactory { get; init; }
 
     [Inject] private IConfiguration Configuration { get; init; }
 
-    [Inject] private ISqlServerChangeDataCaptureProvider CdcProvider { get; init; }
+    [Inject] private ICdcClient CdcProvider { get; init; }
 
     private int TotalCount => sensors.Count;
 
@@ -41,11 +45,13 @@ namespace Blazor.Sample.Pages.SqlServerCDC
 
       const string tableName = "Sensors";
 
-      await CdcProvider.EnableAsync(tableName);
+      await CreateSensorsCdcStreamAsync();
+
+      await EnableCdcAsync(tableName);
 
       await CreateConnectorAsync(tableName);
 
-      await CreateSensorsChangeDataCaptureStreamAsync();
+      //await CreateSensorsChangeDataCaptureStreamAsync();
 
       var synchronizationContext = SynchronizationContext.Current;
 
@@ -54,6 +60,49 @@ namespace Blazor.Sample.Pages.SqlServerCDC
       await base.OnInitializedAsync();
     }
 
+    private async Task EnableCdcAsync(string tableName)
+    {
+      try
+      {
+        await CdcProvider.EnableAsync(tableName);
+      }
+      catch (Exception e)
+      {
+        Console.WriteLine(e);
+      }
+    }
+
+    private async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationToken = default)
+    {
+      await using var context = new KSqlDBContext(KsqlDbUrl);
+
+      string fromName = "sqlserversensors";
+      string kafkaTopic = "sqlserver2019.dbo.Sensors";
+
+      var ksqlDbUrl = Configuration[ConfigKeys.KSqlDb_Url];
+
+      var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
+      var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+      EntityCreationMetadata metadata = new()
+      {
+        EntityName = fromName,
+        KafkaTopic = kafkaTopic,
+        ValueFormat = SerializationFormats.Json,
+        Partitions = 1,
+        Replicas = 1
+      };
+      
+      var ksql = StatementGenerator.CreateStream<DatabaseChangeObject>(metadata, ifNotExists: true);
+      
+      var httpResponseMessage = await restApiClient.CreateStreamAsync<DatabaseChangeObject>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
+        .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Create stream from string statement example
+    /// </summary>
     private async Task CreateSensorsChangeDataCaptureStreamAsync()
     {
       var createSensorsCDCStream = @"
@@ -67,22 +116,43 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
       var ksqlDbStatement = new KSqlDbStatement(createSensorsCDCStream);
 
       var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement);
-      if (httpResponseMessage.IsSuccessStatusCode)
-      {
-        StatementResponse[] statementResponses = httpResponseMessage.ToStatementResponses();
-      }
-      else
-      {
-        StatementResponse statementResponse = httpResponseMessage.ToStatementResponse();
-      }
     }
 
+    /// <summary>
+    /// Create connector from metadata example
+    /// </summary>
     private async Task CreateConnectorAsync(string tableName, string schemaName = "dbo")
     {
-      string bootstrapServers= Configuration[ConfigKeys.Kafka_BootstrapServers];
+      string bootstrapServers = Configuration[ConfigKeys.Kafka_BootstrapServers];
+      var connectionString = Configuration.GetConnectionString("DefaultConnection");
 
-      //TODO: extract database from config
-      var createConnector = @$"CREATE SOURCE CONNECTOR MSSQL_SENSORS WITH (
+      var connectorMetadata = new ConnectorMetadata(connectionString)
+        .SetJsonKeyConverter()
+        .SetJsonValueConverter()
+        .SetTableIncludeListPropertyName($"{schemaName}.{tableName}")
+        .SetProperty("database.history.kafka.bootstrap.servers", bootstrapServers)
+        .SetProperty("database.history.kafka.topic", $"dbhistory.{tableName}")
+        .SetProperty("database.server.name", "sqlserver2019")
+        .SetProperty("key.converter.schemas.enable", "false")
+        .SetProperty("value.converter.schemas.enable", "false")
+        .SetProperty("include.schema.changes", "false")
+        .SetTableIncludeListPropertyName($"{schemaName}.{tableName}");
+
+      var createConnector = connectorMetadata.ToStatement(connectorName: "MSSQL_SENSORS_CONNECTOR");
+
+      KSqlDbStatement ksqlDbStatement = new(createConnector);
+
+      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Create connector from string statement example
+    /// </summary>
+    private async Task CreateConnectorFromStringAsync(string tableName, string schemaName = "dbo")
+    {
+      string bootstrapServers = Configuration[ConfigKeys.Kafka_BootstrapServers];
+
+      var createConnector = @$"CREATE SOURCE CONNECTOR MSSQL_SENSORS_CONNECTOR WITH (
   'connector.class' = 'io.debezium.connector.sqlserver.SqlServerConnector',
   'database.hostname'= 'sqlserver2019', 
   'database.port'= '1433',
@@ -118,6 +188,8 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
 
     private string KsqlDbUrl => Configuration[ConfigKeys.KSqlDb_Url];
 
+    private IDisposable cdcSubscription;
+
     private async Task SubscribeToQuery(SynchronizationContext? synchronizationContext)
     {
       var options = new KSqlDBContextOptions(KsqlDbUrl)
@@ -127,7 +199,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
 
       await using var context = new KSqlDBContext(options);
 
-      context.CreateQuery<DatabaseChangeObject>("sqlserversensors")
+      cdcSubscription = context.CreateQuery<DatabaseChangeObject>("sqlserversensors")
         .WithOffsetResetPolicy(AutoOffsetReset.Latest)
         .ToObservable()
         .ObserveOn(synchronizationContext)
@@ -143,7 +215,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
 
     private void UpdateTable(DatabaseChangeObject databaseChangeObject)
     {
-      switch (ToChangeDataCaptureType(databaseChangeObject.Op))
+      switch (databaseChangeObject.Op.ToChangeDataCaptureType())
       {
         case ChangeDataCaptureType.Created:
           var sensor = JsonSerializer.Deserialize<IoTSensor>(databaseChangeObject.After);
@@ -179,18 +251,6 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
         sensors[index] = sensorAfter;
       else
         sensors.Add(sensorAfter);
-    }
-
-    private ChangeDataCaptureType ToChangeDataCaptureType(string operation)
-    {
-      return operation switch
-      {
-        "r" => ChangeDataCaptureType.Read,
-        "c" => ChangeDataCaptureType.Created,
-        "u" => ChangeDataCaptureType.Updated,
-        "d" => ChangeDataCaptureType.Deleted,
-        _ => throw new ArgumentOutOfRangeException(nameof(operation), operation, null)
-      };
     }
 
     private string TranslateOperation(string operation)
@@ -232,6 +292,11 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
       {
         SensorId = Guid.NewGuid().ToString().Substring(0, 10)
       };
+    }
+
+    public void Dispose()
+    {
+      cdcSubscription?.Dispose();
     }
   }
 }

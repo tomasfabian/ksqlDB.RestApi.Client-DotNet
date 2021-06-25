@@ -6,16 +6,15 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Autofac;
 using Blazor.Sample.Data;
 using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Kafka;
 using Blazor.Sample.Kafka.Consumers;
-using Blazor.Sample.Providers;
 using Confluent.Kafka;
 using Kafka.DotNet.InsideOut.Consumer;
 using Kafka.DotNet.InsideOut.Producer;
+using Kafka.DotNet.SqlServer.Cdc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Blazor.Sample
@@ -59,8 +58,8 @@ namespace Blazor.Sample
     {
       string connectionString = Configuration["ConnectionStrings:DefaultConnection"];
 
-      containerBuilder.RegisterType<SqlServerChangeDataCaptureProvider>()
-        .As<ISqlServerChangeDataCaptureProvider>()
+      containerBuilder.RegisterType<CdcClient>()
+        .As<ICdcClient>()
         .SingleInstance()
         .WithParameter(nameof(connectionString), connectionString);
 
