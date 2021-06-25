@@ -155,7 +155,8 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
           break;
 
         case ChangeDataCaptureType.Updated:
-          var sensorAfter = JsonSerializer.Deserialize<IoTSensor>(databaseChangeObject.After);
+          TryUpdateSensor(databaseChangeObject);
+
           break;
 
         case ChangeDataCaptureType.Deleted:
@@ -165,6 +166,19 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
             sensors.Remove(itemToRemove);
           break;
       }
+    }
+
+    private void TryUpdateSensor(DatabaseChangeObject databaseChangeObject)
+    {
+      var sensorAfter = JsonSerializer.Deserialize<IoTSensor>(databaseChangeObject.After);
+
+      var found = sensors.FirstOrDefault(c => c.SensorId == sensorAfter.SensorId);
+      var index = sensors.IndexOf(found);
+
+      if (index != -1)
+        sensors[index] = sensorAfter;
+      else
+        sensors.Add(sensorAfter);
     }
 
     private ChangeDataCaptureType ToChangeDataCaptureType(string operation)
