@@ -267,3 +267,8 @@ drop stream IOTSENSORS delete topic;
 
 # Linqpad
 [Kafka streaming](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/ksqldb.Streaming.linq)
+
+# Acknowledgements:
+- [Confluent.Kafka](https://www.nuget.org/packages/Confluent.Kafka/)
+- [System.Reactive](https://www.nuget.org/packages/System.Reactive/)
+- [System.Text.Json](https://www.nuget.org/packages/System.Text.Json/)
