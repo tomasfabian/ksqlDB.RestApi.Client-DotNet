@@ -62,6 +62,43 @@ private async Task ProduceValueAsync()
 }
 ```
 
+# KafkaConsumer (v1.0.0)
+```
+Install-Package Kafka.DotNet.InsideOut -Version 1.0.0
+Install-Package System.Interactive.Async -Version 5.0.0
+```
+
+```C#
+using System;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Threading.Tasks;
+using Confluent.Kafka;
+using Kafka.DotNet.InsideOut.Consumer;
+
+const string bootstrapServers = "localhost:29092";
+
+static async Task Main(string[] args)
+{
+  var consumerConfig = new ConsumerConfig
+                       {
+                         BootstrapServers = bootstrapServers,
+                         GroupId = "Client-01",
+                         AutoOffsetReset = AutoOffsetReset.Latest
+                       };
+
+  var kafkaConsumer = new KafkaConsumer<string, IoTSensorStats>("IoTSensors", consumerConfig);
+
+  await foreach (var consumeResult in kafkaConsumer.ConnectToTopic().ToAsyncEnumerable().Take(10))
+  {
+    Console.WriteLine(consumeResult.Message);
+  }
+
+  using (kafkaConsumer)
+  { }
+}
+```
+
 # KafkaConsumer (v0.1.0)
 
 ```C#

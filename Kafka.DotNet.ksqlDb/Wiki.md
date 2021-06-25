@@ -100,7 +100,6 @@ run in command line:
 # Kafka stream processing
 [Kafka.DotNet.InsideOut](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.InsideOut/Wiki.md) is a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with Kafka.DotNet.ksqlDB
 ```
-Install-Package Kafka.DotNet.InsideOut -Version 0.1.0-rc.3
 Install-Package Kafka.DotNet.ksqlDB
 ```
 
@@ -152,26 +151,41 @@ public record IoTSensorStats
   public int Count { get; set; }
 }
 ```
+
+```
+Install-Package Kafka.DotNet.InsideOut -Version 1.0.0
+Install-Package System.Interactive.Async -Version 5.0.0
+```
+
 ```C#
-using System.Reactive.Linq;
+using System;
+using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using Kafka.DotNet.InsideOut.Consumer;
 
 const string bootstrapServers = "localhost:29092";
 
-var consumerConfig = new ConsumerConfig
+static async Task Main(string[] args)
 {
-  BootstrapServers = bootstrapServers,
-  GroupId = System.Diagnostics.Process.GetCurrentProcess().ProcessName,
-  AutoOffsetReset = AutoOffsetReset.Latest
-};
+  var consumerConfig = new ConsumerConfig
+                       {
+                         BootstrapServers = bootstrapServers,
+                         GroupId = "Client-01",
+                         AutoOffsetReset = AutoOffsetReset.Latest
+                       };
 
-var kafkaConsumer = new SensorsTableConsumer(consumerConfig);
+  var kafkaConsumer = new KafkaConsumer<string, IoTSensorStats>("IoTSensors", consumerConfig);
 
-var subscription = kafkaConsumer.ConnectToTopicAsync()
-  .Take(100)
-  .Subscribe(c => Console.WriteLine($"Value: {c.Value}"));
+  await foreach (var consumeResult in kafkaConsumer.ConnectToTopic().ToAsyncEnumerable().Take(10))
+  {
+    Console.WriteLine(consumeResult.Message);
+  }
+
+  using (kafkaConsumer)
+  { }
+}
 ```
 
 [Blazor server side example](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB) - Kafka.DotNet.InsideOut.sln
