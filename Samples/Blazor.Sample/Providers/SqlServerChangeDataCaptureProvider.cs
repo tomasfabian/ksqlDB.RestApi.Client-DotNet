@@ -2,10 +2,11 @@
 using System.Data;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
+using static System.String;
 
 namespace Blazor.Sample.Providers
 {
-  public class SqlServerChangeDataCaptureProvider : ISqlServerChangeDataCaptureProvider
+  public class SqlServerChangeDataCaptureProvider : ISqlServerChangeDataCaptureProvider, ISqlServerChangeDataCapture
   {
     private readonly string connectionString;
 
@@ -14,7 +15,7 @@ namespace Blazor.Sample.Providers
       if(connectionString == null)
         throw new ArgumentNullException(nameof(connectionString));
 
-      if (connectionString.Trim() == String.Empty)
+      if (connectionString.Trim() == Empty)
         throw new ArgumentException($"{nameof(connectionString)} cannot be empty", nameof(connectionString));
 
       this.connectionString = connectionString;
@@ -22,32 +23,58 @@ namespace Blazor.Sample.Providers
 
     public async Task EnableAsync(string tableName, string schemaName = "dbo")
     {
-      var script = @"sys.sp_cdc_enable_db";
+      await CdcEnableDbAsync().ConfigureAwait(false);
 
-      await ExecuteNonQueryAsync(script, connectionString, CommandType.StoredProcedure);
+      await CdcEnableTable(tableName, schemaName).ConfigureAwait(false);
+    }
 
-      script = @"sys.sp_cdc_enable_table";
+    public Task CdcEnableTable(string tableName, string schemaName = "dbo")
+    {
+      string script = @"sys.sp_cdc_enable_table";
 
-      SqlParameter[] parameters = {
+      SqlParameter[] parameters =
+      {
         new("@source_schema", SqlDbType.VarChar),
         new("@source_name", SqlDbType.VarChar),
         new("@role_name", SqlDbType.VarChar),
         new("@supports_net_changes", SqlDbType.Int)
-        };
+      };
 
       parameters[0].Value = schemaName;
-      parameters[1].Value = tableName; //"Sensors";
+      parameters[1].Value = tableName;
       parameters[2].Value = DBNull.Value;
       parameters[3].Value = 0;
 
-      await ExecuteNonQueryAsync(script, connectionString, CommandType.StoredProcedure, parameters);
+      return ExecuteNonQueryAsync(script, connectionString, CommandType.StoredProcedure, parameters);
     }
 
-    public async Task RollbackAsync(string tableName, string schemaName = "dbo")
+    public Task CdcEnableDbAsync()
+    {
+      var script = @"sys.sp_cdc_enable_db";
+
+      return ExecuteNonQueryAsync(script, connectionString, CommandType.StoredProcedure);
+    }
+
+    public async Task DisableAsync(string tableName, string schemaName = "dbo")
+    {
+      await CdcDisableTableAsync(tableName, schemaName).ConfigureAwait(false);
+
+      await CdcDisableDbAsync().ConfigureAwait(false);
+    }
+
+    public Task CdcDisableDbAsync()
+    {
+      string script = @"sys.sp_cdc_disable_db";
+
+      return ExecuteNonQueryAsync(script, connectionString, CommandType.StoredProcedure);
+    }
+
+    public async Task CdcDisableTableAsync(string tableName, string schemaName = "dbo")
     {
       var script = @"sys.sp_cdc_disable_table";
 
-      SqlParameter[] parameters = {
+      var parameters = new SqlParameter[]
+      {
         new("@source_schema", SqlDbType.VarChar),
         new("@source_name", SqlDbType.VarChar),
         new("@capture_instance", SqlDbType.VarChar),
@@ -57,37 +84,24 @@ namespace Blazor.Sample.Providers
       parameters[1].Value = tableName;
       parameters[2].Value = "all";
 
-      await ExecuteNonQueryAsync(script, connectionString, CommandType.StoredProcedure, parameters);
-      
-      script = @"sys.sp_cdc_disable_db";
-
-      await ExecuteNonQueryAsync(script, connectionString, CommandType.StoredProcedure);
+      await ExecuteNonQueryAsync(script, connectionString, CommandType.StoredProcedure, parameters).ConfigureAwait(false);
     }
 
     private static async Task<int?> ExecuteNonQueryAsync(string script, string connectionString, CommandType commandType, params SqlParameter[] parameters)
     {
-      try
+      await using SqlConnection connection = new SqlConnection(connectionString);
+      await using SqlCommand command = new SqlCommand(script, connection)
       {
-        await using SqlConnection connection = new SqlConnection(connectionString);
-        await using SqlCommand command = new SqlCommand(script, connection)
-        {
-          CommandType = commandType,
-        };
+        CommandType = commandType,
+      };
 
-        command.Parameters.AddRange(parameters);
+      command.Parameters.AddRange(parameters);
 
-        await command.Connection.OpenAsync();
+      await command.Connection.OpenAsync().ConfigureAwait(false);
 
-        var result = await command.ExecuteNonQueryAsync();
+      var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
 
-        return result;
-      }
-      catch (Exception e)
-      {
-        Console.WriteLine(e);
-      }
-
-      return null;
+      return result;
     }
   }
 }
