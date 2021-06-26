@@ -36,7 +36,7 @@ string KsqlDbUrl => @"http:\\localhost:8088";
 string tableName = "Sensors";
 string schemaName = "dbo";
 
-ICdcClient CdcProvider { get; set; }
+CdcClient CdcProvider { get; set; }
 
 async Task Main()
 {
@@ -208,21 +208,32 @@ or
 await cdcProvider.DisableAsync(tableName, schemaName).ConfigureAwait(false);
 ```
 
-### ksqlDB Cleanup
+### ksqlDB connector info
 ```KSQL
-show connectors;
+SHOW CONNECTORS;
 
-drop connector MSSQL_SENSORS_CONNECTOR;
-
-drop stream sqlserversensors delete topic;
+DESCRIBE CONNECTOR MSSQL_SENSORS_CONNECTOR;
 ```
 
+### ksqlDB Cleanup
+```KSQL
+DROP CONNECTOR MSSQL_SENSORS_CONNECTOR;
+
+DROP STREAM sqlserversensors DELETE TOPIC;
+```
+
+# Debezium connector for Sql Server
+[Download Debezium connector](https://www.confluent.io/hub/debezium/debezium-connector-sqlserver)
+
+[Deployment](https://debezium.io/documentation/reference/1.5/connectors/sqlserver.html#sqlserver-deploying-a-connector)
+
 ### Linqpad
+[Kafka.DotNet.SqlServer](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.sqlserver.linq)
 
 ### Related sources
 [Debezium](https://github.com/debezium/debezium)
 
-[Debezium connector for Sql server](https://debezium.io/documentation/reference/connectors/sqlserver.html)
+[Debezium source connector for Sql server](https://debezium.io/documentation/reference/1.5/connectors/sqlserver.html)
 
 [ksqlDB](https://ksqldb.io/)
 

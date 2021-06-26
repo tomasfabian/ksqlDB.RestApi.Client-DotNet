@@ -114,6 +114,7 @@ using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.SqlServer.Cdc;
 using Kafka.DotNet.SqlServer.Cdc.Extensions;
+
 string connectionString = @"Server=127.0.0.1,1433;User Id = SA;Password=<YourNewStrong@Passw0rd>;Initial Catalog = Sensors;MultipleActiveResultSets=true";
 
 string bootstrapServers = "localhost:29092";
@@ -122,7 +123,7 @@ string KsqlDbUrl => @"http:\\localhost:8088";
 string tableName = "Sensors";
 string schemaName = "dbo";
 
-ICdcClient CdcProvider { get; set; }
+CdcClient CdcProvider { get; set; }
 
 async Task Main()
 {
