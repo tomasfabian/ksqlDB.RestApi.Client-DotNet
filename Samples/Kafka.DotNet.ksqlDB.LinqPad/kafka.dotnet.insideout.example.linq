@@ -1,6 +1,7 @@
 <Query Kind="Program">
-  <NuGetReference Version="0.1.0" Prerelease="true">Kafka.DotNet.InsideOut</NuGetReference>
+  <NuGetReference>Kafka.DotNet.InsideOut</NuGetReference>
   <NuGetReference Version="1.1.0-rc.1">Kafka.DotNet.ksqlDB</NuGetReference>
+  <NuGetReference>System.Interactive.Async</NuGetReference>
   <Namespace>Confluent.Kafka</Namespace>
   <Namespace>Kafka.DotNet.InsideOut.Producer</Namespace>
   <Namespace>Kafka.DotNet.ksqlDB.KSql.Linq.Statements</Namespace>
@@ -12,6 +13,7 @@
   <Namespace>System.Reactive.Linq</Namespace>
   <Namespace>System.Runtime.Serialization</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
+  <Namespace>Kafka.DotNet.InsideOut.Consumer</Namespace>
 </Query>
 
 const string bootstrapServers = "localhost:29092";
@@ -26,36 +28,23 @@ async Task Main()
 	};
 
 	await TryCreateStreamAsync();
-	
+
 	await CreateOrReplaceMaterializedTableAsync();
-	
+
 	var kafkaConsumer = new SensorsTableConsumer(consumerConfig);
-	
+
 	ProduceValues();
 
-	var subscription = kafkaConsumer.ConnectToTopicAsync()
-		.Take(100)
-		.Subscribe(c => c.Dump(), onError: error =>
-		{
-			semaphoreSlim.Release();
-			$"Exception: {error.Message}".Dump("OnError");
-		},
-		onCompleted: () =>
-		{
-			semaphoreSlim.Release();
-			"Completed".Dump("OnCompleted");
-		});
+	await foreach (var consumeResult in kafkaConsumer.ConnectToTopic().ToAsyncEnumerable().Take(100))
+	{
+		Console.WriteLine(consumeResult.Message);
+	}
 
-	await semaphoreSlim.WaitAsync();
-	
-	using (subscription)
 	using (timerSubscription)
 	using (kafkaProducer)
 	using (kafkaConsumer)
 	{ }
 }
-
-SemaphoreSlim semaphoreSlim = new(0, 1);
 
 private IDisposable timerSubscription;
 private readonly Random randomValue = new(10);
@@ -135,9 +124,6 @@ public record IoTSensorStats
 
 	public int[] LatestByOffset { get; set; }
 
-	public long WindowStart { get; set; }
-	public long WindowEnd { get; set; }
-
 	public string LatestByOffsetJoined => LatestByOffset != null ? string.Join(',', LatestByOffset) : string.Empty;
 }
 
@@ -162,7 +148,7 @@ private async Task CreateOrReplaceMaterializedTableAsync()
 	if (!httpResponseMessage.IsSuccessStatusCode)
 	{
 		var statementResponse = httpResponseMessage.ToStatementResponse();
-		
+
 		statementResponse.Message.Dump();
 	}
 	else
