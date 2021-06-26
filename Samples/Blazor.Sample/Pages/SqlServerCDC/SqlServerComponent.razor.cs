@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Reactive.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Blazor.Sample.Configuration;
@@ -13,7 +11,6 @@ using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Generators;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.SqlServer.Cdc;
@@ -31,27 +28,27 @@ namespace Blazor.Sample.Pages.SqlServerCDC
 
     [Inject] private IConfiguration Configuration { get; init; }
 
-    [Inject] private ICdcClient CdcProvider { get; init; }
+    [Inject] private ISqlServerCdcClient CdcProvider { get; init; }
 
     private int TotalCount => sensors.Count;
+
+    private bool IsLoading { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
       SetNewModel();
 
-      var dbContext = DbContextFactory.CreateDbContext();
-
-      sensors = await EntityFrameworkQueryableExtensions.ToListAsync(dbContext.Sensors);
+      await LoadDataFromDbAsync();
 
       const string tableName = "Sensors";
 
+      //!!! disclaimer - these steps shouldn't be part of a component initialization. It is intended only for demonstration purposes, to see the relevant parts together.
       await CreateSensorsCdcStreamAsync();
 
       await EnableCdcAsync(tableName);
 
       await CreateConnectorAsync(tableName);
-
-      //await CreateSensorsChangeDataCaptureStreamAsync();
+      //!!! disclaimer
 
       var synchronizationContext = SynchronizationContext.Current;
 
@@ -60,11 +57,32 @@ namespace Blazor.Sample.Pages.SqlServerCDC
       await base.OnInitializedAsync();
     }
 
+    private async Task LoadDataFromDbAsync()
+    {
+      IsLoading = true;
+
+      try
+      {
+        var dbContext = DbContextFactory.CreateDbContext();
+
+        sensors = await EntityFrameworkQueryableExtensions.ToListAsync(dbContext.Sensors);
+      }
+      catch (Exception e)
+      {
+        Console.WriteLine(e);
+      }
+      finally
+      {
+        IsLoading = false;
+      }
+    }
+
     private async Task EnableCdcAsync(string tableName)
     {
       try
       {
-        await CdcProvider.EnableAsync(tableName);
+        await CdcProvider.CdcEnableDbAsync();
+        await CdcProvider.CdcEnableTableAsync(tableName);
       }
       catch (Exception e)
       {
@@ -74,8 +92,6 @@ namespace Blazor.Sample.Pages.SqlServerCDC
 
     private async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationToken = default)
     {
-      await using var context = new KSqlDBContext(KsqlDbUrl);
-
       string fromName = "sqlserversensors";
       string kafkaTopic = "sqlserver2019.dbo.Sensors";
 
@@ -93,8 +109,6 @@ namespace Blazor.Sample.Pages.SqlServerCDC
         Partitions = 1,
         Replicas = 1
       };
-      
-      var ksql = StatementGenerator.CreateStream<DatabaseChangeObject>(metadata, ifNotExists: true);
       
       var httpResponseMessage = await restApiClient.CreateStreamAsync<DatabaseChangeObject>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
         .ConfigureAwait(false);
@@ -126,17 +140,16 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
       string bootstrapServers = Configuration[ConfigKeys.Kafka_BootstrapServers];
       var connectionString = Configuration.GetConnectionString("DefaultConnection");
 
-      var connectorMetadata = new ConnectorMetadata(connectionString)
+      var connectorMetadata = new SqlServerConnectorMetadata(connectionString)
+        .SetTableIncludeListPropertyName($"{schemaName}.{tableName}")
         .SetJsonKeyConverter()
         .SetJsonValueConverter()
-        .SetTableIncludeListPropertyName($"{schemaName}.{tableName}")
         .SetProperty("database.history.kafka.bootstrap.servers", bootstrapServers)
         .SetProperty("database.history.kafka.topic", $"dbhistory.{tableName}")
         .SetProperty("database.server.name", "sqlserver2019")
         .SetProperty("key.converter.schemas.enable", "false")
         .SetProperty("value.converter.schemas.enable", "false")
-        .SetProperty("include.schema.changes", "false")
-        .SetTableIncludeListPropertyName($"{schemaName}.{tableName}");
+        .SetProperty("include.schema.changes", "false");
 
       var createConnector = connectorMetadata.ToStatement(connectorName: "MSSQL_SENSORS_CONNECTOR");
 
@@ -199,7 +212,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
 
       await using var context = new KSqlDBContext(options);
 
-      cdcSubscription = context.CreateQuery<DatabaseChangeObject>("sqlserversensors")
+      cdcSubscription = context.CreateQuery<DatabaseChangeObject<IoTSensor>>("sqlserversensors")
         .WithOffsetResetPolicy(AutoOffsetReset.Latest)
         .ToObservable()
         .ObserveOn(synchronizationContext)
@@ -213,12 +226,12 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
         }, error => { });
     }
 
-    private void UpdateTable(DatabaseChangeObject databaseChangeObject)
+    private void UpdateTable(DatabaseChangeObject<IoTSensor> databaseChangeObject)
     {
       switch (databaseChangeObject.Op.ToChangeDataCaptureType())
       {
         case ChangeDataCaptureType.Created:
-          var sensor = JsonSerializer.Deserialize<IoTSensor>(databaseChangeObject.After);
+          var sensor = databaseChangeObject.EntityAfter;
           
           var existing = sensors.FirstOrDefault(c => c.SensorId == sensor.SensorId);
 
@@ -232,7 +245,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
           break;
 
         case ChangeDataCaptureType.Deleted:
-          var sensorBefore = JsonSerializer.Deserialize<IoTSensor>(databaseChangeObject.Before);
+          var sensorBefore = databaseChangeObject.EntityBefore;
           var itemToRemove = sensors.FirstOrDefault(c => c.SensorId == sensorBefore.SensorId);
           if (itemToRemove != null)
             sensors.Remove(itemToRemove);
@@ -240,9 +253,9 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
       }
     }
 
-    private void TryUpdateSensor(DatabaseChangeObject databaseChangeObject)
+    private void TryUpdateSensor(DatabaseChangeObject<IoTSensor> databaseChangeObject)
     {
-      var sensorAfter = JsonSerializer.Deserialize<IoTSensor>(databaseChangeObject.After);
+      var sensorAfter = databaseChangeObject.EntityAfter;
 
       var found = sensors.FirstOrDefault(c => c.SensorId == sensorAfter.SensorId);
       var index = sensors.IndexOf(found);

@@ -7,12 +7,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blazor.Sample.Configuration;
 using Blazor.Sample.Data.Sensors;
+using Blazor.Sample.Extensions.Http;
 using Blazor.Sample.Kafka;
 using Kafka.DotNet.InsideOut.Consumer;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
 
@@ -60,6 +60,7 @@ namespace Blazor.Sample.Pages
 
     private async Task CreateTableAsync()
     {
+      //!!! disclaimer - these steps shouldn't be part of a component initialization. It is intended only for demonstration purposes, to see the relevant parts together.
       string ksqlDbUrl = Configuration[ConfigKeys.KSqlDb_Url];
 
       await using var context = new KSqlDBContext(ksqlDbUrl);
@@ -71,15 +72,9 @@ namespace Blazor.Sample.Pages
         .Select(c => new {SensorId = c.Key, Count = c.Count(), Sum = c.Sum(a => a.Value), LatestByOffset = c.LatestByOffset(a => a.Value, 2) });
 
       var httpResponseMessage = await statement.ExecuteStatementAsync(cancellationTokenSource.Token);
-
-      if (httpResponseMessage.IsSuccessStatusCode)
-      {
-        var statementResponses = httpResponseMessage.ToStatementResponses();
-      }
-      else
-      {
-        var statementResponse = httpResponseMessage.ToStatementResponse();
-      }
+      
+      var statementResponses = httpResponseMessage.ToStatementResponses();
+      //!!! disclaimer
     }
     
     private IDisposable subscription;
@@ -88,6 +83,7 @@ namespace Blazor.Sample.Pages
     {
       subscription = ItemsTableConsumer.ConnectToTopic()
         .ToObservable()
+        .Select(c => c.Message)
         .SubscribeOn(NewThreadScheduler.Default)
         .ObserveOn(synchronizationContext)
         .Subscribe(c =>

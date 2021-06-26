@@ -59,7 +59,7 @@ namespace Blazor.Sample
       string connectionString = Configuration["ConnectionStrings:DefaultConnection"];
 
       containerBuilder.RegisterType<CdcClient>()
-        .As<ICdcClient>()
+        .As<ISqlServerCdcClient>()
         .SingleInstance()
         .WithParameter(nameof(connectionString), connectionString);
 

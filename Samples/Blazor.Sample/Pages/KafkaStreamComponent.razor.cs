@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -14,7 +13,6 @@ using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
 
@@ -34,10 +32,6 @@ namespace Blazor.Sample.Pages
 
     protected override async Task OnInitializedAsync()
     {
-      var adminClient = GetAdminClient();
-
-      var brokerMetadata = adminClient.GetMetadata(TimeSpan.FromSeconds(3));
-
       await CreateItemsStreamAsync();
 
       var synchronizationContext = SynchronizationContext.Current;
@@ -48,8 +42,10 @@ namespace Blazor.Sample.Pages
 
       await base.OnInitializedAsync();
     }
+
     private async Task CreateItemsStreamAsync()
     {
+      //!!! disclaimer - these steps shouldn't be part of a component initialization. It is intended only for demonstration purposes, to see the relevant parts together.
       await using var context = new KSqlDBContext(KsqlDbUrl);
 
       var statement = context.CreateOrReplaceStreamStatement(streamName: TopicNames.SensorsStream)
@@ -58,15 +54,9 @@ namespace Blazor.Sample.Pages
         .PartitionBy(c => c.SensorId);
 
       var httpResponseMessage = await statement.ExecuteStatementAsync(cancellationTokenSource.Token);
-
-      if (httpResponseMessage.IsSuccessStatusCode)
-      {
-        StatementResponse[] statementResponses = httpResponseMessage.ToStatementResponses();
-      }
-      else
-      {
-        StatementResponse statementResponse = httpResponseMessage.ToStatementResponse();
-      }
+      
+      var statementResponses = httpResponseMessage.ToStatementResponses();
+      //!!! disclaimer
     }
 
     private async Task SubscribeToQuery(SynchronizationContext? synchronizationContext)
@@ -94,6 +84,7 @@ namespace Blazor.Sample.Pages
     {
       topicSubscription = ItemsConsumer.ConnectToTopic()
         .ToObservable()
+        .Select(c => c.Message)
         .SubscribeOn(NewThreadScheduler.Default)
         .ObserveOn(synchronizationContext)
         .Subscribe(c =>
@@ -101,6 +92,7 @@ namespace Blazor.Sample.Pages
           c.Value.Id = c.Key;
 
           items.Enqueue(c.Value);
+
           StateHasChanged();
         }, error => { Console.WriteLine(error.Message); });
     }

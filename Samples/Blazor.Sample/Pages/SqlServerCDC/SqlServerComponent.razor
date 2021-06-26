@@ -54,32 +54,39 @@ else
         </table>
       </div>
 
-      <div class="col">
-        <b>Sensors (@TotalCount):</b>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Sensor Id</th>
-              <th>Value</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            @foreach (var sensor in sensors)
+        <div class="col">
+            @if (IsLoading)
             {
-              <tr>
-                <td>@sensor.SensorId</td>
-                <td>@sensor.Value</td>
-                <td>
-                  <a class="btn btn-danger" @onclick="@(async () => await DeleteAsync(sensor))">
-                    <span class="oi oi-trash" title="delete" aria-hidden="true" style="color: #fff"></span>
-                  </a>
-                </td>
-              </tr>
+                <span>Loading...</span>
             }
-          </tbody>
-        </table>
-      </div>
+            else
+            {
+                <b>Sensors (@TotalCount):</b>
+            }
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Sensor Id</th>
+                    <th>Value</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var sensor in sensors)
+                {
+                    <tr>
+                        <td>@sensor.SensorId</td>
+                        <td>@sensor.Value</td>
+                        <td>
+                            <a class="btn btn-danger" @onclick="@(async () => await DeleteAsync(sensor))">
+                                <span class="oi oi-trash" title="delete" aria-hidden="true" style="color: #fff"></span>
+                            </a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
     </div>
   </div>
 
