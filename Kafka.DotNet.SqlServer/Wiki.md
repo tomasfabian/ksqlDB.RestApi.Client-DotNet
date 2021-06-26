@@ -97,7 +97,7 @@ public record IoTSensor
 }
 ```
 
-### ConnectorMetadata (v0.1.0)
+### SqlServerConnectorMetadata, ConnectorMetadata (v0.1.0)
 
 ```C#
 using System;
@@ -195,7 +195,7 @@ private async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationTok
 }
 ```
 
-### Disable CDC from.NET 
+### Disable CDC from.NET (v0.1.0)
 ```C#
 var cdcProvider = new Kafka.DotNet.SqlServer.Cdc.CdcClient(connectionString);
 
@@ -207,6 +207,10 @@ or
 ```C#
 await cdcProvider.DisableAsync(tableName, schemaName).ConfigureAwait(false);
 ```
+
+### DatabaseChangeObject<TEntity> (v.0.1.0)
+
+### KsqlDbConnect (v.0.1.0)
 
 ### ksqlDB connector info
 ```KSQL

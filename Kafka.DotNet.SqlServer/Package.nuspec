@@ -3,7 +3,7 @@
 	<metadata>
 		<id>Kafka.DotNet.SqlServer</id>
 		<title>Kafka.DotNet.SqlServer</title>
-		<version>0.1.0-rc.1</version>
+		<version>0.1.0-rc.2</version>
 		<authors>Tomas Fabian</authors>
 		<owners>@tomasfabian</owners>
 		<license type="expression">Apache-2.0</license>
@@ -19,16 +19,20 @@
 		<dependencies>
 			<group targetFramework=".NETCoreApp3.1">
 				<dependency id="Microsoft.Data.SqlClient" version="3.0" exclude="Build,Analyzers" />
+        <dependency id="Kafka.DotNet.ksqlDB" version="1.1.0" exclude="Build,Analyzers" />
 			</group>
 			<group targetFramework="net5.0">
         <dependency id="Microsoft.Data.SqlClient" version="3.0" exclude="Build,Analyzers" />
-			</group>
-			<group targetFramework=".NETStandard2.0">
-        <dependency id="Microsoft.Data.SqlClient" version="3.0" exclude="Build,Analyzers" />
+        <dependency id="Kafka.DotNet.ksqlDB" version="1.1.0" exclude="Build,Analyzers" />
 			</group>
 			<group targetFramework=".NETStandard2.1">
         <dependency id="Microsoft.Data.SqlClient" version="3.0" exclude="Build,Analyzers" />
+        <dependency id="Kafka.DotNet.ksqlDB" version="1.1.0" exclude="Build,Analyzers" />
 			</group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.Data.SqlClient" version="3.0" exclude="Build,Analyzers" />
+        <dependency id="Kafka.DotNet.ksqlDB" version="1.1.0" exclude="Build,Analyzers" />
+      </group>
 		</dependencies>
 	</metadata>
 	<files>
