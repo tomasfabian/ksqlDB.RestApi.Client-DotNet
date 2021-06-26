@@ -2,11 +2,11 @@
 
 namespace Kafka.DotNet.SqlServer.Cdc
 {
-  public interface ISqlServerCdcClient
+  public interface ISqlServerCdcClient : ICdcClient
   {
-    Task CdcEnableTable(string tableName, string schemaName = "dbo");
-    Task CdcDisableTableAsync(string tableName, string schemaName = "dbo");
-    Task CdcEnableDbAsync();
-    Task CdcDisableDbAsync();
+    Task CdcEnableTableAsync(string tableName, string schemaName = "dbo");
+    Task CdcEnableTableAsync(CdcEnableTable cdcEnableTable);
+
+    Task CdcDisableTableAsync(string tableName, string schemaName = "dbo", string captureInstance = "all");
   }
 }

@@ -6,9 +6,16 @@ using static System.String;
 
 namespace Kafka.DotNet.SqlServer.Cdc
 {
-  public class CdcClient : ICdcClient, ISqlServerCdcClient
+  public class CdcClient : ISqlServerCdcClient
   {
     private readonly string connectionString;
+
+    public CdcClient(SqlConnectionStringBuilder sqlConnectionStringBuilder)
+    {
+      if (sqlConnectionStringBuilder == null) throw new ArgumentNullException(nameof(sqlConnectionStringBuilder));
+
+      connectionString = sqlConnectionStringBuilder.ConnectionString;
+    }
 
     public CdcClient(string connectionString)
     {      
@@ -16,22 +23,25 @@ namespace Kafka.DotNet.SqlServer.Cdc
         throw new ArgumentNullException(nameof(connectionString));
 
       if (connectionString.Trim() == Empty)
-        throw new ArgumentException($"{nameof(connectionString)} cannot be empty", nameof(connectionString));
+        throw new ArgumentException($"{nameof(connectionString)} cannot be null or empty", nameof(connectionString));
 
       this.connectionString = connectionString;
     }
 
-    public async Task EnableAsync(string tableName, string schemaName = "dbo")
+    public Task CdcEnableTableAsync(string tableName, string schemaName = "dbo")
     {
-      await CdcEnableDbAsync().ConfigureAwait(false);
+      CdcEnableTable cdcEnableTable = new(tableName)
+      {
+        SchemaName = schemaName
+      };
 
-      await CdcEnableTable(tableName, schemaName).ConfigureAwait(false);
+      return CdcEnableTableAsync(cdcEnableTable);
     }
 
-    public Task CdcEnableTable(string tableName, string schemaName = "dbo")
+    public Task CdcEnableTableAsync(CdcEnableTable cdcEnableTable)
     {
       string script = @"sys.sp_cdc_enable_table";
-
+      
       SqlParameter[] parameters =
       {
         new("@source_schema", SqlDbType.VarChar),
@@ -40,11 +50,13 @@ namespace Kafka.DotNet.SqlServer.Cdc
         new("@supports_net_changes", SqlDbType.Int)
       };
 
-      parameters[0].Value = schemaName;
-      parameters[1].Value = tableName;
-      parameters[2].Value = DBNull.Value;
-      parameters[3].Value = 0;
+      parameters[0].Value = cdcEnableTable.SchemaName;
+      parameters[1].Value = cdcEnableTable.TableName;
+      parameters[2].Value = cdcEnableTable.RoleName;
+      parameters[3].Value = cdcEnableTable.SupportsNetChanges;
 
+      //TODO: https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sys-sp-cdc-enable-table-transact-sql?view=sql-server-ver15#syntax
+      
       return ExecuteNonQueryAsync(script, connectionString, CommandType.StoredProcedure, parameters);
     }
 
@@ -55,13 +67,6 @@ namespace Kafka.DotNet.SqlServer.Cdc
       return ExecuteNonQueryAsync(script, connectionString, CommandType.StoredProcedure);
     }
 
-    public async Task DisableAsync(string tableName, string schemaName = "dbo")
-    {
-      await CdcDisableTableAsync(tableName, schemaName).ConfigureAwait(false);
-
-      await CdcDisableDbAsync().ConfigureAwait(false);
-    }
-
     public Task CdcDisableDbAsync()
     {
       string script = @"sys.sp_cdc_disable_db";
@@ -69,10 +74,10 @@ namespace Kafka.DotNet.SqlServer.Cdc
       return ExecuteNonQueryAsync(script, connectionString, CommandType.StoredProcedure);
     }
 
-    public async Task CdcDisableTableAsync(string tableName, string schemaName = "dbo")
+    public async Task CdcDisableTableAsync(string tableName, string schemaName = "dbo", string captureInstance = "all")
     {
       var script = @"sys.sp_cdc_disable_table";
-
+      
       var parameters = new SqlParameter[]
       {
         new("@source_schema", SqlDbType.VarChar),
@@ -82,7 +87,7 @@ namespace Kafka.DotNet.SqlServer.Cdc
 
       parameters[0].Value = schemaName;
       parameters[1].Value = tableName;
-      parameters[2].Value = "all";
+      parameters[2].Value = captureInstance;
 
       await ExecuteNonQueryAsync(script, connectionString, CommandType.StoredProcedure, parameters).ConfigureAwait(false);
     }
