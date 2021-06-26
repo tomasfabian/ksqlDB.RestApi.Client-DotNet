@@ -1,0 +1,29 @@
+name: .NET Blazor - CDC and InsideOut
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Setup DotNet Core 3.1
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+
+    - name: Setup .NET 5.0
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+
+    - name: Clean
+      run: dotnet clean Kafka.DotNet.InsideOut.sln --configuration Release && dotnet nuget locals all --clear
+    - name: Install dependencies
+      run: dotnet restore Kafka.DotNet.InsideOut.sln
+    - name: Build with dotnet
+      run: dotnet build Kafka.DotNet.InsideOut.sln --configuration Release
