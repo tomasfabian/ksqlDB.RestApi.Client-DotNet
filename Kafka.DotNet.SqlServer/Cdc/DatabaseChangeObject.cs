@@ -2,7 +2,7 @@
 
 namespace Kafka.DotNet.SqlServer.Cdc
 {
-  public class DatabaseChangeObject<TEntity> : DatabaseChangeObject
+  public record DatabaseChangeObject<TEntity> : DatabaseChangeObject
   {
     public TEntity EntityBefore
     {
@@ -32,7 +32,7 @@ namespace Kafka.DotNet.SqlServer.Cdc
     }
   }
 
-  public class DatabaseChangeObject
+  public record DatabaseChangeObject
   {
     public string Before { get; set; }
     public string After { get; set; }
