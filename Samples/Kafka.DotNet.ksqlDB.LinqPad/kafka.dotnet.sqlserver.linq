@@ -15,6 +15,7 @@
   <Namespace>System.Net.Http</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
   <Namespace>System.Text.Json</Namespace>
+  <Namespace>Kafka.DotNet.SqlServer.Connect</Namespace>
   <RuntimeVersion>5.0</RuntimeVersion>
 </Query>
 
@@ -23,41 +24,39 @@ string connectionString = @"Server=127.0.0.1,1433;User Id = SA;Password=<YourNew
 string bootstrapServers = "localhost:29092";
 string KsqlDbUrl => @"http:\\localhost:8088";
 
-ICdcClient CdcProvider { get; set; }
-
 async Task Main()
 {
-	CdcProvider = new Kafka.DotNet.SqlServer.Cdc.CdcClient(connectionString);
-
 	await CreateSensorsCdcStreamAsync();
 
 	await EnableCdcAsync(tableName);
 
-	await CreateConnectorAsync(tableName);
+	await CreateConnectorAsync();
 
 	await using var context = new KSqlDBContext(KsqlDbUrl);
 
 	var semaphoreSlim = new SemaphoreSlim(0, 1);
 	
-	var cdcSubscription = context.CreateQuery<DatabaseChangeObject>("sqlserversensors")
+	var cdcSubscription = context.CreateQuery<DatabaseChangeObject<IoTSensor>>("sqlserversensors")
 		.WithOffsetResetPolicy(AutoOffsetReset.Latest)
 		.Take(5)
 		.ToObservable()
 		.Subscribe(cdc =>
 		{
-			var operationType = cdc.Op.ToChangeDataCaptureType();
+			var operationType = cdc.OperationType;
 			Console.WriteLine(operationType);
 
 			switch (operationType)
 			{
 				case ChangeDataCaptureType.Created:
+					cdc.EntityAfter.Dump("after");
 					break;
 				case ChangeDataCaptureType.Updated:
 
-					var sensorBefore = System.Text.Json.JsonSerializer.Deserialize<IoTSensor>(cdc.Before).Dump("before");
-					var sensorAfter = System.Text.Json.JsonSerializer.Deserialize<IoTSensor>(cdc.After).Dump("after");
+					var sensorBefore = cdc.EntityBefore.Dump("before");
+					var sensorAfter = cdc.EntityAfter.Dump("after");
 					break;
 				case ChangeDataCaptureType.Deleted:
+					cdc.EntityBefore.Dump("before");
 					break;
 			}
 		}, onError: error =>
@@ -73,7 +72,8 @@ async Task Main()
 
 	await semaphoreSlim.WaitAsync();
 
-	using(cdcSubscription){
+	using(cdcSubscription)
+	{
 	}
 }
 
@@ -84,7 +84,10 @@ private async Task EnableCdcAsync(string tableName)
 {
 	try
 	{
-		await CdcProvider.EnableAsync(tableName);
+		var cdcClient = new Kafka.DotNet.SqlServer.Cdc.CdcClient(connectionString);
+		
+		await cdcClient.CdcEnableDbAsync();
+		await cdcClient.CdcEnableTableAsync(tableName);
 	}
 	catch (Exception e)
 	{
@@ -118,32 +121,31 @@ private async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationTok
 		.ConfigureAwait(false);
 }
 
-private async Task CreateConnectorAsync(string tableName, string schemaName = "dbo")
+private async Task CreateConnectorAsync()
 {
-	var createConnectorStatement = CreateConnector();
+	var ksqlDbConnect = new KsqlDbConnect(new Uri(KsqlDbUrl));
 
-	KSqlDbStatement ksqlDbStatement = new(createConnectorStatement);
+	SqlServerConnectorMetadata connectorMetadata = CreateConnectorMetadata();
 
-	var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement).ConfigureAwait(false);
+	await ksqlDbConnect.CreateConnectorAsync(connectorName: "MSSQL_SENSORS_CONNECTOR", connectorMetadata);
 }
 
-private string CreateConnector()
+private SqlServerConnectorMetadata CreateConnectorMetadata()
 {
-	var createConnector = new ConnectorMetadata(connectionString)
+	var createConnector = new SqlServerConnectorMetadata(connectionString)
+		.SetTableIncludeListPropertyName($"{schemaName}.{tableName}")
 		.SetJsonKeyConverter()
 		.SetJsonValueConverter()
-		.SetTableIncludeListPropertyName($"{schemaName}.{tableName}")
 		.SetProperty("database.history.kafka.bootstrap.servers", bootstrapServers)
 		.SetProperty("database.history.kafka.topic", $"dbhistory.{tableName}")
 		.SetProperty("database.server.name", "sqlserver2019")
 		.SetProperty("key.converter.schemas.enable", "false")
 		.SetProperty("value.converter.schemas.enable", "false")
-		.SetProperty("include.schema.changes", "false")
-		.ToStatement(connectorName: "MSSQL_SENSORS_CONNECTOR");
+		.SetProperty("include.schema.changes", "false");
 
 	createConnector.Dump();
 
-	return createConnector;
+	return createConnector as SqlServerConnectorMetadata;
 }
 
 public Task<HttpResponseMessage> ExecuteStatementAsync(KSqlDbStatement ksqlDbStatement, CancellationToken cancellationToken = default)
