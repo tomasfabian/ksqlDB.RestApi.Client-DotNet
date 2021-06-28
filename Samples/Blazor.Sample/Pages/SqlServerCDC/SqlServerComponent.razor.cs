@@ -16,6 +16,7 @@ using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.SqlServer.Cdc;
 using Kafka.DotNet.SqlServer.Cdc.Connectors;
 using Kafka.DotNet.SqlServer.Cdc.Extensions;
+using Kafka.DotNet.SqlServer.Connect;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -29,6 +30,8 @@ namespace Blazor.Sample.Pages.SqlServerCDC
     [Inject] private IConfiguration Configuration { get; init; }
 
     [Inject] private ISqlServerCdcClient CdcProvider { get; init; }
+
+    [Inject] private IKsqlDbConnect KsqlDbConnect { get; init; }
 
     private int TotalCount => sensors.Count;
 
@@ -149,13 +152,9 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
         .SetProperty("database.server.name", "sqlserver2019")
         .SetProperty("key.converter.schemas.enable", "false")
         .SetProperty("value.converter.schemas.enable", "false")
-        .SetProperty("include.schema.changes", "false");
+        .SetProperty("include.schema.changes", "false") as SqlServerConnectorMetadata;
 
-      var createConnector = connectorMetadata.ToStatement(connectorName: "MSSQL_SENSORS_CONNECTOR");
-
-      KSqlDbStatement ksqlDbStatement = new(createConnector);
-
-      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement).ConfigureAwait(false);
+      var httpResponseMessage = await KsqlDbConnect.CreateConnectorAsync(connectorName: "MSSQL_SENSORS_CONNECTOR", connectorMetadata);
     }
 
     /// <summary>
@@ -228,7 +227,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
 
     private void UpdateTable(DatabaseChangeObject<IoTSensor> databaseChangeObject)
     {
-      switch (databaseChangeObject.Op.ToChangeDataCaptureType())
+      switch (databaseChangeObject.OperationType)
       {
         case ChangeDataCaptureType.Created:
           var sensor = databaseChangeObject.EntityAfter;

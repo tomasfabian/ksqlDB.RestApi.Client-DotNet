@@ -15,6 +15,7 @@ using Confluent.Kafka;
 using Kafka.DotNet.InsideOut.Consumer;
 using Kafka.DotNet.InsideOut.Producer;
 using Kafka.DotNet.SqlServer.Cdc;
+using Kafka.DotNet.SqlServer.Connect;
 using Microsoft.EntityFrameworkCore;
 
 namespace Blazor.Sample
@@ -62,6 +63,13 @@ namespace Blazor.Sample
         .As<ISqlServerCdcClient>()
         .SingleInstance()
         .WithParameter(nameof(connectionString), connectionString);
+
+      Uri ksqlDbUrl = new Uri(Configuration["ksqlDb:Url"]);
+
+      containerBuilder.RegisterType<KsqlDbConnect>()
+        .As<IKsqlDbConnect>()
+        .SingleInstance()
+        .WithParameter(nameof(ksqlDbUrl), ksqlDbUrl);
 
       string bootstrapServers = Configuration["Kafka:BootstrapServers"];
 
