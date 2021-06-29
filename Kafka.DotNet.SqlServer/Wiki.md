@@ -2,11 +2,10 @@
 
 ### Blazor Sample 
 Set docker-compose.csproj as startup project in Kafka.DotNet.InsideOut.sln.
-Work in progress
 
 ### Nuget
 ```
-Install-Package Kafka.DotNet.SqlServer -Version 0.1.0-rc.1
+Install-Package Kafka.DotNet.SqlServer -Version 0.1.0-rc.2
 
 Install-Package Kafka.DotNet.ksqlDB
 ```
@@ -28,65 +27,69 @@ using Kafka.DotNet.SqlServer.Cdc;
 using Kafka.DotNet.SqlServer.Cdc.Connectors;
 using Kafka.DotNet.SqlServer.Cdc.Extensions;
 
-string connectionString = @"Server=127.0.0.1,1433;User Id = SA;Password=<YourNewStrong@Passw0rd>;Initial Catalog = Sensors;MultipleActiveResultSets=true";
-
-string bootstrapServers = "localhost:29092";
-string KsqlDbUrl => @"http:\\localhost:8088";
-    
-string tableName = "Sensors";
-string schemaName = "dbo";
-
-CdcClient CdcProvider { get; set; }
-
-async Task Main()
+class Program
 {
-  CdcProvider = new Kafka.DotNet.SqlServer.Cdc.CdcClient(connectionString);
+  static string connectionString = @"Server=127.0.0.1,1433;User Id = SA;Password=<YourNewStrong@Passw0rd>;Initial Catalog = Sensors;MultipleActiveResultSets=true";
 
-  await CreateSensorsCdcStreamAsync();
+  static string bootstrapServers = "localhost:29092";
+  static string KsqlDbUrl => @"http:\\localhost:8088";
 
-  await CdcProvider.CdcEnableDbAsync().ConfigureAwait(false);
+  static string tableName = "Sensors";
+  static string schemaName = "dbo";
 
-  await CdcProvider.CdcEnableTable(tableName, schemaName).ConfigureAwait(false);
+  static async Task Main(string[] args)
+  {
+    await CreateSensorsCdcStreamAsync();
 
-  await CreateConnectorAsync(tableName);
+    await TryEnableCdcAsync();
 
-  await using var context = new KSqlDBContext(KsqlDbUrl);
+    await CreateConnectorAsync();
 
-  var semaphoreSlim = new SemaphoreSlim(0, 1);
-	
-  var cdcSubscription = context.CreateQuery<DatabaseChangeObject>("sqlserversensors")
-    .WithOffsetResetPolicy(AutoOffsetReset.Latest)
-    .Take(5)
-    .ToObservable()
-    .Subscribe(cdc =>
-      {
-        var operationType = cdc.Op.ToChangeDataCaptureType();
-        Console.WriteLine(operationType);
+    await using var context = new KSqlDBContext(KsqlDbUrl);
 
-        switch (operationType)
+    var semaphoreSlim = new SemaphoreSlim(0, 1);
+
+    var cdcSubscription = context.CreateQuery<DatabaseChangeObject<IoTSensor>>("sqlserversensors")
+      .WithOffsetResetPolicy(AutoOffsetReset.Latest)
+      .Take(5)
+      .ToObservable()
+      .Subscribe(cdc =>
         {
-          case ChangeDataCaptureType.Updated:
+          var operationType = cdc.OperationType;
+          Console.WriteLine(operationType);
 
-            var sensorBefore = System.Text.Json.JsonSerializer.Deserialize<IoTSensor>(cdc.Before);
-            var sensorAfter = System.Text.Json.JsonSerializer.Deserialize<IoTSensor>(cdc.After);
-            break;
-        }
-      }, onError: error =>
-      {
-        semaphoreSlim.Release();
-            
-        Console.WriteLine($"Exception: {error.Message}");
-      },
-      onCompleted: () =>
-      {
-        semaphoreSlim.Release();
-        Console.WriteLine("Completed");
-      });
+          switch (operationType)
+          {
+            case ChangeDataCaptureType.Created:
+              Console.WriteLine($"Value: {cdc.EntityAfter.Value}");
+              break;
+            case ChangeDataCaptureType.Updated:
+
+              Console.WriteLine($"Value before: {cdc.EntityBefore.Value}");
+              Console.WriteLine($"Value after: {cdc.EntityAfter.Value}");
+              break;
+            case ChangeDataCaptureType.Deleted:
+              Console.WriteLine($"Value: {cdc.EntityBefore.Value}");
+              break;
+          }
+        }, onError: error =>
+        {
+          semaphoreSlim.Release();
+
+          Console.WriteLine($"Exception: {error.Message}");
+        },
+        onCompleted: () =>
+        {
+          semaphoreSlim.Release();
+          Console.WriteLine("Completed");
+        });
 
 
-  await semaphoreSlim.WaitAsync();
-	
-  using(cdcSubscription){
+    await semaphoreSlim.WaitAsync();
+
+    using (cdcSubscription)
+    {
+    }
   }
 }
 
@@ -97,50 +100,48 @@ public record IoTSensor
 }
 ```
 
+### CdcClient (v0.1.0)
+```C#
+using Kafka.DotNet.SqlServer.Cdc;
+
+private static async Task TryEnableCdcAsync()
+{
+  var cdcClient = new CdcClient(connectionString);
+
+  try
+  {
+    await cdcClient.CdcEnableDbAsync();
+
+    await cdcClient.CdcEnableTableAsync(tableName);
+  }
+  catch (Exception e)
+  {
+    Console.WriteLine(e);
+  }
+}
+```
+
 ### SqlServerConnectorMetadata, ConnectorMetadata (v0.1.0)
 
 ```C#
 using System;
-using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.SqlServer.Cdc.Connectors;
 
-private async Task CreateConnectorAsync(string tableName, string schemaName = "dbo")
+private static SqlServerConnectorMetadata CreateConnectorMetadata()
 {
-  var createConnectorStatement = CreateConnector();
-
-  KSqlDbStatement ksqlDbStatement = new(createConnectorStatement);
-
-  var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement).ConfigureAwait(false);
-}
-
-private string CreateConnector()
-{
-  var createConnector = new ConnectorMetadata(connectionString)
+  var createConnector = new SqlServerConnectorMetadata(connectionString)
+    .SetTableIncludeListPropertyName($"{schemaName}.{tableName}")
     .SetJsonKeyConverter()
     .SetJsonValueConverter()
-    .SetTableIncludeListPropertyName($"{schemaName}.{tableName}")
     .SetProperty("database.history.kafka.bootstrap.servers", bootstrapServers)
     .SetProperty("database.history.kafka.topic", $"dbhistory.{tableName}")
     .SetProperty("database.server.name", "sqlserver2019")
     .SetProperty("key.converter.schemas.enable", "false")
     .SetProperty("value.converter.schemas.enable", "false")
-    .SetProperty("include.schema.changes", "false")
-    .ToStatement(connectorName: "MSSQL_SENSORS_CONNECTOR");
-      
-  return createConnector;
-}
+    .SetProperty("include.schema.changes", "false");
 
-private Task<HttpResponseMessage> ExecuteStatementAsync(KSqlDbStatement ksqlDbStatement, CancellationToken cancellationToken = default)
-{
-  var httpClientFactory = new HttpClientFactory(new Uri(KsqlDbUrl));
-
-  var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
-
-  return restApiClient.ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
+  return createConnector as SqlServerConnectorMetadata;
 }
 ```
 
@@ -165,10 +166,33 @@ CREATE SOURCE CONNECTOR MSSQL_SENSORS_CONNECTOR WITH (
 );
 ```
 
+### KsqlDbConnect (v.0.1.0)
+```C#
+using Kafka.DotNet.SqlServer.Connect;
+
+private static async Task CreateConnectorAsync()
+{
+  var ksqlDbConnect = new KsqlDbConnect(new Uri(KsqlDbUrl));
+
+  SqlServerConnectorMetadata connectorMetadata = CreateConnectorMetadata();
+
+  await ksqlDbConnect.CreateConnectorAsync(connectorName: "MSSQL_SENSORS_CONNECTOR", connectorMetadata);
+}
+```
+
 ### Creating a stream for CDC - Change data capture  (kafka.dotnet.ksqldb)
 
 ```C#
-private async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationToken = default)
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.KSql.RestApi;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using Kafka.DotNet.SqlServer.Cdc;
+
+private static async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationToken = default)
 {
   await using var context = new KSqlDBContext(KsqlDbUrl);
 
@@ -188,8 +212,6 @@ private async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationTok
     Replicas = 1
   };
 
-  var ksql = StatementGenerator.CreateStream<DatabaseChangeObject>(metadata, ifNotExists: true);
-
   var httpResponseMessage = await restApiClient.CreateStreamAsync<DatabaseChangeObject>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
     .ConfigureAwait(false);
 }
@@ -197,20 +219,33 @@ private async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationTok
 
 ### Disable CDC from.NET (v0.1.0)
 ```C#
-var cdcProvider = new Kafka.DotNet.SqlServer.Cdc.CdcClient(connectionString);
+var cdcClient = new Kafka.DotNet.SqlServer.Cdc.CdcClient(connectionString);
 
-await cdcProvider.CdcDisableTableAsync(tableName, schemaName).ConfigureAwait(false);
+await cdcClient.CdcDisableTableAsync(tableName, schemaName).ConfigureAwait(false);
 
-await cdcProvider.CdcDisableDbAsync().ConfigureAwait(false);
+await cdcClient.CdcDisableDbAsync().ConfigureAwait(false);
 ```
-or 
+
+### `DatabaseChangeObject<TEntity>` (v.0.1.0)
 ```C#
-await cdcProvider.DisableAsync(tableName, schemaName).ConfigureAwait(false);
+using System;
+using System.Reactive;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.SqlServer.Cdc;
+
+await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+
+context.CreateQuery<DatabaseChangeObject<IoTSensor>>("sqlserversensors")
+  .Subscribe(new AnonymousObserver<DatabaseChangeObject<IoTSensor>>(dco =>
+  {
+    Console.WriteLine($"Operation type: {dco.OperationType}");
+    Console.WriteLine($"Before: {dco.Before}");
+    Console.WriteLine($"EntityBefore: {dco.EntityBefore?.Value}");
+    Console.WriteLine($"After: {dco.After}");
+    Console.WriteLine($"EntityAfter: {dco.EntityAfter?.Value}");
+    Console.WriteLine($"Source: {dco.Source}");
+  }));
 ```
-
-### DatabaseChangeObject<TEntity> (v.0.1.0)
-
-### KsqlDbConnect (v.0.1.0)
 
 ### ksqlDB connector info
 ```KSQL

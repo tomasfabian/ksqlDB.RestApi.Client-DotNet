@@ -101,7 +101,7 @@ run in command line:
 Consume row-level table changes (CDC - Change Data Capture) from  Sql Server databases with the Debezium connector streaming platform. 
 ### Nuget
 ```
-Install-Package Kafka.DotNet.SqlServer -Version 0.1.0-rc.1
+Install-Package Kafka.DotNet.SqlServer -Version 0.1.0-rc.2
 ```
 
 Full example is available in [Blazor example](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Blazor.Sample) - Kafka.DotNet.InsideOut.sln:
@@ -115,71 +115,80 @@ using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.SqlServer.Cdc;
 using Kafka.DotNet.SqlServer.Cdc.Extensions;
 
-string connectionString = @"Server=127.0.0.1,1433;User Id = SA;Password=<YourNewStrong@Passw0rd>;Initial Catalog = Sensors;MultipleActiveResultSets=true";
-
-string bootstrapServers = "localhost:29092";
-string KsqlDbUrl => @"http:\\localhost:8088";
-
-string tableName = "Sensors";
-string schemaName = "dbo";
-
-CdcClient CdcProvider { get; set; }
-
-async Task Main()
+class Program
 {
-  CdcProvider = new CdcClient(connectionString);
+  static string connectionString = @"Server=127.0.0.1,1433;User Id = SA;Password=<YourNewStrong@Passw0rd>;Initial Catalog = Sensors;MultipleActiveResultSets=true";
 
-  await CdcProvider.CdcEnableDbAsync().ConfigureAwait(false);
+  static string bootstrapServers = "localhost:29092";
+  static string KsqlDbUrl => @"http:\\localhost:8088";
 
-  await CdcProvider.CdcEnableTableAsync(tableName, schemaName).ConfigureAwait(false);
+  static string tableName = "Sensors";
+  static string schemaName = "dbo";
 
-  await CreateConnectorAsync(tableName);
+  private static ISqlServerCdcClient CdcClient { get; set; }
 
-  await using var context = new KSqlDBContext(KsqlDbUrl);
-
-  var semaphoreSlim = new SemaphoreSlim(0, 1);
-
-  var cdcSubscription = context.CreateQuery<DatabaseChangeObject>("sqlserversensors")
-    .WithOffsetResetPolicy(AutoOffsetReset.Latest)
-    .Take(5)
-    .ToObservable()
-    .Subscribe(cdc =>
-      {
-        var operationType = cdc.Op.ToChangeDataCaptureType();
-        Console.WriteLine(operationType);
-
-        switch (operationType)
-        {
-          case ChangeDataCaptureType.Updated:
-
-            var sensorBefore = System.Text.Json.JsonSerializer.Deserialize<IoTSensor>(cdc.Before);
-            var sensorAfter = System.Text.Json.JsonSerializer.Deserialize<IoTSensor>(cdc.After);
-            break;
-        }
-      }, onError: error =>
-      {
-        semaphoreSlim.Release();
-
-        Console.WriteLine($"Exception: {error.Message}");
-      },
-      onCompleted: () =>
-      {
-        semaphoreSlim.Release();
-        Console.WriteLine("Completed");
-      });
-
-
-  await semaphoreSlim.WaitAsync();
-
-  using (cdcSubscription)
+  static async Task Main(string[] args)
   {
+    CdcClient = new CdcClient(connectionString);
+
+    await CreateSensorsCdcStreamAsync();
+
+    await TryEnableCdcAsync();
+
+    await CreateConnectorAsync();
+
+    await using var context = new KSqlDBContext(KsqlDbUrl);
+
+    var semaphoreSlim = new SemaphoreSlim(0, 1);
+
+    var cdcSubscription = context.CreateQuery<DatabaseChangeObject<IoTSensor>>("sqlserversensors")
+      .WithOffsetResetPolicy(AutoOffsetReset.Latest)
+      .Take(5)
+      .ToObservable()
+      .Subscribe(cdc =>
+        {
+          var operationType = cdc.OperationType;
+          Console.WriteLine(operationType);
+
+          switch (operationType)
+          {
+            case ChangeDataCaptureType.Created:
+              Console.WriteLine($"Value: {cdc.EntityAfter.Value}");
+              break;
+            case ChangeDataCaptureType.Updated:
+
+              Console.WriteLine($"Value before: {cdc.EntityBefore.Value}");
+              Console.WriteLine($"Value after: {cdc.EntityAfter.Value}");
+              break;
+            case ChangeDataCaptureType.Deleted:
+              Console.WriteLine($"Value: {cdc.EntityBefore.Value}");
+              break;
+          }
+        }, onError: error =>
+        {
+          semaphoreSlim.Release();
+
+          Console.WriteLine($"Exception: {error.Message}");
+        },
+        onCompleted: () =>
+        {
+          semaphoreSlim.Release();
+          Console.WriteLine("Completed");
+        });
+
+
+    await semaphoreSlim.WaitAsync();
+
+    using (cdcSubscription)
+    {
+    }
   }
 }
 
 public record IoTSensor
 {
-  public string SensorId { get; set; }
-  public int Value { get; set; }
+	public string SensorId { get; set; }
+	public int Value { get; set; }
 }
 ```
 
