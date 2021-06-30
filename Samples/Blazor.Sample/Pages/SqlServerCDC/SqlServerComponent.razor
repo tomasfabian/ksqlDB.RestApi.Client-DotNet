@@ -93,12 +93,12 @@ else
 }
 
 @code {
-  private FixedSizedQueue<DatabaseChangeObject> items;
+  private FixedSizedQueue<RawDatabaseChangeObject> items;
   private IList<IoTSensor> sensors;
 
   protected override void OnInitialized()
   {
-    items = new FixedSizedQueue<DatabaseChangeObject>();
+    items = new FixedSizedQueue<RawDatabaseChangeObject>();
 
     sensors = new List<IoTSensor>();
   }
