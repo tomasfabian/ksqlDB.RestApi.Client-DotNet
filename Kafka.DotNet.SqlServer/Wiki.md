@@ -1,4 +1,4 @@
-﻿Kafka.DotNet.SqlServer is a client API for consuming row-level table changes (CDC - Change Data Capture) from a Sql Server databases with the Debezium connector streaming platform.
+﻿Kafka.DotNet.SqlServer is a client API for consuming row-level table changes (CDC - [Change Data Capture](https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/about-change-data-capture-sql-server?view=sql-server-ver15)) from a Sql Server databases with the Debezium connector streaming platform.
 
 ### Blazor Sample 
 Set docker-compose.csproj as startup project in Kafka.DotNet.InsideOut.sln.
@@ -10,7 +10,8 @@ Install-Package Kafka.DotNet.SqlServer -Version 0.1.0-rc.2
 Install-Package Kafka.DotNet.ksqlDB
 ```
 
-### CdcClient (v0.1.0)
+### Subscribing to a CDC stream (v0.1.0)
+The Debezium connector produces change events from row-level table changes into a kafka topic. The following program shows how to subscribe to such streams with ksqldb
 ```C#
 using System;
 using System.Net.Http;
@@ -49,7 +50,7 @@ class Program
 
     var semaphoreSlim = new SemaphoreSlim(0, 1);
 
-    var cdcSubscription = context.CreateQuery<DatabaseChangeObject<IoTSensor>>("sqlserversensors")
+    var cdcSubscription = context.CreateQuery<RawDatabaseChangeObject<IoTSensor>>("sqlserversensors")
       .WithOffsetResetPolicy(AutoOffsetReset.Latest)
       .Take(5)
       .ToObservable()
@@ -100,7 +101,74 @@ public record IoTSensor
 }
 ```
 
+Navigate to http://localhost:9000/topic/sqlserver2019.dbo.Sensors for information about the created kafka topic and view messages with (Kafdrop)[https://github.com/obsidiandynamics/kafdrop]
+
+### Creating a CDC stream in ksqldb-cli
+TODO: Create stream as select with kafka.dotnet.ksqldb
+```KSQL
+CREATE STREAM IF NOT EXISTS sqlserversensors3 (
+    op string,
+	before STRUCT<SensorId VARCHAR, Value INT>,
+	after STRUCT<SensorId VARCHAR, Value INT>,
+	source STRUCT<Version VARCHAR, schema VARCHAR, "table" VARCHAR, "connector" VARCHAR>
+  ) WITH (
+    kafka_topic = 'sqlserver2019.dbo.Sensors',
+    value_format = 'JSON'
+);
+
+set 'auto.offset.reset' = 'earliest';
+select * from sqlserversensors3 emit changes;
+```
+
+Output:
+```
++-----------------------------------------------------------------+-----------------------------------------------------------------+-----------------------------------------------------------------+-----------------------------------------------------------------+
+|OP                                                               |BEFORE                                                           |AFTER                                                            |SOURCE                                                           |
++-----------------------------------------------------------------+-----------------------------------------------------------------+-----------------------------------------------------------------+-----------------------------------------------------------------+
+|c                                                                |null                                                             |{SENSORID=734cac20-4, VALUE=33}                                  |{VERSION=1.5.0.Final, SCHEMA=dbo, table=Sensors, connector=sqlser|
+|                                                                 |                                                                 |                                                                 |ver}                                                             |
+|d                                                                |{SENSORID=734cac20-4, VALUE=33}                                  |null                                                             |{VERSION=1.5.0.Final, SCHEMA=dbo, table=Sensors, connector=sqlser|
+|                                                                 |                                                                 |                                                                 |ver}                                                             |
+|u                                                                |{SENSORID=02f8427c-6, VALUE=1855}                                |{SENSORID=02f8427c-6, VALUE=45}                                  |{VERSION=1.5.0.Final, SCHEMA=dbo, table=Sensors, connector=sqlser|
+|                                                                 |                                                                 |                                                                 |ver}                                                             |  
+```
+
+### Consuming table change events directly from a kafka topic
+```
+Install-Package Kafka.DotNet.SqlServer -Version 0.1.0
+Install-Package Kafka.DotNet.InsideOut -Version 1.0.0
+Install-Package System.Interactive.Async -Version 5.0.0
+```
+
+```C#
+async Task Main()
+{
+
+	string bootstrapServers = "localhost:29092";
+	
+	var consumerConfig = new ConsumerConfig
+	{
+		BootstrapServers = bootstrapServers,
+		GroupId = "Client-01",
+		AutoOffsetReset = Confluent.Kafka.AutoOffsetReset.Earliest
+	};
+
+	var kafkaConsumer = new KafkaConsumer<string, DatabaseChangeObject<IoTSensor>>("sqlserver2019.dbo.Sensors", consumerConfig);
+	
+	await foreach (var consumeResult in kafkaConsumer.ConnectToTopic().ToAsyncEnumerable().Take(10))
+	{
+		Console.WriteLine(consumeResult.Message);		
+	}
+
+	using (kafkaConsumer)
+	{ }
+}
+```
+
 ### CdcClient (v0.1.0)
+CdcEnableDbAsync - Enables change data capture for the current database. 
+CdcEnableTableAsync - Enables change data capture for the specified source table in the current database.
+
 ```C#
 using Kafka.DotNet.SqlServer.Cdc;
 
@@ -122,7 +190,7 @@ private static async Task TryEnableCdcAsync()
 ```
 
 ### SqlServerConnectorMetadata, ConnectorMetadata (v0.1.0)
-
+SQL Server connector configuration example
 ```C#
 using System;
 using System.Threading.Tasks;
@@ -167,6 +235,7 @@ CREATE SOURCE CONNECTOR MSSQL_SENSORS_CONNECTOR WITH (
 ```
 
 ### KsqlDbConnect (v.0.1.0)
+Creating the connector with ksqldb
 ```C#
 using Kafka.DotNet.SqlServer.Connect;
 
@@ -212,12 +281,14 @@ private static async Task CreateSensorsCdcStreamAsync(CancellationToken cancella
     Replicas = 1
   };
 
-  var httpResponseMessage = await restApiClient.CreateStreamAsync<DatabaseChangeObject>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
+  var httpResponseMessage = await restApiClient.CreateStreamAsync<RawDatabaseChangeObject>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
     .ConfigureAwait(false);
 }
 ```
 
 ### Disable CDC from.NET (v0.1.0)
+CdcDisableTableAsync - Disables change data capture for the specified source table and capture instance in the current database.
+CdcDisableDbAsync - Disables change data capture for the current database.
 ```C#
 var cdcClient = new Kafka.DotNet.SqlServer.Cdc.CdcClient(connectionString);
 
@@ -226,7 +297,7 @@ await cdcClient.CdcDisableTableAsync(tableName, schemaName).ConfigureAwait(false
 await cdcClient.CdcDisableDbAsync().ConfigureAwait(false);
 ```
 
-### `DatabaseChangeObject<TEntity>` (v.0.1.0)
+### `RawDatabaseChangeObject<TEntity>` (v.0.1.0)
 ```C#
 using System;
 using System.Reactive;
@@ -235,8 +306,8 @@ using Kafka.DotNet.SqlServer.Cdc;
 
 await using var context = new KSqlDBContext(@"http:\\localhost:8088");
 
-context.CreateQuery<DatabaseChangeObject<IoTSensor>>("sqlserversensors")
-  .Subscribe(new AnonymousObserver<DatabaseChangeObject<IoTSensor>>(dco =>
+context.CreateQuery<RawDatabaseChangeObject<IoTSensor>>("sqlserversensors")
+  .Subscribe(new AnonymousObserver<RawDatabaseChangeObject<IoTSensor>>(dco =>
   {
     Console.WriteLine($"Operation type: {dco.OperationType}");
     Console.WriteLine($"Before: {dco.Before}");

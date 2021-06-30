@@ -1,6 +1,6 @@
 ﻿### v0.1.0-rc.2
 - SqlServerConnectorMetadata
-- DatabaseChangeObject<TEntity>
+- DatabaseChangeObject<TEntity>, RawDatabaseChangeObject<TEntity>
 - KsqlDbConnect
 
 ### v0.1.0-rc.1

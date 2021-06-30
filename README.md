@@ -230,7 +230,7 @@ async Task Main()
 
   var semaphoreSlim = new SemaphoreSlim(0, 1);
 
-  var cdcSubscription = context.CreateQuery<DatabaseChangeObject>("sqlserversensors")
+  var cdcSubscription = context.CreateQuery<RawDatabaseChangeObject>("sqlserversensors")
     .WithOffsetResetPolicy(AutoOffsetReset.Latest)
     .Take(5)
     .ToObservable()
