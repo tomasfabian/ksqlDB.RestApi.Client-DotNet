@@ -99,12 +99,14 @@ run in command line:
 
 # CDC - Push notifications from Sql Server tables with Kafka
 Consume row-level table changes (CDC - Change Data Capture) from  Sql Server databases with the Debezium connector streaming platform. 
+
+[Wiki](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
+
 ### Nuget
 ```
-Install-Package Kafka.DotNet.SqlServer -Version 0.1.0-rc.2
+Install-Package Kafka.DotNet.SqlServer -Version 0.1.0
 ```
 
-Full example is available in [Blazor example](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Blazor.Sample) - Kafka.DotNet.InsideOut.sln:
 ```C#
 using System;
 using System.Threading;
@@ -141,7 +143,7 @@ class Program
 
     var semaphoreSlim = new SemaphoreSlim(0, 1);
 
-    var cdcSubscription = context.CreateQuery<DatabaseChangeObject<IoTSensor>>("sqlserversensors")
+    var cdcSubscription = context.CreateQuery<RawDatabaseChangeObject<IoTSensor>>("sqlserversensors")
       .WithOffsetResetPolicy(AutoOffsetReset.Latest)
       .Take(5)
       .ToObservable()
@@ -284,96 +286,6 @@ static async Task Main(string[] args)
 ```
 
 [Blazor server side example](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB) - Kafka.DotNet.InsideOut.sln
-
-# CDC - Push notifications from Sql Server tables with Kafka
-Consume row-level table changes (CDC - Change Data Capture) from  Sql Server databases with the Debezium connector streaming platform. 
-### Nuget
-```
-Install-Package Kafka.DotNet.SqlServer -Version 0.1.0-rc.1
-```
-Full example is available in [Kafka.DotNet.ksqlDB repository](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Kafka.DotNet.SqlServer):
-```C#
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.Linq;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.Query.Options;
-using Kafka.DotNet.SqlServer.Cdc;
-using Kafka.DotNet.SqlServer.Cdc.Extensions;
-string connectionString = @"Server=127.0.0.1,1433;User Id = SA;Password=<YourNewStrong@Passw0rd>;Initial Catalog = Sensors;MultipleActiveResultSets=true";
-
-string bootstrapServers = "localhost:29092";
-string KsqlDbUrl => @"http:\\localhost:8088";
-
-string tableName = "Sensors";
-string schemaName = "dbo";
-
-ICdcClient CdcProvider { get; set; }
-
-async Task Main()
-{
-  CdcProvider = new CdcClient(connectionString);
-
-  await CdcProvider.CdcEnableDbAsync().ConfigureAwait(false);
-
-  await CdcProvider.CdcEnableTableAsync(tableName, schemaName).ConfigureAwait(false);
-
-  await CreateConnectorAsync(tableName);
-
-  await using var context = new KSqlDBContext(KsqlDbUrl);
-
-  var semaphoreSlim = new SemaphoreSlim(0, 1);
-
-  var cdcSubscription = context.CreateQuery<RawDatabaseChangeObject>("sqlserversensors")
-    .WithOffsetResetPolicy(AutoOffsetReset.Latest)
-    .Take(5)
-    .ToObservable()
-    .Subscribe(cdc =>
-      {
-        var operationType = cdc.Op.ToChangeDataCaptureType();
-        Console.WriteLine(operationType);
-
-        switch (operationType)
-        {
-          case ChangeDataCaptureType.Created:
-            break;
-
-          case ChangeDataCaptureType.Updated:
-
-            var sensorBefore = System.Text.Json.JsonSerializer.Deserialize<IoTSensor>(cdc.Before);
-            var sensorAfter = System.Text.Json.JsonSerializer.Deserialize<IoTSensor>(cdc.After);
-            break;
-
-          case ChangeDataCaptureType.Deleted:
-            break;
-        }
-      }, onError: error =>
-      {
-        semaphoreSlim.Release();
-
-        Console.WriteLine($"Exception: {error.Message}");
-      },
-      onCompleted: () =>
-      {
-        semaphoreSlim.Release();
-        Console.WriteLine("Completed");
-      });
-
-
-  await semaphoreSlim.WaitAsync();
-
-  using (cdcSubscription)
-  {
-  }
-}
-
-public record IoTSensor
-{
-  public string SensorId { get; set; }
-  public int Value { get; set; }
-}
-```
 
 # Setting query parameters (v0.1.0)
 Default settings:
