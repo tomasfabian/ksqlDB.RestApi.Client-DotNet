@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\ProjectDefinitions\Constants.csprojimport" />
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <Import Project="..\..\NugetProjects\UnitTests\Microsoft.NET.Test.Sdk.csprojimport" />
+  <Import Project="..\..\NugetProjects\UnitTests\MSTest.TestAdapter.csprojimport" />
+  <Import Project="..\..\NugetProjects\UnitTests\MSTest.TestFramework.csprojimport" />
+  <Import Project="..\..\NugetProjects\UnitTests\coverlet.collector.csprojimport" />
+
+  <Import Project="..\..\NugetProjects\UnitTests\FluentAssertions.csprojimport" />
+  <Import Project="..\..\NugetProjects\UnitTests\Microsoft.Reactive.Testing.csprojimport" />
+  <Import Project="..\..\NugetProjects\UnitTests\Moq.csprojimport" />
+  <Import Project="..\..\NugetProjects\UnitTests\Ninject.MockingKernel.Moq.csprojimport" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Kafka.DotNet.SqlServer\Kafka.DotNet.SqlServer.csproj" />
+    <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
+  </ItemGroup>
+</Project>

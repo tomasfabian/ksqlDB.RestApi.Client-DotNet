@@ -30,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafka.DotNet.SqlServer", "Kafka.DotNet.SqlServer\Kafka.DotNet.SqlServer.csproj", "{E672877E-BC9D-41A2-B665-C943D7EB1DBD}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafka.DotNet.SqlServer.Tests", "Tests\Kafka.DotNet.SqlServer.Tests\Kafka.DotNet.SqlServer.Tests.csproj", "{D73BA2F1-7F1C-45D8-8D53-1832E40320AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,6 +74,10 @@ Global
 		{E672877E-BC9D-41A2-B665-C943D7EB1DBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E672877E-BC9D-41A2-B665-C943D7EB1DBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E672877E-BC9D-41A2-B665-C943D7EB1DBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D73BA2F1-7F1C-45D8-8D53-1832E40320AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D73BA2F1-7F1C-45D8-8D53-1832E40320AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D73BA2F1-7F1C-45D8-8D53-1832E40320AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D73BA2F1-7F1C-45D8-8D53-1832E40320AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,6 +88,7 @@ Global
 		{24D73489-0E6F-42AF-8692-00503FE2406A} = {AA5681E8-1682-47E9-9159-4AE95A92E694}
 		{A1CC1EDB-C346-4BE5-BDC5-8288D2ECC0EC} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}
 		{9B744296-3BDF-41A6-B720-7271C329F7BF} = {AA5681E8-1682-47E9-9159-4AE95A92E694}
+		{D73BA2F1-7F1C-45D8-8D53-1832E40320AA} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {08C8585D-5006-4484-AC12-72B1F42058D7}
