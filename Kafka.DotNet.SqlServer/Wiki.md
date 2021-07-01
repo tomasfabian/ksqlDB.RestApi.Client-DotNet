@@ -116,21 +116,31 @@ CREATE STREAM IF NOT EXISTS sqlserversensors3 (
     value_format = 'JSON'
 );
 
-set 'auto.offset.reset' = 'earliest';
-select * from sqlserversensors3 emit changes;
+SET 'auto.offset.reset' = 'earliest';
+SELECT * FROM sqlserversensors3 EMIT CHANGES;
+```
+
+Sql server DML:
+```SQL
+INSERT INTO [dbo].[Sensors] ([SensorId] ,[Value])
+VALUES ('734cac20-4', 33);
+
+DELETE FROM [dbo].[Sensors] WHERE [SensorId] = '734cac20-4';
+
+UPDATE [Sensors] SET [Value] = 45 WHERE [SensorId] = '02f8427c-6';
 ```
 
 Output:
 ```
-+-----------------------------------------------------------------+-----------------------------------------------------------------+-----------------------------------------------------------------+-----------------------------------------------------------------+
-|OP                                                               |BEFORE                                                           |AFTER                                                            |SOURCE                                                           |
-+-----------------------------------------------------------------+-----------------------------------------------------------------+-----------------------------------------------------------------+-----------------------------------------------------------------+
-|c                                                                |null                                                             |{SENSORID=734cac20-4, VALUE=33}                                  |{VERSION=1.5.0.Final, SCHEMA=dbo, table=Sensors, connector=sqlser|
-|                                                                 |                                                                 |                                                                 |ver}                                                             |
-|d                                                                |{SENSORID=734cac20-4, VALUE=33}                                  |null                                                             |{VERSION=1.5.0.Final, SCHEMA=dbo, table=Sensors, connector=sqlser|
-|                                                                 |                                                                 |                                                                 |ver}                                                             |
-|u                                                                |{SENSORID=02f8427c-6, VALUE=1855}                                |{SENSORID=02f8427c-6, VALUE=45}                                  |{VERSION=1.5.0.Final, SCHEMA=dbo, table=Sensors, connector=sqlser|
-|                                                                 |                                                                 |                                                                 |ver}                                                             |  
++----+-----------------------------------------+---------------------------------------+-----------------------------------------------------------------+
+|OP  |BEFORE                                   |AFTER                                  |SOURCE                                                           |
++----+-----------------------------------------+---------------------------------------+-----------------------------------------------------------------+
+|c   |null                                     |{SENSORID=734cac20-4, VALUE=33}        |{VERSION=1.5.0.Final, SCHEMA=dbo, table=Sensors, connector=sqlser|
+|    |                                         |                                       |ver}                                                             |
+|d   |{SENSORID=734cac20-4, VALUE=33}          |null                                   |{VERSION=1.5.0.Final, SCHEMA=dbo, table=Sensors, connector=sqlser|
+|    |                                         |                                       |ver}                                                             |
+|u   |{SENSORID=02f8427c-6, VALUE=1855}        |{SENSORID=02f8427c-6, VALUE=45}        |{VERSION=1.5.0.Final, SCHEMA=dbo, table=Sensors, connector=sqlser|
+|    |                                         |                                       |ver}                                                             |  
 ```
 
 ### Consuming table change events directly from a kafka topic
@@ -143,25 +153,24 @@ Install-Package System.Interactive.Async -Version 5.0.0
 ```C#
 async Task Main()
 {
+  string bootstrapServers = "localhost:29092";
 
-	string bootstrapServers = "localhost:29092";
-	
-	var consumerConfig = new ConsumerConfig
-	{
-		BootstrapServers = bootstrapServers,
-		GroupId = "Client-01",
-		AutoOffsetReset = Confluent.Kafka.AutoOffsetReset.Earliest
-	};
+  var consumerConfig = new ConsumerConfig
+  {
+    BootstrapServers = bootstrapServers,
+    GroupId = "Client-01",
+    AutoOffsetReset = Confluent.Kafka.AutoOffsetReset.Earliest
+  };
 
-	var kafkaConsumer = new KafkaConsumer<string, DatabaseChangeObject<IoTSensor>>("sqlserver2019.dbo.Sensors", consumerConfig);
-	
-	await foreach (var consumeResult in kafkaConsumer.ConnectToTopic().ToAsyncEnumerable().Take(10))
-	{
-		Console.WriteLine(consumeResult.Message);		
-	}
+  var kafkaConsumer =
+    new KafkaConsumer<string, DatabaseChangeObject<IoTSensor>>("sqlserver2019.dbo.Sensors", consumerConfig);
 
-	using (kafkaConsumer)
-	{ }
+  await foreach (var consumeResult in kafkaConsumer.ConnectToTopic().ToAsyncEnumerable().Take(10))
+  {
+    Console.WriteLine(consumeResult.Message);
+  }
+
+  using (kafkaConsumer)
 }
 ```
 
