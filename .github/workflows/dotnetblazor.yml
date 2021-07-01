@@ -7,6 +7,9 @@ jobs:
 
     runs-on: windows-latest
 
+    env:
+      Kafka_DotNet_SqlServer_Test_Project_Path: Tests\Kafka.DotNet.SqlServer.Tests\Kafka.DotNet.SqlServer.Tests.csproj
+
     steps:
 
     - uses: actions/checkout@v2
@@ -27,3 +30,7 @@ jobs:
       run: dotnet restore Kafka.DotNet.InsideOut.sln
     - name: Build with dotnet
       run: dotnet build Kafka.DotNet.InsideOut.sln --configuration Release
+
+    # Test
+    - name: Execute Kafka DotNet SqlServer Unit Tests
+      run: dotnet test $env:Kafka_DotNet_SqlServer_Test_Project_Path
