@@ -39,5 +39,18 @@ namespace Kafka.DotNet.SqlServer.Tests.Cdc.Connectors
       //Assert
       ClassUnderTest.ValueConverter.Should().Be("org.apache.kafka.connect.json.JsonConverter");
     }
+
+    [TestMethod]
+    public void SetProperty()
+    {
+      //Arrange
+      var sqlServerConnector = "io.debezium.connector.sqlserver.SqlServerConnector";
+
+      //Act
+      ClassUnderTest.SetProperty("connector.class", sqlServerConnector);
+
+      //Assert
+      ClassUnderTest.ConnectorClass.Should().Be(sqlServerConnector);
+    }
   }
 }
