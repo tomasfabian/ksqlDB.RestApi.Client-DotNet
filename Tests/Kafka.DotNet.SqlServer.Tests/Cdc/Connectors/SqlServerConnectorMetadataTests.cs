@@ -74,5 +74,65 @@ namespace Kafka.DotNet.SqlServer.Tests.Cdc.Connectors
       //Assert
       ClassUnderTest.DatabasePort.Should().Be("1433");
     }
+
+    [TestMethod]
+    public void DatabasePassword()
+    {
+      //Arrange
+
+      //Act
+
+      //Assert
+      ClassUnderTest.DatabasePassword.Should().Be("<YourNewStrong@Passw0rd>");
+    }
+
+    [TestMethod]
+    public void DatabaseDbname()
+    {
+      //Arrange
+
+      //Act
+
+      //Assert
+      ClassUnderTest.DatabaseDbname.Should().Be("Sensors");
+    }
+
+    [TestMethod]
+    public void TrySetDatabaseHistoryKafkaTopic()
+    {
+      //Arrange
+      ClassUnderTest.DatabaseServerName = "GAIA";
+
+      //Act
+      ClassUnderTest.TrySetDatabaseHistoryKafkaTopic();
+
+      //Assert
+      ClassUnderTest.DatabaseHistoryKafkaTopic.Should().Be($"dbhistory.{ClassUnderTest.DatabaseServerName}");
+    }
+
+    [TestMethod]
+    public void TrySetConnectorName()
+    {
+      //Arrange
+
+      //Act
+      ClassUnderTest.TrySetConnectorName();
+
+      //Assert
+      ClassUnderTest.Name.Should().Be($"{ClassUnderTest.DatabaseDbname}-connector");
+    }
+
+    [TestMethod]
+    public void KafkaBootstrapServers()
+    {
+      //Arrange
+      string bootstrapServers = "localhost:9092,broker01:29092";
+
+      //Act
+      ClassUnderTest.KafkaBootstrapServers = bootstrapServers;
+
+      //Assert
+      ClassUnderTest.KafkaBootstrapServers.Should().Be(bootstrapServers);
+    }
   }
 }
