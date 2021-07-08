@@ -33,4 +33,4 @@ jobs:
 
     # Test
     - name: Execute Kafka DotNet SqlServer Unit Tests
-      run: dotnet test--filter “TestCategory!=Integration” $env:Kafka_DotNet_SqlServer_Test_Project_Path
+      run: dotnet test --filter “TestCategory!=Integration” $env:Kafka_DotNet_SqlServer_Test_Project_Path
