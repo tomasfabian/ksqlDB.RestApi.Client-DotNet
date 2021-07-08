@@ -2,6 +2,11 @@
 
 Project [Wiki can be found here](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
 
+### v0.2.0-rc.1
+CcdClient:
+- IsCdcDbEnabledAsync
+- IsCdcTableEnabledAsync
+
 ### v0.1.0
 - SqlServerConnectorMetadata, ConnectorMetadata, ConnectorExtensions - connector configuration for SQL Server
 - KsqlDbConnect - class for creating connectors with ksqldb
