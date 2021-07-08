@@ -1,4 +1,5 @@
 This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/)
+It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the Rest API.
 
 ```
 Install-Package Kafka.DotNet.ksqlDB
@@ -99,14 +100,12 @@ run in command line:
 
 # CDC - Push notifications from Sql Server tables with Kafka
 Consume row-level table changes (CDC - Change Data Capture) from  Sql Server databases with the Debezium connector streaming platform. 
-
-[Wiki](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
-
 ### Nuget
 ```
-Install-Package Kafka.DotNet.SqlServer -Version 0.1.0
+Install-Package Kafka.DotNet.SqlServer -Version 0.1.0-rc.2
 ```
 
+Full example is available in [Blazor example](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Blazor.Sample) - Kafka.DotNet.InsideOut.sln:
 ```C#
 using System;
 using System.Threading;
@@ -222,16 +221,13 @@ private async Task CreateOrReplaceMaterializedTableAsync()
 
   var httpResponseMessage = await statement.ExecuteStatementAsync();
 
-  if (httpResponseMessage.IsSuccessStatusCode)
-  {
-    var statementResponses = httpResponseMessage.ToStatementResponses();
-  }
-  else
+  if (!httpResponseMessage.IsSuccessStatusCode)
   {
     var statementResponse = httpResponseMessage.ToStatementResponse();
   }
 }
 ```
+
 ```C#
 public class SensorsTableConsumer : KafkaConsumer<string, IoTSensorStats>
 {
