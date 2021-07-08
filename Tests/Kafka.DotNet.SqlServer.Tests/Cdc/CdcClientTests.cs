@@ -10,6 +10,7 @@ using UnitTests;
 namespace Kafka.DotNet.SqlServer.Tests.Cdc
 {
   [TestClass]
+  [TestCategory("Integration")]
   public class CdcClientTests : TestBase<CdcClient>
   {
     [ClassInitialize]
