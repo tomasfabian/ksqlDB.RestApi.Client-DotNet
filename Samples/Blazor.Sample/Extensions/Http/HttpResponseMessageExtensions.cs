@@ -10,7 +10,7 @@ namespace Blazor.Sample.Extensions.Http
 {
   public static class HttpResponseMessageExtensions
   {
-    public static StatementResponse[] ToStatementResponses(this HttpResponseMessage httpResponseMessage)
+    public static StatementResponse[] ConvertToStatementResponses(this HttpResponseMessage httpResponseMessage)
     {
       StatementResponse[] statementResponses;
 

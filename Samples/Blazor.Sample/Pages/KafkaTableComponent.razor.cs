@@ -73,7 +73,7 @@ namespace Blazor.Sample.Pages
 
       var httpResponseMessage = await statement.ExecuteStatementAsync(cancellationTokenSource.Token);
       
-      var statementResponses = httpResponseMessage.ToStatementResponses();
+      var statementResponses = httpResponseMessage.ConvertToStatementResponses();
       //!!! disclaimer
     }
     

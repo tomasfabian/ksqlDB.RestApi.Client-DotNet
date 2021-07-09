@@ -6,13 +6,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blazor.Sample.Configuration;
 using Blazor.Sample.Data.Sensors;
+using Blazor.Sample.Extensions.Http;
 using Blazor.Sample.Kafka;
 using Confluent.Kafka;
 using Kafka.DotNet.InsideOut.Consumer;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
 
@@ -55,7 +55,7 @@ namespace Blazor.Sample.Pages
 
       var httpResponseMessage = await statement.ExecuteStatementAsync(cancellationTokenSource.Token);
       
-      var statementResponses = httpResponseMessage.ToStatementResponses();
+      var statementResponses = httpResponseMessage.ConvertToStatementResponses();
       //!!! disclaimer
     }
 
