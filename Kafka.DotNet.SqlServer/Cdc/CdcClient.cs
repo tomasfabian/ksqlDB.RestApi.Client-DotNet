@@ -94,7 +94,6 @@ namespace Kafka.DotNet.SqlServer.Cdc
 
     private static async Task<int?> ExecuteNonQueryAsync(string script, string connectionString, CommandType commandType, params SqlParameter[] parameters)
     {
-
 #if NETSTANDARD2_0
       using SqlConnection connection = new SqlConnection(connectionString);
       using SqlCommand command = new SqlCommand(script, connection)
@@ -114,6 +113,52 @@ namespace Kafka.DotNet.SqlServer.Cdc
       await command.Connection.OpenAsync().ConfigureAwait(false);
 
       var result = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+
+      return result;
+    }
+    
+    /// <summary>
+    /// Has SQL Server database enabled Change Data Capture (CDC) 
+    /// </summary>
+    /// <param name="databaseName"></param>
+    /// <returns></returns>
+    public Task<bool> IsCdcDbEnabledAsync(string databaseName)
+    {
+      return ExecuteScalarAsync($"SELECT COUNT(*) FROM sys.databases\r\nWHERE is_cdc_enabled = 1 AND name = '{databaseName}'");
+    }    
+
+    /// <summary>
+    /// Has table Change Data Capture (CDC) enabled on a SQL Server database
+    /// </summary>
+    /// <param name="tableName"></param>
+    /// <returns></returns>
+    public Task<bool> IsCdcTableEnabledAsync(string tableName, string schemaName = "dbo")
+    {
+      string sql = $@"SELECT COUNT(*)
+FROM sys.tables tb
+INNER JOIN sys.schemas s on s.schema_id = tb.schema_id
+WHERE tb.is_tracked_by_cdc = 1 AND tb.name = '{tableName}'
+AND s.name = '{schemaName}'";
+
+      return ExecuteScalarAsync(sql);
+    } 
+    
+    private async Task<bool> ExecuteScalarAsync(string cmdText)
+    {      
+      using var sqlConnection = new SqlConnection(connectionString);
+      
+      await sqlConnection.OpenAsync().ConfigureAwait(false);
+
+      var sqlCommand = new SqlCommand(cmdText, sqlConnection);
+
+      var response = await sqlCommand.ExecuteScalarAsync().ConfigureAwait(false);
+
+      bool result = (int)response > 0;
+#if NETSTANDARD2_0
+      sqlConnection.Close();
+#else
+      await sqlConnection.CloseAsync().ConfigureAwait(false);
+#endif
 
       return result;
     }
