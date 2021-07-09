@@ -13,5 +13,5 @@
 - KafkaDataContractJsonSerializer
 - KafkaDataContractJsonDeserializer
 
-### Extensions :
+### Extensions:
 - ConsumerBuilderExtensions

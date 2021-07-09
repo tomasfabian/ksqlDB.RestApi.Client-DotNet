@@ -1,4 +1,4 @@
-﻿Kafka.DotNet.InsideOut is a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with Kafka.DotNet.ksqlDB or by other means.
+﻿Kafka.DotNet.InsideOut is a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with Kafka.DotNet.ksqlDB or by other means. This package is based on [Confluent.Kafka](https://github.com/confluentinc/confluent-kafka-dotnet)
 
 ### Blazor Sample 
 Set docker-compose.csproj as startup project in Kafka.DotNet.InsideOut.sln.

@@ -101,13 +101,13 @@ public record IoTSensor
 }
 ```
 
-Navigate to http://localhost:9000/topic/sqlserver2019.dbo.Sensors for information about the created kafka topic and view messages with (Kafdrop)[https://github.com/obsidiandynamics/kafdrop]
+Navigate to http://localhost:9000/topic/sqlserver2019.dbo.Sensors for information about the created kafka topic and view messages with [Kafdrop](https://github.com/obsidiandynamics/kafdrop)
 
 ### Creating a CDC stream in ksqldb-cli
 TODO: Create stream as select with kafka.dotnet.ksqldb
 ```KSQL
-CREATE STREAM IF NOT EXISTS sqlserversensors3 (
-    op string,
+CREATE STREAM IF NOT EXISTS sqlserversensors (
+	op string,
 	before STRUCT<SensorId VARCHAR, Value INT>,
 	after STRUCT<SensorId VARCHAR, Value INT>,
 	source STRUCT<Version VARCHAR, schema VARCHAR, "table" VARCHAR, "connector" VARCHAR>
@@ -117,12 +117,12 @@ CREATE STREAM IF NOT EXISTS sqlserversensors3 (
 );
 
 SET 'auto.offset.reset' = 'earliest';
-SELECT * FROM sqlserversensors3 EMIT CHANGES;
+SELECT * FROM sqlserversensors EMIT CHANGES;
 ```
 
 Sql server DML:
 ```SQL
-INSERT INTO [dbo].[Sensors] ([SensorId] ,[Value])
+INSERT INTO [dbo].[Sensors] ([SensorId], [Value])
 VALUES ('734cac20-4', 33);
 
 DELETE FROM [dbo].[Sensors] WHERE [SensorId] = '734cac20-4';
@@ -176,6 +176,7 @@ async Task Main()
 
 ### CdcClient (v0.1.0)
 CdcEnableDbAsync - Enables change data capture for the current database. 
+
 CdcEnableTableAsync - Enables change data capture for the specified source table in the current database.
 
 ```C#
@@ -222,6 +223,21 @@ private static SqlServerConnectorMetadata CreateConnectorMetadata()
 }
 ```
 
+### KsqlDbConnect (v.0.1.0)
+Creating the connector with ksqldb
+```C#
+using Kafka.DotNet.SqlServer.Connect;
+
+private static async Task CreateConnectorAsync()
+{
+  var ksqlDbConnect = new KsqlDbConnect(new Uri(KsqlDbUrl));
+
+  SqlServerConnectorMetadata connectorMetadata = CreateConnectorMetadata();
+
+  await ksqlDbConnect.CreateConnectorAsync(connectorName: "MSSQL_SENSORS_CONNECTOR", connectorMetadata);
+}
+```
+
 Above mentioned C# snippet is equivavelent to:
 ```KSQL
 CREATE SOURCE CONNECTOR MSSQL_SENSORS_CONNECTOR WITH (
@@ -241,21 +257,6 @@ CREATE SOURCE CONNECTOR MSSQL_SENSORS_CONNECTOR WITH (
   'value.converter.schemas.enable'= 'false', 
   'include.schema.changes'= 'false'
 );
-```
-
-### KsqlDbConnect (v.0.1.0)
-Creating the connector with ksqldb
-```C#
-using Kafka.DotNet.SqlServer.Connect;
-
-private static async Task CreateConnectorAsync()
-{
-  var ksqlDbConnect = new KsqlDbConnect(new Uri(KsqlDbUrl));
-
-  SqlServerConnectorMetadata connectorMetadata = CreateConnectorMetadata();
-
-  await ksqlDbConnect.CreateConnectorAsync(connectorName: "MSSQL_SENSORS_CONNECTOR", connectorMetadata);
-}
 ```
 
 ### Creating a stream for CDC - Change data capture  (kafka.dotnet.ksqldb)
@@ -341,7 +342,7 @@ DROP CONNECTOR MSSQL_SENSORS_CONNECTOR;
 DROP STREAM sqlserversensors DELETE TOPIC;
 ```
 
-# Debezium connector for Sql Server
+### Debezium connector for Sql Server
 [Download Debezium connector](https://www.confluent.io/hub/debezium/debezium-connector-sqlserver)
 
 [Deployment](https://debezium.io/documentation/reference/1.5/connectors/sqlserver.html#sqlserver-deploying-a-connector)
