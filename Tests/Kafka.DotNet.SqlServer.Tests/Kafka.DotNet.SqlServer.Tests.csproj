@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\..\ProjectDefinitions\Constants.csprojimport" />
+
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
 
@@ -11,6 +12,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
   </ItemGroup>
 
   <Import Project="..\..\NugetProjects\UnitTests\Microsoft.NET.Test.Sdk.csprojimport" />
@@ -22,8 +25,17 @@
   <Import Project="..\..\NugetProjects\UnitTests\Microsoft.Reactive.Testing.csprojimport" />
   <Import Project="..\..\NugetProjects\UnitTests\Moq.csprojimport" />
   <Import Project="..\..\NugetProjects\UnitTests\Ninject.MockingKernel.Moq.csprojimport" />
+  
   <ItemGroup>
     <ProjectReference Include="..\..\Kafka.DotNet.SqlServer\Kafka.DotNet.SqlServer.csproj" />
+    <ProjectReference Include="..\..\Kafka.DotNet.InsideOut\Kafka.DotNet.InsideOut.csproj" />
     <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
