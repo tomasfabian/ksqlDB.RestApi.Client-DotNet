@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using static System.String;
@@ -54,6 +55,16 @@ namespace Kafka.DotNet.SqlServer.Cdc
       parameters[1].Value = cdcEnableTable.TableName;
       parameters[2].Value = cdcEnableTable.RoleName;
       parameters[3].Value = cdcEnableTable.SupportsNetChanges;
+      
+      if (!IsNullOrEmpty(cdcEnableTable.CaptureInstance))
+      {
+        SqlParameter param = new("@capture_instance", SqlDbType.VarChar)
+        {
+          Value = cdcEnableTable.CaptureInstance
+        };
+
+        parameters = parameters.Concat(new[] {param}).ToArray();
+      }
 
       //TODO: https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sys-sp-cdc-enable-table-transact-sql?view=sql-server-ver15#syntax
       
@@ -125,20 +136,25 @@ namespace Kafka.DotNet.SqlServer.Cdc
     public Task<bool> IsCdcDbEnabledAsync(string databaseName)
     {
       return ExecuteScalarAsync($"SELECT COUNT(*) FROM sys.databases\r\nWHERE is_cdc_enabled = 1 AND name = '{databaseName}'");
-    }    
+    }
 
     /// <summary>
     /// Has table Change Data Capture (CDC) enabled on a SQL Server database
     /// </summary>
     /// <param name="tableName"></param>
+    /// <param name="captureInstance"></param>
     /// <returns></returns>
-    public Task<bool> IsCdcTableEnabledAsync(string tableName, string schemaName = "dbo")
+    public Task<bool> IsCdcTableEnabledAsync(string tableName, string schemaName = "dbo", string captureInstance = null)
     {
       string sql = $@"SELECT COUNT(*)
 FROM sys.tables tb
 INNER JOIN sys.schemas s on s.schema_id = tb.schema_id
+INNER JOIN cdc.change_tables AS ct on ct.source_object_id = tb.object_id
 WHERE tb.is_tracked_by_cdc = 1 AND tb.name = '{tableName}'
 AND s.name = '{schemaName}'";
+
+      if (!IsNullOrEmpty(captureInstance))
+        sql += $"AND ct.capture_instance = '{captureInstance}'";
 
       return ExecuteScalarAsync(sql);
     } 

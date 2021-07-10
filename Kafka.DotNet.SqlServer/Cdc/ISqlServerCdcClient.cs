@@ -21,6 +21,6 @@ namespace Kafka.DotNet.SqlServer.Cdc
     /// </summary>
     /// <param name="tableName"></param>
     /// <returns></returns>
-    Task<bool> IsCdcTableEnabledAsync(string tableName, string schemaName = "dbo");
+    Task<bool> IsCdcTableEnabledAsync(string tableName, string schemaName = "dbo", string captureInstance = null);
   }
 }

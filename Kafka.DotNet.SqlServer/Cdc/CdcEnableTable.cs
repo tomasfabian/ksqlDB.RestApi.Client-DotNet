@@ -16,8 +16,10 @@ namespace Kafka.DotNet.SqlServer.Cdc
     }
 
     public string TableName { get; set; }
-    public string SchemaName { get; set; }
+    public string SchemaName { get; set; } = "dbo";
     public object RoleName { get; set; } = DBNull.Value;
     public int SupportsNetChanges { get; set; }
+
+    public string CaptureInstance { get; set; }
   }
 }

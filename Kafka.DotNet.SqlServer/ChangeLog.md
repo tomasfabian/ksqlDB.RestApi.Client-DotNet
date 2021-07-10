@@ -2,10 +2,18 @@
 
 Project [Wiki can be found here](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
 
-### v0.2.0-rc.1
+### v0.2.0-rc.1 (WIP)
 CcdClient:
 - IsCdcDbEnabledAsync
 - IsCdcTableEnabledAsync
+
+CdcEnableTable:
+- CaptureInstance property
+- SchemaName - default value is set to "dbo"
+- IsCdcTableEnabledAsync added optional parameter 'captureInstance'
+
+KsqlDbConnect:
+- DropConnectorAsync
 
 ### v0.1.0
 - SqlServerConnectorMetadata, ConnectorMetadata, ConnectorExtensions - connector configuration for SQL Server
