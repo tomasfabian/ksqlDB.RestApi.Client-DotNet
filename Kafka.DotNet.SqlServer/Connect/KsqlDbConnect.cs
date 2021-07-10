@@ -28,6 +28,17 @@ namespace Kafka.DotNet.SqlServer.Connect
       return httpResponseMessage;
     }
 
+    public async Task<HttpResponseMessage> DropConnectorAsync(string connectorName, CancellationToken cancellationToken = default)
+    {
+      string dropStatement = $"DROP CONNECTOR {connectorName};";
+
+      KSqlDbStatement ksqlDbStatement = new(dropStatement);
+
+      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
+
+      return httpResponseMessage;
+    }
+
     private Task<HttpResponseMessage> ExecuteStatementAsync(KSqlDbStatement ksqlDbStatement, CancellationToken cancellationToken = default)
     {
       var httpClientFactory = new HttpClientFactory(ksqlDbUrl);
