@@ -7,6 +7,9 @@ using static System.String;
 
 namespace Kafka.DotNet.SqlServer.Cdc
 {
+  /// <summary>
+  /// Sql Server change data capture client.
+  /// </summary>
   public class CdcClient : ISqlServerCdcClient
   {
     private readonly string connectionString;
@@ -29,6 +32,12 @@ namespace Kafka.DotNet.SqlServer.Cdc
       this.connectionString = connectionString;
     }
 
+    /// <summary>
+    /// Enables change data capture for the specified source table in the current database.
+    /// </summary>
+    /// <param name="tableName">The source table.</param>
+    /// <param name="schemaName">Database schema name</param>
+    /// <returns></returns>
     public Task CdcEnableTableAsync(string tableName, string schemaName = "dbo")
     {
       CdcEnableTable cdcEnableTable = new(tableName)
@@ -39,38 +48,36 @@ namespace Kafka.DotNet.SqlServer.Cdc
       return CdcEnableTableAsync(cdcEnableTable);
     }
 
+    /// <summary>
+    /// Enables change data capture for the specified source table in the current database.
+    /// </summary>
+    /// <param name="cdcEnableTable">sys.sp_cdc_enable_table parameters</param>
+    /// <returns></returns>
     public Task CdcEnableTableAsync(CdcEnableTable cdcEnableTable)
     {
+      //TODO: https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sys-sp-cdc-enable-table-transact-sql?view=sql-server-ver15#syntax
       string script = @"sys.sp_cdc_enable_table";
       
       SqlParameter[] parameters =
       {
-        new("@source_schema", SqlDbType.VarChar),
-        new("@source_name", SqlDbType.VarChar),
-        new("@role_name", SqlDbType.VarChar),
-        new("@supports_net_changes", SqlDbType.Int)
+        new("@source_schema", SqlDbType.VarChar) { Value = cdcEnableTable.SchemaName },
+        new("@source_name", SqlDbType.VarChar) { Value = cdcEnableTable.TableName },
+        new("@role_name", SqlDbType.VarChar) { Value = cdcEnableTable.RoleName },
+        new("@supports_net_changes", SqlDbType.Int) { Value = cdcEnableTable.SupportsNetChanges }
       };
 
-      parameters[0].Value = cdcEnableTable.SchemaName;
-      parameters[1].Value = cdcEnableTable.TableName;
-      parameters[2].Value = cdcEnableTable.RoleName;
-      parameters[3].Value = cdcEnableTable.SupportsNetChanges;
-      
-      if (!IsNullOrEmpty(cdcEnableTable.CaptureInstance))
-      {
-        SqlParameter param = new("@capture_instance", SqlDbType.VarChar)
-        {
-          Value = cdcEnableTable.CaptureInstance
-        };
+      parameters = parameters.TryAddVarcharSqlParameter(cdcEnableTable.CaptureInstance, "@capture_instance");
+      parameters = parameters.TryAddVarcharSqlParameter(cdcEnableTable.IndexName, "@index_name");
+      parameters = parameters.TryAddVarcharSqlParameter(cdcEnableTable.CapturedColumnList, "@captured_column_list");
+      parameters = parameters.TryAddVarcharSqlParameter(cdcEnableTable.FilegroupName, "@filegroup_name");
 
-        parameters = parameters.Concat(new[] {param}).ToArray();
-      }
-
-      //TODO: https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sys-sp-cdc-enable-table-transact-sql?view=sql-server-ver15#syntax
-      
       return ExecuteNonQueryAsync(script, connectionString, CommandType.StoredProcedure, parameters);
     }
 
+    /// <summary>
+    /// Enables change data capture for the current database.
+    /// </summary>
+    /// <returns></returns>
     public Task CdcEnableDbAsync()
     {
       var script = @"sys.sp_cdc_enable_db";
@@ -78,6 +85,10 @@ namespace Kafka.DotNet.SqlServer.Cdc
       return ExecuteNonQueryAsync(script, connectionString, CommandType.StoredProcedure);
     }
 
+    /// <summary>
+    /// Disables change data capture for the current database.
+    /// </summary>
+    /// <returns></returns>
     public Task CdcDisableDbAsync()
     {
       string script = @"sys.sp_cdc_disable_db";
@@ -85,6 +96,13 @@ namespace Kafka.DotNet.SqlServer.Cdc
       return ExecuteNonQueryAsync(script, connectionString, CommandType.StoredProcedure);
     }
 
+    /// <summary>
+    /// Disables change data capture for the specified source table and capture instance in the current database.
+    /// </summary>
+    /// <param name="tableName">The source database table name.</param>
+    /// <param name="schemaName">The database schema name.</param>
+    /// <param name="captureInstance">Name of the capture instance in the current database. When 'all' is specified, all capture instances defined for tableName are disabled.</param>
+    /// <returns></returns>
     public async Task CdcDisableTableAsync(string tableName, string schemaName = "dbo", string captureInstance = "all")
     {
       var script = @"sys.sp_cdc_disable_table";
@@ -129,7 +147,7 @@ namespace Kafka.DotNet.SqlServer.Cdc
     }
     
     /// <summary>
-    /// Has SQL Server database enabled Change Data Capture (CDC) 
+    /// Has SQL Server database enabled Change Data Capture (CDC). 
     /// </summary>
     /// <param name="databaseName"></param>
     /// <returns></returns>
@@ -139,10 +157,10 @@ namespace Kafka.DotNet.SqlServer.Cdc
     }
 
     /// <summary>
-    /// Has table Change Data Capture (CDC) enabled on a SQL Server database
+    /// Has table Change Data Capture (CDC) enabled on a SQL Server database.
     /// </summary>
     /// <param name="tableName"></param>
-    /// <param name="captureInstance"></param>
+    /// <param name="captureInstance">Is the name of the capture instance used to name instance-specific change data capture objects.</param>
     /// <returns></returns>
     public Task<bool> IsCdcTableEnabledAsync(string tableName, string schemaName = "dbo", string captureInstance = null)
     {
@@ -177,6 +195,24 @@ AND s.name = '{schemaName}'";
 #endif
 
       return result;
+    }
+  }
+
+  internal static class SqlParametersExtensions
+  {
+    
+    public static SqlParameter[] TryAddVarcharSqlParameter(this SqlParameter[] parameters, string value, string parameterName, SqlDbType dbType = SqlDbType.VarChar)
+    {
+      if (IsNullOrEmpty(value)) return parameters;
+      
+      SqlParameter param = new(parameterName, dbType)
+      {
+        Value = value
+      };
+
+      parameters = parameters.Concat(new[] {param}).ToArray();
+
+      return parameters;
     }
   }
 }
