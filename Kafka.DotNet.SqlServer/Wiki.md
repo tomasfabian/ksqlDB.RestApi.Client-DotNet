@@ -189,8 +189,9 @@ private static async Task TryEnableCdcAsync()
   try
   {
     await cdcClient.CdcEnableDbAsync();
-
-    await cdcClient.CdcEnableTableAsync(tableName);
+    
+    if(!await CdcProvider.IsCdcTableEnabledAsync(tableName))
+      await CdcProvider.CdcEnableTableAsync(tableName);
   }
   catch (Exception e)
   {
@@ -199,8 +200,37 @@ private static async Task TryEnableCdcAsync()
 }
 ```
 
+### IsCdcDbEnabledAsync and IsCdcTableEnabledAsync (v0.2.0)
+IsCdcDbEnabledAsync - Has SQL Server database enabled Change Data Capture (CDC). 
+IsCdcTableEnabledAsync - Has table Change Data Capture (CDC) enabled on a SQL Server database.
+
+```C#
+bool isCdcEnabled = await ClassUnderTest.IsCdcDbEnabledAsync(databaseName);
+bool isTableCdcEnabled = await CdcProvider.IsCdcTableEnabledAsync(tableName)
+```
+
+### CdcEnableTable (v0.1.0)
+Sql parameters for [sys.sp_cdc_enable_table](https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sys-sp-cdc-enable-table-transact-sql?view=sql-server-ver15#arguments)
+Default schema name is 'dbo'.
+
+```C#
+string tableName = "Sensors";
+string captureInstance = $"dbo_{tableName}_v2";
+
+var cdcEnableTable = new CdcEnableTable(tableName)
+{
+  CaptureInstance = captureInstance,
+  IndexName = "IX_Sensors_Name"
+};
+
+await CdcProvider.CdcEnableTableAsync(cdcEnableTable);
+```
+
+Optional arguments were added in (v0.2.0):
+- IndexName, CaptureInstance, CapturedColumnList, FilegroupName
+
 ### SqlServerConnectorMetadata, ConnectorMetadata (v0.1.0)
-SQL Server connector configuration example
+SQL Server connector configuration example:
 ```C#
 using System;
 using System.Threading.Tasks;
@@ -294,6 +324,30 @@ private static async Task CreateSensorsCdcStreamAsync(CancellationToken cancella
   var httpResponseMessage = await restApiClient.CreateStreamAsync<RawDatabaseChangeObject>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
     .ConfigureAwait(false);
 }
+```
+
+### KsqlDbConnect - Drop Connectors (v0.2.0)
+DropConnectorAsync - Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement fails if the connector doesn't exist.
+    
+DropConnectorIfExistsAsync - Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement doesn't fail if the connector doesn't exist.
+
+```C#
+string connectorName = "MSSQL_SENSORS_CONNECTOR";
+
+await ksqlDbConnect.DropConnectorAsync(connectorName);
+
+await ksqlDbConnect.DropConnectorIfExistsAsync(connectorName);
+```
+
+### KsqlDbConnect - Get Connectors (v0.2.0)
+GetConnectorsAsync - List all connectors in the Connect cluster.
+
+```C#
+var ksqlDbUrl = Configuration["ksqlDb:Url"];
+
+var ksqlDbConnect = new KsqlDbConnect(new Uri(ksqlDbUrl));
+      
+var response = await ksqlDbConnect.GetConnectorsAsync();
 ```
 
 ### Disable CDC from.NET (v0.1.0)
