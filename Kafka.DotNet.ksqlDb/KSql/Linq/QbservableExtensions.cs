@@ -163,7 +163,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
 
     #endregion
 
-    #region AsAsyncEnumerable
+    #region ToAsyncEnumerable
 
     /// <summary>
     /// Runs the query as an async-enumerable sequence.
