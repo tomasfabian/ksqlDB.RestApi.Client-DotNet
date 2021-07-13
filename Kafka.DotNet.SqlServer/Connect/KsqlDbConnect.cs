@@ -8,6 +8,9 @@ using Kafka.DotNet.SqlServer.Cdc.Connectors;
 
 namespace Kafka.DotNet.SqlServer.Connect
 {
+  /// <summary>
+  /// KsqlDbConnect executes Kafka Connect related statements against ksqlDb REST API.
+  /// </summary>
   public class KsqlDbConnect : IKsqlDbConnect
   {
     private readonly Uri ksqlDbUrl;
@@ -28,15 +31,49 @@ namespace Kafka.DotNet.SqlServer.Connect
       return httpResponseMessage;
     }
 
-    public async Task<HttpResponseMessage> DropConnectorAsync(string connectorName, CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement doesn't fail if the connector doesn't exist.
+    /// </summary>
+    /// <param name="connectorName">Name of the connector to drop.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<HttpResponseMessage> DropConnectorIfExistsAsync(string connectorName, CancellationToken cancellationToken = default)
+    {
+      string dropIfExistsStatement = $"DROP CONNECTOR IF EXISTS {connectorName};";
+
+      return ExecuteStatementAsync(dropIfExistsStatement, cancellationToken);
+    }
+
+    /// <summary>
+    /// Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement fails if the connector doesn't exist.
+    /// </summary>
+    /// <param name="connectorName">Name of the connector to drop.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<HttpResponseMessage> DropConnectorAsync(string connectorName, CancellationToken cancellationToken = default)
     {
       string dropStatement = $"DROP CONNECTOR {connectorName};";
 
-      KSqlDbStatement ksqlDbStatement = new(dropStatement);
+      return ExecuteStatementAsync(dropStatement, cancellationToken);
+    }
 
-      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
+    /// <summary>
+    /// List all connectors in the Connect cluster.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<HttpResponseMessage> GetConnectorsAsync(CancellationToken cancellationToken = default)
+    {
+      string showStatement = "SHOW CONNECTORS;";
 
-      return httpResponseMessage;
+      return ExecuteStatementAsync(showStatement, cancellationToken);
+    }
+
+    private Task<HttpResponseMessage> ExecuteStatementAsync(string ksqlStatement, CancellationToken cancellationToken = default)
+    {
+      KSqlDbStatement ksqlDbStatement = new(ksqlStatement);
+      
+      return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
     }
 
     private Task<HttpResponseMessage> ExecuteStatementAsync(KSqlDbStatement ksqlDbStatement, CancellationToken cancellationToken = default)
