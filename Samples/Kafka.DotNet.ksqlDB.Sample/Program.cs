@@ -641,15 +641,14 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
         .ToQueryString();
     }
 
-    //TODO: not released
-    //private static void WithOffsetResetPolicy(IKSqlDBContext context)
-    //{
-    //  var subscription = context.CreateQueryStream<Movie>().WithOffsetResetPolicy(AutoOffsetReset.Latest)
-    //    .Subscribe(movie =>
-    //    {
-    //      Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
-    //    }, e => { Console.WriteLine($"Exception: {e.Message}"); });   
-    //}
+    private static void WithOffsetResetPolicy(IKSqlDBContext context)
+    {
+      var subscription = context.CreateQueryStream<Movie>().WithOffsetResetPolicy(AutoOffsetReset.Latest)
+        .Subscribe(movie =>
+        {
+          Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
+        }, e => { Console.WriteLine($"Exception: {e.Message}"); });
+    }
 
     private static async Task CreateStreamAsync()
     {

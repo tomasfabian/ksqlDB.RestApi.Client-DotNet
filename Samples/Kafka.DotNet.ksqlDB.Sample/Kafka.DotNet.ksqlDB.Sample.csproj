@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kafka.DotNet.ksqlDB" Version="1.1.0-rc.1" />
+    <PackageReference Include="Kafka.DotNet.ksqlDB" Version="1.2.0-rc.1" />
     <!-- <ProjectReference Include="..\..\Kafka.DotNet.ksqlDb\Kafka.DotNet.ksqlDB.csproj" /> -->
   </ItemGroup>
 
