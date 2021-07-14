@@ -28,6 +28,22 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     Task<ConnectorsResponse[]> GetConnectorsAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement doesn't fail if the connector doesn't exist.
+    /// </summary>
+    /// <param name="connectorName">Name of the connector to drop.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<HttpResponseMessage> DropConnectorIfExistsAsync(string connectorName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement fails if the connector doesn't exist.
+    /// </summary>
+    /// <param name="connectorName">Name of the connector to drop.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<HttpResponseMessage> DropConnectorAsync(string connectorName, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// List the defined streams.
     /// </summary>
     /// <param name="cancellationToken"></param>

@@ -160,6 +160,36 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       return await httpResponseMessage.ToConnectorsResponseAsync();
     }
 
+    /// <summary>
+    /// Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement doesn't fail if the connector doesn't exist.
+    /// </summary>
+    /// <param name="connectorName">Name of the connector to drop.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<HttpResponseMessage> DropConnectorIfExistsAsync(string connectorName, CancellationToken cancellationToken = default)
+    {
+      string dropIfExistsStatement = $"DROP CONNECTOR IF EXISTS {connectorName};";
+      
+      KSqlDbStatement ksqlDbStatement = new(dropIfExistsStatement);
+
+      return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
+    }
+
+    /// <summary>
+    /// Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement fails if the connector doesn't exist.
+    /// </summary>
+    /// <param name="connectorName">Name of the connector to drop.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<HttpResponseMessage> DropConnectorAsync(string connectorName, CancellationToken cancellationToken = default)
+    {
+      string dropStatement = $"DROP CONNECTOR {connectorName};";
+      
+      KSqlDbStatement ksqlDbStatement = new(dropStatement);
+
+      return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
+    }
+
     #endregion
   }
 }
