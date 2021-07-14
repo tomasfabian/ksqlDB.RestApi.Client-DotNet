@@ -1,6 +1,8 @@
 ﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Streams;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
 
@@ -17,5 +19,19 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// Produce a row into an existing stream or table and its underlying topic based on explicitly specified values.
     /// </summary>
     Task<HttpResponseMessage> InsertIntoAsync<T>(T entity, InsertProperties insertProperties = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// List all connectors in the Connect cluster.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<ConnectorsResponse[]> GetConnectorsAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// List the defined streams.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<StreamsResponseBase[]> GetStreamsAsync(CancellationToken cancellationToken = default);
   }
 }

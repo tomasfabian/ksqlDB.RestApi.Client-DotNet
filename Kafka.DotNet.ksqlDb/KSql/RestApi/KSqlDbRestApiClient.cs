@@ -4,7 +4,10 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Generators;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Streams;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
 
@@ -120,5 +123,43 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
       return httpResponseMessage;
     }
+    
+    /// <summary>
+    /// List the defined streams.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task<StreamsResponseBase[]> GetStreamsAsync(CancellationToken cancellationToken = default)
+    {
+      string showStatement = "SHOW STREAMS;";
+
+      KSqlDbStatement ksqlDbStatement = new(showStatement);
+
+      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
+        
+      var streamsResponses = await httpResponseMessage.ToStreamsResponseAsync().ConfigureAwait(false);
+
+      return streamsResponses;
+    }
+
+    #region Connectors
+
+    /// <summary>
+    /// List all connectors in the Connect cluster.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task<ConnectorsResponse[]> GetConnectorsAsync(CancellationToken cancellationToken = default)
+    {
+      string showStatement = "SHOW CONNECTORS;";
+
+      KSqlDbStatement ksqlDbStatement = new(showStatement);
+
+      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
+        
+      return await httpResponseMessage.ToConnectorsResponseAsync();
+    }
+
+    #endregion
   }
 }
