@@ -12,6 +12,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
     [JsonPropertyName("error_code")]
     public int ErrorCode { get; set; }
 
+    [JsonPropertyName("errorMessage")]
+    public string ErrorMessage { get; set; }
+
     [JsonPropertyName("message")]
     public string Message { get; set; }
 
