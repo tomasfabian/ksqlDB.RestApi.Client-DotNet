@@ -99,10 +99,10 @@ run in command line:
 ```docker compose up -d```
 
 # CDC - Push notifications from Sql Server tables with Kafka
-Consume row-level table changes (CDC - Change Data Capture) from  Sql Server databases with the Debezium connector streaming platform. 
+Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with Kafka.DotNet.SqlServer package together with the Debezium connector streaming platform. 
 ### Nuget
 ```
-Install-Package Kafka.DotNet.SqlServer -Version 0.1.0-rc.2
+Install-Package Kafka.DotNet.SqlServer -Version 0.1.0
 ```
 
 Full example is available in [Blazor example](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Blazor.Sample) - Kafka.DotNet.InsideOut.sln:
@@ -1923,6 +1923,62 @@ var subscription = context.CreateQueryStream<Movie>()
   {
     Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
   }, e => { Console.WriteLine($"Exception: {e.Message}"); });   
+```
+
+### Connectors (v1.2.0)
+GetConnectorsAsync - List all connectors in the Connect cluster.
+
+DropConnectorAsync - Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement fails if the connector doesn't exist.
+    
+DropConnectorIfExistsAsync - Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement doesn't fail if the connector doesn't exist.
+
+```C#
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.RestApi;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+
+public async Task CreateGetAndDropConnectorAsync()
+{
+  var ksqlDbUrl = @"http:\\localhost:8088";
+
+  var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
+  var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+  const string ConnectorName = "mock-connector";
+
+  var createConnector = @$"CREATE SOURCE CONNECTOR `{ConnectorName}` WITH(
+      'connector.class'='org.apache.kafka.connect.tools.MockSourceConnector',
+      'topic.prefix'='mock-',
+      'table.whitelist'='users',
+      'key'='username');";
+
+  var statement = new KSqlDbStatement(createConnector);
+
+  var httpResponseMessage = await restApiClient.ExecuteStatementAsync(statement);
+
+  var connectorsResponse = await restApiClient.GetConnectorsAsync();
+
+  Console.WriteLine("Available connectors: ");
+  Console.WriteLine(string.Join(',', connectorsResponse[0].Connectors.Select(c => c.Name)));
+
+  httpResponseMessage = await restApiClient.DropConnectorAsync(ConnectorName);
+
+  // Or
+  httpResponseMessage = await restApiClient.DropConnectorIfExistsAsync(ConnectorName);
+}
+```
+
+### Get streams (v1.2.0)
+- IKSqlDbRestApiClient.GetStreamsAsync - List the defined streams.
+
+```C#
+var streamResponses = await restApiClient.GetStreamsAsync();
+
+Console.WriteLine(string.Join(',', streamResponses[0].Streams.Select(c => c.Name)));
 ```
 
 # LinqPad samples
