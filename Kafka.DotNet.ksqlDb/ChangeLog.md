@@ -1,4 +1,15 @@
-﻿# v1.1.0
+﻿# v1.2.0-rc.1 (WIP)
+
+KSqlDbRestApiClient: 
+- GetConnectorsAsync - List all connectors in the Connect cluster.
+- DropConnectorAsync, DropConnectorIfExistsAsync - Drop a connector and delete it from the Connect cluster.
+
+- ConnectorsResponse, Connector, HttpResponseMessageExtensions.ToConnectorsResponseAsync
+
+- GetStreamsAsync - List the defined streams.
+- StreamsResponse, Stream, StatementResponseBase
+
+# v1.1.0
 - Pull queries Select extension method
 - Push queries [WithOffsetResetPolicy extension method](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB#withoffsetresetpolicy---push-queries-extension-method-v110)
 - CAST - [ToString](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB#cast---tostring-v110), [string to numeric types](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB#cast---convert-string-to-numeric-types-v110)
@@ -14,7 +25,7 @@ Except of one change all of them will be catched by the compiler. For more infor
 
 IKSqlDbRestApiClient interface:
 ```
-| v0.11.0                      | v1.0.0                        |
+| v0.11.0                       | v1.0.0                        |
 |---------------------------------------------------------------|
 | CreateTable<T>                | CreateTableAsync<T>           |
 | CreateStream<T>               | CreateStreamAsync<T>          |

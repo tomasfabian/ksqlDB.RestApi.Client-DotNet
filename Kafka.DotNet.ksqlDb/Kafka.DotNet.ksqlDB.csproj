@@ -4,18 +4,20 @@
     <TargetFrameworks>netstandard2.0;netcoreapp3.1;net5.0</TargetFrameworks> 
     <Authors>Tomas Fabian</Authors>
     <Company />
-    <PackageLicenseFile>License.txt</PackageLicenseFile>
+    <PackageLicenseFile></PackageLicenseFile>
     <PackageProjectUrl>https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Kafka.DotNet.ksqlDb</PackageProjectUrl>
     <RepositoryUrl>https://github.com/tomasfabian/Kafka.DotNet.ksqlDB</RepositoryUrl>
     <Copyright>@tomasfabian</Copyright>
-    <Description>Kafka.DotNet.ksqlDB is a LINQ-enabled client API for issuing ksqlDB push queries and consuming JSON payloads. 
+    <Description>Kafka.DotNet.ksqlDB is a C# LINQ-enabled client API for issuing ksqlDB push queries and consuming JSON payloads.
+It also enables execution of SQL statements via the Rest API.
 Targets .NET 5, .NET Core 3.1 and .NET Standard 2.0.
 Documentation for the library can be found at https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.ksqlDb/Wiki.md.</Description>
-    <PackageTags>kafka ksql ksqlDB LINQ .NET push query</PackageTags>
-    <Version>1.1.0</Version>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <PackageTags>kafka ksql ksqlDB LINQ .NET csharp push query</PackageTags>
+    <Version>1.2.0-rc.1</Version>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
     <LangVersion>9.0</LangVersion>
     <PackageReleaseNotes>https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.ksqlDb/ChangeLog.md</PackageReleaseNotes>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,13 +26,6 @@ Documentation for the library can be found at https://github.com/tomasfabian/Kaf
     <PackageReference Include="System.Reactive" Version="5.0.0" /> 
     <PackageReference Include="System.Text.Json" Version="5.0.0" />
     <PackageReference Include="Pluralize.NET" Version="1.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="License.txt">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
