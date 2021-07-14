@@ -1,7 +1,9 @@
 ﻿using System.Net.Http;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Connectors;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Streams;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 
 namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions
@@ -26,9 +28,31 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions
       return responseObject;
     }
 
+    public static Task<StatementResponse[]> ToStatementResponsesAsync(this HttpResponseMessage httpResponseMessage)
+    {
+      return httpResponseMessage.ToStatementResponsesAsync<StatementResponse>();
+    }
+
+    public static Task<StreamsResponseBase[]> ToStreamsResponseAsync(this HttpResponseMessage httpResponseMessage)
+    {
+      return httpResponseMessage.ToStatementResponsesAsync<StreamsResponseBase>();
+    }
+
     public static Task<ConnectorsResponse[]> ToConnectorsResponseAsync(this HttpResponseMessage httpResponseMessage)
     {
-      return httpResponseMessage.ToStatementResponseAsync<ConnectorsResponse[]>();
+      return httpResponseMessage.ToStatementResponsesAsync<ConnectorsResponse>();
+    }
+
+    private static async Task<TResponse[]> ToStatementResponsesAsync<TResponse>(this HttpResponseMessage httpResponseMessage)
+    {
+      TResponse[] statementResponses;
+
+      if (httpResponseMessage.IsSuccessStatusCode)
+        statementResponses = await httpResponseMessage.ToStatementResponseAsync<TResponse[]>().ConfigureAwait(false);
+      else
+        statementResponses = new[] { await httpResponseMessage.ToStatementResponseAsync<TResponse>().ConfigureAwait(false) };
+
+      return statementResponses;
     }
 
     private static async Task<TResponse> ToStatementResponseAsync<TResponse>(this HttpResponseMessage httpResponseMessage)

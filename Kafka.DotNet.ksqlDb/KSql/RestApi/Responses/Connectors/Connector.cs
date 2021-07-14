@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Connectors
+namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors
 {
-  public class Connector
+  public record Connector
   {
     [JsonPropertyName("name")]
     public string Name { get; set; }
@@ -15,10 +15,5 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Connectors
     
     [JsonPropertyName("state")]
     public string State { get; set; }
-  }
-
-  internal class ListConnectorsList
-  {
-    public ConnectorsResponse[] Connectors { get; set; }
   }
 }

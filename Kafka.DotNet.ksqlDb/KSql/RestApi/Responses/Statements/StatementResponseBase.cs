@@ -1,9 +1,15 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Connectors
+namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Statements
 {
-  public class ConnectorsResponse
+  public record StatementResponseBase
   {
+    [JsonPropertyName("error_code")]
+    public int ErrorCode { get; set; }
+
+    [JsonPropertyName("message")]
+    public string Message { get; set; }
+
     [JsonPropertyName("@type")]
     public string Type { get; set; }
     
@@ -12,8 +18,5 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Connectors
     
     [JsonPropertyName("warnings")]
     public string[] Warnings { get; set; }
-    
-    [JsonPropertyName("connectors")]
-    public Connector[] Connectors { get; set; }
   }
 }
