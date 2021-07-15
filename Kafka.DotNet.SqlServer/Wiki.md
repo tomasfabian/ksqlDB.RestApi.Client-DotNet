@@ -5,7 +5,7 @@ Set docker-compose.csproj as startup project in Kafka.DotNet.InsideOut.sln.
 
 ### Nuget
 ```
-Install-Package Kafka.DotNet.SqlServer -Version 0.1.0-rc.2
+Install-Package Kafka.DotNet.SqlServer -Version 0.2.0-rc.2
 
 Install-Package Kafka.DotNet.ksqlDB
 ```
