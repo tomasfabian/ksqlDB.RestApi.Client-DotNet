@@ -49,19 +49,6 @@ services:
     depends_on:
       - zookeeper
 
-  kafdrop:
-    image: obsidiandynamics/kafdrop:3.27.0
-    environment:
-      - KAFKA_BROKERCONNECT=broker01:9092
-      - JVM_OPTS=-Xms32M -Xms64M
-      - SERVER_SERVLET_CONTEXTPATH=/
-    ports:
-      - "9000:9000"
-    networks: 
-      - kafkanetwork
-    depends_on:
-      - broker01
-
   schema-registry:
     image: confluentinc/cp-schema-registry:6.0.0
     networks: 
@@ -87,6 +74,11 @@ services:
       - schema-registry
     volumes:
      - "./debezium-connector-sqlserver/:/usr/share/kafka/plugins/"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:8088/healthcheck"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
     environment:
       KSQL_LISTENERS: "http://0.0.0.0:8088"
       KSQL_BOOTSTRAP_SERVERS: broker01:9092
@@ -115,6 +107,19 @@ services:
       KSQL_CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: '1'
       KSQL_CONNECT_PLUGIN_PATH: '/usr/share/kafka/plugins/'
 
+  kafdrop:
+    image: obsidiandynamics/kafdrop:3.27.0
+    environment:
+      - KAFKA_BROKERCONNECT=broker01:9092
+      - JVM_OPTS=-Xms32M -Xms64M
+      - SERVER_SERVLET_CONTEXTPATH=/
+    ports:
+      - "9000:9000"
+    networks: 
+      - kafkanetwork
+    depends_on:
+      - broker01
+
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:0.15.0
     networks: 
@@ -136,5 +141,5 @@ services:
       ksqlDb__Url: "http://ksqldb-server:8088"
       ConnectionStrings__DefaultConnection: "Server=sqlserver2019,1433;User Id = SA;Password=<YourNewStrong@Passw0rd>;Initial Catalog = Sensors;MultipleActiveResultSets=true"
     depends_on:
-      - broker01
-      - ksqldb-server
+      ksqldb-server:
+        condition: service_healthy

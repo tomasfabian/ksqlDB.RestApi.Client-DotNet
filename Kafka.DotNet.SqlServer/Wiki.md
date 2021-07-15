@@ -3,6 +3,8 @@
 ### Blazor Sample 
 Set docker-compose.csproj as startup project in Kafka.DotNet.InsideOut.sln.
 
+Initial run takes a few minutes until all containers are up and running.
+
 ### Nuget
 ```
 Install-Package Kafka.DotNet.SqlServer -Version 0.2.0-rc.2
