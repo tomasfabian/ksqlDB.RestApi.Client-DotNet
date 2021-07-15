@@ -48,15 +48,15 @@ async Task Main()
 			switch (operationType)
 			{
 				case ChangeDataCaptureType.Created:
-					cdc.EntityAfter.Dump("after");
+					cdc.After.Dump("after");
 					break;
 				case ChangeDataCaptureType.Updated:
 
-					var sensorBefore = cdc.EntityBefore.Dump("before");
-					var sensorAfter = cdc.EntityAfter.Dump("after");
+					var sensorBefore = cdc.Before.Dump("before");
+					var sensorAfter = cdc.After.Dump("after");
 					break;
 				case ChangeDataCaptureType.Deleted:
-					cdc.EntityBefore.Dump("before");
+					cdc.Before.Dump("before");
 					break;
 			}
 		}, onError: error =>
@@ -115,9 +115,9 @@ private async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationTok
 		Replicas = 1
 	};
 
-	var ksql = StatementGenerator.CreateStream<DatabaseChangeObject>(metadata, ifNotExists: true);
+	var ksql = StatementGenerator.CreateStream<DatabaseChangeObject<IoTSensor>>(metadata, ifNotExists: true);
 
-	var httpResponseMessage = await restApiClient.CreateStreamAsync<DatabaseChangeObject>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
+	var httpResponseMessage = await restApiClient.CreateStreamAsync<DatabaseChangeObject<IoTSensor>>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
 		.ConfigureAwait(false);
 }
 
