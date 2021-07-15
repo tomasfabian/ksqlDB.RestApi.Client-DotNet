@@ -8,6 +8,7 @@ using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Generators;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Streams;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Tables;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
 
@@ -129,7 +130,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<StreamsResponseBase[]> GetStreamsAsync(CancellationToken cancellationToken = default)
+    public async Task<StreamsResponse[]> GetStreamsAsync(CancellationToken cancellationToken = default)
     {
       string showStatement = "SHOW STREAMS;";
 
@@ -138,6 +139,24 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
         
       var streamsResponses = await httpResponseMessage.ToStreamsResponseAsync().ConfigureAwait(false);
+
+      return streamsResponses;
+    }
+
+    /// <summary>
+    /// List the defined tables.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task<TablesResponse[]> GetTablesAsync(CancellationToken cancellationToken = default)
+    {
+      string showStatement = "SHOW TABLES;";
+
+      KSqlDbStatement ksqlDbStatement = new(showStatement);
+
+      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
+      
+      var streamsResponses = await httpResponseMessage.ToTablesResponseAsync().ConfigureAwait(false);
 
       return streamsResponses;
     }

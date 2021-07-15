@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Streams;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Tables;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
 
@@ -44,10 +45,17 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     Task<HttpResponseMessage> DropConnectorAsync(string connectorName, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// List the defined tables.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<TablesResponse[]> GetTablesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// List the defined streams.
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<StreamsResponseBase[]> GetStreamsAsync(CancellationToken cancellationToken = default);
+    Task<StreamsResponse[]> GetStreamsAsync(CancellationToken cancellationToken = default);
   }
 }

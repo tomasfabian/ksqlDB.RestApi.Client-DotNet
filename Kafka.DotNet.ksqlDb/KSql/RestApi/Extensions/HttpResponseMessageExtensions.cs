@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Streams;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Tables;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 
 namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions
@@ -33,9 +34,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions
       return httpResponseMessage.ToStatementResponsesAsync<StatementResponse>();
     }
 
-    public static Task<StreamsResponseBase[]> ToStreamsResponseAsync(this HttpResponseMessage httpResponseMessage)
+    public static Task<StreamsResponse[]> ToStreamsResponseAsync(this HttpResponseMessage httpResponseMessage)
     {
-      return httpResponseMessage.ToStatementResponsesAsync<StreamsResponseBase>();
+      return httpResponseMessage.ToStatementResponsesAsync<StreamsResponse>();
+    }
+
+    public static Task<TablesResponse[]> ToTablesResponseAsync(this HttpResponseMessage httpResponseMessage)
+    {
+      return httpResponseMessage.ToStatementResponsesAsync<TablesResponse>();
     }
 
     public static Task<ConnectorsResponse[]> ToConnectorsResponseAsync(this HttpResponseMessage httpResponseMessage)
