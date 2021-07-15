@@ -12,10 +12,10 @@
   <Namespace>Kafka.DotNet.SqlServer.Cdc</Namespace>
   <Namespace>Kafka.DotNet.SqlServer.Cdc.Connectors</Namespace>
   <Namespace>Kafka.DotNet.SqlServer.Cdc.Extensions</Namespace>
-  <Namespace>System.Net.Http</Namespace>
-  <Namespace>System.Threading.Tasks</Namespace>
-  <Namespace>System.Text.Json</Namespace>
   <Namespace>Kafka.DotNet.SqlServer.Connect</Namespace>
+  <Namespace>System.Net.Http</Namespace>
+  <Namespace>System.Text.Json</Namespace>
+  <Namespace>System.Threading.Tasks</Namespace>
   <RuntimeVersion>5.0</RuntimeVersion>
 </Query>
 
@@ -36,7 +36,7 @@ async Task Main()
 
 	var semaphoreSlim = new SemaphoreSlim(0, 1);
 	
-	var cdcSubscription = context.CreateQuery<DatabaseChangeObject<IoTSensor>>("sqlserversensors")
+	var cdcSubscription = context.CreateQuery<RawDatabaseChangeObject<IoTSensor>>("sqlserversensors")
 		.WithOffsetResetPolicy(AutoOffsetReset.Latest)
 		.Take(5)
 		.ToObservable()
