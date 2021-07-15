@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Enums;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -126,6 +128,94 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
 
       responseObject?[0].CommandStatus.Status.Should().Be("SUCCESS");
       responseObject?[0].CommandStatus.Message.Should().Be("Stream created");
+    }
+
+    private string ConnectorName => "mock-connector";
+
+    [TestMethod]
+    public async Task GetConnectorAsync()
+    {
+      //Arrange
+      var createConnector = @$"CREATE SOURCE CONNECTOR `{ConnectorName}` WITH(
+      'connector.class'='org.apache.kafka.connect.tools.MockSourceConnector',
+      'topic.prefix'='mock-',
+      'table.whitelist'='users',
+      'key'='username');";
+
+      var statement = new KSqlDbStatement(createConnector);
+
+      //Act
+      var httpResponseMessage = await restApiClient.ExecuteStatementAsync(statement);
+
+      var connectorsResponse = await restApiClient.GetConnectorsAsync();
+
+      //Assert
+      connectorsResponse[0].Connectors.Should().NotBeNull();
+      connectorsResponse[0].Connectors.Any(c => c.Name == ConnectorName).Should().BeTrue();
+      connectorsResponse[0].Type.Should().Be("connector_list");
+
+      httpResponseMessage = await restApiClient.DropConnectorAsync($"`{ConnectorName}`");
+
+      httpResponseMessage = await restApiClient.DropConnectorAsync("UnknownConnector");
+      var content1 = await httpResponseMessage.ToStatementResponsesAsync();
+
+      httpResponseMessage = await restApiClient.DropConnectorIfExistsAsync("UnknownConnector");
+      var content2 = await httpResponseMessage.ToStatementResponsesAsync();
+
+      connectorsResponse = await restApiClient.GetConnectorsAsync();
+      connectorsResponse[0].Connectors.Any(c => c.Name == ConnectorName).Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task GetStreamsAsync()
+    {
+      //Arrange
+
+      //Act
+      var streamResponses = await restApiClient.GetStreamsAsync();
+
+      //Assert
+      streamResponses[0].StatementText.Should().Be("SHOW STREAMS;"); //TODO: create test stream
+    }
+
+    [TestMethod]
+    public async Task GetTablesAsync()
+    {
+      //Arrange
+
+      //Act
+      var tablesResponses = await restApiClient.GetTablesAsync();
+
+      //Assert
+
+      Console.WriteLine(string.Join(',', tablesResponses[0].Tables.Select(c => c.Name)));
+      tablesResponses[0].StatementText.Should().Be("SHOW TABLES;"); //TODO: create test stream
+    }
+
+    [TestMethod]
+    public async Task DropConnectorIfExistsAsync_DoesNotExist_WarningResponse()
+    {
+      //Arrange
+
+      //Act
+      var httpResponseMessage = await restApiClient.DropConnectorIfExistsAsync("UnknownConnector");
+      var content = await httpResponseMessage.ToStatementResponsesAsync();
+      
+      //Assert
+      content[0].Type.Should().Be("warning_entity");
+    }
+    
+    [TestMethod]
+    public async Task DropConnectorAsync_DoesNotExist_ErrorResponse()
+    {
+      //Arrange
+
+      //Act
+      var httpResponseMessage = await restApiClient.DropConnectorAsync("UnknownConnector");
+      var content = await httpResponseMessage.ToStatementResponsesAsync();
+      
+      //Assert
+      content[0].Type.Should().Be("error_entity");
     }
 
     internal record MyMoviesTable : MyMoviesStreamTest
