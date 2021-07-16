@@ -311,5 +311,23 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Query.Functions
       Assert.AreEqual(expectedItemsCount, actualValues.Count);
       actualValues[0].Col["1"].Should().Be(11);
     }
+    
+    [TestMethod]
+    public async Task JsonArrayContains()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+
+      //Act
+      var source = Context.CreateQuery<Movie>(MoviesTableName)
+        .Select(c => new { Col = K.Functions.JsonArrayContains("[1, 2, 3]", 2) })
+        .ToAsyncEnumerable();
+      
+      var actualValues = await CollectActualValues(source, expectedItemsCount);
+      
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+      actualValues[0].Col.Should().BeTrue();
+    }
   }
 }

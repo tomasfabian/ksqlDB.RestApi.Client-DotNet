@@ -602,6 +602,23 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
 
     #endregion
 
+    #region JsonArrayContains
+    
+    [TestMethod]
+    public void JsonArrayContains_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      Expression<Func<Collection, bool>> expression = _ => K.Functions.JsonArrayContains("[1, 2, 3]", 2);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo("JSON_ARRAY_CONTAINS('[1, 2, 3]', 2)");
+    } 
+
+    #endregion
+
     #endregion
 
     #region String functions
