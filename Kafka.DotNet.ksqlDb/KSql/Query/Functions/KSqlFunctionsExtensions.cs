@@ -1509,7 +1509,73 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
 
     #endregion
 
-    #region AS_MAP
+    #region AsMap
+
+    /// <summary>
+    /// Construct a map from a list of keys and a list of values.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="keys"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static IDictionary<string, string> AsMap(this KSqlFunctions kSqlFunctions, string[] keys, string[] values)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Construct a map from a list of keys and a list of values.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="keys"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static IDictionary<string, int> AsMap(this KSqlFunctions kSqlFunctions, string[] keys, int[] values)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Construct a map from a list of keys and a list of values.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="keys"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static IDictionary<string, long> AsMap(this KSqlFunctions kSqlFunctions, string[] keys, long[] values)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Construct a map from a list of keys and a list of values.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="keys"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static IDictionary<string, double> AsMap(this KSqlFunctions kSqlFunctions, string[] keys, double[] values)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Construct a map from a list of keys and a list of values.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="keys"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static IDictionary<string, decimal> AsMap(this KSqlFunctions kSqlFunctions, string[] keys, decimal[] values)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    #endregion
+    
+    // TODO: ELT, FIELD
+
+    #region JSON_ARRAY_CONTAINS
 
     
 
