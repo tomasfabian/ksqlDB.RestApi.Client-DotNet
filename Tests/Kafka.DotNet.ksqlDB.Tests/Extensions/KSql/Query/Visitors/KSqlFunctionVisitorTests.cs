@@ -585,6 +585,23 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
 
     #endregion
 
+    #region AsMap
+    
+    [TestMethod]
+    public void AsMap_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      Expression<Func<Collection, IDictionary<string, int>>> expression = _ => K.Functions.AsMap(new []{ "1", "2" }, new []{ 11, 22 });
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo("AS_MAP(ARRAY['1', '2'], ARRAY[11, 22])");
+    } 
+
+    #endregion
+
     #endregion
 
     #region String functions
