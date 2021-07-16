@@ -619,6 +619,27 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
 
     #endregion
 
+    #region MapKeys
+    
+    [TestMethod]
+    public void MapKeys_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      Expression<Func<Collection, string[]>> expression = c => K.Functions.MapKeys(new Dictionary<string, int>
+      {
+        {"apple", 10},
+        {"banana", 20}
+      });
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo("MAP_KEYS(MAP('apple' := 10, 'banana' := 20))");
+    } 
+
+    #endregion
+
     #endregion
 
     #region String functions

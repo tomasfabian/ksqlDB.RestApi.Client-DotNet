@@ -329,5 +329,33 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Query.Functions
       Assert.AreEqual(expectedItemsCount, actualValues.Count);
       actualValues[0].Col.Should().BeTrue();
     }
+    
+    [TestMethod]
+    public async Task MapKeys()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+      var map = new Dictionary<string, int>
+      {
+        {"apple", 10},
+        {"banana", 20}
+      };
+
+      //Act
+      var source = Context.CreateQuery<Movie>(MoviesTableName)
+        .Select(c => new { Col = K.Functions.MapKeys(new Dictionary<string, int>
+        {
+          {"apple", 10},
+          {"banana", 20}
+        }) })
+        .ToAsyncEnumerable();
+      
+      var actualValues = await CollectActualValues(source, expectedItemsCount);
+      
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+      actualValues[0].Col[0].Should().Be("banana");
+      actualValues[0].Col[1].Should().Be("apple");
+    }
   }
 }
