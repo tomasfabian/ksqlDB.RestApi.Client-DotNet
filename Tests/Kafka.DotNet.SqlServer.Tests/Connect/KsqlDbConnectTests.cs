@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Confluent.Kafka;
-using Confluent.Kafka.Admin;
 using FluentAssertions;
 using Kafka.DotNet.InsideOut.Consumer;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
 using Kafka.DotNet.SqlServer.Cdc;
 using Kafka.DotNet.SqlServer.Cdc.Connectors;
 using Kafka.DotNet.SqlServer.Connect;
@@ -58,34 +59,11 @@ namespace Kafka.DotNet.SqlServer.Tests.Connect
       var ksqlDbUrl = Configuration["ksqlDb:Url"];
 
       var ksqlDbConnect = new KsqlDbConnect(new Uri(ksqlDbUrl));
-
-      await ksqlDbConnect.DropConnectorAsync(connectorName);
+      
+      await ksqlDbConnect.DropConnectorIfExistsAsync(connectorName);
     }
 
     private static string exposedBootstrapServers = "localhost:29092";
-
-    private static async Task DeleteTopicAsync(string topicName)
-    {
-      try
-      {
-        var config = new AdminClientConfig
-        {
-          BootstrapServers = exposedBootstrapServers
-        };
-
-        var adminClientBuilder = new AdminClientBuilder(config);
-
-        var adminClient = adminClientBuilder.Build();
-
-        await adminClient.DeleteTopicsAsync(new[] {topicName});
-        
-        // await Task.Delay(5000);
-      }
-      catch (Exception e)
-      {
-        Console.WriteLine(e);
-      }
-    }
 
     private static async Task DropDependenciesAsync(DatabaseFacade databaseFacade)
     {
@@ -107,7 +85,7 @@ namespace Kafka.DotNet.SqlServer.Tests.Connect
 
     private static string tableName = "Sensors";
     private static string cdcTopicName = "sqlserver2019Tests.dbo.Sensors";
-
+    
     [TestMethod]
     public async Task CreateConnectorAsync_AndReceivesDatabaseChangeObjects()
     {
@@ -145,6 +123,8 @@ namespace Kafka.DotNet.SqlServer.Tests.Connect
 
       await ReceivesDatabaseChangeObjectsAsync(databaseServerName);
     }
+    
+    static readonly IoTSensor Sensor = new() {SensorId = "1-X", Value = 42};
 
     private static async Task ReceivesDatabaseChangeObjectsAsync(string databaseServerName)
     {
@@ -160,23 +140,22 @@ namespace Kafka.DotNet.SqlServer.Tests.Connect
       short expectedItemsCount = 3;
       IList<DatabaseChangeObject<IoTSensor>> receivedSensors = new List<DatabaseChangeObject<IoTSensor>>();
       
-      //await Task.Delay(5000);
-      var sensor = new IoTSensor {SensorId = "1-X", Value = 42};
-      ApplicationDbContext.Sensors.Add(sensor);
+      ApplicationDbContext.Sensors.Add(Sensor);
       var saveResult = await ApplicationDbContext.SaveChangesAsync();
 
-      sensor.Value = 43;
-      ApplicationDbContext.Sensors.Update(sensor);
+      ApplicationDbContext.Entry(Sensor).State = EntityState.Detached;
+
+      var updatedSensor = Sensor with {Value = 43};
+
+      ApplicationDbContext.Sensors.Update(updatedSensor);
       saveResult = await ApplicationDbContext.SaveChangesAsync();
 
-      ApplicationDbContext.Sensors.Remove(sensor);
+      ApplicationDbContext.Sensors.Remove(updatedSensor);
       saveResult = await ApplicationDbContext.SaveChangesAsync();
-
-      //await Task.Delay(5000);
 
       //Act
       string topicName = $"{databaseServerName}.dbo.{tableName}";
-      //topicName = "sqlserver2019.dbo.Sensors";
+      
       var kafkaConsumer =
         new KafkaConsumer<string, DatabaseChangeObject<IoTSensor>>(topicName, consumerConfig);
 
@@ -202,7 +181,65 @@ namespace Kafka.DotNet.SqlServer.Tests.Connect
 
     private static void VerifyMessages(DatabaseChangeObject<IoTSensor>[] messages)
     {
+      var createOperation = messages[0];
 
+      createOperation.OperationType.Should().Be(ChangeDataCaptureType.Created);
+      createOperation.Before.Should().BeNull();
+      createOperation.After.Should().NotBeNull();
+      createOperation.After.Should().Be(Sensor);
+      
+      var updateOperation = messages[1];
+
+      updateOperation.OperationType.Should().Be(ChangeDataCaptureType.Updated);
+      updateOperation.Before.Should().Be(Sensor);
+      updateOperation.After.Should().Be(Sensor with { Value = 43 });
+      
+      var deleteOperation = messages[2];
+
+      deleteOperation.OperationType.Should().Be(ChangeDataCaptureType.Deleted);
+      deleteOperation.Before.Should().Be(Sensor with { Value = 43 });
+      deleteOperation.After.Should().BeNull();
+    }
+
+    [TestMethod]
+    public async Task GetConnectorsAsync()
+    {
+      var ksqlDbUrl = Configuration["ksqlDb:Url"];
+
+      var ksqlDbConnect = new KsqlDbConnect(new Uri(ksqlDbUrl));
+      
+      var response = await ksqlDbConnect.GetConnectorsAsync();
+
+      response.IsSuccessStatusCode.Should().BeTrue();
+
+      var connectors = await response.Content.ReadAsStringAsync();
+      var connectorsResponse = JsonSerializer.Deserialize<ConnectorsResponse[]>(connectors);
+
+      connectorsResponse[0].Connectors.Select(c => c.Name.ToLower()).Contains(connectorName).Should().BeTrue();
+      var testConnector = connectorsResponse[0].Connectors.FirstOrDefault(c => c.Name.ToLower() == connectorName);
+
+      testConnector.State.Should().Contain("RUNNING");
+    }
+
+    private static async Task DeleteTopicAsync(string topicName)
+    {
+      try
+      {
+        var config = new AdminClientConfig
+        {
+          BootstrapServers = exposedBootstrapServers
+        };
+
+        var adminClientBuilder = new AdminClientBuilder(config);
+
+        var adminClient = adminClientBuilder.Build();
+
+        await adminClient.DeleteTopicsAsync(new[] {topicName});
+      }
+      catch (Exception e)
+      {
+        Console.WriteLine(e);
+      }
     }
   }
 }
