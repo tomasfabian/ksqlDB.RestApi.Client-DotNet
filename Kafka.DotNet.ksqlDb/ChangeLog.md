@@ -9,6 +9,11 @@ KSqlDbRestApiClient:
 - GetStreamsAsync - List the defined streams.
 - StreamsResponse, Stream, StatementResponseBase
 
+- GetTablesAsync - List the defined tables.
+- TablesResponse, Table, 
+
+- scalar collection functions: AsMap
+
 # v1.1.0
 - Pull queries Select extension method
 - Push queries [WithOffsetResetPolicy extension method](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB#withoffsetresetpolicy---push-queries-extension-method-v110)

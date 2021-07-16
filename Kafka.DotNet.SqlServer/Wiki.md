@@ -3,7 +3,7 @@
 ### Blazor Sample 
 Set docker-compose.csproj as startup project in Kafka.DotNet.InsideOut.sln.
 
-Initial run takes a few minutes until all containers are up and running.
+The initial run takes a few minutes until all containers are up and running.
 
 ### Nuget
 ```
@@ -173,6 +173,8 @@ async Task Main()
   }
 
   using (kafkaConsumer)
+  {
+  }
 }
 ```
 
