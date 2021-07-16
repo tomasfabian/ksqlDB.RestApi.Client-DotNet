@@ -1615,6 +1615,82 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
 
     #endregion
 
+    #region MapKeys
+
+    /// <summary>
+    /// Returns an array of all the keys from the specified map, or NULL if the input map is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">Map (dictionary) input.</param>
+    /// <returns>Returns an array that contains all of the keys from the specified map.</returns>
+    public static string[] MapKeys(this KSqlFunctions kSqlFunctions, IDictionary<string, string> input)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns an array of all the keys from the specified map, or NULL if the input map is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">Map (dictionary) input.</param>
+    /// <returns>Returns an array that contains all of the keys from the specified map.</returns>
+    public static string[] MapKeys(this KSqlFunctions kSqlFunctions, IDictionary<string, int> input)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns an array of all the keys from the specified map, or NULL if the input map is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">Map (dictionary) input.</param>
+    /// <returns>Returns an array that contains all of the keys from the specified map.</returns>
+    public static string[] MapKeys(this KSqlFunctions kSqlFunctions, IDictionary<string, long> input)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns an array of all the keys from the specified map, or NULL if the input map is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">Map (dictionary) input.</param>
+    /// <returns>Returns an array that contains all of the keys from the specified map.</returns>
+    public static string[] MapKeys(this KSqlFunctions kSqlFunctions, IDictionary<string, decimal> input)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns an array of all the keys from the specified map, or NULL if the input map is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">Map (dictionary) input.</param>
+    /// <returns>Returns an array that contains all of the keys from the specified map.</returns>
+    public static string[] MapKeys(this KSqlFunctions kSqlFunctions, IDictionary<string, short> input)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns an array of all the keys from the specified map, or NULL if the input map is NULL.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">Map (dictionary) input.</param>
+    /// <returns>Returns an array that contains all of the keys from the specified map.</returns>
+    public static string[] MapKeys(this KSqlFunctions kSqlFunctions, IDictionary<string, double> input)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    #endregion
+
+    #region MAP_VALUES
+
+    
+
+    #endregion
+
     #endregion
 
     #region String functions
