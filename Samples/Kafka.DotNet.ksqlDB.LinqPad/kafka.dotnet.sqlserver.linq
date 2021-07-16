@@ -1,4 +1,5 @@
 <Query Kind="Program">
+  <NuGetReference>Kafka.DotNet.InsideOut</NuGetReference>
   <NuGetReference Prerelease="true">Kafka.DotNet.ksqlDB</NuGetReference>
   <NuGetReference Prerelease="true">Kafka.DotNet.SqlServer</NuGetReference>
   <NuGetReference>System.Data.SqlClient</NuGetReference>
@@ -16,6 +17,8 @@
   <Namespace>System.Net.Http</Namespace>
   <Namespace>System.Text.Json</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
+  <Namespace>Kafka.DotNet.InsideOut.Consumer</Namespace>
+  <Namespace>Confluent.Kafka</Namespace>
   <RuntimeVersion>5.0</RuntimeVersion>
 </Query>
 
@@ -31,13 +34,15 @@ async Task Main()
 	await EnableCdcAsync(tableName);
 
 	await CreateConnectorAsync();
-
+  
+	//await ConsumeFromTopicAsync(); // Consuming CDC events directly from a Kafka topic
+	
 	await using var context = new KSqlDBContext(KsqlDbUrl);
 
 	var semaphoreSlim = new SemaphoreSlim(0, 1);
 	
-	var cdcSubscription = context.CreateQuery<RawDatabaseChangeObject<IoTSensor>>("sqlserversensors")
-		.WithOffsetResetPolicy(AutoOffsetReset.Latest)
+	var cdcSubscription = context.CreateQuery<DatabaseChangeObject<IoTSensor>>("sqlserversensors")
+		.WithOffsetResetPolicy(Kafka.DotNet.ksqlDB.KSql.Query.Options.AutoOffsetReset.Latest)
 		.Take(5)
 		.ToObservable()
 		.Subscribe(cdc =>
@@ -77,6 +82,37 @@ async Task Main()
 	}
 }
 
+async Task ConsumeFromTopicAsync()
+{
+	string bootstrapServers = "localhost:29092";
+
+	var consumerConfig = new ConsumerConfig
+	{
+		BootstrapServers = bootstrapServers,
+		GroupId = "Client-01",
+		AutoOffsetReset = Confluent.Kafka.AutoOffsetReset.Earliest
+	};
+
+	var kafkaConsumer =
+		new KafkaConsumer<string, DatabaseChangeObject<IoTSensor>>("sqlserver2019.dbo.Sensors", consumerConfig);
+
+	var dataChanges = kafkaConsumer.ConnectToTopic().ToAsyncEnumerable().Where(c => c.Message.Value.OperationType != ChangeDataCaptureType.Read).Take(2);
+	
+	await foreach (var consumeResult in dataChanges)
+	{
+		var message = consumeResult.Message;
+		var changeNotification = message.Value; 
+
+		Console.WriteLine(changeNotification.OperationType);
+		Console.WriteLine(changeNotification.Before);
+		Console.WriteLine(changeNotification.After);
+	}
+
+	using (kafkaConsumer)
+	{		
+	}
+}
+
 string tableName = "Sensors";
 string schemaName = "dbo";
 
@@ -99,7 +135,7 @@ private async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationTok
 {
 	await using var context = new KSqlDBContext(KsqlDbUrl);
 
-	string fromName = "sqlserversensors";
+	string fromName = "sqlserversensorsv2";
 	string kafkaTopic = "sqlserver2019.dbo.Sensors";
 
 	var httpClientFactory = new HttpClientFactory(new Uri(KsqlDbUrl));
