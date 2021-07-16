@@ -78,6 +78,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
           case nameof(KSqlFunctionsExtensions.ArraySort):
           case nameof(KSqlFunctionsExtensions.ArrayUnion):
           case nameof(KSqlFunctionsExtensions.AsMap):
+          case nameof(KSqlFunctionsExtensions.JsonArrayContains):
             Append($"{methodInfo.Name.ToKSqlFunctionName()}");
             PrintFunctionArguments(methodCallExpression.Arguments.Skip(1));
             break;

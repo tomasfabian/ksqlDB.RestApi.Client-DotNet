@@ -1577,7 +1577,41 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
 
     #region JSON_ARRAY_CONTAINS
 
-    
+    /// <summary>
+    /// Given a STRING containing a JSON array, checks if a search value is contained in the array.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="jsonArray"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool JsonArrayContains(this KSqlFunctions kSqlFunctions, string jsonArray, string value)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Given a STRING containing a JSON array, checks if a search value is contained in the array.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="jsonArray"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool JsonArrayContains(this KSqlFunctions kSqlFunctions, string jsonArray, int value)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Given a STRING containing a JSON array, checks if a search value is contained in the array.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="jsonArray"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool JsonArrayContains(this KSqlFunctions kSqlFunctions, string jsonArray, long value)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
 
     #endregion
 
