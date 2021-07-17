@@ -1,4 +1,4 @@
-This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/)
+This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/)
 It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the Rest API.
 
 ```
@@ -102,10 +102,11 @@ run in command line:
 Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with Kafka.DotNet.SqlServer package together with the Debezium connector streaming platform. 
 ### Nuget
 ```
-Install-Package Kafka.DotNet.SqlServer -Version 0.1.0
+Install-Package Kafka.DotNet.SqlServer -Version 0.2.0-rc.2
 ```
 
-Full example is available in [Blazor example](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Blazor.Sample) - Kafka.DotNet.InsideOut.sln:
+[Kafka.DotNet.SqlServer WIKI](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
+Full example is available in [Blazor example](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Blazor.Sample) - Kafka.DotNet.InsideOut.sln: (The initial run takes a few minutes until all containers are up and running.)
 ```C#
 using System;
 using System.Threading;
@@ -1875,7 +1876,7 @@ SELECT * FROM Tweet EMIT CHANGES;
 
 # v1.1.0:
 ```
-Install-Package Kafka.DotNet.ksqlDB -Version 1.1.0-rc.1
+Install-Package Kafka.DotNet.ksqlDB -Version 1.1.0
 ```
 
 ### CAST - ToString (v1.1.0)
@@ -1923,6 +1924,11 @@ var subscription = context.CreateQueryStream<Movie>()
   {
     Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
   }, e => { Console.WriteLine($"Exception: {e.Message}"); });   
+```
+
+# v1.2.0:
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 1.2.0-rc.1
 ```
 
 ### Connectors (v1.2.0)
@@ -1981,6 +1987,15 @@ var streamResponses = await restApiClient.GetStreamsAsync();
 Console.WriteLine(string.Join(',', streamResponses[0].Streams.Select(c => c.Name)));
 ```
 
+### Get tables (v1.2.0)
+- IKSqlDbRestApiClient.GetTablesAsync - List the defined tables.
+
+```C#
+var tableResponses = await restApiClient.GetTablesAsync();
+
+Console.WriteLine(string.Join(',', tableResponses[0].Tables.Select(c => c.Name)));
+```
+
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
 
@@ -2010,3 +2025,5 @@ https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
 - [System.Text.Json](https://www.nuget.org/packages/System.Text.Json/)
 
 - [ksql](https://github.com/confluentinc/ksql)
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/tomasfabian)
