@@ -9,98 +9,104 @@
 
 @if (items == null)
 {
-  <p><em>Loading...</em></p>
+    <p><em>Loading...</em></p>
 }
 else
 {
-  <EditForm Model="@Model">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    <EditForm Model="@Model">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <br />
+
+        <div class="form-group">
+            <label for="sensorValue">Sensor Value:</label>
+            <input type="number" class="form-control" id="sensorValue" placeholder="New value..." @bind="@Model.Value">
+        </div>
+
+        <br />
+        <button class="btn btn-info" @onclick="@(async () => await SaveAsync())">Save</button>
+    </EditForm>
+
     <br />
 
-    <div class="form-group">
-      <label for="sensorValue">Sensor Value:</label>
-      <input type="text" class="form-control" id="sensorValue" placeholder="New value..." @bind="@Model.Value">
-    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <b>Change data capture notifications:</b>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Operation</th>
+                            <th>Value Before</th>
+                            <th>Value After</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in items)
+                        {
+                            <tr>
+                                <td>@TranslateOperation(item.Op)</td>
+                                <td>@item.Before</td>
+                                <td>@item.After</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
 
-    <br />
-    <button class="btn btn-info" @onclick="@(async () => await SaveAsync())">Save</button>
-  </EditForm>
-
-  <br />
-
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col">
-        <b>Change data capture notifications:</b>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Operation</th>
-              <th>Value Before</th>
-              <th>Value After</th>
-            </tr>
-          </thead>
-          <tbody>
-            @foreach (var item in items)
-            {
-              <tr>
-                <td>@TranslateOperation(item.Op)</td>
-                <td>@item.Before</td>
-                <td>@item.After</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-        <div class="col">
-            @if (IsLoading)
-            {
-                <span>Loading...</span>
-            }
-            else
-            {
-                <b>Sensors (@TotalCount):</b>
-            }
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Sensor Id</th>
-                    <th>Value</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach (var sensor in sensors)
+            <div class="col">
+                @if (IsLoading)
                 {
-                    <tr>
-                        <td>@sensor.SensorId</td>
-                        <td>@sensor.Value</td>
-                        <td>
-                            <a class="btn btn-danger" @onclick="@(async () => await DeleteAsync(sensor))">
-                                <span class="oi oi-trash" title="delete" aria-hidden="true" style="color: #fff"></span>
-                            </a>
-                        </td>
-                    </tr>
+                    <span>Loading...</span>
                 }
-                </tbody>
-            </table>
+                else
+                {
+                    <b>Sensors (@TotalCount):</b>
+                }
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Sensor Id</th>
+                            <th>Value</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var sensor in sensors)
+                        {
+                            <tr>
+                                <td>@sensor.SensorId</td>
+                                <td>@sensor.Value</td>
+                                <td>
+                                    <button class="btn btn-info" @onclick="@(async () => await UpdateAsync(sensor))">
+                                        <i class="oi oi-pencil"></i>
+                                    </button>
+                                </td>
+                                <td>
+                                    <a class="btn btn-danger" @onclick="@(async () => await DeleteAsync(sensor))">
+                                        <span class="oi oi-trash" title="delete" aria-hidden="true" style="color: #fff"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-  </div>
 
 }
 
 @code {
-  private FixedSizedQueue<RawDatabaseChangeObject> items;
-  private IList<IoTSensor> sensors;
+    private FixedSizedQueue<RawDatabaseChangeObject> items;
+    private IList<IoTSensor> sensors;
 
-  protected override void OnInitialized()
-  {
-    items = new FixedSizedQueue<RawDatabaseChangeObject>();
+    protected override void OnInitialized()
+    {
+        items = new FixedSizedQueue<RawDatabaseChangeObject>();
 
-    sensors = new List<IoTSensor>();
-  }
+        sensors = new List<IoTSensor>();
+    }
 
 }

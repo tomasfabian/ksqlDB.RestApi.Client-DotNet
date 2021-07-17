@@ -12,11 +12,11 @@ using Kafka.DotNet.InsideOut.Consumer;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.SqlServer.Cdc;
 using Kafka.DotNet.SqlServer.Cdc.Connectors;
-using Kafka.DotNet.SqlServer.Cdc.Extensions;
 using Kafka.DotNet.SqlServer.Connect;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
@@ -55,6 +55,9 @@ namespace Blazor.Sample.Pages.SqlServerCDC
       await CreateConnectorAsync(tableName);
       //!!! disclaimer
 
+      var connectorsResponse = await KsqlDbConnect.GetConnectorsAsync();
+      var connectors = await connectorsResponse.ToConnectorsResponseAsync();
+
       var synchronizationContext = SynchronizationContext.Current;
 
       await SubscribeToQuery(synchronizationContext);
@@ -87,7 +90,9 @@ namespace Blazor.Sample.Pages.SqlServerCDC
       try
       {
         await CdcProvider.CdcEnableDbAsync();
-        await CdcProvider.CdcEnableTableAsync(tableName);
+
+        if(!await CdcProvider.IsCdcTableEnabledAsync(tableName))
+          await CdcProvider.CdcEnableTableAsync(tableName);
       }
       catch (Exception e)
       {
@@ -291,6 +296,21 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
       
       SetNewModel();
     }
+    
+    private async Task UpdateAsync(IoTSensor sensor)
+    {
+      if(sensor == null)
+        return;
+
+      var dbContext = DbContextFactory.CreateDbContext();
+
+      var updatedSensor = sensor with {Value = new Random().Next(1, 100)};
+
+      dbContext.Sensors.Update(updatedSensor);
+
+      await dbContext.SaveChangesAsync();
+    }
+
     private async Task DeleteAsync(IoTSensor sensor)
     {
       var dbContext = DbContextFactory.CreateDbContext();
