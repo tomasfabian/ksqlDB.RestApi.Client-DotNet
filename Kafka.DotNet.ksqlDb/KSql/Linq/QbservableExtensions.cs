@@ -27,9 +27,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
     /// </summary>
     /// <typeparam name="TSource">The type of the elements of source.</typeparam>
     /// <typeparam name="TResult">The type of the value returned by selector.</typeparam>
-    /// <param name="source"></param>
+    /// <param name="source">The sequence to take elements from.</param>
     /// <param name="selector">A transform function to apply to each source element.</param>
-    /// <returns></returns>
+    /// <returns>An continuous sequence whose elements are the result of invoking the transform function on each element of source.</returns>
     public static IQbservable<TResult> Select<TSource, TResult>(this IQbservable<TSource> source, Expression<Func<TSource, TResult>> selector)
     {
       if (source == null)
@@ -59,10 +59,10 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
     /// <summary>
     /// Determines what to do when there is no initial offset in Apache Kafka® or if the current offset doesn't exist on the server. The default value in ksqlDB is latest, which means all Kafka topics are read from the latest available offset.
     /// </summary>
-    /// <typeparam name="TSource"></typeparam>
-    /// <param name="source"></param>
+    /// <typeparam name="TSource">The type of the elements of source.</typeparam>
+    /// <param name="source">The sequence to take elements from.</param>
     /// <param name="autoOffsetReset">Earliest or the latest offset.</param>
-    /// <returns></returns>
+    /// <returns>The original sequence.</returns>
     public static IQbservable<TSource> WithOffsetResetPolicy<TSource>(this IQbservable<TSource> source, AutoOffsetReset autoOffsetReset)
     {
       return source.Provider.CreateQuery<TSource>(
@@ -83,6 +83,13 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
       (whereTSource ??= new Func<IQbservable<object>, Expression<Func<object, bool>>, IQbservable<object>>(Where).GetMethodInfo().GetGenericMethodDefinition())
       .MakeGenericMethod(TSource);
 
+    /// <summary>
+    /// Filters records that fulfill a specified condition.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the source sequence.</typeparam>
+    /// <param name="source">An observable sequence whose elements to filter.</param>
+    /// <param name="predicate">A function to test each source element for a condition.</param>
+    /// <returns>An observable sequence that contains elements from the input sequence that satisfy the condition.</returns>
     public static IQbservable<TSource> Where<TSource>(this IQbservable<TSource> source, Expression<Func<TSource, bool>> predicate)
     {
       if (source == null)
@@ -109,6 +116,13 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
       (takeTSource ??= new Func<IQbservable<object>, int, IQbservable<object>>(Take).GetMethodInfo().GetGenericMethodDefinition())
       .MakeGenericMethod(TSource);
 
+    /// <summary>
+    /// Returns a specified number of contiguous elements from the start of an observable sequence.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the source sequence.</typeparam>
+    /// <param name="source">The sequence to take elements from.</param>
+    /// <param name="count">The number of elements to return.</param>
+    /// <returns>An observable sequence that contains the specified number of elements from the start of the input sequence.</returns>
     public static IQbservable<TSource> Take<TSource>(this IQbservable<TSource> source, int count)
     {
       return source.Provider.CreateQuery<TSource>(
@@ -123,6 +137,12 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
 
     #region ToQueryString
 
+    /// <summary>
+    /// Generates a string representation of the query used.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the source sequence.</typeparam>
+    /// <param name="source">The sequence to take elements from.</param>
+    /// <returns>String representation of the push query.</returns>
     public static string ToQueryString<TSource>(this IQbservable<TSource> source)
     {
       if (source == null) throw new ArgumentNullException(nameof(source));
@@ -256,6 +276,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
       (groupByTSourceTKey ??= new Func<IQbservable<object>, Expression<Func<object, object>>, IQbservable<IKSqlGrouping<object, object>>>(GroupBy).GetMethodInfo().GetGenericMethodDefinition())
       .MakeGenericMethod(TSource, TKey);
 
+    /// <summary>
+    /// Group records in a window. Required by the WINDOW clause. Windowing queries must group by the keys that are selected in the query.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the source sequence.</typeparam>
+    /// <typeparam name="TKey">The type of the grouping key computed for each element in the source sequence.</typeparam>
+    /// <param name="source">An observable sequence whose elements to group.</param>
+    /// <param name="keySelector">A function to extract the key for each element.</param>
+    /// <returns>Grouped elements of an observable sequence according to a specified key selector function.</returns>
     public static IQbservable<IKSqlGrouping<TKey, TSource>> GroupBy<TSource, TKey>(this IQbservable<TSource> source, Expression<Func<TSource, TKey>> keySelector)
     {
       if (source == null) throw new ArgumentNullException(nameof(source));
@@ -278,7 +306,15 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
     private static MethodInfo HavingTSource(Type TSource, Type TKey) =>
       (havingTSource ??= new Func<IQbservable<IKSqlGrouping<object, object>>, Expression<Func<IKSqlGrouping<object, object>, bool>>, IQbservable<IKSqlGrouping<object, object>>>(Having).GetMethodInfo().GetGenericMethodDefinition())
       .MakeGenericMethod(TSource, TKey);
-
+    
+    /// <summary>
+    /// Extract records from an aggregation that fulfill a specified condition.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the source sequence.</typeparam>
+    /// <typeparam name="TKey">The type of the grouping key computed for each element in the source sequence.</typeparam>
+    /// <param name="source">An observable sequence whose elements to group.</param>
+    /// <param name="predicate">A function to extract the key for each element.</param>
+    /// <returns>Extracted elements of an aggregation that satisfy the condition.</returns>
     public static IQbservable<IKSqlGrouping<TKey, TSource>> Having<TSource, TKey>(this IQbservable<IKSqlGrouping<TKey, TSource>> source, Expression<Func<IKSqlGrouping<TKey, TSource>, bool>> predicate)
     {
       if (source == null)
@@ -305,6 +341,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
       (windowedByTSourceTKey ??= new Func<IQbservable<IKSqlGrouping<object, object>>, TimeWindows, IQbservable<IWindowedKSql<object, object>>>(WindowedBy).GetMethodInfo().GetGenericMethodDefinition())
       .MakeGenericMethod(TSource, TKey);
 
+    /// <summary>
+    /// Group input records that have the same key into a window, for operations like aggregations and joins.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the source sequence.</typeparam>
+    /// <typeparam name="TKey">The type of the grouping key computed for each element in the source sequence.</typeparam>
+    /// <param name="source">An observable sequence whose elements to group.</param>
+    /// <param name="timeWindows">Type of window TUMBLING, HOPPING, etc and its durations.</param>
+    /// <returns>Grouped elements of an aggregation or join that satisfy the condition.</returns>
     public static IQbservable<IWindowedKSql<TKey, TSource>> WindowedBy<TSource, TKey>(this IQbservable<IKSqlGrouping<TKey, TSource>> source, TimeWindows timeWindows)
     {
       if (source == null) throw new ArgumentNullException(nameof(source));
@@ -326,6 +370,19 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
       (joinTOuterTInnerTKeyTResult ??= new Func<IQbservable<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, IQbservable<object>>(Join).GetMethodInfo().GetGenericMethodDefinition())
       .MakeGenericMethod(TOuter, TInner, TKey, TResult);
 
+    /// <summary>
+    /// Select records in a stream or table that have matching values in another stream or table. (INNER JOIN)
+    /// </summary>
+    /// <typeparam name="TOuter"></typeparam>
+    /// <typeparam name="TInner"></typeparam>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="outer"></param>
+    /// <param name="inner"></param>
+    /// <param name="outerKeySelector"></param>
+    /// <param name="innerKeySelector"></param>
+    /// <param name="resultSelector"></param>
+    /// <returns></returns>
     public static IQbservable<TResult> Join<TOuter, TInner, TKey, TResult>(this IQbservable<TOuter> outer, ISource<TInner> inner, Expression<Func<TOuter, TKey>> outerKeySelector, Expression<Func<TInner, TKey>> innerKeySelector, Expression<Func<TOuter, TInner, TResult>> resultSelector)
     {
       if (outer == null) throw new ArgumentNullException(nameof(outer));
@@ -350,6 +407,19 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
       (leftJoinTOuterTInnerTKeyTResult ??= new Func<IQbservable<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, IQbservable<object>>(LeftJoin).GetMethodInfo().GetGenericMethodDefinition())
       .MakeGenericMethod(TOuter, TInner, TKey, TResult);
 
+    /// <summary>
+    /// Select all records from the left stream/table and the matched records from the right stream/table.
+    /// </summary>
+    /// <typeparam name="TOuter"></typeparam>
+    /// <typeparam name="TInner"></typeparam>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="outer"></param>
+    /// <param name="inner"></param>
+    /// <param name="outerKeySelector"></param>
+    /// <param name="innerKeySelector"></param>
+    /// <param name="resultSelector"></param>
+    /// <returns></returns>
     public static IQbservable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(this IQbservable<TOuter> outer, ISource<TInner> inner, Expression<Func<TOuter, TKey>> outerKeySelector, Expression<Func<TInner, TKey>> innerKeySelector, Expression<Func<TOuter, TInner, TResult>> resultSelector)
     {
       if (outer == null) throw new ArgumentNullException(nameof(outer));
@@ -374,6 +444,19 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
       (fullOuterJoinTOuterTInnerTKeyTResult ??= new Func<IQbservable<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, IQbservable<object>>(FullOuterJoin).GetMethodInfo()?.GetGenericMethodDefinition())
       .MakeGenericMethod(TOuter, TInner, TKey, TResult);
 
+    /// <summary>
+    /// Select all records when there is a match in the left stream/table or the right stream/table records.
+    /// </summary>
+    /// <typeparam name="TOuter"></typeparam>
+    /// <typeparam name="TInner"></typeparam>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="outer"></param>
+    /// <param name="inner"></param>
+    /// <param name="outerKeySelector"></param>
+    /// <param name="innerKeySelector"></param>
+    /// <param name="resultSelector"></param>
+    /// <returns></returns>
     public static IQbservable<TResult> FullOuterJoin<TOuter, TInner, TKey, TResult>(this IQbservable<TOuter> outer, ISource<TInner> inner, Expression<Func<TOuter, TKey>> outerKeySelector, Expression<Func<TInner, TKey>> innerKeySelector, Expression<Func<TOuter, TInner, TResult>> resultSelector)
     {
       if (outer == null) throw new ArgumentNullException(nameof(outer));
