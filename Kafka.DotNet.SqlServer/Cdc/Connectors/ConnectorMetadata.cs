@@ -4,6 +4,8 @@ namespace Kafka.DotNet.SqlServer.Cdc.Connectors
 {
   public record ConnectorMetadata
   {
+    public ConnectorType ConnectorType { get; set; } = ConnectorType.Source;
+
     private const string NamePropertyName = "name";
     private const string ConnectorClassName = "connector.class";
     private const string KeyConverterPropertyName = "key.converter";
@@ -48,7 +50,7 @@ namespace Kafka.DotNet.SqlServer.Cdc.Connectors
 
       return this;
     }
-
+    
     internal Dictionary<string, string> Properties { get; } = new();
 
     public string this[string key]
