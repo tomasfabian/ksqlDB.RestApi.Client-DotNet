@@ -19,6 +19,9 @@ namespace Kafka.DotNet.SqlServer.Cdc
     {
       get
       {
+        if (string.IsNullOrEmpty(Before))
+          return default;
+
         var entity = DeserializeValue(Before);
 
         return entity;
@@ -29,6 +32,9 @@ namespace Kafka.DotNet.SqlServer.Cdc
     {
       get
       {
+        if (string.IsNullOrEmpty(After))
+          return default;
+
         var entity = DeserializeValue(After);
 
         return entity;
