@@ -20,9 +20,34 @@ namespace Kafka.DotNet.SqlServer.Connect
       this.ksqlDbUrl = ksqlDbUrl ?? throw new ArgumentNullException(nameof(ksqlDbUrl));
     }
 
+    /// <summary>
+    /// Create a new connector in the Kafka Connect cluster with the configuration passed in the connectorMetadata parameter.
+    /// </summary>
+    /// <param name="connectorName">Name of the connector.</param>
+    /// <param name="connectorMetadata">Configuration passed in the WITH clause.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async Task<HttpResponseMessage> CreateConnectorAsync(string connectorName, SqlServerConnectorMetadata connectorMetadata, CancellationToken cancellationToken = default)
     {
-      var createConnector = connectorMetadata.ToStatement(connectorName);
+      var createConnector = connectorMetadata.ToCreateConnectorStatement(connectorName);
+
+      KSqlDbStatement ksqlDbStatement = new(createConnector);
+
+      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
+
+      return httpResponseMessage;
+    }
+
+    /// <summary>
+    /// Create a new connector in the Kafka Connect cluster with the configuration passed in the connectorMetadata parameter. The statement does not fail if a connector with the supplied name already exists.
+    /// </summary>
+    /// <param name="connectorName">Name of the connector.</param>
+    /// <param name="connectorMetadata">Configuration passed in the WITH clause.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task<HttpResponseMessage> CreateConnectorIfNotExistsAsync(string connectorName, SqlServerConnectorMetadata connectorMetadata, CancellationToken cancellationToken = default)
+    {
+      var createConnector = connectorMetadata.ToCreateConnectorStatement(connectorName, ifNotExists: true);
 
       KSqlDbStatement ksqlDbStatement = new(createConnector);
 
