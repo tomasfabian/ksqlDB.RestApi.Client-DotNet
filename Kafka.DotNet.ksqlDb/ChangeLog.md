@@ -12,7 +12,7 @@ KSqlDbRestApiClient:
 - GetTablesAsync - List the defined tables.
 - TablesResponse, Table, 
 
-- scalar collection functions: AsMap
+- scalar collection functions: AsMap, JsonArrayContains, MapKeys
 
 # v1.1.0
 - Pull queries Select extension method

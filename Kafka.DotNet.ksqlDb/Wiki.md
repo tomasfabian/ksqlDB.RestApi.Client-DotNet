@@ -2025,3 +2025,5 @@ https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
 - [System.Text.Json](https://www.nuget.org/packages/System.Text.Json/)
 
 - [ksql](https://github.com/confluentinc/ksql)
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/tomasfabian)
