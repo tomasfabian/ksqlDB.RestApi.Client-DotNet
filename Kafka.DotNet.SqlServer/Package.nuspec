@@ -3,18 +3,21 @@
 	<metadata>
 		<id>Kafka.DotNet.SqlServer</id>
 		<title>Kafka.DotNet.SqlServer</title>
-		<version>0.2.0-rc.2</version>
+		<version>0.2.0</version>
 		<authors>Tomas Fabian</authors>
 		<owners>@tomasfabian</owners>
 		<license type="expression">Apache-2.0</license>
 		<projectUrl>https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer</projectUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
-		<description>Kafka.DotNet.SqlServer is a client API for consuming row-level table changes (CDC - Change Data Capture) from a Sql Server database with the Debezium connector streaming platform. See https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
-    Targets .NET 5, .NET Core 3.1 and .NET Standard 2.0.
-    Documentation for the library can be found at https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md.</description>
+		<description>Kafka.DotNet.SqlServer is a C# / .NET client API for consuming row-level table changes (CDC - Change Data Capture) from a SQL Server database with the Debezium connector streaming platform.
+With Kafka Connect and Debezium connectors you can stream data to and from Kafka and use it as your integral component of the ETL pipeline or create materialized views (caches) where it is needed, precompute the results of a query and store them for fast read access. See also https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
+      
+Targets .NET 5, .NET Core 3.1 and .NET Standard 2.0.
+    
+Documentation for the library can be found at https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md.</description>
 		<releaseNotes>https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/ChangeLog.md</releaseNotes>
 		<copyright>Copyright 2021</copyright>
-		<tags>kafka SqlServer .NET push</tags>
+		<tags>Kafka Connect Monitoring SqlServer C# .NET push notifications</tags>
 
 		<dependencies>
 			<group targetFramework=".NETCoreApp3.1">

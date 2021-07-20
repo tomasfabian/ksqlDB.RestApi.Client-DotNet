@@ -1,9 +1,12 @@
 ﻿Kafka.DotNet.SqlServer is a client API for consuming row-level table changes (CDC - [Change Data Capture](https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/about-change-data-capture-sql-server?view=sql-server-ver15)) from a Sql Server databases with the Debezium connector streaming platform.
 
 ### Blazor Sample 
-Set docker-compose.csproj as startup project in Kafka.DotNet.InsideOut.sln.
+Set docker-compose.csproj as startup project in Kafka.DotNet.InsideOut.sln for an embedded Kafka connect integration.
 
 The initial run takes a few minutes until all containers are up and running.
+
+### External Kafka Connect (WIP)
+Set docker-compose.csproj as startup project in Samples\Kafka.Connect\Connect.SqlServer.sln for an external Kafka connect integration.
 
 ### Nuget
 ```
@@ -386,6 +389,25 @@ context.CreateQuery<RawDatabaseChangeObject<IoTSensor>>("sqlserversensors")
   }));
 ```
 
+### KsqlDbConnect (v.0.2.0)
+CreateConnectorIfNotExistsAsync - Create a new connector in the Kafka Connect cluster with the configuration passed in the connectorMetadata parameter. The statement does not fail if a connector with the supplied name already exists.
+
+```C#
+private static async Task CreateConnectorAsync()
+{
+  var ksqlDbConnect = new KsqlDbConnect(new Uri(KsqlDbUrl));
+
+  SqlServerConnectorMetadata connectorMetadata = CreateConnectorMetadata();
+
+  connector.connectorMetadata = ConnectorType.Sink;
+
+  await ksqlDbConnect.CreateConnectorIfNotExistsAsync(connectorName: "MSSQL_SENSORS_SINK_CONNECTOR", connectorMetadata);
+}
+
+```KSQL
+CREATE SINK CONNECTOR IF NOT EXISTS MSSQL_SENSORS_SINK_CONNECTOR ...
+```
+
 ### ksqlDB connector info
 ```KSQL
 SHOW CONNECTORS;
@@ -417,3 +439,5 @@ DROP STREAM sqlserversensors DELETE TOPIC;
 
 # Acknowledgements:
 - [Microsoft.Data.SqlClient](https://www.nuget.org/packages/Microsoft.Data.SqlClient/)
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/tomasfabian)
