@@ -1465,10 +1465,10 @@ foreach (var response in responses)
 | Statement                  | Description  |
 |-------------------------------------------------------------------------------------------------------------------------|---|
 | [EXECUTE STATEMENTS](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) | CreateStatementAsync - execution of general-purpose string statements   |
-| [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/)                       |  CreateStreamStatement - Create a new materialized stream view, along with the corresponding Kafka topic, and stream the result of the query into the topic. |
-| [CREATE TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table/)                       | CreateOrReplaceStreamStatement - Create or replace a materialized stream view, along with the corresponding Kafka topic, and stream the result of the query into the topic. |
-| [CREATE STREAM AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream-as-select/) |  CreateTableStatement - Create a new ksqlDB materialized table view, along with the corresponding Kafka topic, and stream the result of the query as a changelog into the topic. |
-| [CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/)   |  CreateOrReplaceTableStatement - Create or replace a ksqlDB materialized table view, along with the corresponding Kafka topic, and stream the result of the query as a changelog into the topic.   |
+| [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/)                       |  CreateStreamAsync - Create a new stream with the specified columns and properties. |
+| [CREATE TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table/)                         |  CreateTableAsync - Create a new table with the specified columns and properties. |
+| [CREATE STREAM AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream-as-select/)   |  CreateOrReplaceStreamStatement - Create or replace a new materialized stream view, along with the corresponding Kafka topic, and stream the result of the query into the topic. |
+| [CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/)     |  CreateOrReplaceTableStatement - Create or replace a ksqlDB materialized table view, along with the corresponding Kafka topic, and stream the result of the query as a changelog into the topic.   |
 
 ```C#
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
