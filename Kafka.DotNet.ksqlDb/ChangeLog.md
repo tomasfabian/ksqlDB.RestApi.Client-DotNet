@@ -1,4 +1,4 @@
-﻿# v1.2.0-rc.1 (WIP)
+﻿# v1.2.0
 
 KSqlDbRestApiClient: 
 - GetConnectorsAsync - List all connectors in the Connect cluster.
