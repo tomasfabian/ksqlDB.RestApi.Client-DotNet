@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
 using Kafka.DotNet.ksqlDB.IntegrationTests.Models.Movies;
+using Kafka.DotNet.ksqlDB.IntegrationTests.Models.Sensors;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
@@ -75,7 +76,9 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;");
     {
       //Arrange
       var query = Context.CreateOrReplaceTableStatement(TableName)
-        .As<Movie>("Movies");
+        .As<IoTSensor>("IoTSensors")
+        .GroupBy(c => c.SensorId)
+        .Select(c => new { SensorId = c.Key, Count = c.Count() });
 
       //Act
       var httpResponseMessage = await query.ExecuteStatementAsync();
@@ -84,9 +87,8 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;");
       string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
       responseContent.Should().NotBeNull();
 
-      var response = httpResponseMessage.ToStatementResponses()[0];
-      response.CommandStatus.Status.Should().Be("SUCCESS");
+      var responses = await httpResponseMessage.ToStatementResponsesAsync();
+      responses[0].CommandStatus.Status.Should().Be("SUCCESS");
     }
-    //[{"@type":"currentStatus","statementText":"CREATE OR REPLACE TABLE INTEGRATIONTESTTABLE WITH (KAFKA_TOPIC='INTEGRATIONTESTTABLE', PARTITIONS=1, REPLICAS=1) AS SELECT *\nFROM MOVIES MOVIES\nEMIT CHANGES;","commandId":"table/`INTEGRATIONTESTTABLE`/create","commandStatus":{"status":"SUCCESS","message":"Created query with ID CTAS_INTEGRATIONTESTTABLE_2257","queryId":"CTAS_INTEGRATIONTESTTABLE_2257"},"commandSequenceNumber":2258,"warnings":[]}]
   }
 }
