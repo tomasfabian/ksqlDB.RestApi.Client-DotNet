@@ -97,6 +97,10 @@ namespace Kafka.DotNet.ksqlDB.Sample
         Console.WriteLine(e);
       }
 
+      //var tablesResponse = await restApiProvider.GetTablesAsync();
+      var streamsResponse = await restApiProvider.GetStreamsAsync();
+      var connectorsResponse = await restApiProvider.GetConnectorsAsync();
+
       Console.WriteLine("Press any key to stop the subscription");
 
       Console.ReadKey();
@@ -643,7 +647,8 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
 
     private static void WithOffsetResetPolicy(IKSqlDBContext context)
     {
-      var subscription = context.CreateQueryStream<Movie>().WithOffsetResetPolicy(AutoOffsetReset.Latest)
+      var subscription = context.CreateQueryStream<Movie>()
+        .WithOffsetResetPolicy(AutoOffsetReset.Latest)
         .Subscribe(movie =>
         {
           Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
