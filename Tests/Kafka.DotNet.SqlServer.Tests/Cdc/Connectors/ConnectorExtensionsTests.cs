@@ -15,19 +15,52 @@ namespace Kafka.DotNet.SqlServer.Tests.Cdc.Connectors
 
       return new SqlServerConnectorMetadata(connectionString);
     }
+    
+    string connectorName = "myConnector";
 
     [TestMethod]
-    public void ToStatement()
+    public void ToCreateSourceConnectorStatement()
     {
       //Arrange
       var connector = CreateConnector();
-      string connectorName = "myConnector";
 
       //Act
-      var statement = connector.ToStatement(connectorName);
+      var statement = connector.ToCreateConnectorStatement(connectorName);
 
       //Assert
-      statement.Should().Be(@$"CREATE SOURCE CONNECTOR {connectorName} WITH (
+      statement.Should().Be(ExpectedStatement("CREATE SOURCE CONNECTOR"));
+    }
+
+    [TestMethod]
+    public void ToCreateSourceConnectorStatement_IfNotExists()
+    {
+      //Arrange
+      var connector = CreateConnector();
+
+      //Act
+      var statement = connector.ToCreateConnectorStatement(connectorName, ifNotExists: true);
+
+      //Assert
+      statement.Should().Be(ExpectedStatement("CREATE SOURCE CONNECTOR IF NOT EXISTS"));
+    }
+
+    [TestMethod]
+    public void ToCreateSinkConnectorStatement()
+    {
+      //Arrange
+      var connector = CreateConnector();
+      connector.ConnectorType = ConnectorType.Sink;
+
+      //Act
+      var statement = connector.ToCreateConnectorStatement(connectorName);
+      
+      //Assert
+      statement.Should().Be(ExpectedStatement("CREATE SINK CONNECTOR"));
+    }
+
+    private string ExpectedStatement(string create)
+    {
+      return @$"{create} {connectorName} WITH (
 	'connector.class'= 'io.debezium.connector.sqlserver.SqlServerConnector', 
 	'database.port'= '1433', 
 	'database.hostname'= '127.0.0.1', 
@@ -35,7 +68,7 @@ namespace Kafka.DotNet.SqlServer.Tests.Cdc.Connectors
 	'database.password'= '<YourNewStrong@Passw0rd>', 
 	'database.dbname'= 'Sensors'
 );
-");
+";
     }
   }
 }
