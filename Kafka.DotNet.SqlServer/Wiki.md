@@ -408,6 +408,31 @@ private static async Task CreateConnectorAsync()
 CREATE SINK CONNECTOR IF NOT EXISTS MSSQL_SENSORS_SINK_CONNECTOR ...
 ```
 
+### ConnectRestApiClient CreateConnectorAsync (v.0.3.0)
+- REST API client for managing connectors. 
+```C#
+using System;
+using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.RestApi;
+using Kafka.DotNet.SqlServer.Cdc.Connectors;
+using Kafka.DotNet.SqlServer.Connect;
+
+static string ConnectUrl => @"http://localhost:8083";
+
+async Task Main()
+{
+  SqlServerConnectorMetadata connectorMetadata = CreateConnectorMetadata();
+
+  string connectorName = "MSSQL_CDC_CONNECTOR";
+	
+  var httpClientFactory = new HttpClientFactory(new Uri(ConnectUrl));
+	
+  var connectRestApiClient = new ConnectRestApiClient(httpClientFactory);
+	
+  var httpResponseMessage = await connectRestApiClient.CreateConnectorAsync(connectorMetadata, connectorName).Dump();
+}
+```
+
 ### ksqlDB connector info
 ```KSQL
 SHOW CONNECTORS;
