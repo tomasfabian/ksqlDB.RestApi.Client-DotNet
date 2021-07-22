@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
@@ -57,5 +58,25 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<StreamsResponse[]> GetStreamsAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Create a new source connector in the Kafka Connect cluster with the configuration passed in the config parameter.
+    /// </summary>
+    /// <param name="config"></param>
+    /// <param name="connectorName">Name of the connector to create.</param>
+    /// <param name="ifNotExists">If the IF NOT EXISTS clause is present, the statement does not fail if a connector with the supplied name already exists.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<HttpResponseMessage> CreateSourceConnectorAsync(IDictionary<string, string> config, string connectorName, bool ifNotExists = false, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
+    /// </summary>
+    /// <param name="config"></param>
+    /// <param name="connectorName">Name of the connector to create.</param>
+    /// <param name="ifNotExists">If the IF NOT EXISTS clause is present, the statement does not fail if a connector with the supplied name already exists.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<HttpResponseMessage> CreateSinkConnectorAsync(IDictionary<string, string> config, string connectorName, bool ifNotExists = false, CancellationToken cancellationToken = default);
   }
 }

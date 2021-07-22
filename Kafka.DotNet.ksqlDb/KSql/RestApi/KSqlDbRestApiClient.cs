@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -10,6 +11,7 @@ using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Streams;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Tables;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Connectors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
 
 namespace Kafka.DotNet.ksqlDB.KSql.RestApi
@@ -177,6 +179,52 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
         
       return await httpResponseMessage.ToConnectorsResponseAsync();
+    }
+
+    /// <summary>
+    /// Create a new source connector in the Kafka Connect cluster with the configuration passed in the config parameter.
+    /// </summary>
+    /// <param name="config">Configuration passed into the WITH clause.</param>
+    /// <param name="connectorName">Name of the connector to create.</param>
+    /// <param name="ifNotExists">If the IF NOT EXISTS clause is present, the statement does not fail if a connector with the supplied name already exists.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<HttpResponseMessage> CreateSourceConnectorAsync(IDictionary<string, string> config, string connectorName, bool ifNotExists = false, CancellationToken cancellationToken = default)
+    {
+      if (config == null) throw new ArgumentNullException(nameof(config));
+      
+      if (string.IsNullOrWhiteSpace(connectorName))
+        throw new ArgumentException(NullOrWhiteSpaceErrorMessage, nameof(connectorName));
+
+      string createConnectorStatement = config.ToCreateConnectorStatement(connectorName, ifNotExists);
+
+      KSqlDbStatement ksqlDbStatement = new(createConnectorStatement);
+
+      return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
+    }
+
+    private string NullOrWhiteSpaceErrorMessage => "Can't be null, empty, or contain only whitespace.";
+
+    /// <summary>
+    /// Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
+    /// </summary>
+    /// <param name="config">Configuration passed into the WITH clause.</param>
+    /// <param name="connectorName">Name of the connector to create.</param>
+    /// <param name="ifNotExists">If the IF NOT EXISTS clause is present, the statement does not fail if a connector with the supplied name already exists.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<HttpResponseMessage> CreateSinkConnectorAsync(IDictionary<string, string> config, string connectorName, bool ifNotExists = false, CancellationToken cancellationToken = default)
+    {
+      if (config == null) throw new ArgumentNullException(nameof(config));
+      
+      if (string.IsNullOrWhiteSpace(connectorName))
+        throw new ArgumentException(NullOrWhiteSpaceErrorMessage, nameof(connectorName));
+
+      string createConnectorStatement = config.ToCreateConnectorStatement(connectorName, ifNotExists, ConnectorType.Sink);
+
+      KSqlDbStatement ksqlDbStatement = new(createConnectorStatement);
+
+      return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
     }
 
     /// <summary>
