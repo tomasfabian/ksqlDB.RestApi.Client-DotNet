@@ -36,7 +36,7 @@ services:
       - "9000:9000"
 
   ksqldb-server:
-    image: confluentinc/ksqldb-server:0.15.0
+    image: confluentinc/ksqldb-server:${KSQLDB_VERSION}
     hostname: ksqldb-server
     container_name: ksqldb-server
     depends_on:
@@ -52,7 +52,7 @@ services:
 
 
   ksqldb-cli:
-    image: confluentinc/ksqldb-cli:0.15.0
+    image: confluentinc/ksqldb-cli:${KSQLDB_VERSION}
     depends_on:
       - broker01
       - ksqldb-server
