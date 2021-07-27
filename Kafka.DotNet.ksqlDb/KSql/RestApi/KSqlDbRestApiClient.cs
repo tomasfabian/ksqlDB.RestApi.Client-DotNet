@@ -10,6 +10,7 @@ using Kafka.DotNet.ksqlDB.KSql.RestApi.Generators;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Streams;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Tables;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Topics;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Connectors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
@@ -162,6 +163,84 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
       return streamsResponses;
     }
+
+    #region Topics
+    
+    //SHOW | LIST [ALL] TOPICS [EXTENDED];
+    
+    /// <summary>
+    /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns>List of topics.</returns>
+    public async Task<TopicsResponse[]> GetTopicsAsync(CancellationToken cancellationToken = default)
+    {
+      string showStatement = "SHOW TOPICS;";
+
+      KSqlDbStatement ksqlDbStatement = new(showStatement);
+
+      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
+
+      var responses = await httpResponseMessage.ToTopicsResponseAsync().ConfigureAwait(false);
+
+      return responses;
+    }
+	
+    /// <summary>
+    /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to, including hidden topics.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns>List of topics.</returns>
+    public async Task<TopicsResponse[]> GetAllTopicsAsync(CancellationToken cancellationToken = default)
+    {
+      string showStatement = "SHOW ALL TOPICS;";
+
+      KSqlDbStatement ksqlDbStatement = new(showStatement);
+
+      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
+    
+      var responses = await httpResponseMessage.ToTopicsResponseAsync().ConfigureAwait(false);
+
+      return responses;
+    }
+	
+    /// <summary>
+    /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns>List of topics. Also displays consumer groups and their active consumer counts.</returns>
+    public async Task<TopicsExtendedResponse[]> GetTopicsExtendedAsync(CancellationToken cancellationToken = default)
+    {
+      string showStatement = "SHOW TOPICS EXTENDED;";
+
+      KSqlDbStatement ksqlDbStatement = new(showStatement);
+
+      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
+
+      var responses = await httpResponseMessage.ToTopicsExtendedResponseAsync().ConfigureAwait(false);
+
+      return responses;
+    }
+
+    /// <summary>
+    /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to, including hidden topics.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns>List of topics. Also displays consumer groups and their active consumer counts.</returns>
+    public async Task<TopicsExtendedResponse[]> GetAllTopicsExtendedAsync(CancellationToken cancellationToken = default)
+    {
+      string showStatement = "SHOW ALL TOPICS EXTENDED;";
+
+      KSqlDbStatement ksqlDbStatement = new(showStatement);
+
+      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
+
+      var responses = await httpResponseMessage.ToTopicsExtendedResponseAsync().ConfigureAwait(false);
+
+      return responses;
+    }
+
+    #endregion
 
     #region Connectors
 
