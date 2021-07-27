@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Streams;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Tables;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Topics;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 
 namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions
@@ -42,6 +43,16 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions
     public static Task<TablesResponse[]> ToTablesResponseAsync(this HttpResponseMessage httpResponseMessage)
     {
       return httpResponseMessage.ToStatementResponsesAsync<TablesResponse>();
+    }
+
+    public static Task<TopicsResponse[]> ToTopicsResponseAsync(this HttpResponseMessage httpResponseMessage)
+    {
+      return httpResponseMessage.ToStatementResponsesAsync<TopicsResponse>();
+    }
+	
+    public static Task<TopicsExtendedResponse[]> ToTopicsExtendedResponseAsync(this HttpResponseMessage httpResponseMessage)
+    {
+      return httpResponseMessage.ToStatementResponsesAsync<TopicsExtendedResponse>();
     }
 
     public static Task<ConnectorsResponse[]> ToConnectorsResponseAsync(this HttpResponseMessage httpResponseMessage)
