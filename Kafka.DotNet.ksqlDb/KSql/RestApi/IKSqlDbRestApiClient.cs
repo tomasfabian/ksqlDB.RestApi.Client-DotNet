@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Streams;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Tables;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Topics;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
 
@@ -78,5 +79,33 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<HttpResponseMessage> CreateSinkConnectorAsync(IDictionary<string, string> config, string connectorName, bool ifNotExists = false, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns>List of topics.</returns>
+    Task<TopicsResponse[]> GetTopicsAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to, including hidden topics.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns>List of topics.</returns>
+    Task<TopicsResponse[]> GetAllTopicsAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns>List of topics. Also displays consumer groups and their active consumer counts.</returns>
+    Task<TopicsExtendedResponse[]> GetTopicsExtendedAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to, including hidden topics.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns>List of topics. Also displays consumer groups and their active consumer counts.</returns>
+    Task<TopicsExtendedResponse[]> GetAllTopicsExtendedAsync(CancellationToken cancellationToken = default);
   }
 }
