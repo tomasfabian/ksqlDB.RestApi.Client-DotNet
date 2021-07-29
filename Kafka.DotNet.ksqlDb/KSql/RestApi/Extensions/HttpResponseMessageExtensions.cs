@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Queries;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Streams;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Tables;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Topics;
@@ -72,11 +73,16 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions
       return statementResponses;
     }
 
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+    {
+      PropertyNameCaseInsensitive = true
+    };
+    
     private static async Task<TResponse> ToStatementResponseAsync<TResponse>(this HttpResponseMessage httpResponseMessage)
     {
       string responseContent = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
       
-      var responseObject = JsonSerializer.Deserialize<TResponse>(responseContent);
+      var responseObject = JsonSerializer.Deserialize<TResponse>(responseContent, JsonSerializerOptions);
 
       return responseObject;
     }
