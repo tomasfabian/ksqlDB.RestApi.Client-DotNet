@@ -175,7 +175,7 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
       var streamResponses = await restApiClient.GetStreamsAsync();
 
       //Assert
-      streamResponses[0].StatementText.Should().Be("SHOW STREAMS;"); //TODO: create test stream
+      streamResponses[0].StatementText.Should().Be(StatementTemplates.ShowStreams); //TODO: create test stream
     }
 
     [TestMethod]
@@ -189,7 +189,7 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
       //Assert
 
       Console.WriteLine(string.Join(',', tablesResponses[0].Tables.Select(c => c.Name)));
-      tablesResponses[0].StatementText.Should().Be("SHOW TABLES;"); //TODO: create test
+      tablesResponses[0].StatementText.Should().Be(StatementTemplates.ShowTables); //TODO: create test
     }
 
     [TestMethod]
@@ -201,9 +201,8 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
       var topicsResponses = await restApiClient.GetAllTopicsAsync();
 
       //Assert
-
       Console.WriteLine(string.Join(',', topicsResponses[0].Topics.Select(c => c.Name)));
-      topicsResponses[0].StatementText.Should().Be("SHOW TOPICS;"); //TODO: create test
+      topicsResponses[0].StatementText.Should().Be(StatementTemplates.ShowAllTopics); //TODO: create test
     }
 
     [TestMethod]
@@ -217,7 +216,7 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
       //Assert
 
       Console.WriteLine(string.Join(',', topicsResponses[0].Queries.Select(c => c.Id)));
-      topicsResponses[0].StatementText.Should().Be("SHOW QUERIES;"); //TODO: create test
+      topicsResponses[0].StatementText.Should().Be(StatementTemplates.ShowQueries); //TODO: create test
     }
 
     [TestMethod]

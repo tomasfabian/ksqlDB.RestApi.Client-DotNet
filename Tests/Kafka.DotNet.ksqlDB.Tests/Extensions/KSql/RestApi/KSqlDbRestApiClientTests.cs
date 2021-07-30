@@ -249,8 +249,38 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       string expectedStatement = StatementTemplates.TerminatePushQuery(queryId);
       (await responses.ToStatementResponsesAsync())[0].StatementText.Should().Be(expectedStatement);
     }
+    private string GetAllStreamsResponse => @"[{""@type"":""streams"",""statementText"":""SHOW STREAMS;"",""streams"":[{""type"":""STREAM"",""name"":""SENSORSSTREAM"",""topic"":""SENSORSSTREAM"",""keyFormat"":""KAFKA"",""valueFormat"":""JSON"",""isWindowed"":false},{""type"":""STREAM"",""name"":""MYMOVIESSTREAMTESTS"",""topic"":""MyMoviesStreamTest"",""keyFormat"":""JSON"",""valueFormat"":""JSON"",""isWindowed"":true}],""warnings"":[]}]";
 
-    //show streams
-    //show tables
+    [TestMethod]
+    public async Task GetStreamsAsync()
+    {
+      //Arrange
+      CreateHttpMocks(GetAllStreamsResponse);
+
+      //Act
+      var queriesResponses = await ClassUnderTest.GetStreamsAsync();
+
+      //Assert
+      queriesResponses[0].StatementText.Should().Be(StatementTemplates.ShowStreams);
+
+      queriesResponses[0].Streams.Length.Should().Be(2);
+    }
+
+    private string GetAllTablesResponse => @"[{""@type"":""tables"",""statementText"":""SHOW TABLES;"",""tables"":[{""type"":""TABLE"",""name"":""AVG_SENSOR_VALUES"",""topic"":""AVG_SENSOR_VALUES"",""keyFormat"":""KAFKA"",""valueFormat"":""JSON"",""isWindowed"":true},{""type"":""TABLE"",""name"":""MYMOVIESTABLES"",""topic"":""MyMoviesTable"",""keyFormat"":""JSON"",""valueFormat"":""JSON"",""isWindowed"":true}],""warnings"":[]}]";
+
+    [TestMethod]
+    public async Task GetTablesAsync()
+    {
+      //Arrange
+      CreateHttpMocks(GetAllTablesResponse);
+
+      //Act
+      var queriesResponses = await ClassUnderTest.GetTablesAsync();
+
+      //Assert
+      queriesResponses[0].StatementText.Should().Be(StatementTemplates.ShowTables);
+
+      queriesResponses[0].Tables.Length.Should().Be(2);
+    }
   }
 }
