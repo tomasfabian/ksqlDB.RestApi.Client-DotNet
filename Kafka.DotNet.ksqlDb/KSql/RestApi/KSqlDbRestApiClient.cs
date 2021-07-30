@@ -184,7 +184,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <returns></returns>
     public Task<StreamsResponse[]> GetStreamsAsync(CancellationToken cancellationToken = default)
     {
-      string showStatement = "SHOW STREAMS;";
+      string showStatement = StatementTemplates.ShowStreams;
 
       return ExecuteStatementAsync<StreamsResponse>(showStatement, cancellationToken);
     }
@@ -196,7 +196,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <returns></returns>
     public async Task<TablesResponse[]> GetTablesAsync(CancellationToken cancellationToken = default)
     {
-      string showStatement = "SHOW TABLES;";
+      string showStatement = StatementTemplates.ShowTables;
 
       KSqlDbStatement ksqlDbStatement = new(showStatement);
 
@@ -218,7 +218,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <returns>List of topics.</returns>
     public async Task<TopicsResponse[]> GetTopicsAsync(CancellationToken cancellationToken = default)
     {
-      string showStatement = "SHOW TOPICS;";
+      string showStatement = StatementTemplates.ShowTopics;
 
       KSqlDbStatement ksqlDbStatement = new(showStatement);
 
@@ -236,7 +236,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <returns>List of topics.</returns>
     public async Task<TopicsResponse[]> GetAllTopicsAsync(CancellationToken cancellationToken = default)
     {
-      string showStatement = "SHOW ALL TOPICS;";
+      string showStatement = StatementTemplates.ShowAllTopics;
 
       KSqlDbStatement ksqlDbStatement = new(showStatement);
 
@@ -254,7 +254,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <returns>List of topics. Also displays consumer groups and their active consumer counts.</returns>
     public async Task<TopicsExtendedResponse[]> GetTopicsExtendedAsync(CancellationToken cancellationToken = default)
     {
-      string showStatement = "SHOW TOPICS EXTENDED;";
+      string showStatement = StatementTemplates.ShowTopicsExtended;
 
       KSqlDbStatement ksqlDbStatement = new(showStatement);
 
@@ -272,7 +272,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <returns>List of topics. Also displays consumer groups and their active consumer counts.</returns>
     public async Task<TopicsExtendedResponse[]> GetAllTopicsExtendedAsync(CancellationToken cancellationToken = default)
     {
-      string showStatement = "SHOW ALL TOPICS EXTENDED;";
+      string showStatement = StatementTemplates.ShowAllTopicsExtended;
 
       KSqlDbStatement ksqlDbStatement = new(showStatement);
 
@@ -295,7 +295,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     public async Task<QueriesResponse[]> GetQueriesAsync(CancellationToken cancellationToken = default)
     {
       //SHOW | LIST QUERIES [EXTENDED];
-      string showStatement = "SHOW QUERIES;";
+      string showStatement = StatementTemplates.ShowQueries;
 
       KSqlDbStatement ksqlDbStatement = new(showStatement);
 
@@ -319,7 +319,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <returns></returns>
     public async Task<ConnectorsResponse[]> GetConnectorsAsync(CancellationToken cancellationToken = default)
     {
-      string showStatement = "SHOW CONNECTORS;";
+      string showStatement = StatementTemplates.ShowConnectors;
 
       KSqlDbStatement ksqlDbStatement = new(showStatement);
 
@@ -395,7 +395,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <returns></returns>
     public Task<HttpResponseMessage> DropConnectorAsync(string connectorName, CancellationToken cancellationToken = default)
     {
-      string dropStatement = $"DROP CONNECTOR {connectorName};";
+      string dropStatement = StatementTemplates.DropConnector(connectorName);
       
       KSqlDbStatement ksqlDbStatement = new(dropStatement);
 
@@ -412,7 +412,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <returns></returns>
     public async Task<HttpResponseMessage> TerminatePushQueryAsync(string queryId, CancellationToken cancellationToken = default)
     {
-      string terminateStatement = $"TERMINATE {queryId};";
+      string terminateStatement = StatementTemplates.TerminatePushQuery(queryId);
 
       KSqlDbStatement ksqlDbStatement = new(terminateStatement);
 
