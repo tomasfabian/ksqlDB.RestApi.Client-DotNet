@@ -6,6 +6,7 @@ using Moq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 
 namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
 {
@@ -177,6 +178,25 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       endpoint.Should().Be("/query");
     }
 
+    private string GetQueriesResponse => @"[{""@type"":""queries"",""statementText"":""SHOW QUERIES;"",""queries"":[{""queryString"":""select * from mymovies emit changes;"",""sinks"":[],""sinkKafkaTopics"":[],""id"":""_confluent-ksql-ksql-connect-clustertransient_6719152142362566835_1627490551142"",""statusCount"":{""RUNNING"":1},""queryType"":""PUSH"",""state"":""RUNNING""}],""warnings"":[]}]";
+
+    [TestMethod]
+    public async Task GetQueriesAsync()
+    {
+      //Arrange
+      CreateHttpMocks(GetQueriesResponse);
+
+      //Act
+      var queriesResponses = await ClassUnderTest.GetQueriesAsync();
+
+      //Assert
+      queriesResponses[0].StatementText.Should().Be(StatementTemplates.ShowQueries);
+
+      queriesResponses[0].Type.Should().Be("queries");
+      queriesResponses[0].Queries.Length.Should().Be(1);
+      queriesResponses[0].Queries[0].QueryType.Should().Be("PUSH");
+    }
+
     private string GetTopicsResponse => @"[{""@type"":""kafka_topics"",""statementText"":""SHOW TOPICS;"",""topics"":[{""name"":""AVG_SENSOR_VALUES"",""replicaInfo"":[1,1]},{""name"":""sensor_values"",""replicaInfo"":[1,1]}],""warnings"":[]}]";
     private string GetAllTopicsResponse => @"[{""@type"":""kafka_topics"",""statementText"":""SHOW ALL TOPICS;"",""topics"":[{""name"":""AVG_SENSOR_VALUES"",""replicaInfo"":[1,1]},{""name"":""sensor_values"",""replicaInfo"":[1,1]}],""warnings"":[]}]";
 
@@ -190,7 +210,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       var queriesResponses = await ClassUnderTest.GetTopicsAsync();
 
       //Assert
-      queriesResponses[0].StatementText.Should().Be("SHOW TOPICS;");
+      queriesResponses[0].StatementText.Should().Be(StatementTemplates.ShowTopics);
 
       queriesResponses[0].Type.Should().Be("kafka_topics");
       queriesResponses[0].Topics.Length.Should().Be(2);
@@ -206,9 +226,31 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       var queriesResponses = await ClassUnderTest.GetAllTopicsAsync();
 
       //Assert
-      queriesResponses[0].StatementText.Should().Be("SHOW ALL TOPICS;");
+      queriesResponses[0].StatementText.Should().Be(StatementTemplates.ShowAllTopics);
 
       queriesResponses[0].Topics.Length.Should().Be(2);
     }
+    
+    string queryId = "CTAS_MOVIESBYTITLE_35";
+    string type = "@type";
+
+    private string TerminatePushQueryResponse => $@"[{{""{type}"":""currentStatus"",""statementText"":""TERMINATE {queryId};"",""commandId"":""terminate/{queryId}/execute"",""commandStatus"":{{""status"":""SUCCESS"",""message"":""Query terminated."",""queryId"":null}},""commandSequenceNumber"":40,""warnings"":[]}}]";
+
+    [TestMethod]
+    public async Task TerminatePushQueryAsync()
+    {
+      //Arrange
+      CreateHttpMocks(TerminatePushQueryResponse);
+
+      //Act
+      var responses = await ClassUnderTest.TerminatePushQueryAsync(queryId);
+
+      //Assert
+      string expectedStatement = StatementTemplates.TerminatePushQuery(queryId);
+      (await responses.ToStatementResponsesAsync())[0].StatementText.Should().Be(expectedStatement);
+    }
+
+    //show streams
+    //show tables
   }
 }
