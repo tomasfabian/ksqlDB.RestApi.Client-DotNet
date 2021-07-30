@@ -28,12 +28,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     }
 
     internal static readonly string MediaType = "application/vnd.ksql.v1+json";
+    
+    private string NullOrWhiteSpaceErrorMessage => "Can't be null, empty, or contain only whitespace.";
 
     /// <summary>
     /// Run a sequence of SQL statements.
     /// </summary>
     /// <param name="ksqlDbStatement">The text of the SQL statements.</param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns></returns>
     public async Task<HttpResponseMessage> ExecuteStatementAsync(KSqlDbStatement ksqlDbStatement, CancellationToken cancellationToken = default)
     {
@@ -93,7 +95,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <typeparam name="T"></typeparam>
     /// <param name="creationMetadata">Stream properties, specify details about your stream by using the WITH clause.</param>
     /// <param name="ifNotExists">If the IF NOT EXISTS clause is present, the statement won't fail if a stream with the same name already exists.</param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> CreateStreamAsync<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false, CancellationToken cancellationToken = default)
     {
@@ -107,7 +109,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="creationMetadata">Stream properties, specify details about your stream by using the WITH clause.</param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> CreateOrReplaceStreamAsync<T>(EntityCreationMetadata creationMetadata, CancellationToken cancellationToken = default)
     {
@@ -122,7 +124,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <typeparam name="T"></typeparam>
     /// <param name="creationMetadata">Table properties, specify details about your table by using the WITH clause.</param>
     /// <param name="ifNotExists">If the IF NOT EXISTS clause is present, the statement won't fail if a table with the same name already exists.</param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> CreateTableAsync<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false, CancellationToken cancellationToken = default)
     {
@@ -136,7 +138,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="creationMetadata">Table properties, specify details about your table by using the WITH clause.</param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> CreateOrReplaceTableAsync<T>(EntityCreationMetadata creationMetadata, CancellationToken cancellationToken = default)
     {
@@ -160,7 +162,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <typeparam name="T"></typeparam>
     /// <param name="entity">Entity for insertion.</param>
     /// <param name="insertProperties">Overrides conventions.</param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> InsertIntoAsync<T>(T entity, InsertProperties insertProperties = null, CancellationToken cancellationToken = default)
     {
@@ -178,25 +180,19 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <summary>
     /// List the defined streams.
     /// </summary>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns></returns>
-    public async Task<StreamsResponse[]> GetStreamsAsync(CancellationToken cancellationToken = default)
+    public Task<StreamsResponse[]> GetStreamsAsync(CancellationToken cancellationToken = default)
     {
       string showStatement = "SHOW STREAMS;";
 
-      KSqlDbStatement ksqlDbStatement = new(showStatement);
-
-      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
-        
-      var streamsResponses = await httpResponseMessage.ToStreamsResponseAsync().ConfigureAwait(false);
-
-      return streamsResponses;
+      return ExecuteStatementAsync<StreamsResponse>(showStatement, cancellationToken);
     }
 
     /// <summary>
     /// List the defined tables.
     /// </summary>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns></returns>
     public async Task<TablesResponse[]> GetTablesAsync(CancellationToken cancellationToken = default)
     {
@@ -218,7 +214,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <summary>
     /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to.
     /// </summary>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns>List of topics.</returns>
     public async Task<TopicsResponse[]> GetTopicsAsync(CancellationToken cancellationToken = default)
     {
@@ -236,7 +232,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <summary>
     /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to, including hidden topics.
     /// </summary>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns>List of topics.</returns>
     public async Task<TopicsResponse[]> GetAllTopicsAsync(CancellationToken cancellationToken = default)
     {
@@ -254,7 +250,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <summary>
     /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to.
     /// </summary>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns>List of topics. Also displays consumer groups and their active consumer counts.</returns>
     public async Task<TopicsExtendedResponse[]> GetTopicsExtendedAsync(CancellationToken cancellationToken = default)
     {
@@ -272,7 +268,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <summary>
     /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to, including hidden topics.
     /// </summary>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns>List of topics. Also displays consumer groups and their active consumer counts.</returns>
     public async Task<TopicsExtendedResponse[]> GetAllTopicsExtendedAsync(CancellationToken cancellationToken = default)
     {
@@ -294,7 +290,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <summary>
     /// Lists queries running in the cluster.
     /// </summary>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns>List of queries.</returns>
     public async Task<QueriesResponse[]> GetQueriesAsync(CancellationToken cancellationToken = default)
     {
@@ -319,7 +315,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <summary>
     /// List all connectors in the Connect cluster.
     /// </summary>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns></returns>
     public async Task<ConnectorsResponse[]> GetConnectorsAsync(CancellationToken cancellationToken = default)
     {
@@ -338,7 +334,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <param name="config">Configuration passed into the WITH clause.</param>
     /// <param name="connectorName">Name of the connector to create.</param>
     /// <param name="ifNotExists">If the IF NOT EXISTS clause is present, the statement does not fail if a connector with the supplied name already exists.</param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns></returns>
     public Task<HttpResponseMessage> CreateSourceConnectorAsync(IDictionary<string, string> config, string connectorName, bool ifNotExists = false, CancellationToken cancellationToken = default)
     {
@@ -354,15 +350,13 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
     }
 
-    private string NullOrWhiteSpaceErrorMessage => "Can't be null, empty, or contain only whitespace.";
-
     /// <summary>
     /// Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
     /// </summary>
     /// <param name="config">Configuration passed into the WITH clause.</param>
     /// <param name="connectorName">Name of the connector to create.</param>
     /// <param name="ifNotExists">If the IF NOT EXISTS clause is present, the statement does not fail if a connector with the supplied name already exists.</param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns></returns>
     public Task<HttpResponseMessage> CreateSinkConnectorAsync(IDictionary<string, string> config, string connectorName, bool ifNotExists = false, CancellationToken cancellationToken = default)
     {
@@ -382,7 +376,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement doesn't fail if the connector doesn't exist.
     /// </summary>
     /// <param name="connectorName">Name of the connector to drop.</param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns></returns>
     public Task<HttpResponseMessage> DropConnectorIfExistsAsync(string connectorName, CancellationToken cancellationToken = default)
     {
@@ -397,7 +391,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement fails if the connector doesn't exist.
     /// </summary>
     /// <param name="connectorName">Name of the connector to drop.</param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns></returns>
     public Task<HttpResponseMessage> DropConnectorAsync(string connectorName, CancellationToken cancellationToken = default)
     {
@@ -409,5 +403,33 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     }
 
     #endregion
+
+    /// <summary>
+    /// Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
+    /// </summary>
+    /// <param name="queryId">Id of the query to terminate.</param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+    /// <returns></returns>
+    public async Task<HttpResponseMessage> TerminatePushQueryAsync(string queryId, CancellationToken cancellationToken = default)
+    {
+      string terminateStatement = $"TERMINATE {queryId};";
+
+      KSqlDbStatement ksqlDbStatement = new(terminateStatement);
+
+      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
+
+      return httpResponseMessage;
+    }
+
+    private async Task<TResponse[]> ExecuteStatementAsync<TResponse>(string statement, CancellationToken cancellationToken = default)
+    {
+      KSqlDbStatement ksqlDbStatement = new(statement);
+
+      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
+
+      var statementResponse = await httpResponseMessage.ToStatementResponsesAsync<TResponse>().ConfigureAwait(false);
+
+      return statementResponse;
+    }
   }
 }

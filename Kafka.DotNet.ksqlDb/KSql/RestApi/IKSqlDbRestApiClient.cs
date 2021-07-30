@@ -161,5 +161,13 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<HttpResponseMessage> DropConnectorAsync(string connectorName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
+    /// </summary>
+    /// <param name="queryId">Id of the query to terminate.</param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+    /// <returns></returns>
+    Task<HttpResponseMessage> TerminatePushQueryAsync(string queryId, CancellationToken cancellationToken = default);
   }
 }
