@@ -189,7 +189,35 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
       //Assert
 
       Console.WriteLine(string.Join(',', tablesResponses[0].Tables.Select(c => c.Name)));
-      tablesResponses[0].StatementText.Should().Be("SHOW TABLES;"); //TODO: create test stream
+      tablesResponses[0].StatementText.Should().Be("SHOW TABLES;"); //TODO: create test
+    }
+
+    [TestMethod]
+    public async Task GetAllTopicsAsync()
+    {
+      //Arrange
+
+      //Act
+      var topicsResponses = await restApiClient.GetAllTopicsAsync();
+
+      //Assert
+
+      Console.WriteLine(string.Join(',', topicsResponses[0].Topics.Select(c => c.Name)));
+      topicsResponses[0].StatementText.Should().Be("SHOW TOPICS;"); //TODO: create test
+    }
+
+    [TestMethod]
+    public async Task GetQueriesAsync()
+    {
+      //Arrange
+
+      //Act
+      var topicsResponses = await restApiClient.GetQueriesAsync();
+
+      //Assert
+
+      Console.WriteLine(string.Join(',', topicsResponses[0].Queries.Select(c => c.Id)));
+      topicsResponses[0].StatementText.Should().Be("SHOW QUERIES;"); //TODO: create test
     }
 
     [TestMethod]

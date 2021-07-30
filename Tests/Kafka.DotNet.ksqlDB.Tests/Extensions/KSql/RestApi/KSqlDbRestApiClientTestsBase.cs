@@ -12,15 +12,17 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
     protected IHttpClientFactory HttpClientFactory;
     protected HttpClient HttpClient;
 
-    protected virtual string StatementResponse { get; set; }
-
     [TestInitialize]
     public override void TestInitialize()
     {
       base.TestInitialize();
 
       HttpClientFactory = Mock.Of<IHttpClientFactory>();
-      HttpClient = FakeHttpClient.CreateWithResponse(StatementResponse);
+    }
+
+    protected void CreateHttpMocks(string responseContents)
+    {
+      HttpClient = FakeHttpClient.CreateWithResponse(responseContents);
 
       Mock.Get(HttpClientFactory).Setup(c => c.CreateClient()).Returns(HttpClient);
     }

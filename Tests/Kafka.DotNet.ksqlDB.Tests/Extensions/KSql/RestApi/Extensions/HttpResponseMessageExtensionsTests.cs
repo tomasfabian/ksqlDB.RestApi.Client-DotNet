@@ -16,13 +16,15 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Extensions
     public async Task ExecuteStatementAsync_HttpClientWasCalled_OkResult()
     {
       //Arrange
+      CreateHttpMocks(StatementResponse);
+
       var ksqlDbStatement = new KSqlDbStatement(statement);
       var restApiClient = new KSqlDbRestApiClient(HttpClientFactory);
 
       var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement);
 
       //Act
-      var responses = httpResponseMessage.ToStatementResponses();
+      var responses = await httpResponseMessage.ToStatementResponsesAsync();
       
       //Assert
       responses[0].CommandStatus.Message.Should().Be("Table created");
@@ -31,6 +33,6 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Extensions
       responses[0].CommandSequenceNumber.Should().Be(328);
     }
 
-    protected override string StatementResponse { get; set; } = @"[{""@type"":""currentStatus"",""statementText"":""CREATE OR REPLACE TABLE MOVIES (TITLE STRING PRIMARY KEY, ID INTEGER, RELEASE_YEAR INTEGER) WITH (KAFKA_TOPIC='Movies', KEY_FORMAT='KAFKA', PARTITIONS=1, VALUE_FORMAT='JSON');"",""commandId"":""table/`MOVIES`/create"",""commandStatus"":{""status"":""SUCCESS"",""message"":""Table created"",""queryId"":null},""commandSequenceNumber"":328,""warnings"":[]}]";
+    private string StatementResponse => @"[{""@type"":""currentStatus"",""statementText"":""CREATE OR REPLACE TABLE MOVIES (TITLE STRING PRIMARY KEY, ID INTEGER, RELEASE_YEAR INTEGER) WITH (KAFKA_TOPIC='Movies', KEY_FORMAT='KAFKA', PARTITIONS=1, VALUE_FORMAT='JSON');"",""commandId"":""table/`MOVIES`/create"",""commandStatus"":{""status"":""SUCCESS"",""message"":""Table created"",""queryId"":null},""commandSequenceNumber"":328,""warnings"":[]}]";
   }
 }

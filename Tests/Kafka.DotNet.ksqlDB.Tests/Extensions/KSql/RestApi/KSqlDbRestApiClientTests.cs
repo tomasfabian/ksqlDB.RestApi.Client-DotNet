@@ -24,10 +24,15 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
     
     string statement = "CREATE OR REPLACE TABLE movies";
 
+    private string StatementResponse => @"[{""@type"":""currentStatus"",""statementText"":""CREATE OR REPLACE TABLE MOVIES (TITLE STRING PRIMARY KEY, ID INTEGER, RELEASE_YEAR INTEGER) WITH (KAFKA_TOPIC='Movies', KEY_FORMAT='KAFKA', PARTITIONS=1, VALUE_FORMAT='JSON');"",""commandId"":""table/`MOVIES`/create"",""commandStatus"":{""status"":""SUCCESS"",""message"":""Table created"",""queryId"":null},""commandSequenceNumber"":328,""warnings"":[]}]
+";
+
     [TestMethod]
     public async Task ExecuteStatementAsync_HttpClientWasCalled_OkResult()
     {
       //Arrange
+      CreateHttpMocks(StatementResponse);
+
       var ksqlDbStatement = new KSqlDbStatement(statement);
 
       //Act
@@ -172,7 +177,38 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       endpoint.Should().Be("/query");
     }
 
-    protected override string StatementResponse { get; set; } = @"[{""@type"":""currentStatus"",""statementText"":""CREATE OR REPLACE TABLE MOVIES (TITLE STRING PRIMARY KEY, ID INTEGER, RELEASE_YEAR INTEGER) WITH (KAFKA_TOPIC='Movies', KEY_FORMAT='KAFKA', PARTITIONS=1, VALUE_FORMAT='JSON');"",""commandId"":""table/`MOVIES`/create"",""commandStatus"":{""status"":""SUCCESS"",""message"":""Table created"",""queryId"":null},""commandSequenceNumber"":328,""warnings"":[]}]
-";
+    private string GetTopicsResponse => @"[{""@type"":""kafka_topics"",""statementText"":""SHOW TOPICS;"",""topics"":[{""name"":""AVG_SENSOR_VALUES"",""replicaInfo"":[1,1]},{""name"":""sensor_values"",""replicaInfo"":[1,1]}],""warnings"":[]}]";
+    private string GetAllTopicsResponse => @"[{""@type"":""kafka_topics"",""statementText"":""SHOW ALL TOPICS;"",""topics"":[{""name"":""AVG_SENSOR_VALUES"",""replicaInfo"":[1,1]},{""name"":""sensor_values"",""replicaInfo"":[1,1]}],""warnings"":[]}]";
+
+    [TestMethod]
+    public async Task GetTopicsAsync()
+    {
+      //Arrange
+      CreateHttpMocks(GetTopicsResponse);
+
+      //Act
+      var queriesResponses = await ClassUnderTest.GetTopicsAsync();
+
+      //Assert
+      queriesResponses[0].StatementText.Should().Be("SHOW TOPICS;");
+
+      queriesResponses[0].Type.Should().Be("kafka_topics");
+      queriesResponses[0].Topics.Length.Should().Be(2);
+    }
+
+    [TestMethod]
+    public async Task GetAllTopicsAsync()
+    {
+      //Arrange
+      CreateHttpMocks(GetAllTopicsResponse);
+
+      //Act
+      var queriesResponses = await ClassUnderTest.GetAllTopicsAsync();
+
+      //Assert
+      queriesResponses[0].StatementText.Should().Be("SHOW ALL TOPICS;");
+
+      queriesResponses[0].Topics.Length.Should().Be(2);
+    }
   }
 }
