@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Queries;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Streams;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Tables;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Topics;
@@ -107,5 +108,12 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <param name="cancellationToken"></param>
     /// <returns>List of topics. Also displays consumer groups and their active consumer counts.</returns>
     Task<TopicsExtendedResponse[]> GetAllTopicsExtendedAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists queries running in the cluster.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns>List of queries.</returns>
+    Task<QueriesResponse[]> GetQueriesAsync(CancellationToken cancellationToken = default);
   }
 }

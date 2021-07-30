@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Generators;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Queries;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Streams;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Tables;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Topics;
@@ -236,6 +237,29 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
 
       var responses = await httpResponseMessage.ToTopicsExtendedResponseAsync().ConfigureAwait(false);
+
+      return responses;
+    }
+
+    #endregion
+
+    #region GetQueriesAsync
+
+    /// <summary>
+    /// Lists queries running in the cluster.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns>List of queries.</returns>
+    public async Task<QueriesResponse[]> GetQueriesAsync(CancellationToken cancellationToken = default)
+    {
+      //SHOW | LIST QUERIES [EXTENDED];
+      string showStatement = "SHOW QUERIES;";
+
+      KSqlDbStatement ksqlDbStatement = new(showStatement);
+
+      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
+
+      var responses = await httpResponseMessage.ToQueriesResponseAsync().ConfigureAwait(false);
 
       return responses;
     }
