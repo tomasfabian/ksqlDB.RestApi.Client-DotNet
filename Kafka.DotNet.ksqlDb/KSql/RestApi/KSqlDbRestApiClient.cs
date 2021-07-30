@@ -410,7 +410,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <param name="queryId">Id of the query to terminate.</param>
     /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns></returns>
-    public async Task<HttpResponseMessage> TerminatePushQueryAsync(string queryId, CancellationToken cancellationToken = default)
+    public async Task<StatementResponse[]> TerminatePushQueryAsync(string queryId, CancellationToken cancellationToken = default)
     {
       string terminateStatement = StatementTemplates.TerminatePushQuery(queryId);
 
@@ -418,7 +418,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
       var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
 
-      return httpResponseMessage;
+      var statementResponse = await httpResponseMessage.ToStatementResponsesAsync().ConfigureAwait(false);
+
+      return statementResponse;
     }
 
     private async Task<TResponse[]> ExecuteStatementAsync<TResponse>(string statement, CancellationToken cancellationToken = default)

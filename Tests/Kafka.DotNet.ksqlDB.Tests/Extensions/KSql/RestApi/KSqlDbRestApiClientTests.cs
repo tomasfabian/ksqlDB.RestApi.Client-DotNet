@@ -247,8 +247,9 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
 
       //Assert
       string expectedStatement = StatementTemplates.TerminatePushQuery(queryId);
-      (await responses.ToStatementResponsesAsync())[0].StatementText.Should().Be(expectedStatement);
+      responses[0].StatementText.Should().Be(expectedStatement);
     }
+
     private string GetAllStreamsResponse => @"[{""@type"":""streams"",""statementText"":""SHOW STREAMS;"",""streams"":[{""type"":""STREAM"",""name"":""SENSORSSTREAM"",""topic"":""SENSORSSTREAM"",""keyFormat"":""KAFKA"",""valueFormat"":""JSON"",""isWindowed"":false},{""type"":""STREAM"",""name"":""MYMOVIESSTREAMTESTS"",""topic"":""MyMoviesStreamTest"",""keyFormat"":""JSON"",""valueFormat"":""JSON"",""isWindowed"":true}],""warnings"":[]}]";
 
     [TestMethod]

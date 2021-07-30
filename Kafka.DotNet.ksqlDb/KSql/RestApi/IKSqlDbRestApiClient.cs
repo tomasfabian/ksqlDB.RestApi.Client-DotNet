@@ -168,6 +168,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <param name="queryId">Id of the query to terminate.</param>
     /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns></returns>
-    Task<HttpResponseMessage> TerminatePushQueryAsync(string queryId, CancellationToken cancellationToken = default);
+    Task<StatementResponse[]> TerminatePushQueryAsync(string queryId, CancellationToken cancellationToken = default);
   }
 }
