@@ -46,6 +46,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions
       return httpResponseMessage.ToStatementResponsesAsync<TablesResponse>();
     }
 
+    public static Task<QueriesResponse[]> ToQueriesResponseAsync(this HttpResponseMessage httpResponseMessage)
+    {
+      return httpResponseMessage.ToStatementResponsesAsync<QueriesResponse>();
+    }
+
     public static Task<TopicsResponse[]> ToTopicsResponseAsync(this HttpResponseMessage httpResponseMessage)
     {
       return httpResponseMessage.ToStatementResponsesAsync<TopicsResponse>();
