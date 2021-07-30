@@ -29,6 +29,12 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
     internal static readonly string MediaType = "application/vnd.ksql.v1+json";
 
+    /// <summary>
+    /// Run a sequence of SQL statements.
+    /// </summary>
+    /// <param name="ksqlDbStatement">The text of the SQL statements.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async Task<HttpResponseMessage> ExecuteStatementAsync(KSqlDbStatement ksqlDbStatement, CancellationToken cancellationToken = default)
     {
       using var httpClient = httpClientFactory.CreateClient();
@@ -81,6 +87,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
     #region Creation
     
+    /// <summary>
+    /// Create a new stream with the specified columns and properties.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="creationMetadata">Stream properties, specify details about your stream by using the WITH clause.</param>
+    /// <param name="ifNotExists">If the IF NOT EXISTS clause is present, the statement won't fail if a stream with the same name already exists.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> CreateStreamAsync<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false, CancellationToken cancellationToken = default)
     {
       var ksql = StatementGenerator.CreateStream<T>(creationMetadata, ifNotExists);
@@ -88,6 +102,13 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       return ExecuteAsync<T>(ksql, cancellationToken);
     }
 
+    /// <summary>
+    /// Create a new stream or replace an existing one with the specified columns and properties.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="creationMetadata">Stream properties, specify details about your stream by using the WITH clause.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> CreateOrReplaceStreamAsync<T>(EntityCreationMetadata creationMetadata, CancellationToken cancellationToken = default)
     {
       var ksql = StatementGenerator.CreateOrReplaceStream<T>(creationMetadata);
@@ -95,13 +116,28 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       return ExecuteAsync<T>(ksql, cancellationToken);
     }
     
+    /// <summary>
+    /// Create a new table with the specified columns and properties.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="creationMetadata">Table properties, specify details about your table by using the WITH clause.</param>
+    /// <param name="ifNotExists">If the IF NOT EXISTS clause is present, the statement won't fail if a table with the same name already exists.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> CreateTableAsync<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false, CancellationToken cancellationToken = default)
     {
       var ksql = StatementGenerator.CreateTable<T>(creationMetadata, ifNotExists);
 
       return ExecuteAsync<T>(ksql, cancellationToken);
     }
-
+    
+    /// <summary>
+    /// Create a new table or replace an existing one with the specified columns and properties.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="creationMetadata">Table properties, specify details about your table by using the WITH clause.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> CreateOrReplaceTableAsync<T>(EntityCreationMetadata creationMetadata, CancellationToken cancellationToken = default)
     {
       var ksql = StatementGenerator.CreateOrReplaceTable<T>(creationMetadata);
@@ -118,6 +154,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
     #endregion
 
+    /// <summary>
+    /// Produce a row into an existing stream or table and its underlying topic based on explicitly specified entity properties.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="entity">Entity for insertion.</param>
+    /// <param name="insertProperties">Overrides conventions.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> InsertIntoAsync<T>(T entity, InsertProperties insertProperties = null, CancellationToken cancellationToken = default)
     {
       var insert = new CreateInsert().Generate<T>(entity, insertProperties);
@@ -128,7 +172,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
       return httpResponseMessage;
     }
-    
+
+    #region Get
+
     /// <summary>
     /// List the defined streams.
     /// </summary>
@@ -266,6 +312,8 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
     #endregion
 
+    #endregion
+    
     #region Connectors
 
     /// <summary>
