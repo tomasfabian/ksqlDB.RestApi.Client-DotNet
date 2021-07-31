@@ -2049,6 +2049,41 @@ private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient cli
 }
 ```
 
+### Creating connectors (v1.3.0)
+- CreateSourceConnectorAsync - Create a new source connector in the Kafka Connect cluster with the configuration passed in the config parameter.
+
+- CreateSinkConnectorAsync - Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
+
+See also how to create a SQL Server source connector with [Kafka.DotNet.SqlServer](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
+
+```C#
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.RestApi;
+
+private static string SourceConnectorName => "mock-source-connector";
+private static string SinkConnectorName => "mock-sink-connector";
+
+private static async Task CreateConnectorsAsync(IKSqlDbRestApiClient restApiClient)
+{
+  var sourceConnectorConfig = new Dictionary<string, string>
+  {
+    {"connector.class", "org.apache.kafka.connect.tools.MockSourceConnector"}
+  };
+
+  var httpResponseMessage = await restApiClient.CreateSourceConnectorAsync(sourceConnectorConfig, SourceConnectorName);
+      
+  var sinkConnectorConfig = new Dictionary<string, string> {
+    { "connector.class", "org.apache.kafka.connect.tools.MockSinkConnector" },
+    { "topics.regex", "mock-sink*"},
+  }; 		
+
+  httpResponseMessage = await restApiClient.CreateSinkConnectorAsync(sinkConnectorConfig, SinkConnectorName);
+
+  httpResponseMessage = await restApiClient.DropConnectorAsync($"`{SinkConnectorName}`");
+}
+```
+
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
 
