@@ -61,6 +61,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
           case nameof(KSqlFunctionsExtensions.DateToString):
           case nameof(KSqlFunctionsExtensions.StringToTimestamp):
           case nameof(KSqlFunctionsExtensions.TimestampToString):
+          case nameof(KSqlFunctionsExtensions.ExtractJsonField):
             Append($"{methodInfo.Name.ToUpper()}");
             PrintFunctionArguments(methodCallExpression.Arguments.Skip(1));
             break;

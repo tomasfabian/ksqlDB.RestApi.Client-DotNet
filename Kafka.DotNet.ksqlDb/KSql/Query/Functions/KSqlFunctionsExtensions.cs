@@ -1770,10 +1770,27 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
     /// <summary>
     /// Concatenate two or more string expressions. Any input strings which evaluate to NULL are replaced with empty string in the output.
     /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">The varchar (string) fields to concatenate</param>
+    /// <returns></returns>
     public static string Concat(this KSqlFunctions kSqlFunctions, params string[] input)
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
+
+    /// <summary>
+    /// Given a STRING that contains JSON data, extract the value at the specified JSONPath or NULL if the specified path does not exist.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">The input JSON string.</param>
+    /// <param name="jsonPath">The JSONPath to extract.</param>
+    /// <returns>The extracted string value. If the requested JSONPath does not exist, the function returns NULL.</returns>
+    public static string ExtractJsonField(this KSqlFunctions kSqlFunctions, string input, string jsonPath)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    //CONCAT_WS
 
     #endregion
 
