@@ -1,4 +1,19 @@
-﻿# v1.2.0
+﻿# v1.3.0-rc.1
+KSqlDbRestApiClient:
+- CreateSourceConnectorAsync - Create a new source connector in the Kafka Connect cluster with the configuration passed in the config parameter.
+- CreateSinkConnectorAsync - Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
+
+- GetTopicsAsync - lists the available topics in the Kafka cluster that ksqlDB is configured to connect to.
+- GetAllTopicsAsync - lists all topics, including hidden topics.
+- GetTopicsExtendedAsync - list of topics. Also displays consumer groups and their active consumer counts.
+- GetAllTopicsExtendedAsync - list of all topics. Also displays consumer groups and their active consumer counts.
+
+- GetQueriesAsync - Lists queries running in the cluster.
+- QueriesResponse, Query
+
+- TerminatePushQueryAsync (wil be renamed to TerminatePersistentQueryAsync) - Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
+
+# v1.2.0
 
 KSqlDbRestApiClient: 
 - GetConnectorsAsync - List all connectors in the Connect cluster.
@@ -211,6 +226,4 @@ Fixes:
 
 # TODO:
 - missing scalar functions https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#date-and-time
-- CreateQueryStream options parameter
 - BETWEEN
-- CAST
