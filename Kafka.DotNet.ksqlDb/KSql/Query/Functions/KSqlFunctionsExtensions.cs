@@ -1791,6 +1791,21 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
     }
 
     /// <summary>
+    /// Takes an input string s, which is encoded as input_encoding, and encodes it as output_encoding. The
+    /// accepted input and output encodings are: hex, utf8, ascii and base64. Throws exception if provided
+    /// encodings are not supported.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="str">The source string</param>
+    /// <param name="inputEncoding">The input encoding. If null, then function returns null.</param>
+    /// <param name="outputEncoding">The output encoding. If null, then function returns null.</param>
+    /// <returns>Returns a new string encoded using the outputEncoding</returns>
+    public static string Encode(this KSqlFunctions kSqlFunctions, string str, string inputEncoding, string outputEncoding)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
     /// Given a STRING that contains JSON data, extract the value at the specified JSONPath or NULL if the specified path does not exist.
     /// </summary>
     /// <param name="kSqlFunctions"></param>
