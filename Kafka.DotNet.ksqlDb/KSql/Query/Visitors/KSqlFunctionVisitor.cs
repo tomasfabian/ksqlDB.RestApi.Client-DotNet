@@ -89,11 +89,25 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
             var newArrayExpression = methodCallExpression.Arguments.Skip(1).OfType<NewArrayExpression>().First();
             VisitParams(newArrayExpression);
             break;
+          case nameof(KSqlFunctionsExtensions.ConcatWS):
+            PrintConcatWithSeparator(methodCallExpression);
+            break;
         }
       }
       else base.VisitMethodCall(methodCallExpression);
 
       return methodCallExpression;
+    }
+
+    private void PrintConcatWithSeparator(MethodCallExpression methodCallExpression)
+    {
+      Append("CONCAT_WS(");
+      Visit(methodCallExpression.Arguments[1]);
+      Append(", ");
+      var newArrayExpression2 = methodCallExpression.Arguments.Skip(1).OfType<NewArrayExpression>().First();
+      PrintCommaSeparated(newArrayExpression2.Expressions);
+
+      Append(")");
     }
 
     protected void VisitParams(NewArrayExpression node)

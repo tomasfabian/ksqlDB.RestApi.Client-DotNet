@@ -1779,6 +1779,18 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
     }
 
     /// <summary>
+    /// Concatenates two or more string expressions, inserting a separator string between each.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="separator">Separator string.</param>
+    /// <param name="input">The varchar (string) fields to concatenate</param>
+    /// <returns></returns>
+    public static string ConcatWS(this KSqlFunctions kSqlFunctions, string separator, params string[] input)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
     /// Given a STRING that contains JSON data, extract the value at the specified JSONPath or NULL if the specified path does not exist.
     /// </summary>
     /// <param name="kSqlFunctions"></param>
