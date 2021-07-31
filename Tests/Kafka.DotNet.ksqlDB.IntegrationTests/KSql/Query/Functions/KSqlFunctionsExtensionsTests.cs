@@ -357,5 +357,28 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Query.Functions
       actualValues[0].Col[0].Should().Be("banana");
       actualValues[0].Col[1].Should().Be("apple");
     }
+    
+    [TestMethod]
+    public async Task ExtractJsonField()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+
+      string json =
+        "{\r\n   \"log\": {\r\n      \"cloud\": \"gcp836Csd\",\r\n      \"app\": \"ksProcessor\",\r\n      \"instance\": 4\r\n   }\r\n}";
+
+      string jsonPath = "$.log.cloud";
+
+      //Act
+      var source = Context.CreateQuery<Movie>(MoviesTableName)
+        .Select(c => new { Extracted = K.Functions.ExtractJsonField(json, jsonPath) })
+        .ToAsyncEnumerable();
+      
+      var actualValues = await CollectActualValues(source, expectedItemsCount);
+      
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+      actualValues[0].Extracted.Should().Be("gcp836Csd");
+    }
   }
 }

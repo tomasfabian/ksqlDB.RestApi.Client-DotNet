@@ -853,6 +853,24 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
     }
 
     #endregion
+
+    #region ExtractJsonField
+
+    [TestMethod]
+    public void ExtractJsonField_BuildKSql_PrintsTheFunction()
+    {
+      //Arrange
+      string jsonPath = "$.log.cloud";
+      Expression<Func<Tweet, string>> expression = c => K.Functions.ExtractJsonField(c.Message, jsonPath);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"EXTRACTJSONFIELD({nameof(Tweet.Message)}, '{jsonPath}')");
+    }
+
+    #endregion
     
     #endregion
 
