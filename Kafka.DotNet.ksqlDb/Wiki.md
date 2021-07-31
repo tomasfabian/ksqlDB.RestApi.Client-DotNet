@@ -2027,6 +2027,28 @@ private static async Task GetKsqlDbInformationAsync(IKSqlDbRestApiProvider restA
 }
 ```
 
+### Getting queries and termination of persistant queries (v1.3.0)
+- GetQueriesAsync - Lists queries running in the cluster.
+
+- TerminatePersistentQueryAsync - Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
+
+```C#
+using System.Linq;
+using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.RestApi;
+
+private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient client)
+{
+  string topicName = "moviesByTitle";
+
+  var queries = await client.GetQueriesAsync();
+
+  var query = queries.SelectMany(c => c.Queries).FirstOrDefault(c => c.SinkKafkaTopics.Contains(topicName));
+
+  var response = await client.TerminatePersistentQueryAsync(query.Id);
+}
+```
+
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
 
