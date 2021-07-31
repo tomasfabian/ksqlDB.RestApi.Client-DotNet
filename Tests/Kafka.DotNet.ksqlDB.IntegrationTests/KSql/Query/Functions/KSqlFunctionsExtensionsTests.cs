@@ -284,7 +284,7 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Query.Functions
 
       //Act
       var source = Context.CreateQuery<Movie>(MoviesTableName)
-        .Select(c => new { Col = K.Functions.Concat(c.Title, message) })
+        .Select(c => new { Col = K.Functions.Concat(c.Title, message), ColWS = K.Functions.ConcatWS(" - ", c.Title, message) })
         .ToAsyncEnumerable();
       
       var actualValues = await CollectActualValues(source, expectedItemsCount);
@@ -292,8 +292,9 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Query.Functions
       //Assert
       Assert.AreEqual(expectedItemsCount, actualValues.Count);
       actualValues[0].Col.Should().Be($"{MoviesProvider.Movie1.Title}{message}");
+      actualValues[0].ColWS.Should().Be($"{MoviesProvider.Movie1.Title} - {message}");
     }
-    
+
     [TestMethod]
     public async Task AsMap()
     {

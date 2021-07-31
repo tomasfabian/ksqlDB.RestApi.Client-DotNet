@@ -759,6 +759,24 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
 
     #endregion
 
+    #region ConcatWS
+
+    [TestMethod]
+    public void ConcatWS_BuildKSql_PrintsTrimFunction()
+    {
+      //Arrange
+      string separator = " - ";
+      Expression<Func<Tweet, string>> expression = c => K.Functions.ConcatWS(separator, c.Message, "Value");
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"CONCAT_WS(' - ', {nameof(Tweet.Message)}, 'Value')");
+    }
+
+    #endregion
+
     #region Cast
 
     [TestMethod]
