@@ -8,6 +8,7 @@ Install-Package Kafka.DotNet.ksqlDB
 using System;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.Sample.Model;
 
 var ksqlDbUrl = @"http:\\localhost:8088";
@@ -15,6 +16,7 @@ var ksqlDbUrl = @"http:\\localhost:8088";
 await using var context = new KSqlDBContext(ksqlDbUrl);
 
 using var disposable = context.CreateQueryStream<Tweet>()
+  .WithOffsetResetPolicy(AutoOffsetReset.Latest)
   .Where(p => p.Message != "Hello world" || p.Id == 1)
   .Select(l => new { l.Message, l.Id })
   .Take(2)
@@ -1484,14 +1486,14 @@ private static async Task CreateOrReplaceTableStatement(IKSqlDBStatementsContext
 {
   var creationMetadata = new CreationMetadata
   {
-    KafkaTopic = "tweetsByTitle",		
+    KafkaTopic = "moviesByTitle",		
     KeyFormat = SerializationFormats.Json,
     ValueFormat = SerializationFormats.Json,
     Replicas = 1,
     Partitions = 1
   };
 
-  var httpResponseMessage = await context.CreateOrReplaceTableStatement(tableName: "TweetsByTitle")
+  var httpResponseMessage = await context.CreateOrReplaceTableStatement(tableName: "MoviesByTitle")
     .With(creationMetadata)
     .As<Movie>()
     .Where(c => c.Id < 3)
@@ -1505,8 +1507,8 @@ private static async Task CreateOrReplaceTableStatement(IKSqlDBStatementsContext
 
 Generated KSQL statement:
 ```KSQL
-CREATE OR REPLACE TABLE TweetsByTitle
-WITH ( KAFKA_TOPIC='tweetsByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
+CREATE OR REPLACE TABLE MoviesByTitle
+WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
 AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
 WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
 ```
@@ -1535,7 +1537,7 @@ Generates ksql statement from Create(OrReplace)[Table|Stream]Statements
 ```C#
 await using var context = new KSqlDBContext(@"http:\\localhost:8088");
 
-var statement = context.CreateOrReplaceTableStatement(tableName: "TweetsByTitle")
+var statement = context.CreateOrReplaceTableStatement(tableName: "MoviesByTitle")
   .As<Movie>()
   .Where(c => c.Id < 3)
   .Select(c => new {c.Title, ReleaseYear = c.Release_Year})
@@ -1545,7 +1547,7 @@ var statement = context.CreateOrReplaceTableStatement(tableName: "TweetsByTitle"
 
 Generated KSQL:
 ```KSQL
-CREATE OR REPLACE TABLE TweetsByTitle
+CREATE OR REPLACE TABLE MoviesByTitle
 AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
 WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
 ```
@@ -1954,13 +1956,10 @@ public async Task CreateGetAndDropConnectorAsync()
 
   var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
-  const string ConnectorName = "mock-connector";
+  const string SinkConnectorName = "mock-connector";
 
-  var createConnector = @$"CREATE SOURCE CONNECTOR `{ConnectorName}` WITH(
-      'connector.class'='org.apache.kafka.connect.tools.MockSourceConnector',
-      'topic.prefix'='mock-',
-      'table.whitelist'='users',
-      'key'='username');";
+  var createConnector = @$"CREATE SOURCE CONNECTOR `{SinkConnectorName}` WITH(
+      'connector.class'='org.apache.kafka.connect.tools.MockSourceConnector');";
 
   var statement = new KSqlDbStatement(createConnector);
 
@@ -1971,10 +1970,10 @@ public async Task CreateGetAndDropConnectorAsync()
   Console.WriteLine("Available connectors: ");
   Console.WriteLine(string.Join(',', connectorsResponse[0].Connectors.Select(c => c.Name)));
 
-  httpResponseMessage = await restApiClient.DropConnectorAsync(ConnectorName);
+  httpResponseMessage = await restApiClient.DropConnectorAsync($"`{SinkConnectorName}`");
 
   // Or
-  httpResponseMessage = await restApiClient.DropConnectorIfExistsAsync(ConnectorName);
+  httpResponseMessage = await restApiClient.DropConnectorIfExistsAsync($"`{SinkConnectorName}`");
 }
 ```
 
@@ -1994,6 +1993,38 @@ Console.WriteLine(string.Join(',', streamResponses[0].Streams.Select(c => c.Name
 var tableResponses = await restApiClient.GetTablesAsync();
 
 Console.WriteLine(string.Join(',', tableResponses[0].Tables.Select(c => c.Name)));
+```
+
+# v1.3.0:
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 1.3.0-rc.1
+```
+
+# KSqlDbRestApiClient:
+
+### Get topics (v1.3.0)
+- GetTopicsAsync - lists the available topics in the Kafka cluster that ksqlDB is configured to connect to.
+- GetAllTopicsAsync - lists all topics, including hidden topics.
+- GetTopicsExtendedAsync - list of topics. Also displays consumer groups and their active consumer counts.
+- GetAllTopicsExtendedAsync - list of all topics. Also displays consumer groups and their active consumer counts.
+
+```C#
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Topics;
+using Kafka.DotNet.ksqlDB.Sample.Providers;
+
+private static async Task GetKsqlDbInformationAsync(IKSqlDbRestApiProvider restApiProvider)
+{
+  Console.WriteLine($"{Environment.NewLine}Available topics:");
+  var topicsResponses = await restApiProvider.GetTopicsAsync();
+  Console.WriteLine(string.Join(',', topicsResponses[0].Topics.Select(c => c.Name)));
+
+  TopicsResponse[] allTopicsResponses = await restApiProvider.GetAllTopicsAsync();
+  TopicsExtendedResponse[] topicsExtendedResponses = await restApiProvider.GetTopicsExtendedAsync();
+  var allTopicsExtendedResponses = await restApiProvider.GetAllTopicsExtendedAsync();
+}
 ```
 
 # LinqPad samples
