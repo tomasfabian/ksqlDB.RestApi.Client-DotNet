@@ -1,0 +1,2 @@
+[*.cs]
+dotnet_diagnostic.CS4014.severity = error
