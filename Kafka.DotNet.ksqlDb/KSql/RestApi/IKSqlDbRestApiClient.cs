@@ -95,7 +95,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to, including hidden topics.
     /// </summary>
     /// <param name="cancellationToken"></param>
-    /// <returns>List of topics.</returns>
+    /// <returns>List of all topics.</returns>
     Task<TopicsResponse[]> GetAllTopicsAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -109,7 +109,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to, including hidden topics.
     /// </summary>
     /// <param name="cancellationToken"></param>
-    /// <returns>List of topics. Also displays consumer groups and their active consumer counts.</returns>
+    /// <returns>List of all topics. Also displays consumer groups and their active consumer counts.</returns>
     Task<TopicsExtendedResponse[]> GetAllTopicsExtendedAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -168,6 +168,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <param name="queryId">Id of the query to terminate.</param>
     /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns></returns>
-    Task<StatementResponse[]> TerminatePushQueryAsync(string queryId, CancellationToken cancellationToken = default);
+    Task<StatementResponse[]> TerminatePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default);
   }
 }

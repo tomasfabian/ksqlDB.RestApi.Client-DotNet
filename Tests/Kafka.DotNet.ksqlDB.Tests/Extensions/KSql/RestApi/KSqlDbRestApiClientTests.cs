@@ -243,7 +243,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       CreateHttpMocks(TerminatePushQueryResponse);
 
       //Act
-      var responses = await ClassUnderTest.TerminatePushQueryAsync(queryId);
+      var responses = await ClassUnderTest.TerminatePersistentQueryAsync(queryId);
 
       //Assert
       string expectedStatement = StatementTemplates.TerminatePushQuery(queryId);
