@@ -707,5 +707,27 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
 
       var response = await restApiClient.TerminatePushQueryAsync(query.Id);// renamed to TerminatePersistentQueryAsync 
     }
+
+    private static string SourceConnectorName => "mock-source-connector";
+    private static string SinkConnectorName => "mock-sink-connector";
+
+    private static async Task CreateConnectorsAsync(IKSqlDbRestApiClient restApiClient)
+    {
+      var sourceConnectorConfig = new Dictionary<string, string>
+      {
+        {"connector.class", "org.apache.kafka.connect.tools.MockSourceConnector"}
+      };
+
+      var httpResponseMessage = await restApiClient.CreateSourceConnectorAsync(sourceConnectorConfig, SourceConnectorName);
+      
+      var sinkConnectorConfig = new Dictionary<string, string> {
+        { "connector.class", "org.apache.kafka.connect.tools.MockSinkConnector" },
+        { "topics.regex", "mock-sink*"},
+      }; 		
+
+      httpResponseMessage = await restApiClient.CreateSinkConnectorAsync(sinkConnectorConfig, SinkConnectorName);
+
+      httpResponseMessage = await restApiClient.DropConnectorAsync($"`{SinkConnectorName}`");
+    }
   }
 }
