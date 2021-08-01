@@ -25,6 +25,8 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{DC411C68-7EC4-4104-A80D-2FFD8FA092F9}"
 	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
 		Kafka.DotNet.InsideOut\Package.nuspec = Kafka.DotNet.InsideOut\Package.nuspec
 	EndProjectSection
 EndProject
