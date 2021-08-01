@@ -34,6 +34,19 @@ services:
       - SERVER_SERVLET_CONTEXTPATH=/
     ports:
       - "9000:9000"
+            
+  connect:
+    image: debezium/connect:1.6
+    ports:
+     - 8083:8083
+    links:
+     - broker01
+    environment:
+     - BOOTSTRAP_SERVERS=broker01:9092
+     - GROUP_ID=1
+     - CONFIG_STORAGE_TOPIC=my_connect_configs
+     - OFFSET_STORAGE_TOPIC=my_connect_offsets
+     - STATUS_STORAGE_TOPIC=my_source_connect_statuses
 
   ksqldb-server:
     image: confluentinc/ksqldb-server:${KSQLDB_VERSION}
@@ -41,12 +54,14 @@ services:
     container_name: ksqldb-server
     depends_on:
       - broker01
+      - connect
     ports:
       - "8088:8088"
     environment:
       KSQL_CONFIG_DIR: "/etc/ksql"
       KSQL_BOOTSTRAP_SERVERS: "broker01:9092"
-      KSQL_HOST_NAME: ksqldb-server
+      KSQL_HOST_NAME: ksqldb-server      
+      KSQL_KSQL_CONNECT_URL: "http://connect:8083"
       KSQL_LISTENERS: "http://0.0.0.0:8088"
       KSQL_CACHE_MAX_BYTES_BUFFERING: 0
 
