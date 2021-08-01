@@ -35,11 +35,13 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Parsers
 
     readonly char[] structuredTypeStarted = { '[', '{' };
     readonly char[] structuredTypeEnded = { ']', '}' };
-
+    
     private IEnumerable<string> Split(string row)
     {
       var stringBuilder = new StringBuilder();
       var isStructuredType = 0;
+
+      bool isInsideString = false;
 
       foreach(var ch in row)
       {
@@ -48,11 +50,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Parsers
 		 
         if(structuredTypeEnded.Contains(ch))
           isStructuredType--;
-					
-        if(ch != ',' || isStructuredType > 0)
+
+        if (ch == '"')
+          isInsideString = !isInsideString;
+
+        if(ch != ',' || isInsideString || isStructuredType > 0)
           stringBuilder.Append(ch);
 
-        if(ch == ',' && !(isStructuredType > 0))
+        if(ch == ',' && !isInsideString && !(isStructuredType > 0))
         {
           yield return stringBuilder.ToString();
           stringBuilder.Clear();
