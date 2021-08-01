@@ -358,7 +358,29 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Query.Functions
       actualValues[0].Col[0].Should().Be("banana");
       actualValues[0].Col[1].Should().Be("apple");
     }
-    
+
+    [TestMethod]
+    public async Task Encode()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+
+      string inputEncoding = "utf8";
+      string outputEncoding = "ascii";
+      Expression<Func<Movie, string>> expression = c => K.Functions.Encode(c.Title, inputEncoding, outputEncoding);
+
+      //Act
+      var source = Context.CreateQuery<Movie>(MoviesTableName)
+        .Select(expression)
+        .ToAsyncEnumerable();
+      
+      var actualValues = await CollectActualValues(source, expectedItemsCount);
+      
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+      actualValues[0].Should().Be(MoviesProvider.Movie1.Title);
+    }
+
     [TestMethod]
     public async Task ExtractJsonField()
     {

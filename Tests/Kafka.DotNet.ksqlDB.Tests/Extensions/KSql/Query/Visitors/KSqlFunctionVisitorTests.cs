@@ -745,7 +745,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
     #region Concat
 
     [TestMethod]
-    public void Concat_BuildKSql_PrintsTrimFunction()
+    public void Concat_BuildKSql_PrintsFunction()
     {
       //Arrange
       Expression<Func<Tweet, string>> expression = c => K.Functions.Concat(c.Message, "Value");
@@ -762,7 +762,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
     #region ConcatWS
 
     [TestMethod]
-    public void ConcatWS_BuildKSql_PrintsTrimFunction()
+    public void ConcatWS_BuildKSql_PrintsFunction()
     {
       //Arrange
       string separator = " - ";
@@ -773,6 +773,25 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
 
       //Assert
       query.Should().BeEquivalentTo($"CONCAT_WS(' - ', {nameof(Tweet.Message)}, 'Value')");
+    }
+
+    #endregion
+
+    #region Encode
+
+    [TestMethod]
+    public void Encode_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      string inputEncoding = "utf";
+      string outputEncoding = "ascii";
+      Expression<Func<Tweet, string>> expression = c => K.Functions.Encode(c.Message, inputEncoding, outputEncoding);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"ENCODE({nameof(Tweet.Message)}, '{inputEncoding}', '{outputEncoding}')");
     }
 
     #endregion
