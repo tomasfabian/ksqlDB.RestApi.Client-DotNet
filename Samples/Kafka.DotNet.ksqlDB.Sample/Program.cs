@@ -19,6 +19,7 @@ using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Topics;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.ksqlDB.Sample.Providers;
@@ -97,10 +98,6 @@ namespace Kafka.DotNet.ksqlDB.Sample
         Console.WriteLine(e);
       }
 
-      //var tablesResponse = await restApiProvider.GetTablesAsync();
-      var streamsResponse = await restApiProvider.GetStreamsAsync();
-      var connectorsResponse = await restApiProvider.GetConnectorsAsync();
-
       Console.WriteLine("Press any key to stop the subscription");
 
       Console.ReadKey();
@@ -108,6 +105,29 @@ namespace Kafka.DotNet.ksqlDB.Sample
       await moviesProvider.DropTablesAsync();
 
       Console.WriteLine("Subscription completed");
+    }
+
+    private static async Task GetKsqlDbInformationAsync(KSqlDbRestApiProvider restApiProvider)
+    {
+      Console.WriteLine($"{Environment.NewLine}Available topics:");
+      var topicsResponses = await restApiProvider.GetTopicsAsync();
+      Console.WriteLine(string.Join(',', topicsResponses[0].Topics.Select(c => c.Name)));
+
+      TopicsResponse[] allTopicsResponses = await restApiProvider.GetAllTopicsAsync();
+      TopicsExtendedResponse[] topicsExtendedResponses = await restApiProvider.GetTopicsExtendedAsync();
+      var allTopicsExtendedResponses = await restApiProvider.GetAllTopicsExtendedAsync();
+
+      Console.WriteLine($"{Environment.NewLine}Available tables:");
+      var tablesResponse = await restApiProvider.GetTablesAsync();
+      Console.WriteLine(string.Join(',', tablesResponse[0].Tables.Select(c => c.Name)));
+
+      Console.WriteLine($"{Environment.NewLine}Available streams:");
+      var streamsResponse = await restApiProvider.GetStreamsAsync();
+      Console.WriteLine(string.Join(',', streamsResponse[0].Streams.Select(c => c.Name)));
+      
+      Console.WriteLine($"{Environment.NewLine}Available connectors:");
+      var connectorsResponse = await restApiProvider.GetConnectorsAsync();
+      Console.WriteLine(string.Join(',', connectorsResponse[0].Connectors.Select(c => c.Name)));
     }
 
     private static async Task CreateOrReplaceTableStatement(IKSqlDBStatementsContext context)
@@ -675,6 +695,17 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
       //httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MovieNullableFields>(metadata);
       
       string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
+    }
+
+    private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient restApiClient)
+    {
+      string topicName = "moviesByTitle";
+
+      var queries = await restApiClient.GetQueriesAsync();
+
+      var query = queries.SelectMany(c => c.Queries).FirstOrDefault(c => c.SinkKafkaTopics.Contains(topicName));
+
+      var response = await restApiClient.TerminatePushQueryAsync(query.Id);// renamed to TerminatePersistentQueryAsync 
     }
   }
 }
