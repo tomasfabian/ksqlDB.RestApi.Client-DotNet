@@ -705,7 +705,7 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
 
       var query = queries.SelectMany(c => c.Queries).FirstOrDefault(c => c.SinkKafkaTopics.Contains(topicName));
 
-      var response = await restApiClient.TerminatePushQueryAsync(query.Id);// renamed to TerminatePersistentQueryAsync 
+      var response = await restApiClient.TerminatePersistentQueryAsync(query.Id); 
     }
 
     private static string SourceConnectorName => "mock-source-connector";

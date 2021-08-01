@@ -1,4 +1,4 @@
-﻿# v1.3.0-rc.1
+﻿# v1.3.0-rc.2
 KSqlDbRestApiClient:
 - CreateSourceConnectorAsync - Create a new source connector in the Kafka Connect cluster with the configuration passed in the config parameter.
 - CreateSinkConnectorAsync - Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
@@ -11,7 +11,12 @@ KSqlDbRestApiClient:
 - GetQueriesAsync - Lists queries running in the cluster.
 - QueriesResponse, Query
 
-- TerminatePushQueryAsync (wil be renamed to TerminatePersistentQueryAsync) - Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
+- TerminatePersistentQueryAsync - Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
+
+Scalar functions: ExtractJsonField, ConcatWS, Encode
+
+Bug fix:
+- [#1](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/issues/1) - [Pull Query] JsonException when a field contains a comma 
 
 # v1.2.0
 
