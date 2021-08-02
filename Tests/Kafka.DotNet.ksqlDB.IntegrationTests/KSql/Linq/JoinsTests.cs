@@ -107,8 +107,6 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
 
       Assert.AreEqual(MoviesProvider.Movie1.Title, actualValues[0].Title);
       Assert.AreEqual(MoviesProvider.LeadActor1.Title, actualValues[0].Title);
-      Assert.IsNotNull(actualValues[0].ActorTitle);
-      Assert.IsNotNull(actualValues[0].Substr);
 
       Assert.AreEqual("lien", actualValues[1].Substr);
       Assert.AreEqual(MoviesProvider.Movie1.Release_Year, actualValues[1].Release_Year);

@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
+using Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.IntegrationTests.Models.Movies;
-using Kafka.DotNet.ksqlDB.IntegrationTests.Models.Sensors;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
@@ -45,7 +45,7 @@ AS SELECT * FROM {nameof(Movie)} EMIT CHANGES;");
       //Arrange
       var creationMetadata = new CreationMetadata
       {
-        KafkaTopic = "tweetsByTitle",
+        KafkaTopic = "moviesByTitle",
         KeyFormat = SerializationFormats.Json,
         ValueFormat = SerializationFormats.Json,
         Replicas = 1,
@@ -64,7 +64,7 @@ AS SELECT * FROM {nameof(Movie)} EMIT CHANGES;");
 
       //Assert
       ksql.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
- WITH ( KAFKA_TOPIC='tweetsByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
+ WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
 AS SELECT Title, Release_Year AS ReleaseYear FROM Movie
 WHERE Id < 3 PARTITION BY Title EMIT CHANGES;");
     }
@@ -75,10 +75,13 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;");
     public async Task CreateOrReplaceTableStatement_ExecuteStatementAsync_ResponseWasReceived()
     {
       //Arrange
-      var query = Context.CreateOrReplaceTableStatement(TableName)
-        .As<IoTSensor>("IoTSensors")
-        .GroupBy(c => c.SensorId)
-        .Select(c => new { SensorId = c.Key, Count = c.Count() });
+      var statement = new KSqlDbStatement(StatementTemplates.DropTable(TableName));
+      var response = await KSqlDbRestApiProvider.Create().ExecuteStatementAsync(statement);
+
+      var query = Context.CreateTableStatement(TableName)
+        .As<Movie>("MYMOVIESSTREAMTESTS")
+        .GroupBy(c => c.Title)
+        .Select(c => new { Title = c.Key, Count = c.Count() });
 
       //Act
       var httpResponseMessage = await query.ExecuteStatementAsync();
