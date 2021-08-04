@@ -60,7 +60,7 @@ namespace Kafka.DotNet.SqlServer.Tests.Cdc.Connectors
 
     private string ExpectedStatement(string create)
     {
-      return @$"{create} {connectorName} WITH (
+      return @$"{create} `{connectorName}` WITH (
 	'connector.class'= 'io.debezium.connector.sqlserver.SqlServerConnector', 
 	'database.port'= '1433', 
 	'database.hostname'= '127.0.0.1', 

@@ -74,7 +74,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements.Connector
 
     private string ExpectedStatement(string create)
     {
-      return @$"{create} {connectorName} WITH (
+      return @$"{create} `{connectorName}` WITH (
 	'key1'= 'value1', 
 	'key2'= 'value2'
 );

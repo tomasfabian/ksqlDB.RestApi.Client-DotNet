@@ -20,7 +20,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Connectors
 
       string existsCondition = ifNotExists ? "IF NOT EXISTS " : string.Empty;
 
-      string createConnector = $"CREATE {connectorTypeClause} CONNECTOR {existsCondition}{connectorName} WITH ({Environment.NewLine}";
+      string createConnector = $"CREATE {connectorTypeClause} CONNECTOR {existsCondition}`{connectorName}` WITH ({Environment.NewLine}";
 
       stringBuilder.Append(createConnector);
 
