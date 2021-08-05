@@ -1,4 +1,4 @@
-﻿# v1.3.0-rc.2
+﻿# v1.3.0
 KSqlDbRestApiClient:
 - CreateSourceConnectorAsync - Create a new source connector in the Kafka Connect cluster with the configuration passed in the config parameter.
 - CreateSinkConnectorAsync - Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
@@ -14,6 +14,8 @@ KSqlDbRestApiClient:
 - TerminatePersistentQueryAsync - Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
 
 Scalar functions: ExtractJsonField, ConcatWS, Encode
+
+HttpResponseMessageExtensions - added JsonSerializerOptions - PropertyNameCaseInsensitive = true
 
 Bug fix:
 - [#1](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/issues/1) - [Pull Query] JsonException when a field contains a comma 
@@ -228,6 +230,10 @@ Fixes:
 - KStreamSet, KQuerySet, KQueryStreamSet
 - QbservableProvider
 - ```KSqldbProvider<T>``` - ksqldb REST api provider for push queries (```KSqlDbQueryProvider<T>```, ```KSqlDbQueryStreamProvider<T>```)
+
+# v1.4.0-rc.1
+KSqlDbRestApiClient:
+- TerminatePushQueryAsync - terminates push query by query id
 
 # TODO:
 - missing scalar functions https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#date-and-time
