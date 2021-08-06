@@ -20,6 +20,6 @@
     public static string DropTableAndDeleteTopic(string tableName) => $"DROP TABLE IF EXISTS {tableName} DELETE TOPIC;";
     //public static string DropTable(string tableName) => $"DROP TABLE [IF EXISTS] {tableName} [DELETE TOPIC];";
 
-    public static string TerminatePushQuery(string queryId) => $"TERMINATE {queryId};";
+    public static string TerminatePersistentQuery(string queryId) => $"TERMINATE {queryId};";
   }
 }

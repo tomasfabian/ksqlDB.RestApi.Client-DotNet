@@ -412,7 +412,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <returns></returns>
     public async Task<StatementResponse[]> TerminatePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default)
     {
-      string terminateStatement = StatementTemplates.TerminatePushQuery(queryId);
+      string terminateStatement = StatementTemplates.TerminatePersistentQuery(queryId);
 
       KSqlDbStatement ksqlDbStatement = new(terminateStatement);
 
