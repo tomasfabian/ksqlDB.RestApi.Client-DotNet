@@ -158,7 +158,7 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
       
       string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
 
-      var statementResponse = httpResponseMessage.ToStatementResponses();
+      var statementResponse = await httpResponseMessage.ToStatementResponsesAsync();
     }
 
     private static IDisposable ClientSideBatching(KSqlDBContext context)
