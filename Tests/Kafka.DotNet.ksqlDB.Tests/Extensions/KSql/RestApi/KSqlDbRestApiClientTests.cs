@@ -1,12 +1,14 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
+using Moq.Protected;
 
 namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
 {
@@ -23,7 +25,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       ClassUnderTest = new KSqlDbRestApiClient(HttpClientFactory);
     }
     
-    string statement = "CREATE OR REPLACE TABLE movies";
+    string createOrReplaceTableStatement = "CREATE OR REPLACE TABLE movies";
 
     private string StatementResponse => @"[{""@type"":""currentStatus"",""statementText"":""CREATE OR REPLACE TABLE MOVIES (TITLE STRING PRIMARY KEY, ID INTEGER, RELEASE_YEAR INTEGER) WITH (KAFKA_TOPIC='Movies', KEY_FORMAT='KAFKA', PARTITIONS=1, VALUE_FORMAT='JSON');"",""commandId"":""table/`MOVIES`/create"",""commandStatus"":{""status"":""SUCCESS"",""message"":""Table created"",""queryId"":null},""commandSequenceNumber"":328,""warnings"":[]}]
 ";
@@ -34,7 +36,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       //Arrange
       CreateHttpMocks(StatementResponse);
 
-      var ksqlDbStatement = new KSqlDbStatement(statement);
+      var ksqlDbStatement = new KSqlDbStatement(createOrReplaceTableStatement);
 
       //Act
       var httpResponseMessage = await ClassUnderTest.ExecuteStatementAsync(ksqlDbStatement);
@@ -49,7 +51,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
     public void CreateHttpRequestMessage_HttpRequestMessage_WasConfigured()
     {
       //Arrange
-      var ksqlDbStatement = new KSqlDbStatement(statement);
+      var ksqlDbStatement = new KSqlDbStatement(createOrReplaceTableStatement);
 
       //Act
       var httpRequestMessage = ClassUnderTest.CreateHttpRequestMessage(ksqlDbStatement);
@@ -64,21 +66,21 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
     public async Task CreateHttpRequestMessage_HttpRequestMessage_ContentWasSet()
     {
       //Arrange
-      var ksqlDbStatement = new KSqlDbStatement(statement);
+      var ksqlDbStatement = new KSqlDbStatement(createOrReplaceTableStatement);
 
       //Act
       var httpRequestMessage = ClassUnderTest.CreateHttpRequestMessage(ksqlDbStatement);
 
       //Assert
       var content = await httpRequestMessage.Content.ReadAsStringAsync();
-      content.Should().Be(@$"{{""ksql"":""{statement}"",""streamsProperties"":{{}}}}");
+      content.Should().Be(@$"{{""ksql"":""{createOrReplaceTableStatement}"",""streamsProperties"":{{}}}}");
     }
 
     [TestMethod]
     public void CreateContent_MediaTypeAndCharsetWereApplied()
     {
       //Arrange
-      var ksqlDbStatement = new KSqlDbStatement(statement);
+      var ksqlDbStatement = new KSqlDbStatement(createOrReplaceTableStatement);
 
       //Act
       var stringContent = ClassUnderTest.CreateContent(ksqlDbStatement);
@@ -94,7 +96,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       //Arrange
       var encoding = Encoding.Unicode;
 
-      var ksqlDbStatement = new KSqlDbStatement(statement)
+      var ksqlDbStatement = new KSqlDbStatement(createOrReplaceTableStatement)
       {
         ContentEncoding = encoding
       };
@@ -110,7 +112,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
     public async Task CreateContent_KSqlContentWasSet()
     {
       //Arrange
-      var ksqlDbStatement = new KSqlDbStatement(statement);
+      var ksqlDbStatement = new KSqlDbStatement(createOrReplaceTableStatement);
 
       //Act
       var stringContent = ClassUnderTest.CreateContent(ksqlDbStatement);
@@ -118,7 +120,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       //Assert
       var content = await GetContent(stringContent);
       
-      content.Should().Be(@$"{{""ksql"":""{statement}"",""streamsProperties"":{{}}}}");
+      content.Should().Be(@$"{{""ksql"":""{createOrReplaceTableStatement}"",""streamsProperties"":{{}}}}");
     }
 
     [TestMethod]
@@ -126,7 +128,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
     {
       //Arrange
       long commandSequenceNumber = 1000;
-      var ksqlDbStatement = new KSqlDbStatement(statement)
+      var ksqlDbStatement = new KSqlDbStatement(createOrReplaceTableStatement)
       {
         CommandSequenceNumber = commandSequenceNumber
       };
@@ -137,7 +139,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       //Assert
       var content = await GetContent(stringContent);
 
-      content.Should().Be(@$"{{""commandSequenceNumber"":{commandSequenceNumber},""ksql"":""{statement}"",""streamsProperties"":{{}}}}");
+      content.Should().Be(@$"{{""commandSequenceNumber"":{commandSequenceNumber},""ksql"":""{createOrReplaceTableStatement}"",""streamsProperties"":{{}}}}");
     }
 
     private static async Task<string> GetContent(StringContent stringContent)
@@ -153,7 +155,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
     public void GetEndpoint_DefaultIs_KSql()
     {
       //Arrange
-      var ksqlDbStatement = new KSqlDbStatement(statement);
+      var ksqlDbStatement = new KSqlDbStatement(createOrReplaceTableStatement);
 
       //Act
       var endpoint = KSqlDbRestApiClient.GetEndpoint(ksqlDbStatement);
@@ -166,7 +168,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
     public void GetEndpoint_OverridenToQueryEndpoint()
     {
       //Arrange
-      var ksqlDbStatement = new KSqlDbStatement(statement)
+      var ksqlDbStatement = new KSqlDbStatement(createOrReplaceTableStatement)
       {
         EndpointType = EndpointType.Query
       };
@@ -190,6 +192,10 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       var queriesResponses = await ClassUnderTest.GetQueriesAsync();
 
       //Assert
+      var expectedContent = GetExpectedContent(StatementTemplates.ShowQueries);
+      
+      VerifySendAsync(expectedContent);
+
       queriesResponses[0].StatementText.Should().Be(StatementTemplates.ShowQueries);
 
       queriesResponses[0].Type.Should().Be("queries");
@@ -207,13 +213,17 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       CreateHttpMocks(GetTopicsResponse);
 
       //Act
-      var queriesResponses = await ClassUnderTest.GetTopicsAsync();
+      var topicsResponses = await ClassUnderTest.GetTopicsAsync();
 
       //Assert
-      queriesResponses[0].StatementText.Should().Be(StatementTemplates.ShowTopics);
+      var expectedContent = GetExpectedContent(StatementTemplates.ShowTopics);
+      
+      VerifySendAsync(expectedContent);
 
-      queriesResponses[0].Type.Should().Be("kafka_topics");
-      queriesResponses[0].Topics.Length.Should().Be(2);
+      topicsResponses[0].StatementText.Should().Be(StatementTemplates.ShowTopics);
+
+      topicsResponses[0].Type.Should().Be("kafka_topics");
+      topicsResponses[0].Topics.Length.Should().Be(2);
     }
 
     [TestMethod]
@@ -223,31 +233,86 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       CreateHttpMocks(GetAllTopicsResponse);
 
       //Act
-      var queriesResponses = await ClassUnderTest.GetAllTopicsAsync();
+      var topicsResponses = await ClassUnderTest.GetAllTopicsAsync();
 
       //Assert
-      queriesResponses[0].StatementText.Should().Be(StatementTemplates.ShowAllTopics);
+      var expectedContent = GetExpectedContent(StatementTemplates.ShowAllTopics);
+      
+      VerifySendAsync(expectedContent);
 
-      queriesResponses[0].Topics.Length.Should().Be(2);
+      topicsResponses[0].StatementText.Should().Be(StatementTemplates.ShowAllTopics);
+
+      topicsResponses[0].Topics.Length.Should().Be(2);
+    }
+
+    [TestMethod]
+    public async Task GetTopicsExtendedAsync()
+    {
+      //Arrange
+      CreateHttpMocks(GetTopicsResponse);
+
+      //Act
+      var responses = await ClassUnderTest.GetTopicsExtendedAsync();
+
+      //Assert
+      var expectedContent = GetExpectedContent(StatementTemplates.ShowTopicsExtended);
+      
+      VerifySendAsync(expectedContent);
+    }
+
+    [TestMethod]
+    public async Task GetAllTopicsExtendedAsync()
+    {
+      //Arrange
+      CreateHttpMocks(GetTopicsResponse);
+
+      //Act
+      var responses = await ClassUnderTest.GetAllTopicsExtendedAsync();
+
+      //Assert
+      var expectedContent = GetExpectedContent(StatementTemplates.ShowAllTopicsExtended);
+      
+      VerifySendAsync(expectedContent);
     }
     
     string queryId = "CTAS_MOVIESBYTITLE_35";
     string type = "@type";
 
-    private string TerminatePushQueryResponse => $@"[{{""{type}"":""currentStatus"",""statementText"":""TERMINATE {queryId};"",""commandId"":""terminate/{queryId}/execute"",""commandStatus"":{{""status"":""SUCCESS"",""message"":""Query terminated."",""queryId"":null}},""commandSequenceNumber"":40,""warnings"":[]}}]";
+    private string TerminatePersistentQueryResponse => $@"[{{""{type}"":""currentStatus"",""statementText"":""TERMINATE {queryId};"",""commandId"":""terminate/{queryId}/execute"",""commandStatus"":{{""status"":""SUCCESS"",""message"":""Query terminated."",""queryId"":null}},""commandSequenceNumber"":40,""warnings"":[]}}]";
 
     [TestMethod]
-    public async Task TerminatePushQueryAsync()
+    public async Task TerminatePersistentQueryAsync()
     {
       //Arrange
-      CreateHttpMocks(TerminatePushQueryResponse);
+      CreateHttpMocks(TerminatePersistentQueryResponse);
 
       //Act
       var responses = await ClassUnderTest.TerminatePersistentQueryAsync(queryId);
 
       //Assert
-      string expectedStatement = StatementTemplates.TerminatePushQuery(queryId);
+      string terminateStatement = StatementTemplates.TerminatePersistentQuery(queryId);
+
+      var expectedContent = GetExpectedContent(terminateStatement);
+      
+      VerifySendAsync(expectedContent);
+
+      string expectedStatement = StatementTemplates.TerminatePersistentQuery(queryId);
       responses[0].StatementText.Should().Be(expectedStatement);
+    }
+
+    private string GetExpectedContent(string statement)
+    {
+      string parameters = @$"{{""ksql"":""{statement}"",""streamsProperties"":{{}}}}";
+
+      return parameters;
+    }
+
+    private void VerifySendAsync(string content, string requestUri = @"/ksql")
+    {
+      var request = ItExpr.Is<HttpRequestMessage>(c => c.Method == HttpMethod.Post && c.RequestUri.PathAndQuery == requestUri && c.Content.ReadAsStringAsync().Result == content);
+      
+      httpMessageHandlerMock.Protected()
+        .Verify(nameof(HttpClient.SendAsync), Times.Once(), exactParameterMatch: true, request, ItExpr.IsAny<CancellationToken>());
     }
 
     private string GetAllStreamsResponse => @"[{""@type"":""streams"",""statementText"":""SHOW STREAMS;"",""streams"":[{""type"":""STREAM"",""name"":""SENSORSSTREAM"",""topic"":""SENSORSSTREAM"",""keyFormat"":""KAFKA"",""valueFormat"":""JSON"",""isWindowed"":false},{""type"":""STREAM"",""name"":""MYMOVIESSTREAMTESTS"",""topic"":""MyMoviesStreamTest"",""keyFormat"":""JSON"",""valueFormat"":""JSON"",""isWindowed"":true}],""warnings"":[]}]";
@@ -262,6 +327,10 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       var queriesResponses = await ClassUnderTest.GetStreamsAsync();
 
       //Assert
+      var expectedContent = GetExpectedContent(StatementTemplates.ShowStreams);
+      
+      VerifySendAsync(expectedContent);
+
       queriesResponses[0].StatementText.Should().Be(StatementTemplates.ShowStreams);
 
       queriesResponses[0].Streams.Length.Should().Be(2);
@@ -279,6 +348,10 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       var queriesResponses = await ClassUnderTest.GetTablesAsync();
 
       //Assert
+      var expectedContent = GetExpectedContent(StatementTemplates.ShowTables);
+      
+      VerifySendAsync(expectedContent);
+
       queriesResponses[0].StatementText.Should().Be(StatementTemplates.ShowTables);
 
       queriesResponses[0].Tables.Length.Should().Be(2);

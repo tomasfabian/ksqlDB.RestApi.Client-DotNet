@@ -117,13 +117,39 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
     }
 
     [Test]
+    public void DropStream()
+    {
+      //Arrange
+      string streamName = "STREAM_NAME";
+
+      //Act
+      var statement = StatementTemplates.DropStream(streamName);
+
+      //Assert
+      statement.Should().Be($"DROP STREAM IF EXISTS {streamName} DELETE TOPIC;");
+    }
+
+    [Test]
+    public void DropTable()
+    {
+      //Arrange
+      string tableName = "TABLE_NAME";
+
+      //Act
+      var statement = StatementTemplates.DropTable(tableName);
+
+      //Assert
+      statement.Should().Be($"DROP TABLE IF EXISTS {tableName};");// DELETE TOPIC
+    }
+
+    [Test]
     public void TerminatePushQuery()
     {
       //Arrange
       string queryId = "QUERY_ID";
 
       //Act
-      var statement = StatementTemplates.TerminatePushQuery(queryId);
+      var statement = StatementTemplates.TerminatePersistentQuery(queryId);
 
       //Assert
       statement.Should().Be($"TERMINATE {queryId};");

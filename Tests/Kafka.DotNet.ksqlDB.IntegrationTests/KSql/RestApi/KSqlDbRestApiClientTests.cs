@@ -232,7 +232,7 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
     }
 
     [TestMethod]
-    public async Task TerminatePushQueryAsync()
+    public async Task TerminatePersistentQueryAsync()
     {
       //Arrange
       string topicName = "testTableAsSelect";

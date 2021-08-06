@@ -11,6 +11,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
   {
     protected IHttpClientFactory HttpClientFactory;
     protected HttpClient HttpClient;
+    protected Mock<HttpMessageHandler> httpMessageHandlerMock;
 
     [TestInitialize]
     public override void TestInitialize()
@@ -22,7 +23,9 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
 
     protected void CreateHttpMocks(string responseContents)
     {
-      HttpClient = FakeHttpClient.CreateWithResponse(responseContents);
+      httpMessageHandlerMock = FakeHttpClient.CreateHttpMessageHandler(responseContents);
+
+      HttpClient = httpMessageHandlerMock.ToHttpClient();
 
       Mock.Get(HttpClientFactory).Setup(c => c.CreateClient()).Returns(HttpClient);
     }
