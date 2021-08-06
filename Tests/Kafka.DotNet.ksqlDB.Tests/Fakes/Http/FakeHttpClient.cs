@@ -11,7 +11,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Fakes.Http
 {
   public static class FakeHttpClient
   {
-    public static HttpClient CreateWithResponse(string responseContent, HttpStatusCode statusCode = HttpStatusCode.OK)
+    public static Mock<HttpMessageHandler> CreateHttpMessageHandler(string responseContent, HttpStatusCode statusCode = HttpStatusCode.OK)
     {     
       var handlerMock = new Mock<HttpMessageHandler>();
 
@@ -22,17 +22,29 @@ namespace Kafka.DotNet.ksqlDB.Tests.Fakes.Http
           ItExpr.IsAny<HttpRequestMessage>(),
           ItExpr.IsAny<CancellationToken>()
         )
-        .ReturnsAsync(new HttpResponseMessage()
+        .ReturnsAsync(new HttpResponseMessage
         {
           StatusCode = statusCode,
           Content = new StringContent(responseContent),
         })
         .Verifiable();
 
+      return handlerMock;
+    }
+
+    public static HttpClient ToHttpClient(this Mock<HttpMessageHandler> handlerMock)
+    {     
       return new HttpClient(handlerMock.Object)
       {
         BaseAddress = new Uri(TestParameters.KsqlDBUrl)
       };
+    }
+
+    public static HttpClient CreateWithResponse(string responseContent, HttpStatusCode statusCode = HttpStatusCode.OK)
+    {     
+      var handlerMock = CreateHttpMessageHandler(responseContent, statusCode);
+
+      return handlerMock.ToHttpClient();
     }
   }
 }
