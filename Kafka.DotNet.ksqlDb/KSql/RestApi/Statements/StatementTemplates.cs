@@ -14,6 +14,12 @@
     public static string ShowConnectors => "SHOW CONNECTORS;";
     public static string DropConnector(string connectorName) => $"DROP CONNECTOR {connectorName};";
 
+    public static string DropStream(string streamName) => $"DROP STREAM IF EXISTS {streamName} DELETE TOPIC;";
+    //public static string DropStream(string streamName) => $"DROP STREAM [IF EXISTS] {streamName} [DELETE TOPIC];";
+    public static string DropTable(string tableName) => $"DROP TABLE IF EXISTS {tableName};";
+    public static string DropTableAndDeleteTopic(string tableName) => $"DROP TABLE IF EXISTS {tableName} DELETE TOPIC;";
+    //public static string DropTable(string tableName) => $"DROP TABLE [IF EXISTS] {tableName} [DELETE TOPIC];";
+
     public static string TerminatePushQuery(string queryId) => $"TERMINATE {queryId};";
   }
 }
