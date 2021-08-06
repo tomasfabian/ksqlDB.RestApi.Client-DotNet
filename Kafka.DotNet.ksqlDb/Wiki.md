@@ -972,7 +972,7 @@ ROUND(Amount, 3)
 ```
 
 ### Dynamic - calling not supported ksqldb functions (v0.3.0)
-Some of the ksqldb functions have not been implemented yet. This can be circumvented by calling K.Functions.Dynamic with the appropriate function call and its paramaters. The type of the column value is set with C# **as** operator.
+Some of the ksqldb functions have not been implemented yet. This can be circumvented by calling K.Functions.Dynamic with the appropriate function call and its parameters. The type of the column value is set with C# **as** operator.
 ```C#
 using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
 
@@ -1852,7 +1852,7 @@ KSqlDBContextOptions.ShouldPluralizeStreamName was renamed to ShouldPluralizeFro
 
 Record.RowTime was decorated with IgnoreByInsertsAttribute
 
-> ⚠  From version 1.0.0 the overriden from item names are pluralized, too. 
+> ⚠  From version 1.0.0 the overridden from item names are pluralized, too. 
 Join items are also affected by this breaking change. This breaking change can cause runtime exceptions for users updating from lower versions. In case that you have never used custom singular from-item names, your code won't be affected, see the example below:
 ```
 var contextOptions = new KSqlDBContextOptions(@"http:\\localhost:8088")
@@ -1997,10 +1997,10 @@ Console.WriteLine(string.Join(',', tableResponses[0].Tables.Select(c => c.Name))
 
 # v1.3.0:
 ```
-Install-Package Kafka.DotNet.ksqlDB -Version 1.3.0-rc.1
+Install-Package Kafka.DotNet.ksqlDB -Version 1.3.0-rc.2
 ```
 
-# KSqlDbRestApiClient:
+### KSqlDbRestApiClient:
 
 ### Get topics (v1.3.0)
 - GetTopicsAsync - lists the available topics in the Kafka cluster that ksqlDB is configured to connect to.
@@ -2027,7 +2027,7 @@ private static async Task GetKsqlDbInformationAsync(IKSqlDbRestApiProvider restA
 }
 ```
 
-### Getting queries and termination of persistant queries (v1.3.0)
+### Getting queries and termination of persistent queries (v1.3.0)
 - GetQueriesAsync - Lists queries running in the cluster.
 
 - TerminatePersistentQueryAsync - Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
@@ -2084,6 +2084,13 @@ private static async Task CreateConnectorsAsync(IKSqlDbRestApiClient restApiClie
 }
 ```
 
+# v1.4.0 Road map:
+
+### Terminate push queries
+```C#
+
+```
+
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
 
@@ -2095,7 +2102,7 @@ https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
 **TODO:**
 - [CREATE STREAM AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream-as-select/) - [ WITHIN [(before TIMEUNIT, after TIMEUNIT) | N TIMEUNIT] ]
 - [CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/) - EMIT output_refinement
-- rest of the [ksql query syntax](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/) (supported operators etc)
+- rest of the [ksql query syntax](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/) (supported operators etc.)
 - backpressure support
 
 # ksqldb links
