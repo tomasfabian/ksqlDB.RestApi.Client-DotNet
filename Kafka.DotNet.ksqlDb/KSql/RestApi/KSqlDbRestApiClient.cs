@@ -59,6 +59,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       return httpResponseMessage;
     }
 
+    internal HttpRequestMessage CreateHttpRequestMessage(KSqlDbStatement ksqlDbStatement)
+    {
+      return CreateHttpRequestMessage(ksqlDbStatement, ksqlDbStatement.EndpointType, ksqlDbStatement.ContentEncoding);
+    }
+
     internal HttpRequestMessage CreateHttpRequestMessage(object content, EndpointType endPointType, Encoding encoding)
     {
       var data = CreateContent(content, encoding);
@@ -73,6 +78,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       return httpRequestMessage;
     }
 
+    internal StringContent CreateContent(KSqlDbStatement ksqlDbStatement)
+    {
+      return CreateContent(ksqlDbStatement, ksqlDbStatement.ContentEncoding);
+    }
+
     internal static StringContent CreateContent(object content, Encoding encoding)
     {
       var json = JsonSerializer.Serialize(content);
@@ -80,6 +90,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       var data = new StringContent(json, encoding, MediaType);
 
       return data;
+    }
+
+    internal static string GetEndpoint(KSqlDbStatement ksqlDbStatement)
+    {
+      return GetEndpoint(ksqlDbStatement.EndpointType);
     }
 
     internal static string GetEndpoint(EndpointType endpointType)
