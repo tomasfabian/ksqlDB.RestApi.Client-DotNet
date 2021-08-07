@@ -708,6 +708,16 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
       var response = await restApiClient.TerminatePersistentQueryAsync(query.Id); 
     }
 
+    //TODO: v1.4.0
+    //private static async Task TerminatePushQueryAsync(IKSqlDBContext context, IKSqlDbRestApiClient restApiClient)
+    //{
+    //  var queryId = await context.CreateQueryStream<Movie>()
+    //    .SubscribeOn(ThreadPoolScheduler.Instance)
+    //    .SubscribeAsync(onNext: _ => {}, onError: e => { }, onCompleted: () => { });
+      
+    //  var response = await restApiClient.TerminatePushQueryAsync(queryId);
+    //}
+
     private static string SourceConnectorName => "mock-source-connector";
     private static string SinkConnectorName => "mock-sink-connector";
 
