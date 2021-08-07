@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
@@ -273,6 +274,26 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
 
       statementResponse[0].CommandStatus.Status.Should().Be(SuccessStatus);
       statementResponse[0].CommandStatus.Message.Should().Be("Query terminated.");
+    }
+
+    [TestMethod]
+    public async Task TerminatePushQueryAsync()
+    {
+      //Arrange
+      var contextOptions = new KSqlDBContextOptions(@"http:\\localhost:8088");
+      await using var context = new KSqlDBContext(contextOptions);
+
+      var queryId = await context.CreateQueryStream<MyMoviesTable>().SubscribeAsync(_ => {}, e => { }, () => { });
+
+      //Act
+      var response = await restApiClient.TerminatePushQueryAsync(queryId);
+
+      //Assert
+      
+      //https://github.com/confluentinc/ksql/issues/7559
+      //"{"@type":"generic_error","error_code":50000,"message":"On wrong context or worker"}"
+      response.IsSuccessStatusCode.Should().BeFalse();
+      //response.IsSuccessStatusCode.Should().BeTrue();
     }
 
     [TestMethod]
