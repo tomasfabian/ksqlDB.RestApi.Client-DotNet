@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Query;
 using Moq.Protected;
 
 namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
@@ -298,6 +299,31 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
 
       string expectedStatement = StatementTemplates.TerminatePersistentQuery(queryId);
       responses[0].StatementText.Should().Be(expectedStatement);
+    }
+
+    //TODO: test close-query
+    //https://github.com/confluentinc/ksql/issues/7559
+    private string TerminatePushQueryResponse => @"""{""@type"":""generic_error"",""error_code"":50000,""message"":""On wrong context or worker""}""";
+
+    [TestMethod]
+    public async Task TerminatePushQueryAsync()
+    {
+      //Arrange
+      CreateHttpMocks(TerminatePushQueryResponse);
+
+      //Act
+      var response = await ClassUnderTest.TerminatePushQueryAsync(queryId);
+
+      //Assert
+      response.IsSuccessStatusCode.Should().BeTrue();
+      var closeQuery = new CloseQuery
+      {
+        QueryId = queryId
+      };
+      
+      var expectedContent = await KSqlDbRestApiClient.CreateContent(closeQuery, Encoding.UTF8).ReadAsStringAsync();
+
+      VerifySendAsync(expectedContent, "/close-query");
     }
 
     private string GetExpectedContent(string statement)
