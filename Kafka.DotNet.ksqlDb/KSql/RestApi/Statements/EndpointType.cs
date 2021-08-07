@@ -4,6 +4,7 @@
   {
     Query,
     QueryStream,
-    KSql
+    KSql,
+    CloseQuery
   }
 }
