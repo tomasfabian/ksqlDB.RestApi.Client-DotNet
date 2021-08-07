@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Generators;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Query;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Queries;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Streams;
@@ -28,7 +30,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     }
 
     internal static readonly string MediaType = "application/vnd.ksql.v1+json";
-    
+
     private string NullOrWhiteSpaceErrorMessage => "Can't be null, empty, or contain only whitespace.";
 
     /// <summary>
@@ -37,11 +39,16 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <param name="ksqlDbStatement">The text of the SQL statements.</param>
     /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns></returns>
-    public async Task<HttpResponseMessage> ExecuteStatementAsync(KSqlDbStatement ksqlDbStatement, CancellationToken cancellationToken = default)
+    public Task<HttpResponseMessage> ExecuteStatementAsync(KSqlDbStatement ksqlDbStatement, CancellationToken cancellationToken = default)
+    {
+      return ExecuteStatementAsync(ksqlDbStatement, ksqlDbStatement.EndpointType, ksqlDbStatement.ContentEncoding, cancellationToken);
+    }
+
+    private async Task<HttpResponseMessage> ExecuteStatementAsync(object content, EndpointType endPointType, Encoding encoding, CancellationToken cancellationToken = default)
     {
       using var httpClient = httpClientFactory.CreateClient();
 
-      var httpRequestMessage = CreateHttpRequestMessage(ksqlDbStatement);
+      var httpRequestMessage = CreateHttpRequestMessage(content, endPointType, encoding);
 
       httpClient.DefaultRequestHeaders.Accept.Add(
         new MediaTypeWithQualityHeaderValue(MediaType));
@@ -52,11 +59,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       return httpResponseMessage;
     }
 
-    internal HttpRequestMessage CreateHttpRequestMessage(KSqlDbStatement ksqlDbStatement)
+    internal HttpRequestMessage CreateHttpRequestMessage(object content, EndpointType endPointType, Encoding encoding)
     {
-      var data = CreateContent(ksqlDbStatement);
+      var data = CreateContent(content, encoding);
 
-      var endpoint = GetEndpoint(ksqlDbStatement);
+      var endpoint = GetEndpoint(endPointType);
 
       var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, endpoint)
       {
@@ -66,21 +73,22 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       return httpRequestMessage;
     }
 
-    internal StringContent CreateContent(KSqlDbStatement ksqlDbStatement)
+    internal static StringContent CreateContent(object content, Encoding encoding)
     {
-      var json = JsonSerializer.Serialize(ksqlDbStatement);
+      var json = JsonSerializer.Serialize(content);
 
-      var data = new StringContent(json, ksqlDbStatement.ContentEncoding, MediaType);
+      var data = new StringContent(json, encoding, MediaType);
 
       return data;
     }
 
-    internal static string GetEndpoint(KSqlDbStatement ksqlDbStatement)
+    internal static string GetEndpoint(EndpointType endpointType)
     {
-      var endpoint = ksqlDbStatement.EndpointType switch
+      var endpoint = endpointType switch
       {
         EndpointType.KSql => "/ksql",
         EndpointType.Query => "/query",
+        EndpointType.CloseQuery => "/close-query",
         _ => throw new ArgumentOutOfRangeException()
       };
 
@@ -88,7 +96,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     }
 
     #region Creation
-    
+
     /// <summary>
     /// Create a new stream with the specified columns and properties.
     /// </summary>
@@ -117,7 +125,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
       return ExecuteAsync<T>(ksql, cancellationToken);
     }
-    
+
     /// <summary>
     /// Create a new table with the specified columns and properties.
     /// </summary>
@@ -132,7 +140,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
       return ExecuteAsync<T>(ksql, cancellationToken);
     }
-    
+
     /// <summary>
     /// Create a new table or replace an existing one with the specified columns and properties.
     /// </summary>
@@ -167,7 +175,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     public Task<HttpResponseMessage> InsertIntoAsync<T>(T entity, InsertProperties insertProperties = null, CancellationToken cancellationToken = default)
     {
       var insert = new CreateInsert().Generate<T>(entity, insertProperties);
-	
+
       KSqlDbStatement ksqlDbStatement = new(insert);
 
       var httpResponseMessage = ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
@@ -201,16 +209,16 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       KSqlDbStatement ksqlDbStatement = new(showStatement);
 
       var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
-      
+
       var streamsResponses = await httpResponseMessage.ToTablesResponseAsync().ConfigureAwait(false);
 
       return streamsResponses;
     }
 
     #region Topics
-    
+
     //SHOW | LIST [ALL] TOPICS [EXTENDED];
-    
+
     /// <summary>
     /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to.
     /// </summary>
@@ -228,7 +236,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
       return responses;
     }
-	
+
     /// <summary>
     /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to, including hidden topics.
     /// </summary>
@@ -241,12 +249,12 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       KSqlDbStatement ksqlDbStatement = new(showStatement);
 
       var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
-    
+
       var responses = await httpResponseMessage.ToTopicsResponseAsync().ConfigureAwait(false);
 
       return responses;
     }
-	
+
     /// <summary>
     /// Lists the available topics in the Kafka cluster that ksqlDB is configured to connect to.
     /// </summary>
@@ -309,7 +317,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     #endregion
 
     #endregion
-    
+
     #region Connectors
 
     /// <summary>
@@ -324,7 +332,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       KSqlDbStatement ksqlDbStatement = new(showStatement);
 
       var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
-        
+
       return await httpResponseMessage.ToConnectorsResponseAsync();
     }
 
@@ -339,7 +347,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     public Task<HttpResponseMessage> CreateSourceConnectorAsync(IDictionary<string, string> config, string connectorName, bool ifNotExists = false, CancellationToken cancellationToken = default)
     {
       if (config == null) throw new ArgumentNullException(nameof(config));
-      
+
       if (string.IsNullOrWhiteSpace(connectorName))
         throw new ArgumentException(NullOrWhiteSpaceErrorMessage, nameof(connectorName));
 
@@ -361,7 +369,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     public Task<HttpResponseMessage> CreateSinkConnectorAsync(IDictionary<string, string> config, string connectorName, bool ifNotExists = false, CancellationToken cancellationToken = default)
     {
       if (config == null) throw new ArgumentNullException(nameof(config));
-      
+
       if (string.IsNullOrWhiteSpace(connectorName))
         throw new ArgumentException(NullOrWhiteSpaceErrorMessage, nameof(connectorName));
 
@@ -381,7 +389,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     public Task<HttpResponseMessage> DropConnectorIfExistsAsync(string connectorName, CancellationToken cancellationToken = default)
     {
       string dropIfExistsStatement = $"DROP CONNECTOR IF EXISTS {connectorName};";
-      
+
       KSqlDbStatement ksqlDbStatement = new(dropIfExistsStatement);
 
       return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
@@ -396,7 +404,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     public Task<HttpResponseMessage> DropConnectorAsync(string connectorName, CancellationToken cancellationToken = default)
     {
       string dropStatement = StatementTemplates.DropConnector(connectorName);
-      
+
       KSqlDbStatement ksqlDbStatement = new(dropStatement);
 
       return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
@@ -421,6 +429,27 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       var statementResponse = await httpResponseMessage.ToStatementResponsesAsync().ConfigureAwait(false);
 
       return statementResponse;
+    }
+
+    /// <summary>
+    /// Terminate a push query.
+    /// </summary>
+    /// <param name="queryId">Id of the query to terminate.</param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+    /// <returns></returns>
+    public async Task<HttpResponseMessage> TerminatePushQueryAsync(string queryId, CancellationToken cancellationToken = default)
+    {
+      //https://github.com/confluentinc/ksql/issues/7559
+      //"{"@type":"generic_error","error_code":50000,"message":"On wrong context or worker"}"
+
+      var closeQuery = new CloseQuery
+      {
+        QueryId = queryId
+      };
+		
+      var response = await ExecuteStatementAsync(closeQuery, EndpointType.CloseQuery, Encoding.UTF8, cancellationToken);
+		
+      return response;
     }
 
     private async Task<TResponse[]> ExecuteStatementAsync<TResponse>(string statement, CancellationToken cancellationToken = default)
