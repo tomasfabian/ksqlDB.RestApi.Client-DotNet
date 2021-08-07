@@ -2084,9 +2084,26 @@ private static async Task CreateConnectorsAsync(IKSqlDbRestApiClient restApiClie
 }
 ```
 
+
 # v1.4.0 Road map:
 
+KSqlDbRestApiClient:
+
 ### Terminate push queries
+- TerminatePushQueryAsync - terminates push query by query id
+
+```C#
+string queryId = "xyz123"; // <----- the ID of the query to terminate
+
+var response = await restApiClient.TerminatePushQueryAsync(queryId);
+```
+
+### Drop a table
+```C#
+
+```
+
+### Drop a stream
 ```C#
 
 ```

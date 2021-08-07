@@ -231,7 +231,7 @@ Fixes:
 - QbservableProvider
 - ```KSqldbProvider<T>``` - ksqldb REST api provider for push queries (```KSqlDbQueryProvider<T>```, ```KSqlDbQueryStreamProvider<T>```)
 
-# v1.4.0-rc.1
+# v1.4.0-rc.1 (road map WIP)
 KSqlDbRestApiClient:
 - TerminatePushQueryAsync - terminates push query by query id
 
