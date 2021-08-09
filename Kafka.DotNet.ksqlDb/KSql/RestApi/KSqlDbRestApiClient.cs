@@ -432,13 +432,13 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// DROP STREAM [IF EXISTS] stream_name [DELETE TOPIC];
     /// </summary>
     /// <param name="streamName">Name of the stream to delete.</param>
-    /// <param name="useIfExists">If the IF EXISTS clause is present, the statement doesn't fail if the table doesn't exist.</param>
+    /// <param name="useIfExistsClause">If the IF EXISTS clause is present, the statement doesn't fail if the table doesn't exist.</param>
     /// <param name="deleteTopic">If the DELETE TOPIC clause is present, the stream's source topic is marked for deletion.</param>
     /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns></returns>
-    public Task<HttpResponseMessage> DropStreamAsync(string streamName, bool useIfExists = false, bool deleteTopic = false, CancellationToken cancellationToken = default)
+    public Task<HttpResponseMessage> DropStreamAsync(string streamName, bool useIfExistsClause, bool deleteTopic, CancellationToken cancellationToken = default)
     {      
-      string dropStatement = StatementTemplates.DropStream(streamName, useIfExists, deleteTopic);
+      string dropStatement = StatementTemplates.DropStream(streamName, useIfExistsClause, deleteTopic);
 
       KSqlDbStatement ksqlDbStatement = new(dropStatement);
 
@@ -466,13 +466,13 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// DROP TABLE [IF EXISTS] table_name [DELETE TOPIC];
     /// </summary>
     /// <param name="tableName">Name of the table to delete.</param>
-    /// <param name="useIfExists">If the IF EXISTS clause is present, the statement doesn't fail if the table doesn't exist.</param>
+    /// <param name="useIfExistsClause">If the IF EXISTS clause is present, the statement doesn't fail if the table doesn't exist.</param>
     /// <param name="deleteTopic">If the DELETE TOPIC clause is present, the table's source topic is marked for deletion.</param>
     /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns></returns>
-    public Task<HttpResponseMessage> DropTableAsync(string tableName, bool useIfExists = false, bool deleteTopic = false, CancellationToken cancellationToken = default)
+    public Task<HttpResponseMessage> DropTableAsync(string tableName, bool useIfExistsClause, bool deleteTopic, CancellationToken cancellationToken = default)
     {
-      string dropStatement = StatementTemplates.DropTable(tableName, useIfExists: false, deleteTopic: false);
+      string dropStatement = StatementTemplates.DropTable(tableName, useIfExistsClause, deleteTopic);
 
       KSqlDbStatement ksqlDbStatement = new(dropStatement);
 
