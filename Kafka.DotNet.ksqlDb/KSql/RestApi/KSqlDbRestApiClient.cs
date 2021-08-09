@@ -427,6 +427,24 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
     #endregion
 
+    internal Task<HttpResponseMessage> DropStreamAsync(string streamName, CancellationToken cancellationToken = default)
+    {
+      string dropStatement = StatementTemplates.DropStream(streamName);
+
+      KSqlDbStatement ksqlDbStatement = new(dropStatement);
+
+      return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
+    }
+
+    internal Task<HttpResponseMessage> DropTableAsync(string tableName, CancellationToken cancellationToken = default)
+    {
+      string dropStatement = StatementTemplates.DropTable(tableName);
+
+      KSqlDbStatement ksqlDbStatement = new(dropStatement);
+
+      return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
+    }
+
     /// <summary>
     /// Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
     /// </summary>
