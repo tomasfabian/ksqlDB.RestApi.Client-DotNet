@@ -432,7 +432,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// DROP STREAM [IF EXISTS] stream_name [DELETE TOPIC];
     /// </summary>
     /// <param name="streamName">Name of the stream to delete.</param>
-    /// <param name="useIfExistsClause">If the IF EXISTS clause is present, the statement doesn't fail if the table doesn't exist.</param>
+    /// <param name="useIfExistsClause">If the IF EXISTS clause is present, the statement doesn't fail if the stream doesn't exist.</param>
     /// <param name="deleteTopic">If the DELETE TOPIC clause is present, the stream's source topic is marked for deletion.</param>
     /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns></returns>
