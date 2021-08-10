@@ -1,4 +1,6 @@
-﻿namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
+﻿using static System.String;
+
+namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
 {
   internal static class StatementTemplates
   {
@@ -14,11 +16,21 @@
     public static string ShowConnectors => "SHOW CONNECTORS;";
     public static string DropConnector(string connectorName) => $"DROP CONNECTOR {connectorName};";
 
-    public static string DropStream(string streamName) => $"DROP STREAM IF EXISTS {streamName} DELETE TOPIC;";
-    //public static string DropStream(string streamName) => $"DROP STREAM [IF EXISTS] {streamName} [DELETE TOPIC];";
-    public static string DropTable(string tableName) => $"DROP TABLE IF EXISTS {tableName};";
-    public static string DropTableAndDeleteTopic(string tableName) => $"DROP TABLE IF EXISTS {tableName} DELETE TOPIC;";
-    //public static string DropTable(string tableName) => $"DROP TABLE [IF EXISTS] {tableName} [DELETE TOPIC];";
+    public static string DropStream(string streamName, bool useIfExists = false, bool deleteTopic = false)
+    {
+      string ifExistsClause = useIfExists ? " IF EXISTS" : Empty;
+      string deleteTopicClause = deleteTopic ? " DELETE TOPIC" : Empty;
+
+      return $"DROP STREAM{ifExistsClause} {streamName}{deleteTopicClause};";
+    } 
+
+    public static string DropTable(string tableName, bool useIfExists = false, bool deleteTopic = false)
+    {
+      string ifExistsClause = useIfExists ? " IF EXISTS" : Empty;
+      string deleteTopicClause = deleteTopic ? " DELETE TOPIC" : Empty;
+      
+      return $"DROP TABLE{ifExistsClause} {tableName}{deleteTopicClause};";
+    }
 
     public static string TerminatePersistentQuery(string queryId) => $"TERMINATE {queryId};";
   }
