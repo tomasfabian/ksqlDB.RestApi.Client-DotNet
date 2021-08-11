@@ -382,5 +382,79 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
 
       queriesResponses[0].Tables.Length.Should().Be(2);
     }
+
+    [TestMethod]
+    public async Task DropStreamAsync()
+    {
+      //Arrange
+      CreateHttpMocks(@"[]");
+
+      string streamName = "TEST_STREAM";
+
+      //Act
+      var response = await ClassUnderTest.DropStreamAsync(streamName);
+
+      //Assert
+      var expectedContent = GetExpectedContent(StatementTemplates.DropStream(streamName));
+      
+      VerifySendAsync(expectedContent);
+    }
+
+    [TestMethod]
+    public async Task DropStreamAsync_IfExistsAndDeleteTopic()
+    {
+      //Arrange
+      CreateHttpMocks(@"[]");
+
+      string streamName = "TEST_STREAM";
+
+      bool useIfExistsClause = true;
+      bool deleteTopic = true;
+      
+      //Act
+      var response = await ClassUnderTest.DropStreamAsync(streamName, useIfExistsClause, deleteTopic);
+
+      //Assert
+      var expectedContent = GetExpectedContent(StatementTemplates.DropStream(streamName, useIfExistsClause, deleteTopic));
+      
+      VerifySendAsync(expectedContent);
+    }
+
+    [TestMethod]
+    public async Task DropTableAsync()
+    {
+      //Arrange
+      CreateHttpMocks(@"[]");
+
+      string tableName = "TEST_TABLE";
+
+      //Act
+      var response = await ClassUnderTest.DropTableAsync(tableName);
+
+      //Assert
+      var expectedContent = GetExpectedContent(StatementTemplates.DropTable(tableName));
+      
+      VerifySendAsync(expectedContent);
+    }
+
+    [TestMethod]
+    public async Task DropTableAsync_IfExistsAndDeleteTopic()
+    {
+      //Arrange
+      CreateHttpMocks(@"[]");
+
+      string tableName = "TEST_TABLE";
+
+      bool useIfExistsClause = true;
+      bool deleteTopic = true;
+
+      //Act
+      var response = await ClassUnderTest.DropTableAsync(tableName, useIfExistsClause, deleteTopic);
+
+      //Assert
+      var expectedContent = GetExpectedContent(StatementTemplates.DropTable(tableName, useIfExistsClause, deleteTopic));
+      
+      VerifySendAsync(expectedContent);
+    }
   }
 }
