@@ -336,6 +336,49 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
       content[0].Type.Should().Be("error_entity");
     }
 
+    private string CreateStreamStatement(string streamName = "TestTable")
+    {
+      return $@"CREATE OR REPLACE STREAM {streamName} (
+        title VARCHAR KEY,
+        id INT,
+        release_year INT
+      ) WITH (
+        KAFKA_TOPIC='{streamName}',
+        PARTITIONS=1,
+        VALUE_FORMAT = 'JSON'
+      );";
+    }
+
+    [TestMethod]
+    public async Task DropStreamAsync()
+    {
+      //Arrange
+      string streamName = Guid.NewGuid().ToString().Substring(0, 8);
+      var response = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(CreateStreamStatement(streamName)));
+
+      //Act
+      var httpResponseMessage = await restApiClient.DropStreamAsync(streamName, true, true);
+      var content = await httpResponseMessage.ToStatementResponsesAsync();
+
+      //Assert
+      httpResponseMessage.IsSuccessStatusCode.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task DropTableAsync()
+    {
+      //Arrange
+      string tableName = Guid.NewGuid().ToString().Substring(0, 8);
+      var response = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(CreateTableStatement(tableName)));
+
+      //Act
+      var httpResponseMessage = await restApiClient.DropTableAsync(tableName, true, true);
+      var content = await httpResponseMessage.ToStatementResponsesAsync();
+
+      //Assert
+      httpResponseMessage.IsSuccessStatusCode.Should().BeTrue();
+    }
+
     internal record MyMoviesTable : MyMoviesStreamTest
     {
 
