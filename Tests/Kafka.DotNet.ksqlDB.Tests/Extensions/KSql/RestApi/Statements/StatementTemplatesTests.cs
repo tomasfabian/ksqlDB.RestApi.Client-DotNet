@@ -126,6 +126,45 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       var statement = StatementTemplates.DropStream(streamName);
 
       //Assert
+      statement.Should().Be($"DROP STREAM {streamName};");
+    }
+
+    [Test]
+    public void DropStream_IfExists()
+    {
+      //Arrange
+      string streamName = "STREAM_NAME";
+
+      //Act
+      var statement = StatementTemplates.DropStream(streamName, useIfExists: true, deleteTopic: false);
+
+      //Assert
+      statement.Should().Be($"DROP STREAM IF EXISTS {streamName};");
+    }
+
+    [Test]
+    public void DropStream_DeleteTopic()
+    {
+      //Arrange
+      string streamName = "STREAM_NAME";
+
+      //Act
+      var statement = StatementTemplates.DropStream(streamName, useIfExists: false, deleteTopic: true);
+
+      //Assert
+      statement.Should().Be($"DROP STREAM {streamName} DELETE TOPIC;");
+    }
+
+    [Test]
+    public void DropStream_IfExistsAndDeleteTopic()
+    {
+      //Arrange
+      string streamName = "STREAM_NAME";
+
+      //Act
+      var statement = StatementTemplates.DropStream(streamName, useIfExists: true, deleteTopic: true);
+
+      //Assert
       statement.Should().Be($"DROP STREAM IF EXISTS {streamName} DELETE TOPIC;");
     }
 
@@ -139,7 +178,46 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       var statement = StatementTemplates.DropTable(tableName);
 
       //Assert
-      statement.Should().Be($"DROP TABLE IF EXISTS {tableName};");// DELETE TOPIC
+      statement.Should().Be($"DROP TABLE {tableName};");
+    }
+
+    [Test]
+    public void DropTable_IfExists()
+    {
+      //Arrange
+      string tableName = "TABLE_NAME";
+
+      //Act
+      var statement = StatementTemplates.DropTable(tableName, useIfExists: true, deleteTopic: false);
+
+      //Assert
+      statement.Should().Be($"DROP TABLE IF EXISTS {tableName};");
+    }
+
+    [Test]
+    public void DropTable_DeleteTopic()
+    {
+      //Arrange
+      string tableName = "TABLE_NAME";
+
+      //Act
+      var statement = StatementTemplates.DropTable(tableName, useIfExists: false, deleteTopic: true);
+
+      //Assert
+      statement.Should().Be($"DROP TABLE {tableName} DELETE TOPIC;");
+    }
+
+    [Test]
+    public void DropTable_IfExistsAndDeleteTopic()
+    {
+      //Arrange
+      string tableName = "TABLE_NAME";
+
+      //Act
+      var statement = StatementTemplates.DropTable(tableName, useIfExists: true, deleteTopic: true);
+
+      //Assert
+      statement.Should().Be($"DROP TABLE IF EXISTS {tableName} DELETE TOPIC;");
     }
 
     [Test]
