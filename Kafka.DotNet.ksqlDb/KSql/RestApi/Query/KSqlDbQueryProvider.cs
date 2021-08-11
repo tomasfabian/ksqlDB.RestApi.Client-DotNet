@@ -37,7 +37,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Query
       if (rawJson.EndsWith("]"))
         rawJson = rawJson.Substring(0, rawJson.Length - 1);
 
-      if (rawJson.Contains("statement_error"))
+      if (rawJson.StartsWith("{\"@type\":\"statement_error\""))
       {
         var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(rawJson);
 
@@ -49,10 +49,10 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Query
           };
       }
 
-      if (rawJson.Contains("header"))
+      if (rawJson.StartsWith("{\"header\""))
         headerResponse = JsonSerializer.Deserialize<HeaderResponse>(rawJson);
 
-      if (rawJson.Contains("row"))
+      if (rawJson.StartsWith("{\"row\""))
         return CreateRowValue<T>(rawJson);
 
       return default;

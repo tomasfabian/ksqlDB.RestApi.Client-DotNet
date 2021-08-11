@@ -40,13 +40,13 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     protected override RowValue<T> OnLineRead<T>(string rawJson)
     {
       //Console.WriteLine(rawJson);
-      if (rawJson.Contains("queryId"))
+      if (rawJson.StartsWith("{\"queryId\""))
       {
         var queryStreamHeader = JsonSerializer.Deserialize<QueryStreamHeader>(rawJson);
 
         serializer = new(queryStreamHeader);
       }      
-      else if (rawJson.Contains("_error"))
+      else if (rawJson.Contains("_error"))//{"@type":"generic_error"
       {
         var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(rawJson);
 
