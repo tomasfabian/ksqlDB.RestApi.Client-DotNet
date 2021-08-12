@@ -1996,9 +1996,6 @@ Console.WriteLine(string.Join(',', tableResponses[0].Tables.Select(c => c.Name))
 ```
 
 # v1.3.0:
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 1.3.0-rc.2
-```
 
 ### KSqlDbRestApiClient:
 
@@ -2084,8 +2081,10 @@ private static async Task CreateConnectorsAsync(IKSqlDbRestApiClient restApiClie
 }
 ```
 
-
-# v1.4.0 Road map:
+# v1.4.0:
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 1.4.0-rc.1
+```
 
 KSqlDbRestApiClient:
 
@@ -2099,14 +2098,51 @@ var response = await restApiClient.TerminatePushQueryAsync(queryId);
 ```
 
 ### Drop a table
+- Drops an existing table.
 ```C#
+var ksqlDbUrl = @"http:\\localhost:8088";
 
+var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+var ksqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+string tableName = "TableName";
+
+// DROP TABLE TableName;
+var httpResponseMessage = ksqlDbRestApiClient.DropTableAsync(tableName);
+
+// OR DROP TABLE IF EXISTS TableName DELETE TOPIC;
+httpResponseMessage = ksqlDbRestApiClient.DropTableAsync(tableName, useIfExistsClause: true, deleteTopic: true);
 ```
+
+Parameters:
+
+`useIfExistsClause` - If the IF EXISTS clause is present, the statement doesn't fail if the table doesn't exist.
+
+`deleteTopic` - If the DELETE TOPIC clause is present, the table's source topic is marked for deletion.
 
 ### Drop a stream
+- Drops an existing stream.
 ```C#
+var ksqlDbUrl = @"http:\\localhost:8088";
 
+var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+var ksqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+string streamName = "StreamName";
+
+// DROP STREAM StreamName;
+var httpResponseMessage = ksqlDbRestApiClient.DropStreamAsync(streamName);
+
+// OR DROP STREAM IF EXISTS StreamName DELETE TOPIC;
+httpResponseMessage = ksqlDbRestApiClient.DropStreamAsync(streamName, useIfExistsClause: true, deleteTopic: true);
 ```
+
+Parameters:
+
+`useIfExistsClause` - If the IF EXISTS clause is present, the statement doesn't fail if the stream doesn't exist.
+
+`deleteTopic` - If the DELETE TOPIC clause is present, the stream's source topic is marked for deletion.
+
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
