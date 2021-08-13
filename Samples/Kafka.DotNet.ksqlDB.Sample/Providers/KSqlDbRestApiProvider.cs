@@ -2,7 +2,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 
 namespace Kafka.DotNet.ksqlDB.Sample.Providers
 {
@@ -24,20 +23,12 @@ namespace Kafka.DotNet.ksqlDB.Sample.Providers
 
     public Task<HttpResponseMessage> DropStreamAndTopic(string streamName)
     {
-      var statement = $"DROP STREAM IF EXISTS {streamName} DELETE TOPIC;";
-      
-      KSqlDbStatement ksqlDbStatement = new(statement);
-
-      return ExecuteStatementAsync(ksqlDbStatement);
+      return DropStreamAsync(streamName, useIfExistsClause: true, deleteTopic: true);
     }
 
     public Task<HttpResponseMessage> DropTableAndTopic(string tableName)
     {
-      var statement = $"DROP TABLE IF EXISTS {tableName} DELETE TOPIC;";
-      
-      KSqlDbStatement ksqlDbStatement = new(statement);
-
-      return ExecuteStatementAsync(ksqlDbStatement);
+      return DropTableAsync(tableName, useIfExistsClause: true, deleteTopic: true);
     }
   }
 }
