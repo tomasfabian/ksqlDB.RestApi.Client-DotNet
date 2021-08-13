@@ -1,4 +1,10 @@
-﻿# v1.3.0
+﻿# v1.4.0-rc.1
+KSqlDbRestApiClient:
+- TerminatePushQueryAsync - terminates push query by query id
+- DropStreamAsync - Drops an existing stream.
+- DropTableAsync - Drops an existing table.
+
+# v1.3.0
 KSqlDbRestApiClient:
 - CreateSourceConnectorAsync - Create a new source connector in the Kafka Connect cluster with the configuration passed in the config parameter.
 - CreateSinkConnectorAsync - Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
@@ -230,10 +236,6 @@ Fixes:
 - KStreamSet, KQuerySet, KQueryStreamSet
 - QbservableProvider
 - ```KSqldbProvider<T>``` - ksqldb REST api provider for push queries (```KSqlDbQueryProvider<T>```, ```KSqlDbQueryStreamProvider<T>```)
-
-# v1.4.0-rc.1 (road map WIP)
-KSqlDbRestApiClient:
-- TerminatePushQueryAsync - terminates push query by query id
 
 # TODO:
 - missing scalar functions https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#date-and-time
