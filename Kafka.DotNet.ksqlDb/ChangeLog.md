@@ -1,4 +1,4 @@
-﻿# v1.4.0-rc.1
+﻿# v1.4.0
 KSqlDbRestApiClient:
 - TerminatePushQueryAsync - terminates push query by query id
 - DropStreamAsync - Drops an existing stream.
