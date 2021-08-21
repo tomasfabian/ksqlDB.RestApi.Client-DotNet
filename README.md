@@ -6,6 +6,7 @@ Install-Package Kafka.DotNet.ksqlDB
 ```
 ```C#
 using System;
+using ConsoleAppKsqlDB;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
@@ -28,6 +29,16 @@ using var disposable = context.CreateQueryStream<Tweet>()
 Console.WriteLine("Press any key to stop the subscription");
 
 Console.ReadKey();
+
+namespace ConsoleAppKsqlDB
+{
+  public class Tweet : Record
+  {
+    public int Id { get; set; }
+
+    public string Message { get; set; }
+  }
+}
 ```
 
 LINQ code written in C# from the sample is equivalent to this ksql query:
