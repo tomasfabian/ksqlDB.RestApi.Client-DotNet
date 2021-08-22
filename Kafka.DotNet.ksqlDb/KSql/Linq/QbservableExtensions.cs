@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading;
@@ -264,6 +265,37 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
         throw new ArgumentNullException(nameof(onNext));
 
       return source.Subscribe(new AnonymousObserver<T>(onNext, e => throw e, () => {}));
+    }
+
+    #endregion
+    
+    #region ObserveOn
+
+    //TODO:
+    /// <summary>
+    /// Wraps the source sequence in order to run its observer callbacks on the specified scheduler.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the source sequence.</typeparam>
+    /// <param name="source">Source sequence.</param>
+    /// <param name="scheduler">Scheduler to notify observers on.</param>
+    /// <returns>The source sequence whose observations happen on the specified scheduler.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="scheduler"/> is null.</exception>
+    /// <remarks>
+    /// This only invokes observer callbacks on a scheduler. In case the subscription and/or unsubscription actions have side-effects
+    /// that require to be run on a scheduler, use <see cref="Observable.SubscribeOn{TSource}(IObservable{TSource}, IScheduler)"/>.
+    /// </remarks>
+    public static IQbservable<TSource> ObserveOn<TSource>(this IQbservable<TSource> source, IScheduler scheduler)
+    {
+      if (source == null)
+        throw new ArgumentNullException(nameof(source));
+
+      if (scheduler == null)
+        throw new ArgumentNullException(nameof(scheduler));
+
+      if (source is KStreamSet streamSet)
+        streamSet.ObserveOnScheduler = scheduler;
+
+      return source;
     }
 
     #endregion

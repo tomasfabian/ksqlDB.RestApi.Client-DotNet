@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Threading;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
 using Microsoft.Extensions.DependencyInjection;
+using IQbservable = Kafka.DotNet.ksqlDB.KSql.Linq.IQbservable;
 
 namespace Kafka.DotNet.ksqlDB.KSql.Query
 {
@@ -16,9 +19,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
     public IKSqlQbservableProvider Provider { get; internal set; }
     
     internal QueryContext QueryContext { get; set; }
+
+    internal IScheduler ObserveOnScheduler { get; set; }
   }
 
-  internal abstract class KStreamSet<TEntity> : KStreamSet, IQbservable<TEntity>
+  internal abstract class KStreamSet<TEntity> : KStreamSet, Linq.IQbservable<TEntity>
   {
     private readonly IServiceScopeFactory serviceScopeFactory;
     private IServiceScope serviceScope;
@@ -52,6 +57,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       var cancellationTokenSource = new CancellationTokenSource(); 
 
       var querySubscription = RunStreamAsObservable(cancellationTokenSource)
+        .ObserveOn(ObserveOnScheduler ?? Scheduler.Default)
         .Subscribe(observer);
 
       var compositeDisposable = new CompositeDisposable
