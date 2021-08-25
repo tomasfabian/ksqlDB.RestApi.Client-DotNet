@@ -238,7 +238,7 @@ Fixes:
 - ```KSqldbProvider<T>``` - ksqldb REST api provider for push queries (```KSqlDbQueryProvider<T>```, ```KSqlDbQueryStreamProvider<T>```)
 
 # v2.0.0-preview
-QbservableExtensions ObserveOn
+QbservableExtensions ObserveOn, SubscribeOn
 
 # TODO:
 - missing scalar functions https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#date-and-time

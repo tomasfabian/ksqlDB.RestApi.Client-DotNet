@@ -21,6 +21,8 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
     internal QueryContext QueryContext { get; set; }
 
     internal IScheduler ObserveOnScheduler { get; set; }
+
+    internal IScheduler SubscribeOnScheduler { get; set; }
   }
 
   internal abstract class KStreamSet<TEntity> : KStreamSet, Linq.IQbservable<TEntity>
@@ -57,6 +59,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       var cancellationTokenSource = new CancellationTokenSource(); 
 
       var querySubscription = RunStreamAsObservable(cancellationTokenSource)
+        .SubscribeOn(SubscribeOnScheduler ?? TaskPoolScheduler.Default)
         .ObserveOn(ObserveOnScheduler ?? Scheduler.Default)
         .Subscribe(observer);
 
