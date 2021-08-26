@@ -13,6 +13,7 @@ using Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.Tests.Helpers;
 using Kafka.DotNet.ksqlDB.Tests.Pocos;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Reactive.Testing;
 using Moq;
 using UnitTests;
 
@@ -29,6 +30,16 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Linq
       context.KSqldbProviderMock.Setup(c => c.Run<long>(It.IsAny<object>(), It.IsAny<CancellationToken>())).Returns(GetDecimalTestValues);
 
       return context.CreateQueryStream<City>();
+    }
+          
+    TestScheduler testScheduler;
+
+    [TestInitialize]
+    public override void TestInitialize()
+    {
+      base.TestInitialize();
+
+      testScheduler = new TestScheduler();
     }
 
     #region Count
@@ -105,7 +116,11 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Linq
       bool valuesWereReceived = false;
 
       //Act
-      var subscription = grouping.Subscribe(c => { valuesWereReceived = true; });
+      var subscription = grouping.SubscribeOn(testScheduler)
+        .ObserveOn(testScheduler)
+        .Subscribe(c => { valuesWereReceived = true; });
+
+      testScheduler.Start();
 
       //Assert
       valuesWereReceived.Should().BeTrue();
@@ -128,7 +143,8 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Linq
       bool valuesWereReceived = false;
 
       //Act
-      var subscription = grouping.Subscribe(c => { valuesWereReceived = true; });
+      var subscription = grouping.SubscribeOn(testScheduler).ObserveOn(testScheduler).Subscribe(c => { valuesWereReceived = true; });
+      testScheduler.Start();
 
       //Assert
       valuesWereReceived.Should().BeTrue();

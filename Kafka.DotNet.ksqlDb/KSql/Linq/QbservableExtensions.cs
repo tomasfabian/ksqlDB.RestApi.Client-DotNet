@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.Query;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.Query.Windows;
@@ -264,6 +266,89 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
         throw new ArgumentNullException(nameof(onNext));
 
       return source.Subscribe(new AnonymousObserver<T>(onNext, e => throw e, () => {}));
+    }
+
+    #endregion
+    
+    #region ObserveOn
+
+    /// <summary>
+    /// Wraps the source sequence in order to run its observer callbacks on the specified scheduler.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the source sequence.</typeparam>
+    /// <param name="source">Source sequence.</param>
+    /// <param name="scheduler">Scheduler to notify observers on.</param>
+    /// <returns>The source sequence whose observations happen on the specified scheduler.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="scheduler"/> is null.</exception>
+    public static IQbservable<TSource> ObserveOn<TSource>(this IQbservable<TSource> source, IScheduler scheduler)
+    {
+      if (source == null)
+        throw new ArgumentNullException(nameof(source));
+
+      if (scheduler == null)
+        throw new ArgumentNullException(nameof(scheduler));
+
+      if (source is KStreamSet streamSet)
+        streamSet.ObserveOnScheduler = scheduler;
+
+      return source;
+    }
+
+    #endregion
+
+    #region SubscribeOn
+
+    /// <summary>
+    /// Wraps the source sequence in order to run its subscription on the specified scheduler.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the source sequence.</typeparam>
+    /// <param name="source">Source sequence.</param>
+    /// <param name="scheduler">Scheduler to perform subscription actions on.</param>
+    /// <returns>The original source.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="scheduler"/> is null.</exception>
+    public static IQbservable<TSource> SubscribeOn<TSource>(this IQbservable<TSource> source, IScheduler scheduler)
+    {
+      if (source == null)
+        throw new ArgumentNullException(nameof(source));
+
+      if (scheduler == null)
+        throw new ArgumentNullException(nameof(scheduler));
+
+      if (source is KStreamSet streamSet)
+        streamSet.SubscribeOnScheduler = scheduler;
+
+      return source;
+    }
+
+    #endregion
+
+    #region SubscribeAsync
+
+    /// <summary>
+    /// Subscribes an element handler, an exception handler, and a completion handler to an qbservable stream.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the source stream.</typeparam>
+    /// <param name="source">Observable sequence to subscribe to.</param>
+    /// <param name="onNext">Action to invoke for each element in the qbservable stream.</param>
+    /// <param name="onError">Action to invoke upon exceptional termination of the qbservable stream.</param>
+    /// <param name="onCompleted">Action to invoke upon graceful termination of the qbservable stream.</param>
+    /// <returns>Subscription with query id.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="onNext"/> or <paramref name="onError"/> or <paramref name="onCompleted"/> is <c>null</c>.</exception>
+    public static Task<Subscription> SubscribeAsync<T>(this IQbservable<T> source, Action<T> onNext, Action<Exception> onError, Action onCompleted, CancellationToken cancellationToken = default)
+    {
+      if (source == null)
+        throw new ArgumentNullException(nameof(source));
+
+      if (onNext == null)
+        throw new ArgumentNullException(nameof(onNext));
+
+      if (onError == null)
+        throw new ArgumentNullException(nameof(onError));
+
+      if (onCompleted == null)
+        throw new ArgumentNullException(nameof(onCompleted));
+
+      return source.SubscribeAsync(new AnonymousObserver<T>(onNext, onError, onCompleted), cancellationToken);
     }
 
     #endregion

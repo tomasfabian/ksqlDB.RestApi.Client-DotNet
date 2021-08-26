@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -13,6 +12,7 @@ using Kafka.DotNet.ksqlDB.Tests.Helpers;
 using Kafka.DotNet.ksqlDB.Tests.Models;
 using Kafka.DotNet.ksqlDB.Tests.Pocos;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Reactive.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UnitTests;
@@ -298,14 +298,18 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     {
       //Arrange
       var query = CreateTestableKStreamSet();
+      
+      var testScheduler = new TestScheduler();
 
       var results = new List<string>();
 
       //Act
-      using var disposable = query.Subscribe(value =>
+      using var disposable = query.SubscribeOn(testScheduler).Subscribe(value =>
       {
         results.Add(value);
       }, error => { }, () => { });
+
+      testScheduler.Start();
 
       //Assert
       Assert.AreEqual(2, results.Count);

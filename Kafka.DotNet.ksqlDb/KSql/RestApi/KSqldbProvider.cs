@@ -7,9 +7,13 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Query;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Query;
 
 namespace Kafka.DotNet.ksqlDB.KSql.RestApi
-{    
+{
   internal abstract class KSqlDbProvider : IKSqlDbProvider
   {
     private readonly IHttpClientFactory httpClientFactory;
@@ -28,9 +32,32 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       return httpClientFactory.CreateClient();
     }
 
+    public async Task<Query<T>> RunAsync<T>(object parameters, CancellationToken cancellationToken = default)
+    {
+      var streamReader = await GetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
+
+      cancellationToken.Register(() => streamReader?.Dispose());
+
+      var queryId = await ReadHeaderAsync<T>(streamReader).ConfigureAwait(false);
+
+      return new Query<T>
+      {
+        EnumerableQuery = ConsumeAsync<T>(streamReader, cancellationToken),
+        QueryId = queryId
+      };
+    }
+
     /// <param name="parameters">Query parameters</param>
     /// <param name="cancellationToken">A token that can be used to request cancellation of the asynchronous operation.</param>
     public async IAsyncEnumerable<T> Run<T>(object parameters, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+      using var streamReader = await GetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
+
+      await foreach (var entity in ConsumeAsync<T>(streamReader, cancellationToken).WithCancellation(cancellationToken).ConfigureAwait(false))
+        yield return entity;
+    }
+
+    private async Task<StreamReader> GetStreamReaderAsync<T>(object parameters, CancellationToken cancellationToken)
     {
       using var httpClient = OnCreateHttpClient();
 
@@ -38,8 +65,8 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
       //https://docs.ksqldb.io/en/latest/developer-guide/api/
       var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage,
-        HttpCompletionOption.ResponseHeadersRead,
-        cancellationToken)
+          HttpCompletionOption.ResponseHeadersRead,
+          cancellationToken)
         .ConfigureAwait(false);
 
 #if NET
@@ -47,9 +74,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 #else
       var stream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
 #endif
-      
-      using var streamReader = new StreamReader(stream);
 
+      var streamReader = new StreamReader(stream);
+
+      return streamReader;
+    }
+
+    private async IAsyncEnumerable<T> ConsumeAsync<T>(StreamReader streamReader, [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
       while (!streamReader.EndOfStream)
       {
         if (cancellationToken.IsCancellationRequested)
@@ -62,6 +94,33 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
         if (record != null) yield return record.Value;
       }
+    }
+
+    //TODO: move to inherited classes
+    private async Task<string> ReadHeaderAsync<T>(StreamReader streamReader)
+    {
+      var rawJson = await streamReader.ReadLineAsync()
+        .ConfigureAwait(false);
+
+      if (rawJson != null && rawJson.StartsWith("{\"queryId\""))
+      {
+        OnLineRead<T>(rawJson);
+
+        var queryStreamHeader = JsonSerializer.Deserialize<QueryStreamHeader>(rawJson);
+
+        return queryStreamHeader?.QueryId;
+      }
+
+      if (rawJson != null && rawJson.StartsWith("[{\"header\""))
+      {
+        OnLineRead<T>(rawJson);
+
+        var headerResponse = JsonSerializer.Deserialize<HeaderResponse>(rawJson.Substring(startIndex: 1, rawJson.Length - 2));
+
+        return headerResponse?.Header.QueryId;
+      }
+
+      return null;
     }
 
     protected abstract RowValue<T> OnLineRead<T>(string rawJson);

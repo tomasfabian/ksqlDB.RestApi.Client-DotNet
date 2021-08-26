@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Kafka.DotNet.ksqlDB.KSql.Linq
 {
@@ -24,5 +26,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
   public interface IQbservable<out T> : IQbservable
   {
     IDisposable Subscribe(IObserver<T> observer);
+
+    Task<Subscription> SubscribeAsync(IObserver<T> observer, CancellationToken cancellationToken = default);
   }
 }
