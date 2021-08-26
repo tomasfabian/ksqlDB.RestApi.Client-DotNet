@@ -6,9 +6,11 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Query;
 using Microsoft.Extensions.DependencyInjection;
 using IQbservable = Kafka.DotNet.ksqlDB.KSql.Linq.IQbservable;
 
@@ -19,9 +21,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
     public IKSqlQbservableProvider Provider { get; internal set; }
     
     internal QueryContext QueryContext { get; set; }
-
+    
     internal IScheduler ObserveOnScheduler { get; set; }
-
+    
     internal IScheduler SubscribeOnScheduler { get; set; }
   }
 
@@ -56,7 +58,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
 
     public IDisposable Subscribe(IObserver<TEntity> observer)
     {
-      var cancellationTokenSource = new CancellationTokenSource(); 
+      var cancellationTokenSource = new CancellationTokenSource();
 
       var querySubscription = RunStreamAsObservable(cancellationTokenSource)
         .SubscribeOn(SubscribeOnScheduler ?? TaskPoolScheduler.Default)
@@ -72,20 +74,51 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       return compositeDisposable;
     }
 
+    public async Task<string> SubscribeAsync(IObserver<TEntity> observer, CancellationToken cancellationToken = default)
+    {
+      var query = await RunStreamAsObservableAsync(cancellationToken).ConfigureAwait(false);
+
+      query.Source
+        .SubscribeOn(SubscribeOnScheduler ?? TaskPoolScheduler.Default)
+        .ObserveOn(ObserveOnScheduler ?? Scheduler.Default)
+        .Subscribe(observer, cancellationToken);
+      
+      return query.QueryId;
+    }
+
     internal IAsyncEnumerable<TEntity> RunStreamAsAsyncEnumerable(CancellationToken cancellationToken = default)
     {
       using var scope = serviceScopeFactory.CreateScope();
 
       var dependencies = scope.ServiceProvider.GetRequiredService<IKStreamSetDependencies>();
-
-      var queryParameters = dependencies.QueryStreamParameters;
-      queryParameters.Sql = dependencies.KSqlQueryGenerator.BuildKSql(Expression, QueryContext);
-
-
-      queryParameters = TryOverrideAutoOffsetResetPolicy(queryParameters);
+      
+      var queryParameters = GetQueryParameters(dependencies);
 
       return dependencies.KsqlDBProvider
         .Run<TEntity>(queryParameters, cancellationToken);
+    }
+
+    internal Task<Query<TEntity>> RunStreamAsAsyncEnumerableAsync(CancellationToken cancellationToken = default)
+    {
+      using var scope = serviceScopeFactory.CreateScope();
+
+      var dependencies = scope.ServiceProvider.GetRequiredService<IKStreamSetDependencies>();
+
+      var queryParameters = GetQueryParameters(dependencies);
+
+      return dependencies.KsqlDBProvider
+        .RunAsync<TEntity>(queryParameters, cancellationToken);
+    }
+
+    private IQueryParameters GetQueryParameters(IKStreamSetDependencies dependencies)
+    {
+      var queryParameters = dependencies.QueryStreamParameters;
+      
+      queryParameters.Sql = dependencies.KSqlQueryGenerator.BuildKSql(Expression, QueryContext);
+
+      queryParameters = TryOverrideAutoOffsetResetPolicy(queryParameters);
+
+      return queryParameters;
     }
 
     private IQueryParameters TryOverrideAutoOffsetResetPolicy(IQueryParameters queryParameters)
@@ -110,10 +143,20 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
 
     internal IObservable<TEntity> RunStreamAsObservable(CancellationTokenSource cancellationTokenSource)
     {
-      var observableStream = RunStreamAsAsyncEnumerable(cancellationTokenSource.Token)
-        .ToObservable();
+      var query = RunStreamAsAsyncEnumerable(cancellationTokenSource.Token);
+
+      var observableStream = query.ToObservable();
 
       return observableStream;
+    }
+    
+    internal async Task<(string QueryId, IObservable<TEntity> Source)> RunStreamAsObservableAsync(CancellationToken cancellationTokenSource = default)
+    {
+      var query = await RunStreamAsAsyncEnumerableAsync(cancellationTokenSource).ConfigureAwait(false);
+
+      var observableStream = query.EnumerableQuery.ToObservable();
+
+      return (query.QueryId, observableStream);
     }
 
     internal string BuildKsql()
