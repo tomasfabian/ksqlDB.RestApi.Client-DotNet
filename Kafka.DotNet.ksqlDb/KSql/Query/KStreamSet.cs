@@ -74,7 +74,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       return compositeDisposable;
     }
 
-    public async Task<string> SubscribeAsync(IObserver<TEntity> observer, CancellationToken cancellationToken = default)
+    public async Task<Subscription> SubscribeAsync(IObserver<TEntity> observer, CancellationToken cancellationToken = default)
     {
       var query = await RunStreamAsObservableAsync(cancellationToken).ConfigureAwait(false);
 
@@ -83,7 +83,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
         .ObserveOn(ObserveOnScheduler ?? Scheduler.Default)
         .Subscribe(observer, cancellationToken);
       
-      return query.QueryId;
+      return new Subscription { QueryId = query.QueryId };
     }
 
     internal IAsyncEnumerable<TEntity> RunStreamAsAsyncEnumerable(CancellationToken cancellationToken = default)

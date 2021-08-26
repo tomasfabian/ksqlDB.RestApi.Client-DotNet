@@ -332,9 +332,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
     /// <param name="onNext">Action to invoke for each element in the qbservable stream.</param>
     /// <param name="onError">Action to invoke upon exceptional termination of the qbservable stream.</param>
     /// <param name="onCompleted">Action to invoke upon graceful termination of the qbservable stream.</param>
-    /// <returns>Query id.</returns>
+    /// <returns>Subscription with query id.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="onNext"/> or <paramref name="onError"/> or <paramref name="onCompleted"/> is <c>null</c>.</exception>
-    public static Task<string> SubscribeAsync<T>(this IQbservable<T> source, Action<T> onNext, Action<Exception> onError, Action onCompleted, CancellationToken cancellationToken = default)
+    public static Task<Subscription> SubscribeAsync<T>(this IQbservable<T> source, Action<T> onNext, Action<Exception> onError, Action onCompleted, CancellationToken cancellationToken = default)
     {
       if (source == null)
         throw new ArgumentNullException(nameof(source));

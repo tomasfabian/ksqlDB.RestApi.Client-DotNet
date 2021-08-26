@@ -27,6 +27,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
   {
     IDisposable Subscribe(IObserver<T> observer);
 
-    Task<string> SubscribeAsync(IObserver<T> observer, CancellationToken cancellationToken = default);
+    Task<Subscription> SubscribeAsync(IObserver<T> observer, CancellationToken cancellationToken = default);
   }
 }
