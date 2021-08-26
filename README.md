@@ -6,7 +6,6 @@ Install-Package Kafka.DotNet.ksqlDB
 ```
 ```C#
 using System;
-using ConsoleAppKsqlDB;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
@@ -29,16 +28,6 @@ using var disposable = context.CreateQueryStream<Tweet>()
 Console.WriteLine("Press any key to stop the subscription");
 
 Console.ReadKey();
-
-namespace ConsoleAppKsqlDB
-{
-  public class Tweet : Record
-  {
-    public int Id { get; set; }
-
-    public string Message { get; set; }
-  }
-}
 ```
 
 LINQ code written in C# from the sample is equivalent to this ksql query:
@@ -1703,8 +1692,8 @@ EntityCreationMetadata metadata = new()
 
 string url = @"http:\\localhost:8088";
 
-var http = new HttpClientFactory(new Uri(url));
-var restApiClient = new KSqlDbRestApiClient(http);
+var httpClientFactory = new HttpClientFactory(new Uri(url));
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
 var httpResponseMessage = await restApiClient.CreateStreamAsync<MyMovies>(metadata, ifNotExists: true);
 ```
@@ -1722,10 +1711,10 @@ public record MyMovies
 ```
 
 ```KSQL
-CREATE STREAM MyMovies (
-  Id INT,
-  Title VARCHAR,
-  Release_Year INT
+CREATE STREAM IF NOT EXISTS MyMovies (
+	Id INT KEY,
+	Title VARCHAR,
+	Release_Year INT
 ) WITH ( KAFKA_TOPIC='MyMovies', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );
 ```
 
@@ -1745,17 +1734,17 @@ EntityCreationMetadata metadata = new()
 
 string url = @"http:\\localhost:8088";
 
-var http = new HttpClientFactory(new Uri(url));
-var restApiClient = new KSqlDbRestApiClient(http);
+var httpClientFactory = new HttpClientFactory(new Uri(url));
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
 var httpResponseMessage = await restApiClient.CreateTableAsync<MyMovies>(metadata, ifNotExists: true);
 ```
 
 ```KSQL
-CREATE TABLE MyMovies (
-  Id INT,
-  Title VARCHAR,
-  Release_Year INT
+CREATE TABLE IF NOT EXISTS MyMovies (
+	Id INT PRIMARY KEY,
+	Title VARCHAR,
+	Release_Year INT
 ) WITH ( KAFKA_TOPIC='MyMovies', VALUE_FORMAT='Json', PARTITIONS='2', REPLICAS='3' );
 ```
 
@@ -2099,7 +2088,7 @@ Install-Package Kafka.DotNet.ksqlDB -Version 1.4.0-rc.1
 
 KSqlDbRestApiClient:
 
-### Terminate push queries (v1.4.0)
+### Terminate push queries
 - TerminatePushQueryAsync - terminates push query by query id
 
 ```C#
@@ -2108,7 +2097,7 @@ string queryId = "xyz123"; // <----- the ID of the query to terminate
 var response = await restApiClient.TerminatePushQueryAsync(queryId);
 ```
 
-### Drop a table (v1.4.0)
+### Drop a table
 - Drops an existing table.
 ```C#
 var ksqlDbUrl = @"http:\\localhost:8088";
@@ -2131,7 +2120,7 @@ Parameters:
 
 `deleteTopic` - If the DELETE TOPIC clause is present, the table's source topic is marked for deletion.
 
-### Drop a stream (v1.4.0)
+### Drop a stream
 - Drops an existing stream.
 ```C#
 var ksqlDbUrl = @"http:\\localhost:8088";
