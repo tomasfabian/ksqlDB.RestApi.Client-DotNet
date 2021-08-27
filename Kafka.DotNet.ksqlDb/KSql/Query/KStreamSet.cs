@@ -83,10 +83,15 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
     {
       var query = await RunStreamAsObservableAsync(cancellationToken).ConfigureAwait(false);
 
-      query.Source
-        .SubscribeOn(SubscribeOnScheduler ?? TaskPoolScheduler.Default)
-        .ObserveOn(ObserveOnScheduler ?? Scheduler.Default)
-        .Subscribe(observer, cancellationToken);
+      var observable = query.Source;
+
+      if(SubscribeOnScheduler != null)
+        observable = observable.SubscribeOn(SubscribeOnScheduler);
+      
+      if(ObserveOnScheduler != null)
+        observable = observable.ObserveOn(ObserveOnScheduler);
+      
+      observable.Subscribe(observer, cancellationToken);
       
       return new Subscription { QueryId = query.QueryId };
     }
