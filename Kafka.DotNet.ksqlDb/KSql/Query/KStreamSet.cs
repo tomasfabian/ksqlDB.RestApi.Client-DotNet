@@ -60,10 +60,15 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
     {
       var cancellationTokenSource = new CancellationTokenSource();
 
-      var querySubscription = RunStreamAsObservable(cancellationTokenSource)
-        .SubscribeOn(SubscribeOnScheduler ?? TaskPoolScheduler.Default)
-        .ObserveOn(ObserveOnScheduler ?? Scheduler.Default)
-        .Subscribe(observer);
+      var observable = RunStreamAsObservable(cancellationTokenSource);
+      
+      if(SubscribeOnScheduler != null)
+        observable = observable.SubscribeOn(SubscribeOnScheduler);
+      
+      if(ObserveOnScheduler != null)
+        observable = observable.ObserveOn(ObserveOnScheduler);
+      
+      var querySubscription = observable.Subscribe(observer);
 
       var compositeDisposable = new CompositeDisposable
       {
