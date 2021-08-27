@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
@@ -281,20 +282,23 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
       //Arrange
       var contextOptions = new KSqlDBContextOptions(@"http:\\localhost:8088");
       await using var context = new KSqlDBContext(contextOptions);
-
-      string queryId = "abc";
-      //TODO:
-      //var queryId = await context.CreateQueryStream<MyMoviesTable>().SubscribeAsync(_ => {}, e => { }, () => { });
+      
+      var subscription = await context.CreateQueryStream<MyMoviesTable>().SubscribeAsync(_ => {}, e => { }, () => { });
+      
+      int queriesCount = (await restApiClient.GetQueriesAsync()).SelectMany(c => c.Queries).Count();
 
       //Act
-      var response = await restApiClient.TerminatePushQueryAsync(queryId);
+      var response = await restApiClient.TerminatePushQueryAsync(subscription.QueryId);
 
       //Assert
       
       //https://github.com/confluentinc/ksql/issues/7559
       //"{"@type":"generic_error","error_code":50000,"message":"On wrong context or worker"}"
-      response.IsSuccessStatusCode.Should().BeFalse();
-      //response.IsSuccessStatusCode.Should().BeTrue();
+      //response.IsSuccessStatusCode.Should().BeTrue()
+
+      await Task.Delay(2000);
+      var queriesResponses = await restApiClient.GetQueriesAsync();
+      queriesResponses.SelectMany(c => c.Queries).Count().Should().Be(queriesCount - 1);
     }
 
     [TestMethod]
