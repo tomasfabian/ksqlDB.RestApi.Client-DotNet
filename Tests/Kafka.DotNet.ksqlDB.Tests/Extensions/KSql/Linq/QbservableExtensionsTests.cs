@@ -7,6 +7,7 @@ using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Query;
 using Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.Tests.Helpers;
 using Kafka.DotNet.ksqlDB.Tests.Models;
@@ -248,7 +249,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     }
 
     [TestMethod]
-    public void ToObservable_QueryShouldBeDeferred_KSqldbProviderRunWasNotCalled()
+    public void ToObservable_QueryShouldBeDeferred_KSqlDbProviderRunWasNotCalled()
     {
       //Arrange
       var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
@@ -315,6 +316,29 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
       Assert.AreEqual(2, results.Count);
     }
 
+    [TestMethod]
+    public async Task SubscribeAsync_ObservesItems()
+    {
+      //Arrange
+      var query = CreateTestableKStreamSet();
+      
+      var testScheduler = new TestScheduler();
+
+      var results = new List<string>();
+
+      //Act
+      var subscription = await query.SubscribeOn(testScheduler).SubscribeAsync(value =>
+      {
+        results.Add(value);
+      }, error => { }, () => { });
+
+      testScheduler.Start();
+
+      //Assert
+      Assert.AreEqual(2, results.Count);
+      subscription.QueryId.Should().Be("xyz");
+    }
+
     private IQbservable<Location> CreateStreamSource()
     {
       var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
@@ -328,6 +352,11 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
       
       context.KSqldbProviderMock.Setup(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
         .Returns(GetTestValues);
+
+      var query = new Query<string> { EnumerableQuery = GetTestValues(), QueryId = "xyz" };
+
+      context.KSqldbProviderMock.Setup(c => c.RunAsync<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+        .ReturnsAsync(query);
       
       return context.CreateQueryStream<string>();
     }
