@@ -2,7 +2,7 @@
 
 namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Query
 {
-  public record Query<T>
+  public record QueryStream<T>
   {
     public string QueryId { get; set; }
 

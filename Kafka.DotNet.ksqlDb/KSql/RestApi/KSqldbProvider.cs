@@ -32,7 +32,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       return httpClientFactory.CreateClient();
     }
 
-    public async Task<Query<T>> RunAsync<T>(object parameters, CancellationToken cancellationToken = default)
+    public async Task<QueryStream<T>> RunAsync<T>(object parameters, CancellationToken cancellationToken = default)
     {
       var streamReader = await GetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
 
@@ -40,7 +40,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
       var queryId = await ReadHeaderAsync<T>(streamReader).ConfigureAwait(false);
 
-      return new Query<T>
+      return new QueryStream<T>
       {
         EnumerableQuery = ConsumeAsync<T>(streamReader, cancellationToken),
         QueryId = queryId

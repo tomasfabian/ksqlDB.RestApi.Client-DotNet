@@ -108,7 +108,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
         .Run<TEntity>(queryParameters, cancellationToken);
     }
 
-    internal Task<Query<TEntity>> RunStreamAsAsyncEnumerableAsync(CancellationToken cancellationToken = default)
+    internal Task<QueryStream<TEntity>> RunStreamAsAsyncEnumerableAsync(CancellationToken cancellationToken = default)
     {
       using var scope = serviceScopeFactory.CreateScope();
 
