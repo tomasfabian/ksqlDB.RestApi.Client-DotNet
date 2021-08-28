@@ -187,6 +187,70 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
     }
 
     [TestMethod]
+    public async Task SubscribeOn_Blocks()
+    {
+      //Arrange
+      var actualValues = new List<Tweet>();
+
+      int expectedItemsCount = 2;
+      
+      var source = QuerySource;
+
+      //Act
+      var subscription = await source.Take(expectedItemsCount)
+        .SubscribeOn(ImmediateScheduler.Instance)
+        .SubscribeAsync(c => actualValues.Add(c), e => {}, () => {});
+
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    }
+
+    [TestMethod]
+    public async Task ObserveOn_TaskPoolScheduler_ReceivesValuesOnNewThread()
+    {
+      //Arrange
+      var semaphore = new SemaphoreSlim(initialCount: 0, 1);
+      var source = QuerySource;
+
+      var currentThread = Thread.CurrentThread.ManagedThreadId;
+      int? observeOnThread = null;
+
+      //Act
+      var subscription = await source.Take(1)
+        .ObserveOn(TaskPoolScheduler.Default)
+        .SubscribeAsync(_ => observeOnThread = Thread.CurrentThread.ManagedThreadId, e => semaphore.Release(), () => semaphore.Release());
+      
+      await semaphore.WaitAsync(TimeSpan.FromSeconds(4));
+
+      //Assert
+      observeOnThread.Should().NotBeNull();
+      Assert.AreNotEqual(currentThread, observeOnThread.Value);
+    }
+
+    [TestMethod]
+    public async Task ObserveOn_TaskPoolScheduler_ReceivesValuesOnNonThreadPoolThread()
+    {
+      //Arrange
+      var semaphore = new SemaphoreSlim(initialCount: 0, 1);
+      var source = QuerySource;
+
+      Thread observeOnThread = null;
+
+      //Act
+      var subscription = source.Take(1)
+        .ObserveOn(TaskPoolScheduler.Default)
+        .Subscribe(_ => observeOnThread = Thread.CurrentThread, e => semaphore.Release(), () => semaphore.Release());
+
+      await semaphore.WaitAsync(TimeSpan.FromSeconds(4));
+
+      //Assert
+      observeOnThread.Should().NotBeNull();
+      observeOnThread.IsThreadPoolThread.Should().BeFalse();
+
+      using(subscription){}
+    }
+
+    [TestMethod]
     public async Task ToObservable()
     {
       //Arrange
