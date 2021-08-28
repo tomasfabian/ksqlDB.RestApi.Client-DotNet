@@ -1,4 +1,12 @@
-﻿# v1.4.0
+﻿# v1.5.0-rc.1
+### QbservableExtensions 
+ObserveOn - Wraps the source sequence in order to run its observer callbacks on the specified scheduler.
+
+SubscribeOn - Wraps the source sequence in order to run its subscription on the specified scheduler.
+
+SubscribeAsync - Subscribes an element handler, an exception handler, and a completion handler to an qbservable stream and asynchronously returns the query id.
+
+# v1.4.0
 KSqlDbRestApiClient:
 - TerminatePushQueryAsync - terminates push query by query id
 - DropStreamAsync - Drops an existing stream.
@@ -236,10 +244,6 @@ Fixes:
 - KStreamSet, KQuerySet, KQueryStreamSet
 - QbservableProvider
 - ```KSqldbProvider<T>``` - ksqldb REST api provider for push queries (```KSqlDbQueryProvider<T>```, ```KSqlDbQueryStreamProvider<T>```)
-
-# v2.0.0-preview
-QbservableExtensions ObserveOn, SubscribeOn, SubscribeAsync
-`IQbservable<T>`
 
 # TODO:
 - missing scalar functions https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#date-and-time
