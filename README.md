@@ -1,11 +1,14 @@
 This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/)
 It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the Rest API.
 
+Kafka.DotNet.ksqlDB is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
+
 ```
 Install-Package Kafka.DotNet.ksqlDB
 ```
 ```C#
 using System;
+using ConsoleAppKsqlDB;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
@@ -28,6 +31,16 @@ using var disposable = context.CreateQueryStream<Tweet>()
 Console.WriteLine("Press any key to stop the subscription");
 
 Console.ReadKey();
+
+namespace ConsoleAppKsqlDB
+{
+  public class Tweet : Record
+  {
+    public int Id { get; set; }
+
+    public string Message { get; set; }
+  }
+}
 ```
 
 LINQ code written in C# from the sample is equivalent to this ksql query:
@@ -2082,13 +2095,10 @@ private static async Task CreateConnectorsAsync(IKSqlDbRestApiClient restApiClie
 ```
 
 # v1.4.0:
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 1.4.0-rc.1
-```
 
 KSqlDbRestApiClient:
 
-### Terminate push queries
+### Terminate push queries (v1.4.0)
 - TerminatePushQueryAsync - terminates push query by query id
 
 ```C#
@@ -2097,7 +2107,7 @@ string queryId = "xyz123"; // <----- the ID of the query to terminate
 var response = await restApiClient.TerminatePushQueryAsync(queryId);
 ```
 
-### Drop a table
+### Drop a table (v1.4.0)
 - Drops an existing table.
 ```C#
 var ksqlDbUrl = @"http:\\localhost:8088";
@@ -2120,7 +2130,7 @@ Parameters:
 
 `deleteTopic` - If the DELETE TOPIC clause is present, the table's source topic is marked for deletion.
 
-### Drop a stream
+### Drop a stream (v1.4.0)
 - Drops an existing stream.
 ```C#
 var ksqlDbUrl = @"http:\\localhost:8088";
@@ -2143,6 +2153,52 @@ Parameters:
 
 `deleteTopic` - If the DELETE TOPIC clause is present, the stream's source topic is marked for deletion.
 
+
+# v1.5.0-rc.1:
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 1.5.0-rc.1
+```
+
+### QbservableExtensions
+## SubscribeAsync 
+- Subscribes an element handler, an exception handler, and a completion handler to an qbservable stream and asynchronously returns the query id.
+
+## SubscribeOn
+- Wraps the source sequence in order to run its subscription on the specified scheduler.
+## ObserveOn
+- Wraps the source sequence in order to run its observer callbacks on the specified scheduler.
+```C#
+using System;
+using System.Reactive.Concurrency;
+using System.Threading;
+using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.Linq;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.Sample.Models.Movies;
+private static async Task SubscribeAsync(IKSqlDBContext context)
+{
+  var cts = new CancellationTokenSource();
+
+  try
+  {
+    var subscription = await context.CreateQueryStream<Movie>()
+      .SubscribeOn(ThreadPoolScheduler.Instance)
+      .ObserveOn(TaskPoolScheduler.Default)
+      .SubscribeAsync(onNext: movie =>
+        {
+          Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
+          Console.WriteLine();
+        }, onError: error => { Console.WriteLine($"SubscribeAsync Exception: {error.Message}"); },
+        onCompleted: () => Console.WriteLine("SubscribeAsync Completed"), cts.Token);
+
+    Console.WriteLine($"Query id: {subscription}");
+  }
+  catch (Exception e)
+  {
+    Console.WriteLine(e);
+  }
+}
+```
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
