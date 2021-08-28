@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -140,6 +141,49 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
 
       //Assert
       Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    }
+
+    [TestMethod]
+    public async Task SubscribeAsync_ReturnQueryId()
+    {
+      //Arrange
+      var semaphore = new SemaphoreSlim(initialCount: 0, 1);
+      var actualValues = new List<Tweet>();
+
+      int expectedItemsCount = 2;
+      
+      var source = QuerySource;
+
+      //Act
+      var subscription = await source.Take(expectedItemsCount).SubscribeAsync(c => actualValues.Add(c), e => semaphore.Release(), () => semaphore.Release());
+      await semaphore.WaitAsync(TimeSpan.FromSeconds(4));
+
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+      subscription.QueryId.Should().NotBeNullOrEmpty();
+    }
+
+    [TestMethod]
+    public async Task SubscribeAsync_Canceled()
+    {
+      //Arrange
+      var semaphore = new SemaphoreSlim(initialCount: 0, 1);
+      var actualValues = new List<Tweet>();
+
+      var source = QuerySource;
+
+      var cts = new CancellationTokenSource();
+
+      //Act
+      var subscription = await source.SubscribeOn(ThreadPoolScheduler.Instance)
+        .SubscribeAsync(c => actualValues.Add(c), e => semaphore.Release(), () => semaphore.Release(), cancellationToken: cts.Token);
+      
+      cts.Cancel();
+      await semaphore.WaitAsync(TimeSpan.FromSeconds(4));
+
+      //Assert
+      Assert.AreEqual(0, actualValues.Count);
+      subscription.QueryId.Should().NotBeNullOrEmpty();
     }
 
     [TestMethod]
