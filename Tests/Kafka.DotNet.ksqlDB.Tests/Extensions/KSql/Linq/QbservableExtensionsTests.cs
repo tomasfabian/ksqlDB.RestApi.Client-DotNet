@@ -396,7 +396,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
       context.KSqldbProviderMock.Setup(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
         .Returns(GetTestValues);
 
-      var query = new Query<string> { EnumerableQuery = GetTestValues(), QueryId = "xyz" };
+      var query = new QueryStream<string> { EnumerableQuery = GetTestValues(), QueryId = "xyz" };
 
       context.KSqldbProviderMock.Setup(c => c.RunAsync<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
         .ReturnsAsync(query);
