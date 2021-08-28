@@ -339,6 +339,49 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
       subscription.QueryId.Should().Be("xyz");
     }
 
+    [TestMethod]
+    public void Source_SchedulersAreNotSet()
+    {
+      //Arrange
+      var source = CreateTestableKStreamSet();
+
+      //Act
+
+      //Assert
+      (source as KStreamSet).SubscribeOnScheduler.Should().BeNull();
+      (source as KStreamSet).ObserveOnScheduler.Should().BeNull();
+    }
+
+    [TestMethod]
+    public void SubscribeOn_SetsSubscribeOnScheduler()
+    {
+      //Arrange
+      var query = CreateTestableKStreamSet();
+      
+      var testScheduler = new TestScheduler();
+
+      //Act
+      var source = query.SubscribeOn(testScheduler);
+
+      //Assert
+      (source as KStreamSet).SubscribeOnScheduler.Should().Be(testScheduler);
+    }
+
+    [TestMethod]
+    public void ObserveOn_SetsObserveOnScheduler()
+    {
+      //Arrange
+      var query = CreateTestableKStreamSet();
+      
+      var testScheduler = new TestScheduler();
+
+      //Act
+      var source = query.ObserveOn(testScheduler);
+
+      //Assert
+      (source as KStreamSet).ObserveOnScheduler.Should().Be(testScheduler);
+    }
+
     private IQbservable<Location> CreateStreamSource()
     {
       var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
