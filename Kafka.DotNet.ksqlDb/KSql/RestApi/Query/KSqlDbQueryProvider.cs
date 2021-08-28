@@ -78,5 +78,19 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Query
 
       return new RowValue<T>(record);
     }
+
+    protected override string OnReadHeader<T>(string rawJson)
+    {
+      if (rawJson != null && rawJson.StartsWith("[{\"header\""))
+      {
+        OnLineRead<T>(rawJson);
+
+        var headerResponse = JsonSerializer.Deserialize<HeaderResponse>(rawJson.Substring(startIndex: 1, rawJson.Length - 2));
+
+        return headerResponse?.Header.QueryId;
+      }
+
+      return null;
+    }
   }
 }

@@ -96,32 +96,15 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       }
     }
 
-    //TODO: move to inherited classes
     private async Task<string> ReadHeaderAsync<T>(StreamReader streamReader)
     {
       var rawJson = await streamReader.ReadLineAsync()
         .ConfigureAwait(false);
 
-      if (rawJson != null && rawJson.StartsWith("{\"queryId\""))
-      {
-        OnLineRead<T>(rawJson);
-
-        var queryStreamHeader = JsonSerializer.Deserialize<QueryStreamHeader>(rawJson);
-
-        return queryStreamHeader?.QueryId;
-      }
-
-      if (rawJson != null && rawJson.StartsWith("[{\"header\""))
-      {
-        OnLineRead<T>(rawJson);
-
-        var headerResponse = JsonSerializer.Deserialize<HeaderResponse>(rawJson.Substring(startIndex: 1, rawJson.Length - 2));
-
-        return headerResponse?.Header.QueryId;
-      }
-
-      return null;
+      return OnReadHeader<T>(rawJson);
     }
+
+    protected abstract string OnReadHeader<T>(string rawJson);
 
     protected abstract RowValue<T> OnLineRead<T>(string rawJson);
 
