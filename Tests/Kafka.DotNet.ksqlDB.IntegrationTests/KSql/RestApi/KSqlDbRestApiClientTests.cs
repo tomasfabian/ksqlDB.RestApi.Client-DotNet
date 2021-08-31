@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reactive.Concurrency;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -283,7 +284,10 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
       var contextOptions = new KSqlDBContextOptions(@"http:\\localhost:8088");
       await using var context = new KSqlDBContext(contextOptions);
       
-      var subscription = await context.CreateQueryStream<MyMoviesTable>().SubscribeAsync(_ => {}, e => { }, () => { });
+      var subscription = await context
+        .CreateQueryStream<MyMoviesTable>()
+        .SubscribeOn(ThreadPoolScheduler.Instance)
+        .SubscribeAsync(_ => {}, e => { }, () => { });
       
       int queriesCount = (await restApiClient.GetQueriesAsync()).SelectMany(c => c.Queries).Count();
 
