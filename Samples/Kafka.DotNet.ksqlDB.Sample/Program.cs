@@ -65,7 +65,7 @@ namespace Kafka.DotNet.ksqlDB.Sample
         .Where(p => p.Title != "E.T.")
         .Where(c => K.Functions.Like(c.Title.ToLower(), "%hard%".ToLower()) || c.Id == 1)
         .Where(p => p.RowTime >= 1510923225000)
-        .Select(l => new {Id = l.Id, l.Title, l.Release_Year, l.RowTime})
+        .Select(l => new { Id = l.Id, l.Title, l.Release_Year, l.RowTime })
         .Take(2); // LIMIT 2    
 
       var ksql = query.ToQueryString();
@@ -74,15 +74,15 @@ namespace Kafka.DotNet.ksqlDB.Sample
       Console.WriteLine(ksql);
       Console.WriteLine();
 
-      using var disposable = query  
+      using var disposable = query
         .ToObservable() // client side processing starts here lazily after subscription. Switches to Rx.NET
-        .ObserveOn(TaskPoolScheduler.Default)
+        .Finally(() => { Console.WriteLine("Finally"); })
         .Subscribe(onNext: movie =>
         {
           Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
           Console.WriteLine();
         }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
-      
+
       await CreateOrReplaceTableStatement(context);
 
       await moviesProvider.InsertMovieAsync(MoviesProvider.Movie1);
@@ -104,7 +104,7 @@ namespace Kafka.DotNet.ksqlDB.Sample
 
       await moviesProvider.DropTablesAsync();
 
-      Console.WriteLine("Subscription completed");
+      Console.WriteLine("Finished.");
     }
 
     private static async Task GetKsqlDbInformationAsync(KSqlDbRestApiProvider restApiProvider)
@@ -124,7 +124,7 @@ namespace Kafka.DotNet.ksqlDB.Sample
       Console.WriteLine($"{Environment.NewLine}Available streams:");
       var streamsResponse = await restApiProvider.GetStreamsAsync();
       Console.WriteLine(string.Join(',', streamsResponse[0].Streams.Select(c => c.Name)));
-      
+
       Console.WriteLine($"{Environment.NewLine}Available connectors:");
       var connectorsResponse = await restApiProvider.GetConnectorsAsync();
       Console.WriteLine(string.Join(',', connectorsResponse[0].Connectors.Select(c => c.Name)));
@@ -134,7 +134,7 @@ namespace Kafka.DotNet.ksqlDB.Sample
     {
       var creationMetadata = new CreationMetadata
       {
-        KafkaTopic = "tweetsByTitle",		
+        KafkaTopic = "tweetsByTitle",
         KeyFormat = SerializationFormats.Json,
         ValueFormat = SerializationFormats.Json,
         Replicas = 1,
@@ -145,7 +145,7 @@ namespace Kafka.DotNet.ksqlDB.Sample
         .With(creationMetadata)
         .As<Movie>()
         .Where(c => c.Id < 3)
-        .Select(c => new {c.Title, ReleaseYear = c.Release_Year})
+        .Select(c => new { c.Title, ReleaseYear = c.Release_Year })
         .PartitionBy(c => c.Title)
         .ExecuteStatementAsync();
 
@@ -155,7 +155,7 @@ CREATE OR REPLACE TABLE TweetsByTitle
 AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
 WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
        */
-      
+
       string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
 
       var statementResponse = await httpResponseMessage.ToStatementResponsesAsync();
@@ -661,7 +661,7 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
       //SELECT Id, CAST(COUNT(*) AS VARCHAR) Count, CAST('42' AS INT) TheAnswer FROM Movies GROUP BY Id EMIT CHANGES;
       var query = context.CreateQueryStream<Movie>()
         .GroupBy(c => c.Id)
-        .Select(c => new {Id = c.Key, Count = c.Count().ToString(), TheAnswer = KSQLConvert.ToInt32("42")})
+        .Select(c => new { Id = c.Key, Count = c.Count().ToString(), TheAnswer = KSQLConvert.ToInt32("42") })
         .ToQueryString();
     }
 
@@ -688,12 +688,12 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
 
       var http = new HttpClientFactory(new Uri(url));
       var restApiClient = new KSqlDbRestApiClient(http);
-      
+
       var httpResponseMessage = await restApiClient.CreateStreamAsync<MovieNullableFields>(metadata, ifNotExists: true);
 
       //OR
       //httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MovieNullableFields>(metadata);
-      
+
       string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
     }
 
@@ -705,25 +705,17 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
 
       var query = queries.SelectMany(c => c.Queries).FirstOrDefault(c => c.SinkKafkaTopics.Contains(topicName));
 
-      var response = await restApiClient.TerminatePersistentQueryAsync(query.Id); 
+      var response = await restApiClient.TerminatePersistentQueryAsync(query.Id);
     }
 
     private static async Task TerminatePushQueryAsync(IKSqlDBContext context, IKSqlDbRestApiClient restApiClient)
     {
-      var queryId = @"abc123";
+      var subscription = await context.CreateQueryStream<Movie>()
+        .SubscribeOn(ThreadPoolScheduler.Instance)
+        .SubscribeAsync(onNext: _ => { }, onError: e => { }, onCompleted: () => { });
 
-      var response = await restApiClient.TerminatePushQueryAsync(queryId);
+      var response = await restApiClient.TerminatePushQueryAsync(subscription.QueryId);
     }
-
-    //TODO: v1.5.0
-    //private static async Task TerminatePushQueryAsync(IKSqlDBContext context, IKSqlDbRestApiClient restApiClient)
-    //{
-    //  var queryId = await context.CreateQueryStream<Movie>()
-    //    .SubscribeOn(ThreadPoolScheduler.Instance)
-    //    .SubscribeAsync(onNext: _ => {}, onError: e => { }, onCompleted: () => { });
-
-    //  var response = await restApiClient.TerminatePushQueryAsync(queryId);
-    //}
 
     private static string SourceConnectorName => "mock-source-connector";
     private static string SinkConnectorName => "mock-sink-connector";
@@ -736,11 +728,11 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
       };
 
       var httpResponseMessage = await restApiClient.CreateSourceConnectorAsync(sourceConnectorConfig, SourceConnectorName);
-      
+
       var sinkConnectorConfig = new Dictionary<string, string> {
         { "connector.class", "org.apache.kafka.connect.tools.MockSinkConnector" },
         { "topics.regex", "mock-sink*"},
-      }; 		
+      };
 
       httpResponseMessage = await restApiClient.CreateSinkConnectorAsync(sinkConnectorConfig, SinkConnectorName);
 
