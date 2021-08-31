@@ -62,11 +62,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
 
       var observable = RunStreamAsObservable(cancellationTokenSource);
       
-      if(SubscribeOnScheduler != null)
-        observable = observable.SubscribeOn(SubscribeOnScheduler);
-      
-      if(ObserveOnScheduler != null)
-        observable = observable.ObserveOn(ObserveOnScheduler);
+      observable = TryApplySchedulers(observable);
       
       var querySubscription = observable.Subscribe(observer);
 
@@ -85,15 +81,22 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
 
       var observable = query.Source;
 
-      if(SubscribeOnScheduler != null)
-        observable = observable.SubscribeOn(SubscribeOnScheduler);
-      
-      if(ObserveOnScheduler != null)
-        observable = observable.ObserveOn(ObserveOnScheduler);
-      
+      observable = TryApplySchedulers(observable);
+
       observable.Subscribe(observer, cancellationToken);
       
       return new Subscription { QueryId = query.QueryId };
+    }
+
+    private IObservable<TEntity> TryApplySchedulers(IObservable<TEntity> observable)
+    {
+      if (SubscribeOnScheduler != null)
+        observable = observable.SubscribeOn(SubscribeOnScheduler);
+
+      if (ObserveOnScheduler != null)
+        observable = observable.ObserveOn(ObserveOnScheduler);
+
+      return observable;
     }
 
     internal IAsyncEnumerable<TEntity> RunStreamAsAsyncEnumerable(CancellationToken cancellationToken = default)
