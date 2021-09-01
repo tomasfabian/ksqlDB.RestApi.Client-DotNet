@@ -2154,18 +2154,18 @@ Parameters:
 `deleteTopic` - If the DELETE TOPIC clause is present, the stream's source topic is marked for deletion.
 
 
-# v1.5.0-rc.1:
+# v1.5.0:
 ```
 Install-Package Kafka.DotNet.ksqlDB -Version 1.5.0-rc.1
 ```
 
 ### QbservableExtensions
-## SubscribeAsync 
+## SubscribeAsync (v1.5.0)
 - Subscribes an element handler, an exception handler, and a completion handler to an qbservable stream and asynchronously returns the query id.
 
-## SubscribeOn
+## SubscribeOn (v1.5.0)
 - Wraps the source sequence in order to run its subscription on the specified scheduler.
-## ObserveOn
+## ObserveOn (v1.5.0)
 - Wraps the source sequence in order to run its observer callbacks on the specified scheduler.
 ```C#
 using System;

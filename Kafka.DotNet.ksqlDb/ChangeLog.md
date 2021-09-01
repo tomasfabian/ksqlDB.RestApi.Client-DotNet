@@ -1,4 +1,4 @@
-﻿# v1.5.0-rc.1
+﻿# v1.5.0
 ### QbservableExtensions 
 ObserveOn - Wraps the source sequence in order to run its observer callbacks on the specified scheduler.
 
