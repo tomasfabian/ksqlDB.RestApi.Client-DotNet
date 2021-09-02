@@ -12,32 +12,17 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
 {
   internal sealed class CreateEntity : CreateEntityStatement
   {
-    internal string KSqlTypeTranslator(Type type)
+    internal static string KSqlTypeTranslator(Type type)
     {
       var ksqlType = string.Empty;
 
-      if (type == typeof(string))
-        ksqlType = "VARCHAR";
-      if (type.IsOneOfFollowing(typeof(int), typeof(int?), typeof(short), typeof(short?)))
-        ksqlType = "INT";
-      if (type.IsOneOfFollowing(typeof(long), typeof(long?)))
-        ksqlType = "BIGINT";
-      if (type.IsOneOfFollowing(typeof(double), typeof(double?)))
-        ksqlType = "DOUBLE";
-      if (type.IsOneOfFollowing(typeof(bool), typeof(bool?)))
-        ksqlType = "BOOLEAN";
-
-      if (type == typeof(decimal))
-        ksqlType = "DECIMAL";
-
-        if (type.IsArray)
+      if (type.IsArray)
       {
         var elementType = KSqlTypeTranslator(type.GetElementType());
 
         ksqlType = $"ARRAY<{elementType}>";
       }
-
-      if (type.IsDictionary())
+      else if (type.IsDictionary())
       {
         Type[] typeParameters = type.GetGenericArguments();
 
@@ -46,6 +31,18 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
 
         ksqlType = $"MAP<{keyType}, {valueType}>";
       }
+      else if (type == typeof(string))
+        ksqlType = "VARCHAR";
+      else if (type.IsOneOfFollowing(typeof(int), typeof(int?), typeof(short), typeof(short?)))
+        ksqlType = "INT";
+      else if (type.IsOneOfFollowing(typeof(long), typeof(long?)))
+        ksqlType = "BIGINT";
+      else if (type.IsOneOfFollowing(typeof(double), typeof(double?)))
+        ksqlType = "DOUBLE";
+      else if (type.IsOneOfFollowing(typeof(bool), typeof(bool?)))
+        ksqlType = "BOOLEAN";
+      else if (type == typeof(decimal))
+        ksqlType = "DECIMAL";
 
       return ksqlType;
     }
@@ -76,7 +73,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
       return stringBuilder.ToString();
     }
 
-    private string ExploreAttributes(MemberInfo memberInfo, Type type)
+    internal static string ExploreAttributes(MemberInfo memberInfo, Type type)
     {
       if (type == typeof(decimal))
       {
