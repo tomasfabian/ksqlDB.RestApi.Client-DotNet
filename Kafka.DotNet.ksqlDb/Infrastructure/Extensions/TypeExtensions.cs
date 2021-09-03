@@ -49,5 +49,13 @@ namespace Kafka.DotNet.ksqlDB.Infrastructure.Extensions
     {
       return typeInfo.GetCustomAttributes().OfType<KeyAttribute>().Any();
     }
+
+    internal static IEnumerable<Type> GetEnumerableTypeDefinition(this Type type)
+    {
+      return type
+        .GetInterfaces()
+        .Where(t => t.IsGenericType
+                    && t.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+    }
   }
 }
