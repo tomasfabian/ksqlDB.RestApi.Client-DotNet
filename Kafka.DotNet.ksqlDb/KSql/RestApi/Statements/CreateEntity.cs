@@ -43,6 +43,33 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
         ksqlType = "BOOLEAN";
       else if (type == typeof(decimal))
         ksqlType = "DECIMAL";
+      else if (!type.IsGenericType && (type.IsClass || type.IsStruct()))
+      {
+        ksqlType = type.Name.ToUpper();
+      }
+      else
+      {
+        Type elementType = null;
+
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+          elementType = type.GetGenericArguments()[0];
+        else
+        {
+          var enumerableInterfaces = type.GetEnumerableTypeDefinition().ToArray();
+
+          if (enumerableInterfaces.Any())
+          {
+            elementType = enumerableInterfaces[0].GetGenericArguments()[0];
+          }
+        }
+
+        if(elementType != null)
+        {
+          string ksqlElementType = KSqlTypeTranslator(elementType);
+
+          ksqlType = $"ARRAY<{ksqlElementType}>";
+        }
+      }
 
       return ksqlType;
     }
