@@ -136,6 +136,35 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
       responseObject?[0].CommandStatus.Message.Should().Be("Stream created");
     }
 
+    [TestMethod]
+    public async Task CreateTypeAsync()
+    {
+      //Arrange
+      var httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@"
+Drop type Person;
+Drop type Address;
+"));
+      
+      //Act
+      httpResponseMessage = await restApiClient.CreateTypeAsync<Address>();
+      httpResponseMessage = await restApiClient.CreateTypeAsync<Person>();
+
+      //Assert
+      httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    public record Address
+    {
+      public int Number { get; set; }
+      public string Street { get; set; }
+    }
+
+    public class Person
+    {
+      public string Name { get; set; }
+      public Address Address { get; set; }
+    }
+
     #region Connectors
 
     private string SinkConnectorName => "mock-sink-connector";
