@@ -245,6 +245,9 @@ Fixes:
 - QbservableProvider
 - ```KSqldbProvider<T>``` - ksqldb REST api provider for push queries (```KSqlDbQueryProvider<T>```, ```KSqlDbQueryStreamProvider<T>```)
 
+# v1.6.0-rc.1
+KSqlDbRestApiClient - CreateTypeAsync - Create an alias for a complex type declaration.
+
 # TODO:
 - missing scalar functions https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#date-and-time
 - BETWEEN
