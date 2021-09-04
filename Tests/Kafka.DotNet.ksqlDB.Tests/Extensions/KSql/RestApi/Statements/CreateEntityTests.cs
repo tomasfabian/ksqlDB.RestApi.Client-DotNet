@@ -230,6 +230,78 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       statement.Should().Be(CreateExpectedStatement("CREATE OR REPLACE TABLE", hasPrimaryKey: true));
     }
 
+    public abstract record AbstractProducerClass
+    {
+      [Key]
+      public string Key { get; set; }
+    }
+
+    record Enrichedevent1 : AbstractProducerClass
+    {
+      public EventCategory[] EventCategories { get; set; }
+    }
+    
+    [Test]
+    public void Print_NestedArrayType_CreateTableIfNotExists()
+    {
+      TestCreateEntityWithEnumerable<Enrichedevent1>();
+    }
+
+    record Enrichedevent2 : AbstractProducerClass
+    {
+      public List<EventCategory> EventCategories { get; set; }
+    }
+    
+    [Test]
+    public void Print_NestedListType_CreateTableIfNotExists()
+    {
+      TestCreateEntityWithEnumerable<Enrichedevent2>();
+    }
+    
+    record Enrichedevent3 : AbstractProducerClass
+    {
+      public IEnumerable<EventCategory> EventCategories { get; set; }
+    }
+
+    [Test]
+    public void Print_NestedGenericEnumerableType_CreateTableIfNotExists()
+    {
+      TestCreateEntityWithEnumerable<Enrichedevent3>();
+    }
+    
+    //CREATE TYPE EventCategories AS STRUCT<id INTEGER, name VARCHAR, description VARCHAR>;
+    record EventCategory
+    {
+      public int Id { get; set; }
+      public string Name { get; set; }
+    }
+
+    private static void TestCreateEntityWithEnumerable<TEntity>()
+    {
+      //Arrange
+      var statementContext = new StatementContext
+      {
+        CreationType = CreationType.Create,
+        KSqlEntityType = KSqlEntityType.Table
+      };
+
+      var creationMetadata = new EntityCreationMetadata()
+      {
+        EntityName = "Enrichedevents",
+        KafkaTopic = "enrichedevents",
+        Partitions = 1
+      };
+
+      //Act
+      string statement = new CreateEntity().Print<TEntity>(statementContext, creationMetadata, true);
+
+      //Assert
+      statement.Should().Be(@"CREATE TABLE IF NOT EXISTS Enrichedevents (
+	EventCategories ARRAY<EVENTCATEGORY>,
+	Key VARCHAR PRIMARY KEY
+) WITH ( KAFKA_TOPIC='enrichedevents', VALUE_FORMAT='Json', PARTITIONS='1' );");
+    }
+
     internal class MyMovie
     {
       [Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.Key]
