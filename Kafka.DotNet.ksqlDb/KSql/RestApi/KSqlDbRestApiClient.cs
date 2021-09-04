@@ -177,6 +177,21 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       return ExecuteStatementAsync(ksqlStatement, cancellationToken);
     }
 
+    /// <summary>
+    /// Create an alias for a complex type declaration.
+    /// The CREATE TYPE statement registers a type alias directly in KSQL. Any types registered by using this command can be leveraged in future statements. The CREATE TYPE statement works in interactive and headless modes.
+    /// Any attempt to register the same type twice, without a corresponding DROP TYPE statement, will fail.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+    /// <returns>Http response object.</returns>
+    public Task<HttpResponseMessage> CreateTypeAsync<T>(CancellationToken cancellationToken = default)
+    {
+      var ksql = new TypeGenerator().Print<T>();
+
+      return ExecuteAsync<T>(ksql, cancellationToken);
+    }
+
     #endregion
 
     /// <summary>
