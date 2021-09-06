@@ -19,7 +19,7 @@ namespace Kafka.DotNet.ksqlDB.Infrastructure.Extensions
     {
       while (type != null)
       {
-        if (type.Name== nameof(KSet))
+        if (type.Name == nameof(KSet))
         {
           return type;
         }
