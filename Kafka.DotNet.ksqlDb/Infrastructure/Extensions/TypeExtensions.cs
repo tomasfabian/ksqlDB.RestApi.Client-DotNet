@@ -45,6 +45,16 @@ namespace Kafka.DotNet.ksqlDB.Infrastructure.Extensions
       return isDictionary;
     }
 
+    internal static bool IsList(this Type type)
+    {
+      if (!type.IsGenericType)
+        return false;
+
+      var isList = type.GetGenericTypeDefinition() == typeof(IList<>) || type.GetGenericTypeDefinition() == typeof(List<>);
+
+      return isList;
+    }
+
     internal static bool HasKey(this MemberInfo typeInfo)
     {
       return typeInfo.GetCustomAttributes().OfType<KeyAttribute>().Any();
