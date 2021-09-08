@@ -107,6 +107,45 @@ namespace Kafka.DotNet.ksqlDB.Tests.Infrastructure.Extensions
     }
 
     [TestMethod]
+    public void IsList()
+    {
+      //Arrange
+      var type = typeof(List<string>);
+
+      //Act
+      var typeDefinition = type.IsList();
+
+      //Assert
+      typeDefinition.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void IsList_Interface()
+    {
+      //Arrange
+      var type = typeof(IList<string>);
+
+      //Act
+      var typeDefinition = type.IsList();
+
+      //Assert
+      typeDefinition.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void IsList_PrimitiveType_ReturnsFalse()
+    {
+      //Arrange
+      var type = typeof(string);
+
+      //Act
+      var typeDefinition = type.IsList();
+
+      //Assert
+      typeDefinition.Should().BeFalse();
+    }
+
+    [TestMethod]
     public void HasKey_PropertyIsNotAnnotatedWithAKeyAttribute_ReturnsFalse()
     {
       //Arrange
