@@ -1,4 +1,4 @@
-﻿This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/)
+﻿This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
 It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the Rest API.
 
 Kafka.DotNet.ksqlDB is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
@@ -2153,11 +2153,7 @@ Parameters:
 
 `deleteTopic` - If the DELETE TOPIC clause is present, the stream's source topic is marked for deletion.
 
-
 # v1.5.0:
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 1.5.0-rc.1
-```
 
 ### QbservableExtensions
 ## SubscribeAsync (v1.5.0)
@@ -2197,6 +2193,80 @@ private static async Task SubscribeAsync(IKSqlDBContext context)
   {
     Console.WriteLine(e);
   }
+}
+```
+
+# v1.6.0-rc.1:
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 1.6.0-rc.1
+```
+
+## CreateTypeAsync (v1.6.0)
+- `IKSqlDbRestApiClient.CreateTypeAsync<TEntity>` - Create an alias for a complex type declaration.
+
+```C#
+using System;
+using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.Linq;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.KSql.RestApi;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using Kafka.DotNet.ksqlDB.Sample.Models.Events;
+
+private static async Task SubscriptionToAComplexTypeAsync()
+{      
+  var ksqlDbUrl = @"http:\\localhost:8088";
+
+  var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+  var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+  var httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@$"
+Drop type {nameof(EventCategory)};
+Drop table {nameof(Event)};
+"));
+
+  httpResponseMessage = await restApiClient.CreateTypeAsync<EventCategory>();
+  httpResponseMessage = await restApiClient.CreateTableAsync<Event>(new EntityCreationMetadata { KafkaTopic = "Events", Partitions = 1 });
+      
+  await using var ksqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(ksqlDbUrl));
+
+  var subscription = ksqlDbContext.CreateQueryStream<Event>()
+    .Take(1)
+    .Subscribe(value =>
+    {
+      Console.WriteLine("Categories: ");
+
+      foreach (var category in value.Categories)
+      {
+        Console.WriteLine($"{category.Name}");
+      }
+    }, error =>
+    {
+      Console.WriteLine(error.Message);
+    });
+
+  httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@"
+INSERT INTO Events (Id, Places, Categories) VALUES (1, ARRAY['1','2','3'], ARRAY[STRUCT(Name := 'Planet Earth'), STRUCT(Name := 'Discovery')]);"));
+}
+```
+
+```C#
+using System.Collections.Generic;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
+
+record EventCategory
+{
+  public string Name { get; set; }
+}
+
+record Event
+{
+  [Key]
+  public int Id { get; set; }
+
+  public string[] Places { get; set; }
+
+  public IEnumerable<EventCategory> Categories { get; set; }
 }
 ```
 
