@@ -269,6 +269,17 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       TestCreateEntityWithEnumerable<Enrichedevent3>();
     }
     
+    record Enrichedevent4 : AbstractProducerClass
+    {
+      public int[] EventCategories { get; set; }
+    }
+
+    [Test]
+    public void Print_NestedPrimitiveArrayType_CreateTableIfNotExists()
+    {
+      TestCreateEntityWithEnumerable<Enrichedevent4>(arrayElementType: "INT");
+    }
+    
     //CREATE TYPE EventCategories AS STRUCT<id INTEGER, name VARCHAR, description VARCHAR>;
     record EventCategory
     {
@@ -276,7 +287,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       public string Name { get; set; }
     }
 
-    private static void TestCreateEntityWithEnumerable<TEntity>()
+    private static void TestCreateEntityWithEnumerable<TEntity>(string arrayElementType = "EVENTCATEGORY")
     {
       //Arrange
       var statementContext = new StatementContext
@@ -296,8 +307,8 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateEntity().Print<TEntity>(statementContext, creationMetadata, true);
 
       //Assert
-      statement.Should().Be(@"CREATE TABLE IF NOT EXISTS Enrichedevents (
-	EventCategories ARRAY<EVENTCATEGORY>,
+      statement.Should().Be(@$"CREATE TABLE IF NOT EXISTS Enrichedevents (
+	EventCategories ARRAY<{arrayElementType}>,
 	Key VARCHAR PRIMARY KEY
 ) WITH ( KAFKA_TOPIC='enrichedevents', VALUE_FORMAT='Json', PARTITIONS='1' );");
     }

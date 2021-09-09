@@ -11,12 +11,17 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
   internal class CreateEntityStatement
   {
     protected static readonly IPluralize EnglishPluralizationService = new Pluralizer();
-    
+
     protected IEnumerable<MemberInfo> Members<T>()
     {
-      var fields = typeof(T).GetFields(BindingFlags.Public | BindingFlags.Instance);
+      return Members(typeof(T));
+    }
 
-      var properties = typeof(T)
+    protected IEnumerable<MemberInfo> Members(Type type)
+    {
+      var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
+
+      var properties = type
         .GetProperties(BindingFlags.Public | BindingFlags.Instance)
         .Where(c => c.CanWrite).OfType<MemberInfo>()
         .Concat(fields);

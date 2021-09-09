@@ -50,7 +50,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
       return insert;
     }
 
-    private static object? ExtractValue<T>(T inputValue, InsertProperties insertProperties, MemberInfo memberInfo, Type type)
+    private object? ExtractValue<T>(T inputValue, InsertProperties insertProperties, MemberInfo memberInfo, Type type)
     {
       Type valueType = inputValue.GetType();
       var value = valueType.IsPrimitive || valueType == typeof(string) ? inputValue : valueType.GetProperty(memberInfo.Name)?.GetValue(inputValue);
@@ -61,7 +61,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
 
         value = insertProperties.FormatDecimalValue((decimal) value);
       }
-
       else if (type == typeof(double) && insertProperties.FormatDoubleValue != null)
       {
         Debug.Assert(value != null, nameof(value) + " != null");
@@ -72,6 +71,34 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
         value = $"'{value}'";
       else if (type.IsPrimitive)
         ;
+      else if (type.IsArray)
+      {
+        var source = ((IEnumerable)value).Cast<object>();
+        var array = source.Select(c => ExtractValue(c, insertProperties, null, type.GetElementType())).ToArray();
+        value = PrintArray(array);
+      }
+      else if (!type.IsGenericType && (type.IsClass || type.IsStruct()))
+      {
+        bool isFirst = true;
+
+        var sb = new StringBuilder();
+        sb.Append("STRUCT(");
+        foreach (var memberInfo2 in Members(type))
+        {
+          if (isFirst)
+            isFirst = false;
+          else
+            sb.Append(", ");
+          
+          type = GetMemberType<T>(memberInfo2);
+
+          var innerValue = ExtractValue(value, insertProperties, memberInfo2, type);
+          sb.Append($"{memberInfo2.Name} := {innerValue}");
+        }
+
+        sb.Append(")");
+        value = sb.ToString();
+      }
       else
       {
         var enumerableType = type.GetEnumerableTypeDefinition();
@@ -81,23 +108,30 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
 
         type = enumerableType.First();
         type = type.GetGenericArguments()[0];
-
-        var source = value as IEnumerable<object>;
-        source = ((IEnumerable)value).Cast<object>();
+        
+        var source = ((IEnumerable)value).Cast<object>();
         var array = source.Select(c => ExtractValue(c, insertProperties, null, type)).ToArray();
 
-        var sb = new StringBuilder();
-        sb.Append("ARRAY[");
-#if NETSTANDARD
-        value = string.Join(",", array);
-#else
-        value = string.Join(',', array);
-#endif
-        sb.Append(value);
-        sb.Append("]");
-        value = sb.ToString();
+        value = PrintArray(array);
       }
 
+      return value;
+    }
+
+    private static object PrintArray(object[] array)
+    {
+      var sb = new StringBuilder();
+      sb.Append("ARRAY[");
+#if NETSTANDARD
+      var value = string.Join(",", array);
+#else
+      var value = string.Join(',', array);
+#endif
+      sb.Append(value);
+      sb.Append("]");
+      
+      value = sb.ToString();
+      
       return value;
     }
   }
