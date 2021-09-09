@@ -189,17 +189,34 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
 
         Append(")");
       }
+      else if (listInitExpression.Type.IsList())
+      {
+        var arguments = listInitExpression.Initializers.SelectMany(c => c.Arguments);
+
+        if (isInScope)
+          JoinAppend(arguments);
+        else
+          PrintArray(arguments);
+      }
 
       return listInitExpression;
     }
 
     protected override Expression VisitNewArray(NewArrayExpression node)
     {
-      Append("ARRAY[");
-      PrintCommaSeparated(node.Expressions);
-      Append("]");
+      if (isInScope)
+        JoinAppend(node.Expressions);
+      else
+        PrintArray(node.Expressions);
 
       return node;
+    }
+
+    private void PrintArray(IEnumerable<Expression> expressions)
+    {
+      Append("ARRAY[");
+      PrintCommaSeparated(expressions);
+      Append("]");
     }
 
     protected override Expression VisitMethodCall(MethodCallExpression methodCallExpression)
@@ -244,8 +261,52 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
           Append(")");
         }
       }
+        
+      TryPrintContains(methodCallExpression, methodInfo);
 
       return methodCallExpression;
+    }
+
+    private void TryPrintContains(MethodCallExpression methodCallExpression, MethodInfo methodInfo)
+    {
+      if (methodCallExpression.Object != null && methodCallExpression.Object.Type.IsList())
+      {
+        if (methodInfo.Name == nameof(List<int>.Contains))
+        {
+          PrintArrayContains(methodCallExpression);
+        }
+      }
+
+      if (methodCallExpression.Method.DeclaringType == typeof(Enumerable) && methodCallExpression.Method.Name == nameof(Enumerable.Contains))
+      {
+        PrintArrayContainsForEnumerable(methodCallExpression.Arguments);
+      }
+    }
+
+    private bool isInScope;
+
+    private void PrintArrayContainsForEnumerable(IReadOnlyCollection<Expression> arguments)
+    {
+      isInScope = true;
+
+      Visit(arguments.Last());
+      Append(" IN (");
+      Visit(arguments.First());
+      Append(")");
+
+      isInScope = false;
+    }
+
+    private void PrintArrayContains(MethodCallExpression methodCallExpression)
+    {
+      isInScope = true;
+
+      Visit(methodCallExpression.Arguments);
+      Append(" IN (");
+      Visit(methodCallExpression.Object);
+      Append(")");
+
+      isInScope = false;
     }
 
     private void TryCast(MethodCallExpression methodCallExpression)
@@ -600,19 +661,27 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
 
     private const string ColumnsSeparator = ", ";
 
-    protected void Append(IEnumerable enumerable)
+    protected void JoinAppend(IEnumerable enumerable)
     {
       bool isFirst = true;
 
-      foreach (var constant in enumerable)
+      foreach (var value in enumerable)
       {
         if (isFirst)
           isFirst = false;
         else
           stringBuilder.Append(ColumnsSeparator);
 
-        stringBuilder.Append(constant);
+        Visit(Expression.Constant(value));
       }
+    }
+
+    protected void Append(IEnumerable enumerable)
+    {
+      if (isInScope)
+        JoinAppend(enumerable);
+      else
+        PrintArray(enumerable.OfType<object>().Select(Expression.Constant));
     }
   }
 }
