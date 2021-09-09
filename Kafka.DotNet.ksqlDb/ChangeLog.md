@@ -1,4 +1,13 @@
-﻿# v1.5.0
+﻿# v1.6.0-rc.1
+KSqlDbRestApiClient - CreateTypeAsync - #4 Create an alias for a complex type declaration.
+KSqlDbRestApiClient - InsertIntoAsync Complex types - `IEnumerable<T>`, record, class and struct
+
+Added support for IN - `IEnumerable<T>` and `IList<T>` Contains method in Where clauses is interpreted as IN #5
+
+FIX:
+- IEnumerables are converted to ksql ARRAY not list of comma separated values
+
+# v1.5.0
 ### QbservableExtensions 
 ObserveOn - Wraps the source sequence in order to run its observer callbacks on the specified scheduler.
 
@@ -244,9 +253,6 @@ Fixes:
 - KStreamSet, KQuerySet, KQueryStreamSet
 - QbservableProvider
 - ```KSqldbProvider<T>``` - ksqldb REST api provider for push queries (```KSqlDbQueryProvider<T>```, ```KSqlDbQueryStreamProvider<T>```)
-
-# v1.6.0-rc.1
-KSqlDbRestApiClient - CreateTypeAsync - Create an alias for a complex type declaration.
 
 # TODO:
 - missing scalar functions https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#date-and-time
