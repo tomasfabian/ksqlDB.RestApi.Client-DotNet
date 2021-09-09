@@ -1,7 +1,7 @@
 ﻿This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
 It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the Rest API.
 
-Kafka.DotNet.ksqlDB is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
+[Kafka.DotNet.ksqlDB](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB) is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
 
 ```
 Install-Package Kafka.DotNet.ksqlDB
@@ -2268,6 +2268,72 @@ record Event
 
   public IEnumerable<EventCategory> Categories { get; set; }
 }
+```
+
+## InsertIntoAsync for complex types (v1.6.0)
+In v1.0.0 support for inserting entities with primitive types and strings was added. This version adds support for `IEnumerables<T>` and records, classes and structs. 
+Deeply nested types and dictionaries are not yet supported.
+
+```C#
+var testEvent = new EventWithList
+{
+  Id = "1",
+  Places = new List<int> { 1, 2, 3 }
+};
+
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
+var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
+  .InsertIntoAsync(testEvent);
+```
+Generated KSQL:
+```SQL
+INSERT INTO EventWithLists (Id, Places) VALUES ('1', ARRAY[1,2,3]);
+```
+
+```C#
+var eventCategory = new EventCategory
+{
+  Count = 1,
+  Name = "Planet Earth"
+};
+
+var testEvent2 = new ComplexEvent
+{
+  Id = 1,
+  Category = eventCategory
+};
+
+var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
+  .InsertIntoAsync(testEvent2, new InsertProperties { EntityName = "Events"});
+```
+
+Generated KSQL:
+```SQL
+INSERT INTO Events (Id, Category) VALUES (1, STRUCT(Count := 1, Name := 'Planet Earth'));
+```
+
+## IN - `IEnumerable<T>` and `IList<T>` Contains (v1.6.0)
+Specifies multiple OR conditions.
+`IList<T>`.Contains:
+```C#
+var orderTypes = new List<int> { 1, 2, 3 };
+
+Expression<Func<OrderData, bool>> expression = o => orderTypes.Contains(o.OrderType);
+
+```
+Enumerable extension:
+```C#
+IEnumerable<int> orderTypes = Enumerable.Range(1, 3);
+
+Expression<Func<OrderData, bool>> expression = o => orderTypes.Contains(o.OrderType);
+
+```
+For both options the following SQL is generated:
+```SQL
+OrderType IN (1, 2, 3)
 ```
 
 # LinqPad samples
