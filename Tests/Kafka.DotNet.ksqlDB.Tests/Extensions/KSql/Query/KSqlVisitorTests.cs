@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using FluentAssertions;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query;
+using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
 using Kafka.DotNet.ksqlDB.Tests.Pocos;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
@@ -68,7 +70,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query
     }
 
     [TestMethod]
-    public void EnumerableConstant_BuildKSql_PrintsCommaSeparatedTextFields()
+    public void EnumerableStringConstant_BuildKSql_PrintsArray()
     {
       //Arrange
       var constant = new[] { "Field1", "Field2" };
@@ -78,7 +80,21 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query
       var query = ClassUnderTest.BuildKSql(constantExpression);
 
       //Assert
-      query.Should().BeEquivalentTo("Field1, Field2");
+      query.Should().BeEquivalentTo("ARRAY['Field1', 'Field2']");
+    }
+
+    [TestMethod]
+    public void EnumerableIntConstant_BuildKSql_PrintsArray()
+    {
+      //Arrange
+      var constant = new[] { 1, 2 };
+      var constantExpression = Expression.Constant(constant);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(constantExpression);
+
+      //Assert
+      query.Should().BeEquivalentTo("ARRAY[1, 2]");
     }
 
     [TestMethod]
@@ -675,5 +691,143 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query
     }
 
     #endregion
+    
+    #region ListContains
+    
+    class OrderData
+    {
+      public int OrderType { get; set; }
+      public string Category { get; set; }
+    }
+
+    [TestMethod]
+    public void ListContains()
+    {
+      //Arrange
+      Expression<Func<OrderData, bool>> expression = o => new List<int> { 1, 3 }.Contains(o.OrderType);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 3)");
+    } 
+
+    [TestMethod]
+    public void ListMemberContains()
+    {
+      //Arrange
+      var orderTypes = new List<int> { 1, 3 };
+
+      Expression<Func<OrderData, bool>> expression = o => orderTypes.Contains(o.OrderType);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 3)");
+    } 
+
+    [TestMethod]
+    public void VisitNewArrayContains()
+    {
+      //Arrange
+      Expression<Func<OrderData, bool>> expression = o => new []{ 1, 3 }.Contains(o.OrderType);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 3)");
+    } 
+
+    [TestMethod]
+    public void EnumerableContains()
+    {
+      //Arrange
+      IEnumerable<int> orderTypes = Enumerable.Range(1, 3);
+
+      Expression<Func<OrderData, bool>> expression = o => orderTypes.Contains(o.OrderType);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 2, 3)");
+    } 
+
+    [TestMethod]
+    public void EnumerableOfStringContains()
+    {
+      //Arrange
+      IEnumerable<string> orderTypes = new [] { "1", "2" };
+
+      Expression<Func<OrderData, bool>> expression = o => orderTypes.Contains(o.Category);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"{nameof(OrderData.Category)} IN ('1', '2')");
+    } 
+
+    [TestMethod]
+    public void IListMemberContains()
+    {
+      //Arrange
+      IList<int> orderTypes = new List<int> { 1, 3 };
+
+      Expression<Func<OrderData, bool>> expression = o => orderTypes.Contains(o.OrderType);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 3)");
+    } 
+
+    [TestMethod]
+    public void IEnumerableMemberContains()
+    {
+      //Arrange
+      IEnumerable<int> orderTypes = new List<int> { 1, 3 };
+
+      Expression<Func<OrderData, bool>> expression = o => orderTypes.Contains(o.OrderType);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 3)");
+    } 
+
+    #endregion
+
+    [TestMethod]
+    public void ArrayContains_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      Expression<Func<OrderData, bool>> expression = c => K.Functions.ArrayContains(new[]{ 1, 3 }, c.OrderType);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)})");
+    }
+
+    [TestMethod]
+    public void ArrayMemberContains_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      var orderTypes = new[] { 1, 3 };
+      Expression<Func<OrderData, bool>> expression = c => K.Functions.ArrayContains(orderTypes, c.OrderType);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)})");
+    }
   }
 }
