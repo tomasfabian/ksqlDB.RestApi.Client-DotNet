@@ -22,6 +22,7 @@ using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Topics;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using Kafka.DotNet.ksqlDB.Sample.Models.Events;
 using Kafka.DotNet.ksqlDB.Sample.Providers;
 using Kafka.DotNet.ksqlDB.Sample.PullQuery;
 using K = Kafka.DotNet.ksqlDB.KSql.Query.Functions.KSql;
@@ -53,7 +54,7 @@ namespace Kafka.DotNet.ksqlDB.Sample
       var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
       var restApiProvider = new KSqlDbRestApiProvider(httpClientFactory);
       var moviesProvider = new MoviesProvider(restApiProvider);
-
+      
       await moviesProvider.CreateTablesAsync();
 
       var contextOptions = CreateQueryStreamOptions(ksqlDbUrl);
@@ -765,6 +766,18 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
       httpResponseMessage = await restApiClient.CreateSinkConnectorAsync(sinkConnectorConfig, SinkConnectorName);
 
       httpResponseMessage = await restApiClient.DropConnectorAsync($"`{SinkConnectorName}`");
+    }
+
+    private static async Task CreateTypesAsync(IKSqlDbRestApiClient restApiClient)
+    {
+      var httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@"
+Drop type Person;
+Drop type Address;
+"));
+      
+      //Act
+      httpResponseMessage = await restApiClient.CreateTypeAsync<Address>();
+      httpResponseMessage = await restApiClient.CreateTypeAsync<Person>();
     }
   }
 }

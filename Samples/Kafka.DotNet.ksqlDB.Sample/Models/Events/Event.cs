@@ -11,6 +11,7 @@ namespace Kafka.DotNet.ksqlDB.Sample.Models.Events
     public string[] Places { get; set; }
 
     //public EventCategory[] Categories { get; init; }
+    [IgnoreByInserts]
     public IEnumerable<EventCategory> Categories { get; set; }
   }
 }
