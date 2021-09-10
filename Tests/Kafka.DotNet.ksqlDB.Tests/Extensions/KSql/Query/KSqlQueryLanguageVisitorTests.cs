@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query;
@@ -141,6 +142,42 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
       ksql.Should().BeEquivalentTo(expectedKsql);
     }
 
+    [TestMethod]
+    public void SelectListMember_BuildKSql_PrintsArray()
+    {
+      //Arrange
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<OrderData>()
+        .Select(l => new List<int> { 1, 3 });
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql = @$"SELECT ARRAY[1, 3] FROM {nameof(OrderData)} EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void SelectList_BuildKSql_PrintsArray()
+    {
+      //Arrange
+      var orderTypes = new List<int> { 1, 3 };
+
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<OrderData>()
+        .Select(l => new { OrderTypes = orderTypes });
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql = @$"SELECT ARRAY[1, 3] AS OrderTypes FROM {nameof(OrderData)} EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
     #endregion
 
     #region Where
@@ -177,6 +214,100 @@ WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;");
 WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;";
 
       ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    class OrderData
+    {
+      public int OrderType { get; set; }
+      public string Category { get; set; }
+    }
+
+    [TestMethod]
+    public void WhereContains_BuildKSql_PrintsArrayContains()
+    {
+      //Arrange
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<OrderData>()
+        .Where(c => K.Functions.ArrayContains(new[] { 1, 3 }, c.OrderType));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      ksql.Should().BeEquivalentTo(@$"SELECT * FROM {nameof(OrderData)}
+WHERE ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)}) EMIT CHANGES;");
+    }
+
+    [TestMethod]
+    public void WhereContainsArrayMember_BuildKSql_PrintsArrayContains()
+    {
+      //Arrange
+      var orderTypes = new[] { 1, 3 };
+
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<OrderData>()
+        .Where(c => K.Functions.ArrayContains(orderTypes, c.OrderType));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      ksql.Should().BeEquivalentTo(@$"SELECT * FROM {nameof(OrderData)}
+WHERE ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)}) EMIT CHANGES;");
+    }
+
+    [TestMethod]
+    public void WhereContainsListMember_BuildKSql_PrintsWhere()
+    {
+      //Arrange
+      var orderTypes = new List<int> { 1, 3 };
+
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<OrderData>()
+        .Where(c => orderTypes.Contains(c.OrderType));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      ksql.Should().BeEquivalentTo(@$"SELECT * FROM {nameof(OrderData)}
+WHERE {nameof(OrderData.OrderType)} IN (1, 3) EMIT CHANGES;");
+    }
+
+    [TestMethod]
+    public void WhereContainsListOfStringsMember_BuildKSql_PrintsWhere()
+    {
+      //Arrange
+      var orderTypes = new List<string> { "1", "3" };
+
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<OrderData>()
+        .Where(c => orderTypes.Contains(c.Category));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      ksql.Should().BeEquivalentTo(@$"SELECT * FROM {nameof(OrderData)}
+WHERE {nameof(OrderData.Category)} IN ('1', '3') EMIT CHANGES;");
+    }
+
+    [TestMethod]
+    public void WhereContainsArrayMember_BuildKSql_PrintsWhere()
+    {
+      //Arrange
+      var orderTypes = new[] { 1, 3 };
+
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<OrderData>()
+        .Where(c => orderTypes.Contains(c.OrderType));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      ksql.Should().BeEquivalentTo(@$"SELECT * FROM {nameof(OrderData)}
+WHERE {nameof(OrderData.OrderType)} IN (1, 3) EMIT CHANGES;");
     }
 
     #endregion
