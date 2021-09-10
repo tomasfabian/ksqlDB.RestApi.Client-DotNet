@@ -779,5 +779,33 @@ Drop type Address;
       httpResponseMessage = await restApiClient.CreateTypeAsync<Address>();
       httpResponseMessage = await restApiClient.CreateTypeAsync<Person>();
     }
+
+    private static async Task SubscriptionToAComplexTypeAsync(IKSqlDbRestApiClient restApiClient, IKSqlDBContext ksqlDbContext)
+    {
+      var httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@$"
+Drop type {nameof(EventCategory)};
+Drop table {nameof(Event)};
+"));
+
+      httpResponseMessage = await restApiClient.CreateTypeAsync<EventCategory>();
+      httpResponseMessage = await restApiClient.CreateTableAsync<Event>(new EntityCreationMetadata { KafkaTopic = "Events", Partitions = 1 });
+
+      var subscription = ksqlDbContext.CreateQueryStream<Event>()
+        .Subscribe(value =>
+          {
+            Console.WriteLine("Categories: ");
+
+            foreach (var category in value.Categories ?? Enumerable.Empty<EventCategory>())
+            {
+              Console.WriteLine($"{category.Name}");
+            }
+          }, error =>
+          {
+            Console.WriteLine(error.Message);
+          });
+
+      httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@"
+INSERT INTO Events (Id, Places, Categories) VALUES (1, ARRAY['Place1','Place2','Place3'], ARRAY[STRUCT(Name := 'Planet Earth'), STRUCT(Name := 'Discovery')]);"));
+    }
   }
 }
