@@ -389,7 +389,50 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
       //Assert
       Assert.AreEqual(expectedItemsCount, actualValues.Count);
     }
-    
+
+    [TestMethod]
+    public async Task InClauseFilter()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+
+      var orderTypes = new List<int> { 1, 3 };
+
+      var source = QuerySource
+        .Where(c => orderTypes.Contains(c.Id))
+        .ToAsyncEnumerable();
+
+      //Act
+      var actualValues = await CollectActualValues(source, expectedItemsCount);
+
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+      Assert.AreEqual(actualValues[0].Id, 1);
+    }
+
+    [TestMethod]
+    public async Task ListContainsProjection()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+
+      var orderTypes = new List<int> { 1, 3 };
+
+      var c = QuerySource
+        .Select(c => orderTypes.Contains(c.Id)).ToQueryString();
+
+      var source = QuerySource
+        .Select(c => orderTypes.Contains(c.Id))
+        .ToAsyncEnumerable();
+
+      //Act
+      var actualValues = await CollectActualValues(source, expectedItemsCount);
+
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+      actualValues[0].Should().BeTrue();
+    }
+
     [TestMethod]
     public async Task WithOffsetResetPolicy()
     {
