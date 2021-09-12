@@ -55,6 +55,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
       Type valueType = inputValue.GetType();
       var value = valueType.IsPrimitive || valueType == typeof(string) ? inputValue : valueType.GetProperty(memberInfo.Name)?.GetValue(inputValue);
 
+      if (value == null)
+        return "NULL";
+
       if (type == typeof(decimal) && insertProperties.FormatDecimalValue != null)
       {
         Debug.Assert(value != null, nameof(value) + " != null");
