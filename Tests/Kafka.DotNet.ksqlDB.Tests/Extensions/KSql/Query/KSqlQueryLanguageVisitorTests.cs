@@ -178,6 +178,40 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
       ksql.Should().BeEquivalentTo(expectedKsql);
     }
 
+    [TestMethod]
+    public void SelectListContains_BuildKSql_PrintsIn()
+    {
+      //Arrange
+      var orderTypes = new List<int> { 1, 3 };
+
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<OrderData>()
+        .Select(c => orderTypes.Contains(c.OrderType));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      ksql.Should().BeEquivalentTo(@$"SELECT {nameof(OrderData.OrderType)} IN (1, 3) FROM {nameof(OrderData)} EMIT CHANGES;");
+    }
+
+    [TestMethod]
+    public void SelectNewListContains_BuildKSql_PrintsIn()
+    {
+      //Arrange
+      var orderTypes = new List<int> { 1, 3 };
+
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<OrderData>()
+        .Select(c => new { Contains = new List<int> { 1, 3 }.Contains(c.OrderType) });
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      ksql.Should().BeEquivalentTo(@$"SELECT {nameof(OrderData.OrderType)} IN (1, 3) Contains FROM {nameof(OrderData)} EMIT CHANGES;");
+    }
+
     #endregion
 
     #region Where
