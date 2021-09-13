@@ -192,5 +192,22 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       //Assert
       statement.Should().Be(@"INSERT INTO Events (Id, Category) VALUES (1, STRUCT(Count := 1, Name := 'Planet Earth'));");
     }
+
+    [Test]
+    public void ComplexType_NullReferenceValue()
+    {
+      //Arrange
+      var testEvent = new ComplexEvent
+      {
+        Id = 1,
+        Category = null
+      };
+
+      //Act
+      string statement = new CreateInsert().Generate(testEvent, new InsertProperties { EntityName = "Events"});
+
+      //Assert
+      statement.Should().Be(@"INSERT INTO Events (Id, Category) VALUES (1, NULL);");
+    }
   }
 }
