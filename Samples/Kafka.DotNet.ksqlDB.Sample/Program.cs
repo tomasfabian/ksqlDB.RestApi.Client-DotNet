@@ -807,5 +807,33 @@ Drop table {nameof(Event)};
       httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@"
 INSERT INTO Events (Id, Places, Categories) VALUES (1, ARRAY['Place1','Place2','Place3'], ARRAY[STRUCT(Name := 'Planet Earth'), STRUCT(Name := 'Discovery')]);"));
     }
+
+    // await SubscriptionToAComplexTypeAsync(restApiProvider, context);
+    // await InsertAComplexTypeAsync(restApiProvider, context);
+    
+    private static async Task InsertAComplexTypeAsync(IKSqlDbRestApiClient restApiClient, IKSqlDBContext ksqlDbContext)
+    {
+      var httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@$"
+Drop type {nameof(EventCategory)};
+Drop table {nameof(Event)};
+"));
+
+      httpResponseMessage = await restApiClient.CreateTypeAsync<EventCategory>();
+      httpResponseMessage = await restApiClient.CreateTableAsync<Event>(new EntityCreationMetadata { KafkaTopic = "Events", Partitions = 1 });
+
+      var eventCategory = new EventCategory
+      {
+        Name = "Planet Earth"
+      };
+
+      var testEvent = new Event
+      {
+        Id = 42,
+        Places = new[] { "Place1", "Place2", "Place3" },
+        //Categories = new[] { eventCategory, new EventCategory { Name = "Discovery" } } // TODO
+      };
+
+      httpResponseMessage = await restApiClient.InsertIntoAsync(testEvent);
+    }
   }
 }
