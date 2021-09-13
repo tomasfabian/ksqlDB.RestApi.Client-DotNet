@@ -2196,7 +2196,7 @@ private static async Task SubscribeAsync(IKSqlDBContext context)
 }
 ```
 
-# v1.6.0-rc.1:
+# v1.6.0:
 ```
 Install-Package Kafka.DotNet.ksqlDB -Version 1.6.0-rc.1
 ```
