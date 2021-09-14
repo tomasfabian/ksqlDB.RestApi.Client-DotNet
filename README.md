@@ -1,4 +1,5 @@
 This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
+You can continually process computations over unbounded (theoretically never-ending) streams of data.
 It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the Rest API.
 
 [Kafka.DotNet.ksqlDB](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB) is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
@@ -2196,7 +2197,7 @@ private static async Task SubscribeAsync(IKSqlDBContext context)
 }
 ```
 
-# v1.6.0-rc.1:
+# v1.6.0:
 ```
 Install-Package Kafka.DotNet.ksqlDB -Version 1.6.0-rc.1
 ```
