@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -44,12 +45,25 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.PullQueries
 
     public override Type ElementType => typeof(TEntity);
 
+    /// <summary>
+    /// Pulls the first value or returns NULL from the materialized view and terminates. 
+    /// </summary>
     public ValueTask<TEntity> GetAsync(CancellationToken cancellationToken = default)
     {
       var dependencies = GetDependencies();
 
       return dependencies.KsqlDBProvider.Run<TEntity>(dependencies.QueryStreamParameters, cancellationToken)
         .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Pulls all values from the materialized view and terminates. 
+    /// </summary>
+    public IAsyncEnumerable<TEntity> GetManyAsync(CancellationToken cancellationToken = default)
+    {
+      var dependencies = GetDependencies();
+
+      return dependencies.KsqlDBProvider.Run<TEntity>(dependencies.QueryStreamParameters, cancellationToken);
     }
 
     internal IKStreamSetDependencies GetDependencies()
