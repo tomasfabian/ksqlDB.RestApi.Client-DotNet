@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,5 +39,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries
     /// <param name="cancellationToken">A token that can be used to request cancellation of the asynchronous operation.</param>
     /// <returns></returns>
     ValueTask<T> GetAsync(CancellationToken cancellationToken = default);
+    IAsyncEnumerable<T> GetManyAsync(CancellationToken cancellationToken = default);
   }
 }
