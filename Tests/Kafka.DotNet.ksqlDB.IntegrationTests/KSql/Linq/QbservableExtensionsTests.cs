@@ -469,5 +469,33 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
       
       CollectionAssert.AreEqual(expectedValues, actualValues);
     }
+    
+    [TestMethod]
+    public async Task ExplainAsync()
+    {
+      //Arrange
+      var query = QuerySource.Where(c => c.Message == "ET");
+
+      //Act
+      var description = await query.ExplainAsync();
+
+      //Assert
+      description[0].StatementText.Should().Be(@"EXPLAIN SELECT * FROM tweetsTest
+WHERE Message = 'ET' EMIT CHANGES;");
+      description[0].QueryDescription.QueryType.Should().Be("PUSH");
+      description[0].QueryDescription.ExecutionPlan.Should().NotBeNullOrEmpty();
+    }
+
+    [TestMethod]
+    public async Task ExplainAsStringAsync()
+    {
+      //Arrange
+
+      //Act
+      var description = await QuerySource.ExplainAsStringAsync();
+
+      //Assert
+      description.Should().Contain("EXPLAIN SELECT * FROM tweetsTest EMIT CHANGES;");
+    }
   }
 }
