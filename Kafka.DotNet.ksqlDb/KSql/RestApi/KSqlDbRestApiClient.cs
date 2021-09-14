@@ -11,6 +11,7 @@ using Kafka.DotNet.ksqlDB.KSql.RestApi.Generators;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Query;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Connectors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Queries;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Query.Descriptors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Streams;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Tables;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Topics;
@@ -548,6 +549,19 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       var response = await ExecuteStatementAsync(closeQuery, EndpointType.CloseQuery, Encoding.UTF8, cancellationToken);
 		
       return response;
+    }
+
+    /// <summary>
+    /// Show the execution plan of a running query, show the execution plan plus additional runtime information and metrics.
+    /// </summary>
+    /// <param name="queryId">Id of the query to explain.</param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation.</param>
+    /// <returns>ExplainResponse with execution plan plus additional runtime information and metrics.</returns>
+    private Task<ExplainResponse[]> ExplainAsync(string queryId, CancellationToken cancellationToken = default)
+    {
+      string explainStatement = StatementTemplates.ExplainBy(queryId);
+
+      return ExecuteStatementAsync<ExplainResponse>(explainStatement, cancellationToken);
     }
 
     private async Task<TResponse[]> ExecuteStatementAsync<TResponse>(string statement, CancellationToken cancellationToken = default)

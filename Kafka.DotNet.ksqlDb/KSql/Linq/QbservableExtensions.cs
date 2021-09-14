@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Http;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -11,6 +12,10 @@ using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.Query;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.Query.Windows;
+using Kafka.DotNet.ksqlDB.KSql.RestApi;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Query.Descriptors;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 
 namespace Kafka.DotNet.ksqlDB.KSql.Linq
 {
@@ -158,6 +163,68 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
 
     #endregion
 
+    #region ExplainAsStringAsync
+
+    internal static async Task<HttpResponseMessage> ExplainInternalAsync<TSource>(this IQbservable<TSource> source, CancellationToken cancellationToken = default)
+    {
+      if (source == null) throw new ArgumentNullException(nameof(source));
+
+      var kStreamSet = source as KStreamSet<TSource>;
+
+      var explainStatement = CreateExplainStatement(kStreamSet);
+
+      var httpClientFactory = kStreamSet.GetHttpClientFactory();
+
+      var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+      var httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(explainStatement), cancellationToken);
+
+      return httpResponseMessage;
+    }
+
+    internal static string CreateExplainStatement<TSource>(KStreamSet<TSource> kStreamSet)
+    {
+      var ksqlQuery = kStreamSet?.BuildKsql();
+
+      string explainStatement = StatementTemplates.Explain($"{ksqlQuery}");
+
+      return explainStatement;
+    }
+
+    /// <summary>
+    /// Show the execution plan for a SQL expression, show the execution plan plus additional runtime information and metrics.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the source sequence.</typeparam>
+    /// <param name="source">The sequence to take elements from.</param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation.</param>
+    /// <returns>Json with execution plan plus additional runtime information and metrics.</returns>
+    public static async Task<string> ExplainAsStringAsync<TSource>(this IQbservable<TSource> source, CancellationToken cancellationToken = default)
+    {
+      var httpResponseMessage = await source.ExplainInternalAsync(cancellationToken);
+
+      return await httpResponseMessage.Content.ReadAsStringAsync();
+    }
+
+    #endregion
+
+    #region ExplainAsync
+    
+    /// <summary>
+    /// Show the execution plan for a SQL expression, show the execution plan plus additional runtime information and metrics.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the source sequence.</typeparam>
+    /// <param name="source">The sequence to take elements from.</param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+    /// <returns>ExplainResponse with execution plan plus additional runtime information and metrics.</returns>
+    public static async Task<ExplainResponse[]> ExplainAsync<TSource>(this IQbservable<TSource> source, CancellationToken cancellationToken = default)
+    {
+      var httpResponseMessage = await source.ExplainInternalAsync(cancellationToken);
+
+      return await httpResponseMessage.ToStatementResponsesAsync<ExplainResponse>();
+    }
+
+    #endregion
+
     #region ToObservable
 
     /// <summary>
@@ -178,7 +245,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
         var cancellationTokenSource = new CancellationTokenSource();
 
         var observable = streamSet?.RunStreamAsObservable(cancellationTokenSource);
-      
+
         return observable?.Finally(() => cancellationTokenSource.Cancel());
       });
     }
@@ -199,7 +266,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
       if (source == null) throw new ArgumentNullException(nameof(source));
 
       var streamSet = source as KStreamSet<TSource>;
-      
+
       return streamSet?.RunStreamAsAsyncEnumerable();
     }
 
@@ -265,11 +332,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
       if (onNext == null)
         throw new ArgumentNullException(nameof(onNext));
 
-      return source.Subscribe(new AnonymousObserver<T>(onNext, e => throw e, () => {}));
+      return source.Subscribe(new AnonymousObserver<T>(onNext, e => throw e, () => { }));
     }
 
     #endregion
-    
+
     #region ObserveOn
 
     /// <summary>
@@ -354,7 +421,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
     #endregion
 
     #region GroupBy
-    
+
     private static MethodInfo? groupByTSourceTKey;
 
     private static MethodInfo GroupByTSourceTKey(Type TSource, Type TKey) =>
@@ -391,7 +458,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
     private static MethodInfo HavingTSource(Type TSource, Type TKey) =>
       (havingTSource ??= new Func<IQbservable<IKSqlGrouping<object, object>>, Expression<Func<IKSqlGrouping<object, object>, bool>>, IQbservable<IKSqlGrouping<object, object>>>(Having).GetMethodInfo().GetGenericMethodDefinition())
       .MakeGenericMethod(TSource, TKey);
-    
+
     /// <summary>
     /// Extract records from an aggregation that fulfill a specified condition.
     /// </summary>
@@ -422,7 +489,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
 
     private static MethodInfo? windowedByTSourceTKey;
 
-    private static MethodInfo WindowedByTSourceTKey(Type TSource, Type TKey)  =>
+    private static MethodInfo WindowedByTSourceTKey(Type TSource, Type TKey) =>
       (windowedByTSourceTKey ??= new Func<IQbservable<IKSqlGrouping<object, object>>, TimeWindows, IQbservable<IWindowedKSql<object, object>>>(WindowedBy).GetMethodInfo().GetGenericMethodDefinition())
       .MakeGenericMethod(TSource, TKey);
 
@@ -440,7 +507,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
       if (timeWindows == null) throw new ArgumentNullException(nameof(timeWindows));
 
       return source.Provider.CreateQuery<IWindowedKSql<TKey, TSource>>(
-        Expression.Call(null, 
+        Expression.Call(null,
           WindowedByTSourceTKey(typeof(TSource), typeof(TKey)),
           source.Expression, Expression.Constant(timeWindows)));
     }

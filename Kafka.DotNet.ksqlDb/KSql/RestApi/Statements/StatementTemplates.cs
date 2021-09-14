@@ -33,5 +33,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
     }
 
     public static string TerminatePersistentQuery(string queryId) => $"TERMINATE {queryId};";
+
+    public static string Explain(string sqlExpression) => $"EXPLAIN {sqlExpression}";
+
+    public static string ExplainBy(string queryId) => $"{Explain(queryId)};";
   }
 }

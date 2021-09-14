@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Query;
 using Microsoft.Extensions.DependencyInjection;
@@ -183,6 +184,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       serviceScope.Dispose();
 
       return ksqlQuery;
+    }
+
+    internal IHttpClientFactory GetHttpClientFactory()
+    {
+      using var scope = serviceScopeFactory.CreateScope();
+      var httpClientFactory = scope.ServiceProvider.GetService<IHttpClientFactory>();
+
+      return httpClientFactory;
     }
   }
 }
