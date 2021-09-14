@@ -232,5 +232,31 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       //Assert
       statement.Should().Be($"TERMINATE {queryId};");
     }
+
+    [Test]
+    public void Explain()
+    {
+      //Arrange
+      string sqlExpression = "SELECT * FROM My EMIT CHANGES;";
+
+      //Act
+      var statement = StatementTemplates.Explain(sqlExpression);
+
+      //Assert
+      statement.Should().Be($"EXPLAIN {sqlExpression}");
+    }
+
+    [Test]
+    public void ExplainBy()
+    {
+      //Arrange
+      string queryId = "QUERY_ID";
+
+      //Act
+      var statement = StatementTemplates.ExplainBy(queryId);
+
+      //Assert
+      statement.Should().Be($"EXPLAIN {queryId};");
+    }
   }
 }
