@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.IntegrationTests.Models.Sensors;
@@ -45,6 +46,26 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq.PullQueries
       result.SensorId.Should().Be(sensorId);
       result.WindowStart.Should().NotBe(null);
       result.WindowEnd.Should().NotBe(null);
+    }
+
+    [TestMethod]
+    public async Task GetManyAsync()
+    {
+      //Arrange
+      string sensorId = "sensor-1";
+
+      //Act
+      var asyncEnumerable = context.CreatePullQuery<IoTSensorStats>(SensorsPullQueryProvider.MaterializedViewName)
+        .Where(c => c.SensorId == sensorId)
+        .GetManyAsync();
+
+      var results = new List<IoTSensorStats>();
+
+      await foreach(var item in asyncEnumerable.ConfigureAwait(false))
+        results.Add(item);
+
+      //Assert
+      results.Should().NotBeEmpty();
     }
 
     [TestMethod]
