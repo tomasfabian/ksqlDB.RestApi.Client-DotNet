@@ -1,4 +1,5 @@
-﻿This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
+﻿[Kafka.DotNet.ksqlDB] - [Kafka.DotNet.ksqlDB] - [Kafka.DotNet.ksqlDB] - This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
+You can continually process computations over unbounded (theoretically never-ending) streams of data.
 It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the Rest API.
 
 [Kafka.DotNet.ksqlDB](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB) is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
@@ -2315,7 +2316,7 @@ Generated KSQL:
 INSERT INTO Events (Id, Category) VALUES (1, STRUCT(Count := 1, Name := 'Planet Earth'));
 ```
 
-## IN - `IEnumerable<T>` and `IList<T>` Contains (v1.6.0)
+## Operator IN - `IEnumerable<T>` and `IList<T>` Contains (v1.6.0)
 Specifies multiple OR conditions.
 `IList<T>`.Contains:
 ```C#
@@ -2334,6 +2335,50 @@ Expression<Func<OrderData, bool>> expression = o => orderTypes.Contains(o.OrderT
 For both options the following SQL is generated:
 ```SQL
 OrderType IN (1, 2, 3)
+```
+
+# v1.7.0-rc.1:
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 1.7.0-rc.1
+```
+
+## IPullable - GetManyAsync (v1.7.0)
+- `IPullable.GetManyAsync<TEntity>` - Pulls all values from the materialized view asynchronously and terminates. 
+
+```C#
+public static async Task<List<OrderData>> GetOrderStreamsAsync()
+{
+  var ksqlDbUrl = @"http:\\localhost:8088";
+  var options = new KSqlDBContextOptions(ksqlDbUrl) { ShouldPluralizeFromItemName = false };
+  options.QueryParameters.Properties["ksql.query.pull.table.scan.enabled"] = "true";
+
+  await using var context = new KSqlDBContext(options);
+  var tableName = "queryable_order";
+  var orderTypes = new List<int> { 1,3 };
+
+  var enumerable = context.CreatePullQuery<OrderData>(tableName)    
+    .Where(o => o.EventTime >= 1630886400 && o.EventTime <= 1630887401 && orderTypes.Contains(o.OrderType))
+    .GetManyAsync();
+
+  List<OrderData> list = new List<OrderData>();
+
+  await foreach (var item in enumerable.ConfigureAwait(false))
+  {
+    Console.WriteLine(item.ToString());
+    list.Add(item);
+  } 
+
+  return list;
+}
+```
+```C#
+public class OrderData: Record
+{
+  public int Id { get; set; }
+  public long EventTime  { get; set; }
+  public int OrderType { get; set; }
+  public string Description { get; set; }
+}
 ```
 
 # LinqPad samples
