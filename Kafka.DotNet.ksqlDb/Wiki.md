@@ -2381,6 +2381,16 @@ public class OrderData: Record
 }
 ```
 
+## QbservableExtensions - ExplainAsync (v1.7.0)
+- `ExplainAsync` - Show the execution plan for a SQL expression, show the execution plan plus additional runtime information and metrics.
+
+```C#
+string explain = await context.CreateQueryStream<Movie>().ExplainAsStringAsync();
+
+ExplainResponse[] explainResponses = await context.CreateQueryStream<Movie>().ExplainAsync();
+Console.WriteLine(explainResponses[0].QueryDescription.ExecutionPlan);
+```
+
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
 
