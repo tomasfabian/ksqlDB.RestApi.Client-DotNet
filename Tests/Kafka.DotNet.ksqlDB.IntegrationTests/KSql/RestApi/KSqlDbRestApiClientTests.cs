@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Kafka.DotNet.ksqlDB.IntegrationTests.Models.Movies;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
@@ -16,6 +17,8 @@ using Kafka.DotNet.ksqlDB.KSql.RestApi.Enums;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
@@ -329,7 +332,7 @@ Drop type Address;
       //"{"@type":"generic_error","error_code":50000,"message":"On wrong context or worker"}"
       //response.IsSuccessStatusCode.Should().BeTrue()
 
-      await Task.Delay(2000);
+      await Task.Delay(5000);
       var queriesResponses = await restApiClient.GetQueriesAsync();
       queriesResponses.SelectMany(c => c.Queries).Count().Should().Be(queriesCount - 1);
     }
@@ -371,6 +374,34 @@ Drop type Address;
 
       //Assert
       content[0].Type.Should().Be("error_entity");
+    }
+
+    record Movie2
+    {
+      [Key]
+      public int Id { get; set; }
+      public string Title { get; init; }
+      public Lead_Actor Actor { get; set; }
+    }
+
+    [TestMethod]
+    public async Task InsertIntoAsync_NullValue()
+    {
+      //Arrange
+      var response = await restApiClient.CreateTypeAsync<Lead_Actor>();
+      response = await restApiClient.CreateTableAsync<Movie2>(new EntityCreationMetadata() { EntityName = "puk", KafkaTopic = "puk", Partitions = 1 });
+
+      var movie2 = new Movie2
+      {
+        Id = 1,
+        Actor = null
+      };
+
+      //Act
+      var httpResponseMessage = await restApiClient.InsertIntoAsync(movie2, new InsertProperties { EntityName = "puk" });
+
+      //Assert
+      httpResponseMessage.IsSuccessStatusCode.Should().BeTrue();
     }
 
     private string CreateStreamStatement(string streamName = "TestTable")
