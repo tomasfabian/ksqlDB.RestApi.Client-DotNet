@@ -57,7 +57,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.PullQueries
     }
 
     /// <summary>
-    /// Pulls all values from the materialized view and terminates. 
+    /// Pulls all values from the materialized view asynchronously and terminates. 
     /// </summary>
     public IAsyncEnumerable<TEntity> GetManyAsync(CancellationToken cancellationToken = default)
     {
