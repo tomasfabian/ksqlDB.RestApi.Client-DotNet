@@ -2337,7 +2337,7 @@ For both options the following SQL is generated:
 OrderType IN (1, 2, 3)
 ```
 
-# v1.7.0-rc.1:
+# v1.7.0:
 ```
 Install-Package Kafka.DotNet.ksqlDB -Version 1.7.0-rc.1
 ```
@@ -2346,7 +2346,14 @@ Install-Package Kafka.DotNet.ksqlDB -Version 1.7.0-rc.1
 - `IPullable.GetManyAsync<TEntity>` - Pulls all values from the materialized view asynchronously and terminates. 
 
 ```C#
-public static async Task<List<OrderData>> GetOrderStreamsAsync()
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries;
+using Kafka.DotNet.ksqlDB.KSql.Query;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+
+public static async Task<List<OrderData>> GetOrdersAsync()
 {
   var ksqlDbUrl = @"http:\\localhost:8088";
   var options = new KSqlDBContextOptions(ksqlDbUrl) { ShouldPluralizeFromItemName = false };
@@ -2385,10 +2392,26 @@ public class OrderData: Record
 - `ExplainAsync` - Show the execution plan for a SQL expression, show the execution plan plus additional runtime information and metrics.
 
 ```C#
-string explain = await context.CreateQueryStream<Movie>().ExplainAsStringAsync();
+using System;
+using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.Linq;
+using Kafka.DotNet.ksqlDB.KSql.Query;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Query.Descriptors;
+using Kafka.DotNet.ksqlDB.Sample.Models.Movies;
 
-ExplainResponse[] explainResponses = await context.CreateQueryStream<Movie>().ExplainAsync();
-Console.WriteLine(explainResponses[0].QueryDescription.ExecutionPlan);
+public static async Task ExplainAsync(IKSqlDBContext context)
+{
+  var query = context.CreateQueryStream<Movie>()
+    .Where(c => c.Title != "E.T.");
+
+  string explain = await query
+    .ExplainAsStringAsync();
+
+  ExplainResponse[] explainResponses = await context.CreateQueryStream<Movie>().ExplainAsync();
+      
+  Console.WriteLine(explainResponses[0].QueryDescription.ExecutionPlan);
+}
 ```
 
 # LinqPad samples
