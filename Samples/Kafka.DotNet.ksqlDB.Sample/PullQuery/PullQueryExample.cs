@@ -46,17 +46,29 @@ namespace Kafka.DotNet.ksqlDB.Sample.PullQuery
       string windowStart = "2019-10-03T21:31:16";
       string windowEnd = "2025-10-03T21:31:16";
 
-      var result = await context.CreatePullQuery<IoTSensorStats>(MaterializedViewName)
-        .Where(c => c.SensorId == "sensor-1")
-        .Where(c => Bounds.WindowStart > windowStart && Bounds.WindowEnd <= windowEnd)
-        .GetAsync();
+      var pullQuery = context.CreatePullQuery<IoTSensorStats>(MaterializedViewName)
+        .Where(c => c.SensorId == "sensor-1x")
+        .Where(c => Bounds.WindowStart > windowStart && Bounds.WindowEnd <= windowEnd);
 
-      Console.WriteLine($"Pull query result => Id: {result?.SensorId} - Avg Value: {result?.AvgValue} - Window Start {result?.WindowStart}");
-      Console.WriteLine();
+      var sql = pullQuery.ToQueryString();
+
+      await foreach(var item in pullQuery.GetManyAsync().ConfigureAwait(false))
+        Console.WriteLine($"Pull query - GetMany result => Id: {item?.SensorId} - Avg Value: {item?.AvgValue} - Window Start {item?.WindowStart}");
 
       string ksql = "SELECT * FROM avg_sensor_values WHERE SensorId = 'sensor-1';";
 
-      result = await context.ExecutePullQuery<IoTSensorStats>(ksql);
+      var result2 = await context.ExecutePullQuery<IoTSensorStats>(ksql);
+    }
+
+    private static async Task GetAsync(IPullable<IoTSensorStats> pullQuery)
+    {
+      var result = await pullQuery
+        .GetAsync();
+
+      Console.WriteLine(
+        $"Pull query GetAsync result => Id: {result?.SensorId} - Avg Value: {result?.AvgValue} - Window Start {result?.WindowStart}");
+
+      Console.WriteLine();
     }
 
     const string MaterializedViewName = "avg_sensor_values";

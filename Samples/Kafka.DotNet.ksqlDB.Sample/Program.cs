@@ -19,6 +19,7 @@ using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Query.Descriptors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Topics;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
@@ -83,7 +84,7 @@ namespace Kafka.DotNet.ksqlDB.Sample
           Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
           Console.WriteLine();
         }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
-
+      
       await CreateOrReplaceTableStatement(context);
 
       await moviesProvider.InsertMovieAsync(MoviesProvider.Movie1);
@@ -98,6 +99,10 @@ namespace Kafka.DotNet.ksqlDB.Sample
       {
         Console.WriteLine(e);
       }
+      
+      string explain = await query.ExplainAsStringAsync();
+      ExplainResponse[] explainResponses = await query.ExplainAsync();
+      Console.WriteLine(explainResponses[0].QueryDescription.ExecutionPlan);
 
       Console.WriteLine("Press any key to stop the subscription");
 
@@ -292,6 +297,7 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
       await foreach (var movie in asyncTweetsEnumerable.WithCancellation(cts.Token))
       {
         Console.WriteLine(movie.Title);
+
         cts.Cancel();
       }
     }
