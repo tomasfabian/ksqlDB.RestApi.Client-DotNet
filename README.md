@@ -99,6 +99,7 @@ Sample project can be found under [Samples](https://github.com/tomasfabian/Kafka
 
 **External dependencies:**
 - [kafka broker](https://kafka.apache.org/intro) and [ksqlDB-server](https://ksqldb.io/overview.html) 0.14.0
+- the solution requires [Docker desktop](https://www.docker.com/products/docker-desktop) and Visual Studio 2019
 
 Clone the repository
 ```
@@ -114,11 +115,15 @@ run in command line:
 
 ```docker compose up -d```
 
+**AspNet Blazor server side sample:**
+
+- set docker-compose.csproj as startup project in Kafka.DotNet.InsideOut.sln for an embedded Kafka connect integration and stream processing examples. 
+
 # CDC - Push notifications from Sql Server tables with Kafka
 Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with Kafka.DotNet.SqlServer package together with the Debezium connector streaming platform. 
 ### Nuget
 ```
-Install-Package Kafka.DotNet.SqlServer -Version 0.2.0-rc.2
+Install-Package Kafka.DotNet.SqlServer -Version 0.2.0
 ```
 
 [Kafka.DotNet.SqlServer WIKI](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
@@ -378,10 +383,11 @@ Omitting select is equivalent to SELECT *
 | BIGINT  | long   |
 | DOUBLE  | double |
 | BOOLEAN | bool   |
-| ```ARRAY<ElementType>``` | C#Type[]   |
+| ```ARRAY<ElementType>``` | C#Type[] <br /> IEnumerable<C#Type>*   |
 | ```MAP<KeyType, ValueType>``` | IDictionary<C#Type, C#Type>   |
 | ```STRUCT``` | struct   |
 
+\* IEnumerable was added in version 1.6.0
 Array type mapping example (available from v0.3.0):
 All of the elements in the array must be of the same type. The element type can be any valid SQL type.
 ```
@@ -1573,6 +1579,8 @@ Install-Package Kafka.DotNet.ksqlDB -Version 0.10.0-rc.1
 
 # Pull queries - `CreatePullQuery<TEntity>` (v.0.10.0)
 [A pull query](https://docs.ksqldb.io/en/latest/concepts/queries/#pull) is a form of query issued by a client that retrieves a result as of "now", like a query against a traditional RDBS.
+
+See also [GetManyAsync](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB#ipullable---getmanyasync-v170).
 
 ```C#
 using System.Net.Http;
