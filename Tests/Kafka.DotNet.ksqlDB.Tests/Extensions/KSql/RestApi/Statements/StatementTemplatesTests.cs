@@ -258,5 +258,31 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       //Assert
       statement.Should().Be($"EXPLAIN {queryId};");
     }
+
+    [Test]
+    public void DropType()
+    {
+      //Arrange
+      string typeName = "MY_TYPE";
+
+      //Act
+      var statement = StatementTemplates.DropType(typeName);
+
+      //Assert
+      statement.Should().Be($"DROP TYPE {typeName};");
+    }
+
+    [Test]
+    public void DropTypeIfExists()
+    {
+      //Arrange
+      string typeName = "MY_TYPE";
+
+      //Act
+      var statement = StatementTemplates.DropTypeIfExists(typeName);
+
+      //Assert
+      statement.Should().Be($"DROP TYPE IF EXISTS {typeName};");
+    }
   }
 }
