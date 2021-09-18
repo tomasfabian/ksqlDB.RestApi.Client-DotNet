@@ -193,6 +193,36 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       return ExecuteAsync<T>(ksql, cancellationToken);
     }
 
+    /// <summary>
+    /// Removes a type alias from ksqlDB. This statement doesn't fail if the type is in use in active queries or user-defined functions.
+    /// </summary>
+    /// <param name="typeName">Name of the type to remove.</param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+    /// <returns>Http response object.</returns>
+    public Task<HttpResponseMessage> DropTypeAsync(string typeName, CancellationToken cancellationToken = default)
+    {
+      string dropStatement = StatementTemplates.DropType(typeName);
+
+      KSqlDbStatement ksqlDbStatement = new(dropStatement);
+
+      return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
+    }
+
+    /// <summary>
+    /// Removes a type alias from ksqlDB. This statement doesn't fail if the type is in use in active queries or user-defined functions. The statement doesn't fail if the type doesn't exist.
+    /// </summary>
+    /// <param name="typeName">Name of the type to remove.</param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+    /// <returns>Http response object.</returns>
+    public Task<HttpResponseMessage> DropTypeIfExistsAsync(string typeName, CancellationToken cancellationToken = default)
+    {
+      string dropStatement = StatementTemplates.DropTypeIfExists(typeName);
+
+      KSqlDbStatement ksqlDbStatement = new(dropStatement);
+
+      return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
+    }
+
     #endregion
 
     /// <summary>
