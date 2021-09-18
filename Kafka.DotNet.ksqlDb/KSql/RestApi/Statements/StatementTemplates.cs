@@ -16,6 +16,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
     public static string ShowConnectors => "SHOW CONNECTORS;";
     public static string DropConnector(string connectorName) => $"DROP CONNECTOR {connectorName};";
 
+    public static string DropType(string typeName) => $"DROP TYPE {typeName};";
+    public static string DropTypeIfExists(string typeName) => $"DROP TYPE IF EXISTS {typeName};";
+
     public static string DropStream(string streamName, bool useIfExists = false, bool deleteTopic = false)
     {
       string ifExistsClause = useIfExists ? " IF EXISTS" : Empty;
