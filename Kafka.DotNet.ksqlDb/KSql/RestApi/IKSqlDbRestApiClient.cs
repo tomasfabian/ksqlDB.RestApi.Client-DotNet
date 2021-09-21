@@ -243,5 +243,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns>Http response object.</returns>
     Task<HttpResponseMessage> DropTypeIfExistsAsync(string typeName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Generates raw string Insert Into, but does not execute it.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="entity">Entity for insertion.</param>
+    /// <param name="insertProperties">Overrides conventions.</param>
+    /// <returns></returns>
+    string ToRawInsertStatement<T>(T entity, InsertProperties insertProperties = null);
   }
 }
