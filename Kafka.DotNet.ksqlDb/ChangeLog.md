@@ -1,5 +1,14 @@
-﻿# v1.7.0
-- KPullSet - GetManyAsync - Pulls all values from the materialized view asynchronously and terminates. 
+﻿# v1.8.0-rc.1
+### KSqlDbRestApiClient
+- DropTypeIfExistsAsync and DropTypeAsync - Removes a type alias from ksqlDB. If the IF EXISTS clause is present, the statement doesn't fail if the type doesn't exist.
+- ToRawInsertStatement - Generates raw string Insert Into, but does not execute it.
+
+### Operator BETWEEN
+- KSqlOperatorExtensions - Between - Constrain a value to a specified range in a WHERE clause.
+- KSqlOperatorExtensions - NotBetween - operator is used to indicate that a certain value must not be within a specified range, including boundaries.
+
+# v1.7.0
+- KPullSet - GetManyAsync - Pulls all values from the materialized view asynchronously and terminates. #6 
 - QbservableExtensions - ExplainAsync and ExplainAsStringAsync - Show the execution plan for a SQL expression, show the execution plan plus additional runtime information and metrics.
 
 # v1.6.0
@@ -263,4 +272,3 @@ Fixes:
 
 # TODO:
 - missing scalar functions https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#date-and-time
-- BETWEEN
