@@ -388,6 +388,7 @@ Omitting select is equivalent to SELECT *
 | ```STRUCT``` | struct   |
 
 \* IEnumerable was added in version 1.6.0
+
 Array type mapping example (available from v0.3.0):
 All of the elements in the array must be of the same type. The element type can be any valid SQL type.
 ```
@@ -2420,6 +2421,56 @@ public static async Task ExplainAsync(IKSqlDBContext context)
       
   Console.WriteLine(explainResponses[0].QueryDescription.ExecutionPlan);
 }
+```
+
+# v1.8.0-rc.1:
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 1.8.0-rc.1
+```
+
+### KSqlDbRestApiClient Droping types (v1.8.0)
+- DropTypeAsync and DropTypeIfExistsAsync - Removes a type alias from ksqlDB. If the IF EXISTS clause is present, the statement doesn't fail if the type doesn't exist.
+
+```C#
+string typeName = nameof(EventCategory);
+var httpResponseMessage = await restApiClient.DropTypeAsync(typeName);
+//OR
+httpResponseMessage = await restApiClient.DropTypeIfExistsAsync(typeName);
+```
+
+# KSqlDbRestApiClient ToRawInsertStatement (v1.8.0)
+- Generates raw string Insert Into, but does not execute it.
+```C#
+Movie movie = new()
+{
+  Id = 1,
+  Release_Year = 1986,
+  Title = "Aliens"
+};
+
+var rawInsert = restApiProvider.ToRawInsertStatement(movie);
+
+Console.WriteLine(rawInsert);
+```
+
+Output:
+```SQL
+INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Aliens', 1, 1986);
+```
+
+### Operator BETWEEN (v1.8.0)
+- KSqlOperatorExtensions - Between - Constrain a value to a specified range in a WHERE clause.
+```C#
+using Kafka.DotNet.ksqlDB.KSql.Query.Operators;
+
+IQbservable<Tweet> query = context.CreateQueryStream<Tweet>()
+  .Where(c => c.Id.Between(1, 5));
+```
+
+Generated KSQL:
+```SQL
+SELECT * FROM Tweets
+WHERE Id BETWEEN 1 AND 5 EMIT CHANGES;
 ```
 
 # LinqPad samples
