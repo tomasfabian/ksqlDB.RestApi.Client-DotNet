@@ -9,6 +9,7 @@ using System.Text;
 using Kafka.DotNet.ksqlDB.Infrastructure.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
+using Kafka.DotNet.ksqlDB.KSql.Query.Operators;
 using Kafka.DotNet.ksqlDB.KSql.Query.Visitors;
 
 namespace Kafka.DotNet.ksqlDB.KSql.Query
@@ -244,6 +245,12 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
           && (methodInfo.DeclaringType.Name == typeof(IAggregations<>).Name || methodInfo.DeclaringType.Name == nameof(IAggregations)))
       {
         new AggregationFunctionVisitor(stringBuilder, useTableAlias).Visit(methodCallExpression);
+      }
+
+      if (methodCallExpression.Object == null
+          && methodInfo.DeclaringType.Name == nameof(KSqlOperatorExtensions))
+      {
+        new OperatorBetweenKSqlVisitor(stringBuilder).Visit(methodCallExpression);
       }
 
       if (methodCallExpression.Type == typeof(string))
