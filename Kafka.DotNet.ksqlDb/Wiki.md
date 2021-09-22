@@ -99,6 +99,7 @@ Sample project can be found under [Samples](https://github.com/tomasfabian/Kafka
 
 **External dependencies:**
 - [kafka broker](https://kafka.apache.org/intro) and [ksqlDB-server](https://ksqldb.io/overview.html) 0.14.0
+- the solution requires [Docker desktop](https://www.docker.com/products/docker-desktop) and Visual Studio 2019
 
 Clone the repository
 ```
@@ -114,11 +115,15 @@ run in command line:
 
 ```docker compose up -d```
 
+**AspNet Blazor server side sample:**
+
+- set docker-compose.csproj as startup project in Kafka.DotNet.InsideOut.sln for an embedded Kafka connect integration and stream processing examples. 
+
 # CDC - Push notifications from Sql Server tables with Kafka
 Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with Kafka.DotNet.SqlServer package together with the Debezium connector streaming platform. 
 ### Nuget
 ```
-Install-Package Kafka.DotNet.SqlServer -Version 0.2.0-rc.2
+Install-Package Kafka.DotNet.SqlServer -Version 0.2.0
 ```
 
 [Kafka.DotNet.SqlServer WIKI](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
@@ -378,9 +383,11 @@ Omitting select is equivalent to SELECT *
 | BIGINT  | long   |
 | DOUBLE  | double |
 | BOOLEAN | bool   |
-| ```ARRAY<ElementType>``` | C#Type[]   |
+| ```ARRAY<ElementType>``` | C#Type[] <br /> IEnumerable<C#Type>*   |
 | ```MAP<KeyType, ValueType>``` | IDictionary<C#Type, C#Type>   |
 | ```STRUCT``` | struct   |
+
+\* IEnumerable was added in version 1.6.0
 
 Array type mapping example (available from v0.3.0):
 All of the elements in the array must be of the same type. The element type can be any valid SQL type.
@@ -1574,6 +1581,8 @@ Install-Package Kafka.DotNet.ksqlDB -Version 0.10.0-rc.1
 # Pull queries - `CreatePullQuery<TEntity>` (v.0.10.0)
 [A pull query](https://docs.ksqldb.io/en/latest/concepts/queries/#pull) is a form of query issued by a client that retrieves a result as of "now", like a query against a traditional RDBS.
 
+See also [GetManyAsync](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB#ipullable---getmanyasync-v170).
+
 ```C#
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -2337,7 +2346,7 @@ For both options the following SQL is generated:
 OrderType IN (1, 2, 3)
 ```
 
-# v1.7.0-rc.1:
+# v1.7.0:
 ```
 Install-Package Kafka.DotNet.ksqlDB -Version 1.7.0-rc.1
 ```
@@ -2346,7 +2355,14 @@ Install-Package Kafka.DotNet.ksqlDB -Version 1.7.0-rc.1
 - `IPullable.GetManyAsync<TEntity>` - Pulls all values from the materialized view asynchronously and terminates. 
 
 ```C#
-public static async Task<List<OrderData>> GetOrderStreamsAsync()
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries;
+using Kafka.DotNet.ksqlDB.KSql.Query;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+
+public static async Task<List<OrderData>> GetOrdersAsync()
 {
   var ksqlDbUrl = @"http:\\localhost:8088";
   var options = new KSqlDBContextOptions(ksqlDbUrl) { ShouldPluralizeFromItemName = false };
@@ -2385,10 +2401,76 @@ public class OrderData: Record
 - `ExplainAsync` - Show the execution plan for a SQL expression, show the execution plan plus additional runtime information and metrics.
 
 ```C#
-string explain = await context.CreateQueryStream<Movie>().ExplainAsStringAsync();
+using System;
+using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.Linq;
+using Kafka.DotNet.ksqlDB.KSql.Query;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Query.Descriptors;
+using Kafka.DotNet.ksqlDB.Sample.Models.Movies;
 
-ExplainResponse[] explainResponses = await context.CreateQueryStream<Movie>().ExplainAsync();
-Console.WriteLine(explainResponses[0].QueryDescription.ExecutionPlan);
+public static async Task ExplainAsync(IKSqlDBContext context)
+{
+  var query = context.CreateQueryStream<Movie>()
+    .Where(c => c.Title != "E.T.");
+
+  string explain = await query
+    .ExplainAsStringAsync();
+
+  ExplainResponse[] explainResponses = await context.CreateQueryStream<Movie>().ExplainAsync();
+      
+  Console.WriteLine(explainResponses[0].QueryDescription.ExecutionPlan);
+}
+```
+
+# v1.8.0-rc.1:
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 1.8.0-rc.1
+```
+
+### KSqlDbRestApiClient Droping types (v1.8.0)
+- DropTypeAsync and DropTypeIfExistsAsync - Removes a type alias from ksqlDB. If the IF EXISTS clause is present, the statement doesn't fail if the type doesn't exist.
+
+```C#
+string typeName = nameof(EventCategory);
+var httpResponseMessage = await restApiClient.DropTypeAsync(typeName);
+//OR
+httpResponseMessage = await restApiClient.DropTypeIfExistsAsync(typeName);
+```
+
+# KSqlDbRestApiClient ToInsertStatement (v1.8.0)
+- Generates raw string Insert Into, but does not execute it.
+```C#
+Movie movie = new()
+{
+  Id = 1,
+  Release_Year = 1986,
+  Title = "Aliens"
+};
+
+var insertStatement = restApiProvider.ToInsertStatement(movie);
+
+Console.WriteLine(insertStatement.Sql);
+```
+
+Output:
+```SQL
+INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Aliens', 1, 1986);
+```
+
+### Operator (NOT) BETWEEN (v1.8.0)
+- KSqlOperatorExtensions - Between - Constrain a value to a specified range in a WHERE clause.
+```C#
+using Kafka.DotNet.ksqlDB.KSql.Query.Operators;
+
+IQbservable<Tweet> query = context.CreateQueryStream<Tweet>()
+  .Where(c => c.Id.Between(1, 5));
+```
+
+Generated KSQL:
+```SQL
+SELECT * FROM Tweets
+WHERE Id BETWEEN 1 AND 5 EMIT CHANGES;
 ```
 
 # LinqPad samples

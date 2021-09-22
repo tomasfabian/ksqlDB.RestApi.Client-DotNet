@@ -1,7 +1,7 @@
-﻿# v1.8.0-rc.1
+﻿# v1.8.0
 ### KSqlDbRestApiClient
 - DropTypeIfExistsAsync and DropTypeAsync - Removes a type alias from ksqlDB. If the IF EXISTS clause is present, the statement doesn't fail if the type doesn't exist.
-- ToRawInsertStatement - Generates raw string Insert Into, but does not execute it.
+- ToInsertStatement - Generates raw string Insert Into, but does not execute it.
 
 ### Operator BETWEEN
 - KSqlOperatorExtensions - Between - Constrain a value to a specified range in a WHERE clause.
