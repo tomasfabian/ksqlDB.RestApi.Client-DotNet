@@ -235,11 +235,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> InsertIntoAsync<T>(T entity, InsertProperties insertProperties = null, CancellationToken cancellationToken = default)
     {
-      var insert = ToRawInsertStatement(entity, insertProperties);
+      var insertStatement = ToInsertStatement(entity, insertProperties);
 
-      KSqlDbStatement ksqlDbStatement = new(insert);
-
-      var httpResponseMessage = ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
+      var httpResponseMessage = ExecuteStatementAsync(insertStatement, cancellationToken);
 
       return httpResponseMessage;
     }
@@ -251,11 +249,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     /// <param name="entity">Entity for insertion.</param>
     /// <param name="insertProperties">Overrides conventions.</param>
     /// <returns></returns>
-    public string ToRawInsertStatement<T>(T entity, InsertProperties insertProperties = null)
+    public KSqlDbStatement ToInsertStatement<T>(T entity, InsertProperties insertProperties = null)
     {
       var insert = new CreateInsert().Generate(entity, insertProperties);
 
-      return insert;
+      return new KSqlDbStatement(insert);
     }
 
     #region Get
