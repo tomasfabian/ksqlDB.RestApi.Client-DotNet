@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Query;
+using Kafka.DotNet.ksqlDB.Tests.Models.Movies;
 using Moq.Protected;
 
 namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
@@ -455,6 +456,18 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
       var expectedContent = GetExpectedContent(StatementTemplates.DropTable(tableName, useIfExistsClause, deleteTopic));
       
       VerifySendAsync(expectedContent);
+    }
+
+    [TestMethod]
+    public void ToInsertStatement()
+    {
+      //Arrange
+
+      //Act
+      var insertStatement = ClassUnderTest.ToInsertStatement(new Movie { Id = 1 });
+
+      //Assert
+      insertStatement.Sql.Should().Be("INSERT INTO Movies (Title, Id, Release_Year) VALUES (NULL, 1, 0);");
     }
   }
 }
