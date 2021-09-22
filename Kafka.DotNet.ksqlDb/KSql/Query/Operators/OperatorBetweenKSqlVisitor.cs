@@ -21,16 +21,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Operators
         {
           case nameof(KSqlOperatorExtensions.Between):
             
-            Visit(methodCallExpression.Arguments[0]);
+            PrintBetween(methodCallExpression);
 
-            Append(" BETWEEN ");
+            break;
 
-            Visit(methodCallExpression.Arguments[1]);
-
-            Append(" AND ");
-
-            Visit(methodCallExpression.Arguments[2]);
+          case nameof(KSqlOperatorExtensions.NotBetween):
             
+            PrintBetween(methodCallExpression, negated: true);
+
             break;
         }
 
@@ -38,6 +36,22 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Operators
       else base.VisitMethodCall(methodCallExpression);
 
       return methodCallExpression;
+    }
+
+    private void PrintBetween(MethodCallExpression methodCallExpression, bool negated = false)
+    {
+      Visit(methodCallExpression.Arguments[0]);
+
+      if(negated)
+        Append(" NOT");
+
+      Append(" BETWEEN ");
+
+      Visit(methodCallExpression.Arguments[1]);
+
+      Append(" AND ");
+
+      Visit(methodCallExpression.Arguments[2]);
     }
   }
 }
