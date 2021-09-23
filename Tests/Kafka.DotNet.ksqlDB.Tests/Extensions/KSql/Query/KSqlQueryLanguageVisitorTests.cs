@@ -5,6 +5,7 @@ using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
+using Kafka.DotNet.ksqlDB.KSql.Query.Operators;
 using Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Linq;
 using Kafka.DotNet.ksqlDB.Tests.Helpers;
 using Kafka.DotNet.ksqlDB.Tests.Pocos;
@@ -342,6 +343,138 @@ WHERE {nameof(OrderData.Category)} IN ('1', '3') EMIT CHANGES;");
       //Assert
       ksql.Should().BeEquivalentTo(@$"SELECT * FROM {nameof(OrderData)}
 WHERE {nameof(OrderData.OrderType)} IN (1, 3) EMIT CHANGES;");
+    }
+
+    #endregion
+
+    #region Between
+
+    [TestMethod]
+    public void WhereBetween_StringField_PrintsBetween()
+    {
+      //Arrange
+      var query = CreateTweetsStreamSource()
+        .Where(p => p.Message.Between("1", "3"));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @$"SELECT * FROM Tweets
+WHERE {nameof(Tweet.Message)} BETWEEN '1' AND '3' EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void WhereBetween_IntegerField_PrintsBetween()
+    {
+      //Arrange
+      var query = CreateTweetsStreamSource()
+        .Where(p => p.Id.Between(1, 3));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @$"SELECT * FROM Tweets
+WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void SelectBetween_IntegerField_PrintsBetween()
+    {
+      //Arrange
+      var query = CreateTweetsStreamSource()
+        .Select(p => p.Id.Between(1, 3));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @$"SELECT {nameof(Tweet.Id)} BETWEEN 1 AND 3 FROM Tweets EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void SelectBetweenAsAlias_IntegerField_PrintsBetween()
+    {
+      //Arrange
+      var query = CreateTweetsStreamSource()
+        .Select(p => new { IsBetween = p.Id.Between(1, 3) } );
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @$"SELECT {nameof(Tweet.Id)} BETWEEN 1 AND 3 IsBetween FROM Tweets EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void SelectBetweenFromVariables_IntegerField_PrintsBetween()
+    {
+      //Arrange
+      int startExpression = 1;
+      int endExpression = 3;
+
+      var query = CreateTweetsStreamSource()
+        .Select(p => new { IsBetween = p.Id.Between(startExpression, endExpression) } );
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @$"SELECT {nameof(Tweet.Id)} BETWEEN 1 AND 3 IsBetween FROM Tweets EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void SelectBetweenFromConstants_IntegerField_PrintsBetween()
+    {
+      //Arrange
+      int startExpression = 1;
+      int endExpression = 3;
+
+      var query = CreateTweetsStreamSource()
+        .Select(p => new { IsBetween = 3.Between(startExpression, endExpression) } );
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @$"SELECT 3 BETWEEN 1 AND 3 IsBetween FROM Tweets EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void WhereNotBetween_StringField_PrintsBetween()
+    {
+      //Arrange
+      var query = CreateTweetsStreamSource()
+        .Where(p => p.Message.NotBetween("1", "3"));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @$"SELECT * FROM Tweets
+WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
     }
 
     #endregion
