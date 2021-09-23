@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
 using Kafka.DotNet.ksqlDB.Sample.Models.Movies;
 
 namespace Kafka.DotNet.ksqlDB.Sample.Providers
@@ -72,8 +74,14 @@ namespace Kafka.DotNet.ksqlDB.Sample.Providers
 
     public async Task<HttpResponseMessage> InsertMovieAsync(Movie movie)
     {
-      var result = await restApiProvider.InsertIntoAsync(movie);      
+      var insertStatement = restApiProvider.ToInsertStatement(movie);
+      //Console.WriteLine(insertStatement.Sql);
 
+      var result = await restApiProvider.InsertIntoAsync(movie, new InsertProperties() { ShouldPluralizeEntityName = false });
+
+      var content = await result.Content.ReadAsStringAsync();
+      var responses = await result.ToStatementResponsesAsync();
+      
       return result;
     }
 

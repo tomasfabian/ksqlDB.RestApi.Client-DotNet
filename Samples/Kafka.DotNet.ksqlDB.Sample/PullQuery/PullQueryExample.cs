@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries;
@@ -47,14 +48,15 @@ namespace Kafka.DotNet.ksqlDB.Sample.PullQuery
       string windowEnd = "2025-10-03T21:31:16";
 
       var pullQuery = context.CreatePullQuery<IoTSensorStats>(MaterializedViewName)
-        .Where(c => c.SensorId == "sensor-1x")
+        .Where(c => c.SensorId == "sensor-1")
         .Where(c => Bounds.WindowStart > windowStart && Bounds.WindowEnd <= windowEnd);
 
       var sql = pullQuery.ToQueryString();
 
-      await foreach(var item in pullQuery.GetManyAsync().ConfigureAwait(false))
+      await foreach(var item in pullQuery.GetManyAsync().OrderBy(c => c.SensorId).ConfigureAwait(false))
         Console.WriteLine($"Pull query - GetMany result => Id: {item?.SensorId} - Avg Value: {item?.AvgValue} - Window Start {item?.WindowStart}");
 
+      var list = await pullQuery.GetManyAsync().OrderBy(c => c.SensorId).ToListAsync();
       string ksql = "SELECT * FROM avg_sensor_values WHERE SensorId = 'sensor-1';";
 
       var result2 = await context.ExecutePullQuery<IoTSensorStats>(ksql);

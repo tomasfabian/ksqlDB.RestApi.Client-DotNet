@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context.Options;
+using Kafka.DotNet.ksqlDB.KSql.Query.Operators;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
@@ -55,7 +56,7 @@ namespace Kafka.DotNet.ksqlDB.Sample
       var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
       var restApiProvider = new KSqlDbRestApiProvider(httpClientFactory);
       var moviesProvider = new MoviesProvider(restApiProvider);
-      
+
       await moviesProvider.CreateTablesAsync();
 
       var contextOptions = CreateQueryStreamOptions(ksqlDbUrl);
@@ -97,11 +98,12 @@ namespace Kafka.DotNet.ksqlDB.Sample
       }
       catch (Exception e)
       {
-        Console.WriteLine(e);
+        Console.WriteLine(e.Message);
       }
       
       string explain = await query.ExplainAsStringAsync();
       ExplainResponse[] explainResponses = await query.ExplainAsync();
+      Console.WriteLine("Explain => ExecutionPlan:");
       Console.WriteLine(explainResponses[0].QueryDescription.ExecutionPlan);
 
       Console.WriteLine("Press any key to stop the subscription");
@@ -300,6 +302,12 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
 
         cts.Cancel();
       }
+    }
+
+    private static void Between(IKSqlDBContext context)
+    {
+      var ksql = context.CreateQueryStream<Tweet>().Where(c => c.Id.Between(1, 5))
+        .ToQueryString();
     }
 
     private static IDisposable KQueryWithObserver(string ksqlDbUrl)
@@ -788,8 +796,10 @@ Drop type Address;
 
     private static async Task SubscriptionToAComplexTypeAsync(IKSqlDbRestApiClient restApiClient, IKSqlDBContext ksqlDbContext)
     {
-      var httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@$"
-Drop type {nameof(EventCategory)};
+      string typeName = nameof(EventCategory);
+      var httpResponseMessage = await restApiClient.DropTypeIfExistsAsync(typeName);
+
+      httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@$"
 Drop table {nameof(Event)};
 "));
 
