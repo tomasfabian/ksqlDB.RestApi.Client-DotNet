@@ -74,7 +74,8 @@ namespace Kafka.DotNet.ksqlDB.Sample.Providers
 
     public async Task<HttpResponseMessage> InsertMovieAsync(Movie movie)
     {
-      var insertStatement = restApiProvider.ToInsertStatement(movie);
+      //TODO: release
+      //var insertStatement = restApiProvider.ToInsertStatement(movie);
       //Console.WriteLine(insertStatement.Sql);
 
       var result = await restApiProvider.InsertIntoAsync(movie, new InsertProperties() { ShouldPluralizeEntityName = false });
