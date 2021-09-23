@@ -9,6 +9,7 @@ using FluentAssertions;
 using Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.IntegrationTests.Models;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
+using Kafka.DotNet.ksqlDB.KSql.Query.Operators;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.Query.Windows;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
@@ -122,6 +123,24 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
       //Assert
       Assert.AreEqual(expectedItemsCount, actualValues.Count);
       Assert.AreEqual(actualValues[0].Message, Tweet2.Message);
+    }
+
+    [TestMethod]
+    public async Task Between_MessageWasNotFiltered()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+      
+      var source = QuerySource
+        .Where(p => p.Amount.Between(1, 100))
+        .ToAsyncEnumerable();
+      
+      //Act
+      var actualValues = await CollectActualValues(source, expectedItemsCount);
+      
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+      Assert.AreEqual(actualValues[0].Amount, Tweet2.Amount);
     }
 
     [TestMethod]
