@@ -12,6 +12,37 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
       : base(stringBuilder, useTableAlias)
     {
     }
+    
+    private bool canVisitParams = true;
+
+    public override Expression? Visit(Expression? expression)
+    {
+      if (expression == null)
+        return null;
+
+      switch (expression.NodeType)
+      {
+        case ExpressionType.Parameter:
+          VisitParameter((ParameterExpression)expression);
+          break;
+        default:
+          base.Visit(expression);
+          canVisitParams = false;
+          break;
+      }
+
+      return expression;
+    }
+
+    protected override Expression VisitParameter(ParameterExpression node)
+    {
+      if (!canVisitParams)
+        return node;
+
+      Append(node.Name);
+
+      return base.VisitParameter(node);
+    }
 
     protected override Expression VisitMethodCall(MethodCallExpression methodCallExpression)
     {

@@ -36,19 +36,12 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
       return expression;
     }
 
-    private readonly IList<ParameterExpression> processedExpressions = new List<ParameterExpression>();
-
     protected override Expression VisitParameter(ParameterExpression node)
     {
       if (!canVisitParams)
         return node;
 
-      if (processedExpressions.Contains(node))
-        return node;
-
       Append(node.Name);
-
-      processedExpressions.Add(node);
 
       return base.VisitParameter(node);
     }
