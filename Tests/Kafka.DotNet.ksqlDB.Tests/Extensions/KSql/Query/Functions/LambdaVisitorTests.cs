@@ -22,7 +22,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Functions
     }
     
     [TestMethod]
-    public void Transform()
+    public void SingleLambdaParam()
     {
       //Arrange
       Expression<Func<string, string>> expression = x => x.ToUpper();
@@ -31,7 +31,20 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Functions
       var ksql = ClassUnderTest.BuildKSql(expression);
 
       //Assert
-      ksql.Should().Be("x => UCASE(x)");
+      ksql.Should().Be("(x) => UCASE(x)");
+    }
+    
+    [TestMethod]
+    public void MultipleLambdaParams()
+    {
+      //Arrange
+      Expression<Func<int, int, int>> expression = (x, y) => x + y;
+      
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      ksql.Should().Be("(x, y) => x + y");
     }
   }
 }
