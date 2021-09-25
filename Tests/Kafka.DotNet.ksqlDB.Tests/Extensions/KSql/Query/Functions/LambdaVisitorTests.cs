@@ -35,6 +35,19 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Functions
     }
     
     [TestMethod]
+    public void AnonymousTypeProjection()
+    {
+      //Arrange
+      Expression<Func<string, object>> expression = x => new { Col = x.ToUpper() };
+      
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      ksql.Should().Be("(x) => UCASE(x) Col");
+    }
+    
+    [TestMethod]
     public void MultipleLambdaParams()
     {
       //Arrange
@@ -45,6 +58,21 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Functions
 
       //Assert
       ksql.Should().Be("(x, y) => x + y");
+    }
+    
+    [TestMethod]
+    public void CapturedVariable()
+    {
+      //Arrange
+      int i = 1;
+
+      Expression<Func<int, int, int>> expression = (x, y) => x + i;
+      
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      ksql.Should().Be("(x, y) => x + 1");
     }
   }
 }
