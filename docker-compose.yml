@@ -63,7 +63,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
 
   ksqldb-server:
-    image: confluentinc/ksqldb-server:0.15.0
+    image: confluentinc/ksqldb-server:${CONFLUENT_VERSION}
     ports:
       - "8088:8088"
       - "8083:8083"
@@ -121,7 +121,7 @@ services:
       - broker01
 
   ksqldb-cli:
-    image: confluentinc/ksqldb-cli:0.15.0
+    image: confluentinc/ksqldb-cli:${CONFLUENT_VERSION}
     networks: 
       - kafkanetwork
     depends_on:
