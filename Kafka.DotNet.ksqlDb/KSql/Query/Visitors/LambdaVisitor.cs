@@ -11,6 +11,8 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
     {
     }
 
+    private bool canVisitParams = true;
+
     public override Expression? Visit(Expression? expression)
     {
       if (expression == null)
@@ -27,6 +29,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
           break;
         default:
           base.Visit(expression);
+          canVisitParams = false;
           break;
       }
 
@@ -37,6 +40,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
 
     protected override Expression VisitParameter(ParameterExpression node)
     {
+      if (!canVisitParams)
+        return node;
+
       if (processedExpressions.Contains(node))
         return node;
 
