@@ -49,9 +49,21 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
 
     protected override Expression VisitLambda<T>(Expression<T> node)
     {
-      Append(node.Parameters[0].Name);
+      Append("(");
 
-      Append(" => ");
+      bool isFirst = true;
+
+      foreach (var parameterExpression in node.Parameters)
+      {
+        if (isFirst)
+          isFirst = false;
+        else
+          Append(", ");
+
+        Append(parameterExpression.Name);
+      }
+      
+      Append(") => ");
 
       base.VisitLambda(node);
 
