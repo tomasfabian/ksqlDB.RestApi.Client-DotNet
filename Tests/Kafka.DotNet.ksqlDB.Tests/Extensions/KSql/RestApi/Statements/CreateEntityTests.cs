@@ -47,6 +47,192 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       return expectedStatementTemplate;
     }
 
+    #region KSqlTypeTranslator
+
+    [Test]
+    public void KSqlTypeTranslator_StringType()
+    {
+      //Arrange
+      var type = typeof(string);
+
+      //Act
+      string ksqlType = CreateEntity.KSqlTypeTranslator(type);
+
+      //Assert
+      ksqlType.Should().Be("VARCHAR");
+    }
+
+    [Test]
+    public void KSqlTypeTranslator_IntType()
+    {
+      //Arrange
+      var type = typeof(int);
+
+      //Act
+      string ksqlType = CreateEntity.KSqlTypeTranslator(type);
+
+      //Assert
+      ksqlType.Should().Be("INT");
+    }
+
+    [Test]
+    public void KSqlTypeTranslator_LongType()
+    {
+      //Arrange
+      var type = typeof(long);
+
+      //Act
+      string ksqlType = CreateEntity.KSqlTypeTranslator(type);
+
+      //Assert
+      ksqlType.Should().Be("BIGINT");
+    }
+
+    [Test]
+    public void KSqlTypeTranslator_DoubleType()
+    {
+      //Arrange
+      var type = typeof(double);
+
+      //Act
+      string ksqlType = CreateEntity.KSqlTypeTranslator(type);
+
+      //Assert
+      ksqlType.Should().Be("DOUBLE");
+    }
+
+    [Test]
+    public void KSqlTypeTranslator_DecimalType()
+    {
+      //Arrange
+      var type = typeof(decimal);
+
+      //Act
+      string ksqlType = CreateEntity.KSqlTypeTranslator(type);
+
+      //Assert
+      ksqlType.Should().Be("DECIMAL");
+    }
+
+    [Test]
+    public void KSqlTypeTranslator_BoolType()
+    {
+      //Arrange
+      var type = typeof(bool);
+
+      //Act
+      string ksqlType = CreateEntity.KSqlTypeTranslator(type);
+
+      //Assert
+      ksqlType.Should().Be("BOOLEAN");
+    }
+
+    [Test]
+    public void KSqlTypeTranslator_DictionaryType()
+    {
+      //Arrange
+      var type = typeof(Dictionary<string, int>);
+
+      //Act
+      string ksqlType = CreateEntity.KSqlTypeTranslator(type);
+
+      //Assert
+      ksqlType.Should().Be("MAP<VARCHAR, INT>");
+    }
+
+    [Test]
+    public void KSqlTypeTranslator_DictionaryInterface()
+    {
+      //Arrange
+      var type = typeof(IDictionary<string, long>);
+
+      //Act
+      string ksqlType = CreateEntity.KSqlTypeTranslator(type);
+
+      //Assert
+      ksqlType.Should().Be("MAP<VARCHAR, BIGINT>");
+    }
+
+    [Test]
+    public void KSqlTypeTranslator_ArrayType()
+    {
+      //Arrange
+      var type = typeof(double[]);
+
+      //Act
+      string ksqlType = CreateEntity.KSqlTypeTranslator(type);
+
+      //Assert
+      ksqlType.Should().Be("ARRAY<DOUBLE>");
+    }
+
+    [Test]
+    public void KSqlTypeTranslator_ListType()
+    {
+      //Arrange
+      var type = typeof(List<string>);
+
+      //Act
+      string ksqlType = CreateEntity.KSqlTypeTranslator(type);
+
+      //Assert
+      ksqlType.Should().Be("ARRAY<VARCHAR>");
+    }
+
+    [Test]
+    public void KSqlTypeTranslator_IListInterface()
+    {
+      //Arrange
+      var type = typeof(IList<string>);
+
+      //Act
+      string ksqlType = CreateEntity.KSqlTypeTranslator(type);
+
+      //Assert
+      ksqlType.Should().Be("ARRAY<VARCHAR>");
+    }
+
+    [Test]
+    public void KSqlTypeTranslator_IEnumerable()
+    {
+      //Arrange
+      var type = typeof(IEnumerable<string>);
+
+      //Act
+      string ksqlType = CreateEntity.KSqlTypeTranslator(type);
+
+      //Assert
+      ksqlType.Should().Be("ARRAY<VARCHAR>");
+    }
+
+    [Test]
+    public void KSqlTypeTranslator_NestedMapInArray()
+    {
+      //Arrange
+      var type = typeof(IDictionary<string, int>[]);
+
+      //Act
+      string ksqlType = CreateEntity.KSqlTypeTranslator(type);
+
+      //Assert
+      ksqlType.Should().Be("ARRAY<MAP<VARCHAR, INT>>");
+    }
+
+    [Test]
+    public void KSqlTypeTranslator_NestedArrayInMap()
+    {
+      //Arrange
+      var type = typeof(IDictionary<string, int[]>);
+
+      //Act
+      string ksqlType = CreateEntity.KSqlTypeTranslator(type);
+
+      //Assert
+      ksqlType.Should().Be("MAP<VARCHAR, ARRAY<INT>>");
+    }
+    
+    #endregion
+
     [Test]
     public void Print_CreateStream()
     {
