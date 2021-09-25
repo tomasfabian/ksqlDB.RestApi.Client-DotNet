@@ -238,6 +238,10 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       TryCast(methodCallExpression);
 
       if (methodCallExpression.Object == null
+          && methodInfo.DeclaringType.Name == nameof(KSqlInvocationFunctionsExtensions))
+        new KSqlInvocationFunctionVisitor(stringBuilder).Visit(methodCallExpression);
+
+      if (methodCallExpression.Object == null
           && methodInfo.DeclaringType.Name == nameof(KSqlFunctionsExtensions))
         new KSqlFunctionVisitor(stringBuilder, useTableAlias).Visit(methodCallExpression);
 

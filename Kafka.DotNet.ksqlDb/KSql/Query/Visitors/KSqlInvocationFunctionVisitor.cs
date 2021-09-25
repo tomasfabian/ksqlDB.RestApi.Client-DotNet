@@ -27,14 +27,27 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
         switch (methodInfo.Name)
         {
           case nameof(KSqlInvocationFunctionsExtensions.Transform):
+          case nameof(KSqlInvocationFunctionsExtensions.Filter):
+          case nameof(KSqlInvocationFunctionsExtensions.Reduce):
 
             Append($"{methodInfo.Name.ToKSqlFunctionName()}(");
 
             Visit(methodCallExpression.Arguments[1]);
 
             Append(", ");
+            
+            if (methodCallExpression.Arguments.Count == 3)
+            {
+              new LambdaVisitor(stringBuilder).Visit(methodCallExpression.Arguments[2]);
+            }
+            else
+            {
+              Visit(methodCallExpression.Arguments[2]);
 
-            new LambdaVisitor(stringBuilder).Visit(methodCallExpression.Arguments[2]);
+              Append(", ");
+
+              new LambdaVisitor(stringBuilder).Visit(methodCallExpression.Arguments[3]);
+            }
 
             Append(")");
 
