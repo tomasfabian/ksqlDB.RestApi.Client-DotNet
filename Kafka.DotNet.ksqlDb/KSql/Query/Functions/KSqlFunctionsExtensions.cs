@@ -1791,6 +1791,18 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
     }
 
     /// <summary>
+    /// Converts a BYTES value to STRING in the specified encoding. The accepted encoders are 'hex', 'utf8',
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="value">The bytes value to convert.</param>
+    /// <param name="encoding">The encoding to use on conversion.</param>
+    /// <returns>The converted value.</returns>
+    public static string FromBytes(this KSqlFunctions kSqlFunctions, byte[] value, string encoding)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
     /// Concatenates two or more string expressions, inserting a separator string between each.
     /// </summary>
     /// <param name="kSqlFunctions"></param>
