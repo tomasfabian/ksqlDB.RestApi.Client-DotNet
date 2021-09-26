@@ -11,8 +11,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
     {
     }
 
-    private bool canVisitParams = true;
-
     public override Expression? Visit(Expression? expression)
     {
       if (expression == null)
@@ -27,9 +25,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
         case ExpressionType.Parameter:
           VisitParameter((ParameterExpression)expression);
           break;
+
         default:
           base.Visit(expression);
-          canVisitParams = false;
           break;
       }
 
@@ -38,9 +36,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
 
     protected override Expression VisitParameter(ParameterExpression node)
     {
-      if (!canVisitParams)
-        return node;
-
       Append(node.Name);
 
       return base.VisitParameter(node);
@@ -64,7 +59,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
       
       Append(") => ");
 
-      base.VisitLambda(node);
+      Visit(node.Body);
 
       return node;
     }
