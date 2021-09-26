@@ -15,8 +15,10 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
     internal static string KSqlTypeTranslator(Type type)
     {
       var ksqlType = string.Empty;
-
-      if (type.IsArray)
+      
+      if (type == typeof(byte[]))
+        ksqlType = "BYTES";
+      else if (type.IsArray)
       {
         var elementType = KSqlTypeTranslator(type.GetElementType());
 
