@@ -1776,6 +1776,18 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
     public static string Concat(this KSqlFunctions kSqlFunctions, params string[] input)
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }    
+    
+    /// <summary>
+    /// Converts a STRING value in the specified encoding to BYTES. The accepted encoders are 'hex', 'utf8', 'ascii' and 'base64'. Since: - ksqldb 0.21
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="value">The string to convert.</param>
+    /// <param name="encoding">The type of encoding.</param>
+    /// <returns>The converted string.</returns>
+    public static byte[] ToBytes(this KSqlFunctions kSqlFunctions, string value, string encoding)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
 
     /// <summary>

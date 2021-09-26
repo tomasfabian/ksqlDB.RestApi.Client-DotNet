@@ -759,6 +759,23 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
 
     #endregion
 
+    #region ToBytes
+
+    [TestMethod]
+    public void ToBytes_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      Expression<Func<Tweet, byte[]>> expression = c => K.Functions.ToBytes(c.Message, "utf8");
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"TO_BYTES({nameof(Tweet.Message)}, 'utf8')");
+    }
+
+    #endregion
+
     #region ConcatWS
 
     [TestMethod]
