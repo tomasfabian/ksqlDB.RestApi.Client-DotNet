@@ -1,6 +1,6 @@
 ﻿# Kafka.DotNet.ksqlDB
 
-# v1.9.0-rc.1 (WIP)
+# v1.9.0-rc.1
 ## Invocation (lambda) functions
 - requirements: ksqldb 0.17.0
 - This version covers ARRAY type. MAP types are not included in this release.
