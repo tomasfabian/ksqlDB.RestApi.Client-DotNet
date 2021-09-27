@@ -1,4 +1,30 @@
-﻿# v1.8.0
+﻿# Kafka.DotNet.ksqlDB
+
+# v1.9.0-rc.1 (WIP)
+## Invocation (lambda) functions
+- requirements: ksqldb 0.17.0
+- This version covers ARRAY type. MAP types are not included in this release.
+ 
+### Transform 
+- Transform a collection by using a lambda function.
+
+### Reduce 
+- Reduce a collection starting from an initial state.
+
+### Filter 
+- Filter a collection with a lambda function.
+
+## BYTES
+- [BYTES TYPE](https://docs.ksqldb.io/en/latest/reference/sql/data-types/#character-types) - variable-length byte array (byte[])
+- requirements: ksqldb 0.21.0
+
+## ToBytes
+- Converts a STRING value in the specified encoding to BYTES. The accepted encoders are 'hex', 'utf8', 'ascii' and 'base64'. Since: - ksqldb 0.21
+
+## FromBytes
+- Converts a BYTES value to STRING in the specified encoding. The accepted encoders are 'hex', 'utf8', 'ascii' and 'base64'. Since: - ksqldb 0.21
+
+# v1.8.0
 ### KSqlDbRestApiClient
 - DropTypeIfExistsAsync and DropTypeAsync - Removes a type alias from ksqlDB. If the IF EXISTS clause is present, the statement doesn't fail if the type doesn't exist.
 - ToInsertStatement - Generates raw string Insert Into, but does not execute it.
