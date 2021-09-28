@@ -25,6 +25,7 @@ using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Topics;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.ksqlDB.Sample.Models.Events;
+using Kafka.DotNet.ksqlDB.Sample.Models.InvocationFunctions;
 using Kafka.DotNet.ksqlDB.Sample.Providers;
 using Kafka.DotNet.ksqlDB.Sample.PullQuery;
 using K = Kafka.DotNet.ksqlDB.KSql.Query.Functions.KSql;
@@ -850,6 +851,27 @@ Drop table {nameof(Event)};
       };
 
       httpResponseMessage = await restApiClient.InsertIntoAsync(testEvent);
+    }
+    
+    private static void InvocationFunctions(IKSqlDBContext ksqlDbContext)
+    {
+      var ksql = ksqlDbContext.CreateQueryStream<Lambda>()
+        .Select(c => new
+        {
+          Transformed = KSqlFunctions.Instance.Transform(c.Lambda_Arr, x => x + 1),
+          Filtered = KSqlFunctions.Instance.Filter(c.Lambda_Arr, x => x > 1),
+          Acc = K.Functions.Reduce(c.Lambda_Arr, 0, (x, y) => x + y)
+        })
+        .ToQueryString();
+
+      Console.WriteLine(ksql);
+    }
+
+    private static void Bytes(IKSqlDBContext ksqlDbContext)
+    {
+      var ksql = ksqlDbContext.CreateQuery<Thumbnail>()
+        .Select(c => new { Col = K.Functions.FromBytes(c.Image, "hex") })
+        .ToQueryString();
     }
   }
 }
