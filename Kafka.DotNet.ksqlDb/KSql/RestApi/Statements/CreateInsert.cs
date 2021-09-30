@@ -2,9 +2,11 @@
 using System.Collections;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using Kafka.DotNet.ksqlDB.Infrastructure.Extensions;
+using Kafka.DotNet.ksqlDB.KSql.Query.Visitors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
 
 namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
@@ -117,9 +119,12 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
 
     private object GenerateEnumerableValue(Type type, object value, InsertProperties insertProperties)
     {
+      if(value == null)
+        return "NULL";
+      
       var enumerableType = type.GetEnumerableTypeDefinition();
 
-      if (enumerableType == null)
+      if (enumerableType == null || !enumerableType.Any())
         return value;
 
       type = enumerableType.First();
@@ -127,6 +132,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
         
       var source = ((IEnumerable)value).Cast<object>();
       var array = source.Select(c => ExtractValue(c, insertProperties, null, type)).ToArray();
+
+      if (!array.Any())
+        return "ARRAY_REMOVE(ARRAY[0], 0)";
 
       return PrintArray(array);
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -62,10 +63,18 @@ namespace Kafka.DotNet.ksqlDB.Infrastructure.Extensions
 
     internal static IEnumerable<Type> GetEnumerableTypeDefinition(this Type type)
     {
-      return type
+      if (!type.IsGenericType && type == typeof(IEnumerable))
+        return new[] { type };
+
+      if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+        return new[] { type };
+
+      var enumerableTypes = type
         .GetInterfaces()
-        .Where(t => t.IsGenericType
-                    && t.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+        .Where(t => t == typeof(IEnumerable) ||
+                     (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)));
+
+      return enumerableTypes;
     }
   }
 }
