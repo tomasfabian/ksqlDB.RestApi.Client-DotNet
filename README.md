@@ -4,8 +4,13 @@ It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/
 
 [Kafka.DotNet.ksqlDB](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB) is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
 
+Install with NuGet package manager:
 ```
 Install-Package Kafka.DotNet.ksqlDB
+```
+or with .NET CLI
+```
+dotnet add package Kafka.DotNet.ksqlDB
 ```
 ```C#
 using System;
@@ -2573,6 +2578,13 @@ Output:
 - Transform a collection by using a lambda function.
 - If the collection is an array, the lambda function must have one input argument.
 ```C#
+record Tweets
+{
+  public string[] Messages { get; set; }
+  public int[] Values { get; set; }
+}
+```
+
 Expression<Func<Tweets, string[]>> expression = c => K.Functions.Transform(c.Messages, x => x.ToUpper());
 ```
 
@@ -2634,6 +2646,53 @@ Is equivalent to:
 ```KSQL
 FROM_BYTES(Message, 'utf8')
 ```
+
+## KSqlDbRestApiClient.InsertIntoAsync (v1.9.0)
+- added support for ```IEnumerable<T>``` properties
+
+```C#
+record Order
+{
+  public int Id { get; set; }
+  public IEnumerable<double> Items { get; set; }
+}
+```
+
+```C#
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
+var order = new Order { Id = 1, ItemsList = new List<double> { 1.1, 2 }};
+
+var config = new InsertProperties
+{
+  ShouldPluralizeEntityName = false, 
+  EntityName = "`my_order`"
+};
+
+var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
+  .InsertIntoAsync(order, config);
+```
+
+Equivalent KSQL:
+```SQL
+INSERT INTO `my_order` (Id, ItemsList) VALUES (1, ARRAY[1.1,2]);
+```
+
+### Inserting empty arrays (v1.9.0)
+- empty arrays are generated in the following way (workaround)
+```C#
+var order = new Order { Id = 1, ItemsList = new List<double>()};
+
+var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
+  .InsertIntoAsync(order);
+```
+
+```SQL
+ARRAY_REMOVE(ARRAY[0], 0))
+```
+```ARRAY[]``` is not yet supported in ksqldb (v.0.21.0)
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
