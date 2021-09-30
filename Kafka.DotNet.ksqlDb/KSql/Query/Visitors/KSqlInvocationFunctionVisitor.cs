@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Text;
 using Kafka.DotNet.ksqlDB.Infrastructure.Extensions;
@@ -31,22 +32,19 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
           case nameof(KSqlInvocationFunctionsExtensions.Reduce):
 
             Append($"{methodInfo.Name.ToKSqlFunctionName()}(");
-
-            Visit(methodCallExpression.Arguments[1]);
+            
+            VisitArgument(methodCallExpression.Arguments[1]);
 
             Append(", ");
             
-            if (methodCallExpression.Arguments.Count == 3)
-            {
-              new LambdaVisitor(stringBuilder).Visit(methodCallExpression.Arguments[2]);
-            }
-            else
-            {
-              Visit(methodCallExpression.Arguments[2]);
+            if (methodCallExpression.Arguments.Count >= 3)
+              VisitArgument(methodCallExpression.Arguments[2]);
 
+            if (methodCallExpression.Arguments.Count == 4)
+            {
               Append(", ");
 
-              new LambdaVisitor(stringBuilder).Visit(methodCallExpression.Arguments[3]);
+              VisitArgument(methodCallExpression.Arguments[3]);
             }
 
             Append(")");
@@ -57,6 +55,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
       else base.VisitMethodCall(methodCallExpression);
 
       return methodCallExpression;
+    }
+
+    private void VisitArgument(Expression expression)
+    {
+      new LambdaVisitor(stringBuilder).Visit(expression);
     }
   }
 }

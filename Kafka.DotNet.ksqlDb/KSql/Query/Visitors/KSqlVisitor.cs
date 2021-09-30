@@ -380,6 +380,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
 
       var value = constantExpression.Value;
 
+      if (value is byte[])
+        throw new NotSupportedException();
+
       if (value is not string && value is IEnumerable enumerable)
       {
         Append(enumerable);
