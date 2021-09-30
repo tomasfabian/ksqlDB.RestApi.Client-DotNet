@@ -1,4 +1,4 @@
-[Kafka.DotNet.ksqlDB] - [Kafka.DotNet.ksqlDB] - [Kafka.DotNet.ksqlDB] - This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
+This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
 You can continually process computations over unbounded (theoretically never-ending) streams of data.
 It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the Rest API.
 
@@ -2290,7 +2290,7 @@ record Event
 ```
 
 ## InsertIntoAsync for complex types (v1.6.0)
-In v1.0.0 support for inserting entities with primitive types and strings was added. This version adds support for `IEnumerables<T>` and records, classes and structs. 
+In v1.0.0 support for inserting entities with primitive types and strings was added. This version adds support for `List<T>` and records, classes and structs. 
 Deeply nested types and dictionaries are not yet supported.
 
 ```C#
@@ -2482,10 +2482,7 @@ SELECT * FROM Tweets
 WHERE Id BETWEEN 1 AND 5 EMIT CHANGES;
 ```
 
-# v1.9.0-rc.1:
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 1.9.0-rc.1
-```
+# v1.9.0:
 
 ## Lambda functions (Invocation functions) (v1.9.0)
 - requirements: ksqldb 0.17.0
@@ -2693,6 +2690,7 @@ var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
 ARRAY_REMOVE(ARRAY[0], 0))
 ```
 ```ARRAY[]``` is not yet supported in ksqldb (v.0.21.0)
+
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
