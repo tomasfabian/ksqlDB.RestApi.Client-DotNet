@@ -1,6 +1,6 @@
 ﻿# Kafka.DotNet.ksqlDB
 
-# v1.9.0-rc.1
+# v1.9.0
 ## Invocation (lambda) functions
 - requirements: ksqldb 0.17.0
 - This version covers ARRAY type. MAP types are not included in this release.
@@ -23,6 +23,16 @@
 
 ## FromBytes
 - Converts a BYTES value to STRING in the specified encoding. The accepted encoders are 'hex', 'utf8', 'ascii' and 'base64'. Since: - ksqldb 0.21
+
+## KSqlDbRestApiClient.InsertIntoAsync
+- added support for ```IEnumerable<T>``` properties #10
+ 
+### Inserting empty arrays
+- empty arrays are generated in the following way (workaround)
+```SQL
+ARRAY_REMOVE(ARRAY[0], 0))
+```
+```ARRAY[]``` is not yet supported
 
 # v1.8.0
 ### KSqlDbRestApiClient
