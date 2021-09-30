@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -6,9 +7,17 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
 {
   internal class LambdaVisitor : KSqlVisitor
   {
+    private readonly StringBuilder stringBuilder;
+
     public LambdaVisitor(StringBuilder stringBuilder)
       : base(stringBuilder, useTableAlias: false)
     {
+      this.stringBuilder = stringBuilder ?? throw new ArgumentNullException(nameof(stringBuilder));
+    }
+
+    protected override KSqlFunctionVisitor CreateKSqlFunctionVisitor()
+    {
+      return new KSqlFunctionLambdaVisitor(stringBuilder);
     }
 
     public override Expression? Visit(Expression? expression)

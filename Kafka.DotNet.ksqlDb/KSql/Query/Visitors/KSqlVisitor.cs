@@ -220,6 +220,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       Append("]");
     }
 
+    protected virtual KSqlFunctionVisitor CreateKSqlFunctionVisitor()
+    {
+      return new KSqlFunctionVisitor(stringBuilder, useTableAlias);
+    }
+
     protected override Expression VisitMethodCall(MethodCallExpression methodCallExpression)
     {      
       var methodInfo = methodCallExpression.Method;
@@ -243,7 +248,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
 
       if (methodCallExpression.Object == null
           && methodInfo.DeclaringType.Name == nameof(KSqlFunctionsExtensions))
-        new KSqlFunctionVisitor(stringBuilder, useTableAlias).Visit(methodCallExpression);
+        CreateKSqlFunctionVisitor().Visit(methodCallExpression);
 
       if (methodCallExpression.Object != null
           && (methodInfo.DeclaringType.Name == typeof(IAggregations<>).Name || methodInfo.DeclaringType.Name == nameof(IAggregations)))
