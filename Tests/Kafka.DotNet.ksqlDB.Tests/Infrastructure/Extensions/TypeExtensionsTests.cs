@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -179,11 +180,56 @@ namespace Kafka.DotNet.ksqlDB.Tests.Infrastructure.Extensions
       hasKey.Should().BeTrue();
     }
 
+    #region GetEnumerableTypeDefinition
+    
     [TestMethod]
     public void GetEnumerableTypeDefinition_FindsEnumerableType()
     {
       //Arrange
+      var type = typeof(IEnumerable);
+
+      //Act
+      var typeDefinition = type.GetEnumerableTypeDefinition();
+
+      //Assert
+      typeDefinition.Should().Contain(typeof(IEnumerable));
+    }
+    
+    class TestEnumerable : IEnumerable<string>
+    {
+      public IEnumerator<string> GetEnumerator()
+      {
+        throw new System.NotImplementedException();
+      }
+
+      IEnumerator IEnumerable.GetEnumerator()
+      {
+        return GetEnumerator();
+      }
+    }
+
+    [TestMethod]
+    public void GetEnumerableTypeDefinition_EnumerableOfStringBaseType_FindsEnumerableType()
+    {
+      //Arrange
       var type = typeof(TestEnumerable);
+
+      //Act
+      var typeDefinition = type.GetEnumerableTypeDefinition();
+
+      //Assert
+      typeDefinition.Should().Contain(typeof(IEnumerable<string>));
+    }
+
+    class TestList : List<string>
+    {
+    }
+
+    [TestMethod]
+    public void GetEnumerableTypeDefinition_ListBaseType_FindsEnumerableType()
+    {
+      //Arrange
+      var type = typeof(TestList);
 
       //Act
       var typeDefinition = type.GetEnumerableTypeDefinition();
@@ -205,9 +251,45 @@ namespace Kafka.DotNet.ksqlDB.Tests.Infrastructure.Extensions
       typeDefinition.Should().BeEmpty();
     }
 
-    class TestEnumerable : List<string>
+    [TestMethod]
+    public void GetEnumerableOfStringTypeDefinition_FindsEnumerableType()
     {
+      //Arrange
+      var type = typeof(IEnumerable<string>);
 
+      //Act
+      var typeDefinitions = type.GetEnumerableTypeDefinition();
+
+      //Assert
+      typeDefinitions.Should().Contain(typeof(IEnumerable<string>));
     }
+
+    [TestMethod]
+    public void GetEnumerableOfStringTypeDefinition_IList_FindsEnumerableType()
+    {
+      //Arrange
+      var type = typeof(IList<string>);
+
+      //Act
+      var typeDefinitions = type.GetEnumerableTypeDefinition();
+
+      //Assert
+      typeDefinitions.Should().Contain(typeof(IEnumerable<string>));
+    }
+
+    [TestMethod]
+    public void GetEnumerableOfStringTypeDefinition_List_FindsEnumerableType()
+    {
+      //Arrange
+      var type = typeof(List<string>);
+
+      //Act
+      var typeDefinitions = type.GetEnumerableTypeDefinition();
+
+      //Assert
+      typeDefinitions.Should().Contain(typeof(IEnumerable<string>));
+    }
+
+    #endregion
   }
 }
