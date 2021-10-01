@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Blazor.Sample.Configuration;
 using Blazor.Sample.Data;
 using Blazor.Sample.Data.Sensors;
+using Blazor.Sample.Pages.SqlServerCDC.Models;
 using Confluent.Kafka;
 using Kafka.DotNet.InsideOut.Consumer;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
@@ -60,7 +61,10 @@ namespace Blazor.Sample.Pages.SqlServerCDC
 
       var synchronizationContext = SynchronizationContext.Current;
 
-      await SubscribeToQuery(synchronizationContext);
+      if (useKsqlDbTypes)
+        await SubscribeToQuery(synchronizationContext);
+      else
+        await SubscribeToRawQuery(synchronizationContext);
 
       await base.OnInitializedAsync();
     }
@@ -91,7 +95,7 @@ namespace Blazor.Sample.Pages.SqlServerCDC
       {
         await CdcProvider.CdcEnableDbAsync();
 
-        if(!await CdcProvider.IsCdcTableEnabledAsync(tableName))
+        if (!await CdcProvider.IsCdcTableEnabledAsync(tableName))
           await CdcProvider.CdcEnableTableAsync(tableName);
       }
       catch (Exception e)
@@ -99,6 +103,8 @@ namespace Blazor.Sample.Pages.SqlServerCDC
         Console.WriteLine(e);
       }
     }
+
+    private bool useKsqlDbTypes = true;
 
     private async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationToken = default)
     {
@@ -119,9 +125,20 @@ namespace Blazor.Sample.Pages.SqlServerCDC
         Partitions = 1,
         Replicas = 1
       };
-      
-      var httpResponseMessage = await restApiClient.CreateStreamAsync<RawDatabaseChangeObject>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
-        .ConfigureAwait(false);
+
+      if (useKsqlDbTypes)
+      {
+        var createTypeResponse = await restApiClient.CreateTypeAsync<IoTSensor>(cancellationToken);
+        createTypeResponse = await restApiClient.CreateTypeAsync<IoTSensorChange>(cancellationToken);
+        
+        var httpResponseMessage = await restApiClient.CreateStreamAsync<IoTSensorChange>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
+          .ConfigureAwait(false);
+      }
+      else
+      {
+        var httpResponseMessage = await restApiClient.CreateStreamAsync<RawDatabaseChangeObject>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
+          .ConfigureAwait(false);
+      }
     }
 
     /// <summary>
@@ -218,7 +235,31 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
 
       await using var context = new KSqlDBContext(options);
 
-      cdcSubscription = context.CreateQuery<RawDatabaseChangeObject<IoTSensor>>("sqlserversensors")
+      cdcSubscription = context.CreateQuery<IoTSensorChange>("sqlserversensors")
+        .WithOffsetResetPolicy(AutoOffsetReset.Latest)
+        .Where(c => c.Op != "r" && (c.After == null || c.After.SensorId != "d542a2b3-c"))
+        .ToObservable()
+        .ObserveOn(synchronizationContext)
+        .Subscribe(cdc =>
+        {
+          items.Enqueue(cdc);
+          
+          UpdateTable(cdc);
+
+          StateHasChanged();
+        }, error => { Console.WriteLine(error.Message); });
+    }
+
+    private async Task SubscribeToRawQuery(SynchronizationContext? synchronizationContext)
+    {
+      var options = new KSqlDBContextOptions(KsqlDbUrl)
+      {
+        ShouldPluralizeFromItemName = false
+      };
+
+      await using var context = new KSqlDBContext(options);
+
+      cdcSubscription = context.CreateQuery<IoTSensorRawChange>("sqlserversensors")
         .WithOffsetResetPolicy(AutoOffsetReset.Latest)
         .ToObservable()
         .ObserveOn(synchronizationContext)
@@ -229,16 +270,16 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
           UpdateTable(cdc);
 
           StateHasChanged();
-        }, error => { });
+        }, error => { Console.WriteLine(error.Message); });
     }
 
-    private void UpdateTable(RawDatabaseChangeObject<IoTSensor> rawDatabaseChangeObject)
+    private void UpdateTable(IDbRecord<IoTSensor> rawDatabaseChangeObject)
     {
       switch (rawDatabaseChangeObject.OperationType)
       {
         case ChangeDataCaptureType.Created:
           var sensor = rawDatabaseChangeObject.EntityAfter;
-          
+
           var existing = sensors.FirstOrDefault(c => c.SensorId == sensor.SensorId);
 
           if (existing == null)
@@ -259,9 +300,9 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
       }
     }
 
-    private void TryUpdateSensor(RawDatabaseChangeObject<IoTSensor> rawDatabaseChangeObject)
+    private void TryUpdateSensor(IDbRecord<IoTSensor> dbRecord)
     {
-      var sensorAfter = rawDatabaseChangeObject.EntityAfter;
+      var sensorAfter = dbRecord.EntityAfter;
 
       var found = sensors.FirstOrDefault(c => c.SensorId == sensorAfter.SensorId);
       var index = sensors.IndexOf(found);
@@ -284,7 +325,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
       };
     }
 
-    private IoTSensor Model { get; set; } 
+    private IoTSensor Model { get; set; }
 
     private async Task SaveAsync()
     {
@@ -293,18 +334,18 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
       dbContext.Sensors.Add(Model);
 
       await dbContext.SaveChangesAsync();
-      
+
       SetNewModel();
     }
-    
+
     private async Task UpdateAsync(IoTSensor sensor)
     {
-      if(sensor == null)
+      if (sensor == null)
         return;
 
       var dbContext = DbContextFactory.CreateDbContext();
 
-      var updatedSensor = sensor with {Value = new Random().Next(1, 100)};
+      var updatedSensor = sensor with { Value = new Random().Next(1, 100) };
 
       dbContext.Sensors.Update(updatedSensor);
 
@@ -337,11 +378,11 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
         AutoOffsetReset = Confluent.Kafka.AutoOffsetReset.Earliest
       };
 
-      var kafkaConsumer = new KafkaConsumer<string, DatabaseChangeObject<IoTSensor>>("sqlserver2019.dbo.Sensors", consumerConfig);
-	
+      var kafkaConsumer = new KafkaConsumer<string, global::Kafka.DotNet.SqlServer.Cdc.DatabaseChangeObject<IoTSensor>>("sqlserver2019.dbo.Sensors", consumerConfig);
+
       await foreach (var consumeResult in kafkaConsumer.ConnectToTopic().ToAsyncEnumerable().Take(10))
       {
-        Console.WriteLine(consumeResult.Message);		
+        Console.WriteLine(consumeResult.Message);
       }
 
       using (kafkaConsumer)

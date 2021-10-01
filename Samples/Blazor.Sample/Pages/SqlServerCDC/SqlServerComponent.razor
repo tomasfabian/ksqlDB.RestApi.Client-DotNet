@@ -1,6 +1,7 @@
 ﻿@page "/sqlserver"
 @using Blazor.Sample.Collections
 @using Blazor.Sample.Data.Sensors
+@using Blazor.Sample.Pages.SqlServerCDC.Models
 @using global::Kafka.DotNet.SqlServer.Cdc
 
 <h1>Kafka</h1>
@@ -46,8 +47,8 @@ else
                         {
                             <tr>
                                 <td>@TranslateOperation(item.Op)</td>
-                                <td>@item.Before</td>
-                                <td>@item.After</td>
+                                <td>@item.EntityBefore</td>
+                                <td>@item.EntityAfter</td>
                             </tr>
                         }
                     </tbody>
@@ -99,12 +100,12 @@ else
 }
 
 @code {
-    private FixedSizedQueue<RawDatabaseChangeObject> items;
+    private FixedSizedQueue<IDbRecord<IoTSensor>> items;
     private IList<IoTSensor> sensors;
 
     protected override void OnInitialized()
     {
-        items = new FixedSizedQueue<RawDatabaseChangeObject>();
+        items = new FixedSizedQueue<IDbRecord<IoTSensor>>();
 
         sensors = new List<IoTSensor>();
     }
