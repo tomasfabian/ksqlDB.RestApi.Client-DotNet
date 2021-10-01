@@ -527,6 +527,15 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
                 Visit(memberWithArguments.Second);
                 Append(" ");
               }
+              else if (memberWithArguments.Second.NodeType == ExpressionType.MemberAccess && memberWithArguments.Second is MemberExpression
+              {
+                Member: { ReflectedType: { } }
+              } me && me.Expression.NodeType == ExpressionType.MemberAccess && me.Member.ReflectedType.IsKsqlGrouping())
+              {
+                VisitMemberWithArguments(memberWithArguments.First, memberWithArguments.Second);
+
+                continue;
+              }
               break;
             
             case ExpressionType.Conditional:
@@ -543,19 +552,24 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
             continue;
           }
 
-          if (ShouldAppendAlias(memberWithArguments.First, memberWithArguments.Second)) 
-            PrintColumnWithAlias(memberWithArguments.First, memberWithArguments.Second);
-          else
-            ProcessVisitNewMember(memberWithArguments.First, memberWithArguments.Second);
+          VisitMemberWithArguments(memberWithArguments.First, memberWithArguments.Second);
         }
       }
 
       return newExpression;
     }
 
+    private void VisitMemberWithArguments(MemberInfo memberInfo, Expression expression)
+    {
+      if (ShouldAppendAlias(memberInfo, expression))
+        PrintColumnWithAlias(memberInfo, expression);
+      else
+        ProcessVisitNewMember(memberInfo, expression);
+    }
+
     private bool ShouldAppendAlias(MemberInfo memberInfo, Expression expression)
     {
-      if (expression is MemberExpression me2 && me2.Member.DeclaringType.IsGenericType && me2.Member.DeclaringType.GetGenericTypeDefinition() == typeof(IKSqlGrouping<,>))
+      if (expression is MemberExpression me2 && me2.Member.DeclaringType.IsKsqlGrouping())
         return false;
 
       return expression.NodeType == ExpressionType.MemberAccess && expression is MemberExpression me &&
@@ -571,7 +585,16 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
 
     protected virtual void ProcessVisitNewMember(MemberInfo memberInfo, Expression expression)
     {
-      Append(memberInfo.Name);
+      if (expression is MemberExpression { Expression: MemberExpression me3 } && me3.Expression != null && me3.Expression.Type.IsKsqlGrouping())
+      {
+        Append(memberInfo.Name);
+        return;
+      }
+
+      if(expression is MemberExpression { Expression: { NodeType: ExpressionType.MemberAccess } } me)
+        Destructure(me);
+      else
+        Append(memberInfo.Name);
     }
 
     protected override Expression VisitMember(MemberExpression memberExpression)
@@ -599,9 +622,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       }
       else if (memberExpression.Expression.NodeType == ExpressionType.MemberInit)
       {
-        Visit(memberExpression.Expression);
-        Append("->");
-        Append(memberExpression.Member.Name);
+        Destructure(memberExpression);
       }
       else if (memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
       {
@@ -610,6 +631,13 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
           Append("LEN(");
           Visit(memberExpression.Expression);
           Append(")");
+        }
+        else if(memberExpression.NodeType == ExpressionType.MemberAccess && memberExpression.Expression is MemberExpression
+        {
+          Member: { ReflectedType: { } }
+        } me && !me.Member.ReflectedType.IsKsqlGrouping())
+        {
+          Destructure(memberExpression);
         }
         else
           Append($"{memberExpression.Member.Name.ToUpper()}");
@@ -622,6 +650,13 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       }
 
       return memberExpression;
+    }
+
+    private void Destructure(MemberExpression memberExpression)
+    {
+      Visit(memberExpression.Expression);
+      Append("->");
+      Append(memberExpression.Member.Name);
     }
 
     internal static object ExtractFieldValue(MemberExpression memberExpression)
