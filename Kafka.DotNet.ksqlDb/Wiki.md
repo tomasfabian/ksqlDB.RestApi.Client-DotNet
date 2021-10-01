@@ -1,4 +1,4 @@
-﻿[Kafka.DotNet.ksqlDB] - [Kafka.DotNet.ksqlDB] - [Kafka.DotNet.ksqlDB] - This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
+﻿This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
 You can continually process computations over unbounded (theoretically never-ending) streams of data.
 It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the Rest API.
 
@@ -133,6 +133,8 @@ Install-Package Kafka.DotNet.SqlServer -Version 0.2.0
 
 [Kafka.DotNet.SqlServer WIKI](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
 Full example is available in [Blazor example](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Blazor.Sample) - Kafka.DotNet.InsideOut.sln: (The initial run takes a few minutes until all containers are up and running.)
+
+The following example demonstrates ksqldb server side filtering of database transactions: 
 ```C#
 using System;
 using System.Threading;
@@ -169,8 +171,9 @@ class Program
 
     var semaphoreSlim = new SemaphoreSlim(0, 1);
 
-    var cdcSubscription = context.CreateQuery<RawDatabaseChangeObject<IoTSensor>>("sqlserversensors")
+    var cdcSubscription = context.CreateQuery<IoTSensorChange>("sqlserversensors")
       .WithOffsetResetPolicy(AutoOffsetReset.Latest)
+      .Where(c => c.Op != "r" && (c.After == null || c.After.SensorId != "d542a2b3-c"))
       .Take(5)
       .ToObservable()
       .Subscribe(cdc =>
@@ -181,15 +184,15 @@ class Program
           switch (operationType)
           {
             case ChangeDataCaptureType.Created:
-              Console.WriteLine($"Value: {cdc.EntityAfter.Value}");
+              Console.WriteLine($"Value: {cdc.After.Value}");
               break;
             case ChangeDataCaptureType.Updated:
 
-              Console.WriteLine($"Value before: {cdc.EntityBefore.Value}");
-              Console.WriteLine($"Value after: {cdc.EntityAfter.Value}");
+              Console.WriteLine($"Value before: {cdc.Before.Value}");
+              Console.WriteLine($"Value after: {cdc.After.Value}");
               break;
             case ChangeDataCaptureType.Deleted:
-              Console.WriteLine($"Value: {cdc.EntityBefore.Value}");
+              Console.WriteLine($"Value: {cdc.Before.Value}");
               break;
           }
         }, onError: error =>
@@ -211,12 +214,44 @@ class Program
     {
     }
   }
+
+  private static async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationToken = default)
+  {
+    string fromName = "sqlserversensors";
+    string kafkaTopic = "sqlserver2019.dbo.Sensors";
+
+    var ksqlDbUrl = Configuration[ConfigKeys.KSqlDb_Url];
+
+    var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
+    var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+    EntityCreationMetadata metadata = new()
+    {
+      EntityName = fromName,
+      KafkaTopic = kafkaTopic,
+      ValueFormat = SerializationFormats.Json,
+      Partitions = 1,
+      Replicas = 1
+    };
+
+    var createTypeResponse = await restApiClient.CreateTypeAsync<IoTSensor>(cancellationToken);
+    createTypeResponse = await restApiClient.CreateTypeAsync<IoTSensorChange>(cancellationToken);
+
+    var httpResponseMessage = await restApiClient.CreateStreamAsync<DatabaseChangeObject<IoTSensor>>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
+      .ConfigureAwait(false);
+  }
+}
+
+public record IoTSensorChange : DatabaseChangeObject<IoTSensor>
+{
 }
 
 public record IoTSensor
 {
-	public string SensorId { get; set; }
-	public int Value { get; set; }
+  [Key]
+  public string SensorId { get; set; }
+  public int Value { get; set; }
 }
 ```
 
@@ -2290,7 +2325,7 @@ record Event
 ```
 
 ## InsertIntoAsync for complex types (v1.6.0)
-In v1.0.0 support for inserting entities with primitive types and strings was added. This version adds support for `IEnumerables<T>` and records, classes and structs. 
+In v1.0.0 support for inserting entities with primitive types and strings was added. This version adds support for `List<T>` and records, classes and structs. 
 Deeply nested types and dictionaries are not yet supported.
 
 ```C#
@@ -2482,10 +2517,7 @@ SELECT * FROM Tweets
 WHERE Id BETWEEN 1 AND 5 EMIT CHANGES;
 ```
 
-# v1.9.0-rc.1:
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 1.9.0-rc.1
-```
+# v1.9.0:
 
 ## Lambda functions (Invocation functions) (v1.9.0)
 - requirements: ksqldb 0.17.0
@@ -2692,7 +2724,8 @@ var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
 ```SQL
 ARRAY_REMOVE(ARRAY[0], 0))
 ```
-```ARRAY[]``` is not yet supported in ksqldb (v.0.21.0)
+```ARRAY[]``` is not yet supported in ksqldb (v0.21.0)
+
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
