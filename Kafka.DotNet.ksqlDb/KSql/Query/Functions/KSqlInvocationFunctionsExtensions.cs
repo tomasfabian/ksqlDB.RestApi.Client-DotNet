@@ -49,7 +49,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
     /// <param name="keySelector"></param>
     /// <param name="valueSelector"></param>
     /// <returns>Apply a function to each element in a collection. The transformed collection is returned.</returns>
-    internal static IDictionary<TKeyResult, TValueResult> Transform<TKey, TValue, TKeyResult, TValueResult>(this KSqlFunctions kSqlFunctions, IDictionary<TKey, TValue> source, Func<TKey, TValue, TKeyResult> keySelector, Func<TKey, TValue, TValueResult> valueSelector)
+    public static IDictionary<TKeyResult, TValueResult> Transform<TKey, TValue, TKeyResult, TValueResult>(this KSqlFunctions kSqlFunctions, IDictionary<TKey, TValue> source, Func<TKey, TValue, TKeyResult> keySelector, Func<TKey, TValue, TValueResult> valueSelector)
     {
       throw new InvalidOperationException(KSqlFunctionsExtensions.ServerSideOperationErrorMessage);
     }
@@ -90,7 +90,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
     /// <param name="dictionary">The dictionary.</param>
     /// <param name="predicate">A function to test each element for a condition.</param>
     /// <returns>Filter the input collection through a given lambda function. The filtered collection is returned.</returns>
-    internal static IDictionary<TKey, TValue> Filter<TKey, TValue>(this KSqlFunctions kSqlFunctions, IDictionary<TKey, TValue> dictionary, Func<TKey, TValue, bool> predicate)
+    public static IDictionary<TKey, TValue> Filter<TKey, TValue>(this KSqlFunctions kSqlFunctions, IDictionary<TKey, TValue> dictionary, Func<TKey, TValue, bool> predicate)
     {
       throw new InvalidOperationException(KSqlFunctionsExtensions.ServerSideOperationErrorMessage);
     } 
@@ -134,7 +134,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
     /// <param name="state">The initial state.</param>
     /// <param name="accumulator"></param>
     /// <returns>When reducing a map, the reduce function must have three arguments. The three arguments for the reduce function are in order: the state, the key, and the value. The final state is returned.</returns>
-    internal static TState Reduce<TKey, TSource, TState>(this KSqlFunctions kSqlFunctions, IDictionary<TKey, TSource> dictionary, TState state, Func<TState, TKey, TSource, TState> accumulator)
+    public static TState Reduce<TKey, TSource, TState>(this KSqlFunctions kSqlFunctions, IDictionary<TKey, TSource> dictionary, TState state, Func<TState, TKey, TSource, TState> accumulator)
     {
       throw new InvalidOperationException(KSqlFunctionsExtensions.ServerSideOperationErrorMessage);
     }

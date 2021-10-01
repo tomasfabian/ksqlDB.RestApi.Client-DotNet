@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
@@ -30,7 +31,11 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Functions
       public int Id { get; set; }
       public string[] Messages { get; set; }
       public int[] Values { get; set; }
+      public IDictionary<string, int[]> Dictionary { get; set; }
+      public IDictionary<string, int> Dictionary2 { get; set; }
     }
+
+    #region Array
 
     [TestMethod]
     public void Transform()
@@ -109,5 +114,51 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Functions
       //Assert
       ksql.Should().Be($"REDUCE({nameof(Tweets.Values)}, 0, (x, y) => x + y)");
     }
+
+    #endregion
+
+    #region Map
+
+    [TestMethod]
+    public void TransformMap()
+    {
+      //Arrange
+      Expression<Func<Tweets, IDictionary<string, int[]>>> expression = c => K.Functions.Transform(c.Dictionary, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v, x => x * x));
+      
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      ksql.Should().Be($"TRANSFORM({nameof(Tweets.Dictionary)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v, (x) => x * x))");
+    }
+
+    [TestMethod]
+    public void FilterMap()
+    {
+      //Arrange
+      Expression<Func<Tweets, IDictionary<string, int>>> expression = c => K.Functions.Filter(c.Dictionary2, (k, v) => k != "E.T" && v > 0);
+      
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      ksql.Should().Be($"FILTER({nameof(Tweets.Dictionary2)}, (k, v) => (k != 'E.T') AND (v > 0))");
+      //ksql.Should().Be($"FILTER({nameof(Tweets.Dictionary2)}, (k, v) => INSTR(k, 'name') > 0 AND v != 0)");
+    }
+
+    [TestMethod]
+    public void ReduceMap()
+    {
+      //Arrange
+      Expression<Func<Tweets, int>> expression = c => K.Functions.Reduce(c.Dictionary2, 2, (s, k, v) => K.Functions.Ceil(s / v));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      ksql.Should().Be($"REDUCE({nameof(Tweets.Dictionary2)}, 2, (s, k, v) => CEIL(s / v))");
+    }
+
+    #endregion
   }
 }
