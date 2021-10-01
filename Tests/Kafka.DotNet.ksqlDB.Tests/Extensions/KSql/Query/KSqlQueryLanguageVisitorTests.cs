@@ -896,6 +896,76 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
 
       ksql.Should().BeEquivalentTo(expectedKsql);
     }
+    
+    record DatabaseChangeObject<TEntity>
+    {
+      public TEntity After { get; set; }
+    }
+
+    record Entity
+    {
+      public string SensorId { get; set; }
+    }
+    
+    private IQbservable<DatabaseChangeObject<Entity>> CreateDatabaseChangeObjectStreamSource()
+    {
+      var context = new TestableDbProvider(contextOptions);
+
+      return context.CreateQueryStream<DatabaseChangeObject<Entity>>();
+    }
+
+    [TestMethod]
+    public void SelectNestedProperty_BuildKSql_PrintsElementAccessor()
+    {
+      //Arrange
+      var query = CreateDatabaseChangeObjectStreamSource()
+        .Select(c => c.After.SensorId);
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @$"SELECT {nameof(DatabaseChangeObject<object>.After)}->{nameof(Entity.SensorId)} FROM {nameof(DatabaseChangeObject<object>)}s EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void SelectNewNestedProperty_BuildKSql_PrintsElementAccessor()
+    {
+      //Arrange
+      var query = CreateDatabaseChangeObjectStreamSource()
+        .Select(c => new { c.After.SensorId });
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @$"SELECT {nameof(DatabaseChangeObject<object>.After)}->{nameof(Entity.SensorId)} FROM {nameof(DatabaseChangeObject<object>)}s EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void SelectNewNestedPropertyWithAlias_BuildKSql_PrintsElementAccessor()
+    {
+      //Arrange
+      var query = CreateDatabaseChangeObjectStreamSource()
+        .Select(c => new { X = c.After.SensorId, Y = c.After.SensorId.Length, Substr = K.Functions.Substring(c.After.SensorId, 2) });
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string after = nameof(DatabaseChangeObject<object>.After);
+      string substr = $"SUBSTRING({after}->{nameof(Entity.SensorId)}, 2)";
+      string expectedKsql =
+        @$"SELECT {after}->{nameof(Entity.SensorId)} AS X, LEN({after}->{nameof(Entity.SensorId)}) AS Y, {substr} Substr FROM {nameof(DatabaseChangeObject<object>)}s EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
 
     #endregion
 

@@ -371,6 +371,30 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query
       query.Should().BeEquivalentTo($"{nameof(Location.Longitude)} = 1.2");
     }
 
+    record DatabaseChangeObject<TEntity>
+    {
+      public TEntity Before { get; set; }
+      public TEntity After { get; set; }
+    }
+
+    record IoTSensor
+    {
+      public string SensorId { get; set; }
+    }
+
+    [TestMethod]
+    public void PredicateNestedProperty_BuildKSql_PrintsDestructuredField()
+    {
+      //Arrange
+      Expression<Func<DatabaseChangeObject<IoTSensor>, bool>> predicate = l => l.After.SensorId == "sensor-42";
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(predicate);
+
+      //Assert
+      query.Should().BeEquivalentTo("After->SensorId = 'sensor-42'");
+    }
+
     #endregion
 
     #region Parameter
