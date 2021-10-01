@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Kafka.DotNet.ksqlDB.Infrastructure.Extensions;
+using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -291,5 +292,57 @@ namespace Kafka.DotNet.ksqlDB.Tests.Infrastructure.Extensions
     }
 
     #endregion
+
+    [TestMethod]
+    public void IsKsqlGrouping_List_FindsEnumerableType()
+    {
+      //Arrange
+      var type = typeof(List<string>);
+
+      //Act
+      var isKsqlGrouping = type.IsKsqlGrouping();
+
+      //Assert
+      isKsqlGrouping.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void IsKsqlGrouping_KsqlGrouping_ReturnsTrue()
+    {
+      //Arrange
+      var type = typeof(IKSqlGrouping<int, string>);
+
+      //Act
+      var isKsqlGrouping = type.IsKsqlGrouping();
+
+      //Assert
+      isKsqlGrouping.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void ExtractName_Type()
+    {
+      //Arrange
+      var type = typeof(TestList);
+
+      //Act
+      var name = type.ExtractTypeName();
+
+      //Assert
+      name.Should().Be(nameof(TestList));
+    }
+
+    [TestMethod]
+    public void ExtractName_GenericType()
+    {
+      //Arrange
+      var type = typeof(List<string>);
+
+      //Act
+      var name = type.ExtractTypeName();
+
+      //Assert
+      name.Should().Be("List");
+    }
   }
 }

@@ -230,6 +230,19 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       //Assert
       ksqlType.Should().Be("MAP<VARCHAR, ARRAY<INT>>");
     }
+
+    [Test]
+    public void KSqlTypeTranslator_BytesType()
+    {
+      //Arrange
+      var type = typeof(byte[]);
+
+      //Act
+      string ksqlType = CreateEntity.KSqlTypeTranslator(type);
+
+      //Assert
+      ksqlType.Should().Be("BYTES");
+    }
     
     #endregion
 
