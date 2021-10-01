@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Kafka.DotNet.ksqlDB.Infrastructure.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 
 namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Generators
@@ -15,7 +16,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Generators
 
       var type = typeof(T);
       
-      var name = type.Name.ToUpper();
+      var name = type.ExtractTypeName();
+
+      name = name.ToUpper();
 
       stringBuilder.Append(@$"CREATE TYPE {name} AS STRUCT<");
 

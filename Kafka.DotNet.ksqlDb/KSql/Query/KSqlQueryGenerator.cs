@@ -154,7 +154,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       var kStreamSetType = type.TryFindProviderAncestor();
 
       if (kStreamSetType != null)
-        fromItemName = ((KSet) constantExpression.Value).ElementType.Name;
+        fromItemName = ((KSet) constantExpression.Value)?.ElementType.ExtractTypeName();
 
       return constantExpression;
     }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
 
@@ -75,6 +76,21 @@ namespace Kafka.DotNet.ksqlDB.Infrastructure.Extensions
                      (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)));
 
       return enumerableTypes;
+    }
+
+    internal static bool IsKsqlGrouping(this Type type)
+    {
+      return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IKSqlGrouping<,>);
+    }
+    
+    internal static string ExtractTypeName(this Type type)
+    {
+      var name = type.Name;
+
+      if (type.IsGenericType)
+        name = name.Remove(name.IndexOf('`'));
+
+      return name;
     }
   }
 }
