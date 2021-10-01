@@ -2,7 +2,7 @@
 
 namespace Kafka.DotNet.SqlServer.Cdc
 {
-  public record DatabaseChangeObject<TEntity> : DatabaseChangeObject
+  public record DatabaseChangeObject<TEntity> : DatabaseChangeObject, IDatabaseChangeObject<TEntity>
   {
     public TEntity Before { get; set; }
     public TEntity After { get; set; }
@@ -14,7 +14,7 @@ namespace Kafka.DotNet.SqlServer.Cdc
     public string Op { get; set; }
     public long TsMs { get; set; }
     public object Transaction { get; set; }
-    
+
     public ChangeDataCaptureType OperationType => Op.ToChangeDataCaptureType();
   }
 }

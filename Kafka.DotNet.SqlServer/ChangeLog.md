@@ -25,9 +25,10 @@ KsqlDbConnect:
 - SqlServerConnectorMetadata, ConnectorMetadata, ConnectorExtensions - connector configuration for SQL Server
 - KsqlDbConnect - class for creating connectors with ksqldb
 - CdcClient, ICdcClient, ISqlServerCdcClient - Enables/Disables change data capture for the current database and specified source table.
-- DatabaseChangeObject, DatabaseChangeObject<TEntity>, RawDatabaseChangeObject<TEntity> - POCOs
+- DatabaseChangeObject, `DatabaseChangeObject<TEntity>`, `RawDatabaseChangeObject<TEntity>` - POCOs
 - ChangeDataCaptureType enum
 
 ### v0.3.0-rc.1 (WIP)
 - ConnectRestApiClient, IConnectRestApiClient
 - Connector, CreateConnectorResponse, ConnectorTask
+- added interface `IDatabaseChangeObject<TEntity>`
