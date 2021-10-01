@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq;
@@ -293,6 +294,70 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Query.Functions
       Assert.AreEqual(expectedItemsCount, actualValues.Count);
       actualValues[0].Col.Should().Be($"{MoviesProvider.Movie1.Title}{message}");
       actualValues[0].ColWS.Should().Be($"{MoviesProvider.Movie1.Title} - {message}");
+    }
+    
+    [TestMethod]
+    public async Task ToBytes()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+
+      //Act
+      var source = Context.CreateQuery<Movie>(MoviesTableName)
+        .Select(c => new { Col = K.Functions.ToBytes(c.Title, "utf8") })
+        .ToAsyncEnumerable();
+      
+      var actualValues = await CollectActualValues(source, expectedItemsCount);
+      
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+
+      string result = System.Text.Encoding.UTF8.GetString(actualValues[0].Col);
+      result.Should().Be(MoviesProvider.Movie1.Title);
+    }
+    
+    [TestMethod]
+    public async Task FromBytes()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+
+      //Act
+      var source = Context.CreateQuery<Movie>(MoviesTableName)
+        .Select(c => new { Col = K.Functions.FromBytes(K.Functions.ToBytes(c.Title, "utf8"), "utf8") })
+        .ToAsyncEnumerable();
+      
+      var actualValues = await CollectActualValues(source, expectedItemsCount);
+      
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+
+      actualValues[0].Col.Should().BeEquivalentTo(MoviesProvider.Movie1.Title);
+    }
+    
+    [TestMethod]
+    [Ignore("TODO")]
+    public async Task FromBytes_CapturedVariable()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+      byte[] bytes = Encoding.UTF8.GetBytes(MoviesProvider.Movie1.Title);
+      //QWxpZW4=
+
+      var s = Context.CreateQuery<Movie>(MoviesTableName)
+        .Select(c => new { Col = K.Functions.FromBytes(bytes, "utf8") }).ToQueryString();
+
+      //Act
+      var source = Context.CreateQuery<Movie>(MoviesTableName)
+        .Select(c => new { Col = K.Functions.FromBytes(bytes, "utf8") })
+        .ToAsyncEnumerable();
+      
+      var actualValues = await CollectActualValues(source, expectedItemsCount);
+      
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+
+      actualValues[0].Col.Should().BeEquivalentTo(MoviesProvider.Movie1.Title);
     }
 
     [TestMethod]

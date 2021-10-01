@@ -776,6 +776,45 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
 
     #endregion
 
+    #region FromBytes
+
+    struct Thumbnail
+    {
+      public byte[] Image { get; init; }
+    }
+
+    [TestMethod]
+    public void FromBytes_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      Expression<Func<Thumbnail, string>> expression = c => K.Functions.FromBytes(c.Image, "utf8");
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"FROM_BYTES({nameof(Thumbnail.Image)}, 'utf8')");
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(NotSupportedException))]
+    public void FromBytes_CapturedVariable()
+    {
+      //Arrange
+      byte[] bytes = Encoding.UTF8.GetBytes("Alien");
+      //QWxpZW4=
+
+      Expression<Func<Thumbnail, string>> expression = c => K.Functions.FromBytes(bytes, "utf8");
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"FROM_BYTES({nameof(Thumbnail.Image)}, 'utf8')");
+    }
+
+    #endregion
+
     #region ConcatWS
 
     [TestMethod]
