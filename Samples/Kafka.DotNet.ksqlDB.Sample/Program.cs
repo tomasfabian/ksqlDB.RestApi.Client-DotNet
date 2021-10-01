@@ -867,14 +867,14 @@ Drop table {nameof(Event)};
 
       Console.WriteLine(ksql);
 
-      var ksqlMap = ksqlDbContext.CreateQueryStream<Lambda>()
-        .Select(c => new
-        {
-          Transformed = K.Functions.Transform(c.DictionaryArrayValues, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v, x => x * x)),
-          Filtered = K.Functions.Filter(c.DictionaryInValues, (k, v) => k != "E.T" && v > 0),
-          Acc = K.Functions.Reduce(c.DictionaryInValues, 2, (s, k, v) => K.Functions.Ceil(s / v))
-        })
-        .ToQueryString();
+      //var ksqlMap = ksqlDbContext.CreateQueryStream<Lambda>()
+      //  .Select(c => new
+      //  {
+      //    Transformed = K.Functions.Transform(c.DictionaryArrayValues, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v, x => x * x)),
+      //    Filtered = K.Functions.Filter(c.DictionaryInValues, (k, v) => k != "E.T" && v > 0),
+      //    Acc = K.Functions.Reduce(c.DictionaryInValues, 2, (s, k, v) => K.Functions.Ceil(s / v))
+      //  })
+      //  .ToQueryString();
     }
 
     private static void Bytes(IKSqlDBContext ksqlDbContext)
