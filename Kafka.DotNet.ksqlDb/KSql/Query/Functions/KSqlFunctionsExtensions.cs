@@ -1888,6 +1888,23 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
 
     #endregion
 
+    #region Nulls
+
+    /// <summary>
+    /// If the provided expression is NULL, returns altValue, otherwise, returns expression.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="expression">Expression to evaluate.</param>
+    /// <param name="altValue">Alternative value.</param>
+    /// <returns>Returns expression if NOT NULL, otherwise the alternative value. </returns>
+    public static T IfNull<T>(this KSqlFunctions kSqlFunctions, string expression, T altValue)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    #endregion
+
     #region Date and time functions
     
     /// <summary>
