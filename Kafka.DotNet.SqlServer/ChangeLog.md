@@ -2,6 +2,11 @@
 
 Project [Wiki can be found here](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
 
+### v0.3.0-rc.1
+- ConnectRestApiClient, IConnectRestApiClient
+- Connector, CreateConnectorResponse, ConnectorTask
+- added interface `IDatabaseChangeObject<TEntity>`
+- 
 ### v0.2.0
 KsqlDbConnect:
 - CreateConnectorIfNotExistsAsync - Create a new connector in the Kafka Connect cluster with the configuration passed in the connectorMetadata parameter. If the IF NOT EXISTS clause is present, the statement does not fail if a connector with the supplied name already exists
@@ -27,8 +32,3 @@ KsqlDbConnect:
 - CdcClient, ICdcClient, ISqlServerCdcClient - Enables/Disables change data capture for the current database and specified source table.
 - DatabaseChangeObject, `DatabaseChangeObject<TEntity>`, `RawDatabaseChangeObject<TEntity>` - POCOs
 - ChangeDataCaptureType enum
-
-### v0.3.0-rc.1 (WIP)
-- ConnectRestApiClient, IConnectRestApiClient
-- Connector, CreateConnectorResponse, ConnectorTask
-- added interface `IDatabaseChangeObject<TEntity>`

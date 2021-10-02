@@ -433,6 +433,132 @@ async Task Main()
 }
 ```
 
+###
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 1.10.0-rc.1
+```
+
+The following example demonstrates ksqldb server side filtering of database transactions: 
+```C#
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.Linq;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.KSql.Query.Options;
+using Kafka.DotNet.SqlServer.Cdc;
+using Kafka.DotNet.SqlServer.Cdc.Extensions;
+
+class Program
+{
+  static string connectionString = @"Server=127.0.0.1,1433;User Id = SA;Password=<YourNewStrong@Passw0rd>;Initial Catalog = Sensors;MultipleActiveResultSets=true";
+
+  static string bootstrapServers = "localhost:29092";
+  static string KsqlDbUrl => @"http:\\localhost:8088";
+
+  static string tableName = "Sensors";
+  static string schemaName = "dbo";
+
+  private static ISqlServerCdcClient CdcClient { get; set; }
+
+  static async Task Main(string[] args)
+  {
+    CdcClient = new CdcClient(connectionString);
+
+    await CreateSensorsCdcStreamAsync();
+
+    await TryEnableCdcAsync();
+
+    await CreateConnectorAsync();
+
+    await using var context = new KSqlDBContext(KsqlDbUrl);
+
+    var semaphoreSlim = new SemaphoreSlim(0, 1);
+
+    var cdcSubscription = context.CreateQuery<IoTSensorChange>("sqlserversensors")
+      .WithOffsetResetPolicy(AutoOffsetReset.Latest)
+      .Where(c => c.Op != "r" && (c.After == null || c.After.SensorId != "d542a2b3-c"))
+      .Take(5)
+      .ToObservable()
+      .Subscribe(cdc =>
+        {
+          var operationType = cdc.OperationType;
+          Console.WriteLine(operationType);
+
+          switch (operationType)
+          {
+            case ChangeDataCaptureType.Created:
+              Console.WriteLine($"Value: {cdc.After.Value}");
+              break;
+            case ChangeDataCaptureType.Updated:
+
+              Console.WriteLine($"Value before: {cdc.Before.Value}");
+              Console.WriteLine($"Value after: {cdc.After.Value}");
+              break;
+            case ChangeDataCaptureType.Deleted:
+              Console.WriteLine($"Value: {cdc.Before.Value}");
+              break;
+          }
+        }, onError: error =>
+        {
+          semaphoreSlim.Release();
+
+          Console.WriteLine($"Exception: {error.Message}");
+        },
+        onCompleted: () =>
+        {
+          semaphoreSlim.Release();
+          Console.WriteLine("Completed");
+        });
+
+
+    await semaphoreSlim.WaitAsync();
+
+    using (cdcSubscription)
+    {
+    }
+  }
+
+  private static async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationToken = default)
+  {
+    string fromName = "sqlserversensors";
+    string kafkaTopic = "sqlserver2019.dbo.Sensors";
+
+    var ksqlDbUrl = Configuration[ConfigKeys.KSqlDb_Url];
+
+    var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
+    var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+    EntityCreationMetadata metadata = new()
+    {
+      EntityName = fromName,
+      KafkaTopic = kafkaTopic,
+      ValueFormat = SerializationFormats.Json,
+      Partitions = 1,
+      Replicas = 1
+    };
+
+    var createTypeResponse = await restApiClient.CreateTypeAsync<IoTSensor>(cancellationToken);
+    createTypeResponse = await restApiClient.CreateTypeAsync<IoTSensorChange>(cancellationToken);
+
+    var httpResponseMessage = await restApiClient.CreateStreamAsync<DatabaseChangeObject<IoTSensor>>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
+      .ConfigureAwait(false);
+  }
+}
+
+public record IoTSensorChange : DatabaseChangeObject<IoTSensor>
+{
+}
+
+public record IoTSensor
+{
+  [Key]
+  public string SensorId { get; set; }
+  public int Value { get; set; }
+}
+```
+
 ### ksqlDB connector info
 ```KSQL
 SHOW CONNECTORS;
