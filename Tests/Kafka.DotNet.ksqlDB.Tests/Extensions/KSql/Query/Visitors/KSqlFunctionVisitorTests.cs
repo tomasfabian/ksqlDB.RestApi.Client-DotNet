@@ -681,7 +681,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
     #region Instr
     
     [TestMethod]
-    public void InstrOccurence_BuildKSql_PrintsLPadFunction()
+    public void InstrOccurrence_BuildKSql_PrintsFunction()
     {
       //Arrange
       Expression<Func<Tweet, int>> expression = c => K.Functions.Instr(c.Message, "sub", 1, 1);
@@ -694,7 +694,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
     }
     
     [TestMethod]
-    public void InstrPosition_BuildKSql_PrintsLPadFunction()
+    public void InstrPosition_BuildKSql_PrintsFunction()
     {
       //Arrange
       Expression<Func<Tweet, int>> expression = c => K.Functions.Instr(c.Message, "sub", 1);
@@ -707,7 +707,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
     }
     
     [TestMethod]
-    public void Instr_BuildKSql_PrintsLPadFunction()
+    public void Instr_BuildKSql_PrintsFunction()
     {
       //Arrange
       Expression<Func<Tweet, int>> expression = c => K.Functions.Instr(c.Message, "sub");
@@ -1143,6 +1143,49 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
 
       //Assert
       kSqlFunction.Should().BeEquivalentTo($"TIMESTAMPTOSTRING({epochMilli}, '{format}', '{timeZone}')");
+    }
+
+    #endregion
+
+    #region Nulls
+    
+    [TestMethod]
+    public void IfNull_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      Expression<Func<Tweet, string>> expression = c => K.Functions.IfNull(c.Message, "x");
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"IFNULL({nameof(Tweet.Message)}, 'x')");
+    }
+
+
+
+    private struct TweetMessage
+    {
+      public User User { get; init; }
+    }
+
+    private struct User
+    {
+      public string Description { get; init; }
+    }
+
+    [TestMethod]
+    public void IfNullStruct_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      string altValue = "x";
+      Expression<Func<TweetMessage, string>> expression = c => K.Functions.IfNull(c.User.Description, altValue);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"IFNULL({nameof(User)}->{nameof(User.Description)}, '{altValue}')");
     }
 
     #endregion
