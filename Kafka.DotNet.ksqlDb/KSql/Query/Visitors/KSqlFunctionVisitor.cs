@@ -84,6 +84,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
           case nameof(KSqlFunctionsExtensions.MapKeys):
           case nameof(KSqlFunctionsExtensions.ToBytes):
           case nameof(KSqlFunctionsExtensions.FromBytes):
+          case nameof(KSqlFunctionsExtensions.Instr):
             Append($"{methodInfo.Name.ToKSqlFunctionName()}");
             PrintFunctionArguments(methodCallExpression.Arguments.Skip(1));
             break;

@@ -1701,6 +1701,49 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Functions
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
 
+    #region Instr
+
+    /// <summary>
+    /// Returns the position of substring in the provided string.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="str"></param>
+    /// <param name="substring"></param>
+    /// <returns>Returns the position of substring in the provided string. If substring is not found, the return value is 0.</returns>
+    public static int Instr(this KSqlFunctions kSqlFunctions, string str, string substring)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns the position of substring in the provided string.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="str"></param>
+    /// <param name="substring"></param>
+    /// <param name="position">The first character is at position 1. The search starts from the specified position. Negative position causes the search to work from end to start of string.</param>
+    /// <returns>Returns the position of substring in the provided string. If substring is not found, the return value is 0.</returns>
+    public static int Instr(this KSqlFunctions kSqlFunctions, string str, string substring, int position)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Returns the position of substring in the provided string.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="str"></param>
+    /// <param name="substring"></param>
+    /// <param name="position">The first character is at position 1. The search starts from the specified position. Negative position causes the search to work from end to start of string.</param>
+    /// <param name="occurrence">The position of n-th occurrence is returned.</param>
+    /// <returns>Returns the position of substring in the provided string. If substring is not found, the return value is 0.</returns>
+    public static int Instr(this KSqlFunctions kSqlFunctions, string str, string substring, int position, int occurrence)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    #endregion
+
     /// <summary>
     /// Pads the input string, beginning from the left, with the specified padding string until the target length
     /// is reached. If the input string is longer than the specified target length it will be truncated. If the
