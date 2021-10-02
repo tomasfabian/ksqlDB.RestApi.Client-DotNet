@@ -678,6 +678,49 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
 
     #endregion
 
+    #region Instr
+    
+    [TestMethod]
+    public void InstrOccurence_BuildKSql_PrintsLPadFunction()
+    {
+      //Arrange
+      Expression<Func<Tweet, int>> expression = c => K.Functions.Instr(c.Message, "sub", 1, 1);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"INSTR({nameof(Tweet.Message)}, 'sub', 1, 1)");
+    }
+    
+    [TestMethod]
+    public void InstrPosition_BuildKSql_PrintsLPadFunction()
+    {
+      //Arrange
+      Expression<Func<Tweet, int>> expression = c => K.Functions.Instr(c.Message, "sub", 1);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"INSTR({nameof(Tweet.Message)}, 'sub', 1)");
+    }
+    
+    [TestMethod]
+    public void Instr_BuildKSql_PrintsLPadFunction()
+    {
+      //Arrange
+      Expression<Func<Tweet, int>> expression = c => K.Functions.Instr(c.Message, "sub");
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"INSTR({nameof(Tweet.Message)}, 'sub')");
+    }
+
+    #endregion
+
     #region RPad
     
     [TestMethod]
