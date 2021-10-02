@@ -1,5 +1,17 @@
 ﻿# Kafka.DotNet.ksqlDB
 
+# v1.10.0-rc.1
+## Invocation (lambda) functions
+- **Transform**, **Reduce** and **Filter** for Maps (dictionaries)
+- requirements: ksqldb 0.17.0
+
+## Select and Where destructuring properties
+- first level
+
+Bug fix:
+- KSqlDbRestApiClient.CreateTypeAsync - Entity name from generic types fix
+- KsqlDbContext.CreateQueryStream - From item name from generic types fix
+
 # v1.9.0
 ## Invocation (lambda) functions
 - requirements: ksqldb 0.17.0
@@ -51,7 +63,7 @@ ARRAY_REMOVE(ARRAY[0], 0))
 ### KSqlDbRestApiClient 
 - CreateTypeAsync -  Create an alias for a complex type declaration. [#4 Complex Types](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/issues/4)
 
-- InsertIntoAsync for Complex types - `IEnumerable<T>`, record, class and struct
+- InsertIntoAsync for Complex types - `List<T>`, record, class and struct
 
 ### IN operator 
 - `IEnumerable<T>` and `IList<T>` Contains method in Where and Select clauses is interpreted as IN.  [#5 Use 'Contains()'](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/issues/5)
