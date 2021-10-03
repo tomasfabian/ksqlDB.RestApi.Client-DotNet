@@ -10,7 +10,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
     private readonly StringBuilder stringBuilder;
 
     public LambdaVisitor(StringBuilder stringBuilder)
-      : base(stringBuilder, useTableAlias: false)
+      : base(stringBuilder)
     {
       this.stringBuilder = stringBuilder ?? throw new ArgumentNullException(nameof(stringBuilder));
     }

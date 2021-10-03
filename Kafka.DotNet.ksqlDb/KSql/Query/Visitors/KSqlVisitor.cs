@@ -32,6 +32,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       this.useTableAlias = useTableAlias;
     }
 
+    internal KSqlVisitor(StringBuilder stringBuilder)
+    {
+      this.stringBuilder = stringBuilder;
+    }
+
     public string BuildKSql()
     {
       var ksql = stringBuilder.ToString();
@@ -87,6 +92,10 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
           base.Visit(expression);
           break;
 
+        case ExpressionType.Parameter:
+          base.Visit(expression);
+          break;
+
         case ExpressionType.New:
           VisitNew((NewExpression)expression);
           break;
@@ -125,7 +134,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
 
       return expression;
     }
-
+    
     protected override Expression VisitConditional(ConditionalExpression node)
     {
       Append(" WHEN ");
@@ -242,40 +251,28 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
 
       TryCast(methodCallExpression);
 
-      if (methodCallExpression.Object == null
-          && methodInfo.DeclaringType.Name == nameof(KSqlInvocationFunctionsExtensions))
+      if (methodCallExpression.Object == null && methodInfo.DeclaringType is { Name: nameof(KSqlInvocationFunctionsExtensions) })
         new KSqlInvocationFunctionVisitor(stringBuilder).Visit(methodCallExpression);
 
-      if (methodCallExpression.Object == null
-          && methodInfo.DeclaringType.Name == nameof(KSqlFunctionsExtensions))
+      if (methodCallExpression.Object == null && methodInfo.DeclaringType is { Name: nameof(KSqlFunctionsExtensions) })
         CreateKSqlFunctionVisitor().Visit(methodCallExpression);
 
-      if (methodCallExpression.Object != null
-          && (methodInfo.DeclaringType.Name == typeof(IAggregations<>).Name || methodInfo.DeclaringType.Name == nameof(IAggregations)))
+      if (methodCallExpression.Object != null && (methodInfo.DeclaringType != null && methodInfo.DeclaringType.Name == typeof(IAggregations<>).Name || methodInfo.DeclaringType is
+      {
+        Name: nameof(IAggregations)
+      }))
       {
         new AggregationFunctionVisitor(stringBuilder, useTableAlias).Visit(methodCallExpression);
       }
 
-      if (methodCallExpression.Object == null
-          && methodInfo.DeclaringType.Name == nameof(KSqlOperatorExtensions))
+      if (methodCallExpression.Object == null && methodInfo.DeclaringType is { Name: nameof(KSqlOperatorExtensions) })
       {
         new OperatorBetweenKSqlVisitor(stringBuilder).Visit(methodCallExpression);
       }
 
       if (methodCallExpression.Type == typeof(string))
       {
-        if (methodInfo.Name == nameof(string.ToUpper))
-        {
-          Append("UCASE(");
-          Visit(methodCallExpression.Object);
-          Append(")");
-        }
-        if (methodInfo.Name == nameof(string.ToLower))
-        {
-          Append("LCASE(");
-          Visit(methodCallExpression.Object);
-          Append(")");
-        }
+        new StringVisitor(stringBuilder, useTableAlias).Visit(methodCallExpression);
       }
         
       TryPrintContains(methodCallExpression, methodInfo);
