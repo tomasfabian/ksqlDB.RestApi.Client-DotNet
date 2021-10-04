@@ -448,6 +448,26 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
           source.Expression, Expression.Quote(keySelector))
         );
     }
+    
+    private static MethodInfo? groupByTSourceTKeyTElement3;
+
+    private static MethodInfo GroupBy_TSource_TKey_TElement_3(Type TSource, Type TKey, Type TElement) =>
+      (groupByTSourceTKeyTElement3 ??= new Func<IQbservable<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, IQbservable<IKSqlGrouping<object, object>>>(GroupBy).GetMethodInfo().GetGenericMethodDefinition())
+      .MakeGenericMethod(TSource, TKey, TElement);
+
+    private static IQbservable<IKSqlGrouping<TKey, TElement>> GroupBy<TSource, TKey, TElement>(this IQbservable<TSource> source, Expression<Func<TSource, TKey>> keySelector, Expression<Func<TSource, TElement>> elementSelector)
+    {
+      if (source == null) throw new ArgumentNullException(nameof(source));
+      if (keySelector == null)throw new ArgumentNullException(nameof(keySelector));
+      if (elementSelector == null)throw new ArgumentNullException(nameof(elementSelector));
+
+      return source.Provider.CreateQuery<IKSqlGrouping<TKey, TElement>>(
+        Expression.Call(
+          null,
+          GroupBy_TSource_TKey_TElement_3(typeof(TSource), typeof(TKey), typeof(TElement)),
+          source.Expression, Expression.Quote(keySelector), Expression.Quote(elementSelector)
+        ));
+    }
 
     #endregion
 
