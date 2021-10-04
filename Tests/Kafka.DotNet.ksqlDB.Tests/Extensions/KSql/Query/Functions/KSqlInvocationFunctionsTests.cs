@@ -136,14 +136,13 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Functions
     public void FilterMap()
     {
       //Arrange
-      Expression<Func<Tweets, IDictionary<string, int>>> expression = c => K.Functions.Filter(c.Dictionary2, (k, v) => k != "E.T" && v > 0);
+      Expression<Func<Tweets, IDictionary<string, int>>> expression = c => K.Functions.Filter(c.Dictionary2, (k, v) => K.Functions.Instr(k, "name") > 0 && k != "E.T" && v > 0);
       
       //Act
       var ksql = ClassUnderTest.BuildKSql(expression);
 
       //Assert
-      ksql.Should().Be($"FILTER({nameof(Tweets.Dictionary2)}, (k, v) => (k != 'E.T') AND (v > 0))");
-      //ksql.Should().Be($"FILTER({nameof(Tweets.Dictionary2)}, (k, v) => INSTR(k, 'name') > 0 AND v != 0)");
+      ksql.Should().Be($"FILTER({nameof(Tweets.Dictionary2)}, (k, v) => ((INSTR(k, 'name') > 0) AND (k != 'E.T')) AND (v > 0))");
     }
 
     [TestMethod]
