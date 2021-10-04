@@ -433,8 +433,9 @@ async Task Main()
 }
 ```
 
-###
+### KsqlDb server side query for database transactions
 ```
+Install-Package Kafka.DotNet.SqlServer -Version 0.3.0-rc.1
 Install-Package Kafka.DotNet.ksqlDB -Version 1.10.0-rc.1
 ```
 

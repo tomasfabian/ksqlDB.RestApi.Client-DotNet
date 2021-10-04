@@ -8,9 +8,12 @@
 ## Select and Where destructuring properties
 - first level
 
-Bug fix:
+## Scalar functions
+- Instr, IfNull
+
+Bug fixes:
 - KSqlDbRestApiClient.CreateTypeAsync - Entity name from generic types fix
-- KsqlDbContext.CreateQueryStream - From item name from generic types fix
+- KsqlDbContext.CreateQueryStream - From item name - generic types fix
 
 # v1.9.0
 ## Invocation (lambda) functions

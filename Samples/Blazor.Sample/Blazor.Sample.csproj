@@ -19,12 +19,12 @@
   <ItemGroup>
     <PackageReference Include="Kafka.DotNet.SqlServer" Version="0.3.0-rc.1" />
     <PackageReference Include="Kafka.DotNet.InsideOut" Version="1.0.0" />
-    <!--<PackageReference Include="Kafka.DotNet.ksqlDB" Version="1.10.0-rc.1" />-->
+    <PackageReference Include="Kafka.DotNet.ksqlDB" Version="1.10.0-rc.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Kafka.DotNet.ksqlDB\Kafka.DotNet.ksqlDB.csproj" />
-    <!--<ProjectReference Include="..\..\Kafka.DotNet.InsideOut\Kafka.DotNet.InsideOut.csproj" />
+    <!--<ProjectReference Include="..\..\Kafka.DotNet.ksqlDB\Kafka.DotNet.ksqlDB.csproj" />
+    <ProjectReference Include="..\..\Kafka.DotNet.InsideOut\Kafka.DotNet.InsideOut.csproj" />
     <ProjectReference Include="..\..\Kafka.DotNet.SqlServer\Kafka.DotNet.SqlServer.csproj" />-->
   </ItemGroup>
 
