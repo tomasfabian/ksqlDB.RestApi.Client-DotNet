@@ -455,7 +455,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
       (groupByTSourceTKeyTElement3 ??= new Func<IQbservable<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, IQbservable<IKSqlGrouping<object, object>>>(GroupBy).GetMethodInfo().GetGenericMethodDefinition())
       .MakeGenericMethod(TSource, TKey, TElement);
 
-    private static IQbservable<IKSqlGrouping<TKey, TElement>> GroupBy<TSource, TKey, TElement>(this IQbservable<TSource> source, Expression<Func<TSource, TKey>> keySelector, Expression<Func<TSource, TElement>> elementSelector)
+    internal static IQbservable<IKSqlGrouping<TKey, TElement>> GroupBy<TSource, TKey, TElement>(this IQbservable<TSource> source, Expression<Func<TSource, TKey>> keySelector, Expression<Func<TSource, TElement>> elementSelector)
     {
       if (source == null) throw new ArgumentNullException(nameof(source));
       if (keySelector == null)throw new ArgumentNullException(nameof(keySelector));

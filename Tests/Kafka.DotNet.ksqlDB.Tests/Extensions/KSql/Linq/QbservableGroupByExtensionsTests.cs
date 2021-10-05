@@ -228,6 +228,111 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Linq
       ksql.Should().BeEquivalentTo(expectedKSql);
     }
 
+    [TestMethod]
+    public void GroupByNestedProperty_BuildKSql_PrintsQuery()
+    {
+      //Arrange
+      var grouping = CreateQbservable()
+        .GroupBy(c => c.State.Name)
+        .Select(g => new { g.Source.State.Name, num_times = g.Count()});
+
+      //Act
+      var ksql = grouping.ToQueryString();
+
+      //Assert
+      ksql.Should().BeEquivalentTo("SELECT State->Name, COUNT(*) num_times FROM Cities GROUP BY State->Name EMIT CHANGES;");
+    }
+
+    [TestMethod]
+    public void GroupByNestedPropertyWithSameAlias_BuildKSql_PrintsQuery()
+    {
+      //Arrange
+      var grouping = CreateQbservable()
+        .GroupBy(c => c.State.Name)
+        .Select(g => new { Name = g.Source.State.Name, num_times = g.Count()});
+
+      //Act
+      var ksql = grouping.ToQueryString();
+
+      //Assert
+      ksql.Should().BeEquivalentTo("SELECT State->Name, COUNT(*) num_times FROM Cities GROUP BY State->Name EMIT CHANGES;");
+    }
+
+    [TestMethod]
+    public void GroupByNestedPropertyWithDifferentAlias_BuildKSql_PrintsQuery()
+    {
+      //Arrange
+      var grouping = CreateQbservable()
+        .GroupBy(c => c.State.Name)
+        .Select(g => new { MyAlias = g.Source.State.Name, num_times = g.Count()});
+
+      //Act
+      var ksql = grouping.ToQueryString();
+
+      //Assert
+      ksql.Should().BeEquivalentTo("SELECT State->Name AS MyAlias, COUNT(*) num_times FROM Cities GROUP BY State->Name EMIT CHANGES;");
+    }
+
+    [TestMethod]
+    public void GroupByAnonymousType_BuildKSql_PrintsQuery()
+    {
+      //Arrange
+      var grouping = CreateQbservable()
+        .GroupBy(c => new { c.RegionCode, c.State.Name })
+        .Select(g => new { g.Source.RegionCode, g.Source.State.Name, num_times = g.Count()});
+
+      //Act
+      var ksql = grouping.ToQueryString();
+
+      //Assert
+      ksql.Should().BeEquivalentTo("SELECT RegionCode, State->Name, COUNT(*) num_times FROM Cities GROUP BY RegionCode, State->Name EMIT CHANGES;");
+    }
+
+    [TestMethod]
+    public void GroupByQuerySyntax_BuildKSql_PrintsQuery()
+    {
+      //Arrange
+      var grouping = 
+        from city in CreateQbservable()
+        where city.RegionCode != "xx"
+        group city by city.State.Name into g
+        select new
+        {
+          g.Source.RegionCode,
+          g.Source.State.Name,
+          num_times = g.Count()
+        };
+
+      //Act
+      var ksql = grouping.ToQueryString();
+
+      //Assert
+      ksql.Should().BeEquivalentTo(@"SELECT RegionCode, STATE->Name, COUNT(*) num_times FROM Cities
+WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES;");
+    }
+
+    [TestMethod]
+    public void GroupNewByQuerySyntax_BuildKSql_PrintsQuery()
+    {
+      //Arrange
+      var grouping = 
+        from city in CreateQbservable()
+        where city.RegionCode != "xx"
+        group new { city.RegionCode } by city.RegionCode into g
+        select new
+        {
+          g.Source.RegionCode,
+          num_times = g.Count()
+        };
+
+      //Act
+      var ksql = grouping.ToQueryString();
+
+      //Assert
+      ksql.Should().BeEquivalentTo(@"SELECT RegionCode, COUNT(*) num_times FROM Cities
+WHERE RegionCode != 'xx' GROUP BY RegionCode EMIT CHANGES;");
+    }
+
     #endregion
 
     #region Min
@@ -339,6 +444,12 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Linq
     {
       public string RegionCode { get; set; }
       public long Citizens { get; set; }
+      public State State { get; set; }
+    }
+
+    public record State
+    {
+      public string Name { get; set; }
     }
   }
 
