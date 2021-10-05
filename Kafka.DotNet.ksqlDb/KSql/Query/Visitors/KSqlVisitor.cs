@@ -20,7 +20,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
     private readonly bool useTableAlias;
 
     internal StringBuilder StringBuilder => stringBuilder;
-
+    
     public KSqlVisitor()
     {
       stringBuilder = new();
@@ -524,10 +524,8 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
                 Visit(memberWithArguments.Second);
                 Append(" ");
               }
-              else if (memberWithArguments.Second.NodeType == ExpressionType.MemberAccess && memberWithArguments.Second is MemberExpression
-              {
-                Member: { ReflectedType: { } }
-              } me && me.Expression.NodeType == ExpressionType.MemberAccess && me.Member.ReflectedType.IsKsqlGrouping())
+              else if (memberWithArguments.Second.NodeType == ExpressionType.MemberAccess &&
+                       memberWithArguments.Second is MemberExpression me5 && me5.Expression.Type.IsKsqlGrouping())
               {
                 VisitMemberWithArguments(memberWithArguments.First, memberWithArguments.Second);
 
@@ -592,6 +590,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
         Destructure(me);
       else
         Append(memberInfo.Name);
+
+      if (expression.NodeType == ExpressionType.New)
+        Visit(expression);
     }
 
     protected override Expression VisitMember(MemberExpression memberExpression)

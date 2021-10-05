@@ -6,5 +6,6 @@
     /// The type of the key of the IKSqlGrouping.
     /// </summary>
     TKey Key { get; }
+    TElement Source { get; }
   }
 }
