@@ -17,5 +17,17 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Config
       //Assert
       config.Should().Be("ksql.query.pull.table.scan.enabled");
     }
+
+    [Test]
+    public void ProcessingGuarantee()
+    {
+      //Arrange
+
+      //Act
+      var config = KSqlDbConfigs.ProcessingGuarantee;
+
+      //Assert
+      config.Should().Be("processing.guarantee");
+    }
   }
 }
