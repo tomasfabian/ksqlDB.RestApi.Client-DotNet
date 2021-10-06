@@ -26,14 +26,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters
       get
       {
         var value = this[AutoOffsetResetPropertyName];
-
-        if (value == "earliest")
-          return AutoOffsetReset.Earliest;
         
-        return AutoOffsetReset.Latest;
+        return value.ToAutoOffsetReset();
       }
 
-      set => this[AutoOffsetResetPropertyName] = value.ToString().ToLower();
+      set => this[AutoOffsetResetPropertyName] = value.ToKSqlValue();
     }
 
     internal QueryType QueryType { get; } = QueryType.QueryStream;
