@@ -135,24 +135,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       return queryParameters;
     }
 
-    private IQueryParameters TryOverrideAutoOffsetResetPolicy(IQueryParameters queryParameters)
+    private IKSqlDbParameters TryOverrideAutoOffsetResetPolicy(IKSqlDbParameters queryParameters)
     {
       if (!QueryContext.AutoOffsetReset.HasValue) return queryParameters;
       
-      if (queryParameters is QueryStreamParameters queryStreamParameters)
-      {
-        queryStreamParameters = queryStreamParameters.Clone();
-        queryStreamParameters[QueryStreamParameters.AutoOffsetResetPropertyName] = QueryContext.AutoOffsetReset.Value.ToString().ToLower();
+      var overridenParameters = queryParameters.Clone();
+      overridenParameters.AutoOffsetReset = QueryContext.AutoOffsetReset.Value;
 
-        queryParameters = queryStreamParameters;
-      }
-
-      if (queryParameters is not QueryParameters qp) return queryParameters;
-      
-      queryParameters = qp.Clone();
-      queryParameters.Properties[QueryParameters.AutoOffsetResetPropertyName] = QueryContext.AutoOffsetReset.Value.ToString().ToLower();
-
-      return queryParameters;
+      return overridenParameters;
     }
 
     internal IObservable<TEntity> RunStreamAsObservable(CancellationTokenSource cancellationTokenSource)

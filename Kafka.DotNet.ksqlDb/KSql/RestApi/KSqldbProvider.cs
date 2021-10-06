@@ -9,8 +9,6 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Query;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Query;
 
 namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 {

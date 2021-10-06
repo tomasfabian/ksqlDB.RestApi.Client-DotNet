@@ -4,7 +4,7 @@ using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 
 namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters
 {
-  public sealed class QueryStreamParameters : IQueryParameters
+  public sealed class QueryStreamParameters : IKSqlDbParameters
   {
     [JsonPropertyName("sql")]
     public string Sql { get; set; }
@@ -20,9 +20,25 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters
       set => Properties[key] = value;
     }
 
+    [JsonIgnore]
+    public AutoOffsetReset AutoOffsetReset
+    {
+      get
+      {
+        var value = this[AutoOffsetResetPropertyName];
+
+        if (value == "earliest")
+          return AutoOffsetReset.Earliest;
+        
+        return AutoOffsetReset.Latest;
+      }
+
+      set => this[AutoOffsetResetPropertyName] = value.ToString().ToLower();
+    }
+
     internal QueryType QueryType { get; } = QueryType.QueryStream;
     
-    internal QueryStreamParameters Clone()
+    public IKSqlDbParameters Clone()
     {
       var queryParams = new QueryStreamParameters
       {

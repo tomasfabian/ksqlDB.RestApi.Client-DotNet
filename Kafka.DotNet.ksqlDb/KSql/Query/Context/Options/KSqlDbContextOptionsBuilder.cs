@@ -21,40 +21,32 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context.Options
 #if !NETSTANDARD
     ISetupParameters ISetupParameters.SetupQueryStream(Action<IQueryOptions> configure)
     {
-      var queryStreamParameters = CreateQueryStreamParameters();
-      InternalOptions.QueryStreamParameters = queryStreamParameters;
-
-      configure(queryStreamParameters);
+      configure(InternalOptions.QueryStreamParameters);
 
       return this;
     }
 
-    private QueryStreamParameters CreateQueryStreamParameters()
-    {
-      return new()
-      {
-        [QueryStreamParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToString().ToLower()
-      };
-    }
 #endif
 
     ISetupParameters ISetupParameters.SetupQuery(Action<IQueryOptions> configure)
     {
-      var queryParameters = CreateQueryParameters();
-
-      InternalOptions.QueryParameters = queryParameters;
-      
-      configure(queryParameters);
+      configure(InternalOptions.QueryParameters);
 
       return this;
     }
 
-    private QueryParameters CreateQueryParameters()
+    ISetupParameters ISetupParameters.SetProcessingGuarantee(ProcessingGuarantee processingGuarantee)
     {
-      return new()
-      {
-        [QueryParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToString().ToLower()
-      };
+      InternalOptions.SetProcessingGuarantee(processingGuarantee);
+
+      return this;
+    }
+
+    ISetupParameters ISetupParameters.SetAutoOffsetReset(AutoOffsetReset autoOffsetReset)
+    {
+      InternalOptions.SetAutoOffsetReset(autoOffsetReset);
+
+      return this;
     }
 
     private KSqlDBContextOptions contextOptions;

@@ -41,7 +41,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
           
       serviceCollection.TryAddScoped<IKSqlDbProvider, KSqlDbQueryStreamProvider>();
           
-      serviceCollection.TryAddSingleton<IQueryParameters>(contextOptions.QueryStreamParameters);
+      serviceCollection.TryAddSingleton<IKSqlDbParameters>(contextOptions.QueryStreamParameters);
     }
 
     public IAsyncEnumerable<TEntity> CreateQueryStream<TEntity>(QueryStreamParameters queryStreamParameters, CancellationToken cancellationToken = default)
