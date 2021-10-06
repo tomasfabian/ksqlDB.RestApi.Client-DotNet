@@ -1,5 +1,6 @@
 ﻿using System;
 using FluentAssertions;
+using Kafka.DotNet.ksqlDB.KSql.Config;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context.Options;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
@@ -55,6 +56,56 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Context.Options
 
       //Assert
       options.Url.Should().BeEquivalentTo(TestParameters.KsqlDBUrl);
+    }
+    
+    [TestMethod]
+    public void SetProcessingGuarantee()
+    {
+      //Arrange
+      var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl);
+
+      //Act
+      var options = setupParameters.SetProcessingGuarantee(ProcessingGuarantee.AtLeastOnce).Options;
+
+      //Assert
+      options.QueryParameters[KSqlDbConfigs.ProcessingGuarantee].Should().Be("at_least_once");
+      options.QueryStreamParameters[KSqlDbConfigs.ProcessingGuarantee].Should().Be("at_least_once");
+    }
+    
+    [TestMethod]
+    public void SetProcessingGuarantee_ThenSetupQueryStream()
+    {
+      //Arrange
+      var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl)
+        .SetProcessingGuarantee(ProcessingGuarantee.AtLeastOnce);
+
+      //Act
+      var options = setupParameters
+        .SetupQueryStream(options =>
+        {
+        }).Options;
+
+      //Assert
+      options.QueryParameters[KSqlDbConfigs.ProcessingGuarantee].Should().Be("at_least_once");
+      options.QueryStreamParameters[KSqlDbConfigs.ProcessingGuarantee].Should().Be("at_least_once");
+    }
+    
+    [TestMethod]
+    public void SetAutoOffsetReset()
+    {
+      //Arrange
+      var autoOffsetReset = AutoOffsetReset.Latest;
+
+      var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl);
+
+      //Act
+      var options = setupParameters
+        .SetAutoOffsetReset(autoOffsetReset).Options;
+
+      //Assert
+      string expectedValue = autoOffsetReset.ToString().ToLower();
+      options.QueryParameters.Properties[QueryParameters.AutoOffsetResetPropertyName].Should().Be(expectedValue);
+      options.QueryStreamParameters[QueryStreamParameters.AutoOffsetResetPropertyName].Should().Be(expectedValue);
     }
 
     #region QueryStream

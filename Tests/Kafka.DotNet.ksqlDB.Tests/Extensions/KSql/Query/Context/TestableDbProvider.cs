@@ -23,7 +23,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Context
 
     private void InitMocks()
     {
-      KSqldbProviderMock.Setup(c => c.Run<TValue>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+      KSqlDbProviderMock.Setup(c => c.Run<TValue>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
         .Returns(GetAsyncEnumerable);
     }
 
@@ -32,14 +32,14 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Context
       return new List<TValue>().ToAsyncEnumerable();
     }
 
-    public readonly Mock<IKSqlDbProvider> KSqldbProviderMock = new Mock<IKSqlDbProvider>();
-    public readonly Mock<IKSqlQueryGenerator> KSqlQueryGenerator = new Mock<IKSqlQueryGenerator>();
+    public readonly Mock<IKSqlDbProvider> KSqlDbProviderMock = new();
+    public readonly Mock<IKSqlQueryGenerator> KSqlQueryGenerator = new();
 
-    protected bool RegisterKSqlQueryGenerator { get; set; } = true;
+    internal bool RegisterKSqlQueryGenerator { get; set; } = true;
 
     protected override void OnConfigureServices(IServiceCollection serviceCollection, KSqlDBContextOptions options)
     {
-      serviceCollection.AddSingleton(KSqldbProviderMock.Object);
+      serviceCollection.AddSingleton(KSqlDbProviderMock.Object);
 
       if(RegisterKSqlQueryGenerator)
         serviceCollection.AddSingleton(KSqlQueryGenerator.Object);

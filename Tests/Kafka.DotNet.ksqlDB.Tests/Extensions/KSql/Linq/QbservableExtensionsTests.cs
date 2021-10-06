@@ -218,7 +218,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     {
       //Arrange
       var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
-      context.KSqldbProviderMock.Setup(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+      context.KSqlDbProviderMock.Setup(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
         .Returns(GetTestValues);
       var query = context.CreateQueryStream<string>();
 
@@ -226,7 +226,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
       var asyncEnumerable = query.ToAsyncEnumerable();
 
       //Assert
-      context.KSqldbProviderMock.Verify(c => c.Run<string>(It.IsAny<QueryStreamParameters>(), It.IsAny<CancellationToken>()), Times.Once);
+      context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.IsAny<QueryStreamParameters>(), It.IsAny<CancellationToken>()), Times.Once);
 
       await asyncEnumerable.GetAsyncEnumerator().DisposeAsync();
     }
@@ -262,7 +262,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
       //Assert
       observable.Should().NotBeNull();
 
-      context.KSqldbProviderMock.Verify(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()), Times.Never);
+      context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [TestMethod]
@@ -272,7 +272,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
       CancellationToken cancellationToken = default;
 
       var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
-      context.KSqldbProviderMock.Setup(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+      context.KSqlDbProviderMock.Setup(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
         .Callback<object, CancellationToken>((par, ct) => { cancellationToken = ct; })
         .Returns(GetTestValues);
 
@@ -393,12 +393,12 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     {
       var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
       
-      context.KSqldbProviderMock.Setup(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+      context.KSqlDbProviderMock.Setup(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
         .Returns(GetTestValues);
 
       var query = new QueryStream<string> { EnumerableQuery = GetTestValues(), QueryId = "xyz" };
 
-      context.KSqldbProviderMock.Setup(c => c.RunAsync<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+      context.KSqlDbProviderMock.Setup(c => c.RunAsync<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
         .ReturnsAsync(query);
       
       return context.CreateQueryStream<string>();

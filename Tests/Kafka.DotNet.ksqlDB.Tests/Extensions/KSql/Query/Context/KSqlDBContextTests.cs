@@ -2,8 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Kafka.DotNet.ksqlDB.KSql.Config;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
 using Kafka.DotNet.ksqlDB.Tests.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -16,7 +18,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Context
   public class KSqlDBContextTests : TestBase
   {
     [TestMethod]
-    public void CreateStreamSet_Subscribe_KSqldbProvidersRunWasCalled()
+    public void CreateStreamSet_Subscribe_KSqlDbProvidersRunWasCalled()
     {
       //Arrange
       var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
@@ -26,15 +28,20 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Context
 
       //Assert
       streamSet.Should().NotBeNull();
-      context.KSqldbProviderMock.Verify(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()), Times.Once);
+      context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [TestMethod]
     public void CreateStreamSet_Subscribe_QueryOptionsWereTakenFromContext()
     {
       //Arrange
-      var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDBUrl);
-      contextOptions.QueryStreamParameters["auto.offset.reset"] = "latest";
+      var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDBUrl)
+      {
+        QueryStreamParameters =
+        {
+          ["auto.offset.reset"] = "latest"
+        }
+      };
 
       var context = new TestableDbProvider<string>(contextOptions);
 
@@ -42,7 +49,62 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Context
       var subscription = context.CreateQueryStream<string>().Subscribe(_ => {});
 
       //Assert
-      context.KSqldbProviderMock.Verify(c => c.Run<string>(It.Is<QueryStreamParameters>(c => c["auto.offset.reset"] == "latest"), It.IsAny<CancellationToken>()), Times.Once);
+      context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.Is<QueryStreamParameters>(c => c["auto.offset.reset"] == "latest"), It.IsAny<CancellationToken>()), Times.Once);
+      
+      subscription.Dispose();
+    }
+
+    [TestMethod]
+    public void WithOffsetResetPolicy_Subscribe_QueryOptionsWereTakenFromContext()
+    {
+      //Arrange
+      var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDBUrl);
+
+      var context = new TestableDbProvider<string>(contextOptions)
+      {
+        RegisterKSqlQueryGenerator = false
+      };
+
+      //Act
+      var subscription = context.CreateQueryStream<string>().WithOffsetResetPolicy(AutoOffsetReset.Latest).Subscribe(_ => {});
+
+      //Assert
+      // context.KSqldbProviderMock.Verify(c => c.Run<string>(It.Is<IQueryParameters>(c => c["auto.offset.reset"] == "latest"), It.IsAny<CancellationToken>()), Times.Once);
+      context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.Is<QueryStreamParameters>(c => c.AutoOffsetReset == AutoOffsetReset.Latest), It.IsAny<CancellationToken>()), Times.Once);
+
+      subscription.Dispose();
+    }
+
+    [TestMethod]
+    public void SetAutoOffsetReset_Subscribe_ProcessingGuarantee()
+    {
+      //Arrange
+      var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDBUrl);
+      contextOptions.SetAutoOffsetReset(AutoOffsetReset.Latest); 
+
+      var context = new TestableDbProvider<string>(contextOptions);
+
+      //Act
+      var subscription = context.CreateQueryStream<string>().Subscribe(_ => {});
+
+      //Assert
+      context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.Is<QueryStreamParameters>(c => c["auto.offset.reset"] == "latest"), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [TestMethod]
+    public void CreateStreamSet_Subscribe_ProcessingGuarantee()
+    {
+      //Arrange
+      var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDBUrl);
+      contextOptions.SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce); 
+
+      var context = new TestableDbProvider<string>(contextOptions);
+
+      //Act
+      var subscription = context.CreateQueryStream<string>().Subscribe(_ => {});
+
+      //Assert
+      context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.Is<QueryStreamParameters>(c => c[KSqlDbConfigs.ProcessingGuarantee] == "exactly_once"), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [TestMethod]
@@ -71,7 +133,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Context
       var subscription = context.CreateQueryStream<string>().Subscribe(_ => {}, e => {});
 
       //Assert
-      context.KSqldbProviderMock.Verify(c => c.Run<string>(It.Is<QueryStreamParameters>(parameters => parameters["auto.offset.reset"] == "latest"), It.IsAny<CancellationToken>()), Times.Once);
+      context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.Is<QueryStreamParameters>(parameters => parameters["auto.offset.reset"] == "latest"), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [TestMethod]
