@@ -133,6 +133,7 @@ Install-Package Kafka.DotNet.ksqlDB -Version 1.10.0-rc.1
 ```
 
 [Kafka.DotNet.SqlServer WIKI](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
+
 Full example is available in [Blazor example](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Blazor.Sample) - Kafka.DotNet.InsideOut.sln: (The initial run takes a few minutes until all containers are up and running.)
 
 The following example demonstrates ksqldb server side filtering of database transactions: 
@@ -634,8 +635,8 @@ context.CreateQueryStream<Tweet>()
 SELECT Id, COUNT(*) Count FROM Tweets GROUP BY Id EMIT CHANGES;
 ```
 ` `
-> ⚠ There is a known limitation in the early access versions (bellow 1.0). The aggregation functions have to be named/aliased COUNT(*) Count, otherwise the deserialization won't be able to map the unknown column name KSQL_COL_0. 
-The Key should be mapped back to the respective column too Id = g.Key
+> ⚠ There is a known limitation in the early access versions (bellow version 1.10). The aggregation functions have to be named/aliased COUNT(*) Count, otherwise the deserialization won't be able to map the unknown column name KSQL_COL_0. 
+The Key should be mapped back to the respective column too Id = g.Key. See IKSqlGrouping.Source (v1.10.0).
 
 Or without the new expression:
 ```C#
@@ -1298,6 +1299,9 @@ FROM Tweets EMIT CHANGES;
 **NOTE:** Switch expressions and if-elseif-else statements are not supported at current versions
 
 ### KSqlDbContextOptionsBuilder (v0.6.0)
+> ⚠ KSqlDBContextOptions created with a constructor or by KSqlDbContextOptionsBuilder sets auto.offset.reset to earliest by default.
+> This was changed in version 2.0.0
+
 ```C#
 public static KSqlDBContextOptions CreateQueryStreamOptions(string ksqlDbUrl)
 {
@@ -2727,7 +2731,7 @@ ARRAY_REMOVE(ARRAY[0], 0))
 ```
 ```ARRAY[]``` is not yet supported in ksqldb (v0.21.0)
 
-# v1.10.0-rc.1:
+# v1.10.0:
 ```
 Install-Package Kafka.DotNet.ksqlDB -Version 1.10.0-rc.1
 ```
@@ -2781,6 +2785,55 @@ Expression<Func<Lambda, int>> expression = c => K.Functions.Reduce(c.Dictionary2
 Equivalent KSQL:
 ```SQL
 REDUCE(DictionaryInValues, 2, (s, k, v) => CEIL(s / v))
+```
+
+### IKSqlGrouping.Source (v1.10.0)
+- grouping by nested properies (one level). Can be used in the following way:
+
+```C#
+var source = Context.CreateQueryStream<City>()
+  .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
+  .GroupBy(c => new { c.RegionCode, c.State.Name })
+  .Select(g => new { g.Source.RegionCode, g.Source.State.Name, Count = g.Count()})
+  .Take(1)
+  .ToAsyncEnumerable();
+```
+
+```C#
+record City
+{
+  [Key]
+  public string RegionCode { get; init; }
+  public State State { get; init; }
+}
+
+record State
+{
+  public string Name { get; init; }
+}
+```
+
+Equivalent KSQL:
+```SQL
+SELECT RegionCode, State->Name, COUNT(*) Count 
+FROM Cities 
+GROUP BY RegionCode, State->Name 
+EMIT CHANGES;
+```
+
+### Query syntax
+Note that ksqldb does not support OrderBy
+```C#
+var grouping = 
+  from city in context.CreateQueryStream<City>()
+  where city.RegionCode != "xy"
+  group city by city.State.Name into g
+  select new
+  {
+    g.Source.RegionCode,
+    g.Source.State.Name,
+    Num_Times = g.Count()
+  };
 ```
 
 # LinqPad samples

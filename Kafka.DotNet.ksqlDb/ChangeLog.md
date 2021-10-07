@@ -1,6 +1,6 @@
 ﻿# Kafka.DotNet.ksqlDB
 
-# v1.10.0-rc.1
+# v1.10.0
 ## Invocation (lambda) functions
 - **Transform**, **Reduce** and **Filter** for Maps (dictionaries)
 - requirements: ksqldb 0.17.0
@@ -10,6 +10,9 @@
 
 ## Scalar functions
 - Instr, IfNull
+
+## IKSqlGrouping.Source
+- grouping by nested properies (one level)
 
 Bug fixes:
 - KSqlDbRestApiClient.CreateTypeAsync - Entity name from generic types fix
