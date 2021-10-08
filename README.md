@@ -129,7 +129,7 @@ Monitor Sql Server tables for changes and forward them to the appropriate Kafka 
 ### Nuget
 ```
 Install-Package Kafka.DotNet.SqlServer -Version 0.3.0-rc.1
-Install-Package Kafka.DotNet.ksqlDB -Version 1.10.0-rc.1
+Install-Package Kafka.DotNet.ksqlDB -Version 1.10.0
 ```
 
 [Kafka.DotNet.SqlServer WIKI](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
@@ -1299,6 +1299,9 @@ FROM Tweets EMIT CHANGES;
 **NOTE:** Switch expressions and if-elseif-else statements are not supported at current versions
 
 ### KSqlDbContextOptionsBuilder (v0.6.0)
+> ⚠ KSqlDBContextOptions created with a constructor or by KSqlDbContextOptionsBuilder sets auto.offset.reset to earliest by default.
+> This was changed in version 2.0.0
+
 ```C#
 public static KSqlDBContextOptions CreateQueryStreamOptions(string ksqlDbUrl)
 {
@@ -2619,6 +2622,7 @@ record Tweets
 }
 ```
 
+```C#
 Expression<Func<Tweets, string[]>> expression = c => K.Functions.Transform(c.Messages, x => x.ToUpper());
 ```
 
@@ -2728,7 +2732,7 @@ ARRAY_REMOVE(ARRAY[0], 0))
 ```
 ```ARRAY[]``` is not yet supported in ksqldb (v0.21.0)
 
-# v1.10.0-rc.1:
+# v1.10.0:
 ```
 Install-Package Kafka.DotNet.ksqlDB -Version 1.10.0-rc.1
 ```
@@ -2749,7 +2753,8 @@ Transform a collection by using a lambda function.
 If the collection is a map, two lambda functions must be provided, and both lambdas must have two arguments: a map entry key and a map entry value.
 
 ```C#
-Expression<Func<Lambda, IDictionary<string, int[]>>> expression = c => K.Functions.Transform(c.Dictionary, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v, x => x * x));
+Expression<Func<Lambda, IDictionary<string, int[]>>> expression = 
+    c => K.Functions.Transform(c.Dictionary, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v, x => x * x));
 ```
 
 Equivalent KSQL:
@@ -2762,7 +2767,8 @@ Filter a collection with a lambda function.
 If the collection is a map, the lambda function must have two input arguments.
 
 ```C#
-Expression<Func<Lambda, IDictionary<string, int>>> expression = c => K.Functions.Filter(c.Dictionary2, (k, v) => k != "E.T" && v > 0);
+Expression<Func<Lambda, IDictionary<string, int>>> expression = 
+    c => K.Functions.Filter(c.Dictionary2, (k, v) => k != "E.T" && v > 0);
 ```
 
 Equivalent KSQL:
@@ -2776,12 +2782,62 @@ If the collection is a map, the lambda function must have three input arguments.
 If the state is null, the result is null.
 
 ```C#
-Expression<Func<Lambda, int>> expression = c => K.Functions.Reduce(c.Dictionary2, 2, (s, k, v) => K.Functions.Ceil(s / v));
+Expression<Func<Lambda, int>> expression = 
+    c => K.Functions.Reduce(c.Dictionary2, 2, (s, k, v) => K.Functions.Ceil(s / v));
 ```
 
 Equivalent KSQL:
 ```SQL
 REDUCE(DictionaryInValues, 2, (s, k, v) => CEIL(s / v))
+```
+
+### IKSqlGrouping.Source (v1.10.0)
+- grouping by nested properies (one level). Can be used in the following way:
+
+```C#
+var source = Context.CreateQueryStream<City>()
+  .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
+  .GroupBy(c => new { c.RegionCode, c.State.Name })
+  .Select(g => new { g.Source.RegionCode, g.Source.State.Name, Count = g.Count()})
+  .Take(1)
+  .ToAsyncEnumerable();
+```
+
+```C#
+record City
+{
+  [Key]
+  public string RegionCode { get; init; }
+  public State State { get; init; }
+}
+
+record State
+{
+  public string Name { get; init; }
+}
+```
+
+Equivalent KSQL:
+```SQL
+SELECT RegionCode, State->Name, COUNT(*) Count 
+FROM Cities 
+GROUP BY RegionCode, State->Name 
+EMIT CHANGES;
+```
+
+### Query syntax
+Note that ksqldb does not support OrderBy
+```C#
+var grouping = 
+  from city in context.CreateQueryStream<City>()
+  where city.RegionCode != "xy"
+  group city by city.State.Name into g
+  select new
+  {
+    g.Source.RegionCode,
+    g.Source.State.Name,
+    Num_Times = g.Count()
+  };
 ```
 
 # LinqPad samples
