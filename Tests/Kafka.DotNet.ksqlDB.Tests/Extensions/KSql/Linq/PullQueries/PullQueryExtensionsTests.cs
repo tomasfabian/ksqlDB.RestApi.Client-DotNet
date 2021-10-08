@@ -42,7 +42,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Linq.PullQueries
       //Act
       var result = await DbProvider.CreatePullQuery<IoTSensorStats>()
         .Where(c => c.SensorId == sensorId)
-        .GetAsync();
+        .FirstOrDefaultAsync();
       
       //Assert
       result.Should().NotBeNull();

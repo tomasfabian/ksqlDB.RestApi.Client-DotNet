@@ -39,7 +39,7 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq.PullQueries
       //Act
       var result = await context.CreatePullQuery<IoTSensorStats>(SensorsPullQueryProvider.MaterializedViewName)
         .Where(c => c.SensorId == sensorId)
-        .GetAsync();
+        .FirstOrDefaultAsync();
       
       //Assert
       result.Should().NotBeNull();
@@ -78,7 +78,7 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq.PullQueries
       var result = await context.CreatePullQuery<IoTSensorStats>(SensorsPullQueryProvider.MaterializedViewName)
         .Where(c => c.SensorId == sensorId)
         .Select(c => c.SensorId)
-        .GetAsync();
+        .FirstOrDefaultAsync();
       
       //Assert
       result.Should().NotBeNull();
@@ -95,7 +95,7 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq.PullQueries
       var result = await context.CreatePullQuery<IoTSensorStats>(SensorsPullQueryProvider.MaterializedViewName)
         .Where(c => c.SensorId == sensorId)
         .Select(c => new { c.SensorId, Start = c.WindowStart })
-        .GetAsync();
+        .FirstOrDefaultAsync();
       
       //Assert
       result.Start.Should().NotBe(null);
@@ -115,7 +115,7 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq.PullQueries
       var result = await context.CreatePullQuery<IoTSensorStats>(SensorsPullQueryProvider.MaterializedViewName)
         .Where(c => c.SensorId == sensorId)
         .Where(c => Bounds.WindowStart > windowStart && Bounds.WindowEnd <= windowEnd)
-        .GetAsync();
+        .FirstOrDefaultAsync();
       
       //Assert
       result.Should().NotBeNull();

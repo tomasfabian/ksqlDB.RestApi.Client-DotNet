@@ -56,7 +56,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Mocking
       pullQueryMock.Setup(c => c.Expression)
         .Returns(Expression.Constant(pullQueryMock.Object));
 
-      pullQueryMock.Setup(c => c.GetAsync(It.IsAny<CancellationToken>()))
+      pullQueryMock.Setup(c => c.FirstOrDefaultAsync(It.IsAny<CancellationToken>()))
         .ReturnsAsync(new ElasticSearchEvent { Key = 42 });
 
       ksqlDbContextMock.Setup(c => c.CreatePullQuery<ElasticSearchEvent>("EventTopic"))
@@ -134,7 +134,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Mocking
     {
       var response = await context.CreatePullQuery<ElasticSearchEvent>("EventTopic")
         .Where(c => c.Key == id)
-        .GetAsync();
+        .FirstOrDefaultAsync();
 
       return response;
     }
