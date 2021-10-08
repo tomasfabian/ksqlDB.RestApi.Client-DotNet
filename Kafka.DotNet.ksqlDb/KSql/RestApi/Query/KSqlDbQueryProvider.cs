@@ -37,7 +37,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Query
       if (rawJson.EndsWith("]"))
         rawJson = rawJson.Substring(0, rawJson.Length - 1);
 
-      if (rawJson.StartsWith("{\"@type\":\"statement_error\""))
+      if (IsErrorRow(rawJson))
       {
         var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(rawJson);
 

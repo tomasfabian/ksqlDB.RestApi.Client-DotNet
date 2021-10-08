@@ -46,7 +46,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
 
         serializer = new(queryStreamHeader);
       }      
-      else if (rawJson.Contains("_error"))//{"@type":"generic_error"
+      else if (IsErrorRow(rawJson))//{"@type":"generic_error"
       {
         var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(rawJson);
 

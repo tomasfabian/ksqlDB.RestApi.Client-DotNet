@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Query;
 
 namespace Kafka.DotNet.ksqlDB.KSql.RestApi
@@ -131,7 +132,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       var json = JsonSerializer.Serialize(parameters);
 
       var data = new StringContent(json, Encoding.UTF8, "application/json");
-
+      
       httpClient.DefaultRequestHeaders.Accept.Add(
         new MediaTypeWithQualityHeaderValue(ContentType));
 
@@ -141,6 +142,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       };
 
       return httpRequestMessage;
+    }
+
+    protected bool IsErrorRow(string rawJson)
+    {
+      return rawJson.StartsWith("{\"@type\":\"statement_error\"") || rawJson.StartsWith("{\"@type\":\"generic_error\"");
     }
   }
 }
