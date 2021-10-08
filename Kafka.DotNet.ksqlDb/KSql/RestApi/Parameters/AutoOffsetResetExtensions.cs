@@ -1,18 +1,22 @@
-﻿using Kafka.DotNet.ksqlDB.KSql.Query.Options;
+﻿using System;
+using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 
 namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters
 {
-  internal static class AutoOffsetResetExtensions
+  public static class AutoOffsetResetExtensions
   {
-    internal static AutoOffsetReset ToAutoOffsetReset(this string value)
+    public static AutoOffsetReset ToAutoOffsetReset(this string autoOffsetResetValue)
     {        
-      if (value == "earliest")
+      if (autoOffsetResetValue == "earliest")
         return AutoOffsetReset.Earliest;
         
-      return AutoOffsetReset.Latest;
+      if (autoOffsetResetValue == "latest")
+        return AutoOffsetReset.Latest;
+
+      throw new ArgumentOutOfRangeException(nameof(autoOffsetResetValue), autoOffsetResetValue, null);
     }
 
-    internal static string ToKSqlValue(this AutoOffsetReset value)
+    public static string ToKSqlValue(this AutoOffsetReset value)
     {
       return value.ToString().ToLower();
     }
