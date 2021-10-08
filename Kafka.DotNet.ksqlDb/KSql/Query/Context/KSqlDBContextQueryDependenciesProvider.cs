@@ -7,6 +7,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
 {
   internal class KSqlDBContextQueryDependenciesProvider : KSqlDBContextDependenciesProvider
   {
+    public KSqlDBContextQueryDependenciesProvider(KSqlDBContextOptions kSqlDbContextOptions)
+      : base(kSqlDbContextOptions)
+    {
+    }
+    
     protected override void OnConfigureServices(IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
     {
       base.OnConfigureServices(serviceCollection, contextOptions);

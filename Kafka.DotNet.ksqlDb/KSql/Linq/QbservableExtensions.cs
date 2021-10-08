@@ -175,7 +175,8 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq
 
       var httpClientFactory = kStreamSet.GetHttpClientFactory();
 
-      var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+      var restApiClient = new KSqlDbRestApiClient(httpClientFactory)
+        .SetCredentials(kStreamSet.QueryContext.Credentials);
 
       var httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(explainStatement), cancellationToken);
 

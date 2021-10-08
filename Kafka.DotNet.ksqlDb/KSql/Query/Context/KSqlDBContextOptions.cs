@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Config;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
@@ -39,12 +40,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
     /// <param name="processingGuarantee">Type of processing guarantee.</param>
     public void SetProcessingGuarantee(ProcessingGuarantee processingGuarantee)
     {
-      string guarantee = processingGuarantee switch
-      {
-        ProcessingGuarantee.AtLeastOnce => "at_least_once",
-        ProcessingGuarantee.ExactlyOnce => "exactly_once",
-        _ => throw new ArgumentOutOfRangeException(nameof(processingGuarantee), processingGuarantee, null)
-      };
+      string guarantee = processingGuarantee.ToKSqlValue();
 
       QueryStreamParameters[KSqlDbConfigs.ProcessingGuarantee] = guarantee; 
       QueryParameters[KSqlDbConfigs.ProcessingGuarantee] = guarantee;
@@ -53,10 +49,10 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
     public void SetAutoOffsetReset(AutoOffsetReset autoOffsetReset)
     {
       QueryParameters[RestApi.Parameters.QueryParameters.AutoOffsetResetPropertyName] =
-        autoOffsetReset.ToString().ToLower();
+        autoOffsetReset.ToKSqlValue();
 
       QueryStreamParameters[QueryStreamParameters.AutoOffsetResetPropertyName] =
-        autoOffsetReset.ToString().ToLower();
+        autoOffsetReset.ToKSqlValue();
     }
 
     internal KSqlDBContextOptions Clone()
@@ -69,6 +65,20 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
       };
 
       return options;
+    }
+
+    public bool UseBasicAuth => userName != null || password != null;
+
+    private string userName;
+    internal string BasicAuthUserName => string.IsNullOrEmpty(userName) ? "" : userName;
+
+    private string password;
+    internal string BasicAuthPassword => string.IsNullOrEmpty(password) ? "" : password;
+
+    public void SetBasicAuthCredentials(string userName, string password)
+    {
+      this.userName = userName;
+      this.password = password;
     }
   }
 }

@@ -7,5 +7,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
   {
     public string FromItemName { get; internal set; }
     internal AutoOffsetReset? AutoOffsetReset { get; set; }
+    internal BasicAuthCredentials Credentials { get; set; }
   }
 }

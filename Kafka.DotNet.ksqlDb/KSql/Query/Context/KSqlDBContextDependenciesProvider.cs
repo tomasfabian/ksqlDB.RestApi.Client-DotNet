@@ -12,7 +12,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
 {
   public abstract class KSqlDBContextDependenciesProvider : AsyncDisposableObject
   {
+    private readonly KSqlDBContextOptions kSqlDbContextOptions;
     private readonly IServiceCollection serviceCollection;
+
+    protected KSqlDBContextDependenciesProvider(KSqlDBContextOptions kSqlDbContextOptions)
+      : this()
+    {
+      this.kSqlDbContextOptions = kSqlDbContextOptions ?? throw new ArgumentNullException(nameof(kSqlDbContextOptions));
+    }
 
     protected KSqlDBContextDependenciesProvider()
     {
@@ -51,6 +58,8 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
 
     protected virtual void OnConfigureServices(IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
     {
+      serviceCollection.AddSingleton(contextOptions);
+
       serviceCollection.TryAddScoped<IKSqlQbservableProvider, QbservableProvider>();
       serviceCollection.TryAddScoped<ICreateStatementProvider, CreateStatementProvider>();
 

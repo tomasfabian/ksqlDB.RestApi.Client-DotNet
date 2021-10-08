@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Generators;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Query;
@@ -33,6 +34,20 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
     internal static readonly string MediaType = "application/vnd.ksql.v1+json";
 
     private string NullOrWhiteSpaceErrorMessage => "Can't be null, empty, or contain only whitespace.";
+    
+    private BasicAuthCredentials credentials;
+
+    /// <summary>
+    /// Sets Basic HTTP authentication mechanism.
+    /// </summary>
+    /// <param name="credentials">User credentials.</param>
+    /// <returns>This instance.</returns>
+    public IKSqlDbRestApiClient SetCredentials(BasicAuthCredentials credentials)
+    {
+      this.credentials = credentials;
+
+      return this;
+    }
 
     /// <summary>
     /// Run a sequence of SQL statements.
@@ -75,6 +90,13 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       {
         Content = data
       };
+
+      if (credentials != null)
+      {
+        string basicAuthHeader = credentials.CreateToken();
+
+        httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue(credentials.Schema, basicAuthHeader);
+      }
 
       return httpRequestMessage;
     }

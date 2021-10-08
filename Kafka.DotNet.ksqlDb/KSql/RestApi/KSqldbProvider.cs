@@ -46,6 +46,17 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       };
     }
 
+    private BasicAuthCredentials credentials;
+
+    /// <summary>
+    /// Sets Basic HTTP authentication mechanism.
+    /// </summary>
+    /// <param name="credentials">User credentials.</param>
+    public void SetCredentials(BasicAuthCredentials credentials)
+    {
+      this.credentials = credentials;
+    }
+
     /// <param name="parameters">Query parameters</param>
     /// <param name="cancellationToken">A token that can be used to request cancellation of the asynchronous operation.</param>
     public async IAsyncEnumerable<T> Run<T>(object parameters, [EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -140,6 +151,13 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
       {
         Content = data
       };
+      
+      if (credentials != null)
+      {
+        string basicAuthHeader = credentials.CreateToken();
+
+        httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue(credentials.Schema, basicAuthHeader);
+      }
 
       return httpRequestMessage;
     }
