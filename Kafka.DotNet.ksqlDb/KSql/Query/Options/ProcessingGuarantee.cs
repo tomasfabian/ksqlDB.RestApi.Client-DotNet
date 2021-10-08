@@ -3,11 +3,13 @@
   public enum ProcessingGuarantee
   {
     /// <summary>
-    /// exactly_once
+    /// Records are processed once. To achieve a true exactly-once system, end consumers and producers must also implement exactly-once semantics.
+    /// processing.guarantee="exactly_once"
     /// </summary>
     ExactlyOnce,
     /// <summary>
-    /// at_least_once
+    /// Records are never lost but may be redelivered.
+    /// processing.guarantee="at_least_once" 
     /// </summary>
     AtLeastOnce
   }

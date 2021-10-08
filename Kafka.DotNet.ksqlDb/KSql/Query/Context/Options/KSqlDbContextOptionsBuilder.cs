@@ -35,6 +35,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context.Options
       return this;
     }
 
+    /// <summary>
+    /// Enable exactly-once or at_least_once semantics
+    /// </summary>
+    /// <param name="processingGuarantee">Type of processing guarantee.</param>
+    /// <returns>Returns this instance.</returns>
     ISetupParameters ISetupParameters.SetProcessingGuarantee(ProcessingGuarantee processingGuarantee)
     {
       InternalOptions.SetProcessingGuarantee(processingGuarantee);

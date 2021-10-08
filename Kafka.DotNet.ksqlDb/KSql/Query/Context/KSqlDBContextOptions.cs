@@ -33,6 +33,10 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
 
     public IKSqlDbParameters QueryParameters { get; internal set; }
 
+    /// <summary>
+    /// Enable exactly-once or at_least_once semantics.
+    /// </summary>
+    /// <param name="processingGuarantee">Type of processing guarantee.</param>
     public void SetProcessingGuarantee(ProcessingGuarantee processingGuarantee)
     {
       string guarantee = processingGuarantee switch
