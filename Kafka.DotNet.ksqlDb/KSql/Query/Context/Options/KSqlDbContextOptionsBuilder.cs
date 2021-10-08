@@ -19,7 +19,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context.Options
     private string Url { get; set; }
 
 #if !NETSTANDARD
-    ISetupParameters ISetupParameters.SetupQueryStream(Action<IQueryOptions> configure)
+    ISetupParameters ISetupParameters.SetupQueryStream(Action<IKSqlDbParameters> configure)
     {
       configure(InternalOptions.QueryStreamParameters);
 
@@ -28,7 +28,14 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context.Options
 
 #endif
 
-    ISetupParameters ISetupParameters.SetupQuery(Action<IQueryOptions> configure)
+    ISetupParameters ISetupParameters.SetBasicAuthCredentials(string username, string password)
+    {
+      InternalOptions.SetBasicAuthCredentials(username, password);
+
+      return this;
+    }
+
+    ISetupParameters ISetupParameters.SetupQuery(Action<IKSqlDbParameters> configure)
     {
       configure(InternalOptions.QueryParameters);
 

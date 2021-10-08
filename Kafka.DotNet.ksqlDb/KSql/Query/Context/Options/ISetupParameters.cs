@@ -9,9 +9,10 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context.Options
     ISetupParameters SetProcessingGuarantee(ProcessingGuarantee processingGuarantee);
     ISetupParameters SetAutoOffsetReset(AutoOffsetReset autoOffsetReset);
 
-    ISetupParameters SetupQuery(Action<IQueryOptions> configure);
+    ISetupParameters SetupQuery(Action<IKSqlDbParameters> configure);
 #if !NETSTANDARD
-    ISetupParameters SetupQueryStream(Action<IQueryOptions> configure);
+    ISetupParameters SetupQueryStream(Action<IKSqlDbParameters> configure);
 #endif
+    ISetupParameters SetBasicAuthCredentials(string username, string password);
   }
 }
