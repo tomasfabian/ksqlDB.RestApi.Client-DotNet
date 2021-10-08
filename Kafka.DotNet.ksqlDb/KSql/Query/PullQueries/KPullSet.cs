@@ -48,7 +48,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.PullQueries
     /// <summary>
     /// Pulls the first value or returns NULL from the materialized view and terminates. 
     /// </summary>
-    public ValueTask<TEntity> GetAsync(CancellationToken cancellationToken = default)
+    public ValueTask<TEntity> FirstOrDefaultAsync(CancellationToken cancellationToken = default)
     {
       var dependencies = GetDependencies();
 

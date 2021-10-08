@@ -38,7 +38,11 @@ namespace Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries
     /// </summary>
     /// <param name="cancellationToken">A token that can be used to request cancellation of the asynchronous operation.</param>
     /// <returns></returns>
-    ValueTask<T> GetAsync(CancellationToken cancellationToken = default);
+    ValueTask<T> FirstOrDefaultAsync(CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// Pulls all values from the materialized view asynchronously and terminates. 
+    /// </summary>
     IAsyncEnumerable<T> GetManyAsync(CancellationToken cancellationToken = default);
   }
 }
