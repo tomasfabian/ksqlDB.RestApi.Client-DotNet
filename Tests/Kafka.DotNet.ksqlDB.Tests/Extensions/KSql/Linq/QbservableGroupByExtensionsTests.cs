@@ -312,6 +312,30 @@ WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES;");
     }
 
     [TestMethod]
+    public void GroupByQuerySyntaxWithLimit_BuildKSql_PrintsQuery()
+    {
+      //Arrange
+      var grouping = 
+        (from city in CreateQbservable()
+        where city.RegionCode != "xx"
+        group city by city.State.Name into g
+        select new
+        {
+          g.Source.RegionCode,
+          g.Source.State.Name,
+          num_times = g.Count()
+        })
+        .Take(2);
+
+      //Act
+      var ksql = grouping.ToQueryString();
+
+      //Assert
+      ksql.Should().BeEquivalentTo(@"SELECT RegionCode, STATE->Name, COUNT(*) num_times FROM Cities
+WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES LIMIT 2;");
+    }
+
+    [TestMethod]
     public void GroupNewByQuerySyntax_BuildKSql_PrintsQuery()
     {
       //Arrange
