@@ -57,6 +57,37 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Context.Options
       //Assert
       options.Url.Should().BeEquivalentTo(TestParameters.KsqlDBUrl);
     }
+
+    [TestMethod]
+    public void SetBasicAuthCredentials()
+    {
+      //Arrange
+      string userName = "fred";
+      string password = "letmein";
+
+      //Act
+      var options = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl)
+        .SetBasicAuthCredentials(userName, password).Options;
+
+      //Assert
+      options.UseBasicAuth.Should().BeTrue();
+      options.BasicAuthUserName.Should().Be(userName);
+      options.BasicAuthPassword.Should().Be(password);
+    }
+
+    [TestMethod]
+    public void NotSetBasicAuthCredentials()
+    {
+      //Arrange
+
+      //Act
+      var options = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl).Options;
+
+      //Assert
+      options.UseBasicAuth.Should().BeFalse();
+      options.BasicAuthUserName.Should().BeEmpty();
+      options.BasicAuthPassword.Should().BeEmpty();
+    }
     
     [TestMethod]
     public void SetProcessingGuarantee()

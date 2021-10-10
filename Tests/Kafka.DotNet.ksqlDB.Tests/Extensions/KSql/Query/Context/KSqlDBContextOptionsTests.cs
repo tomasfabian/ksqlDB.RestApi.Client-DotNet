@@ -32,6 +32,36 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Context
       //Assert
       url.Should().Be(TestParameters.KsqlDBUrl);
     }
+    
+    [TestMethod]
+    public void NotSetBasicAuthCredentials()
+    {
+      //Arrange
+
+      //Act
+
+      //Assert
+      ClassUnderTest.UseBasicAuth.Should().BeFalse();
+      ClassUnderTest.BasicAuthUserName.Should().BeEmpty();
+      ClassUnderTest.BasicAuthPassword.Should().BeEmpty();
+    }
+    
+    [TestMethod]
+    public void SetBasicAuthCredentials()
+    {
+      //Arrange
+      string userName = "fred";
+      string password = "letmein";
+
+      //Act
+      ClassUnderTest
+        .SetBasicAuthCredentials(userName, password);
+
+      //Assert
+      ClassUnderTest.UseBasicAuth.Should().BeTrue();
+      ClassUnderTest.BasicAuthUserName.Should().Be(userName);
+      ClassUnderTest.BasicAuthPassword.Should().Be(password);
+    }
 
     [TestMethod]
     [ExpectedException(typeof(KeyNotFoundException))]
