@@ -1,22 +1,27 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Http;
 using Kafka.DotNet.ksqlDB.Tests.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 
-namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi
+namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Http
 {
   [TestClass]
-  public class HttpClientFactoryTests : TestBase
+  public class HttpClientFactoryWithBasicAuthTests : TestBase
   {
     [TestMethod]
     public void CreateClient_BaseAddressWasSet()
     {
       //Arrange
-      var httpClientFactory = new HttpClientFactory(new Uri(TestParameters.KsqlDBUrl));
+      var credentials = new BasicAuthCredentials
+      {
+        UserName = "fred",
+        Password = "letmein"
+      };
+
+      var httpClientFactory = new HttpClientFactoryWithBasicAuth(new Uri(TestParameters.KsqlDBUrl), credentials);
 
       //Act
       var httpClient = httpClientFactory.CreateClient();
