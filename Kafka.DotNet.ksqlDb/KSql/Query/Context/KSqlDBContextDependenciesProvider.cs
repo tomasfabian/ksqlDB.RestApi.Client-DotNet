@@ -5,6 +5,7 @@ using Kafka.DotNet.ksqlDB.KSql.Disposables;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -68,8 +69,23 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
       serviceCollection.TryAddTransient<IKSqlQueryGenerator, KSqlQueryGenerator>();
 
       if (!serviceCollection.HasRegistration<IHttpClientFactory>())
-        serviceCollection.AddSingleton<IHttpClientFactory, HttpClientFactory>(_ =>
-          new HttpClientFactory(uri));
+      {
+        if(kSqlDbContextOptions.UseBasicAuth)
+        {
+          serviceCollection.AddSingleton<IHttpClientFactory, HttpClientFactoryWithBasicAuth>(sp =>
+          {
+            var credentials = new BasicAuthCredentials(kSqlDbContextOptions.BasicAuthUserName,
+              kSqlDbContextOptions.BasicAuthPassword);
+
+            return new HttpClientFactoryWithBasicAuth(uri, credentials);
+          });
+        }
+        else
+        {
+          serviceCollection.AddSingleton<IHttpClientFactory, HttpClientFactory>(_ =>
+            new HttpClientFactory(uri));
+        }
+      }
 
       serviceCollection.TryAddSingleton(contextOptions);
       serviceCollection.TryAddScoped<IKStreamSetDependencies, KStreamSetDependencies>();

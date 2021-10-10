@@ -2,9 +2,8 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 
-namespace Kafka.DotNet.ksqlDB.KSql.RestApi
+namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Http
 {
   internal class BasicAuthHandler : DelegatingHandler
   {

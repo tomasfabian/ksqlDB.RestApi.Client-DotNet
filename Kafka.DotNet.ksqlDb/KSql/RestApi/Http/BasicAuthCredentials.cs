@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
+namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Http
 {
   public record BasicAuthCredentials
   {
