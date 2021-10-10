@@ -1,7 +1,6 @@
 ﻿using System;
-using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 
-namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters
+namespace Kafka.DotNet.ksqlDB.KSql.Query.Options
 {
   public static class AutoOffsetResetExtensions
   {

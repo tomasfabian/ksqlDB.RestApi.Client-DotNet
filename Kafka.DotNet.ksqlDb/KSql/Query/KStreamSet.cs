@@ -107,9 +107,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       var dependencies = scope.ServiceProvider.GetRequiredService<IKStreamSetDependencies>();
       
       var queryParameters = GetQueryParameters(dependencies);
-      
-      var credentials = QueryContext.Credentials;
-      dependencies.KsqlDBProvider.SetCredentials(credentials);
 
       return dependencies.KsqlDBProvider
         .Run<TEntity>(queryParameters, cancellationToken);
@@ -122,10 +119,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       var dependencies = scope.ServiceProvider.GetRequiredService<IKStreamSetDependencies>();
 
       var queryParameters = GetQueryParameters(dependencies);
-
-      var credentials = QueryContext.Credentials;
-
-      dependencies.KsqlDBProvider.SetCredentials(credentials);
 
       return dependencies.KsqlDBProvider
         .RunAsync<TEntity>(queryParameters, cancellationToken);

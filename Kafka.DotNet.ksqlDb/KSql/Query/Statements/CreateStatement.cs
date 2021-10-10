@@ -67,12 +67,6 @@ AS {ksqlQuery}";
       cancellationToken.Register(() => serviceScope?.Dispose());
       
       var restApiClient = serviceScope.ServiceProvider.GetRequiredService<IKSqlDbRestApiClient>();
-      var options = serviceScope.ServiceProvider.GetRequiredService<KSqlDBContextOptions>();
-
-      if (options.UseBasicAuth)
-      {
-        restApiClient.SetCredentials(new BasicAuthCredentials(options.BasicAuthUserName, options.BasicAuthPassword));
-      }
 
       serviceScope.Dispose();
 

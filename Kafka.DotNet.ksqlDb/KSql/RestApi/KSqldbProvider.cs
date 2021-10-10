@@ -8,7 +8,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Query;
 
 namespace Kafka.DotNet.ksqlDB.KSql.RestApi
@@ -44,17 +43,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
         EnumerableQuery = ConsumeAsync<T>(streamReader, cancellationToken),
         QueryId = queryId
       };
-    }
-
-    private BasicAuthCredentials credentials;
-
-    /// <summary>
-    /// Sets Basic HTTP authentication mechanism.
-    /// </summary>
-    /// <param name="credentials">User credentials.</param>
-    public void SetCredentials(BasicAuthCredentials credentials)
-    {
-      this.credentials = credentials;
     }
 
     /// <param name="parameters">Query parameters</param>
@@ -152,13 +140,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi
         Content = data
       };
       
-      if (credentials != null)
-      {
-        string basicAuthHeader = credentials.CreateToken();
-
-        httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue(credentials.Schema, basicAuthHeader);
-      }
-
       return httpRequestMessage;
     }
 

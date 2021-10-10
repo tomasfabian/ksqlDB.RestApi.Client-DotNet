@@ -27,6 +27,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
     }
 
     public KSqlDBContext(KSqlDBContextOptions contextOptions)
+      : base(contextOptions)
     {
       this.contextOptions = contextOptions ?? throw new ArgumentNullException(nameof(contextOptions));
 
@@ -67,8 +68,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
         FromItemName = fromItemName
       };
       
-      TrySetBasicAuth(queryStreamContext);
-
       return new KQueryStreamSet<TEntity>(serviceScopeFactory, queryStreamContext);
     }
 
@@ -95,19 +94,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
         FromItemName = fromItemName
       };
 
-      TrySetBasicAuth(queryStreamContext);
-
       return new KQueryStreamSet<TEntity>(serviceScopeFactory, queryStreamContext);
-    }
-
-    private void TrySetBasicAuth(QueryContext queryStreamContext)
-    {
-      if (contextOptions.UseBasicAuth)
-        queryStreamContext.Credentials = new BasicAuthCredentials
-        {
-          UserName = contextOptions.BasicAuthUserName,
-          Password = contextOptions.BasicAuthPassword
-        };
     }
 
     #region CreateStatements
@@ -165,8 +152,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
         FromItemName = tableName
       };
 
-      TrySetBasicAuth(queryContext);
-
       return new KPullSet<TEntity>(serviceScopeFactory, queryContext);
     }
 
@@ -183,12 +168,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
 
       var queryParameters = dependencies.QueryStreamParameters;
       queryParameters.Sql = ksql;
-
-      dependencies.KsqlDBProvider.SetCredentials(new BasicAuthCredentials
-      {
-        UserName = contextOptions.BasicAuthUserName,
-        Password = contextOptions.BasicAuthPassword
-      });
 
       return dependencies.KsqlDBProvider
         .Run<TEntity>(queryParameters, cancellationToken)

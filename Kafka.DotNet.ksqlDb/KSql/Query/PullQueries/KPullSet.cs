@@ -71,10 +71,6 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.PullQueries
       using var serviceScope = serviceScopeFactory.CreateScope();
 
       var dependencies = serviceScope.ServiceProvider.GetRequiredService<IKStreamSetDependencies>();
-      var options = serviceScope.ServiceProvider.GetRequiredService<KSqlDBContextOptions>();
-
-      var credentials = new BasicAuthCredentials(options.BasicAuthUserName, options.BasicAuthPassword);
-      dependencies.KsqlDBProvider.SetCredentials(credentials);
 
       dependencies.KSqlQueryGenerator.ShouldEmitChanges = false;
 
