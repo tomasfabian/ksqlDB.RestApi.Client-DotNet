@@ -129,7 +129,7 @@ Monitor Sql Server tables for changes and forward them to the appropriate Kafka 
 ### Nuget
 ```
 Install-Package Kafka.DotNet.SqlServer -Version 0.3.0-rc.1
-Install-Package Kafka.DotNet.ksqlDB -Version 1.10.0-rc.1
+Install-Package Kafka.DotNet.ksqlDB -Version 1.10.0
 ```
 
 [Kafka.DotNet.SqlServer WIKI](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
@@ -2622,6 +2622,7 @@ record Tweets
 }
 ```
 
+```C#
 Expression<Func<Tweets, string[]>> expression = c => K.Functions.Transform(c.Messages, x => x.ToUpper());
 ```
 
@@ -2752,7 +2753,8 @@ Transform a collection by using a lambda function.
 If the collection is a map, two lambda functions must be provided, and both lambdas must have two arguments: a map entry key and a map entry value.
 
 ```C#
-Expression<Func<Lambda, IDictionary<string, int[]>>> expression = c => K.Functions.Transform(c.Dictionary, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v, x => x * x));
+Expression<Func<Lambda, IDictionary<string, int[]>>> expression = 
+    c => K.Functions.Transform(c.Dictionary, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v, x => x * x));
 ```
 
 Equivalent KSQL:
@@ -2765,7 +2767,8 @@ Filter a collection with a lambda function.
 If the collection is a map, the lambda function must have two input arguments.
 
 ```C#
-Expression<Func<Lambda, IDictionary<string, int>>> expression = c => K.Functions.Filter(c.Dictionary2, (k, v) => k != "E.T" && v > 0);
+Expression<Func<Lambda, IDictionary<string, int>>> expression = 
+    c => K.Functions.Filter(c.Dictionary2, (k, v) => k != "E.T" && v > 0);
 ```
 
 Equivalent KSQL:
@@ -2779,7 +2782,8 @@ If the collection is a map, the lambda function must have three input arguments.
 If the state is null, the result is null.
 
 ```C#
-Expression<Func<Lambda, int>> expression = c => K.Functions.Reduce(c.Dictionary2, 2, (s, k, v) => K.Functions.Ceil(s / v));
+Expression<Func<Lambda, int>> expression = 
+    c => K.Functions.Reduce(c.Dictionary2, 2, (s, k, v) => K.Functions.Ceil(s / v));
 ```
 
 Equivalent KSQL:
@@ -2835,6 +2839,84 @@ var grouping =
     Num_Times = g.Count()
   };
 ```
+
+# v2.0.0-rc.1:
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 2.0.0-rc.1
+```
+
+## Breaking change KSqlDBContextOptions
+> ⚠ KSqlDBContextOptions created with a constructor or by KSqlDbContextOptionsBuilder are setting the auto.offset.reset to earliest by default. This version removes this default configuration. It will not be opinionated in this way from now.
+> This will affect your subscriptions to streams.
+
+You can set it back in the following way:
+
+```C#
+var contextOptions = new KSqlDbContextOptionsBuilder()
+  .UseKSqlDb(ksqlDbUrl)
+  .SetAutoOffsetReset(AutoOffsetReset.Earliest)
+  .Options;
+```
+
+### ProcessingGuarantee enum (v2.0.0)
+**ExactlyOnce** - Records are processed once. To achieve a true exactly-once system, end consumers and producers must also implement exactly-once semantics.
+**AtLeastOnce** - Records are never lost but may be redelivered.
+
+For more info check [exactly once semantics](https://docs.ksqldb.io/en/latest/operate-and-deploy/exactly-once-semantics/)
+
+```C#
+public enum ProcessingGuarantee
+{
+  ExactlyOnce,
+  AtLeastOnce
+}
+```
+
+### KSqlDbContextOptionsBuilder SetProcessingGuarantee
+Enable exactly-once or at_least_once semantics
+
+```C#
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context.Options;
+using Kafka.DotNet.ksqlDB.KSql.Query.Options;
+```
+```C#
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+var contextOptions = new KSqlDbContextOptionsBuilder()
+  .UseKSqlDb(ksqlDbUrl)
+  .SetProcessingGuarantee(ProcessingGuarantee.AtLeastOnce)
+  .Options;
+
+await using var context = new KSqlDBContext(contextOptions);
+```
+
+## Basic auth (v2.0.0)
+In ksqldb you can use the [Http-Basic authentication](https://docs.ksqldb.io/en/latest/operate-and-deploy/installation/server-config/security/#configuring-listener-for-http-basic-authenticationauthorization) mechanism:
+```C#
+string ksqlDbUrl = @"http:\\localhost:8088";
+
+string userName = "fred";
+string password = "letmein";
+
+var options = ClassUnderTest.UseKSqlDb(ksqlDbUrl)
+  .SetBasicAuthCredentials(userName, password)
+  .Options;
+
+await using var context = new KSqlDBContext(options);
+```
+
+See also how to [intercept http requests](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/wiki/Interception-of-HTTP-requests-in-kafka.dotnet.ksqldb---Authentication)
+
+```C#
+var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+      
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory)
+  .SetCredentials(new BasicAuthCredentials("fred", "letmein"));
+```
+
+## `IPullable<T>.FirstOrDefaultAsync` (v2.0.0)
+`IPullable<T>.GetAsync` was renamed to `IPullable<T>.FirstOrDefaultAsync`
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
