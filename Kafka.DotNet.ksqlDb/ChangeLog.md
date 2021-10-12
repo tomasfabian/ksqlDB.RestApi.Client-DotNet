@@ -1,5 +1,47 @@
 ﻿# Kafka.DotNet.ksqlDB
 
+# v2.0.0-rc.1
+## ProcessingGuarantee enum
+- KSqlDbContextOptionsBuilder and KSqlDbContextOption SetProcessingGuarantee
+
+- ProcessingGuaranteeExtensions, AutoOffsetResetExtensions
+
+## Basic authentication
+- added IKSqlDbProvider.SetCredentials
+- added IKSqlDbRestApiClient.SetCredentials
+- BasicAuthCredentials
+- KSqlDbContextOptionsBuilder and KSqlDbContextOption SetBasicAuthCredentials
+- BasicAuthHandler, HttpClientFactoryWithBasicAuth
+
+## Breaking changes:
+
+### ISetupParameters changed from
+```
+ISetupParameters SetupQuery(Action<IQueryOptions> configure);
+ISetupParameters SetupQueryStream(Action<IQueryOptions> configure);
+```
+to
+```
+ISetupParameters SetupQuery(Action<IKSqlDbParameters> configure);
+ISetupParameters SetupQueryStream(Action<IKSqlDbParameters> configure);
+```
+
+## IPullable
+```
+public ValueTask<TEntity> GetAsync(CancellationToken cancellationToken = default)
+```
+was renamted to:
+```
+public ValueTask<TEntity> FirstOrDefaultAsync(CancellationToken cancellationToken = default)
+```
+
+## KSqlDBContextOptions
+> ⚠ KSqlDBContextOptions created with a constructor or by KSqlDbContextOptionsBuilder are setting the auto.offset.reset to earliest by default. This version removes this default configuration. It will not be opinionated in this way from now.
+> This will affect your subscriptions to streams.
+
+### Bug fix:
+- deserialization of stream exceptions (KSqlDbQueryProvider and KSqlDbQueryStreamProvider)
+
 # v1.10.0
 ## Invocation (lambda) functions
 - **Transform**, **Reduce** and **Filter** for Maps (dictionaries)
