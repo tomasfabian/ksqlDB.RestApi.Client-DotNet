@@ -30,7 +30,7 @@ ISetupParameters SetupQueryStream(Action<IKSqlDbParameters> configure);
 ```
 public ValueTask<TEntity> GetAsync(CancellationToken cancellationToken = default)
 ```
-was renamted to:
+was renamed to:
 ```
 public ValueTask<TEntity> FirstOrDefaultAsync(CancellationToken cancellationToken = default)
 ```
@@ -48,13 +48,12 @@ public ValueTask<TEntity> FirstOrDefaultAsync(CancellationToken cancellationToke
 - requirements: ksqldb 0.17.0
 
 ## Select and Where destructuring properties
-- first level
 
 ## Scalar functions
 - Instr, IfNull
 
 ## IKSqlGrouping.Source
-- grouping by nested properies (one level)
+- grouping by nested properies
 
 Bug fixes:
 - KSqlDbRestApiClient.CreateTypeAsync - Entity name from generic types fix

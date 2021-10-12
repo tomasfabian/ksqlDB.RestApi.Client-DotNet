@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context.Options;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.ksqlDB.Sample.Models.Sensors;
 using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
 using Kafka.DotNet.ksqlDB.KSql.Query.Windows;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Http;
 
 namespace Kafka.DotNet.ksqlDB.Sample.PullQuery
 {
@@ -19,11 +21,19 @@ namespace Kafka.DotNet.ksqlDB.Sample.PullQuery
 
     public async Task ExecuteAsync()
     {
-      string url = @"http:\\localhost:8088";
-      await using var context = new KSqlDBContext(url);
+      string ksqlDbUrl = @"http:\\localhost:8088";
 
-      var http = new HttpClientFactory(new Uri(url));
-      restApiClient = new KSqlDbRestApiClient(http);
+      var contextOptions = new KSqlDbContextOptionsBuilder()
+        .UseKSqlDb(ksqlDbUrl)
+        .SetBasicAuthCredentials("fred", "letmein")
+        .Options;
+
+      await using var context = new KSqlDBContext(contextOptions);
+
+      var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+      
+      restApiClient = new KSqlDbRestApiClient(httpClientFactory)
+        .SetCredentials(new BasicAuthCredentials("fred", "letmein"));
 
       await CreateOrReplaceStreamAsync();
 
@@ -65,7 +75,7 @@ namespace Kafka.DotNet.ksqlDB.Sample.PullQuery
     private static async Task GetAsync(IPullable<IoTSensorStats> pullQuery)
     {
       var result = await pullQuery
-        .GetAsync();
+        .FirstOrDefaultAsync();
 
       Console.WriteLine(
         $"Pull query GetAsync result => Id: {result?.SensorId} - Avg Value: {result?.AvgValue} - Window Start {result?.WindowStart}");

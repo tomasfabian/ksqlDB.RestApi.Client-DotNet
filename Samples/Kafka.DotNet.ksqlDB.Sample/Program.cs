@@ -13,12 +13,14 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafka.DotNet.ksqlDB.KSql.Config;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context.Options;
 using Kafka.DotNet.ksqlDB.KSql.Query.Operators;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Http;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Query.Descriptors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Topics;
@@ -38,15 +40,21 @@ namespace Kafka.DotNet.ksqlDB.Sample
     {
       var contextOptions = new KSqlDbContextOptionsBuilder()
         .UseKSqlDb(ksqlDbUrl)
+        .SetBasicAuthCredentials("fred", "letmein")
+        //.SetAutoOffsetReset(AutoOffsetReset.Earliest) // global setting
+        .SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce) // global setting
         .SetupQueryStream(options =>
         {
+          //SetupQueryStream affects only IKSqlDBContext.CreateQueryStream<T>
+          options.AutoOffsetReset = AutoOffsetReset.Earliest;
         })
         .SetupQuery(options =>
         {
-          options.Properties[QueryParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Latest.ToString().ToLower(); // "latest"
+          //SetupQuery affects only IKSqlDBContext.CreateQuery<T>
+          options.Properties[KSqlDbConfigs.ProcessingGuarantee] = ProcessingGuarantee.ExactlyOnce.ToKSqlValue();
         })
         .Options;
-
+      
       return contextOptions;
     }
 
@@ -56,6 +64,8 @@ namespace Kafka.DotNet.ksqlDB.Sample
 
       var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
       var restApiProvider = new KSqlDbRestApiProvider(httpClientFactory);
+      restApiProvider.SetCredentials(new BasicAuthCredentials("fred", "letmein"));
+      
       var moviesProvider = new MoviesProvider(restApiProvider);
 
       await moviesProvider.CreateTablesAsync();
@@ -102,11 +112,11 @@ namespace Kafka.DotNet.ksqlDB.Sample
         Console.WriteLine();
         Console.WriteLine(e.Message);
       }
-      
+
       string explain = await query.ExplainAsStringAsync();
       ExplainResponse[] explainResponses = await query.ExplainAsync();
       Console.WriteLine($"{Environment.NewLine} Explain => ExecutionPlan:");
-      Console.WriteLine(explainResponses[0].QueryDescription.ExecutionPlan);
+      Console.WriteLine(explainResponses[0].QueryDescription?.ExecutionPlan);
 
       Console.WriteLine("Press any key to stop the subscription");
 
@@ -395,6 +405,17 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
           Console.WriteLine($"{sum}");
           Console.WriteLine();
         }, error => { Console.WriteLine($"Exception: {error.Message}"); }, () => Console.WriteLine("Completed"));
+
+      var groupBySubscription = context.CreateQueryStream<IoTSensorChange>("sqlserversensors")
+        .GroupBy(c => new { c.Op, c.After.Value })
+        .Select(g => new { g.Source.Op, g.Source.After.Value, num_times = g.Count() })
+        .Subscribe(c =>
+        {
+          Console.WriteLine($"{c}");
+        }, error =>
+        {
+
+        }, () => { });
     }
 
     private static IDisposable NotNull(KSqlDBContext context)

@@ -2792,7 +2792,7 @@ REDUCE(DictionaryInValues, 2, (s, k, v) => CEIL(s / v))
 ```
 
 ### IKSqlGrouping.Source (v1.10.0)
-- grouping by nested properies (one level). Can be used in the following way:
+- grouping by nested properies. Can be used in the following way:
 
 ```C#
 var source = Context.CreateQueryStream<City>()
