@@ -213,6 +213,29 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
       ksql.Should().BeEquivalentTo(@$"SELECT {nameof(OrderData.OrderType)} IN (1, 3) Contains FROM {nameof(OrderData)} EMIT CHANGES;");
     }
 
+    [TestMethod]
+    [Ignore("TODO:captured var")]
+    public void Transform_CapturedNestedPropertyAccessor()
+    {
+      //Arrange
+      var value = new Dictionary<string, IDictionary<string, int>>()
+      {
+        { "a", new Dictionary<string, int>() { { "a", 1 } } }
+      };
+
+      var query = CreateStreamSource().Select(_ => new
+      {
+        Dict = K.Functions.Transform(value, (k, v) => k.ToUpper(), (k, v) => v["a"] + 1)
+      });
+      
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      ksql.Should().Be($@"SELECT TRANSFORM(MAP('a' := MAP('a' := 1, 'b' := 2), 'b' := MAP('a' := 3, 'd' := 4)), (k, v) => UCASE(k), (k, v) => v['a'] + 1) as Dict
+FROM {streamName} EMIT CHANGES;");
+    }
+
     #endregion
 
     #region Where
@@ -905,6 +928,12 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
     record Entity
     {
       public string SensorId { get; set; }
+      public Model Model { get; set; }
+    }
+
+    record Model
+    {
+      public string Version { get; set; }
     }
     
     private IQbservable<DatabaseChangeObject<Entity>> CreateDatabaseChangeObjectStreamSource()
@@ -927,6 +956,23 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
       //Assert
       string expectedKsql =
         @$"SELECT {nameof(DatabaseChangeObject<object>.After)}->{nameof(Entity.SensorId)} FROM {nameof(DatabaseChangeObject<object>)}s EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void SelectDeeplyNestedProperty_BuildKSql_PrintsElementAccessor()
+    {
+      //Arrange
+      var query = CreateDatabaseChangeObjectStreamSource()
+        .Select(c => c.After.Model.Version);
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @$"SELECT {nameof(DatabaseChangeObject<object>.After)}->{nameof(Entity.Model)}->{nameof(Model.Version)} FROM {nameof(DatabaseChangeObject<object>)}s EMIT CHANGES;";
 
       ksql.Should().BeEquivalentTo(expectedKsql);
     }

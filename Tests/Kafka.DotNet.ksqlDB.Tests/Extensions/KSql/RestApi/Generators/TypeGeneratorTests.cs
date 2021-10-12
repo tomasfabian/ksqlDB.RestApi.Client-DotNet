@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FluentAssertions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Generators;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
@@ -44,6 +45,18 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Generators
       statement.Should().Be(@$"CREATE TYPE {nameof(Thumbnail).ToUpper()} AS STRUCT<Image BYTES>;");
     }
 
+    [Test]
+    public void CreateType_MapType()
+    {      
+      //Arrange
+
+      //Act
+      string statement = new TypeGenerator().Print<Container>();
+
+      //Assert
+      statement.Should().Be(@$"CREATE TYPE {nameof(Container).ToUpper()} AS STRUCT<Values2 MAP<VARCHAR, INT>>;");
+    }
+
     public record Address
     {
       public int Number { get; set; }
@@ -60,6 +73,11 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Generators
     public struct Thumbnail
     {
       public byte[] Image { get; set; }
+    }
+
+    record Container
+    {
+      public IDictionary<string, int> Values2 { get; set; }
     }
 
     #region GenericType

@@ -380,6 +380,13 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query
     record IoTSensor
     {
       public string SensorId { get; set; }
+      public Model Model { get; set; }
+    }
+
+    record Model
+    {
+      public string Version { get; set; }
+      public string[] Capabilities { get; set; }
     }
 
     [TestMethod]
@@ -393,6 +400,32 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query
 
       //Assert
       query.Should().BeEquivalentTo("After->SensorId = 'sensor-42'");
+    }
+
+    [TestMethod]
+    public void PredicateDeeplyNestedProperty_BuildKSql_PrintsDestructuredField()
+    {
+      //Arrange
+      Expression<Func<DatabaseChangeObject<IoTSensor>, bool>> predicate = l => l.After.Model.Version == "v-42";
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(predicate);
+
+      //Assert
+      query.Should().BeEquivalentTo("After->Model->Version = 'v-42'");
+    }
+
+    [TestMethod]
+    public void PredicateDeeplyNestedArrayProperty_BuildKSql_PrintsAllFields()
+    {
+      //Arrange
+      Expression<Func<DatabaseChangeObject<IoTSensor>, bool>> predicate = l => l.After.Model.Capabilities.Length > 0;
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(predicate);
+
+      //Assert
+      query.Should().BeEquivalentTo("ARRAY_LENGTH(After->Model->Capabilities) > 0");
     }
 
     #endregion

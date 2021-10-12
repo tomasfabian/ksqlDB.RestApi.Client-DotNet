@@ -5,6 +5,7 @@ using System.Text;
 using FluentAssertions;
 using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
 using Kafka.DotNet.ksqlDB.KSql.Query.Visitors;
+using Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 
@@ -33,6 +34,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Functions
       public int[] Values { get; set; }
       public IDictionary<string, int[]> Dictionary { get; set; }
       public IDictionary<string, int> Dictionary2 { get; set; }
+      public IDictionary<string, QbservableGroupByExtensionsTests.City> Dictionary3 { get; set; }
     }
 
     #region Array
@@ -75,12 +77,52 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Functions
       //Assert
       ksql.Should().Be($"TRANSFORM({nameof(Tweets.Messages)}, (y) => CONCAT(y, '_new'))");
     }
-    
+
+    [TestMethod]
+    public void Transform_Function_NestedPropertyAccessor()
+    {
+      //Arrange
+      Expression<Func<Tweets, IDictionary<string ,string>>> expression = c => K.Functions.Transform(c.Dictionary3, (k, v) => k, (k, v) => v.State.Name);
+      
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      ksql.Should().Be($"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => k, (k, v) => v->State->Name)");
+    }
+
+    [TestMethod]
+    public void Transform_Function_NestedPropertyAccessorAndLength()
+    {
+      //Arrange
+      Expression<Func<Tweets, IDictionary<string, int>>> expression = c => K.Functions.Transform(c.Dictionary3, (k, v) => k, (k, v) => v.State.Name.Length);
+      
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      ksql.Should().Be($"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => k, (k, v) => LEN(v->State->Name))");
+    }
+
     [TestMethod]
     public void Transform_AnonymousType()
     {
       //Arrange
       Expression<Func<Tweets, object>> expression = c => new { Col = K.Functions.Transform(c.Values, x => x + 1)};
+      
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      ksql.Should().Be($"TRANSFORM({nameof(Tweets.Values)}, (x) => x + 1) Col");
+    }
+    
+    [TestMethod]
+    public void Transform_CapturedVariable_AnonymousType()
+    {
+      //Arrange
+      int value = 1;
+      Expression<Func<Tweets, object>> expression = c => new { Col = K.Functions.Transform(c.Values, x => x + value)};
       
       //Act
       var ksql = ClassUnderTest.BuildKSql(expression);
@@ -130,6 +172,36 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Functions
 
       //Assert
       ksql.Should().Be($"TRANSFORM({nameof(Tweets.Dictionary)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v, (x) => x * x))");
+    }
+
+    [TestMethod]
+    public void TransformMap_NestedTransformWithPropertyAccessor()
+    {
+      //Arrange
+      Expression<Func<Tweets, IDictionary<string, int[]>>> expression = c => K.Functions.Transform(c.Dictionary3, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v.Values, x => x * x));
+      
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      ksql.Should().Be($"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->Values, (x) => x * x))");
+    }
+
+    [TestMethod]
+    public void TransformMapTwice()
+    {
+      //Arrange
+      Expression<Func<Tweets, object>> expression = 
+        c => new { A = K.Functions.Transform(c.Dictionary3, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v.Values, x => x * x)), B = K.Functions.Transform(c.Dictionary3, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v.Values, x => x * x))};
+      
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      string expected =
+        $"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->Values, (x) => x * x))";
+
+      ksql.Should().Be($"{expected} A, {expected} B");
     }
 
     [TestMethod]
