@@ -2792,7 +2792,7 @@ REDUCE(DictionaryInValues, 2, (s, k, v) => CEIL(s / v))
 ```
 
 ### IKSqlGrouping.Source (v1.10.0)
-- grouping by nested properies (one level). Can be used in the following way:
+- grouping by nested properies. Can be used in the following way:
 
 ```C#
 var source = Context.CreateQueryStream<City>()
@@ -2839,6 +2839,84 @@ var grouping =
     Num_Times = g.Count()
   };
 ```
+
+# v2.0.0-rc.1:
+```
+Install-Package Kafka.DotNet.ksqlDB -Version 2.0.0-rc.1
+```
+
+## Breaking change KSqlDBContextOptions
+> ⚠ KSqlDBContextOptions created with a constructor or by KSqlDbContextOptionsBuilder are setting the auto.offset.reset to earliest by default. This version removes this default configuration. It will not be opinionated in this way from now.
+> This will affect your subscriptions to streams.
+
+You can set it back in the following way:
+
+```C#
+var contextOptions = new KSqlDbContextOptionsBuilder()
+  .UseKSqlDb(ksqlDbUrl)
+  .SetAutoOffsetReset(AutoOffsetReset.Earliest)
+  .Options;
+```
+
+### ProcessingGuarantee enum (v2.0.0)
+**ExactlyOnce** - Records are processed once. To achieve a true exactly-once system, end consumers and producers must also implement exactly-once semantics.
+**AtLeastOnce** - Records are never lost but may be redelivered.
+
+For more info check [exactly once semantics](https://docs.ksqldb.io/en/latest/operate-and-deploy/exactly-once-semantics/)
+
+```C#
+public enum ProcessingGuarantee
+{
+  ExactlyOnce,
+  AtLeastOnce
+}
+```
+
+### KSqlDbContextOptionsBuilder SetProcessingGuarantee
+Enable exactly-once or at_least_once semantics
+
+```C#
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context.Options;
+using Kafka.DotNet.ksqlDB.KSql.Query.Options;
+```
+```C#
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+var contextOptions = new KSqlDbContextOptionsBuilder()
+  .UseKSqlDb(ksqlDbUrl)
+  .SetProcessingGuarantee(ProcessingGuarantee.AtLeastOnce)
+  .Options;
+
+await using var context = new KSqlDBContext(contextOptions);
+```
+
+## Basic auth (v2.0.0)
+In ksqldb you can use the [Http-Basic authentication](https://docs.ksqldb.io/en/latest/operate-and-deploy/installation/server-config/security/#configuring-listener-for-http-basic-authenticationauthorization) mechanism:
+```C#
+string ksqlDbUrl = @"http:\\localhost:8088";
+
+string userName = "fred";
+string password = "letmein";
+
+var options = ClassUnderTest.UseKSqlDb(ksqlDbUrl)
+  .SetBasicAuthCredentials(userName, password)
+  .Options;
+
+await using var context = new KSqlDBContext(options);
+```
+
+See also how to [intercept http requests](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/wiki/Interception-of-HTTP-requests-in-kafka.dotnet.ksqldb---Authentication)
+
+```C#
+var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+      
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory)
+  .SetCredentials(new BasicAuthCredentials("fred", "letmein"));
+```
+
+## `IPullable<T>.FirstOrDefaultAsync` (v2.0.0)
+`IPullable<T>.GetAsync` was renamed to `IPullable<T>.FirstOrDefaultAsync`
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
