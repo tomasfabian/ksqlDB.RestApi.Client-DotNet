@@ -244,6 +244,21 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Linq
     }
 
     [TestMethod]
+    public void GroupByDeeplyNestedProperty_BuildKSql_PrintsQuery()
+    {
+      //Arrange
+      var grouping = CreateQbservable()
+        .GroupBy(c => c.State.Nested.Version)
+        .Select(g => new { g.Source.State.Nested.Version, num_times = g.Count()});
+
+      //Act
+      var ksql = grouping.ToQueryString();
+
+      //Assert
+      ksql.Should().BeEquivalentTo("SELECT State->Nested->Version, COUNT(*) num_times FROM Cities GROUP BY State->Nested->Version EMIT CHANGES;");
+    }
+
+    [TestMethod]
     public void GroupByNestedPropertyWithSameAlias_BuildKSql_PrintsQuery()
     {
       //Arrange
@@ -469,11 +484,18 @@ WHERE RegionCode != 'xx' GROUP BY RegionCode EMIT CHANGES;");
       public string RegionCode { get; set; }
       public long Citizens { get; set; }
       public State State { get; set; }
+      public int[] Values { get; set; }
     }
 
     public record State
     {
       public string Name { get; set; }
+      public Nested Nested { get; set; }
+    }
+
+    public record Nested
+    {
+      public string Version { get; set; }
     }
   }
 
