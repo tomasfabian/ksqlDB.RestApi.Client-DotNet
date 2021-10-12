@@ -650,7 +650,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       return memberExpression;
     }
 
-    private void Destructure(MemberExpression memberExpression)
+    protected void Destructure(MemberExpression memberExpression)
     {
       Visit(memberExpression.Expression);
       Append("->");

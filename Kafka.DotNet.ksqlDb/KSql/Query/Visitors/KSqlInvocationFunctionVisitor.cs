@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Text;
 using Kafka.DotNet.ksqlDB.Infrastructure.Extensions;
@@ -18,6 +17,8 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
       this.stringBuilder = stringBuilder ?? throw new ArgumentNullException(nameof(stringBuilder));
     }
 
+    private static bool isNestedInvocationFunction;
+
     protected override Expression VisitMethodCall(MethodCallExpression methodCallExpression)
     {
       var methodInfo = methodCallExpression.Method;
@@ -33,7 +34,12 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
 
             Append($"{methodInfo.Name.ToKSqlFunctionName()}(");
             
-            VisitArgument(methodCallExpression.Arguments[1]);
+            if(isNestedInvocationFunction)
+              VisitArgument(methodCallExpression.Arguments[1]);
+            else
+              base.Visit(methodCallExpression.Arguments[1]);
+
+            isNestedInvocationFunction = true;
 
             Append(", ");
             
@@ -53,6 +59,8 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Visitors
         }
       }
       else base.VisitMethodCall(methodCallExpression);
+      
+      isNestedInvocationFunction = false;
 
       return methodCallExpression;
     }
