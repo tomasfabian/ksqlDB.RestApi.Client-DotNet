@@ -2872,7 +2872,7 @@ public enum ProcessingGuarantee
 }
 ```
 
-### KSqlDbContextOptionsBuilder SetProcessingGuarantee
+### KSqlDbContextOptionsBuilder SetProcessingGuarantee (v2.0.0)
 Enable exactly-once or at_least_once semantics
 
 ```C#
@@ -2917,6 +2917,29 @@ var restApiClient = new KSqlDbRestApiClient(httpClientFactory)
 
 ## `IPullable<T>.FirstOrDefaultAsync` (v2.0.0)
 `IPullable<T>.GetAsync` was renamed to `IPullable<T>.FirstOrDefaultAsync`
+
+## KSqlDbRestApiClient.InsertIntoAsync
+- added support for deeply nested types - Maps, Structs and Arrays
+
+```C#
+var value = new ArrayOfMaps
+{
+  Arr = new[]
+        {
+          new Dictionary<string, int> { { "a", 1 }, { "b", 2 } },
+          new Dictionary<string, int> { { "c", 3 }, { "d", 4 } }
+        }
+};
+
+httpResponseMessage = await restApiClient.InsertIntoAsync(value);
+```
+
+```C#
+record ArrayOfMaps
+{
+  public Dictionary<string, int>[] Arr { get; set; }
+}
+```
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
