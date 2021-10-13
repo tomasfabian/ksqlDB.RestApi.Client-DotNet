@@ -2,11 +2,9 @@
 using System.Collections;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using Kafka.DotNet.ksqlDB.Infrastructure.Extensions;
-using Kafka.DotNet.ksqlDB.KSql.Query.Visitors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
 
 namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
@@ -54,7 +52,19 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
     private object? ExtractValue<T>(T inputValue, InsertProperties insertProperties, MemberInfo memberInfo, Type type)
     {
       Type valueType = inputValue.GetType();
-      var value = valueType.IsPrimitive || valueType == typeof(string) ? inputValue : valueType.GetProperty(memberInfo.Name)?.GetValue(inputValue);
+
+
+      bool useValue = valueType.IsPrimitive || valueType == typeof(string)  || valueType.IsStruct() || typeof(IEnumerable).IsAssignableFrom(valueType);
+
+      if (memberInfo?.MemberType == MemberTypes.Property)
+      {
+        foreach (MethodInfo am in ((PropertyInfo)memberInfo).GetAccessors())
+        {
+          useValue = false;
+        }
+      }
+
+      var value = useValue ? inputValue : valueType.GetProperty(memberInfo.Name)?.GetValue(inputValue);
 
       if (value == null)
         return "NULL";
@@ -74,7 +84,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
       else if (type == typeof(string))
         value = $"'{value}'";
       else if (type.IsPrimitive)
-        ;
+        value = value.ToString();
+      else if (type.IsDictionary())
+        GenerateSMap(insertProperties, type, ref value);
       else if (type.IsArray)
       {
         var source = ((IEnumerable)value).Cast<object>();
@@ -93,12 +105,48 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
       return value;
     }
 
-    private void GenerateStruct<T>(InsertProperties insertProperties, Type type, ref object value)
+    private void GenerateSMap(InsertProperties insertProperties, Type type, ref object value)
     {
+      if (value is not IDictionary dict)
+        return;
+      
+      var sb = new StringBuilder();
+
+      sb.Append("MAP(");
+
       bool isFirst = true;
 
+      foreach (DictionaryEntry dictionaryEntry in dict)
+      {
+        if (isFirst)
+          isFirst = false;
+        else
+          sb.Append(", ");
+
+        var key = ExtractValue(dictionaryEntry.Key, insertProperties, type, dictionaryEntry.Key.GetType());
+
+        sb.Append(key);
+
+        sb.Append(" := ");
+
+        var dictValue = ExtractValue(dictionaryEntry.Value, insertProperties, type, dictionaryEntry.Value.GetType());
+
+        sb.Append(dictValue);
+      }
+
+      sb.Append(")");
+
+      value = sb.ToString();
+    }
+
+    private void GenerateStruct<T>(InsertProperties insertProperties, Type type, ref object value)
+    {
       var sb = new StringBuilder();
+
       sb.Append("STRUCT(");
+
+      bool isFirst = true;
+
       foreach (var memberInfo2 in Members(type))
       {
         if (isFirst)
