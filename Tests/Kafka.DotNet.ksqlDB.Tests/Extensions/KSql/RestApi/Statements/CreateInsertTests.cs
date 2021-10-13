@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using FluentAssertions;
 using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
+using Kafka.DotNet.ksqlDB.Tests.Models;
 using Kafka.DotNet.ksqlDB.Tests.Models.Movies;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 
 namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
@@ -17,7 +20,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
     public void Generate()
     {
       //Arrange
-      var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title"};
+      var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title" };
 
       //Act
       string statement = new CreateInsert().Generate(movie, null);
@@ -30,7 +33,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
     public void Generate_OverrideEntityName()
     {
       //Arrange
-      var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title"};
+      var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title" };
       var insertProperties = new InsertProperties
       {
         EntityName = "TestName"
@@ -47,7 +50,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
     public void Generate_OverrideEntityName_ShouldNotPluralize()
     {
       //Arrange
-      var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title"};
+      var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title" };
       var insertProperties = new InsertProperties
       {
         EntityName = "TestName",
@@ -65,7 +68,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
     public void Generate_ShouldNotPluralizeEntityName()
     {
       //Arrange
-      var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title"};
+      var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title" };
       var insertProperties = new InsertProperties
       {
         ShouldPluralizeEntityName = false
@@ -108,7 +111,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       //Assert
       statement.Should().Be(@"INSERT INTO Events (Id, Places) VALUES (1, ARRAY['Place1','Place2','Place3']);");
     }
-    
+
     record EventWithPrimitiveEnumerable
     {
       [Key]
@@ -128,12 +131,12 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       };
 
       //Act
-      string statement = new CreateInsert().Generate(testEvent, new InsertProperties { EntityName = "Events"});
+      string statement = new CreateInsert().Generate(testEvent, new InsertProperties { EntityName = "Events" });
 
       //Assert
       statement.Should().Be(@"INSERT INTO Events (Id, Places) VALUES ('1', ARRAY[1,2,3]);");
     }
-    
+
     record EventWithList
     {
       [Key]
@@ -153,7 +156,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       };
 
       //Act
-      string statement = new CreateInsert().Generate(testEvent, new InsertProperties { EntityName = "Events"});
+      string statement = new CreateInsert().Generate(testEvent, new InsertProperties { EntityName = "Events" });
 
       //Assert
       statement.Should().Be(@"INSERT INTO Events (Id, Places) VALUES ('1', ARRAY[1,2,3]);");
@@ -190,7 +193,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       };
 
       //Act
-      string statement = new CreateInsert().Generate(testEvent, new InsertProperties { EntityName = "Events"});
+      string statement = new CreateInsert().Generate(testEvent, new InsertProperties { EntityName = "Events" });
 
       //Assert
       statement.Should().Be(@"INSERT INTO Events (Id, Category) VALUES (1, STRUCT(Count := 1, Name := 'Planet Earth'));");
@@ -207,11 +210,252 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       };
 
       //Act
-      string statement = new CreateInsert().Generate(testEvent, new InsertProperties { EntityName = "Events"});
+      string statement = new CreateInsert().Generate(testEvent, new InsertProperties { EntityName = "Events" });
 
       //Assert
       statement.Should().Be(@"INSERT INTO Events (Id, Category) VALUES (1, NULL);");
     }
+
+    record Kafka_table_order
+    {
+      public int Id { get; set; }
+      public IEnumerable<double> Items { get; set; }
+    }
+
+    [Test]
+    public void Enumerable()
+    {
+      //Arrange
+      var order = new Kafka_table_order { Id = 1, Items = System.Linq.Enumerable.Range(1, 3).Select(c => (double)c) };
+
+      //Act
+      string statement = new CreateInsert().Generate(order, null);
+
+      //Assert
+      statement.Should().Be(@"INSERT INTO Kafka_table_orders (Id, Items) VALUES (1, ARRAY[1,2,3]);");
+    }
+
+    [Test]
+    public void FromList()
+    {
+      //Arrange
+      var order = new Kafka_table_order { Id = 1, Items = new List<double> { 1.1, 2 } };
+
+      var insertProperties = new InsertProperties
+      {
+        FormatDoubleValue = value => value.ToString(CultureInfo.InvariantCulture)
+      };
+      //Act
+      string statement = new CreateInsert().Generate(order, insertProperties);
+
+      //Assert
+      statement.Should().Be($"INSERT INTO Kafka_table_orders ({nameof(Kafka_table_order.Id)}, {nameof(Kafka_table_order.Items)}) VALUES (1, ARRAY[1.1,2]);");
+    }
+
+
+    record Kafka_table_order2
+    {
+      public int Id { get; set; }
+      public List<double> ItemsList { get; set; }
+    }
+
+    [Test]
+    public void List()
+    {
+      //Arrange
+      var order = new Kafka_table_order2 { Id = 1, ItemsList = new List<double> { 1.1, 2 } };
+
+      var config = new InsertProperties
+      {
+        ShouldPluralizeEntityName = false,
+        FormatDoubleValue = value => value.ToString(CultureInfo.InvariantCulture),
+        EntityName = "`my_order`"
+      };
+
+      //Act
+      string statement = new CreateInsert().Generate(order, config);
+
+      //Assert
+      statement.Should().Be(@"INSERT INTO `my_order` (Id, ItemsList) VALUES (1, ARRAY[1.1,2]);");
+    }
+
+    [Test]
+    public void FromEmptyList()
+    {
+      //Arrange
+      var order = new Kafka_table_order2 { Id = 1, ItemsList = new List<double>() };
+
+      //Act
+      string statement = new CreateInsert().Generate(order);
+
+      //Assert
+      statement.Should().Be(@"INSERT INTO Kafka_table_order2s (Id, ItemsList) VALUES (1, ARRAY_REMOVE(ARRAY[0], 0));"); //ARRAY[] is not supported
+    }
+
+    [Test]
+    public void FromNullList()
+    {
+      //Arrange
+      var order = new Kafka_table_order2 { Id = 1, ItemsList = null };
+
+      //Act
+      string statement = new CreateInsert().Generate(order);
+
+      //Assert
+      statement.Should().Be(@"INSERT INTO Kafka_table_order2s (Id, ItemsList) VALUES (1, NULL);");
+    }
+
+    record Kafka_table_order3
+    {
+      public int Id { get; set; }
+      public IList<int> ItemsList { get; set; }
+    }
+
+    [Test]
+    public void ListInterface()
+    {
+      //Arrange
+      var order = new Kafka_table_order3 { Id = 1, ItemsList = new List<int> { 1, 2 } };
+
+      //Act
+      string statement = new CreateInsert().Generate(order, new InsertProperties { ShouldPluralizeEntityName = false, EntityName = nameof(Kafka_table_order) });
+
+      //Assert
+      statement.Should().Be(@"INSERT INTO Kafka_table_order (Id, ItemsList) VALUES (1, ARRAY[1,2]);");
+    }
+
+    record FooNestedArrayInMap
+    {
+      public Dictionary<string, int[]> Map { get; set; }
+    }
+
+    [Test]
+    public void NestedArrayInMap()
+    {
+      //Arrange
+      var order = new FooNestedArrayInMap
+      {
+        Map = new Dictionary<string, int[]>
+                          {
+                            { "a", new[] { 1, 2 } },
+                            { "b", new[] { 3, 4 } },
+                          }
+
+      };
+
+      //Act
+      string statement = new CreateInsert().Generate(order);
+
+      //Assert
+      statement.Should().Be("INSERT INTO FooNestedArrayInMaps (Map) VALUES (MAP('a' := ARRAY[1,2], 'b' := ARRAY[3,4]));");
+    }
+
+    record FooNestedMapInMap
+    {
+      public Dictionary<string, Dictionary<string, int>> Map { get; set; }
+    }
+
+    [Test]
+    public void NestedMapInMap()
+    {
+      //Arrange
+      var value = new FooNestedMapInMap
+      {
+        Map = new Dictionary<string, Dictionary<string, int>>
+              {
+                { "a", new Dictionary<string, int> { { "a", 1 }, { "b", 2 } } },
+                { "b", new Dictionary<string, int> { { "c", 3 }, { "d", 4 } } },
+              }
+
+      };
+
+      //Act
+      string statement = new CreateInsert().Generate(value);
+
+      //Assert
+      statement.Should().Be("INSERT INTO FooNestedMapInMaps (Map) VALUES (MAP('a' := MAP('a' := 1, 'b' := 2), 'b' := MAP('c' := 3, 'd' := 4)));");
+    }
+
+    private struct LocationStruct
+    {
+      public string X { get; set; }
+      public double Y { get; set; }
+      //public string[] Arr { get; set; }
+      //public Dictionary<string, double> Map { get; set; }
+    }
+
+    record FooStruct
+    {
+      public string Property { get; set; }
+      public FooNestedStruct Str { get; set; }
+    }
+
+    record FooNestedStruct
+    {
+      public int NestedProperty { get; set; }
+      public LocationStruct Nested { get; set; }
+    }
+
+    [Test]
+    public void NestedStruct()
+    {
+      //Arrange
+      var value = new FooStruct
+                  {
+                    Property = "ET",
+                    Str = new FooNestedStruct
+                    {
+                            NestedProperty = 2,
+                            Nested = new LocationStruct
+                            {
+                              X = "test",
+                              Y = 1,
+                            }
+                          }
+      };
+
+      //Act
+      string statement = new CreateInsert().Generate(value);
+
+      //Assert
+      statement.Should().Be("INSERT INTO FooStructs (Property, Str) VALUES ('ET', STRUCT(NestedProperty := 2, Nested := STRUCT(X := 'test', Y := 1)));");
+    }
+
+    record FooNestedStructInMap
+    {
+      public Dictionary<string, LocationStruct> Str { get; set; }
+    }
+
+    [Test]
+    public void NestedStructInMap()
+    {
+      //Arrange
+      var value = new FooNestedStructInMap
+      {
+        Str = new Dictionary<string, LocationStruct>
+                          {
+                            { "a", new LocationStruct
+                                   {
+                                     X = "go",
+                                     Y = 2,
+                                   } },
+                            { "b", new LocationStruct
+                                   {
+                                     X = "test",
+                                     Y = 1,
+                                   }
+                            }
+                          }
+      };
+
+      //Act
+      string statement = new CreateInsert().Generate(value);
+
+      //Assert
+      statement.Should().Be("INSERT INTO FooNestedStructInMaps (Str) VALUES (MAP('a' := STRUCT(X := 'go', Y := 2), 'b' := STRUCT(X := 'test', Y := 1)));");
+    }
+
+    #region TODO insert with functions
 
     struct MovieBytes
     {
@@ -220,7 +464,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
     }
 
     [Test]
-    [Ignore("TODO")]
+    [NUnit.Framework.Ignore("TODO")]
     public void Bytes()
     {
       //Arrange
@@ -230,7 +474,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       };
 
       //Act
-      string statement = new CreateInsert().Generate(movie, new InsertProperties { EntityName = "Movies"});
+      string statement = new CreateInsert().Generate(movie, new InsertProperties { EntityName = "Movies" });
 
       //Assert
       statement.Should().Be(@"INSERT INTO Movies (Title) VALUES (TO_BYTES('Alien', 'utf8'));");
@@ -246,7 +490,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
     }
 
     [Test]
-    [Ignore("TODO")]
+    [NUnit.Framework.Ignore("TODO")]
     public void Concat()
     {
       //Arrange
@@ -256,113 +500,12 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       };
 
       //Act
-      string statement = new CreateInsert().Generate(movie, new InsertProperties { EntityName = "Movies"});
+      string statement = new CreateInsert().Generate(movie, new InsertProperties { EntityName = "Movies" });
 
       //Assert
       statement.Should().Be(@"INSERT INTO Movies (Title) VALUES (CONCAT('Alien', '_new'));");
     }
 
-    record Kafka_table_order
-    {
-      public int Id { get; set; }
-      public IEnumerable<double> Items { get; set; }
-    }
-
-    [Test]
-    public void Enumerable()
-    {
-      //Arrange
-      var order = new Kafka_table_order { Id = 1, Items = System.Linq.Enumerable.Range(1, 3).Select(c => (double)c)};
-
-      //Act
-      string statement = new CreateInsert().Generate(order, null);
-
-      //Assert
-      statement.Should().Be(@"INSERT INTO Kafka_table_orders (Id, Items) VALUES (1, ARRAY[1,2,3]);");
-    }
-
-    [Test]
-    public void FromList()
-    {
-      //Arrange
-      var order = new Kafka_table_order { Id = 1, Items = new List<double> { 1.1, 2 }};
-
-      //Act
-      string statement = new CreateInsert().Generate(order);
-
-      //Assert
-      statement.Should().Be(@$"INSERT INTO Kafka_table_orders ({nameof(Kafka_table_order.Id)}, {nameof(Kafka_table_order.Items)}) VALUES (1, ARRAY[1.1,2]);");
-    }
-    
-
-    record Kafka_table_order2
-    {
-      public int Id { get; set; }
-      public List<double> ItemsList { get; set; }
-    }
-
-    [Test]
-    public void List()
-    {
-      //Arrange
-      var order = new Kafka_table_order2 { Id = 1, ItemsList = new List<double> { 1.1, 2 }};
-      
-      var config = new InsertProperties
-      {
-        ShouldPluralizeEntityName = false, 
-        EntityName = "`my_order`"
-      };
-      
-      //Act
-      string statement = new CreateInsert().Generate(order, config);
-
-      //Assert
-      statement.Should().Be(@"INSERT INTO `my_order` (Id, ItemsList) VALUES (1, ARRAY[1.1,2]);");
-    }
-
-    [Test]
-    public void FromEmptyList()
-    {
-      //Arrange
-      var order = new Kafka_table_order2 { Id = 1, ItemsList = new List<double>()};
-
-      //Act
-      string statement = new CreateInsert().Generate(order);
-
-      //Assert
-      statement.Should().Be(@"INSERT INTO Kafka_table_order2s (Id, ItemsList) VALUES (1, ARRAY_REMOVE(ARRAY[0], 0));"); //ARRAY[] is not supported
-    }
-
-    [Test]
-    public void FromNullList()
-    {
-      //Arrange
-      var order = new Kafka_table_order2 { Id = 1, ItemsList = null};
-
-      //Act
-      string statement = new CreateInsert().Generate(order);
-
-      //Assert
-      statement.Should().Be(@"INSERT INTO Kafka_table_order2s (Id, ItemsList) VALUES (1, NULL);");
-    }
-    
-    record Kafka_table_order3
-    {
-      public int Id { get; set; }
-      public IList<int> ItemsList { get; set; }
-    }
-
-    [Test]
-    public void ListInterface()
-    {
-      //Arrange
-      var order = new Kafka_table_order3 { Id = 1, ItemsList = new List<int> { 1, 2 }};
-
-      //Act
-      string statement = new CreateInsert().Generate(order, new InsertProperties { ShouldPluralizeEntityName = false, EntityName = nameof(Kafka_table_order)});
-
-      //Assert
-      statement.Should().Be(@"INSERT INTO Kafka_table_order (Id, ItemsList) VALUES (1, ARRAY[1,2]);");
-    }
+    #endregion
   }
 }
