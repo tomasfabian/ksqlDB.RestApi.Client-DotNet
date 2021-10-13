@@ -7,9 +7,7 @@ using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
-using Kafka.DotNet.ksqlDB.Tests.Models;
 using Kafka.DotNet.ksqlDB.Tests.Models.Movies;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 
 namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
@@ -453,6 +451,87 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
 
       //Assert
       statement.Should().Be("INSERT INTO FooNestedStructInMaps (Str) VALUES (MAP('a' := STRUCT(X := 'go', Y := 2), 'b' := STRUCT(X := 'test', Y := 1)));");
+    }
+
+    record FooNestedMapInArray
+    {
+      public Dictionary<string, int>[] Arr { get; set; }
+    }
+
+    [Test]
+    public void NestedMapInArray()
+    {
+      //Arrange
+      var value = new FooNestedMapInArray
+      {
+        Arr = new[]
+              {
+                new Dictionary<string, int> { { "a", 1 }, { "b", 2 } },
+                new Dictionary<string, int> { { "c", 3 }, { "d", 4 } }
+              }
+      };
+
+      //Act
+      string statement = new CreateInsert().Generate(value);
+
+      //Assert
+      statement.Should().Be("INSERT INTO FooNestedMapInArrays (Arr) VALUES (ARRAY[MAP('a' := 1, 'b' := 2),MAP('c' := 3, 'd' := 4)]);");
+    }
+
+    record FooNestedArrayInArray
+    {
+      public int[][] Arr { get; set; }
+    }
+
+    [Test]
+    public void NestedArrayInArray()
+    {
+      //Arrange
+      var value = new FooNestedArrayInArray
+      {
+        Arr = new[]
+              {
+                new [] { 1, 2},
+                new [] { 3, 4},
+              }
+      };
+
+      //Act
+      string statement = new CreateInsert().Generate(value);
+
+      //Assert
+      statement.Should().Be("INSERT INTO FooNestedArrayInArrays (Arr) VALUES (ARRAY[ARRAY[1,2],ARRAY[3,4]]);");
+    }
+    record FooNestedStructInArray
+    {
+      public LocationStruct[] Arr { get; set; }
+    }
+
+    [Test]
+    public void NestedStructInArray()
+    {
+      //Arrange
+      var value = new FooNestedStructInArray
+      {
+        Arr = new[]
+              {
+                new LocationStruct
+                {
+                  X = "go",
+                  Y = 2,
+                }, new LocationStruct
+                  {
+                    X = "test",
+                    Y = 1,
+                  }
+                }
+      };
+
+      //Act
+      string statement = new CreateInsert().Generate(value);
+
+      //Assert
+      statement.Should().Be("INSERT INTO FooNestedStructInArrays (Arr) VALUES (ARRAY[STRUCT(X := 'go', Y := 2),STRUCT(X := 'test', Y := 1)]);");
     }
 
     #region TODO insert with functions
