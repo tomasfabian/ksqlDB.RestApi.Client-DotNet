@@ -41,7 +41,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(movie, insertProperties);
 
       //Assert
-      statement.Should().Be(@$"INSERT INTO {insertProperties.EntityName}s (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
+      statement.Should().Be($"INSERT INTO {insertProperties.EntityName}s (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
     }
 
     [Test]
@@ -59,7 +59,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(movie, insertProperties);
 
       //Assert
-      statement.Should().Be(@$"INSERT INTO {insertProperties.EntityName} (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
+      statement.Should().Be($"INSERT INTO {insertProperties.EntityName} (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
     }
 
     [Test]
@@ -107,7 +107,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(testEvent);
 
       //Assert
-      statement.Should().Be(@"INSERT INTO Events (Id, Places) VALUES (1, ARRAY['Place1','Place2','Place3']);");
+      statement.Should().Be("INSERT INTO Events (Id, Places) VALUES (1, ARRAY['Place1', 'Place2', 'Place3']);");
     }
 
     record EventWithPrimitiveEnumerable
@@ -132,7 +132,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(testEvent, new InsertProperties { EntityName = "Events" });
 
       //Assert
-      statement.Should().Be(@"INSERT INTO Events (Id, Places) VALUES ('1', ARRAY[1,2,3]);");
+      statement.Should().Be("INSERT INTO Events (Id, Places) VALUES ('1', ARRAY[1, 2, 3]);");
     }
 
     record EventWithList
@@ -157,7 +157,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(testEvent, new InsertProperties { EntityName = "Events" });
 
       //Assert
-      statement.Should().Be(@"INSERT INTO Events (Id, Places) VALUES ('1', ARRAY[1,2,3]);");
+      statement.Should().Be("INSERT INTO Events (Id, Places) VALUES ('1', ARRAY[1, 2, 3]);");
     }
 
     [Test]
@@ -194,7 +194,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(testEvent, new InsertProperties { EntityName = "Events" });
 
       //Assert
-      statement.Should().Be(@"INSERT INTO Events (Id, Category) VALUES (1, STRUCT(Count := 1, Name := 'Planet Earth'));");
+      statement.Should().Be("INSERT INTO Events (Id, Category) VALUES (1, STRUCT(Count := 1, Name := 'Planet Earth'));");
     }
 
     [Test]
@@ -211,7 +211,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(testEvent, new InsertProperties { EntityName = "Events" });
 
       //Assert
-      statement.Should().Be(@"INSERT INTO Events (Id, Category) VALUES (1, NULL);");
+      statement.Should().Be("INSERT INTO Events (Id, Category) VALUES (1, NULL);");
     }
 
     record Kafka_table_order
@@ -230,7 +230,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(order, null);
 
       //Assert
-      statement.Should().Be(@"INSERT INTO Kafka_table_orders (Id, Items) VALUES (1, ARRAY[1,2,3]);");
+      statement.Should().Be("INSERT INTO Kafka_table_orders (Id, Items) VALUES (1, ARRAY[1, 2, 3]);");
     }
 
     [Test]
@@ -247,7 +247,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(order, insertProperties);
 
       //Assert
-      statement.Should().Be($"INSERT INTO Kafka_table_orders ({nameof(Kafka_table_order.Id)}, {nameof(Kafka_table_order.Items)}) VALUES (1, ARRAY[1.1,2]);");
+      statement.Should().Be($"INSERT INTO Kafka_table_orders ({nameof(Kafka_table_order.Id)}, {nameof(Kafka_table_order.Items)}) VALUES (1, ARRAY[1.1, 2]);");
     }
 
 
@@ -274,7 +274,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(order, config);
 
       //Assert
-      statement.Should().Be(@"INSERT INTO `my_order` (Id, ItemsList) VALUES (1, ARRAY[1.1,2]);");
+      statement.Should().Be("INSERT INTO `my_order` (Id, ItemsList) VALUES (1, ARRAY[1.1, 2]);");
     }
 
     [Test]
@@ -287,7 +287,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(order);
 
       //Assert
-      statement.Should().Be(@"INSERT INTO Kafka_table_order2s (Id, ItemsList) VALUES (1, ARRAY_REMOVE(ARRAY[0], 0));"); //ARRAY[] is not supported
+      statement.Should().Be("INSERT INTO Kafka_table_order2s (Id, ItemsList) VALUES (1, ARRAY_REMOVE(ARRAY[0], 0));"); //ARRAY[] is not supported
     }
 
     [Test]
@@ -300,7 +300,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(order);
 
       //Assert
-      statement.Should().Be(@"INSERT INTO Kafka_table_order2s (Id, ItemsList) VALUES (1, NULL);");
+      statement.Should().Be("INSERT INTO Kafka_table_order2s (Id, ItemsList) VALUES (1, NULL);");
     }
 
     record Kafka_table_order3
@@ -319,7 +319,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(order, new InsertProperties { ShouldPluralizeEntityName = false, EntityName = nameof(Kafka_table_order) });
 
       //Assert
-      statement.Should().Be(@"INSERT INTO Kafka_table_order (Id, ItemsList) VALUES (1, ARRAY[1,2]);");
+      statement.Should().Be("INSERT INTO Kafka_table_order (Id, ItemsList) VALUES (1, ARRAY[1, 2]);");
     }
 
     record FooNestedArrayInMap
@@ -345,7 +345,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(order);
 
       //Assert
-      statement.Should().Be("INSERT INTO FooNestedArrayInMaps (Map) VALUES (MAP('a' := ARRAY[1,2], 'b' := ARRAY[3,4]));");
+      statement.Should().Be("INSERT INTO FooNestedArrayInMaps (Map) VALUES (MAP('a' := ARRAY[1, 2], 'b' := ARRAY[3, 4]));");
     }
 
     record FooNestedMapInMap
@@ -475,7 +475,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(value);
 
       //Assert
-      statement.Should().Be("INSERT INTO FooNestedMapInArrays (Arr) VALUES (ARRAY[MAP('a' := 1, 'b' := 2),MAP('c' := 3, 'd' := 4)]);");
+      statement.Should().Be("INSERT INTO FooNestedMapInArrays (Arr) VALUES (ARRAY[MAP('a' := 1, 'b' := 2), MAP('c' := 3, 'd' := 4)]);");
     }
 
     record FooNestedArrayInArray
@@ -500,7 +500,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(value);
 
       //Assert
-      statement.Should().Be("INSERT INTO FooNestedArrayInArrays (Arr) VALUES (ARRAY[ARRAY[1,2],ARRAY[3,4]]);");
+      statement.Should().Be("INSERT INTO FooNestedArrayInArrays (Arr) VALUES (ARRAY[ARRAY[1, 2], ARRAY[3, 4]]);");
     }
     record FooNestedStructInArray
     {
@@ -531,7 +531,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(value);
 
       //Assert
-      statement.Should().Be("INSERT INTO FooNestedStructInArrays (Arr) VALUES (ARRAY[STRUCT(X := 'go', Y := 2),STRUCT(X := 'test', Y := 1)]);");
+      statement.Should().Be("INSERT INTO FooNestedStructInArrays (Arr) VALUES (ARRAY[STRUCT(X := 'go', Y := 2), STRUCT(X := 'test', Y := 1)]);");
     }
 
     #region TODO insert with functions

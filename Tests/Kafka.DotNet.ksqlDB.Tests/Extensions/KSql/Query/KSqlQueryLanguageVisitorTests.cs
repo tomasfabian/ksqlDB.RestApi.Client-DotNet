@@ -213,28 +213,73 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
       ksql.Should().BeEquivalentTo(@$"SELECT {nameof(OrderData.OrderType)} IN (1, 3) Contains FROM {nameof(OrderData)} EMIT CHANGES;");
     }
 
+    #region CapturedVariables
+
     [TestMethod]
-    [Ignore("TODO:captured var")]
     public void Transform_CapturedNestedPropertyAccessor()
     {
       //Arrange
       var value = new Dictionary<string, IDictionary<string, int>>()
-      {
-        { "a", new Dictionary<string, int>() { { "a", 1 } } }
-      };
+                  {
+                    { "a", new Dictionary<string, int>() { { "a", 1 }, { "b", 2 } } },
+                    { "b", new Dictionary<string, int>() { { "a", 3 }, { "d", 4 } } }
+                  };
 
       var query = CreateStreamSource().Select(_ => new
-      {
-        Dict = K.Functions.Transform(value, (k, v) => k.ToUpper(), (k, v) => v["a"] + 1)
-      });
+                                                   {
+                                                     Dict = K.Functions.Transform(value, (k, v) => k.ToUpper(), (k, v) => v["a"] + 1)
+                                                   });
       
       //Act
       var ksql = query.ToQueryString();
 
       //Assert
-      ksql.Should().Be($@"SELECT TRANSFORM(MAP('a' := MAP('a' := 1, 'b' := 2), 'b' := MAP('a' := 3, 'd' := 4)), (k, v) => UCASE(k), (k, v) => v['a'] + 1) as Dict
-FROM {streamName} EMIT CHANGES;");
+      ksql.Should().Be($"SELECT TRANSFORM(MAP('a' := MAP('a' := 1, 'b' := 2), 'b' := MAP('a' := 3, 'd' := 4)), (k, v) => UCASE(k), (k, v) => v['a'] + 1) Dict FROM {streamName} EMIT CHANGES;");
     }
+
+    struct Foo
+    {
+      public int Prop { get; set; }
+    }
+
+    [TestMethod]
+    public void Select_CapturedStructWithAlias()
+    {
+      //Arrange
+      var value = new Foo { Prop = 42 };
+
+      var query = CreateStreamSource().Select(_ => new
+                                                   {
+                                                     C = value
+                                                   });
+      
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      ksql.Should().Be($"SELECT STRUCT(Prop := 42) AS C FROM {streamName} EMIT CHANGES;");
+    }
+
+    [TestMethod]
+    [Ignore("TODO:capured")]
+    public void Select_CapturedStruct()
+    {
+      //Arrange
+      var value = new Foo { Prop = 42 };
+
+      var query = CreateStreamSource().Select(_ => new
+                                                   {
+                                                     value
+                                                   });
+      
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      ksql.Should().Be($"SELECT STRUCT(Prop := 42) AS C FROM {streamName} EMIT CHANGES;");
+    }
+
+    #endregion
 
     #endregion
 
