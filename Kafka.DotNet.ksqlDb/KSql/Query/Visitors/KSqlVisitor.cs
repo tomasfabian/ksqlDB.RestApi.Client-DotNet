@@ -11,6 +11,7 @@ using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
 using Kafka.DotNet.ksqlDB.KSql.Query.Operators;
 using Kafka.DotNet.ksqlDB.KSql.Query.Visitors;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 
 namespace Kafka.DotNet.ksqlDB.KSql.Query
 {
@@ -376,11 +377,18 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       if (constantExpression == null) throw new ArgumentNullException(nameof(constantExpression));
 
       var value = constantExpression.Value;
+      var type = value?.GetType();
 
       if (value is byte[])
         throw new NotSupportedException();
 
-      if (value is not string && value is IEnumerable enumerable)
+      if (value != null && (type.IsStruct() || type.IsDictionary()))
+      {
+        var ksqlValue = new CreateKSqlValue().ExtractValue(value, null, null, type);
+
+        stringBuilder.Append(ksqlValue);
+      }
+      else if(value is not string && value is IEnumerable enumerable)
       {
         Append(enumerable);
       }
@@ -724,7 +732,10 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
         else
           stringBuilder.Append(ColumnsSeparator);
 
-        Visit(Expression.Constant(value));
+        if(value is ConstantExpression constantExpression)
+          Visit(constantExpression);
+        else
+          Visit(Expression.Constant(value));
       }
     }
 

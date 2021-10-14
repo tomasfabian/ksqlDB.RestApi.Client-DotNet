@@ -154,9 +154,9 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
       var sb = new StringBuilder();
       sb.Append("ARRAY[");
 #if NETSTANDARD
-      var value = string.Join(",", array);
+      var value = string.Join(", ", array);
 #else
-      var value = string.Join(',', array);
+      var value = string.Join(", ", array);
 #endif
       sb.Append(value);
       sb.Append("]");
