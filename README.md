@@ -82,7 +82,7 @@ CREATE OR REPLACE STREAM Tweets (
 
 Run the following insert statements to stream some messages with your ksqldb-cli
 ```
-docker exec -it $(docker ps -q -f name=ksqldb-cli) ksql http://localhost:8088
+docker exec -it $(docker ps -q -f name=ksqldb-cli) ksql http://<YOUR_IP_ADDRESS>:8088
 ```
 ```SQL
 INSERT INTO tweets (id, message) VALUES (1, 'Hello world');
@@ -2840,7 +2840,7 @@ var grouping =
   };
 ```
 
-# v2.0.0-rc.1:
+# v2.0.0:
 ```
 Install-Package Kafka.DotNet.ksqlDB -Version 2.0.0-rc.1
 ```
@@ -2872,7 +2872,7 @@ public enum ProcessingGuarantee
 }
 ```
 
-### KSqlDbContextOptionsBuilder SetProcessingGuarantee
+### KSqlDbContextOptionsBuilder SetProcessingGuarantee (v2.0.0)
 Enable exactly-once or at_least_once semantics
 
 ```C#
@@ -2917,6 +2917,47 @@ var restApiClient = new KSqlDbRestApiClient(httpClientFactory)
 
 ## `IPullable<T>.FirstOrDefaultAsync` (v2.0.0)
 `IPullable<T>.GetAsync` was renamed to `IPullable<T>.FirstOrDefaultAsync`
+
+## KSqlDbRestApiClient.InsertIntoAsync
+- added support for deeply nested types - Maps, Structs and Arrays
+
+```C#
+var value = new ArrayOfMaps
+{
+  Arr = new[]
+        {
+          new Dictionary<string, int> { { "a", 1 }, { "b", 2 } },
+          new Dictionary<string, int> { { "c", 3 }, { "d", 4 } }
+        }
+};
+
+httpResponseMessage = await restApiClient.InsertIntoAsync(value);
+```
+
+```C#
+record ArrayOfMaps
+{
+  public Dictionary<string, int>[] Arr { get; set; }
+}
+```
+
+## Qbservable.Select
+- generation of values from captured variables
+
+```C#
+var value = new FooClass { Property = 42 };
+
+var query = context.CreateQueryStream<Location>()
+    .Select(_ => new
+    {
+      Value = value
+    });
+```
+
+Is equivalent with:
+```SQL
+SELECT STRUCT(Property := 42) AS Value FROM Locations EMIT CHANGES;
+```
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
