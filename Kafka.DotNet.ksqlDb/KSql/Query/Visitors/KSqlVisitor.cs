@@ -205,7 +205,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       {
         var arguments = listInitExpression.Initializers.SelectMany(c => c.Arguments);
 
-        if (isInScope)
+        if (isInContainsScope)
           JoinAppend(arguments);
         else
           PrintArray(arguments);
@@ -216,7 +216,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
 
     protected override Expression VisitNewArray(NewArrayExpression node)
     {
-      if (isInScope)
+      if (isInContainsScope)
         JoinAppend(node.Expressions);
       else
         PrintArray(node.Expressions);
@@ -298,30 +298,30 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       }
     }
 
-    private bool isInScope;
+    private bool isInContainsScope;
 
     private void PrintArrayContainsForEnumerable(IReadOnlyCollection<Expression> arguments)
     {
-      isInScope = true;
+      isInContainsScope = true;
 
       Visit(arguments.Last());
       Append(" IN (");
       Visit(arguments.First());
       Append(")");
 
-      isInScope = false;
+      isInContainsScope = false;
     }
 
     private void PrintArrayContains(MethodCallExpression methodCallExpression)
     {
-      isInScope = true;
+      isInContainsScope = true;
 
       Visit(methodCallExpression.Arguments);
       Append(" IN (");
       Visit(methodCallExpression.Object);
       Append(")");
 
-      isInScope = false;
+      isInContainsScope = false;
     }
 
     private void TryCast(MethodCallExpression methodCallExpression)
@@ -383,7 +383,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       if (value is byte[])
         throw new NotSupportedException();
 
-      if (value != null && (type.IsStruct() || type.IsDictionary()))
+      if (value != null && !isInContainsScope && (type.IsClass || type.IsStruct() || type.IsDictionary()))
       {
         var ksqlValue = new CreateKSqlValue().ExtractValue(value, null, null, type);
 
@@ -748,7 +748,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
 
     protected void Append(IEnumerable enumerable)
     {
-      if (isInScope)
+      if (isInContainsScope)
         JoinAppend(enumerable);
       else
         PrintArray(enumerable.OfType<object>().Select(Expression.Constant));

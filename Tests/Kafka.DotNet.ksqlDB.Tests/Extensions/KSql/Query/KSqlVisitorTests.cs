@@ -109,7 +109,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query
       var query = ClassUnderTest.BuildKSql(constantExpression);
 
       //Assert
-      query.Should().BeEquivalentTo(constant.ToString());
+      query.Should().BeEquivalentTo("Struct()");
     }
 
     #endregion

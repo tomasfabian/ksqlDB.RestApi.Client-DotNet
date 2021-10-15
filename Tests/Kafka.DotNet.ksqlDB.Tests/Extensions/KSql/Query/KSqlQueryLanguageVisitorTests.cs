@@ -265,6 +265,29 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
       ksql.Should().Be($"SELECT STRUCT(Prop := 42) AS C FROM {streamName} EMIT CHANGES;");
     }
 
+    class FooClass
+    {
+      public int Prop { get; set; }
+    }
+
+    [TestMethod]
+    public void Select_CapturedClassWithAlias()
+    {
+      //Arrange
+      var value = new FooClass { Prop = 42 };
+
+      var query = CreateStreamSource().Select(_ => new
+                                                   {
+                                                     C = value
+                                                   });
+      
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      ksql.Should().Be($"SELECT STRUCT(Prop := 42) AS C FROM {streamName} EMIT CHANGES;");
+    }
+
     [TestMethod]
     [Ignore("TODO:capured")]
     public void Select_CapturedStruct()

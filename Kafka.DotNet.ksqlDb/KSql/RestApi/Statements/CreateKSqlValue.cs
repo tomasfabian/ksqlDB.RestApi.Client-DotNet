@@ -15,7 +15,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
     {
       Type valueType = inputValue.GetType();
 
-      bool useValue = valueType.IsPrimitive || valueType == typeof(string) || valueType.IsStruct() || typeof(IEnumerable).IsAssignableFrom(valueType);
+      bool useValue = valueType.IsPrimitive || valueType == typeof(string) || valueType.IsClass || valueType.IsStruct() || typeof(IEnumerable).IsAssignableFrom(valueType);
 
       if (memberInfo?.MemberType == MemberTypes.Property)
         useValue = !((PropertyInfo)memberInfo).GetAccessors().Any();
