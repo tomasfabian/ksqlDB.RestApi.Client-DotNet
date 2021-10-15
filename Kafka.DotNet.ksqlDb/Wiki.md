@@ -82,7 +82,7 @@ CREATE OR REPLACE STREAM Tweets (
 
 Run the following insert statements to stream some messages with your ksqldb-cli
 ```
-docker exec -it $(docker ps -q -f name=ksqldb-cli) ksql http://localhost:8088
+docker exec -it $(docker ps -q -f name=ksqldb-cli) ksql http://<YOUR_IP_ADDRESS>:8088
 ```
 ```SQL
 INSERT INTO tweets (id, message) VALUES (1, 'Hello world');
@@ -2840,7 +2840,7 @@ var grouping =
   };
 ```
 
-# v2.0.0-rc.1:
+# v2.0.0:
 ```
 Install-Package Kafka.DotNet.ksqlDB -Version 2.0.0-rc.1
 ```
@@ -2939,6 +2939,24 @@ record ArrayOfMaps
 {
   public Dictionary<string, int>[] Arr { get; set; }
 }
+```
+
+## Qbservable.Select
+- generation of values from captured variables
+
+```C#
+var value = new FooClass { Property = 42 };
+
+var query = context.CreateQueryStream<Location>()
+    .Select(_ => new
+    {
+      Value = value
+    });
+```
+
+Is equivalent with:
+```SQL
+SELECT STRUCT(Property := 42) AS Value FROM Locations EMIT CHANGES;
 ```
 
 # LinqPad samples

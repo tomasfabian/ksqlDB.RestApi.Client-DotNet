@@ -16,7 +16,17 @@
 ## KSqlDbRestApiClient.InsertIntoAsync
 - added support for deeply nested types - Maps, Structs and Arrays
 
+## Qbservable.Select
+- generation of values from captured variables
+
+## KSqlDBContextOptions.NumberFormatInfo
+- formats double values in Selects
+
 ## Breaking changes:
+
+## KSqlDBContextOptions
+> ⚠ KSqlDBContextOptions created with a constructor or by KSqlDbContextOptionsBuilder are setting the auto.offset.reset to earliest by default. This version removes this default configuration. It will not be opinionated in this way from now.
+> This will affect your subscriptions to streams.
 
 ### ISetupParameters changed from
 ```
@@ -37,12 +47,6 @@ was renamed to:
 ```
 public ValueTask<TEntity> FirstOrDefaultAsync(CancellationToken cancellationToken = default)
 ```
-
-## KSqlDBContextOptions
-> ⚠ KSqlDBContextOptions created with a constructor or by KSqlDbContextOptionsBuilder are setting the auto.offset.reset to earliest by default. This version removes this default configuration. It will not be opinionated in this way from now.
-> This will affect your subscriptions to streams.
-
-
 
 ### Bug fix:
 - deserialization of stream exceptions (KSqlDbQueryProvider and KSqlDbQueryStreamProvider)
