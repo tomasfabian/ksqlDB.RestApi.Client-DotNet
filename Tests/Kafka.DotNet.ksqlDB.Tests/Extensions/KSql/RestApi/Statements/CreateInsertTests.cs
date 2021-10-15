@@ -502,6 +502,7 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.RestApi.Statements
       //Assert
       statement.Should().Be("INSERT INTO FooNestedArrayInArrays (Arr) VALUES (ARRAY[ARRAY[1, 2], ARRAY[3, 4]]);");
     }
+
     record FooNestedStructInArray
     {
       public LocationStruct[] Arr { get; set; }

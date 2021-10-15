@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
 using Kafka.DotNet.ksqlDB.KSql.Query.Visitors;
 using Kafka.DotNet.ksqlDB.Tests.Models;
@@ -26,6 +27,11 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query.Visitors
 
       StringBuilder = new StringBuilder();
       ClassUnderTest = new KSqlFunctionVisitor(StringBuilder, useTableAlias: false);
+      
+      KSqlDBContextOptions.NumberFormatInfo = new System.Globalization.NumberFormatInfo
+                                              {
+                                                NumberDecimalSeparator = "."
+                                              };
     }
 
     #region Abs

@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using Kafka.DotNet.ksqlDB.Infrastructure.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
 using Kafka.DotNet.ksqlDB.KSql.Query.Operators;
 using Kafka.DotNet.ksqlDB.KSql.Query.Visitors;
@@ -391,6 +392,12 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
       else if(value is not string && value is IEnumerable enumerable)
       {
         Append(enumerable);
+      }
+      else if (KSqlDBContextOptions.NumberFormatInfo != null && value is double doubleValue)
+      {
+        var formatted = doubleValue.ToString(KSqlDBContextOptions.NumberFormatInfo);
+
+        stringBuilder.Append(formatted);
       }
       else switch (value)
       {

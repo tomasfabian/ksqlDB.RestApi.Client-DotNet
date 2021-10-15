@@ -115,6 +115,11 @@ WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;";
         .Where(p => p.Longitude == 0.1)
         .Select(l => new { l.Longitude, l.Latitude });
 
+      KSqlDBContextOptions.NumberFormatInfo = new System.Globalization.NumberFormatInfo
+                {
+                  NumberDecimalSeparator = "."
+                };
+
       //Act
       var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
 

@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using FluentAssertions;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
 using Kafka.DotNet.ksqlDB.Tests.Pocos;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -363,6 +364,11 @@ namespace Kafka.DotNet.ksqlDB.Tests.Extensions.KSql.Query
     {
       //Arrange
       Expression<Func<Location, bool>> predicate = l => l.Longitude == 1.2;
+
+      KSqlDBContextOptions.NumberFormatInfo = new System.Globalization.NumberFormatInfo
+                                              {
+                                                NumberDecimalSeparator = "."
+                                              };
 
       //Act
       var query = ClassUnderTest.BuildKSql(predicate);

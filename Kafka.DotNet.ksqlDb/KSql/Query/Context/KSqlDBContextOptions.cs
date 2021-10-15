@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Config;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
@@ -33,6 +34,8 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query.Context
     public QueryStreamParameters QueryStreamParameters { get; internal set; }
 
     public IKSqlDbParameters QueryParameters { get; internal set; }
+
+    public static NumberFormatInfo NumberFormatInfo { get; set; }
 
     /// <summary>
     /// Enable exactly-once or at_least_once semantics.

@@ -18,12 +18,7 @@ namespace Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
       bool useValue = valueType.IsPrimitive || valueType == typeof(string) || valueType.IsStruct() || typeof(IEnumerable).IsAssignableFrom(valueType);
 
       if (memberInfo?.MemberType == MemberTypes.Property)
-      {
-        foreach (MethodInfo am in ((PropertyInfo)memberInfo).GetAccessors())
-        {
-          useValue = false;
-        }
-      }
+        useValue = !((PropertyInfo)memberInfo).GetAccessors().Any();
 
       var value = useValue ? inputValue : valueType.GetProperty(memberInfo.Name)?.GetValue(inputValue);
 
