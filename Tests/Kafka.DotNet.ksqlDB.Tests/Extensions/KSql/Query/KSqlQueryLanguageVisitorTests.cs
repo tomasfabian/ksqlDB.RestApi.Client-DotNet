@@ -116,9 +116,9 @@ WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;";
         .Select(l => new { l.Longitude, l.Latitude });
 
       KSqlDBContextOptions.NumberFormatInfo = new System.Globalization.NumberFormatInfo
-                {
-                  NumberDecimalSeparator = "."
-                };
+      {
+        NumberDecimalSeparator = "."
+      };
 
       //Act
       var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
@@ -231,10 +231,10 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
                   };
 
       var query = CreateStreamSource().Select(_ => new
-                                                   {
-                                                     Dict = K.Functions.Transform(value, (k, v) => k.ToUpper(), (k, v) => v["a"] + 1)
-                                                   });
-      
+      {
+        Dict = K.Functions.Transform(value, (k, v) => k.ToUpper(), (k, v) => v["a"] + 1)
+      });
+
       //Act
       var ksql = query.ToQueryString();
 
@@ -254,10 +254,10 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
       var value = new Foo { Prop = 42 };
 
       var query = CreateStreamSource().Select(_ => new
-                                                   {
-                                                     C = value
-                                                   });
-      
+      {
+        C = value
+      });
+
       //Act
       var ksql = query.ToQueryString();
 
@@ -277,10 +277,10 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
       var value = new FooClass { Prop = 42 };
 
       var query = CreateStreamSource().Select(_ => new
-                                                   {
-                                                     C = value
-                                                   });
-      
+      {
+        C = value
+      });
+
       //Act
       var ksql = query.ToQueryString();
 
@@ -289,22 +289,21 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     }
 
     [TestMethod]
-    [Ignore("TODO:capured")]
     public void Select_CapturedStruct()
     {
       //Arrange
       var value = new Foo { Prop = 42 };
 
       var query = CreateStreamSource().Select(_ => new
-                                                   {
-                                                     value
-                                                   });
-      
+      {
+        value
+      });
+
       //Act
       var ksql = query.ToQueryString();
 
       //Assert
-      ksql.Should().Be($"SELECT STRUCT(Prop := 42) AS C FROM {streamName} EMIT CHANGES;");
+      ksql.Should().Be($"SELECT STRUCT(Prop := 42) FROM {streamName} EMIT CHANGES;");
     }
 
     #endregion
@@ -503,7 +502,7 @@ WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;";
     {
       //Arrange
       var query = CreateTweetsStreamSource()
-        .Select(p => new { IsBetween = p.Id.Between(1, 3) } );
+        .Select(p => new { IsBetween = p.Id.Between(1, 3) });
 
       //Act
       var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
@@ -523,7 +522,7 @@ WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;";
       int endExpression = 3;
 
       var query = CreateTweetsStreamSource()
-        .Select(p => new { IsBetween = p.Id.Between(startExpression, endExpression) } );
+        .Select(p => new { IsBetween = p.Id.Between(startExpression, endExpression) });
 
       //Act
       var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
@@ -543,7 +542,7 @@ WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;";
       int endExpression = 3;
 
       var query = CreateTweetsStreamSource()
-        .Select(p => new { IsBetween = 3.Between(startExpression, endExpression) } );
+        .Select(p => new { IsBetween = 3.Between(startExpression, endExpression) });
 
       //Act
       var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
@@ -992,7 +991,7 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
 
       ksql.Should().BeEquivalentTo(expectedKsql);
     }
-    
+
     record DatabaseChangeObject<TEntity>
     {
       public TEntity After { get; set; }
@@ -1008,7 +1007,7 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
     {
       public string Version { get; set; }
     }
-    
+
     private IQbservable<DatabaseChangeObject<Entity>> CreateDatabaseChangeObjectStreamSource()
     {
       var context = new TestableDbProvider(contextOptions);
@@ -1045,7 +1044,7 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
 
       //Assert
       string expectedKsql =
-        @$"SELECT {nameof(DatabaseChangeObject<object>.After)}->{nameof(Entity.Model)}->{nameof(Model.Version)} FROM {nameof(DatabaseChangeObject<object>)}s EMIT CHANGES;";
+        $"SELECT {nameof(DatabaseChangeObject<object>.After)}->{nameof(Entity.Model)}->{nameof(Model.Version)} FROM {nameof(DatabaseChangeObject<object>)}s EMIT CHANGES;";
 
       ksql.Should().BeEquivalentTo(expectedKsql);
     }
@@ -1062,7 +1061,7 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
 
       //Assert
       string expectedKsql =
-        @$"SELECT {nameof(DatabaseChangeObject<object>.After)}->{nameof(Entity.SensorId)} FROM {nameof(DatabaseChangeObject<object>)}s EMIT CHANGES;";
+        $"SELECT {nameof(DatabaseChangeObject<object>.After)}->{nameof(Entity.SensorId)} FROM {nameof(DatabaseChangeObject<object>)}s EMIT CHANGES;";
 
       ksql.Should().BeEquivalentTo(expectedKsql);
     }
@@ -1217,7 +1216,7 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
 
       ksql.Should().BeEquivalentTo(expectedKsql);
     }
-    
+
     [TestMethod]
     public void NestedStructInArray()
     {
@@ -1250,7 +1249,6 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
     }
 
     [TestMethod]
-    [Ignore("TODO")]
     public void NestedArrayInArray_OuterMemberAccess()
     {
       //Arrange
@@ -1271,7 +1269,7 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
 
       //Assert
       string expectedKsql =
-        @$"SELECT ARRAY[ARRAY[1, 2], ARRAY[3, 4]] Arr FROM {streamName} EMIT CHANGES;";
+        @$"SELECT ARRAY[ARRAY[1, 2], ARRAY[3, 4]] AS Arr FROM {streamName} EMIT CHANGES;";
 
       ksql.Should().BeEquivalentTo(expectedKsql);
     }
@@ -1424,10 +1422,13 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
       //Arrange
       bool sorted = true;
       var query = CreateStreamSource()
-        .Select(c => new { Col = KSqlFunctions.Instance.Entries(new Dictionary<string, string>()
+        .Select(c => new
+        {
+          Col = KSqlFunctions.Instance.Entries(new Dictionary<string, string>()
           {
             { "a", "value" }
-          }, sorted)});
+          }, sorted)
+        });
 
       //Act
       var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
@@ -1474,14 +1475,14 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
 
       var case_result = location.Longitude switch
       {
-        var value when value < 2.0  => "small",
-        var value when (value <= 4.0) => "medium", 
+        var value when value < 2.0 => "small",
+        var value when (value <= 4.0) => "medium",
         _ => "large"
       };
 
       return case_result;
     }
-    
+
     //TODO:IfElse
     private static string IfElseProvider(double value)
     {

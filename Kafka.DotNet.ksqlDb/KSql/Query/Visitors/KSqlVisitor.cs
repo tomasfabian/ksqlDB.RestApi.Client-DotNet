@@ -601,8 +601,12 @@ namespace Kafka.DotNet.ksqlDB.KSql.Query
         return;
       }
 
-      if(expression is MemberExpression { Expression: { NodeType: ExpressionType.MemberAccess } } me)
+
+
+      if (expression is MemberExpression { Expression: { NodeType: ExpressionType.MemberAccess } } me)
         Destructure(me);
+      else if (expression is MemberExpression me2 && me2.Expression.NodeType == ExpressionType.Constant)
+        Visit(expression);
       else
         Append(memberInfo.Name);
 
