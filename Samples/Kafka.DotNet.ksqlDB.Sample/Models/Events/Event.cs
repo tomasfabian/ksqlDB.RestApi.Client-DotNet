@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
 
-namespace Kafka.DotNet.ksqlDB.Sample.Models.Events
+namespace ksqlDB.Api.Client.Samples.Models.Events
 {
   record Event
   {

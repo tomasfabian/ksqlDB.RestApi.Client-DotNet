@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
-using Kafka.DotNet.ksqlDB.Sample.Models.Movies;
+using ksqlDB.Api.Client.Samples.Models.Movies;
 
-namespace Kafka.DotNet.ksqlDB.Sample.Providers
+namespace ksqlDB.Api.Client.Samples.Providers
 {
   public class MoviesProvider
   {

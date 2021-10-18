@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
 
-namespace Kafka.DotNet.ksqlDB.Sample.Providers
+namespace ksqlDB.Api.Client.Samples.Providers
 {
   public interface IKSqlDbRestApiProvider : IKSqlDbRestApiClient
   {

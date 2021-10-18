@@ -1,4 +1,4 @@
-﻿namespace Kafka.DotNet.ksqlDB.Sample.Models
+﻿namespace ksqlDB.Api.Client.Samples.Models
 {
   struct Thumbnail
   {

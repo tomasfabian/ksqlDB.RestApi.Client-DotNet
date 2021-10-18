@@ -2,7 +2,7 @@
 using Kafka.DotNet.ksqlDB.KSql.Query;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
 
-namespace Kafka.DotNet.ksqlDB.Sample.Models
+namespace ksqlDB.Api.Client.Samples.Models
 {
   public class Tweet : Record
   {

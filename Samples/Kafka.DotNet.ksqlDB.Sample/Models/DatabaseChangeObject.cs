@@ -1,6 +1,6 @@
-﻿using Kafka.DotNet.ksqlDB.Sample.Models.Sensors;
+﻿using ksqlDB.Api.Client.Samples.Models.Sensors;
 
-namespace Kafka.DotNet.ksqlDB.Sample.Models
+namespace ksqlDB.Api.Client.Samples.Models
 {
   public record IoTSensorChange : DatabaseChangeObject<IoTSensor>
   {

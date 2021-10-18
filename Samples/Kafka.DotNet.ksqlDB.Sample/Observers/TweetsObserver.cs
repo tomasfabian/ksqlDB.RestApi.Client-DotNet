@@ -1,7 +1,7 @@
 ﻿using System;
-using Kafka.DotNet.ksqlDB.Sample.Models;
+using ksqlDB.Api.Client.Samples.Models;
 
-namespace Kafka.DotNet.ksqlDB.Sample.Observers
+namespace ksqlDB.Api.Client.Samples.Observers
 {
   public class TweetsObserver : IObserver<Tweet>
   {

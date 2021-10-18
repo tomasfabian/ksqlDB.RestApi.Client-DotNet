@@ -1,4 +1,4 @@
-﻿namespace Kafka.DotNet.ksqlDB.Sample.Models.Sensors
+﻿namespace ksqlDB.Api.Client.Samples.Models.Sensors
 {
   public record IoTSensor
   {

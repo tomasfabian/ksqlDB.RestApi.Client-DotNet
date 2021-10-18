@@ -1,4 +1,4 @@
-﻿namespace Kafka.DotNet.ksqlDB.Sample.Models.Events
+﻿namespace ksqlDB.Api.Client.Samples.Models.Events
 {
   record EventCategory
   {

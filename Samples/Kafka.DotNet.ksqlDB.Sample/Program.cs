@@ -1,11 +1,4 @@
-﻿using Kafka.DotNet.ksqlDB.KSql.Linq;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
-using Kafka.DotNet.ksqlDB.KSql.Query.Windows;
-using Kafka.DotNet.ksqlDB.Sample.Models;
-using Kafka.DotNet.ksqlDB.Sample.Models.Movies;
-using Kafka.DotNet.ksqlDB.Sample.Observers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -14,10 +7,14 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.Config;
+using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
+using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context.Options;
+using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
 using Kafka.DotNet.ksqlDB.KSql.Query.Operators;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
+using Kafka.DotNet.ksqlDB.KSql.Query.Windows;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Http;
@@ -26,13 +23,16 @@ using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Query.Descriptors;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Topics;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
-using Kafka.DotNet.ksqlDB.Sample.Models.Events;
-using Kafka.DotNet.ksqlDB.Sample.Models.InvocationFunctions;
-using Kafka.DotNet.ksqlDB.Sample.Providers;
-using Kafka.DotNet.ksqlDB.Sample.PullQuery;
+using ksqlDB.Api.Client.Samples.Models;
+using ksqlDB.Api.Client.Samples.Models.Events;
+using ksqlDB.Api.Client.Samples.Models.InvocationFunctions;
+using ksqlDB.Api.Client.Samples.Models.Movies;
+using ksqlDB.Api.Client.Samples.Observers;
+using ksqlDB.Api.Client.Samples.Providers;
+using ksqlDB.Api.Client.Samples.PullQuery;
 using K = Kafka.DotNet.ksqlDB.KSql.Query.Functions.KSql;
 
-namespace Kafka.DotNet.ksqlDB.Sample
+namespace ksqlDB.Api.Client.Samples
 {
   public static class Program
   {

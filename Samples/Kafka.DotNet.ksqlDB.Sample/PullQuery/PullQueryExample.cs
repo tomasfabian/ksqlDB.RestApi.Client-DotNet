@@ -6,14 +6,14 @@ using Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context.Options;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
-using Kafka.DotNet.ksqlDB.Sample.Models.Sensors;
 using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
 using Kafka.DotNet.ksqlDB.KSql.Query.Windows;
+using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Http;
+using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using ksqlDB.Api.Client.Samples.Models.Sensors;
 
-namespace Kafka.DotNet.ksqlDB.Sample.PullQuery
+namespace ksqlDB.Api.Client.Samples.PullQuery
 {
   public class PullQueryExample
   {

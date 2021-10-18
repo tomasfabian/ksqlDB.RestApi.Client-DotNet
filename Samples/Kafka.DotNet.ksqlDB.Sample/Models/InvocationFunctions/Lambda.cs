@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Kafka.DotNet.ksqlDB.Sample.Models.InvocationFunctions
+namespace ksqlDB.Api.Client.Samples.Models.InvocationFunctions
 {
   record Lambda
   {

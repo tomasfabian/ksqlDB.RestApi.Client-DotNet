@@ -1,6 +1,6 @@
 ﻿using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
 
-namespace Kafka.DotNet.ksqlDB.Sample.Models.Movies
+namespace ksqlDB.Api.Client.Samples.Models.Movies
 {
   public class MovieNullableFields
   {
