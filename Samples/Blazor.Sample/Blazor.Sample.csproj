@@ -17,13 +17,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kafka.DotNet.ksqlDB" Version="1.10.0-rc.1" />
+    <!--<PackageReference Include="Kafka.DotNet.ksqlDB" Version="2.0.0" />-->
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Kafka.DotNet.InsideOut\Kafka.DotNet.InsideOut.csproj" />
     <ProjectReference Include="..\..\Kafka.DotNet.SqlServer\Kafka.DotNet.SqlServer.csproj" />
-    <!--<ProjectReference Include="..\..\Kafka.DotNet.ksqlDB\Kafka.DotNet.ksqlDB.csproj" />-->
+    <ProjectReference Include="..\..\Kafka.DotNet.ksqlDB\Kafka.DotNet.ksqlDB.csproj" />
   </ItemGroup>
 
 </Project>
