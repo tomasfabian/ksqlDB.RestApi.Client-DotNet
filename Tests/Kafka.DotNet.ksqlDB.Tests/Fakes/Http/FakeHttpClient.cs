@@ -3,11 +3,11 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.Tests.Helpers;
+using ksqlDB.Api.Client.Tests.Helpers;
 using Moq;
 using Moq.Protected;
 
-namespace Kafka.DotNet.ksqlDB.Tests.Fakes.Http
+namespace ksqlDB.Api.Client.Tests.Fakes.Http
 {
   public static class FakeHttpClient
   {

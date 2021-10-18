@@ -31,7 +31,7 @@ Documentation for the library can be found at https://github.com/tomasfabian/Kaf
 
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>Kafka.DotNet.ksqlDB.Tests</_Parameter1>
+      <_Parameter1>ksqlDB.Api.Client.Tests</_Parameter1>
     </AssemblyAttribute>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Kafka.DotNet.ksqlDB.IntegrationTests</_Parameter1>

@@ -1,4 +1,4 @@
-﻿namespace Kafka.DotNet.ksqlDB.Tests.Pocos
+﻿namespace ksqlDB.Api.Client.Tests.Models
 {
   public class Click
   {

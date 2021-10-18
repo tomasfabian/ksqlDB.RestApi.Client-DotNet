@@ -1,4 +1,4 @@
-﻿namespace Kafka.DotNet.ksqlDB.Tests.Models
+﻿namespace ksqlDB.Api.Client.Tests.Models
 {
   public class Location
   {

@@ -2,7 +2,7 @@
 using Kafka.DotNet.ksqlDB.Infrastructure.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Kafka.DotNet.ksqlDB.Tests.Infrastructure.Extensions
+namespace ksqlDB.Api.Client.Tests.Infrastructure.Extensions
 {
   [TestClass]
   public class StringExtensionsTests

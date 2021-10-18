@@ -1,6 +1,6 @@
 ﻿using Kafka.DotNet.ksqlDB.KSql.Query;
 
-namespace Kafka.DotNet.ksqlDB.Tests.Models.Movies
+namespace ksqlDB.Api.Client.Tests.Models.Movies
 {
   public class Lead_Actor : Record
   {

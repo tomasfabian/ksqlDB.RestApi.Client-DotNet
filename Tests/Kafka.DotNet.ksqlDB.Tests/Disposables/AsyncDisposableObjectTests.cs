@@ -6,7 +6,7 @@ using Kafka.DotNet.ksqlDB.KSql.Disposables;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 
-namespace Kafka.DotNet.ksqlDB.Tests.Disposables
+namespace ksqlDB.Api.Client.Tests.Disposables
 {
   [TestClass]
   public class AsyncDisposableObjectTests : TestBase<AsyncDisposableObjectTests.TestableAsyncDisposableObject>

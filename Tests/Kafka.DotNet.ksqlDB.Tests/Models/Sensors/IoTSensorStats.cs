@@ -1,4 +1,4 @@
-﻿namespace Kafka.DotNet.ksqlDB.Tests.Models.Sensors
+﻿namespace ksqlDB.Api.Client.Tests.Models.Sensors
 {
   public class IoTSensorStats
   {

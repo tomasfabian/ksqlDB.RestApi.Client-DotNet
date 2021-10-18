@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{AA56
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDB.Api.Client.Samples", "Samples\Kafka.DotNet.ksqlDB.Sample\ksqlDB.Api.Client.Samples.csproj", "{24D73489-0E6F-42AF-8692-00503FE2406A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafka.DotNet.ksqlDB.Tests", "Tests\Kafka.DotNet.ksqlDB.Tests\Kafka.DotNet.ksqlDB.Tests.csproj", "{A1CC1EDB-C346-4BE5-BDC5-8288D2ECC0EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDB.Api.Client.Tests", "Tests\Kafka.DotNet.ksqlDB.Tests\ksqlDB.Api.Client.Tests.csproj", "{A1CC1EDB-C346-4BE5-BDC5-8288D2ECC0EC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Sample", "Samples\Blazor.Sample\Blazor.Sample.csproj", "{9B744296-3BDF-41A6-B720-7271C329F7BF}"
 EndProject

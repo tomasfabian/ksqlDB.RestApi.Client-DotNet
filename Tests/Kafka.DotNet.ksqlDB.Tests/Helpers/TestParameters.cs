@@ -1,4 +1,4 @@
-﻿namespace Kafka.DotNet.ksqlDB.Tests.Helpers
+﻿namespace ksqlDB.Api.Client.Tests.Helpers
 {
   public static class TestParameters
   {

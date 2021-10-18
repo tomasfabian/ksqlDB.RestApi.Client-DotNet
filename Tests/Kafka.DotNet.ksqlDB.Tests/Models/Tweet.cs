@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Kafka.DotNet.ksqlDB.KSql.Query;
 
-namespace Kafka.DotNet.ksqlDB.Tests.Pocos
+namespace ksqlDB.Api.Client.Tests.Models
 {
   public class Tweet : Record
   {

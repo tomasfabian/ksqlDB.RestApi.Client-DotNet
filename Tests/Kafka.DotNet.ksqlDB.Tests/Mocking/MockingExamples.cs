@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,13 +7,13 @@ using Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
-using Kafka.DotNet.ksqlDB.Tests.Helpers;
+using ksqlDB.Api.Client.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Kafka.DotNet.ksqlDB.Tests.Mocking
+namespace ksqlDB.Api.Client.Tests.Mocking
 {
   public class TestableKSqlDBContext : KSqlDBContext
   {

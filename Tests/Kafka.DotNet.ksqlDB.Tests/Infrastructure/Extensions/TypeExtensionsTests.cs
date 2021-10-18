@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -10,7 +9,7 @@ using Kafka.DotNet.ksqlDB.KSql.Query;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Kafka.DotNet.ksqlDB.Tests.Infrastructure.Extensions
+namespace ksqlDB.Api.Client.Tests.Infrastructure.Extensions
 {
   [TestClass]
   public class TypeExtensionsTests
