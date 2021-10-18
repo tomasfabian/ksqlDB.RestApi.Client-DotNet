@@ -8,7 +8,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      Kafka_DotNet_ksqlDB_Test_Project_Path: Tests\ksqlDB.RestApi.Client\ksqlDB.Api.Client.Tests.csproj
+      Kafka_DotNet_ksqlDB_Test_Project_Path: Tests\ksqlDB.RestApi.Client.Tests\ksqlDB.Api.Client.Tests.csproj
 
     steps:
 
