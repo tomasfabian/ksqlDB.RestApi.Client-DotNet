@@ -8,7 +8,6 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.IntegrationTests.Models.Movies;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
@@ -19,9 +18,10 @@ using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
+using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
+namespace ksqlDB.Api.Client.IntegrationTests.KSql.RestApi
 {
   [TestClass]
   public class KSqlDbRestApiClientTests
@@ -454,7 +454,7 @@ Drop type Address;
 
     internal record MyMoviesStreamTest
     {
-      [ksqlDB.KSql.RestApi.Statements.Annotations.Key]
+      [Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.Key]
       public int Id { get; set; }
 
       public string Title { get; set; }

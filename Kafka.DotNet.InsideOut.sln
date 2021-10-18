@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31229.75
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafka.DotNet.ksqlDB", "Kafka.DotNet.ksqlDB\Kafka.DotNet.ksqlDB.csproj", "{84C054D6-BAA2-44BE-AD3B-2FB2805E4305}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafka.DotNet.ksqlDB.IntegrationTests", "Tests\Kafka.DotNet.ksqlDB.IntegrationTests\Kafka.DotNet.ksqlDB.IntegrationTests.csproj", "{FC777D58-2B92-416E-B4B3-CF97DDF1D76A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDB.Api.Client.IntegrationTests", "Tests\Kafka.DotNet.ksqlDB.IntegrationTests\ksqlDB.Api.Client.IntegrationTests.csproj", "{FC777D58-2B92-416E-B4B3-CF97DDF1D76A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}"
 EndProject

@@ -1,17 +1,17 @@
 using System.Threading.Tasks;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
+using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
+namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
 {
   [TestClass]
-  public class GroupByTests : Linq.IntegrationTests
+  public class GroupByTests : Infrastructure.IntegrationTests
   {
     [ClassInitialize]
     public static async Task ClassInitialize(TestContext context)

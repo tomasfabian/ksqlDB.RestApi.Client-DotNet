@@ -1,25 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.IntegrationTests.Models;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Operators;
 using Kafka.DotNet.ksqlDB.KSql.Query.Options;
 using Kafka.DotNet.ksqlDB.KSql.Query.Windows;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
+using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
+using ksqlDB.Api.Client.IntegrationTests.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
+namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
 {
   [TestClass]
   [TestCategory("Integration")]
-  public class QbservableExtensionsTests : IntegrationTests
+  public class QbservableExtensionsTests : Infrastructure.IntegrationTests
   {
     protected static string StreamName = "tweetsTest";
     private static string topicName = "tweetsTestTopic";
@@ -59,7 +58,7 @@ namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
       var result = await RestApiProvider.DropStreamAndTopic(StreamName);
     }
 
-    protected virtual ksqlDB.KSql.Linq.IQbservable<Tweet> QuerySource =>
+    protected virtual Kafka.DotNet.ksqlDB.KSql.Linq.IQbservable<Tweet> QuerySource =>
       Context.CreateQueryStream<Tweet>(StreamName);
 
     [TestMethod]

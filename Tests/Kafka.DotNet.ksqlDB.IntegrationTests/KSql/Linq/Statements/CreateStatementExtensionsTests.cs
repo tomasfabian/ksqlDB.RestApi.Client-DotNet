@@ -1,17 +1,17 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.IntegrationTests.Models.Movies;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
+using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq.Statements
+namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq.Statements
 {
   [TestClass]
-  public class CreateStatementExtensionsTests : IntegrationTests
+  public class CreateStatementExtensionsTests : Infrastructure.IntegrationTests
   {
     [TestInitialize]
     public override void TestInitialize()

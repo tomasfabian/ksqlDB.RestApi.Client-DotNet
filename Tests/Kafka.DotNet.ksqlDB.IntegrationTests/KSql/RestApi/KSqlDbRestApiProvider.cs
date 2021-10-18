@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 
-namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi
+namespace ksqlDB.Api.Client.IntegrationTests.KSql.RestApi
 {
   public class KSqlDbRestApiProvider : KSqlDbRestApiClient
   {

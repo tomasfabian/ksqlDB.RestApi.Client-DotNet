@@ -5,17 +5,17 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq;
-using Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.IntegrationTests.Models.Movies;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
 using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
+using ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
+using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
+using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Query.Functions
+namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Functions
 {
   [TestClass]
-  public class KSqlFunctionsExtensionsTests : Linq.IntegrationTests
+  public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
   {
     private static MoviesProvider moviesProvider;
 

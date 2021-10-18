@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Globalization;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.IntegrationTests.Models;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
+using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
+using ksqlDB.Api.Client.IntegrationTests.Models;
 
-namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
+namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
 {
   public class TweetsProvider
   {

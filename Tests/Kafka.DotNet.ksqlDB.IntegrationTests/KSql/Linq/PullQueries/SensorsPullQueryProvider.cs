@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.IntegrationTests.Models.Sensors;
 using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
 using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.Query.Windows;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using ksqlDB.Api.Client.IntegrationTests.Models.Sensors;
 
-namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq.PullQueries
+namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq.PullQueries
 {
   internal class SensorsPullQueryProvider
   {

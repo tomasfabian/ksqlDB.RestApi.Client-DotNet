@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.IntegrationTests.Models.Movies;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
+using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Query
+namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query
 {
   [TestClass]
   public class KSqlNestedTypesQueryTests : KSqlNestedTypesTests

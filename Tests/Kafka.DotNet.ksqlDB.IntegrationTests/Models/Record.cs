@@ -1,6 +1,6 @@
 ﻿using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
 
-namespace Kafka.DotNet.ksqlDB.IntegrationTests.Models
+namespace ksqlDB.Api.Client.IntegrationTests.Models
 {
   public record Record
   {

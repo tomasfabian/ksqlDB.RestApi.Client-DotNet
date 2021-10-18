@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Kafka.DotNet.ksqlDB.IntegrationTests.Models
+namespace ksqlDB.Api.Client.IntegrationTests.Models
 {
   public record Tweet : Record
   {

@@ -2,16 +2,16 @@
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq;
-using Kafka.DotNet.ksqlDB.IntegrationTests.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.IntegrationTests.Models.Movies;
 using Kafka.DotNet.ksqlDB.KSql.Linq;
+using ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
+using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
+using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Query
+namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query
 {
   [TestClass]
-  public class KSqlNestedTypesTests : Linq.IntegrationTests
+  public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
   {
     protected static MoviesProvider MoviesProvider;
 

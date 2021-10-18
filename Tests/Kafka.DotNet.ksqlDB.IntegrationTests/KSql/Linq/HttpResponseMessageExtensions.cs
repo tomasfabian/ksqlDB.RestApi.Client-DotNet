@@ -2,10 +2,9 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text.Json;
 using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
 
-namespace Kafka.DotNet.ksqlDB.IntegrationTests.KSql.Linq
+namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
 {
   internal static class HttpResponseMessageExtensions
   {

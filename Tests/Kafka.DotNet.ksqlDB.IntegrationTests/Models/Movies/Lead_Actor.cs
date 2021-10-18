@@ -1,4 +1,4 @@
-﻿namespace Kafka.DotNet.ksqlDB.IntegrationTests.Models.Movies
+﻿namespace ksqlDB.Api.Client.IntegrationTests.Models.Movies
 {
   public record Lead_Actor : Record
   {
