@@ -11,9 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "Tests\UnitTest
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{AA5681E8-1682-47E9-9159-4AE95A92E694}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDB.Api.Client.Tests", "Tests\Kafka.DotNet.ksqlDB.Tests\ksqlDB.Api.Client.Tests.csproj", "{1B81259E-59F0-48E1-ACD3-A3DCFCCC5B3E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDB.Api.Client.Tests", "Tests\ksqlDB.RestApi.Client.Tests\ksqlDB.Api.Client.Tests.csproj", "{1B81259E-59F0-48E1-ACD3-A3DCFCCC5B3E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDB.Api.Client.IntegrationTests", "Tests\Kafka.DotNet.ksqlDB.IntegrationTests\ksqlDB.Api.Client.IntegrationTests.csproj", "{EE55516C-160D-4715-ADC6-3E76DE3D89E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDB.Api.Client.IntegrationTests", "Tests\ksqlDB.RestApi.Client.IntegrationTests\ksqlDB.Api.Client.IntegrationTests.csproj", "{EE55516C-160D-4715-ADC6-3E76DE3D89E9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDB.Api.Client.Samples", "Samples\Kafka.DotNet.ksqlDB.Sample\ksqlDB.Api.Client.Samples.csproj", "{9AD222F8-4535-4297-A4F8-9F40FFA8A133}"
 EndProject
