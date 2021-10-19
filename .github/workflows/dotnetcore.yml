@@ -8,7 +8,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      Kafka_DotNet_ksqlDB_Test_Project_Path: Tests\ksqlDB.RestApi.Client.Tests\ksqlDB.Api.Client.Tests.csproj
+      ksqlDB_Test_Project_Path: Tests\ksqlDB.RestApi.Client.Tests\ksqlDB.Api.Client.Tests.csproj
 
     steps:
 
@@ -25,12 +25,12 @@ jobs:
         dotnet-version: 5.0.x
 
     - name: Clean
-      run: dotnet clean Kafka.DotNet.ksqlDb.sln --configuration Release && dotnet nuget locals all --clear
+      run: dotnet clean ksqlDb.RestApi.Client.sln --configuration Release && dotnet nuget locals all --clear
     - name: Install dependencies
-      run: dotnet restore Kafka.DotNet.ksqlDb.sln
+      run: dotnet restore ksqlDb.RestApi.Client.sln
     - name: Build with dotnet
-      run: dotnet build Kafka.DotNet.ksqlDb.sln --configuration Release
+      run: dotnet build ksqlDb.RestApi.Client.sln --configuration Release
     
     # Test
-    - name: Execute Kafka DotNet ksqlDB Unit Tests
-      run: dotnet test $env:Kafka_DotNet_ksqlDB_Test_Project_Path
+    - name: Execute ksqlDb RestApi Client Unit Tests
+      run: dotnet test $env:ksqlDB_Test_Project_Path

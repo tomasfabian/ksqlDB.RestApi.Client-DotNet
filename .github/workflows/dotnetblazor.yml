@@ -8,7 +8,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      Kafka_DotNet_SqlServer_Test_Project_Path: Tests\Kafka.DotNet.SqlServer.Tests\Kafka.DotNet.SqlServer.Tests.csproj
+      SqlServer_Test_Project_Path: Tests\SqlServer.Connector.Tests\SqlServer.Connector.Tests.csproj
 
     steps:
 
@@ -25,12 +25,12 @@ jobs:
         dotnet-version: 5.0.x
 
     - name: Clean
-      run: dotnet clean Kafka.DotNet.InsideOut.sln --configuration Release && dotnet nuget locals all --clear
+      run: dotnet clean InsideOut.sln --configuration Release && dotnet nuget locals all --clear
     - name: Install dependencies
-      run: dotnet restore Kafka.DotNet.InsideOut.sln
+      run: dotnet restore InsideOut.sln
     - name: Build with dotnet
-      run: dotnet build Kafka.DotNet.InsideOut.sln --configuration Release
+      run: dotnet build InsideOut.sln --configuration Release
 
     # Test
-    - name: Execute Kafka DotNet SqlServer Unit Tests
-      run: dotnet test --filter “TestCategory!=Integration” $env:Kafka_DotNet_SqlServer_Test_Project_Path
+    - name: Execute SqlServer Connector Unit Tests
+      run: dotnet test --filter “TestCategory!=Integration” $env:SqlServer_Test_Project_Path
