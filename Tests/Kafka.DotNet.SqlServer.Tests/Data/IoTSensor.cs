@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Kafka.DotNet.SqlServer.Tests.Data
+namespace SqlServer.Connector.Tests.Data
 {
   public record IoTSensor
   {

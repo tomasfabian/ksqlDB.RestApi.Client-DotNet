@@ -1,16 +1,15 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using FluentAssertions;
-using Kafka.DotNet.SqlServer.Tests.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SqlServer.Connector.Cdc;
+using SqlServer.Connector.Tests.Data;
 using UnitTests;
-using ConfigurationProvider = Kafka.DotNet.SqlServer.Tests.Config.ConfigurationProvider;
+using ConfigurationProvider = SqlServer.Connector.Tests.Config.ConfigurationProvider;
 
-namespace Kafka.DotNet.SqlServer.Tests.Cdc
+namespace SqlServer.Connector.Tests.Cdc
 {
   [TestClass]
   [TestCategory("Integration")]

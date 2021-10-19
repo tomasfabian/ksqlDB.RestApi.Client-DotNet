@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
 
-namespace Kafka.DotNet.SqlServer.Tests.Config
+namespace SqlServer.Connector.Tests.Config
 {
   public static class ConfigurationProvider
   {

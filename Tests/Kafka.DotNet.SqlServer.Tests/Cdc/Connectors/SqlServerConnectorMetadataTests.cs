@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SqlServer.Connector.Cdc.Connectors;
 using UnitTests;
 
-namespace Kafka.DotNet.SqlServer.Tests.Cdc.Connectors
+namespace SqlServer.Connector.Tests.Cdc.Connectors
 {
   [TestClass]
   public class SqlServerConnectorMetadataTests : TestBase<SqlServerConnectorMetadata>

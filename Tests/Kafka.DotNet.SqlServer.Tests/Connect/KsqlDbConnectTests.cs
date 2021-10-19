@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Confluent.Kafka;
 using FluentAssertions;
 using InsideOut.Consumer;
-using Kafka.DotNet.SqlServer.Tests.Data;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Connectors;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +15,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SqlServer.Connector.Cdc;
 using SqlServer.Connector.Cdc.Connectors;
 using SqlServer.Connector.Connect;
+using SqlServer.Connector.Tests.Data;
 using UnitTests;
-using ConfigurationProvider = Kafka.DotNet.SqlServer.Tests.Config.ConfigurationProvider;
+using ConfigurationProvider = SqlServer.Connector.Tests.Config.ConfigurationProvider;
 
-namespace Kafka.DotNet.SqlServer.Tests.Connect
+namespace SqlServer.Connector.Tests.Connect
 {
   [TestClass]
   [TestCategory("Integration")]

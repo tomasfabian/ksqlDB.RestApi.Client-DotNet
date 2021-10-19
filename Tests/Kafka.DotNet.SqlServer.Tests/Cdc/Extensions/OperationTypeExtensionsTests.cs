@@ -4,7 +4,7 @@ using SqlServer.Connector.Cdc;
 using SqlServer.Connector.Cdc.Extensions;
 using UnitTests;
 
-namespace Kafka.DotNet.SqlServer.Tests.Cdc.Extensions
+namespace SqlServer.Connector.Tests.Cdc.Extensions
 {
   [TestClass]
   public class OperationTypeExtensionsTests : TestBase

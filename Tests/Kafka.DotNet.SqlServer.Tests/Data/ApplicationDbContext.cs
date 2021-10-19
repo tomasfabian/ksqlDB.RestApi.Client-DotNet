@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using ConfigurationProvider = Kafka.DotNet.SqlServer.Tests.Config.ConfigurationProvider;
+using ConfigurationProvider = SqlServer.Connector.Tests.Config.ConfigurationProvider;
 
-namespace Kafka.DotNet.SqlServer.Tests.Data
+namespace SqlServer.Connector.Tests.Data
 {
   public class ApplicationDbContext : DbContext
   {

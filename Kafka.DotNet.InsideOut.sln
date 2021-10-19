@@ -33,7 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlServer.Connector", "SqlServer.Connector\SqlServer.Connector.csproj", "{E672877E-BC9D-41A2-B665-C943D7EB1DBD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafka.DotNet.SqlServer.Tests", "Tests\Kafka.DotNet.SqlServer.Tests\Kafka.DotNet.SqlServer.Tests.csproj", "{D73BA2F1-7F1C-45D8-8D53-1832E40320AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlServer.Connector.Tests", "Tests\Kafka.DotNet.SqlServer.Tests\SqlServer.Connector.Tests.csproj", "{D73BA2F1-7F1C-45D8-8D53-1832E40320AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
