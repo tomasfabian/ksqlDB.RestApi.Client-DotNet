@@ -1,16 +1,16 @@
-﻿Kafka.DotNet.SqlServer is a client API for consuming row-level table changes (CDC - [Change Data Capture](https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/about-change-data-capture-sql-server?view=sql-server-ver15)) from a Sql Server databases with the Debezium connector streaming platform.
+﻿SqlServer.Connector is a client API for consuming row-level table changes (CDC - [Change Data Capture](https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/about-change-data-capture-sql-server?view=sql-server-ver15)) from a Sql Server databases with the Debezium connector streaming platform.
 
 ### Blazor Sample 
-Set docker-compose.csproj as startup project in Kafka.DotNet.InsideOut.sln for an embedded Kafka connect integration.
+Set docker-compose.csproj as startup project in InsideOut.sln for an embedded Kafka connect integration.
 
 The initial run takes a few minutes until all containers are up and running.
 
 ### External Kafka Connect (WIP)
-Set docker-compose.csproj as startup project in Samples\Kafka.Connect\Connect.SqlServer.sln for an external Kafka connect integration.
+Set docker-compose.csproj as startup project in Samples\Connect\Connect.SqlServer.sln for an external Kafka connect integration.
 
 ### Nuget
 ```
-Install-Package Kafka.DotNet.SqlServer -Version 0.2.0-rc.2
+Install-Package SqlServer.Connector -Version 0.3.0-rc.1
 
 Install-Package ksqlDb.RestApi.Client
 ```
@@ -29,9 +29,9 @@ using ksqlDb.RestApi.Client.KSql.RestApi;
 using ksqlDb.RestApi.Client.KSql.RestApi.Generators;
 using ksqlDb.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDb.RestApi.Client.KSql.RestApi.Statements;
-using Kafka.DotNet.SqlServer.Cdc;
-using Kafka.DotNet.SqlServer.Cdc.Connectors;
-using Kafka.DotNet.SqlServer.Cdc.Extensions;
+using SqlServer.Connector.Cdc;
+using SqlServer.Connector.Cdc.Connectors;
+using SqlServer.Connector.Cdc.Extensions;
 
 class Program
 {
@@ -150,8 +150,7 @@ Output:
 
 ### Consuming table change events directly from a kafka topic
 ```
-Install-Package Kafka.DotNet.SqlServer -Version 0.1.0
-Install-Package Kafka.DotNet.InsideOut -Version 1.0.0
+Install-Package SqlServer.Connector -Version 0.1.0
 Install-Package System.Interactive.Async -Version 5.0.0
 ```
 
@@ -187,7 +186,7 @@ CdcEnableDbAsync - Enables change data capture for the current database.
 CdcEnableTableAsync - Enables change data capture for the specified source table in the current database.
 
 ```C#
-using Kafka.DotNet.SqlServer.Cdc;
+using SqlServer.Connector.Cdc;
 
 private static async Task TryEnableCdcAsync()
 {
@@ -241,7 +240,7 @@ SQL Server connector configuration example:
 ```C#
 using System;
 using System.Threading.Tasks;
-using Kafka.DotNet.SqlServer.Cdc.Connectors;
+using SqlServer.Connector.Cdc.Connectors;
 
 private static SqlServerConnectorMetadata CreateConnectorMetadata()
 {
@@ -263,7 +262,7 @@ private static SqlServerConnectorMetadata CreateConnectorMetadata()
 ### KsqlDbConnect (v.0.1.0)
 Creating the connector with ksqldb
 ```C#
-using Kafka.DotNet.SqlServer.Connect;
+using SqlServer.Connector.Connect;
 
 private static async Task CreateConnectorAsync()
 {
@@ -306,7 +305,7 @@ using ksqlDb.RestApi.Client.KSql.Query.Context;
 using ksqlDb.RestApi.Client.KSql.RestApi;
 using ksqlDb.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDb.RestApi.Client.KSql.RestApi.Statements;
-using Kafka.DotNet.SqlServer.Cdc;
+using SqlServer.Connector.Cdc;
 
 private static async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationToken = default)
 {
@@ -361,7 +360,7 @@ var response = await ksqlDbConnect.GetConnectorsAsync();
 CdcDisableTableAsync - Disables change data capture for the specified source table and capture instance in the current database.
 CdcDisableDbAsync - Disables change data capture for the current database.
 ```C#
-var cdcClient = new Kafka.DotNet.SqlServer.Cdc.CdcClient(connectionString);
+var cdcClient = new SqlServer.Connector.Cdc.CdcClient(connectionString);
 
 await cdcClient.CdcDisableTableAsync(tableName, schemaName).ConfigureAwait(false);
 
@@ -373,7 +372,7 @@ await cdcClient.CdcDisableDbAsync().ConfigureAwait(false);
 using System;
 using System.Reactive;
 using ksqlDb.RestApi.Client.KSql.Query.Context;
-using Kafka.DotNet.SqlServer.Cdc;
+using SqlServer.Connector.Cdc;
 
 await using var context = new KSqlDBContext(@"http:\\localhost:8088");
 
@@ -414,8 +413,8 @@ CREATE SINK CONNECTOR IF NOT EXISTS MSSQL_SENSORS_SINK_CONNECTOR ...
 using System;
 using System.Threading.Tasks;
 using ksqlDb.RestApi.Client.KSql.RestApi;
-using Kafka.DotNet.SqlServer.Cdc.Connectors;
-using Kafka.DotNet.SqlServer.Connect;
+using SqlServer.Connector.Cdc.Connectors;
+using SqlServer.Connector.Connect;
 
 static string ConnectUrl => @"http://localhost:8083";
 
@@ -435,8 +434,8 @@ async Task Main()
 
 ### KsqlDb server side query for database transactions
 ```
-Install-Package Kafka.DotNet.SqlServer -Version 0.3.0-rc.1
-Install-Package ksqlDb.RestApi.Client -Version 1.10.0-rc.1
+Install-Package SqlServer.Connector -Version 0.3.0-rc.1
+Install-Package ksqlDb.RestApi.Client -Version 1.0.0
 ```
 
 The following example demonstrates ksqldb server side filtering of database transactions: 
@@ -447,8 +446,8 @@ using System.Threading.Tasks;
 using ksqlDb.RestApi.Client.KSql.Linq;
 using ksqlDb.RestApi.Client.KSql.Query.Context;
 using ksqlDb.RestApi.Client.KSql.Query.Options;
-using Kafka.DotNet.SqlServer.Cdc;
-using Kafka.DotNet.SqlServer.Cdc.Extensions;
+using SqlServer.Connector.Cdc;
+using SqlServer.Connector.Cdc.Extensions;
 
 class Program
 {
@@ -580,7 +579,7 @@ DROP STREAM sqlserversensors DELETE TOPIC;
 [Deployment](https://debezium.io/documentation/reference/1.5/connectors/sqlserver.html#sqlserver-deploying-a-connector)
 
 ### Linqpad
-[Kafka.DotNet.SqlServer](https://github.com/tomasfabian/ksqlDb.RestApi.Client/blob/main/Samples/ksqlDb.RestApi.Client.LinqPad/kafka.dotnet.sqlserver.linq)
+[SqlServer.Connector](https://github.com/tomasfabian/ksqlDb.RestApi.Client/blob/main/Samples/ksqlDb.RestApi.Client.LinqPad/SqlServer.Connector.linq)
 
 ### Related sources
 [Debezium](https://github.com/debezium/debezium)
