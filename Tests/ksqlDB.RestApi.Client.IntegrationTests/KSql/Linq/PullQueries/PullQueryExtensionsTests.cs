@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models.Sensors;
+using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq.PullQueries

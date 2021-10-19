@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Kafka.DotNet.ksqlDB\Kafka.DotNet.ksqlDB.csproj" />
+    <ProjectReference Include="..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />
   </ItemGroup>
 
 </Project>

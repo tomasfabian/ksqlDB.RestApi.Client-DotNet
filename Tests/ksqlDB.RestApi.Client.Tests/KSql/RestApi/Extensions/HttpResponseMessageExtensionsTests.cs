@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Extensions

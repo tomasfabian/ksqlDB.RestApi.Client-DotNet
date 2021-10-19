@@ -1,6 +1,6 @@
 ﻿using System;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Options

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Generators;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
+using ksqlDB.RestApi.Client.KSql.RestApi.Generators;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Generators

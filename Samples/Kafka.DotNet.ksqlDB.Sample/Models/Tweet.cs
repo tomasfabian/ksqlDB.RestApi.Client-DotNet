@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
-using Kafka.DotNet.ksqlDB.KSql.Query;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
+using ksqlDB.RestApi.Client.KSql.Query;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
 namespace ksqlDB.Api.Client.Samples.Models
 {

@@ -2,7 +2,9 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.RestApi
 {

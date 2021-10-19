@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using FluentAssertions;
 using Joker.Extensions;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Enums;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using NUnit.Framework;
 using Pluralize.NET;
 
@@ -514,7 +514,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements
 
     internal class MyMovie
     {
-      [Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.Key]
+      [Key]
       public int Id { get; set; }
 
       public string Title { get; set; }

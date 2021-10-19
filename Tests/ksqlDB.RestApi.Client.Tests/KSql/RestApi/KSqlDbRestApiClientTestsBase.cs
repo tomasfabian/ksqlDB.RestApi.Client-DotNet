@@ -1,6 +1,6 @@
 ﻿using System.Net.Http;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using ksqlDB.Api.Client.Tests.Fakes.Http;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UnitTests;

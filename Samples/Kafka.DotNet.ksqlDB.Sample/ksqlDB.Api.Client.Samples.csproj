@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
-    <PackageReference Include="Kafka.DotNet.ksqlDB" Version="2.0.0-rc.1" />
-    <!-- <ProjectReference Include="..\..\Kafka.DotNet.ksqlDb\Kafka.DotNet.ksqlDB.csproj" /> -->
+    <!-- <PackageReference Include="ksqlDb.RestApi.Client" Version="1.0.0" /> -->
+    <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />
   </ItemGroup>
 </Project>

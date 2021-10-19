@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 

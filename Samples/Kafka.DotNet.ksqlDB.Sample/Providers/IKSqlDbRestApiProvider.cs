@@ -1,6 +1,6 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi;
 
 namespace ksqlDB.Api.Client.Samples.Providers
 {

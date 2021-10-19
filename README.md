@@ -4,23 +4,23 @@ This package generates ksql queries from your .NET C# linq queries. You can filt
 You can continually process computations over unbounded (theoretically never-ending) streams of data.
 It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the Rest API.
 
-[Kafka.DotNet.ksqlDB](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB) is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
+[ksqlDB.RestApi.Client](https://github.com/tomasfabian/ksqlDB.RestApi.Client) is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
 
 Install with NuGet package manager:
 ```
-Install-Package Kafka.DotNet.ksqlDB
+Install-Package ksqlDB.RestApi.Client
 ```
 or with .NET CLI
 ```
-dotnet add package Kafka.DotNet.ksqlDB
+dotnet add package ksqlDB.RestApi.Client
 ```
 ```C#
 using System;
 using ConsoleAppKsqlDB;
-using Kafka.DotNet.ksqlDB.KSql.Linq;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.Query.Options;
-using Kafka.DotNet.ksqlDB.Sample.Model;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.Sample.Model;
 
 var ksqlDbUrl = @"http:\\localhost:8088";
 
@@ -101,7 +101,7 @@ var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
   .InsertIntoAsync(new Tweet { Id = 2, Message = "ksqlDB rulez!" });
 ```
 
-Sample project can be found under [Samples](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.Sample) solution folder in Kafka.DotNet.ksqlDb.sln 
+Sample project can be found under [Samples](https://github.com/tomasfabian/ksqlDB.RestApi.Client/tree/main/Samples/ksqlDB.RestApi.Client.Sample) solution folder in ksqlDB.RestApi.Client.sln 
 
 
 **External dependencies:**
@@ -110,12 +110,12 @@ Sample project can be found under [Samples](https://github.com/tomasfabian/Kafka
 
 Clone the repository
 ```
-git clone https://github.com/tomasfabian/Kafka.DotNet.ksqlDB.git
+git clone https://github.com/tomasfabian/ksqlDB.RestApi.Client.git
 ```
 
-CD to [Samples](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.Sample)
+CD to [Samples](https://github.com/tomasfabian/ksqlDB.RestApi.Client/tree/main/Samples/ksqlDB.RestApi.Client.Sample)
 ```
-CD Samples\Kafka.DotNet.ksqlDB.Sample\
+CD Samples\ksqlDB.RestApi.Client.Sample\
 ```
 
 run in command line:
@@ -131,21 +131,21 @@ Monitor Sql Server tables for changes and forward them to the appropriate Kafka 
 ### Nuget
 ```
 Install-Package Kafka.DotNet.SqlServer -Version 0.3.0-rc.1
-Install-Package Kafka.DotNet.ksqlDB -Version 1.10.0
+Install-Package ksqlDB.RestApi.Client
 ```
 
-[Kafka.DotNet.SqlServer WIKI](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
+[Kafka.DotNet.SqlServer WIKI](https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
 
-Full example is available in [Blazor example](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Blazor.Sample) - Kafka.DotNet.InsideOut.sln: (The initial run takes a few minutes until all containers are up and running.)
+Full example is available in [Blazor example](https://github.com/tomasfabian/ksqlDB.RestApi.Client/tree/main/Samples/Blazor.Sample) - Kafka.DotNet.InsideOut.sln: (The initial run takes a few minutes until all containers are up and running.)
 
 The following example demonstrates ksqldb server side filtering of database transactions: 
 ```C#
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.Linq;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
 using Kafka.DotNet.SqlServer.Cdc;
 using Kafka.DotNet.SqlServer.Cdc.Extensions;
 
@@ -260,16 +260,16 @@ public record IoTSensor
 ```
 
 # Kafka stream processing
-[Kafka.DotNet.InsideOut](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.InsideOut/Wiki.md) is a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with Kafka.DotNet.ksqlDB
+[Kafka.DotNet.InsideOut](https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/Kafka.DotNet.InsideOut/Wiki.md) is a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with ksqlDB.RestApi.Client
 ```
-Install-Package Kafka.DotNet.ksqlDB
+Install-Package ksqlDB.RestApi.Client
 ```
 
 ```C#
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
+using ksqlDB.RestApi.Client.KSql.Linq.Statements;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 
 private string KsqlDbUrl => "http://localhost:8088";
 
@@ -347,7 +347,7 @@ static async Task Main(string[] args)
 }
 ```
 
-[Blazor server side example](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB) - Kafka.DotNet.InsideOut.sln
+[Blazor server side example](https://github.com/tomasfabian/ksqlDB.RestApi.Client) - Kafka.DotNet.InsideOut.sln
 
 # Setting query parameters (v0.1.0)
 Default settings:
@@ -363,7 +363,7 @@ contextOptions.QueryStreamParameters["auto.offset.reset"] = "latest";
 Record class is a base class for rows returned in push queries. It has a 'RowTime' property.
 
 ```C#
-public class Tweet : Kafka.DotNet.ksqlDB.KSql.Query.Record
+public class Tweet : ksqlDB.RestApi.Client.KSql.Query.Record
 {
   public string Message { get; set; }
 }
@@ -718,9 +718,6 @@ UCASE(Latitude) != 'HI'
 ```
 
 # v0.2.0
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 0.2.0
-```
 
 ### Having (v0.2.0)
 ```C#
@@ -751,7 +748,7 @@ SELECT CardNumber, COUNT(*) Count FROM Transactions
 ```
 Time units:
 ```C#
-using Kafka.DotNet.ksqlDB.KSql.Query.Windows;
+using ksqlDB.RestApi.Client.KSql.Query.Windows;
 
 public enum TimeUnits
 {
@@ -783,7 +780,7 @@ public class Lead_Actor : Record
   public string Actor_Name { get; set; }
 }
 
-using Kafka.DotNet.ksqlDB.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Linq;
 
 var query = context.CreateQueryStream<Movie>()
   .Join(
@@ -843,7 +840,7 @@ var queryMax = CreateQbservable()
 
 ### Like (v0.2.0)
 ```C#
-using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
 
 Expression<Func<Tweet, bool>> likeExpression = c => KSql.Functions.Like(c.Message, "%santa%");
 
@@ -874,7 +871,7 @@ LEN(Message)
 
 ### LPad, RPad, Trim, Substring (v0.2.0)
 ```C#
-using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
 
 Expression<Func<Tweet, string>> expression1 = c => KSql.Functions.LPad(c.Message, 8, "x");
 Expression<Func<Tweet, string>> expression2 = c => KSql.Functions.RPad(c.Message, 8, "x");
@@ -890,9 +887,7 @@ Substring(Message, 2, 3)
 ```
 
 # v0.3.0
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 0.3.0
-```
+
 ## Aggregation functions 
 ### EarliestByOffset, LatestByOffset, EarliestByOffsetAllowNulls, LatestByOffsetAllowNull (v0.3.0)
 [EarliestByOffset](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/#earliest_by_offset),
@@ -1043,7 +1038,7 @@ ROUND(Amount, 3)
 ### Dynamic - calling not supported ksqldb functions (v0.3.0)
 Some of the ksqldb functions have not been implemented yet. This can be circumvented by calling K.Functions.Dynamic with the appropriate function call and its parameters. The type of the column value is set with C# **as** operator.
 ```C#
-using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
 
 context.CreateQueryStream<Tweet>()
   .Select(c => new { Col = KSql.Functions.Dynamic("IFNULL(Message, 'n/a')") as string, c.Id, c.Amount, c.Message });
@@ -1067,7 +1062,7 @@ Result:
 
 Dynamic function call with array result example:
 ```C#
-using K = Kafka.DotNet.ksqlDB.KSql.Query.Functions.KSql;
+using K = ksqlDB.RestApi.Client.KSql.Query.Functions.KSql;
 
 context.CreateQueryStream<Tweet>()
   .Select(c => K.F.Dynamic("ARRAY_DISTINCT(ARRAY[1, 1, 2, 3, 1, 2])") as int[])
@@ -1118,9 +1113,7 @@ FROM Tweets GROUP BY Id EMIT CHANGES;
 ```
 
 # v0.4.0
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 0.4.0
-```
+
 ### Maps (v0.4.0)
 [Maps](https://docs.ksqldb.io/en/latest/how-to-guides/query-structured-data/#maps)
 are an associative data type that map keys of any type to values of any type. The types across all keys must be the same. The same rule holds for values. Destructure maps using bracket syntax ([]).
@@ -1190,9 +1183,6 @@ FROM tweets EMIT CHANGES;
 
 
 # v0.5.0
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 0.5.0
-```
 
 ### Structs (v0.5.0)
 [Structs](https://docs.ksqldb.io/en/latest/how-to-guides/query-structured-data/#structs)
@@ -1342,9 +1332,9 @@ Content-Type: application/vnd.ksqlapi.delimited.v1
 ```
 ```C#
 using System;
-using Kafka.DotNet.ksqlDB.KSql.Linq;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.Sample.Models.Movies;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.Sample.Models.Movies;
 
 var ksqlDbUrl = @"http:\\localhost:8088";
 var contextOptions = CreateQueryStreamOptions(ksqlDbUrl);
@@ -1375,9 +1365,9 @@ Content-Type: application/vnd.ksql.v1+json
 ```
 ```C#
 using System;
-using Kafka.DotNet.ksqlDB.KSql.Linq;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.Sample.Models.Movies;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.Sample.Models.Movies;
 
 var ksqlDbUrl = @"http:\\localhost:8088";
 var contextOptions = CreateQueryStreamOptions(ksqlDbUrl);
@@ -1463,8 +1453,8 @@ var source = context.CreateQueryStream<Movie>(queryStreamParameters)
 [Execute a statement](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/ksql-endpoint/) - The /ksql resource runs a sequence of SQL statements. All statements, except those starting with SELECT, can be run on this endpoint. To run SELECT statements use the /query endpoint.
 
 ```C#
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 public async Task ExecuteStatementAsync()
 {
@@ -1504,7 +1494,7 @@ public record Movies
 KSqlDbStatement allows you to set the statement, content encoding and [CommandSequenceNumber](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/ksql-endpoint/#coordinate-multiple-requests). 
 
 ```C#
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 public KSqlDbStatement CreateStatement(string statement)
 {
@@ -1520,7 +1510,7 @@ public KSqlDbStatement CreateStatement(string statement)
 
 ### HttpResponseMessage ToStatementResponses extension (v0.8.0)
 ```C#
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 
 var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement);
 
@@ -1545,8 +1535,8 @@ foreach (var response in responses)
 | [CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/)     |  CreateOrReplaceTableStatement - Create or replace a ksqlDB materialized table view, along with the corresponding Kafka topic, and stream the result of the query as a changelog into the topic.   |
 
 ```C#
-using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Linq.Statements;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 
 public static async Task Main(string[] args)
 {
@@ -1625,24 +1615,21 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
 ```
 
 # v0.10.0:
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 0.10.0-rc.1
-```
 
 # Pull queries - `CreatePullQuery<TEntity>` (v.0.10.0)
 [A pull query](https://docs.ksqldb.io/en/latest/concepts/queries/#pull) is a form of query issued by a client that retrieves a result as of "now", like a query against a traditional RDBS.
 
-See also [GetManyAsync](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB#ipullable---getmanyasync-v170).
+See also [GetManyAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client#ipullable---getmanyasync-v170).
 
 ```C#
 using System.Net.Http;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries;
-using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
-using Kafka.DotNet.ksqlDB.KSql.Query.Windows;
+using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
+using ksqlDB.RestApi.Client.KSql.Linq.Statements;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.Query.Windows;
 
 IKSqlDbRestApiClient restApiClient;
 
@@ -1724,7 +1711,7 @@ public record IoTSensorStats
 ### Window Bounds (v0.10.0)
 The WHERE clause must contain a value for each primary-key column to retrieve and may optionally include bounds on WINDOWSTART and WINDOWEND if the materialized table is windowed.
 ```C#
-using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
 
 string windowStart = "2019-10-03T21:31:16";
 string windowEnd = "2025-10-03T21:31:16";
@@ -1750,9 +1737,6 @@ var result = await context.ExecutePullQuery<IoTSensorStats>(ksql);
 ```
 
 # v0.11.0:
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 0.11.0-rc.1
-```
 
 ### Creating streams and tables (v.0.11.0)
 - [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/) - fluent API
@@ -1775,7 +1759,7 @@ var httpResponseMessage = await restApiClient.CreateStreamAsync<MyMovies>(metada
 ```C#
 public record MyMovies
 {
-  [Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.Key]
+  [ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations.Key]
   public int Id { get; set; }
 
   public string Title { get; set; }
@@ -1826,7 +1810,7 @@ CREATE TABLE IF NOT EXISTS MyMovies (
 ```C#
 class Transaction
 {
-  [Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.Decimal(3, 2)]
+  [ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations.Decimal(3, 2)]
   public decimal Amount { get; set; }
 }
 ```
@@ -1836,9 +1820,7 @@ Amount DECIMAL(3,2)
 ```
 
 # v1.0.0:
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 1.0.0
-```
+
 ### Insert Into (v1.0.0)
 [Insert values](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/insert-values/) - Produce a row into an existing stream or table and its underlying topic based on explicitly specified values.
 ```C#
@@ -1856,12 +1838,12 @@ Properties and fields decorated with the IgnoreByInsertsAttribute are not part o
 ```C#
 public class Movie
 {
-  [Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.Key]
+  [ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations.Key]
   public int Id { get; set; }
   public string Title { get; set; }
   public int Release_Year { get; set; }
 	
-  [Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.IgnoreByInserts]
+  [ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations.IgnoreByInserts]
   public int IgnoredProperty { get; set; }
 }
 ```
@@ -1951,9 +1933,6 @@ SELECT * FROM Tweet EMIT CHANGES;
 ```
 
 # v1.1.0:
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 1.1.0
-```
 
 ### CAST - ToString (v1.1.0)
 Converts any type to its string representation.
@@ -1971,7 +1950,7 @@ SELECT Title, CONCAT(CAST(COUNT(*) AS VARCHAR), '_Hello') Concatenated FROM Movi
 ### CAST - convert string to numeric types (v1.1.0)
 ```C#
 using System;
-using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
 
 Expression<Func<Tweet, int>> stringToInt = c => KSQLConvert.ToInt32(c.Message);
 Expression<Func<Tweet, long>> stringToLong = c => KSQLConvert.ToInt64(c.Message);
@@ -2003,9 +1982,6 @@ var subscription = context.CreateQueryStream<Movie>()
 ```
 
 # v1.2.0:
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 1.2.0-rc.1
-```
 
 ### Connectors (v1.2.0)
 GetConnectorsAsync - List all connectors in the Connect cluster.
@@ -2018,9 +1994,9 @@ DropConnectorIfExistsAsync - Drop a connector and delete it from the Connect clu
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 public async Task CreateGetAndDropConnectorAsync()
 {
@@ -2083,8 +2059,8 @@ Console.WriteLine(string.Join(',', tableResponses[0].Tables.Select(c => c.Name))
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Topics;
-using Kafka.DotNet.ksqlDB.Sample.Providers;
+using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Topics;
+using ksqlDB.RestApi.Client.Sample.Providers;
 
 private static async Task GetKsqlDbInformationAsync(IKSqlDbRestApiProvider restApiProvider)
 {
@@ -2106,7 +2082,7 @@ private static async Task GetKsqlDbInformationAsync(IKSqlDbRestApiProvider restA
 ```C#
 using System.Linq;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi;
 
 private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient client)
 {
@@ -2125,12 +2101,12 @@ private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient cli
 
 - CreateSinkConnectorAsync - Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
 
-See also how to create a SQL Server source connector with [Kafka.DotNet.SqlServer](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
+See also how to create a SQL Server source connector with [Kafka.DotNet.SqlServer](https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
 
 ```C#
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi;
 
 private static string SourceConnectorName => "mock-source-connector";
 private static string SinkConnectorName => "mock-sink-connector";
@@ -2229,9 +2205,9 @@ using System;
 using System.Reactive.Concurrency;
 using System.Threading;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.Linq;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.Sample.Models.Movies;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.Sample.Models.Movies;
 private static async Task SubscribeAsync(IKSqlDBContext context)
 {
   var cts = new CancellationTokenSource();
@@ -2258,9 +2234,6 @@ private static async Task SubscribeAsync(IKSqlDBContext context)
 ```
 
 # v1.6.0:
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 1.6.0-rc.1
-```
 
 ## CreateTypeAsync (v1.6.0)
 - `IKSqlDbRestApiClient.CreateTypeAsync<TEntity>` - Create an alias for a complex type declaration.
@@ -2268,11 +2241,11 @@ Install-Package Kafka.DotNet.ksqlDB -Version 1.6.0-rc.1
 ```C#
 using System;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.Linq;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
-using Kafka.DotNet.ksqlDB.Sample.Models.Events;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.Sample.Models.Events;
 
 private static async Task SubscriptionToAComplexTypeAsync()
 {      
@@ -2313,7 +2286,7 @@ INSERT INTO Events (Id, Places, Categories) VALUES (1, ARRAY['1','2','3'], ARRAY
 
 ```C#
 using System.Collections.Generic;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
 record EventCategory
 {
@@ -2398,9 +2371,6 @@ OrderType IN (1, 2, 3)
 ```
 
 # v1.7.0:
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 1.7.0-rc.1
-```
 
 ## IPullable - GetManyAsync (v1.7.0)
 - `IPullable.GetManyAsync<TEntity>` - Pulls all values from the materialized view asynchronously and terminates. 
@@ -2409,9 +2379,9 @@ Install-Package Kafka.DotNet.ksqlDB -Version 1.7.0-rc.1
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries;
-using Kafka.DotNet.ksqlDB.KSql.Query;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
+using ksqlDB.RestApi.Client.KSql.Query;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 
 public static async Task<List<OrderData>> GetOrdersAsync()
 {
@@ -2454,11 +2424,11 @@ public class OrderData: Record
 ```C#
 using System;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.Linq;
-using Kafka.DotNet.ksqlDB.KSql.Query;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Responses.Query.Descriptors;
-using Kafka.DotNet.ksqlDB.Sample.Models.Movies;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query.Descriptors;
+using ksqlDB.RestApi.Client.Sample.Models.Movies;
 
 public static async Task ExplainAsync(IKSqlDBContext context)
 {
@@ -2475,9 +2445,6 @@ public static async Task ExplainAsync(IKSqlDBContext context)
 ```
 
 # v1.8.0:
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 1.8.0
-```
 
 ### KSqlDbRestApiClient Droping types (v1.8.0)
 - DropTypeAsync and DropTypeIfExistsAsync - Removes a type alias from ksqlDB. If the IF EXISTS clause is present, the statement doesn't fail if the type doesn't exist.
@@ -2512,7 +2479,7 @@ INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Aliens', 1, 1986);
 ### Operator (NOT) BETWEEN (v1.8.0)
 - KSqlOperatorExtensions - Between - Constrain a value to a specified range in a WHERE clause.
 ```C#
-using Kafka.DotNet.ksqlDB.KSql.Query.Operators;
+using ksqlDB.RestApi.Client.KSql.Query.Operators;
 
 IQbservable<Tweet> query = context.CreateQueryStream<Tweet>()
   .Where(c => c.Id.Between(1, 5));
@@ -2537,19 +2504,19 @@ Lambda functions allow you to compose new expressions from existing ones. Lambda
 
 See also [Use lambda functions](https://docs.ksqldb.io/en/latest/how-to-guides/use-lambda-functions/) and [Invocation functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#invocation-functions)
 
-The following example shows you how to take advantage of invocation functions with Kafka.DotNet.ksqlDB:
+The following example shows you how to take advantage of invocation functions with ksqlDB.RestApi.Client:
 
 Add namespaces:
 ```C#
 using System;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.Linq;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
-using Kafka.DotNet.ksqlDB.KSql.Query.Options;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
-using Kafka.DotNet.ksqlDB.Sample.Models.InvocationFunctions;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.Sample.Models.InvocationFunctions;
 ```
 Prepare the model:
 ```C#
@@ -2735,9 +2702,6 @@ ARRAY_REMOVE(ARRAY[0], 0))
 ```ARRAY[]``` is not yet supported in ksqldb (v0.21.0)
 
 # v1.10.0:
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 1.10.0-rc.1
-```
 
 ## Lambda functions (Invocation functions) - Maps (v1.10.0)
 
@@ -2843,9 +2807,6 @@ var grouping =
 ```
 
 # v2.0.0:
-```
-Install-Package Kafka.DotNet.ksqlDB -Version 2.0.0-rc.1
-```
 
 ## Breaking change KSqlDBContextOptions
 > ⚠ KSqlDBContextOptions created with a constructor or by KSqlDbContextOptionsBuilder are setting the auto.offset.reset to earliest by default. This version removes this default configuration. It will not be opinionated in this way from now.
@@ -2878,9 +2839,9 @@ public enum ProcessingGuarantee
 Enable exactly-once or at_least_once semantics
 
 ```C#
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context.Options;
-using Kafka.DotNet.ksqlDB.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
 ```
 ```C#
 var ksqlDbUrl = @"http:\\localhost:8088";
@@ -2908,7 +2869,7 @@ var options = ClassUnderTest.UseKSqlDb(ksqlDbUrl)
 await using var context = new KSqlDBContext(options);
 ```
 
-See also how to [intercept http requests](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/wiki/Interception-of-HTTP-requests-in-kafka.dotnet.ksqldb---Authentication)
+See also how to [intercept http requests](https://github.com/tomasfabian/ksqlDB.RestApi.Client/wiki/Interception-of-HTTP-requests-in-ksqlDB.RestApi.Client---Authentication)
 
 ```C#
 var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
@@ -2962,12 +2923,12 @@ SELECT STRUCT(Property := 42) AS Value FROM Locations EMIT CHANGES;
 ```
 
 # LinqPad samples
-[Push Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.linq)
+[Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
 
-[Pull Query](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/tree/main/Samples/Kafka.DotNet.ksqlDB.LinqPad/kafka.dotnet.ksqldb.pull-query.linq)
+[Pull Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.pull-query.linq)
 
 # Nuget
-https://www.nuget.org/packages/Kafka.DotNet.ksqlDB/
+https://www.nuget.org/packages/ksqlDB.RestApi.Client/
 
 **TODO:**
 - [CREATE STREAM AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream-as-select/) - [ WITHIN [(before TIMEUNIT, after TIMEUNIT) | N TIMEUNIT] ]

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
 {

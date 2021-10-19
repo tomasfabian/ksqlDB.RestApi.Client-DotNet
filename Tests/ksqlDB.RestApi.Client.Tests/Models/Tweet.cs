@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-using Kafka.DotNet.ksqlDB.KSql.Query;
+using ksqlDB.RestApi.Client.KSql.Query;
 
 namespace ksqlDB.Api.Client.Tests.Models
 {

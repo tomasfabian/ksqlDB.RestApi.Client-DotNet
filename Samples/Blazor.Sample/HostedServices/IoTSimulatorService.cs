@@ -10,7 +10,9 @@ using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Kafka;
 using Kafka.DotNet.InsideOut.Producer;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 

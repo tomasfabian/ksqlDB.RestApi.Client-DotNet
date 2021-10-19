@@ -2,9 +2,9 @@
 using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
-using Kafka.DotNet.ksqlDB.KSql.Query.Visitors;
 using ksqlDB.Api.Client.Tests.Models;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Visitors;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 
@@ -145,7 +145,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
     public void Like_BuildKSql_PrintsLikeCondition()
     {
       //Arrange
-      Expression<Func<Tweet, bool>> likeExpression = c => Kafka.DotNet.ksqlDB.KSql.Query.Functions.KSql.Functions.Like(c.Message, "santa%");
+      Expression<Func<Tweet, bool>> likeExpression = c => ksqlDB.RestApi.Client.KSql.Query.Functions.KSql.Functions.Like(c.Message, "santa%");
 
       //Act
       var query = ClassUnderTest.BuildKSql(likeExpression);
@@ -158,7 +158,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
     public void LikeToLower_BuildKSql_PrintsLikeCondition()
     {
       //Arrange
-      Expression<Func<Tweet, bool>> likeExpression = c => Kafka.DotNet.ksqlDB.KSql.Query.Functions.KSql.Functions.Like(c.Message.ToLower(), "%santa%".ToLower());
+      Expression<Func<Tweet, bool>> likeExpression = c => ksqlDB.RestApi.Client.KSql.Query.Functions.KSql.Functions.Like(c.Message.ToLower(), "%santa%".ToLower());
 
       //Act
       var query = ClassUnderTest.BuildKSql(likeExpression);

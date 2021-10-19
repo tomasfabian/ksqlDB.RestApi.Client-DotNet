@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 
@@ -41,7 +41,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Functions
       //Arrange
 
       //Act
-      var kSqlFunctions = Kafka.DotNet.ksqlDB.KSql.Query.Functions.KSql.Functions;
+      var kSqlFunctions = ksqlDB.RestApi.Client.KSql.Query.Functions.KSql.Functions;
 
       //Assert
       kSqlFunctions.Should().BeOfType<KSqlFunctions>();
@@ -54,7 +54,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Functions
       //Arrange
 
       //Act
-      var kSqlFunctions = Kafka.DotNet.ksqlDB.KSql.Query.Functions.KSql.F;
+      var kSqlFunctions = ksqlDB.RestApi.Client.KSql.Query.Functions.KSql.F;
 
       //Assert
       kSqlFunctions.Should().BeOfType<KSqlFunctions>();

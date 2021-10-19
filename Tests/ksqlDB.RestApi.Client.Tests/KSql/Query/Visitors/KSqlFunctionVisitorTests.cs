@@ -2,9 +2,9 @@
 using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
-using Kafka.DotNet.ksqlDB.KSql.Query.Visitors;
 using ksqlDB.Api.Client.Tests.Models;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Visitors;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 

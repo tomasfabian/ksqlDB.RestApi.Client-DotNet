@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Enums;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements

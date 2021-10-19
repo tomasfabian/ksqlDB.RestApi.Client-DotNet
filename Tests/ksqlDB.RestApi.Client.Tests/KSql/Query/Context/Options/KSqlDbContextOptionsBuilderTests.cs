@@ -1,10 +1,10 @@
 ﻿using System;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.Config;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context.Options;
-using Kafka.DotNet.ksqlDB.KSql.Query.Options;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
 using ksqlDB.Api.Client.Tests.Helpers;
+using ksqlDB.RestApi.Client.KSql.Config;
+using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 using static System.String;

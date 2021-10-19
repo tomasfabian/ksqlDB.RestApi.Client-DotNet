@@ -14,15 +14,15 @@
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="Microsoft.Reactive.Testing" />
     <PackageReference Include="Moq" />
-    <PackageReference Include="MSTest.TestAdapter"/>
-    <PackageReference Include="MSTest.TestFramework"/>
+    <PackageReference Include="MSTest.TestAdapter" />
+    <PackageReference Include="MSTest.TestFramework" />
     <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit3TestAdapter"/>
+    <PackageReference Include="NUnit3TestAdapter" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Kafka.DotNet.ksqlDb\Kafka.DotNet.ksqlDB.csproj" />
+    <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDB.RestApi.Client.csproj" />
     <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
   </ItemGroup>
 </Project>

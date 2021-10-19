@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Enums;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Clauses;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Clauses;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;

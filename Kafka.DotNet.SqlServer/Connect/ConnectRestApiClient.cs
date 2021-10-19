@@ -5,8 +5,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Kafka.DotNet.SqlServer.Cdc.Connectors;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 
 namespace Kafka.DotNet.SqlServer.Connect
 {

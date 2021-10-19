@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Query;
 using ksqlDB.Api.Client.Tests.Fakes.Http;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi
 {

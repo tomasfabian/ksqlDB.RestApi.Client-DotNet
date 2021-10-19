@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
 namespace ksqlDB.Api.Client.Samples.Models.Events
 {

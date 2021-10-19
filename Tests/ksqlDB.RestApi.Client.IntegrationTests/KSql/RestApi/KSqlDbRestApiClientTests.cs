@@ -8,17 +8,19 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.Linq;
-using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Enums;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
 using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Linq.Statements;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.RestApi
@@ -454,7 +456,7 @@ Drop type Address;
 
     internal record MyMoviesStreamTest
     {
-      [Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations.Key]
+      [Key]
       public int Id { get; set; }
 
       public string Title { get; set; }

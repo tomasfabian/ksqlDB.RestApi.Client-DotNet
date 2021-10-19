@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using ksqlDB.Api.Client.IntegrationTests.Models;
+using ksqlDB.RestApi.Client.KSql.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
@@ -19,7 +20,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
       var result = await RestApiProvider.DropStreamAndTopic(StreamName);
     }
 
-    protected override Kafka.DotNet.ksqlDB.KSql.Linq.IQbservable<Tweet> QuerySource =>
+    protected override IQbservable<Tweet> QuerySource =>
       Context.CreateQuery<Tweet>(StreamName);
   }
 }

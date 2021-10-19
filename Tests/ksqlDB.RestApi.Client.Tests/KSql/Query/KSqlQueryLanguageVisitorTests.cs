@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.Linq;
-using Kafka.DotNet.ksqlDB.KSql.Query;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
-using Kafka.DotNet.ksqlDB.KSql.Query.Operators;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.KSql.Linq;
 using ksqlDB.Api.Client.Tests.Models;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Operators;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 using Location = ksqlDB.Api.Client.Tests.Models.Location;
@@ -136,7 +136,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     {
       //Arrange
       var query = CreateStreamSource()
-        .Select(c => new { c.Longitude, c.Latitude, Col = Kafka.DotNet.ksqlDB.KSql.Query.Functions.KSql.F.Dynamic("IFNULL(Latitude, 'n/a')") as string });
+        .Select(c => new { c.Longitude, c.Latitude, Col = ksqlDB.RestApi.Client.KSql.Query.Functions.KSql.F.Dynamic("IFNULL(Latitude, 'n/a')") as string });
 
       //Act
       var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);

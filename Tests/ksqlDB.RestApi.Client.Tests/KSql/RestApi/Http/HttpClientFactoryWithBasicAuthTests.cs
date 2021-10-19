@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Net.Http;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Http;
 using ksqlDB.Api.Client.Tests.Helpers;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 

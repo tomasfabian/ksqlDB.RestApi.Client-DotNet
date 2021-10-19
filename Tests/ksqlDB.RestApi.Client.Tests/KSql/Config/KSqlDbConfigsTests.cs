@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.Config;
+using ksqlDB.RestApi.Client.KSql.Config;
 using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Config

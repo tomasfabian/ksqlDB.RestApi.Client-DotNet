@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Kafka.DotNet.ksqlDB.Infrastructure.Extensions;
+using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ksqlDB.Api.Client.Tests.Infrastructure.Extensions

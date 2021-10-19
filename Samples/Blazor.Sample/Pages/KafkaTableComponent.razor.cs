@@ -10,9 +10,9 @@ using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Extensions.Http;
 using Blazor.Sample.Kafka;
 using Kafka.DotNet.InsideOut.Consumer;
-using Kafka.DotNet.ksqlDB.KSql.Linq;
-using Kafka.DotNet.ksqlDB.KSql.Linq.Statements;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Linq.Statements;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
 

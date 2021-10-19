@@ -10,19 +10,20 @@ using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Pages.SqlServerCDC.Models;
 using Confluent.Kafka;
 using Kafka.DotNet.InsideOut.Consumer;
-using Kafka.DotNet.ksqlDB.KSql.Linq;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
 using Kafka.DotNet.SqlServer.Cdc;
 using Kafka.DotNet.SqlServer.Cdc.Connectors;
 using Kafka.DotNet.SqlServer.Connect;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using AutoOffsetReset = Kafka.DotNet.ksqlDB.KSql.Query.Options.AutoOffsetReset;
+using AutoOffsetReset = ksqlDB.RestApi.Client.KSql.Query.Options.AutoOffsetReset;
 
 namespace Blazor.Sample.Pages.SqlServerCDC
 {

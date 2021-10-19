@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Parsers;
+using ksqlDB.RestApi.Client.KSql.RestApi.Parsers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using UnitTests;

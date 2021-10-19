@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using NUnit.Framework;
 using UnitTests;
 

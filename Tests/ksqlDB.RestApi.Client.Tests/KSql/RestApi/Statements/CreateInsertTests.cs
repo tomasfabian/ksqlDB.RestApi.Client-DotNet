@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Annotations;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements.Properties;
 using ksqlDB.Api.Client.Tests.Models.Movies;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements

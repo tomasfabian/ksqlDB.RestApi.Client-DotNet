@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using ksqlDB.Api.Client.Tests.Helpers;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Moq;
 using Moq.Protected;
 

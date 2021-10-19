@@ -1,4 +1,4 @@
-﻿using Kafka.DotNet.ksqlDB.KSql.RestApi;
+﻿using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi
 {
