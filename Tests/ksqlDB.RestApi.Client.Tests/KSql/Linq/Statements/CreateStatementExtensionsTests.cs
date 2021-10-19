@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using ksqlDB.Api.Client.Tests.Fakes.Http;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.Models;

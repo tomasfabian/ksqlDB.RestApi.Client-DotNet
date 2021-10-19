@@ -3,12 +3,11 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
-using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses;
 
-namespace Kafka.DotNet.ksqlDB.KSql.RestApi
+namespace ksqlDB.RestApi.Client.KSql.RestApi
 {
   internal class KSqlDbQueryStreamProvider : KSqlDbProvider
   {

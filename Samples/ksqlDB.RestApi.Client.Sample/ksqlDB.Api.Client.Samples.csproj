@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ksqlDB.RestApi.Client" Version="1.0.0-rc.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
-    <!-- <PackageReference Include="ksqlDb.RestApi.Client" Version="1.0.0" /> -->
-    <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />
+    <!--<ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />-->
   </ItemGroup>
 </Project>

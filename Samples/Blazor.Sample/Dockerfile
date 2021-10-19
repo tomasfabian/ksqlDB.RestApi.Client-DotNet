@@ -9,8 +9,8 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
 COPY ["nuget.config", "."]
 COPY ["Samples/Blazor.Sample/Blazor.Sample.csproj", "Samples/Blazor.Sample/"]
-COPY ["Kafka.DotNet.InsideOut/Kafka.DotNet.InsideOut.csproj", "Kafka.DotNet.InsideOut/"]
-COPY ["Kafka.DotNet.ksqlDB/Kafka.DotNet.ksqlDB.csproj", "Kafka.DotNet.ksqlDB/"]
+COPY ["Samples/InsideOut/InsideOut.csproj", "InsideOut/"]
+COPY ["ksqlDb.RestApi.Client/ksqlDb.RestApi.Client.csproj", "ksqlDb.RestApi.Client/"]
 RUN dotnet restore "Samples/Blazor.Sample/Blazor.Sample.csproj"
 COPY . .
 WORKDIR "/src/Samples/Blazor.Sample"

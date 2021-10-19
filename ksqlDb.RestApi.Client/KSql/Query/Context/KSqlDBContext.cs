@@ -12,7 +12,6 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Clauses;
 using Microsoft.Extensions.DependencyInjection;
 #if !NETSTANDARD
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 #endif
 

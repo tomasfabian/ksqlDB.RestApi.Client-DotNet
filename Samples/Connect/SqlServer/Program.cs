@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Kafka.DotNet.SqlServer.Cdc.Connectors;
-using Kafka.DotNet.SqlServer.Connect;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using SqlServer.Connector.Cdc.Connectors;
+using SqlServer.Connector.Connect;
 
 namespace Connect.SqlServer
 {

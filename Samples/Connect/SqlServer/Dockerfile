@@ -6,8 +6,8 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
 COPY ["SqlServer/Connect.SqlServer.csproj", "SqlServer/"]
-COPY ["../../Kafka.DotNet.SqlServer/Kafka.DotNet.SqlServer.csproj", "../../Kafka.DotNet.SqlServer/"]
-COPY ["../../Kafka.DotNet.ksqlDb/Kafka.DotNet.ksqlDB.csproj", "../../Kafka.DotNet.ksqlDb/"]
+COPY ["../../SqlServer.Connector/SqlServer.Connector.csproj", "../../SqlServer.Connector/"]
+COPY ["../../ksqlDb.RestApi.Client/ksqlDb.RestApi.Client.csproj", "../../ksqlDb.RestApi.Client/"]
 RUN dotnet restore "SqlServer/Connect.SqlServer.csproj"
 COPY . .
 WORKDIR "/src/SqlServer"
