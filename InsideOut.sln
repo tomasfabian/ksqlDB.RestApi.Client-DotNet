@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "Tests\UnitTest
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{AA5681E8-1682-47E9-9159-4AE95A92E694}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDB.Api.Client.Samples", "Samples\Kafka.DotNet.ksqlDB.Sample\ksqlDB.Api.Client.Samples.csproj", "{24D73489-0E6F-42AF-8692-00503FE2406A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDB.Api.Client.Samples", "Samples\ksqlDB.RestApi.Client.Sample\ksqlDB.Api.Client.Samples.csproj", "{24D73489-0E6F-42AF-8692-00503FE2406A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDB.Api.Client.Tests", "Tests\ksqlDB.RestApi.Client.Tests\ksqlDB.Api.Client.Tests.csproj", "{A1CC1EDB-C346-4BE5-BDC5-8288D2ECC0EC}"
 EndProject
