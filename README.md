@@ -1,4 +1,4 @@
-⚠ Package will be soon renamed to ksqlDB.Api.Client
+⚠ Package had to be renamed to ksqlDB.RestApi.Client. I apologize for the inconveniences.
 
 This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
 You can continually process computations over unbounded (theoretically never-ending) streams of data.
