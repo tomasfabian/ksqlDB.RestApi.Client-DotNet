@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Kafka.DotNet.SqlServer.Cdc;
 using Kafka.DotNet.SqlServer.Tests.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SqlServer.Connector.Cdc;
 using UnitTests;
 using ConfigurationProvider = Kafka.DotNet.SqlServer.Tests.Config.ConfigurationProvider;
 

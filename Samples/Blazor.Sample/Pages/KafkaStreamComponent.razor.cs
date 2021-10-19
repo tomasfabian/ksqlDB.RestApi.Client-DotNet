@@ -9,7 +9,7 @@ using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Extensions.Http;
 using Blazor.Sample.Kafka;
 using Confluent.Kafka;
-using Kafka.DotNet.InsideOut.Consumer;
+using InsideOut.Consumer;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context;

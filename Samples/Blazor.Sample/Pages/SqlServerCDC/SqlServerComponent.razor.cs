@@ -9,10 +9,7 @@ using Blazor.Sample.Data;
 using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Pages.SqlServerCDC.Models;
 using Confluent.Kafka;
-using Kafka.DotNet.InsideOut.Consumer;
-using Kafka.DotNet.SqlServer.Cdc;
-using Kafka.DotNet.SqlServer.Cdc.Connectors;
-using Kafka.DotNet.SqlServer.Connect;
+using InsideOut.Consumer;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
@@ -23,6 +20,9 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using SqlServer.Connector.Cdc;
+using SqlServer.Connector.Cdc.Connectors;
+using SqlServer.Connector.Connect;
 using AutoOffsetReset = ksqlDB.RestApi.Client.KSql.Query.Options.AutoOffsetReset;
 
 namespace Blazor.Sample.Pages.SqlServerCDC
@@ -379,7 +379,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
         AutoOffsetReset = Confluent.Kafka.AutoOffsetReset.Earliest
       };
 
-      var kafkaConsumer = new KafkaConsumer<string, global::Kafka.DotNet.SqlServer.Cdc.DatabaseChangeObject<IoTSensor>>("sqlserver2019.dbo.Sensors", consumerConfig);
+      var kafkaConsumer = new KafkaConsumer<string, Models.DatabaseChangeObject<IoTSensor>>("sqlserver2019.dbo.Sensors", consumerConfig);
 
       await foreach (var consumeResult in kafkaConsumer.ConnectToTopic().ToAsyncEnumerable().Take(10))
       {

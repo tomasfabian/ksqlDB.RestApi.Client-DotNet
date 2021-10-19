@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Kafka.DotNet.SqlServer\Kafka.DotNet.SqlServer.csproj" />
+    <ProjectReference Include="..\..\..\SqlServer.Connector\SqlServer.Connector.csproj" />
   </ItemGroup>
 
 </Project>

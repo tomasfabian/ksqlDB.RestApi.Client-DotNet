@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
-using Kafka.DotNet.SqlServer.Cdc;
-using Kafka.DotNet.SqlServer.Cdc.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SqlServer.Connector.Cdc;
+using SqlServer.Connector.Cdc.Extensions;
 using UnitTests;
 
 namespace Kafka.DotNet.SqlServer.Tests.Cdc.Extensions

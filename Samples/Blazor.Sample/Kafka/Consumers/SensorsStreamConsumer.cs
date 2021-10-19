@@ -2,7 +2,7 @@
 using System.Linq;
 using Blazor.Sample.Data.Sensors;
 using Confluent.Kafka;
-using Kafka.DotNet.InsideOut.Consumer;
+using InsideOut.Consumer;
 
 namespace Blazor.Sample.Kafka.Consumers
 {

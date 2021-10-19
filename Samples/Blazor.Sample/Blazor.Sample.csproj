@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Kafka.DotNet.InsideOut\Kafka.DotNet.InsideOut.csproj" />
-    <ProjectReference Include="..\..\Kafka.DotNet.SqlServer\Kafka.DotNet.SqlServer.csproj" />
+    <ProjectReference Include="..\..\Samples\InsideOut\InsideOut.csproj" />
+    <ProjectReference Include="..\..\SqlServer.Connector\SqlServer.Connector.csproj" />
     <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDB.RestApi.Client.csproj" />
   </ItemGroup>
 

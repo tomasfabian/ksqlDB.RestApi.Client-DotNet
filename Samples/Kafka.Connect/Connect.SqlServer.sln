@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafka.DotNet.SqlServer", "..\..\Kafka.DotNet.SqlServer\Kafka.DotNet.SqlServer.csproj", "{87D0B177-48D0-459A-AD7C-4018B2888050}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafka.DotNet.SqlServer", "..\..\SqlServer.Connector\SqlServer.Connector.csproj", "{87D0B177-48D0-459A-AD7C-4018B2888050}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kafka.DotNet.ksqlDB", "..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj", "{27AA0ADE-4260-4F1C-BCAE-E66ABBBDED3E}"
 EndProject

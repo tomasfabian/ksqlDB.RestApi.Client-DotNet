@@ -1,6 +1,6 @@
 ﻿using Blazor.Sample.Data.Sensors;
-using Kafka.DotNet.SqlServer.Cdc;
-using Kafka.DotNet.SqlServer.Cdc.Extensions;
+using SqlServer.Connector.Cdc;
+using SqlServer.Connector.Cdc.Extensions;
 
 namespace Blazor.Sample.Pages.SqlServerCDC.Models
 {

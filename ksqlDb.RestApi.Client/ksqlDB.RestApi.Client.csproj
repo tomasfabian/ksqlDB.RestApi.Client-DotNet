@@ -15,7 +15,7 @@
       Targets .NET 5, .NET Core 3.1 and .NET Standard 2.0.
       Documentation for the library can be found at https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/ksqlDB.RestApi.Client/Wiki.md.</Description>
     <PackageTags>ksql ksqlDB LINQ .NET csharp push query</PackageTags>
-    <Version>1.0.0</Version>
+    <Version>1.0.0-rc.1</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <LangVersion>9.0</LangVersion>
     <PackageReleaseNotes>https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/ksqlDB.RestApi.Client/ChangeLog.md</PackageReleaseNotes>

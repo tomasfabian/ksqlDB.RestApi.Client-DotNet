@@ -4,17 +4,17 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Kafka.DotNet.ksqlDB.KSql.Linq;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context;
-using Kafka.DotNet.ksqlDB.KSql.Query.Context.Options;
-using Kafka.DotNet.ksqlDB.KSql.Query.Functions;
-using Kafka.DotNet.ksqlDB.KSql.Query.Options;
-using Kafka.DotNet.ksqlDB.KSql.RestApi;
-using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters;
-using Kafka.DotNet.ksqlDB.Sample.Models;
-using Kafka.DotNet.ksqlDB.Sample.Models.Movies;
-using Kafka.DotNet.ksqlDB.Sample.Providers;
-using Kafka.DotNet.ksqlDB.Sample.PullQuery;
+using ksqlDB.Api.Client.Samples.Models;
+using ksqlDB.Api.Client.Samples.Models.Movies;
+using ksqlDB.Api.Client.Samples.Providers;
+using ksqlDB.Api.Client.Samples.PullQuery;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
 namespace Kafka.DotNetFramework.ksqlDB.Sample
 {

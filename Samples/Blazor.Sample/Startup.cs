@@ -12,11 +12,11 @@ using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Kafka;
 using Blazor.Sample.Kafka.Consumers;
 using Confluent.Kafka;
-using Kafka.DotNet.InsideOut.Consumer;
-using Kafka.DotNet.InsideOut.Producer;
-using Kafka.DotNet.SqlServer.Cdc;
-using Kafka.DotNet.SqlServer.Connect;
+using InsideOut.Consumer;
+using InsideOut.Producer;
 using Microsoft.EntityFrameworkCore;
+using SqlServer.Connector.Cdc;
+using SqlServer.Connector.Connect;
 
 namespace Blazor.Sample
 {
