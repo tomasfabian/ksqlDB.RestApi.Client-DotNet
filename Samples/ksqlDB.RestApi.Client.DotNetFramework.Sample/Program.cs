@@ -16,7 +16,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
-namespace Kafka.DotNetFramework.ksqlDB.Sample
+namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
 {
   class Program
   {

@@ -124,19 +124,19 @@ run in command line:
 
 **AspNet Blazor server side sample:**
 
-- set docker-compose.csproj as startup project in Kafka.DotNet.InsideOut.sln for an embedded Kafka connect integration and stream processing examples. 
+- set docker-compose.csproj as startup project in InsideOut.sln for an embedded Kafka connect integration and stream processing examples. 
 
 # CDC - Push notifications from Sql Server tables with Kafka
 Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with Kafka.DotNet.SqlServer package together with the Debezium connector streaming platform. 
 ### Nuget
 ```
-Install-Package Kafka.DotNet.SqlServer -Version 0.3.0-rc.1
+Install-Package SqlServer.Connector -Version 0.3.0-rc.1
 Install-Package ksqlDB.RestApi.Client
 ```
 
-[Kafka.DotNet.SqlServer WIKI](https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
+[SqlServer.Connector WIKI](https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/SqlServer.Connector/Wiki.md)
 
-Full example is available in [Blazor example](https://github.com/tomasfabian/ksqlDB.RestApi.Client/tree/main/Samples/Blazor.Sample) - Kafka.DotNet.InsideOut.sln: (The initial run takes a few minutes until all containers are up and running.)
+Full example is available in [Blazor example](https://github.com/tomasfabian/ksqlDB.RestApi.Client/tree/main/Samples/Blazor.Sample) - InsideOut.sln: (The initial run takes a few minutes until all containers are up and running.)
 
 The following example demonstrates ksqldb server side filtering of database transactions: 
 ```C#
@@ -347,7 +347,7 @@ static async Task Main(string[] args)
 }
 ```
 
-[Blazor server side example](https://github.com/tomasfabian/ksqlDB.RestApi.Client) - Kafka.DotNet.InsideOut.sln
+[Blazor server side example](https://github.com/tomasfabian/ksqlDB.RestApi.Client) - InsideOut.sln
 
 # Setting query parameters (v0.1.0)
 Default settings:
@@ -2101,7 +2101,7 @@ private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient cli
 
 - CreateSinkConnectorAsync - Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
 
-See also how to create a SQL Server source connector with [Kafka.DotNet.SqlServer](https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/Kafka.DotNet.SqlServer/Wiki.md)
+See also how to create a SQL Server source connector with [SqlServer.Connector](https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/SqlServer.Connector/Wiki.md)
 
 ```C#
 using System.Collections.Generic;
