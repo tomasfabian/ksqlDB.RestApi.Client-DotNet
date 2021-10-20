@@ -28,7 +28,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		.env = .env
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
-		Kafka.DotNet.InsideOut\Package.nuspec = Kafka.DotNet.InsideOut\Package.nuspec
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlServer.Connector", "SqlServer.Connector\SqlServer.Connector.csproj", "{E672877E-BC9D-41A2-B665-C943D7EB1DBD}"
@@ -91,6 +90,7 @@ Global
 		{24D73489-0E6F-42AF-8692-00503FE2406A} = {AA5681E8-1682-47E9-9159-4AE95A92E694}
 		{A1CC1EDB-C346-4BE5-BDC5-8288D2ECC0EC} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}
 		{9B744296-3BDF-41A6-B720-7271C329F7BF} = {AA5681E8-1682-47E9-9159-4AE95A92E694}
+		{63BEFF26-D85A-477F-A474-2E2B063BC6C0} = {AA5681E8-1682-47E9-9159-4AE95A92E694}
 		{D73BA2F1-7F1C-45D8-8D53-1832E40320AA} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
