@@ -1,24 +1,23 @@
 <Query Kind="Program">
   <NuGetReference>Kafka.DotNet.InsideOut</NuGetReference>
-  <NuGetReference Prerelease="true">Kafka.DotNet.ksqlDB</NuGetReference>
-  <NuGetReference Prerelease="true">Kafka.DotNet.SqlServer</NuGetReference>
+  <NuGetReference>ksqlDB.RestApi.Client</NuGetReference>
+  <NuGetReference Prerelease="true">SqlServer.Connector</NuGetReference>
   <NuGetReference>System.Data.SqlClient</NuGetReference>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.Linq</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.Query.Context</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.Query.Options</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.RestApi</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.RestApi.Generators</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.RestApi.Statements</Namespace>
-  <Namespace>Kafka.DotNet.SqlServer.Cdc</Namespace>
-  <Namespace>Kafka.DotNet.SqlServer.Cdc.Connectors</Namespace>
-  <Namespace>Kafka.DotNet.SqlServer.Cdc.Extensions</Namespace>
-  <Namespace>Kafka.DotNet.SqlServer.Connect</Namespace>
+  <Namespace>Confluent.Kafka</Namespace>
   <Namespace>System.Net.Http</Namespace>
   <Namespace>System.Text.Json</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
+  <Namespace>SqlServer.Connector.Cdc</Namespace>
   <Namespace>Kafka.DotNet.InsideOut.Consumer</Namespace>
-  <Namespace>Confluent.Kafka</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.Query.Context</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.RestApi.Http</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.RestApi</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.RestApi.Serialization</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.RestApi.Generators</Namespace>
+  <Namespace>SqlServer.Connector.Connect</Namespace>
+  <Namespace>SqlServer.Connector.Cdc.Connectors</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.RestApi.Statements</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.Linq</Namespace>
   <RuntimeVersion>5.0</RuntimeVersion>
 </Query>
 
@@ -42,7 +41,7 @@ async Task Main()
 	var semaphoreSlim = new SemaphoreSlim(0, 1);
 	
 	var cdcSubscription = context.CreateQuery<DatabaseChangeObject<IoTSensor>>("sqlserversensors")
-		.WithOffsetResetPolicy(Kafka.DotNet.ksqlDB.KSql.Query.Options.AutoOffsetReset.Latest)
+		.WithOffsetResetPolicy(ksqlDB.RestApi.Client.KSql.Query.Options.AutoOffsetReset.Latest)
 		.Take(5)
 		.ToObservable()
 		.Subscribe(cdc =>
@@ -120,7 +119,7 @@ private async Task EnableCdcAsync(string tableName)
 {
 	try
 	{
-		var cdcClient = new Kafka.DotNet.SqlServer.Cdc.CdcClient(connectionString);
+		var cdcClient = new CdcClient(connectionString);
 		
 		await cdcClient.CdcEnableDbAsync();
 		await cdcClient.CdcEnableTableAsync(tableName);

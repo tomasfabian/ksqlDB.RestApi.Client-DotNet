@@ -1,17 +1,18 @@
 <Query Kind="Program">
   <NuGetReference Version="0.1.0" Prerelease="true">Kafka.DotNet.InsideOut</NuGetReference>
-  <NuGetReference Version="1.1.0-rc.1">Kafka.DotNet.ksqlDB</NuGetReference>
+  <NuGetReference>ksqlDB.RestApi.Client</NuGetReference>
   <Namespace>Confluent.Kafka</Namespace>
   <Namespace>Kafka.DotNet.InsideOut.Producer</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.Linq.Statements</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.Query.Context</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.RestApi</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.RestApi.Extensions</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.RestApi.Statements</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.Linq.Statements</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.Query.Context</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.RestApi</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.RestApi.Extensions</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.RestApi.Statements</Namespace>
   <Namespace>System.Net.Http</Namespace>
   <Namespace>System.Reactive.Linq</Namespace>
   <Namespace>System.Runtime.Serialization</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.RestApi.Http</Namespace>
 </Query>
 
 const string bootstrapServers = "localhost:29092";

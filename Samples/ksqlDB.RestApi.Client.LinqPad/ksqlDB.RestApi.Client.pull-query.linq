@@ -1,14 +1,15 @@
 <Query Kind="Program">
-  <NuGetReference Prerelease="true">Kafka.DotNet.ksqlDB</NuGetReference>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.Linq.PullQueries</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.Linq.Statements</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.Query.Context</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.RestApi</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.RestApi.Statements</Namespace>
+  <NuGetReference>ksqlDB.RestApi.Client</NuGetReference>
+  <Namespace>ksqlDB.RestApi.Client.KSql.Linq.PullQueries</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.Linq.Statements</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.Query.Context</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.Query.Functions</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.Query.Windows</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.RestApi</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.RestApi.Statements</Namespace>
   <Namespace>System.Net.Http</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.Query.Functions</Namespace>
-  <Namespace>Kafka.DotNet.ksqlDB.KSql.Query.Windows</Namespace>
+  <Namespace>ksqlDB.RestApi.Client.KSql.RestApi.Http</Namespace>
 </Query>
 
 IKSqlDbRestApiClient restApiClient;
@@ -44,7 +45,7 @@ async Task Main()
 	var result = await context.CreatePullQuery<IoTSensorStats>(MaterializedViewName)
 				.Where(c => c.SensorId == "sensor-1")
 				.Where(c => Bounds.WindowStart > windowStart && Bounds.WindowEnd <= windowEnd)
-				.GetAsync();
+				.FirstOrDefaultAsync();
 
 	Console.WriteLine($"{result?.SensorId} - {result?.AvgValue}");
 
