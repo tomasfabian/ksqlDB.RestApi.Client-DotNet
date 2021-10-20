@@ -61,6 +61,11 @@ LIMIT 2;
 
 In the above mentioned code snippet everything runs server side except of the ``` IQbservable<TEntity>.Subscribe``` method. It subscribes to your ksqlDB stream created in the following manner:
 ```C#
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+```
+```C#
 EntityCreationMetadata metadata = new()
 {
   KafkaTopic = nameof(Tweet),
@@ -146,6 +151,7 @@ using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using SqlServer.Connector.Cdc;
 using SqlServer.Connector.Cdc.Extensions;
 
@@ -259,8 +265,8 @@ public record IoTSensor
 }
 ```
 
-# Kafka stream processing
-[InsideOut](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/Samples/InsideOut/Wiki.md) is a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with ksqlDB.RestApi.Client
+# Kafka stream processing example
+[InsideOut](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/InsideOut) is an example of a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with ksqlDB.RestApi.Client
 ```
 Install-Package ksqlDB.RestApi.Client
 ```
@@ -1453,6 +1459,7 @@ var source = context.CreateQueryStream<Movie>(queryStreamParameters)
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 public async Task ExecuteStatementAsync()
@@ -1627,6 +1634,7 @@ using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 
@@ -1654,7 +1662,7 @@ async Task Main()
 	
   var result = await context.CreatePullQuery<IoTSensorStats>("avg_sensor_values")
     .Where(c => c.SensorId == "sensor-1")
-    .GetAsync();
+    .FirstOrDefaultAsync();
 
   Console.WriteLine($"{result?.SensorId} - {result?.AvgValue}");
 }
@@ -1994,6 +2002,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
@@ -2243,6 +2252,7 @@ using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.Sample.Models.Events;
 

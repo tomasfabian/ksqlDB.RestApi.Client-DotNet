@@ -1,4 +1,4 @@
-﻿InsideOut is a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with ksqlDB.RestApi.Client or by other means. This package is based on [Confluent.Kafka](https://github.com/confluentinc/confluent-kafka-dotnet)
+﻿InsideOut is an example of a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with ksqlDB.RestApi.Client or by other means. This package is based on [Confluent.Kafka](https://github.com/confluentinc/confluent-kafka-dotnet)
 
 ### Blazor Sample 
 Set docker-compose.csproj as startup project in InsideOut.sln.
@@ -62,7 +62,6 @@ private async Task ProduceValueAsync()
 
 # KafkaConsumer (v1.0.0)
 ```
-Install-Package InsideOut -Version 1.0.0
 Install-Package System.Interactive.Async -Version 5.0.0
 ```
 
