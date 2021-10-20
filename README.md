@@ -1,10 +1,10 @@
-⚠ Package had to be renamed to ksqlDB.RestApi.Client. I aplogize for the inconveniences.
+⚠ Package will be soon renamed to ksqlDB.Api.Client
 
 This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
 You can continually process computations over unbounded (theoretically never-ending) streams of data.
 It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the Rest API.
 
-[ksqlDB.RestApi.Client](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet) is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
+[ksqlDB.RestApi.Client](https://github.com/tomasfabian/ksqlDB.RestApi.Client) is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
 
 Install with NuGet package manager:
 ```
@@ -61,11 +61,6 @@ LIMIT 2;
 
 In the above mentioned code snippet everything runs server side except of the ``` IQbservable<TEntity>.Subscribe``` method. It subscribes to your ksqlDB stream created in the following manner:
 ```C#
-using ksqlDB.RestApi.Client.KSql.RestApi;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-```
-```C#
 EntityCreationMetadata metadata = new()
 {
   KafkaTopic = nameof(Tweet),
@@ -106,7 +101,7 @@ var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
   .InsertIntoAsync(new Tweet { Id = 2, Message = "ksqlDB rulez!" });
 ```
 
-Sample project can be found under [Samples](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.Sample) solution folder in ksqlDB.RestApi.Client.sln 
+Sample project can be found under [Samples](https://github.com/tomasfabian/ksqlDB.RestApi.Client/tree/main/Samples/ksqlDB.RestApi.Client.Sample) solution folder in ksqlDB.RestApi.Client.sln 
 
 
 **External dependencies:**
@@ -115,10 +110,10 @@ Sample project can be found under [Samples](https://github.com/tomasfabian/ksqlD
 
 Clone the repository
 ```
-git clone https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet.git
+git clone https://github.com/tomasfabian/ksqlDB.RestApi.Client.git
 ```
 
-CD to [Samples](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.Sample)
+CD to [Samples](https://github.com/tomasfabian/ksqlDB.RestApi.Client/tree/main/Samples/ksqlDB.RestApi.Client.Sample)
 ```
 CD Samples\ksqlDB.RestApi.Client.Sample\
 ```
@@ -132,16 +127,16 @@ run in command line:
 - set docker-compose.csproj as startup project in InsideOut.sln for an embedded Kafka connect integration and stream processing examples. 
 
 # CDC - Push notifications from Sql Server tables with Kafka
-Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with SqlServer.Connector package together with the Debezium connector streaming platform. 
+Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with Kafka.DotNet.SqlServer package together with the Debezium connector streaming platform. 
 ### Nuget
 ```
 Install-Package SqlServer.Connector -Version 0.3.0-rc.1
 Install-Package ksqlDB.RestApi.Client
 ```
 
-[SqlServer.Connector WIKI](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/SqlServer.Connector/Wiki.md)
+[SqlServer.Connector WIKI](https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/SqlServer.Connector/Wiki.md)
 
-Full example is available in [Blazor example](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/Blazor.Sample) - InsideOut.sln: (The initial run takes a few minutes until all containers are up and running.)
+Full example is available in [Blazor example](https://github.com/tomasfabian/ksqlDB.RestApi.Client/tree/main/Samples/Blazor.Sample) - InsideOut.sln: (The initial run takes a few minutes until all containers are up and running.)
 
 The following example demonstrates ksqldb server side filtering of database transactions: 
 ```C#
@@ -151,9 +146,8 @@ using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
-using SqlServer.Connector.Cdc;
-using SqlServer.Connector.Cdc.Extensions;
+using Kafka.DotNet.SqlServer.Cdc;
+using Kafka.DotNet.SqlServer.Cdc.Extensions;
 
 class Program
 {
@@ -265,8 +259,8 @@ public record IoTSensor
 }
 ```
 
-# Kafka stream processing example
-[InsideOut](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/InsideOut) is an example of a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with ksqlDB.RestApi.Client
+# Kafka stream processing
+[Kafka.DotNet.InsideOut](https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/Kafka.DotNet.InsideOut/Wiki.md) is a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with ksqlDB.RestApi.Client
 ```
 Install-Package ksqlDB.RestApi.Client
 ```
@@ -318,6 +312,7 @@ public record IoTSensorStats
 ```
 
 ```
+Install-Package Kafka.DotNet.InsideOut -Version 1.0.0
 Install-Package System.Interactive.Async -Version 5.0.0
 ```
 
@@ -327,7 +322,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Confluent.Kafka;
-using InsideOut.Consumer;
+using Kafka.DotNet.InsideOut.Consumer;
 
 const string bootstrapServers = "localhost:29092";
 
@@ -352,7 +347,7 @@ static async Task Main(string[] args)
 }
 ```
 
-[Blazor server side example](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet) - InsideOut.sln
+[Blazor server side example](https://github.com/tomasfabian/ksqlDB.RestApi.Client) - InsideOut.sln
 
 # Setting query parameters (v0.1.0)
 Default settings:
@@ -1459,7 +1454,6 @@ var source = context.CreateQueryStream<Movie>(queryStreamParameters)
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.RestApi;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 public async Task ExecuteStatementAsync()
@@ -1625,7 +1619,7 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
 # Pull queries - `CreatePullQuery<TEntity>` (v.0.10.0)
 [A pull query](https://docs.ksqldb.io/en/latest/concepts/queries/#pull) is a form of query issued by a client that retrieves a result as of "now", like a query against a traditional RDBS.
 
-See also [GetManyAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet#ipullable---getmanyasync-v170).
+See also [GetManyAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client#ipullable---getmanyasync-v170).
 
 ```C#
 using System.Net.Http;
@@ -1634,7 +1628,6 @@ using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 
@@ -1662,7 +1655,7 @@ async Task Main()
 	
   var result = await context.CreatePullQuery<IoTSensorStats>("avg_sensor_values")
     .Where(c => c.SensorId == "sensor-1")
-    .FirstOrDefaultAsync();
+    .GetAsync();
 
   Console.WriteLine($"{result?.SensorId} - {result?.AvgValue}");
 }
@@ -2002,7 +1995,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.RestApi;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
@@ -2109,7 +2101,7 @@ private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient cli
 
 - CreateSinkConnectorAsync - Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
 
-See also how to create a SQL Server source connector with [SqlServer.Connector](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/SqlServer.Connector/Wiki.md)
+See also how to create a SQL Server source connector with [SqlServer.Connector](https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/SqlServer.Connector/Wiki.md)
 
 ```C#
 using System.Collections.Generic;
@@ -2252,7 +2244,6 @@ using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.Sample.Models.Events;
 
@@ -2878,7 +2869,7 @@ var options = ClassUnderTest.UseKSqlDb(ksqlDbUrl)
 await using var context = new KSqlDBContext(options);
 ```
 
-See also how to [intercept http requests](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/Interception-of-HTTP-requests-in-ksqlDB.RestApi.Client---Authentication)
+See also how to [intercept http requests](https://github.com/tomasfabian/ksqlDB.RestApi.Client/wiki/Interception-of-HTTP-requests-in-ksqlDB.RestApi.Client---Authentication)
 
 ```C#
 var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
@@ -2932,9 +2923,9 @@ SELECT STRUCT(Property := 42) AS Value FROM Locations EMIT CHANGES;
 ```
 
 # LinqPad samples
-[Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
+[Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
 
-[Pull Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.pull-query.linq)
+[Pull Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.pull-query.linq)
 
 # Nuget
 https://www.nuget.org/packages/ksqlDB.RestApi.Client/
