@@ -17,13 +17,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!--<PackageReference Include="ksqlDb.RestApi.Client" Version="1.0.0" />-->
+    <PackageReference Include="ksqlDb.RestApi.Client" Version="1.0.0-rc.1" />
+    <PackageReference Include="SqlServer.Connector" Version="0.3.0-rc.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Samples\InsideOut\InsideOut.csproj" />
-    <ProjectReference Include="..\..\SqlServer.Connector\SqlServer.Connector.csproj" />
-    <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDB.RestApi.Client.csproj" />
+    <!-- <ProjectReference Include="..\..\SqlServer.Connector\SqlServer.Connector.csproj" /> -->
+    <!-- <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDB.RestApi.Client.csproj" /> -->
   </ItemGroup>
 
 </Project>
