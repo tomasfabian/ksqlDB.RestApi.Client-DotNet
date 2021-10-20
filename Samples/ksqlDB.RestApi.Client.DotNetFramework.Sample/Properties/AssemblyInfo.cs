@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Kafka.DotNetFramework.ksqlDB.Sample")]
+[assembly: AssemblyTitle("ksqlDB.RestApi.Client.DotNetFramework.Sample")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Kafka.DotNetFramework.ksqlDB.Sample")]
+[assembly: AssemblyProduct("ksqlDB.RestApi.Client.DotNetFramework.Sample")]
 [assembly: AssemblyCopyright("Copyright ©  2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
