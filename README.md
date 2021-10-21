@@ -127,7 +127,7 @@ run in command line:
 - set docker-compose.csproj as startup project in InsideOut.sln for an embedded Kafka connect integration and stream processing examples. 
 
 # CDC - Push notifications from Sql Server tables with Kafka
-Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with Kafka.DotNet.SqlServer package together with the Debezium connector streaming platform. 
+Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with SqlServer.Connector package together with the Debezium connector streaming platform. 
 ### Nuget
 ```
 Install-Package SqlServer.Connector -Version 0.3.0-rc.1
@@ -146,8 +146,8 @@ using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
-using Kafka.DotNet.SqlServer.Cdc;
-using Kafka.DotNet.SqlServer.Cdc.Extensions;
+using SqlServer.Connector.Cdc;
+using SqlServer.Connector.Cdc.Extensions;
 
 class Program
 {
@@ -259,8 +259,8 @@ public record IoTSensor
 }
 ```
 
-# Kafka stream processing
-[Kafka.DotNet.InsideOut](https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/Kafka.DotNet.InsideOut/Wiki.md) is a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with ksqlDB.RestApi.Client
+# Kafka stream processing example
+Example of how to consume a table with a kafka consumer. The following code is based on sample named [InsideOut](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/InsideOut)
 ```
 Install-Package ksqlDB.RestApi.Client
 ```
@@ -312,7 +312,6 @@ public record IoTSensorStats
 ```
 
 ```
-Install-Package Kafka.DotNet.InsideOut -Version 1.0.0
 Install-Package System.Interactive.Async -Version 5.0.0
 ```
 
@@ -322,7 +321,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Confluent.Kafka;
-using Kafka.DotNet.InsideOut.Consumer;
+using InsideOut.Consumer;
 
 const string bootstrapServers = "localhost:29092";
 
