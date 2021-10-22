@@ -93,8 +93,8 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
             movie.Id,
             Title = movie.Title,
             movie.Release_Year,
+            Substr = K.Functions.Substring(movie.Title, 2, 4),
             ActorTitle = actor.Title,
-            Substr = K.Functions.Substring(actor.Title, 2, 4)
           }
         )
         .ToAsyncEnumerable();
@@ -108,9 +108,10 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
       Assert.AreEqual(MoviesProvider.Movie1.Title, actualValues[0].Title);
       Assert.AreEqual(MoviesProvider.LeadActor1.Title, actualValues[0].Title);
 
-      Assert.AreEqual("lien", actualValues[1].Substr);
-      Assert.AreEqual(MoviesProvider.Movie1.Release_Year, actualValues[1].Release_Year);
-      Assert.AreEqual(MoviesProvider.LeadActor1.Title, actualValues[1].ActorTitle);
+      //in ksqldb array indexing starts at +1
+      Assert.AreEqual(MoviesProvider.Movie2.Title.Substring(1, 4), actualValues[1].Substr);
+      Assert.AreEqual(MoviesProvider.Movie2.Release_Year, actualValues[1].Release_Year);
+      actualValues[1].ActorTitle.Should().BeNull();
     }
 
     public record Movie2 : Record
@@ -160,10 +161,8 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
       //Assert
       Assert.AreEqual(expectedItemsCount, actualValues.Count);
 
-      actualValues[2].Id.Should().BeNull();
-      actualValues[2].Release_Year.Should().BeNull();
-      actualValues[2].Title.Should().BeNull();
-      Assert.AreEqual(MoviesProvider.LeadActor2.Title, actualValues[2].ActorTitle);
+      actualValues[2].ActorTitle.Should().BeNull();
+      Assert.AreEqual(MoviesProvider.Movie1.Title, actualValues[2].Title);
     }
   }
 }

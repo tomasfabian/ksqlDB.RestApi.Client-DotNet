@@ -461,7 +461,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
       var subscription = QuerySource.WithOffsetResetPolicy(AutoOffsetReset.Latest)
         .Take(1)
         .ToObservable()
-        .Timeout(TimeSpan.FromSeconds(2))
+        .Timeout(TimeSpan.FromSeconds(5))
         .Subscribe(c =>
         {
           actualValues.Add(c);

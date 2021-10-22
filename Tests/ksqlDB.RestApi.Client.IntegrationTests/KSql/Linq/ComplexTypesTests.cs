@@ -112,7 +112,7 @@ FROM TEST_SENSOR_VALUES EMIT CHANGES;";
         { { "a", new Dictionary<string, int>() { { "a", 1 } } } };
 
       ksql =
-      Context.CreateQueryStream<object>(fromItemName: "TEST_SENSOR_VALUES")
+      Context.CreateQueryStream<object>(fromItemName: "Events")
         .Select(_ => new
         {
           Dict = K.Functions.Transform(new Dictionary<string, IDictionary<string, int>>()
@@ -150,11 +150,10 @@ FROM TEST_SENSOR_VALUES EMIT CHANGES;";
         { { "a", new MyType { a = 1, b = 2 } } };
 
       string ksql =
-        Context.CreateQueryStream<object>(fromItemName: "TEST_SENSOR_VALUES")
+        Context.CreateQueryStream<object>(fromItemName: "Events")
           .Select(_ => new
           {
-            Dict = K.Functions.Transform(new Dictionary<string, MyType>()
-              { { "a", new MyType { a = 1, b = 2 } } }, (k, v) => k.ToUpper(), (k, v) => v.a + 1)
+            Dict = K.Functions.Transform(value, (k, v) => k.ToUpper(), (k, v) => v.a + 1)
           })
           .ToQueryString();
 
