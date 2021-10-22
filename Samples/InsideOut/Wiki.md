@@ -263,7 +263,7 @@ drop stream IOTSENSORS delete topic;
 ```
 
 # Linqpad
-[Kafka streaming](https://github.com/tomasfabian/ksqlDb.RestApi.Client/blob/main/Samples/ksqlDb.RestApi.Client.LinqPad/ksqldb.Streaming.linq)
+[Kafka streaming](https://github.com/tomasfabian/ksqlDb.RestApi.Client-DotNet/blob/main/Samples/ksqlDb.RestApi.Client.LinqPad/ksqldb.Streaming.linq)
 
 # Acknowledgements:
 - [Confluent.Kafka](https://www.nuget.org/packages/Confluent.Kafka/)
