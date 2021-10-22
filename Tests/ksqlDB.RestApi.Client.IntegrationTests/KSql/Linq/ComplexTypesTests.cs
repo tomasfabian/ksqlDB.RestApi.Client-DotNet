@@ -57,6 +57,7 @@ Drop table Events;
       {
         Name = "xyz"
       };
+
       var testEvent = new Event
       {
         Id = 1,
@@ -80,9 +81,7 @@ Drop table Events;
             semaphoreSlim.Release();
           });
 
-      //httpResponseMessage = await restApiClient.InsertIntoAsync(testEvent);//TODO: insert arrays and complex types
-      httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@"
-INSERT INTO Events (Id, Places, Categories) VALUES (1, ARRAY['1','2','3'], ARRAY[STRUCT(Name := 'kuko'), STRUCT(Name := 'puk')]);"));
+      httpResponseMessage = await restApiClient.InsertIntoAsync(testEvent);
 
       string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
 
@@ -105,18 +104,14 @@ INSERT INTO Events (Id, Places, Categories) VALUES (1, ARRAY['1','2','3'], ARRAY
     public void TransformMap_WithNestedMap()
     {
       //Arrange
-      var ksql = @"SELECT TRANSFORM(MAP('a' := MAP('a' := 1, 'b' := 2), 'b' := MAP('a' := 3, 'd' := 4)), (k, v) => UCASE(k), (k, v) => v['a'] + 1) as Dict
-FROM TEST_SENSOR_VALUES EMIT CHANGES;";
-
       var value = new Dictionary<string, IDictionary<string, int>>()
-        { { "a", new Dictionary<string, int>() { { "a", 1 } } } };
+                  { { "a", new Dictionary<string, int>() { { "a", 1 } } } };
 
-      ksql =
+      string ksql =
       Context.CreateQueryStream<object>(fromItemName: "Events")
         .Select(_ => new
         {
-          Dict = K.Functions.Transform(new Dictionary<string, IDictionary<string, int>>()
-          { { "a", new Dictionary<string, int>() { { "a", 1 } } } }, (k, v) => k.ToUpper(), (k, v) => v["a"] + 1)
+          Dict = K.Functions.Transform(value, (k, v) => k.ToUpper(), (k, v) => v["a"] + 1)
         })
         .ToQueryString();
 
@@ -146,7 +141,7 @@ FROM TEST_SENSOR_VALUES EMIT CHANGES;";
     public void TransformMap_WithNestedStruct()
     {
       //Arrange
-      var value = new Dictionary<string, MyType>()
+      var value = new Dictionary<string, MyType>
         { { "a", new MyType { a = 1, b = 2 } } };
 
       string ksql =
