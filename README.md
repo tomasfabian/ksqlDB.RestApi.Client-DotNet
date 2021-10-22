@@ -14,6 +14,10 @@ or with .NET CLI
 ```
 dotnet add package ksqlDB.RestApi.Client
 ```
+This adds a `<PackageReference>` to your csproj file, similar to the following:
+```XML
+<PackageReference Include="ksqlDB.RestApi.Client" Version="1.0.0" />
+```
 ```C#
 using System;
 using ConsoleAppKsqlDB;
@@ -420,17 +424,17 @@ context.CreateQueryStream<Tweet>()
 Omitting select is equivalent to SELECT *
 ### Supported data types mapping
 
-|   ksql  |   c#     |
-|:-------:|:--------:|
-| VARCHAR | string   |
-| INTEGER | int      |
-| BIGINT  | long     |
-| DOUBLE  | double   |
-| BOOLEAN | bool     |
-| BYTES   | byte[] **|
-| ```ARRAY<ElementType>``` | C#Type[] <br /> IEnumerable<C#Type>*   |
-| ```MAP<KeyType, ValueType>``` | IDictionary<C#Type, C#Type>   |
-| ```STRUCT``` | struct   |
+|     ksql     |            c#            |
+|:------------:|:------------------------:|
+|    VARCHAR   |          string          |
+|    INTEGER   |            int           |
+|    BIGINT    |           long           |
+|    DOUBLE    |          double          |
+|    BOOLEAN   |           bool           |
+|     BYTES    |         byte[] **        |
+|  ```ARRAY``` | C#Type[] or IEnumerable* |
+|   ```MAP```  |        IDictionary       |
+| ```STRUCT``` |          struct          |
 
 \* IEnumerable was added in version 1.6.0
 
@@ -503,6 +507,7 @@ EMIT CHANGES;
 ```
 
 Supported operators are:
+
 |   ksql   |           meaning           |  c#  |
 |:--------:|:---------------------------:|:----:|
 | =        | is equal to                 | ==   |
@@ -1525,13 +1530,14 @@ foreach (var response in responses)
 # v0.9.0:
 
 # CreateOrReplaceTableStatement (v.0.9.0)
-| Statement                  | Description  |
-|-------------------------------------------------------------------------------------------------------------------------|---|
-| [EXECUTE STATEMENTS](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) | CreateStatementAsync - execution of general-purpose string statements   |
-| [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/)                       |  CreateStreamAsync - Create a new stream with the specified columns and properties. |
-| [CREATE TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table/)                         |  CreateTableAsync - Create a new table with the specified columns and properties. |
-| [CREATE STREAM AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream-as-select/)   |  CreateOrReplaceStreamStatement - Create or replace a new materialized stream view, along with the corresponding Kafka topic, and stream the result of the query into the topic. |
-| [CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/)     |  CreateOrReplaceTableStatement - Create or replace a ksqlDB materialized table view, along with the corresponding Kafka topic, and stream the result of the query as a changelog into the topic.   |
+
+| Statement                                                                                                             | Description                                                                                                                                                                                     |
+|-----------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [EXECUTE STATEMENTS](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)                              | CreateStatementAsync - execution of general-purpose string statements                                                                                                                           |
+| [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/)                     | CreateStreamAsync - Create a new stream with the specified columns and properties.                                                                                                              |
+| [CREATE TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table/)                       | CreateTableAsync - Create a new table with the specified columns and properties.                                                                                                                |
+| [CREATE STREAM AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream-as-select/) | CreateOrReplaceStreamStatement - Create or replace a new materialized stream view, along with the corresponding Kafka topic, and stream the result of the query into the topic.                 |
+| [CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/)   | CreateOrReplaceTableStatement - Create or replace a ksqlDB materialized table view, along with the corresponding Kafka topic, and stream the result of the query as a changelog into the topic. |
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
@@ -1879,14 +1885,13 @@ INSERT INTO tweetsTest (Id, Amount, AccountBalance) VALUES (1, 4.2E-004, 5333333
 In order to improve the v1.0.0 release the following methods and properties were renamed:
 
 IKSqlDbRestApiClient interface changes:
-```
-| v0.11.0                      | v1.0.0                        |
-|---------------------------------------------------------------|
-| CreateTable<T>                | CreateTableAsync<T>           |
-| CreateStream<T>               | CreateStreamAsync<T>          |
-| CreateOrReplaceTable<T>       | CreateOrReplaceTableAsync<T>  |
-| CreateOrReplaceStream<T>      | CreateOrReplaceStreamAsync<T> |
-```
+
+| v0.11.0                 | v1.0.0                       |
+|-------------------------|------------------------------|
+| `CreateTable`           | `CreateTableAsync`           |
+| `CreateStream`          | `CreateStreamAsync`          |
+| `CreateOrReplaceTable`  | `CreateOrReplaceTableAsync`  |
+| `CreateOrReplaceStream` | `CreateOrReplaceStreamAsync` |
 
 KSQL documentation refers to stream or table name in FROM as [from_item](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/)
 
