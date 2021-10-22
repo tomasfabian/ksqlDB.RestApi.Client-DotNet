@@ -1,4 +1,11 @@
-﻿# Kafka.DotNet.ksqlDB
+﻿# ksqlDB.RestApi.Client
+
+# v1.0.0
+Package had to be renamed to ksqlDB.RestApi.Client
+
+Breaking changes: namespaces were changed accordingly
+
+# Kafka.DotNet.ksqlDB
 
 # v2.0.0
 ## ProcessingGuarantee enum
