@@ -640,7 +640,7 @@ context.CreateQueryStream<Tweet>()
 ```SQL
 SELECT Id, COUNT(*) Count FROM Tweets GROUP BY Id EMIT CHANGES;
 ```
-` `
+
 > ⚠ There is a known limitation in the early access versions (bellow version 1.10). The aggregation functions have to be named/aliased COUNT(*) Count, otherwise the deserialization won't be able to map the unknown column name KSQL_COL_0. 
 The Key should be mapped back to the respective column too Id = g.Key. See IKSqlGrouping.Source (v1.10.0).
 
@@ -2150,6 +2150,7 @@ var response = await restApiClient.TerminatePushQueryAsync(queryId);
 
 ### Drop a table (v1.4.0)
 - Drops an existing table.
+
 ```C#
 var ksqlDbUrl = @"http:\\localhost:8088";
 
@@ -2173,6 +2174,7 @@ Parameters:
 
 ### Drop a stream (v1.4.0)
 - Drops an existing stream.
+
 ```C#
 var ksqlDbUrl = @"http:\\localhost:8088";
 
@@ -2202,8 +2204,10 @@ Parameters:
 
 ## SubscribeOn (v1.5.0)
 - Wraps the source sequence in order to run its subscription on the specified scheduler.
+
 ## ObserveOn (v1.5.0)
 - Wraps the source sequence in order to run its observer callbacks on the specified scheduler.
+
 ```C#
 using System;
 using System.Reactive.Concurrency;
@@ -2212,6 +2216,7 @@ using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.Sample.Models.Movies;
+
 private static async Task SubscribeAsync(IKSqlDBContext context)
 {
   var cts = new CancellationTokenSource();
@@ -2482,6 +2487,7 @@ INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Aliens', 1, 1986);
 
 ### Operator (NOT) BETWEEN (v1.8.0)
 - KSqlOperatorExtensions - Between - Constrain a value to a specified range in a WHERE clause.
+
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
 
@@ -2490,6 +2496,7 @@ IQbservable<Tweet> query = context.CreateQueryStream<Tweet>()
 ```
 
 Generated KSQL:
+
 ```SQL
 SELECT * FROM Tweets
 WHERE Id BETWEEN 1 AND 5 EMIT CHANGES;
@@ -2693,6 +2700,7 @@ INSERT INTO `my_order` (Id, ItemsList) VALUES (1, ARRAY[1.1,2]);
 
 ### Inserting empty arrays (v1.9.0)
 - empty arrays are generated in the following way (workaround)
+
 ```C#
 var order = new Order { Id = 1, ItemsList = new List<double>()};
 
@@ -2703,6 +2711,7 @@ var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
 ```SQL
 ARRAY_REMOVE(ARRAY[0], 0))
 ```
+
 ```ARRAY[]``` is not yet supported in ksqldb (v0.21.0)
 
 # v1.10.0:
