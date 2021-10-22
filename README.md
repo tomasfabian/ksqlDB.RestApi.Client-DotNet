@@ -1789,6 +1789,7 @@ var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MyMovie
 ```
  
 - [CREATE TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table/) - fluent API
+
 ```C#
 EntityCreationMetadata metadata = new()
 {
@@ -2472,7 +2473,7 @@ httpResponseMessage = await restApiClient.DropTypeIfExistsAsync(typeName);
 
 # KSqlDbRestApiClient ToInsertStatement (v1.8.0)
 - Generates raw string Insert Into, but does not execute it.
-- 
+
 ```C#
 Movie movie = new()
 {
