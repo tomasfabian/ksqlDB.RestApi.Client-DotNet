@@ -1745,6 +1745,7 @@ var result = await context.ExecutePullQuery<IoTSensorStats>(ksql);
 
 ### Creating streams and tables (v.0.11.0)
 - [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/) - fluent API
+
 ```C#
 EntityCreationMetadata metadata = new()
 {
@@ -1782,6 +1783,7 @@ CREATE STREAM IF NOT EXISTS MyMovies (
 ```
 
 Create or replace alternative:
+
 ```C#
 var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MyMovies>(metadata);
 ```
@@ -1914,6 +1916,7 @@ Record.RowTime was decorated with IgnoreByInsertsAttribute
 
 > ⚠  From version 1.0.0 the overridden from item names are pluralized, too. 
 Join items are also affected by this breaking change. This breaking change can cause runtime exceptions for users updating from lower versions. In case that you have never used custom singular from-item names, your code won't be affected, see the example below:
+
 ```
 var contextOptions = new KSqlDBContextOptions(@"http:\\localhost:8088")
 {
@@ -1926,12 +1929,14 @@ var query = new KSqlDBContext(contextOptions)
   .ToQueryString();
 ```
 
-KSQL generated since v 1.0
+KSQL generated since v1.0
+
 ```KSQL
 SELECT * FROM Tweets EMIT CHANGES;
 ```
 
-KSQL generated before v 1.0
+KSQL generated before v1.0
+
 ```KSQL
 SELECT * FROM Tweet EMIT CHANGES;
 ```
@@ -2149,7 +2154,7 @@ var response = await restApiClient.TerminatePushQueryAsync(queryId);
 ```
 
 ### Drop a table (v1.4.0)
-- Drops an existing table.
+Drops an existing table.
 
 ```C#
 var ksqlDbUrl = @"http:\\localhost:8088";
@@ -2173,7 +2178,7 @@ Parameters:
 `deleteTopic` - If the DELETE TOPIC clause is present, the table's source topic is marked for deletion.
 
 ### Drop a stream (v1.4.0)
-- Drops an existing stream.
+Drops an existing stream.
 
 ```C#
 var ksqlDbUrl = @"http:\\localhost:8088";
@@ -2467,6 +2472,7 @@ httpResponseMessage = await restApiClient.DropTypeIfExistsAsync(typeName);
 
 # KSqlDbRestApiClient ToInsertStatement (v1.8.0)
 - Generates raw string Insert Into, but does not execute it.
+- 
 ```C#
 Movie movie = new()
 {
@@ -2481,12 +2487,13 @@ Console.WriteLine(insertStatement.Sql);
 ```
 
 Output:
+
 ```SQL
 INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Aliens', 1, 1986);
 ```
 
 ### Operator (NOT) BETWEEN (v1.8.0)
-- KSqlOperatorExtensions - Between - Constrain a value to a specified range in a WHERE clause.
+KSqlOperatorExtensions - Between - Constrain a value to a specified range in a WHERE clause.
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
