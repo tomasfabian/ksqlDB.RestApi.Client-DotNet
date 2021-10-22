@@ -461,7 +461,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
       var subscription = QuerySource.WithOffsetResetPolicy(AutoOffsetReset.Latest)
         .Take(1)
         .ToObservable()
-        .Timeout(TimeSpan.FromSeconds(5))
+        .Timeout(TimeSpan.FromSeconds(40))
         .Subscribe(c =>
         {
           actualValues.Add(c);
@@ -473,7 +473,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
         Message = "42"
       };
 
-      await Task.Delay(250);
+      await Task.Delay(2000);
 
       //Act
       await tweetsProvider.InsertTweetAsync(tweet3, StreamName);

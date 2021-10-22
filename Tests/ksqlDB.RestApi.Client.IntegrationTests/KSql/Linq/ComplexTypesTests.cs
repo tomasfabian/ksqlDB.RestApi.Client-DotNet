@@ -89,8 +89,8 @@ Drop table Events;
       await semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(5));
 
       receivedValues.Count.Should().Be(1);
-      receivedValues[0].Places.Length.Should().Be(3);
-      receivedValues[0].Categories.ToArray()[0].Name.Should().Be("kuko");
+      receivedValues[0].Places.Length.Should().Be(2);
+      receivedValues[0].Categories.ToArray()[0].Name.Should().Be("xyz");
       receivedValues[0].Categories.ToArray()[1].Name.Should().Be("puk");
 
       using (subscription) { }

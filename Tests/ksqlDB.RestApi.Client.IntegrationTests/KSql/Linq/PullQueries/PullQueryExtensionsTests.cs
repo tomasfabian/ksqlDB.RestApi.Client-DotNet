@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
@@ -28,6 +29,8 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq.PullQueries
       pullQueryProvider = new SensorsPullQueryProvider();
 
       await pullQueryProvider.ExecuteAsync();
+
+      await Task.Delay(TimeSpan.FromSeconds(7));//TODO
     }
 
     [TestMethod]

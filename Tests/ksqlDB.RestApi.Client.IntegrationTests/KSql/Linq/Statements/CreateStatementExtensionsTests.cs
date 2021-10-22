@@ -21,7 +21,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq.Statements
       base.TestInitialize();
     }
 
-    private const string StreamName = "TestStream";
+    private const string StreamName = "TestStreamStatement";
 
     [TestMethod]
     public void CreateOrReplaceStreamStatement_ToStatementString_CalledTwiceWithSameResult()
@@ -47,6 +47,11 @@ AS SELECT * FROM {nameof(Movie)} EMIT CHANGES;");
     public async Task CreateOrReplaceStreamStatement_ToStatementString_ComplexQueryWasGenerated()
     {
       //Arrange
+      var restApiClient = KSqlDbRestApiProvider.Create();
+
+      var statement = new KSqlDbStatement(StatementTemplates.DropStream(StreamName));
+      var response = await restApiClient.ExecuteStatementAsync(statement);
+
       EntityCreationMetadata metadata = new()
                                         {
                                           EntityName = StreamEntityName,
@@ -56,7 +61,7 @@ AS SELECT * FROM {nameof(Movie)} EMIT CHANGES;");
                                         };
 
       var httpResponseMessage =
-        await KSqlDbRestApiProvider.Create().CreateStreamAsync<Movie>(metadata, ifNotExists: false);
+        await restApiClient.CreateStreamAsync<Movie>(metadata, ifNotExists: false);
 
       var creationMetadata = new CreationMetadata
       {
