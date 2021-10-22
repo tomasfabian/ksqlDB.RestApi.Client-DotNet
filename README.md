@@ -1,4 +1,4 @@
-⚠ Package will be soon renamed to ksqlDB.Api.Client
+⚠ Package had to be renamed to ksqlDB.Api.Client
 
 This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
 You can continually process computations over unbounded (theoretically never-ending) streams of data.
@@ -130,7 +130,7 @@ run in command line:
 Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with SqlServer.Connector package together with the Debezium connector streaming platform. 
 ### Nuget
 ```
-Install-Package SqlServer.Connector -Version 0.3.0-rc.1
+Install-Package SqlServer.Connector -Version 0.3.0
 Install-Package ksqlDB.RestApi.Client
 ```
 
