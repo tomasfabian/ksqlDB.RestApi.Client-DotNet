@@ -35,6 +35,8 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq.PullQueries
       var response = await statement.ExecuteStatementAsync();
       var statementResponses = await response.ToStatementResponsesAsync();
 
+      await Task.Delay(TimeSpan.FromSeconds(1));
+
       response = await InsertAsync(new IoTSensor { SensorId = "sensor-1", Value = 11 });
     }
 

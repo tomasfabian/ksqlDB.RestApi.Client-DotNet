@@ -14,13 +14,13 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq.PullQueries
   [TestClass]
   public class PullQueryExtensionsTests
   {
-    private SensorsPullQueryProvider pullQueryProvider;
+    private static SensorsPullQueryProvider pullQueryProvider;
 
-    private KSqlDBContextOptions contextOptions;
-    private KSqlDBContext context;
+    private static KSqlDBContextOptions contextOptions;
+    private static KSqlDBContext context;
 
-    [TestInitialize]
-    public async Task TestInitialize()
+    [ClassInitialize]
+    public static async Task ClassInitialize(TestContext testContext)
     {
       contextOptions = new KSqlDBContextOptions(KSqlDbRestApiProvider.KsqlDbUrl);
       
@@ -30,7 +30,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq.PullQueries
 
       await pullQueryProvider.ExecuteAsync();
 
-      await Task.Delay(TimeSpan.FromSeconds(7));//TODO
+      await Task.Delay(TimeSpan.FromSeconds(7));
     }
 
     [TestMethod]

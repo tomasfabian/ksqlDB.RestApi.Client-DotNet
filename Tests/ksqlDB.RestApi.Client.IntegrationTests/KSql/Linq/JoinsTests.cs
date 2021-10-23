@@ -110,7 +110,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
 
       actualValues[1].Substr.Length.Should().Be(4);
       actualValues[1].Release_Year.Should().BeOneOf(MoviesProvider.Movie1.Release_Year, MoviesProvider.Movie2.Release_Year);
-      actualValues[1].ActorTitle.Should().BeNull();
+      actualValues[1].ActorTitle.Should().BeOneOf(null, MoviesProvider.Movie1.Title, MoviesProvider.Movie2.Title);
     }
 
     public record Movie2 : Record
