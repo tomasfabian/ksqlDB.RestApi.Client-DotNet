@@ -470,6 +470,89 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
 
     #endregion
 
+    #region GroupJoin
+
+    private static MethodInfo GetGroupJoinMethodInfo<T1, T2, T3, T4, T5, T6>(Func<T1, T2, T3, T4, T5, T6> f, T1 unused1, T2 unused2, T3 unused3, T4 unused4, T5 unused5)
+    {
+      return f.Method;
+    }
+
+    internal static IQbservable<TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this IQbservable<TOuter> outer, ISource<TInner> inner, Expression<Func<TOuter, TKey>> outerKeySelector, Expression<Func<TInner, TKey>> innerKeySelector, Expression<Func<TOuter, IQbservable<TInner>, TResult>> resultSelector)
+    {
+      if (outer == null)
+        throw new ArgumentNullException(nameof(outer));
+      
+      if (inner == null)
+        throw new ArgumentNullException(nameof(inner));
+      
+      if (outerKeySelector == null)
+        throw new ArgumentNullException(nameof(outerKeySelector));
+      
+      if (innerKeySelector == null)
+        throw new ArgumentNullException(nameof(innerKeySelector));
+      
+      if (resultSelector == null)
+        throw new ArgumentNullException(nameof(resultSelector));
+      
+      return outer.Provider.CreateQuery<TResult>(
+        Expression.Call(
+          null,
+          GetGroupJoinMethodInfo(GroupJoin, outer, inner, outerKeySelector, innerKeySelector, resultSelector),
+          outer.Expression,
+          inner.Expression,
+          Expression.Quote(outerKeySelector), Expression.Quote(innerKeySelector), Expression.Quote(resultSelector)));
+    }
+
+    #endregion
+
+    #region DefaultIfEmpty
+
+    private static MethodInfo? defaultIfEmptyTSource1;
+
+    private static MethodInfo DefaultIfEmptyTSource1(Type source) =>
+      (defaultIfEmptyTSource1 ??= new Func<IQbservable<object>, IQbservable<object>>(DefaultIfEmpty).GetMethodInfo().GetGenericMethodDefinition())
+      .MakeGenericMethod(source);
+
+    internal static IQbservable<TSource> DefaultIfEmpty<TSource>(this IQbservable<TSource> source)
+    {
+      if (source == null)
+        throw new ArgumentNullException(nameof(source));
+
+      return source.Provider.CreateQuery<TSource>(
+        Expression.Call(
+          null,
+          DefaultIfEmptyTSource1(typeof(TSource)), source.Expression));
+    }
+
+    #endregion
+
+    #region SelectMany
+
+    private static MethodInfo? selectManyTSourceTCollectionTResult3;
+
+    private static MethodInfo SelectManyTSourceTCollectionTResult3(Type TSource, Type TCollection, Type TResult) =>
+      (selectManyTSourceTCollectionTResult3 ??= new Func<IQbservable<object>, Expression<Func<object, IQbservable<object>>>, Expression<Func<object, object, object>>, IQbservable<object>>(SelectMany).GetMethodInfo().GetGenericMethodDefinition())
+      .MakeGenericMethod(TSource, TCollection, TResult);
+
+    internal static IQbservable<TResult> SelectMany<TSource, TCollection, TResult>(this IQbservable<TSource> source, Expression<Func<TSource, IQbservable<TCollection>>> collectionSelector, Expression<Func<TSource, TCollection, TResult>> resultSelector)
+    {
+      if (source == null)
+        throw new ArgumentNullException(nameof(source));
+      if (collectionSelector == null)
+        throw new ArgumentNullException(nameof(collectionSelector));
+      if (resultSelector == null)
+        throw new ArgumentNullException(nameof(resultSelector));
+
+      return source.Provider.CreateQuery<TResult>(
+        Expression.Call(
+          null,
+          SelectManyTSourceTCollectionTResult3(typeof(TSource), typeof(TCollection), typeof(TResult)),
+          source.Expression, Expression.Quote(collectionSelector), Expression.Quote(resultSelector)
+        ));
+    }
+
+    #endregion
+
     #region Having
 
     private static MethodInfo havingTSource;
