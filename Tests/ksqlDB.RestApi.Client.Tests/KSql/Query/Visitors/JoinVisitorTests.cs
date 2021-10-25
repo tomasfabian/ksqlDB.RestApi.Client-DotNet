@@ -263,6 +263,34 @@ ON M.Title = A.Title
     }
 
     [TestMethod]
+    [Ignore("TODO:")]
+    public void GroupJoinSelectMany_BuildKSql_Prints()
+    {
+      var query = KSqlDBContext.CreateQueryStream<Movie>()
+        .GroupJoin(Source.Of<Lead_Actor>("Actors"), c => c.Title, d => d.Title, (movie, gj) => new
+        {
+          movie,
+          grouping = gj
+        }).SelectMany(c => c.grouping.DefaultIfEmpty(), (movie2, l) => new
+                                                                       {
+                                                                         movie2.movie.Id,
+                                                                         UpperActorName = l.Actor_Name.ToUpper(),
+                                                                         ActorTitle = l.Title
+                                                                       });
+
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      var expectedQuery = @"SELECT M.Id Id, UCASE(A.Actor_Name) UpperActorName, A.Title AS ActorTitle FROM Movies M
+LEFT JOIN Actors A
+ON M.Title = A.Title
+ EMIT CHANGES;";
+
+      ksql.Should().Be(expectedQuery);
+    }
+
+    [TestMethod]
     public void LeftJoinOverrideStreamName_BuildKSql_Prints()
     {
       //Arrange
