@@ -1,4 +1,6 @@
-﻿SqlServer.Connector is a client API for consuming row-level table changes (CDC - [Change Data Capture](https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/about-change-data-capture-sql-server?view=sql-server-ver15)) from a Sql Server databases with the Debezium connector streaming platform.
+﻿⚠ Package had to be renamed to SqlServer.Connector
+
+SqlServer.Connector is a client API for consuming row-level table changes (CDC - [Change Data Capture](https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/about-change-data-capture-sql-server?view=sql-server-ver15)) from a Sql Server databases with the Debezium connector streaming platform.
 
 ### Blazor Sample 
 Set docker-compose.csproj as startup project in InsideOut.sln for an embedded Kafka connect integration.

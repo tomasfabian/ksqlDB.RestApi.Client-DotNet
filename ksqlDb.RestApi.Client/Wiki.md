@@ -6,6 +6,8 @@ It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/
 
 [ksqlDB.RestApi.Client](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet) is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
 
+[![main](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/actions/workflows/dotnetcore.yml/badge.svg?branch=main&event=push)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/actions/workflows/dotnetcore.yml/)
+
 Install with NuGet package manager:
 ```
 Install-Package ksqlDB.RestApi.Client
