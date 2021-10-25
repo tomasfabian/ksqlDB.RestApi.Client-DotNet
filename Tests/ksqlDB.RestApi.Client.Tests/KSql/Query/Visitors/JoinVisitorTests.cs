@@ -235,6 +235,34 @@ ON M.Title = L.Title
     }
 
     [TestMethod]
+    [Ignore("TODO:")]
+    public void LeftJoinQuerySyntax_BuildKSql_Prints()
+    {
+      var query = 
+        from movie in KSqlDBContext.CreateQueryStream<Movie>()
+        join actor in Source.Of<Lead_Actor>("Actors") 
+        on movie.Title equals actor.Title into gj
+        from a in gj.DefaultIfEmpty()
+        select new
+        {
+          movie.Id,
+          UpperActorName = a.Actor_Name.ToUpper(),
+          ActorTitle = a.Title
+        };
+
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      var expectedQuery = @"SELECT M.Id Id, UCASE(A.Actor_Name) UpperActorName, A.Title AS ActorTitle FROM Movies M
+LEFT JOIN Actors A
+ON M.Title = A.Title
+ EMIT CHANGES;";
+
+      ksql.Should().Be(expectedQuery);
+    }
+
+    [TestMethod]
     public void LeftJoinOverrideStreamName_BuildKSql_Prints()
     {
       //Arrange
