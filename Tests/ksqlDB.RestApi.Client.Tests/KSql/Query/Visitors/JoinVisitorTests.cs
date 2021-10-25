@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Linq;
+using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -55,7 +57,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
 INNER JOIN {joinItemName}s L
 ON M.Title = L.Title
  EMIT CHANGES;";
-      
+
       ksql.Should().Be(expectedQuery);
     }
 
@@ -87,7 +89,7 @@ ON M.Title = L.Title
 INNER JOIN Lead_Actors L
 ON M.Title = L.Title
  EMIT CHANGES;";
-      
+
       ksql.Should().Be(expectedQuery);
     }
 
@@ -172,6 +174,29 @@ ON M.Title = A.Title
 
       ksql.Should().Be(expectedQuery);
     }
+    
+    [TestMethod]
+    public void InnerJoinQuerySyntax_BuildKSql_Prints()
+    {
+      var query = from movie in KSqlDBContext.CreateQueryStream<Movie>()
+                  join actor in Source.Of<Lead_Actor>("Actors") on movie.Title equals actor.Title
+                  select new
+                  {
+                    movie.Title,
+                    ActorName = actor.Actor_Name
+                  };
+
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      var expectedQuery = @"SELECT M.Title Title, A.Actor_Name AS ActorName FROM Movies M
+INNER JOIN Actors A
+ON M.Title = A.Title
+ EMIT CHANGES;";
+
+      ksql.Should().Be(expectedQuery);
+    }
 
     #endregion
 
@@ -205,7 +230,7 @@ ON M.Title = A.Title
 LEFT JOIN Lead_Actors L
 ON M.Title = L.Title
  EMIT CHANGES;";
-      
+
       ksql.Should().Be(expectedQuery);
     }
 
