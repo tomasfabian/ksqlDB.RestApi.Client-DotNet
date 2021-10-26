@@ -290,6 +290,55 @@ ON M.Title = A.Title
       ksql.Should().Be(expectedQuery);
     }
 
+    private class Order
+    {
+      public int OrderId { get; set; }
+      public int CustomerId { get; set; }
+      public int ItemId { get; set; }
+    }
+    private sealed class Customer
+    {
+      public int CustomerId { get; set; }
+    }
+    private sealed class Item
+    {
+      public int ItemId { get; set; }
+      public string ItemName { get; set; }
+    }
+
+    [TestMethod]
+    [Ignore("TODO:")]
+    public void MultipleLeftJoinsQuerySyntax_BuildKSql_Prints()
+    {
+      var query = 
+        from orders in KSqlDBContext.CreateQueryStream<Order>()
+        join customers in Source.Of<Customer>() 
+        on orders.CustomerId equals customers.CustomerId into gj
+        from a in gj.DefaultIfEmpty()
+        join items in Source.Of<Item>() 
+        on orders.ItemId equals items.ItemId into igj
+        from i in igj.DefaultIfEmpty()
+        select new
+        {
+          customerid = a.CustomerId,
+          orders.OrderId,
+          i.ItemId,
+          i.ItemName,
+        };
+
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      var expectedQuery = @"SELECT customers.CustomerId AS customerid, orders.OrderId, items.ItemId, items.ItemName
+FROM orders
+LEFT JOIN customers on orders.CustomerId = customers.CustomerId
+LEFT JOIN items on orders.ItemId = items.ItemId
+ EMIT CHANGES;";
+
+      ksql.Should().Be(expectedQuery);
+    }
+
     [TestMethod]
     public void LeftJoinOverrideStreamName_BuildKSql_Prints()
     {
