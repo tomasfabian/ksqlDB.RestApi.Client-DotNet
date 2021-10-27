@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Helpers;
@@ -24,6 +25,9 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
       var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDBUrl);
       KSqlDBContext = new KSqlDBContext(contextOptions);
     }
+
+    private string MovieAlias => "movie";
+    private string ActorAlias => "actor";
 
     #region Join
 
@@ -53,9 +57,9 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
       var ksql = query.ToQueryString();
 
       //Assert
-      var expectedQuery = @$"SELECT M.Id Id, M.Title Title, M.Release_Year Release_Year, TRIM(L.Actor_Name) ActorName, UCASE(L.Actor_Name) UpperActorName, L.Title AS ActorTitle FROM Movies M
-INNER JOIN {joinItemName}s L
-ON M.Title = L.Title
+      var expectedQuery = @$"SELECT {MovieAlias}.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
+INNER JOIN {joinItemName}s {ActorAlias}
+ON {MovieAlias}.Title = {ActorAlias}.Title
  EMIT CHANGES;";
 
       ksql.Should().Be(expectedQuery);
@@ -85,9 +89,9 @@ ON M.Title = L.Title
       var ksql = query.ToQueryString();
 
       //Assert
-      var expectedQuery = @"SELECT M.Id Id, M.Title Title, M.Release_Year Release_Year, TRIM(L.Actor_Name) ActorName, UCASE(L.Actor_Name) UpperActorName, L.Title AS ActorTitle FROM Movies M
-INNER JOIN Lead_Actors L
-ON M.Title = L.Title
+      var expectedQuery = @$"SELECT {MovieAlias}.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
+INNER JOIN Lead_Actors {ActorAlias}
+ON {MovieAlias}.Title = {ActorAlias}.Title
  EMIT CHANGES;";
 
       ksql.Should().Be(expectedQuery);
@@ -102,23 +106,29 @@ ON M.Title = L.Title
           Source.Of<Lead_Actor>(),
           movie => movie.Title,
           actor => actor.Title,
-          (movie, actor) => new
-          {
-            Title = movie.Title,
-            Length = actor.Actor_Name.Length
-          }
+          (myMovie, actor) => new
+                              {
+                                Title = myMovie.Title,
+                                Length = actor.Actor_Name.Length
+                              }
         );
+
+      string myMovieAlias = "myMovie";
 
       //Act
       var ksql = query.ToQueryString();
 
       //Assert
-      var expectedQuery = @"SELECT M.Title Title, LEN(L.Actor_Name) Length FROM Movies M
-INNER JOIN Lead_Actors L
-ON M.Title = L.Title
+      var expectedQuery = @$"SELECT {myMovieAlias}.Title Title, LEN({ActorAlias}.Actor_Name) Length FROM Movies {myMovieAlias}
+INNER JOIN Lead_Actors {ActorAlias}
+ON {myMovieAlias}.Title = {ActorAlias}.Title
  EMIT CHANGES;";
 
       ksql.Should().Be(expectedQuery);
+    }
+
+    private class MovieExt : Movie
+    {
     }
 
     [TestMethod]
@@ -127,7 +137,7 @@ ON M.Title = L.Title
       //Arrange
       var query = KSqlDBContext.CreateQueryStream<Movie>()
         .Join(
-          Source.Of<Movie>(),
+          Source.Of<MovieExt>(),
           movie => movie.Title,
           actor => actor.Title,
           (movie, actor) => new
@@ -140,9 +150,36 @@ ON M.Title = L.Title
       var ksql = query.ToQueryString();
 
       //Assert
-      var expectedQuery = @"SELECT M.Title Title FROM Movies M
-INNER JOIN Movies M1
-ON M.Title = M1.Title
+      var expectedQuery = @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
+INNER JOIN MovieExts M1
+ON {MovieAlias}.Title = M1.Title
+ EMIT CHANGES;";
+
+      ksql.Should().Be(expectedQuery);
+    }
+
+    [TestMethod]
+    public void InnerJoinOverrideStreamName_NoProjectionFromJoinTable_BuildKSql_Prints()
+    {
+      //Arrange
+      var query = KSqlDBContext.CreateQueryStream<Movie>()
+        .Join(
+          Source.Of<Lead_Actor>("Actors"),
+          movie => movie.Title,
+          actor => actor.Title,
+          (movie, actor) => new
+          {
+            Title = movie.Title
+          }
+        );
+
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      var expectedQuery = @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
+INNER JOIN Actors A
+ON {MovieAlias}.Title = A.Title
  EMIT CHANGES;";
 
       ksql.Should().Be(expectedQuery);
@@ -160,6 +197,7 @@ ON M.Title = M1.Title
           (movie, actor) => new
           {
             Title = movie.Title,
+            ActorName = actor.Actor_Name
           }
         );
 
@@ -167,9 +205,9 @@ ON M.Title = M1.Title
       var ksql = query.ToQueryString();
 
       //Assert
-      var expectedQuery = @"SELECT M.Title Title FROM Movies M
-INNER JOIN Actors A
-ON M.Title = A.Title
+      var expectedQuery = @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
+INNER JOIN Actors {ActorAlias}
+ON {MovieAlias}.Title = {ActorAlias}.Title
  EMIT CHANGES;";
 
       ksql.Should().Be(expectedQuery);
@@ -190,9 +228,9 @@ ON M.Title = A.Title
       var ksql = query.ToQueryString();
 
       //Assert
-      var expectedQuery = @"SELECT M.Title Title, A.Actor_Name AS ActorName FROM Movies M
-INNER JOIN Actors A
-ON M.Title = A.Title
+      var expectedQuery = @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
+INNER JOIN Actors {ActorAlias}
+ON {MovieAlias}.Title = {ActorAlias}.Title
  EMIT CHANGES;";
 
       ksql.Should().Be(expectedQuery);
@@ -206,35 +244,157 @@ ON M.Title = A.Title
     {
       public int Id { get; set; }
     }
+    struct Foo
+    {
+      public int Prop { get; set; }
+    }
 
     [TestMethod]
-    [Ignore("TODO")]
     public void MultipleInnerJoinsQuerySyntax_BuildKSql_Prints()
     {
+      var value = new Foo { Prop = 42 };
+
       var query = from o in KSqlDBContext.CreateQueryStream<Order>()
-                  join p in Source.Of<Payment>() on o.OrderId equals p.Id
-                  join s in Source.Of<Shipment>() on o.OrderId equals s.Id
+                  join p1 in Source.Of<Payment>() on o.OrderId equals p1.Id
+                  join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id
                   select new
                   {
+                    value,
                     orderId = o.OrderId,
-                    shipmentId = s.Id,
-                    paymentId = p.Id,
+                    shipmentId = s1.Id,
+                    paymentId = p1.Id,
                   };
+
+      var query2 = (from o in KSqlDBContext.CreateQueryStream<Order>()
+        join p1 in Source.Of<Payment>() on o.OrderId equals p1.Id
+        join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id into gj
+        from sa in gj.DefaultIfEmpty()
+        select new
+               {
+                 value,
+                 orderId = o.OrderId,
+                 shipmentId = sa.Id,
+                 paymentId = p1.Id,
+               })
+        .Take(5);
+
+      var s = query2.ToQueryString();
 
       //Act
       var ksql = query.ToQueryString();
 
       //Assert
-      var expectedQuery = @"SELECT O.OrderId AS orderId, S.Id AS shipmentId, P.Id AS paymentId FROM Orders O
-INNER JOIN Shipments S
-ON O.OrderId = S.Id
-INNER JOIN Payments P
-ON O.OrderId = P.Id
+      var expectedQuery = @"SELECT STRUCT(Prop := 42) value, O.OrderId AS orderId, S1.Id AS shipmentId, P1.Id AS paymentId FROM Orders O
+INNER JOIN Shipments S1
+ON O.OrderId = S1.Id
+INNER JOIN Payments P1
+ON O.OrderId = P1.Id
  EMIT CHANGES;";
 
-      ksql.Should().Be(expectedQuery);
+      ksql.Should().BeEquivalentTo(expectedQuery);
     }
 
+    class LambdaMap
+    {
+      public int Id { get; set; }
+      public IDictionary<string, City> Dictionary { get; set; }
+    }
+    private class City
+    {
+      public int[] Values { get; set; }
+    }
+
+    [TestMethod]
+    [Ignore("TODO")]
+    public void JoinWithInvocationFunction_BuildKSql_Prints()
+    {
+      var query = from o in KSqlDBContext.CreateQueryStream<Order>()
+        join lm in Source.Of<LambdaMap>() on o.OrderId equals lm.Id
+        join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id
+        select new
+               {
+                 A = K.Functions.Transform(lm.Dictionary, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v.Values, x => x * x)),
+                 //orderId = o.OrderId,
+                 //shipmentId = s1.Id
+               };
+
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      string lambdaAlias = "lm";
+
+      //var expectedQuery = @$"SELECT TRANSFORM({lambdaAlias}.{nameof(LambdaMap.Dictionary)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->Values, (x) => x * x)) A, O.OrderId AS orderId, S1.Id AS shipmentId FROM Orders O
+      var expectedQuery = @$"SELECT TRANSFORM({lambdaAlias}.{nameof(LambdaMap.Dictionary)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->Values, (x) => x * x)) A FROM Orders O
+INNER JOIN LambdaMaps {lambdaAlias}
+ON O.OrderId = {lambdaAlias}.Id
+INNER JOIN Payments P1
+ON O.OrderId = P1.Id
+ EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedQuery);
+    }
+
+    [TestMethod]
+    public void MultipleInnerJoinsQuerySyntax_WithTake_BuildKSql_Prints()
+    {
+      var query = from o in KSqlDBContext.CreateQueryStream<Order>()
+        join p1 in Source.Of<Payment>() on o.OrderId equals p1.Id
+        join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id
+        select new
+               {
+                 orderId = o.OrderId,
+                 shipmentId = s1.Id,
+                 paymentId = p1.Id,
+               };
+
+      query = query.Take(2);
+
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      var expectedQuery = @"SELECT O.OrderId AS orderId, S1.Id AS shipmentId, P1.Id AS paymentId FROM Orders O
+INNER JOIN Shipments S1
+ON O.OrderId = S1.Id
+INNER JOIN Payments P1
+ON O.OrderId = P1.Id
+ EMIT CHANGES LIMIT 2;";
+
+      ksql.Should().BeEquivalentTo(expectedQuery);
+    }
+
+    [TestMethod]
+    public void JoinAndLeftJoin_WithTake_BuildKSql_Prints()
+    {
+      var query = from o in KSqlDBContext.CreateQueryStream<Order>()
+        join p1 in Source.Of<Payment>() on o.OrderId equals p1.Id
+        join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id into gj
+        from sa in gj.DefaultIfEmpty()
+        select new
+               {
+                 orderId = o.OrderId,
+                 shipmentId = sa.Id,
+                 paymentId = p1.Id,
+               };
+
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      string shipmentsAlias = "sa";
+
+      var expectedQuery = @$"SELECT O.OrderId AS orderId, {shipmentsAlias}.Id AS shipmentId, P1.Id AS paymentId FROM Orders O
+LEFT JOIN Shipments {shipmentsAlias}
+ON O.OrderId = {shipmentsAlias}.Id
+INNER JOIN Payments P1
+ON O.OrderId = P1.Id
+ EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedQuery);
+    }
+
+    //TODO:
     //SELECT
     //o.id as orderId,
     //o.itemid as itemId,
@@ -273,9 +433,9 @@ ON O.OrderId = P.Id
       var ksql = query.ToQueryString();
 
       //Assert
-      var expectedQuery = @"SELECT M.Id Id, M.Title Title, M.Release_Year Release_Year, TRIM(L.Actor_Name) ActorName, UCASE(L.Actor_Name) UpperActorName, L.Title AS ActorTitle FROM Movies M
-LEFT JOIN Lead_Actors L
-ON M.Title = L.Title
+      var expectedQuery = @$"SELECT movie.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
+LEFT JOIN Lead_Actors {ActorAlias}
+ON movie.Title = {ActorAlias}.Title
  EMIT CHANGES;";
 
       ksql.Should().Be(expectedQuery);
@@ -300,9 +460,9 @@ ON M.Title = L.Title
       var ksql = query.ToQueryString();
 
       //Assert
-      var expectedQuery = @"SELECT movie.Id Id, UCASE(a.Actor_Name) UpperActorName, a.Title AS ActorTitle FROM Movies movie
+      var expectedQuery = @$"SELECT {MovieAlias}.Id Id, UCASE(a.Actor_Name) UpperActorName, a.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Actors a
-ON movie.Title = a.Title
+ON {MovieAlias}.Title = a.Title
  EMIT CHANGES;";
 
       ksql.Should().Be(expectedQuery);
@@ -327,9 +487,9 @@ ON movie.Title = a.Title
       var ksql = query.ToQueryString();
 
       //Assert
-      var expectedQuery = @"SELECT movie.Id Id, UCASE(a.Actor_Name) UpperActorName, a.Title AS ActorTitle FROM Movies movie
+      var expectedQuery = @$"SELECT {MovieAlias}.Id Id, UCASE(a.Actor_Name) UpperActorName, a.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Actors a
-ON movie.Title = a.Title
+ON {MovieAlias}.Title = a.Title
  EMIT CHANGES;";
 
       ksql.Should().Be(expectedQuery);
@@ -395,6 +555,7 @@ ON orders.CustomerId = customers.CustomerId
           actor => actor.Title,
           (movie, actor) => new
           {
+            actor.RowTime,
             Title = movie.Title,
           }
         );
@@ -403,9 +564,9 @@ ON orders.CustomerId = customers.CustomerId
       var ksql = query.ToQueryString();
 
       //Assert
-      var expectedQuery = @"SELECT M.Title Title FROM Movies M
-LEFT JOIN Actors A
-ON M.Title = A.Title
+      var expectedQuery = @$"SELECT {ActorAlias}.RowTime RowTime, {MovieAlias}.Title Title FROM Movies {MovieAlias}
+LEFT JOIN Actors {ActorAlias}
+ON {MovieAlias}.Title = {ActorAlias}.Title
  EMIT CHANGES;";
 
       ksql.Should().Be(expectedQuery);
@@ -427,6 +588,7 @@ ON M.Title = A.Title
           (movie, actor) => new
           {
             Title = movie.Title,
+            ActorName = actor.Actor_Name
           }
         );
 
@@ -434,9 +596,9 @@ ON M.Title = A.Title
       var ksql = query.ToQueryString();
 
       //Assert
-      var expectedQuery = @"SELECT M.Title Title FROM Movies M
-FULL OUTER JOIN Actors A
-ON M.Title = A.Title
+      var expectedQuery = @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
+FULL OUTER JOIN Actors {ActorAlias}
+ON {MovieAlias}.Title = {ActorAlias}.Title
  EMIT CHANGES;";
 
       ksql.Should().Be(expectedQuery);

@@ -176,9 +176,9 @@ AS SELECT * FROM Movies WINDOW TUMBLING (SIZE 2 MINUTES) GROUP BY Title EMIT CHA
 
         //Assert
         ksql.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
-AS SELECT M.Title Title, A.Actor_Name AS ActorName FROM Movies M
-INNER JOIN Actors A
-ON M.Title = A.Title
+AS SELECT movie.Title Title, actor.Actor_Name AS ActorName FROM Movies movie
+INNER JOIN Actors actor
+ON movie.Title = actor.Title
  EMIT CHANGES;");
       }
 
@@ -203,9 +203,9 @@ ON M.Title = A.Title
 
         //Assert
         ksql.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
-AS SELECT M.Title Title, A.Actor_Name AS ActorName FROM Movies M
-FULL OUTER JOIN Actors A
-ON M.Title = A.Title
+AS SELECT movie.Title Title, actor.Actor_Name AS ActorName FROM Movies movie
+FULL OUTER JOIN Actors actor
+ON movie.Title = actor.Title
  EMIT CHANGES;");
       }
 
@@ -230,9 +230,9 @@ ON M.Title = A.Title
 
         //Assert
         ksql.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
-AS SELECT M.Title Title, A.Actor_Name AS ActorName FROM Movies M
-LEFT JOIN Actors A
-ON M.Title = A.Title
+AS SELECT movie.Title Title, actor.Actor_Name AS ActorName FROM Movies movie
+LEFT JOIN Actors actor
+ON movie.Title = actor.Title
  EMIT CHANGES;");
       }
     }
