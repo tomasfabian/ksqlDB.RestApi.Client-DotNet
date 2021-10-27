@@ -477,7 +477,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
       return f.Method;
     }
 
-    internal static IQbservable<TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this IQbservable<TOuter> outer, ISource<TInner> inner, Expression<Func<TOuter, TKey>> outerKeySelector, Expression<Func<TInner, TKey>> innerKeySelector, Expression<Func<TOuter, IQbservable<TInner>, TResult>> resultSelector)
+    public static IQbservable<TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this IQbservable<TOuter> outer, ISource<TInner> inner, Expression<Func<TOuter, TKey>> outerKeySelector, Expression<Func<TInner, TKey>> innerKeySelector, Expression<Func<TOuter, IQbservable<TInner>, TResult>> resultSelector)
     {
       if (outer == null)
         throw new ArgumentNullException(nameof(outer));
@@ -513,7 +513,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
       (defaultIfEmptyTSource1 ??= new Func<IQbservable<object>, IQbservable<object>>(DefaultIfEmpty).GetMethodInfo().GetGenericMethodDefinition())
       .MakeGenericMethod(source);
 
-    internal static IQbservable<TSource> DefaultIfEmpty<TSource>(this IQbservable<TSource> source)
+    public static IQbservable<TSource> DefaultIfEmpty<TSource>(this IQbservable<TSource> source)
     {
       if (source == null)
         throw new ArgumentNullException(nameof(source));
@@ -534,7 +534,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
       (selectManyTSourceTCollectionTResult3 ??= new Func<IQbservable<object>, Expression<Func<object, IQbservable<object>>>, Expression<Func<object, object, object>>, IQbservable<object>>(SelectMany).GetMethodInfo().GetGenericMethodDefinition())
       .MakeGenericMethod(TSource, TCollection, TResult);
 
-    internal static IQbservable<TResult> SelectMany<TSource, TCollection, TResult>(this IQbservable<TSource> source, Expression<Func<TSource, IQbservable<TCollection>>> collectionSelector, Expression<Func<TSource, TCollection, TResult>> resultSelector)
+    public static IQbservable<TResult> SelectMany<TSource, TCollection, TResult>(this IQbservable<TSource> source, Expression<Func<TSource, IQbservable<TCollection>>> collectionSelector, Expression<Func<TSource, TCollection, TResult>> resultSelector)
     {
       if (source == null)
         throw new ArgumentNullException(nameof(source));
