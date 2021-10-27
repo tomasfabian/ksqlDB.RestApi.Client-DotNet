@@ -198,6 +198,52 @@ ON M.Title = A.Title
       ksql.Should().Be(expectedQuery);
     }
 
+    private class Payment
+    {
+      public int Id { get; set; }
+    }
+    private record Shipment
+    {
+      public int Id { get; set; }
+    }
+
+    [TestMethod]
+    public void MultipleInnerJoinsQuerySyntax_BuildKSql_Prints()
+    {
+      var query = from o in KSqlDBContext.CreateQueryStream<Order>()
+                  join p in Source.Of<Payment>() on o.OrderId equals p.Id
+                  join s in Source.Of<Shipment>() on o.OrderId equals s.Id
+                  select new
+                  {
+                    orderId = o.OrderId,
+                    shipmentId = s.Id,
+                    paymentId = p.Id,
+                  };
+
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      var expectedQuery = @"SELECT O.OrderId AS orderId, S.Id AS shipmentId, P.Id AS paymentId FROM Orders O
+INNER JOIN Shipments S
+ON O.OrderId = S.Id
+INNER JOIN Payments P
+ON O.OrderId = P.Id
+ EMIT CHANGES;";
+
+      ksql.Should().Be(expectedQuery);
+    }
+
+    //SELECT
+    //o.id as orderId,
+    //o.itemid as itemId,
+    //s.id as shipmentId,
+    //p.id as paymentId
+    //FROM orders o
+    //INNER JOIN payments p WITHIN 1 HOURS ON p.id = o.id
+    //INNER JOIN shipments s WITHIN 2 HOURS ON s.id = o.id
+    // EMIT CHANGES;
+
     #endregion
 
     #region LeftJoin
@@ -235,7 +281,6 @@ ON M.Title = L.Title
     }
 
     [TestMethod]
-    [Ignore("TODO:")]
     public void LeftJoinQuerySyntax_BuildKSql_Prints()
     {
       var query = 
@@ -254,16 +299,15 @@ ON M.Title = L.Title
       var ksql = query.ToQueryString();
 
       //Assert
-      var expectedQuery = @"SELECT M.Id Id, UCASE(A.Actor_Name) UpperActorName, A.Title AS ActorTitle FROM Movies M
-LEFT JOIN Actors A
-ON M.Title = A.Title
+      var expectedQuery = @"SELECT movie.Id Id, UCASE(a.Actor_Name) UpperActorName, a.Title AS ActorTitle FROM Movies movie
+LEFT JOIN Actors a
+ON movie.Title = a.Title
  EMIT CHANGES;";
 
       ksql.Should().Be(expectedQuery);
     }
 
     [TestMethod]
-    [Ignore("TODO:")]
     public void GroupJoinSelectMany_BuildKSql_Prints()
     {
       var query = KSqlDBContext.CreateQueryStream<Movie>()
@@ -271,20 +315,20 @@ ON M.Title = A.Title
         {
           movie,
           grouping = gj
-        }).SelectMany(c => c.grouping.DefaultIfEmpty(), (movie2, l) => new
+        }).SelectMany(c => c.grouping.DefaultIfEmpty(), (movie, a) => new
                                                                        {
-                                                                         movie2.movie.Id,
-                                                                         UpperActorName = l.Actor_Name.ToUpper(),
-                                                                         ActorTitle = l.Title
+                                                                         movie.movie.Id,
+                                                                         UpperActorName = a.Actor_Name.ToUpper(),
+                                                                         ActorTitle = a.Title
                                                                        });
 
       //Act
       var ksql = query.ToQueryString();
 
       //Assert
-      var expectedQuery = @"SELECT M.Id Id, UCASE(A.Actor_Name) UpperActorName, A.Title AS ActorTitle FROM Movies M
-LEFT JOIN Actors A
-ON M.Title = A.Title
+      var expectedQuery = @"SELECT movie.Id Id, UCASE(a.Actor_Name) UpperActorName, a.Title AS ActorTitle FROM Movies movie
+LEFT JOIN Actors a
+ON movie.Title = a.Title
  EMIT CHANGES;";
 
       ksql.Should().Be(expectedQuery);
@@ -307,33 +351,33 @@ ON M.Title = A.Title
     }
 
     [TestMethod]
-    [Ignore("TODO:")]
     public void MultipleLeftJoinsQuerySyntax_BuildKSql_Prints()
     {
       var query = 
         from orders in KSqlDBContext.CreateQueryStream<Order>()
-        join customers in Source.Of<Customer>() 
-        on orders.CustomerId equals customers.CustomerId into gj
-        from a in gj.DefaultIfEmpty()
-        join items in Source.Of<Item>() 
-        on orders.ItemId equals items.ItemId into igj
-        from i in igj.DefaultIfEmpty()
+        join customer in Source.Of<Customer>() 
+        on orders.CustomerId equals customer.CustomerId into gj
+        from customers in gj.DefaultIfEmpty()
+        join item in Source.Of<Item>() 
+        on orders.ItemId equals item.ItemId into igj
+        from items in igj.DefaultIfEmpty()
         select new
         {
-          customerid = a.CustomerId,
+          customerid = customers.CustomerId,
           orders.OrderId,
-          i.ItemId,
-          i.ItemName,
+          items.ItemId,
+          items.ItemName,
         };
 
       //Act
       var ksql = query.ToQueryString();
 
       //Assert
-      var expectedQuery = @"SELECT customers.CustomerId AS customerid, orders.OrderId, items.ItemId, items.ItemName
-FROM orders
-LEFT JOIN customers on orders.CustomerId = customers.CustomerId
-LEFT JOIN items on orders.ItemId = items.ItemId
+      var expectedQuery = @"SELECT customers.CustomerId AS customerid, orders.OrderId OrderId, items.ItemId ItemId, items.ItemName ItemName FROM Orders orders
+LEFT JOIN Items items
+ON orders.ItemId = items.ItemId
+LEFT JOIN Customers customers
+ON orders.CustomerId = customers.CustomerId
  EMIT CHANGES;";
 
       ksql.Should().Be(expectedQuery);
