@@ -3,17 +3,18 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using ksqlDb.RestApi.Client.KSql.Entities;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 {
   internal sealed class KSqlTransparentIdentifierJoinSelectFieldsVisitor : KSqlVisitor
   {
-    private readonly Type[] tableTypes;
+    private readonly FromItem[] fromItems;
 
-    internal KSqlTransparentIdentifierJoinSelectFieldsVisitor(StringBuilder stringBuilder, Type[] tableTypes)
+    internal KSqlTransparentIdentifierJoinSelectFieldsVisitor(StringBuilder stringBuilder, FromItem[] fromItems)
       : base(stringBuilder, useTableAlias: true)
     {
-      this.tableTypes = tableTypes;
+      this.fromItems = fromItems;
     }
 
     protected override void ProcessVisitNewMember(MemberInfo memberInfo, Expression expression)
@@ -36,18 +37,29 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 
       if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
       {
-        Append(((ParameterExpression)memberExpression.Expression).Name);
+        string alias = ((ParameterExpression)memberExpression.Expression).Name;
+
+        var fromItem2 = fromItems.FirstOrDefault(c => c.Type == memberExpression.Expression.Type);
+
+        if (fromItem2 != null)
+          fromItem2.Alias = alias;
+
+        Append(alias);
         Append(".");
         Append(memberExpression.Member.Name);
 
         return memberExpression;
       }
 
-      bool isTableType = tableTypes.Contains(memberExpression.Member.DeclaringType);
+      var fromItem = fromItems.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
 
-      if (isTableType && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
+      if (fromItem != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
       {
-        Append(((MemberExpression)memberExpression.Expression).Member.Name);
+        string alias = ((MemberExpression)memberExpression.Expression).Member.Name;
+
+        fromItem.Alias = alias;
+
+        Append(alias);
         
         Append(".");
 

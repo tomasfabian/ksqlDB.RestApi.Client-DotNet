@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
+using ksqlDb.RestApi.Client.KSql.Entities;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using Pluralize.NET;
@@ -25,22 +26,25 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
       this.type = type ?? throw new ArgumentNullException(nameof(type));
     }
 
-    private readonly HashSet<string> aliasHashSet = new();
+    private readonly Dictionary<string, string> aliasDictionary = new();
 
     private string GenerateAlias(string name)
     {
+      if (aliasDictionary.ContainsKey(name))
+        return aliasDictionary[name];
+
       var streamAlias = name[0].ToString();
 
       int i = 0;
 
       var streamAliasAttempt = streamAlias;
 
-      while (aliasHashSet.Contains(streamAliasAttempt))
+      while (aliasDictionary.Values.Any(c => c == streamAliasAttempt))
       {
         streamAliasAttempt = $"{streamAlias}{++i}";
       }
 
-      aliasHashSet.Add(streamAliasAttempt);
+      aliasDictionary.Add(name, streamAliasAttempt);
 
       return streamAliasAttempt;
     }
@@ -57,13 +61,15 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
       return propertyInfo;
     }
 
-    private Type[] tableTypes;
+    private FromItem[] fromItems;
 
     internal void VisitJoinTable(IEnumerable<(MethodInfo, IEnumerable<Expression>, LambdaExpression)> joins)
     {
       bool isFirst = true;
 
-      tableTypes = joins.Select(c => c.Item2.ToArray()[0].Type.GenericTypeArguments[0]).Append(type).ToArray();
+      fromItems = joins.Select(c => c.Item2.ToArray()[0].Type.GenericTypeArguments[0]).Append(type)
+        .Select(c => new FromItem { Type = c })
+        .ToArray();
 
       foreach (var join in joins)
       {
@@ -74,17 +80,18 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
         expressions = expressions.Select(StripQuotes).ToArray();
 
         Visit(expressions[0]);
-        var outerStreamAlias = GenerateAlias(queryContext.FromItemName);
 
-        var streamAlias = GenerateAlias(fromItemName);
+        var outerItemAlias = GenerateAlias(queryContext.FromItemName);
+
+        var itemAlias = GenerateAlias(fromItemName);
 
         if (groupJoin != null)
         {
           var prop = GetPropertyType(groupJoin.Parameters[0].Type);
 
-          outerStreamAlias = prop.Name;
+          outerItemAlias = prop.Name;
 
-          streamAlias = groupJoin.Parameters[1].Name;
+          itemAlias = groupJoin.Parameters[1].Name;
         }
 
         var lambdaExpression = expressions[3] as LambdaExpression;
@@ -95,18 +102,15 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 
           Append("SELECT ");
 
-          if (groupJoin != null)
-          {
-            new KSqlTransparentIdentifierJoinSelectFieldsVisitor(StringBuilder, tableTypes).Visit(groupJoin.Body);
-          }
-          else
-          {
-            var rewrittenAliases = PredicateReWriter.Rewrite(lambdaExpression, outerStreamAlias, streamAlias);
+          var body = groupJoin != null ? groupJoin.Body : lambdaExpression.Body;
 
-            new KSqlJoinSelectFieldsVisitor(StringBuilder).Visit(rewrittenAliases);
-          }
+          new KSqlTransparentIdentifierJoinSelectFieldsVisitor(StringBuilder, fromItems).Visit(body);
 
-          AppendLine($" FROM {queryContext.FromItemName} {outerStreamAlias}");
+          var fromItemAlias = fromItems.Where(c => c.Type == type && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).FirstOrDefault();
+          
+          outerItemAlias = fromItemAlias ?? outerItemAlias;
+
+          AppendLine($" FROM {queryContext.FromItemName} {outerItemAlias}");
         }
 
         var joinType = methodInfo.Name switch
@@ -118,10 +122,16 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
           _ => throw new ArgumentOutOfRangeException()
         };
 
-        AppendLine($"{joinType} JOIN {fromItemName} {streamAlias}");
-        Append($"ON {outerStreamAlias}.");
+        var itemType = join.Item2.First().Type.GetGenericArguments()[0];
+        
+        var joinItemAlias = fromItems.Where(c => c.Type == itemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).FirstOrDefault();
+
+        itemAlias = joinItemAlias ?? itemAlias;
+
+        AppendLine($"{joinType} JOIN {fromItemName} {itemAlias}");
+        Append($"ON {outerItemAlias}.");
         Visit(expressions[1]);
-        Append($" = {streamAlias}.");
+        Append($" = {itemAlias}.");
         Visit(expressions[2]);
         AppendLine(string.Empty);
       }
@@ -150,9 +160,9 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
         return memberExpression;
       }
 
-      bool isTableType = tableTypes.Contains(memberExpression.Member.DeclaringType);
+      var fromItem = fromItems.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
 
-      if (isTableType && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
+      if (fromItems != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
       {
         Append(memberExpression.Member.Name);
       }
