@@ -160,7 +160,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
       //Assert
       Assert.AreEqual(expectedItemsCount, actualValues.Count);
 
-      actualValues[2].Title.Should().BeOneOf(MoviesProvider.Movie1.Title, null);
+      actualValues[2].Title.Should().BeOneOf(MoviesProvider.Movie1.Title, MoviesProvider.Movie2.Title, null);
     }
   }
 }
