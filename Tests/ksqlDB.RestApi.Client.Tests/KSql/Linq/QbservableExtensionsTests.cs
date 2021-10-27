@@ -33,7 +33,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Linq
       var ksql = query.ToQueryString();
 
       //Assert
-      ksql.Should().BeEquivalentTo(@$"SELECT 'Hello world' FROM Locations EMIT CHANGES;");
+      ksql.Should().BeEquivalentTo("SELECT 'Hello world' FROM Locations EMIT CHANGES;");
     }
 
     #region OperatorPrecedence
@@ -121,7 +121,6 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     #endregion
 
     [TestMethod]
-    [Ignore("TODO")]
     public void SelectConstants_BuildKSql_PrintsConstants()
     {
       //Arrange
@@ -132,6 +131,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
       var ksql = query.ToQueryString();
 
       //Assert
+      ksql.Should().Be("SELECT 'Hello world' Message, 23 Age FROM Locations EMIT CHANGES;");
     }
 
     [TestMethod]

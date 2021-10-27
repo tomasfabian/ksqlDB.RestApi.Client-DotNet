@@ -343,7 +343,6 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query
       query.Should().BeEquivalentTo($"{nameof(Location.Latitude)} != 'ahoj svet'");
     }
 
-    [Ignore("Figure out what to do")]
     [TestMethod]
     public void PredicateCompareWithVariable_BuildKSql_PrintsOperatorAndOperands()
     {
@@ -356,7 +355,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query
       var query = ClassUnderTest.BuildKSql(predicate);
 
       //Assert
-      query.Should().BeEquivalentTo($"{nameof(Location.Latitude)} != '${value}'");
+      query.Should().BeEquivalentTo($"{nameof(Location.Latitude)} != '{value}'");
     }
 
     [TestMethod]

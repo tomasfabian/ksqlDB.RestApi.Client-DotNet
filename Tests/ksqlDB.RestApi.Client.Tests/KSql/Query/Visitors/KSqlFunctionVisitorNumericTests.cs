@@ -132,7 +132,6 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
     }
 
     [TestMethod]
-    [Ignore("TODO")]
     public void EntriesOuterMemberAccess_BuildKSql_PrintsFunction()
     {
       //Arrange
@@ -140,14 +139,16 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
       {
         { "a", "value" }
       };
+
       bool sorted = true;
+
       Expression<Func<Test, Entry<string>[]>> expression = c => KSqlFunctions.Instance.Entries(map, sorted);
 
       //Act
       var kSqlFunction = ClassUnderTest.BuildKSql(expression);
 
       //Assert
-      kSqlFunction.Should().BeEquivalentTo("ENTRIES(MAP('a' := 'value'), true)");
+      kSqlFunction.Should().Be("ENTRIES(MAP('a' := 'value'), True)");
     }
 
     #endregion
