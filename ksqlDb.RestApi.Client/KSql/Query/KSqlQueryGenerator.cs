@@ -32,7 +32,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query
     {
       kSqlVisitor = new KSqlVisitor();
       whereClauses = new Queue<Expression>();
-      joinTables = new List<(MethodInfo, IEnumerable<Expression>)>();
+      joinTables = new List<(MethodInfo, IEnumerable<Expression>, LambdaExpression)>();
 
       Visit(expression);
 
@@ -42,12 +42,9 @@ namespace ksqlDB.RestApi.Client.KSql.Query
     
       if (joinTables.Any())
       {
-        var joinsVisitor = new KSqlJoinsVisitor(kSqlVisitor.StringBuilder, options, new QueryContext { FromItemName = finalFromItemName });
+        var joinsVisitor = new KSqlJoinsVisitor(kSqlVisitor.StringBuilder, options, new QueryContext { FromItemName = finalFromItemName }, fromTableType);
 
-        foreach (var joinTable in joinTables)
-        {
-          joinsVisitor.VisitJoinTable(joinTable);
-        }
+        joinsVisitor.VisitJoinTable(joinTables);
       }
       else
       {
@@ -145,6 +142,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query
 
     private string fromItemName;
 
+    private Type fromTableType;
+
     protected override Expression VisitConstant(ConstantExpression constantExpression)
     {
       if (constantExpression == null) throw new ArgumentNullException(nameof(constantExpression));
@@ -154,7 +153,11 @@ namespace ksqlDB.RestApi.Client.KSql.Query
       var kStreamSetType = type.TryFindProviderAncestor();
 
       if (kStreamSetType != null)
-        fromItemName = ((KSet) constantExpression.Value)?.ElementType.ExtractTypeName();
+      {
+        fromTableType = ((KSet)constantExpression.Value)?.ElementType;
+
+        fromItemName = fromTableType.ExtractTypeName();
+      }
 
       return constantExpression;
     }
@@ -224,6 +227,24 @@ namespace ksqlDB.RestApi.Client.KSql.Query
         VisitChained(methodCallExpression);
       }
 
+      if (methodInfo.Name.IsOneOfFollowing(nameof(QbservableExtensions.SelectMany)))
+      {
+        selectManyGroupJoin = (LambdaExpression)StripQuotes(methodCallExpression.Arguments.Last());
+
+        VisitChained(methodCallExpression);
+      }
+
+      if (methodInfo.Name.IsOneOfFollowing(nameof(QbservableExtensions.GroupJoin)))
+      {
+        var joinTable = methodCallExpression.Arguments.Skip(1);
+
+        joinTables.Add((methodInfo, joinTable, selectManyGroupJoin));
+        
+        selectManyGroupJoin = null;
+
+        VisitChained(methodCallExpression);
+      }
+
       if (methodInfo.Name.IsOneOfFollowing(nameof(QbservableExtensions.Having), nameof(CreateStatementExtensions.Having)))
       {
         having = (LambdaExpression)StripQuotes(methodCallExpression.Arguments[1]);
@@ -238,7 +259,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query
         case nameof(QbservableExtensions.FullOuterJoin):
           var joinTable = methodCallExpression.Arguments.Skip(1);
         
-          joinTables.Add((methodInfo, joinTable));
+          joinTables.Add((methodInfo, joinTable, null));
 
           VisitChained(methodCallExpression);
           break;
@@ -262,8 +283,9 @@ namespace ksqlDB.RestApi.Client.KSql.Query
     protected int? Limit;
     private ConstantExpression windowedBy;
     private LambdaExpression groupBy;
+    private LambdaExpression selectManyGroupJoin;
     private LambdaExpression having;
-    private List<(MethodInfo, IEnumerable<Expression>)> joinTables;
+    private List<(MethodInfo, IEnumerable<Expression>, LambdaExpression)> joinTables;
 
     protected static Expression StripQuotes(Expression expression)
     {
