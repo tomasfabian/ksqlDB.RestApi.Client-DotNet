@@ -6,6 +6,8 @@ It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/
 
 [ksqlDB.RestApi.Client](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet) is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
 
+[![main](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/actions/workflows/dotnetcore.yml/badge.svg?branch=main&event=push)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/actions/workflows/dotnetcore.yml/)
+
 Install with NuGet package manager:
 ```
 Install-Package ksqlDB.RestApi.Client
@@ -132,6 +134,7 @@ run in command line:
 
 # CDC - Push notifications from Sql Server tables with Kafka
 Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with SqlServer.Connector package together with the Debezium connector streaming platform. 
+⚠ Package had to be renamed to SqlServer.Connector
 ### Nuget
 ```
 Install-Package SqlServer.Connector -Version 0.3.0
@@ -2602,6 +2605,7 @@ Output:
 ### Transform arrays (v1.9.0)
 - Transform a collection by using a lambda function.
 - If the collection is an array, the lambda function must have one input argument.
+
 ```C#
 record Tweets
 {
@@ -2942,6 +2946,64 @@ Is equivalent with:
 ```SQL
 SELECT STRUCT(Property := 42) AS Value FROM Locations EMIT CHANGES;
 ```
+
+# ksqldb.RestApi.Client v1.1.0-rc.1
+
+### multiple joins with query comprehension syntax (GroupJoin, SelectMany, DefaultIfEmpty)
+
+```C#
+class Order
+{
+  public int OrderId { get; set; }
+  public int PaymentId { get; set; }
+  public int ShipmentId { get; set; }
+}
+
+class Payment
+{
+  public int Id { get; set; }
+}
+
+record Shipment
+{
+  public int Id { get; set; }
+}
+```
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+```
+
+```C#
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+var context = new KSqlDBContext(ksqlDbUrl);
+
+var query = (from o in context.CreateQueryStream<Order>()
+    join p1 in Source.Of<Payment>() on o.PaymentId equals p1.Id
+    join s1 in Source.Of<Shipment>() on o.ShipmentId equals s1.Id into gj
+    from sa in gj.DefaultIfEmpty()
+    select new
+           {
+             orderId = o.OrderId,
+             shipmentId = sa.Id,
+             paymentId = p1.Id,
+           })
+  .Take(5);
+```
+
+Equivalent KSQL:
+
+```SQL
+SELECT o.OrderId AS orderId, sa.Id AS shipmentId, p1.Id AS paymentId FROM Orders o
+INNER JOIN Payments p1
+ON O.PaymentId = p1.Id
+LEFT JOIN Shipments sa
+ON o.ShipmentId = sa.Id
+EMIT CHANGES LIMIT 5;
+```
+
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
