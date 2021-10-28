@@ -2952,6 +2952,8 @@ SELECT STRUCT(Property := 42) AS Value FROM Locations EMIT CHANGES;
 ### multiple joins with query comprehension syntax (GroupJoin, SelectMany, DefaultIfEmpty)
 
 ```C#
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+
 class Order
 {
   public int OrderId { get; set; }
@@ -2961,12 +2963,14 @@ class Order
 
 class Payment
 {
+  [Key]
   public int Id { get; set; }
 }
 
 record Shipment
 {
-  public int Id { get; set; }
+  [Key]
+  public int? Id { get; set; }
 }
 ```
 
@@ -3004,6 +3008,48 @@ ON o.ShipmentId = sa.Id
 EMIT CHANGES LIMIT 5;
 ```
 
+Creation of entities for the above mentioned query:
+
+```C#
+var entityCreationMetadata = new EntityCreationMetadata
+                             {
+                               KafkaTopic = nameof(Order) + "-Join",
+                               Partitions = 1
+                             };
+
+var response = await restApiClient.CreateStreamAsync<Order>(entityCreationMetadata, ifNotExists: true);
+response = await restApiClient.CreateTableAsync<Payment>(entityCreationMetadata with { KafkaTopic = nameof(Payment) }, ifNotExists: true);
+response = await restApiClient.CreateTableAsync<Shipment>(entityCreationMetadata with { KafkaTopic = nameof(Shipment) }, ifNotExists: true);
+```
+
+Listen to the incoming record messages:
+
+```C#
+using var subscription = query
+  .Subscribe(c => {
+               Console.WriteLine($"{nameof(Order.OrderId)}: {c.orderId}");
+
+               Console.WriteLine($"{nameof(Order.PaymentId)}: {c.paymentId}");
+
+               if (c.shipmentId.HasValue)
+                 Console.WriteLine($"{nameof(Order.ShipmentId)}: {c.shipmentId}");
+
+             }, error => {
+                  Console.WriteLine(error.Message);
+                });
+```
+
+Inserting of sample data:
+
+```C#
+var order = new Order { OrderId = 1, PaymentId = 1, ShipmentId = 1 };
+var payment = new Payment { Id = 1 };
+var shipment = new Shipment { Id = 1 };
+
+response = await restApiClient.InsertIntoAsync(order);
+response = await restApiClient.InsertIntoAsync(payment);
+response = await restApiClient.InsertIntoAsync(shipment);
+```
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
