@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
 using System.Reactive;
@@ -477,6 +478,19 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
       return f.Method;
     }
 
+    /// <summary>
+    /// Correlates the elements of two sequences based on equality of keys and groups the results.
+    /// </summary>
+    /// <typeparam name="TOuter">The type of the elements of the first sequence.</typeparam>
+    /// <typeparam name="TInner">The type of the elements of the second sequence.</typeparam>
+    /// <typeparam name="TKey">The type of the keys returned by the key selector functions.</typeparam>
+    /// <typeparam name="TResult">The type of the result elements.</typeparam>
+    /// <param name="outer">The first sequence to join.</param>
+    /// <param name="inner">The second sequence to join.</param>
+    /// <param name="outerKeySelector">A function to extract the join key from each element of the first sequence.</param>
+    /// <param name="innerKeySelector">A function to extract the join key from each element of the second sequence.</param>
+    /// <param name="resultSelector">A function to create a result element from an element from the first sequence and a collection of matching elements from the second sequence.</param>
+    /// <returns>An IQbservable that contains elements of type TResult that are obtained by performing a grouped join on two sequences.</returns>
     public static IQbservable<TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this IQbservable<TOuter> outer, ISource<TInner> inner, Expression<Func<TOuter, TKey>> outerKeySelector, Expression<Func<TInner, TKey>> innerKeySelector, Expression<Func<TOuter, IQbservable<TInner>, TResult>> resultSelector)
     {
       if (outer == null)
@@ -513,6 +527,11 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
       (defaultIfEmptyTSource1 ??= new Func<IQbservable<object>, IQbservable<object>>(DefaultIfEmpty).GetMethodInfo().GetGenericMethodDefinition())
       .MakeGenericMethod(source);
 
+    /// <summary>
+    /// An observable sequence that contains the default value for the TSource type if the source is empty; otherwise, the elements of the source itself.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements of source</typeparam>
+    /// <param name="source">The sequence to return the specified value for if it is empty.</param>
     public static IQbservable<TSource> DefaultIfEmpty<TSource>(this IQbservable<TSource> source)
     {
       if (source == null)
@@ -528,13 +547,24 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
 
     #region SelectMany
 
-    private static MethodInfo? selectManyTSourceTCollectionTResult3;
+    private static MethodInfo selectManyTSourceTCollectionTResult3;
 
-    private static MethodInfo SelectManyTSourceTCollectionTResult3(Type TSource, Type TCollection, Type TResult) =>
+    private static MethodInfo SelectManyTSourceTCollectionTResult3(Type source, Type collection, Type result) =>
       (selectManyTSourceTCollectionTResult3 ??= new Func<IQbservable<object>, Expression<Func<object, IQbservable<object>>>, Expression<Func<object, object, object>>, IQbservable<object>>(SelectMany).GetMethodInfo().GetGenericMethodDefinition())
-      .MakeGenericMethod(TSource, TCollection, TResult);
+      .MakeGenericMethod(source, collection, result);
 
-    public static IQbservable<TResult> SelectMany<TSource, TCollection, TResult>(this IQbservable<TSource> source, Expression<Func<TSource, IQbservable<TCollection>>> collectionSelector, Expression<Func<TSource, TCollection, TResult>> resultSelector)
+
+    /// <summary>
+    /// Projects each element of an qbservable sequence to a sequence, invokes the result selector for the source element and each of the corresponding inner sequence's elements, and merges the results into one observable sequence.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the source sequence.</typeparam>
+    /// <typeparam name="TSequence">The type of the elements in the projected intermediate enumerable sequences.</typeparam>
+    /// <typeparam name="TResult">The type of the elements in the result sequence.</typeparam>
+    /// <param name="source">An observable sequence of elements to project.</param>
+    /// <param name="collectionSelector">A transform function to apply to each element.</param>
+    /// <param name="resultSelector">A transform function to apply to each element of the intermediate sequence.</param>
+    /// <returns>An observable sequence.</returns>
+    public static IQbservable<TResult> SelectMany<TSource, TSequence, TResult>(this IQbservable<TSource> source, Expression<Func<TSource, IQbservable<TSequence>>> collectionSelector, Expression<Func<TSource, TSequence, TResult>> resultSelector)
     {
       if (source == null)
         throw new ArgumentNullException(nameof(source));
@@ -542,11 +572,11 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
         throw new ArgumentNullException(nameof(collectionSelector));
       if (resultSelector == null)
         throw new ArgumentNullException(nameof(resultSelector));
-
+      
       return source.Provider.CreateQuery<TResult>(
         Expression.Call(
           null,
-          SelectManyTSourceTCollectionTResult3(typeof(TSource), typeof(TCollection), typeof(TResult)),
+          SelectManyTSourceTCollectionTResult3(typeof(TSource), typeof(TSequence), typeof(TResult)),
           source.Expression, Expression.Quote(collectionSelector), Expression.Quote(resultSelector)
         ));
     }
