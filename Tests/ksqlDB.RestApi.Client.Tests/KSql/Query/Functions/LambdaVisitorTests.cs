@@ -20,7 +20,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Functions
     {
       base.TestInitialize();
       
-      ClassUnderTest = new LambdaVisitor(new StringBuilder());
+      ClassUnderTest = new LambdaVisitor(new StringBuilder(), new KSqlQueryMetadata());
     }
     
     [TestMethod]

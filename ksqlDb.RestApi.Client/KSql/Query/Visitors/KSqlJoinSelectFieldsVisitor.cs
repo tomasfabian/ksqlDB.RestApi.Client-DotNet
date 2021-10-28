@@ -7,8 +7,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 {
   internal sealed class KSqlJoinSelectFieldsVisitor : KSqlVisitor
   {
-    internal KSqlJoinSelectFieldsVisitor(StringBuilder stringBuilder)
-      : base(stringBuilder, useTableAlias: true)
+    internal KSqlJoinSelectFieldsVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
+      : base(stringBuilder, queryMetadata)
     {
     }
 

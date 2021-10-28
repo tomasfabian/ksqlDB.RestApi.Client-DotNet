@@ -7,8 +7,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 {
   internal class KSqlWindowsVisitor : KSqlVisitor
   {
-    public KSqlWindowsVisitor(StringBuilder stringBuilder)
-      : base(stringBuilder, useTableAlias: false)
+    public KSqlWindowsVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
+      : base(stringBuilder, queryMetadata)
     {
     }
 

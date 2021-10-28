@@ -24,7 +24,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Functions
       base.TestInitialize();
 
       StringBuilder = new StringBuilder();
-      ClassUnderTest = new KSqlInvocationFunctionVisitor(StringBuilder);
+      ClassUnderTest = new KSqlInvocationFunctionVisitor(StringBuilder, new KSqlQueryMetadata());
     }
 
     class Tweets

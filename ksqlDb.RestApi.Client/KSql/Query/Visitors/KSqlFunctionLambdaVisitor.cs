@@ -5,8 +5,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 {
   internal class KSqlFunctionLambdaVisitor : KSqlFunctionVisitor
   {
-    public KSqlFunctionLambdaVisitor(StringBuilder stringBuilder) 
-      : base(stringBuilder, useTableAlias: false)
+    public KSqlFunctionLambdaVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata) 
+      : base(stringBuilder, queryMetadata)
     {
     }
     

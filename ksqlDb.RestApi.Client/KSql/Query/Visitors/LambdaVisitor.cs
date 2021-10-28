@@ -7,16 +7,18 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
   internal class LambdaVisitor : KSqlVisitor
   {
     private readonly StringBuilder stringBuilder;
+    private readonly KSqlQueryMetadata queryMetadata;
 
-    public LambdaVisitor(StringBuilder stringBuilder)
-      : base(stringBuilder)
+    public LambdaVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
+      : base(stringBuilder, queryMetadata)
     {
       this.stringBuilder = stringBuilder ?? throw new ArgumentNullException(nameof(stringBuilder));
+      this.queryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
     }
 
     protected override KSqlFunctionVisitor CreateKSqlFunctionVisitor()
     {
-      return new KSqlFunctionLambdaVisitor(stringBuilder);
+      return new KSqlFunctionLambdaVisitor(stringBuilder, queryMetadata);
     }
 
     public override Expression? Visit(Expression? expression)

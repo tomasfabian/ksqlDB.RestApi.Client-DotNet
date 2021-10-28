@@ -22,7 +22,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
       base.TestInitialize();
 
       StringBuilder = new StringBuilder();
-      ClassUnderTest = new AggregationFunctionVisitor(StringBuilder, useTableAlias: false);
+      ClassUnderTest = new AggregationFunctionVisitor(StringBuilder, new KSqlQueryMetadata());
     }
 
     [TestMethod]

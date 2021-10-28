@@ -3,18 +3,17 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using ksqlDb.RestApi.Client.KSql.Entities;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 {
   internal sealed class KSqlTransparentIdentifierJoinSelectFieldsVisitor : KSqlVisitor
   {
-    private readonly FromItem[] fromItems;
+    private readonly KSqlQueryMetadata queryMetadata;
 
-    internal KSqlTransparentIdentifierJoinSelectFieldsVisitor(StringBuilder stringBuilder, FromItem[] fromItems)
-      : base(stringBuilder, useTableAlias: true)
+    internal KSqlTransparentIdentifierJoinSelectFieldsVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
+      : base(stringBuilder, queryMetadata)
     {
-      this.fromItems = fromItems;
+      this.queryMetadata = queryMetadata;
     }
 
     protected override void ProcessVisitNewMember(MemberInfo memberInfo, Expression expression)
@@ -39,7 +38,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
       {
         string alias = ((ParameterExpression)memberExpression.Expression).Name;
 
-        var fromItem2 = fromItems.FirstOrDefault(c => c.Type == memberExpression.Expression.Type);
+        var fromItem2 = queryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Expression.Type);
 
         if (fromItem2 != null)
           fromItem2.Alias = alias;
@@ -51,7 +50,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
         return memberExpression;
       }
 
-      var fromItem = fromItems.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
+      var fromItem = queryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
 
       if (fromItem != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
       {

@@ -6,8 +6,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Operators
 {
   internal class OperatorBetweenKSqlVisitor : KSqlVisitor
   {
-    public OperatorBetweenKSqlVisitor(StringBuilder stringBuilder)
-      : base(stringBuilder, useTableAlias: false)
+    public OperatorBetweenKSqlVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
+      : base(stringBuilder, queryMetadata)
     {
     }
 

@@ -4,6 +4,7 @@ using System.Text;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
+using ksqlDB.RestApi.Client.KSql.Query.Visitors;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 
@@ -20,7 +21,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
       StringBuilder stringBuilder = new();
 
       //Act
-      new OperatorBetweenKSqlVisitor(stringBuilder).Visit(expression);
+      new OperatorBetweenKSqlVisitor(stringBuilder, new KSqlQueryMetadata()).Visit(expression);
       var ksql = stringBuilder.ToString();
 
       //Assert
@@ -35,7 +36,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
       StringBuilder stringBuilder = new();
 
       //Act
-      new OperatorBetweenKSqlVisitor(stringBuilder).Visit(expression);
+      new OperatorBetweenKSqlVisitor(stringBuilder, new KSqlQueryMetadata()).Visit(expression);
       var ksql = stringBuilder.ToString();
 
       //Assert

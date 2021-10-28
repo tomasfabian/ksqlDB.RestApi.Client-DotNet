@@ -25,7 +25,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
       base.TestInitialize();
 
       StringBuilder = new StringBuilder();
-      ClassUnderTest = new KSqlFunctionVisitor(StringBuilder, useTableAlias: false);
+      ClassUnderTest = new KSqlFunctionVisitor(StringBuilder, new KSqlQueryMetadata());
       
       KSqlDBContextOptions.NumberFormatInfo = new System.Globalization.NumberFormatInfo
                                               {

@@ -9,8 +9,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 {
   internal class AggregationFunctionVisitor : KSqlVisitor
   {
-    public AggregationFunctionVisitor(StringBuilder stringBuilder, bool useTableAlias)
-      : base(stringBuilder, useTableAlias)
+    public AggregationFunctionVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
+      : base(stringBuilder, queryMetadata)
     {
     }
 

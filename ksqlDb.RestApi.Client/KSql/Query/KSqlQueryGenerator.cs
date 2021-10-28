@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
+using ksqlDb.RestApi.Client.KSql.Entities;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
@@ -19,7 +20,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query
     private readonly KSqlDBContextOptions options;
     private static readonly IPluralize EnglishPluralizationService = new Pluralizer();
 
-    private KSqlVisitor kSqlVisitor = new();
+    private KSqlVisitor kSqlVisitor;
+    private KSqlQueryMetadata queryMetadata;
 
     public bool ShouldEmitChanges { get; set; } = true;
 
@@ -30,21 +32,29 @@ namespace ksqlDB.RestApi.Client.KSql.Query
 
     public string BuildKSql(Expression expression, QueryContext queryContext)
     {
-      kSqlVisitor = new KSqlVisitor();
+      queryMetadata = new KSqlQueryMetadata();
+
+      kSqlVisitor = new KSqlVisitor(queryMetadata);
       whereClauses = new Queue<Expression>();
-      joinTables = new List<(MethodInfo, IEnumerable<Expression>, LambdaExpression)>();
+      joins = new List<(MethodInfo, IEnumerable<Expression>, LambdaExpression)>();
 
       Visit(expression);
 
       string finalFromItemName = InterceptFromItemName(queryContext.FromItemName ?? fromItemName);
 
       queryContext.AutoOffsetReset = autoOffsetReset;
-    
-      if (joinTables.Any())
-      {
-        var joinsVisitor = new KSqlJoinsVisitor(kSqlVisitor.StringBuilder, options, new QueryContext { FromItemName = finalFromItemName }, fromTableType);
+      
+      queryMetadata.FromItemType = fromTableType;
 
-        joinsVisitor.VisitJoinTable(joinTables);
+      if (joins.Any())
+      {
+        queryMetadata.Joins = joins.Select(c => c.Item2.ToArray()[0].Type.GenericTypeArguments[0]).Append(queryMetadata.FromItemType)
+          .Select(c => new FromItem { Type = c })
+          .ToArray();
+        
+        var joinsVisitor = new KSqlJoinsVisitor(kSqlVisitor.StringBuilder, options, new QueryContext { FromItemName = finalFromItemName }, queryMetadata);
+
+        joinsVisitor.VisitJoinTable(joins);
       }
       else
       {
@@ -111,7 +121,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query
       if (windowedBy == null)
         return;
 
-      new KSqlWindowsVisitor(kSqlVisitor.StringBuilder).Visit(windowedBy);
+      new KSqlWindowsVisitor(kSqlVisitor.StringBuilder, queryMetadata).Visit(windowedBy);
     }
 
     protected virtual string InterceptFromItemName(string value)
@@ -238,7 +248,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query
       {
         var joinTable = methodCallExpression.Arguments.Skip(1);
 
-        joinTables.Add((methodInfo, joinTable, selectManyGroupJoin));
+        joins.Add((methodInfo, joinTable, selectManyGroupJoin));
         
         selectManyGroupJoin = null;
 
@@ -259,7 +269,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query
         case nameof(QbservableExtensions.FullOuterJoin):
           var joinTable = methodCallExpression.Arguments.Skip(1);
         
-          joinTables.Add((methodInfo, joinTable, null));
+          joins.Add((methodInfo, joinTable, null));
 
           VisitChained(methodCallExpression);
           break;
@@ -285,7 +295,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query
     private LambdaExpression groupBy;
     private LambdaExpression selectManyGroupJoin;
     private LambdaExpression having;
-    private List<(MethodInfo, IEnumerable<Expression>, LambdaExpression)> joinTables;
+    private List<(MethodInfo, IEnumerable<Expression>, LambdaExpression)> joins;
 
     protected static Expression StripQuotes(Expression expression)
     {

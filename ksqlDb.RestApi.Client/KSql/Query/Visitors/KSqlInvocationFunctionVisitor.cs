@@ -9,11 +9,13 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
   internal class KSqlInvocationFunctionVisitor : KSqlVisitor
   {
     private readonly StringBuilder stringBuilder;
+    private readonly KSqlQueryMetadata queryMetadata;
 
-    public KSqlInvocationFunctionVisitor(StringBuilder stringBuilder)
-      : base(stringBuilder, useTableAlias: false)
+    public KSqlInvocationFunctionVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
+      : base(stringBuilder, queryMetadata)
     {
       this.stringBuilder = stringBuilder ?? throw new ArgumentNullException(nameof(stringBuilder));
+      this.queryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
     }
 
     private static bool isNestedInvocationFunction;
@@ -66,7 +68,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 
     private void VisitArgument(Expression expression)
     {
-      new LambdaVisitor(stringBuilder).Visit(expression);
+      new LambdaVisitor(stringBuilder, queryMetadata).Visit(expression);
     }
   }
 }

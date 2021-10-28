@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
-using ksqlDb.RestApi.Client.KSql.Entities;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using Pluralize.NET;
@@ -16,14 +15,14 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
   {
     private readonly KSqlDBContextOptions contextOptions;
     private readonly QueryContext queryContext;
-    private readonly Type type;
+    private readonly KSqlQueryMetadata queryMetadata;
 
-    public KSqlJoinsVisitor(StringBuilder stringBuilder, KSqlDBContextOptions contextOptions, QueryContext queryContext, Type type)
-      : base(stringBuilder, useTableAlias: false)
+    public KSqlJoinsVisitor(StringBuilder stringBuilder, KSqlDBContextOptions contextOptions, QueryContext queryContext, KSqlQueryMetadata queryMetadata)
+      : base(stringBuilder, queryMetadata)
     {
       this.contextOptions = contextOptions ?? throw new ArgumentNullException(nameof(contextOptions));
       this.queryContext = queryContext ?? throw new ArgumentNullException(nameof(queryContext));
-      this.type = type ?? throw new ArgumentNullException(nameof(type));
+      this.queryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
     }
 
     private readonly Dictionary<string, string> aliasDictionary = new();
@@ -61,15 +60,9 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
       return propertyInfo;
     }
 
-    private FromItem[] fromItems;
-
     internal void VisitJoinTable(IEnumerable<(MethodInfo, IEnumerable<Expression>, LambdaExpression)> joins)
     {
       bool isFirst = true;
-
-      fromItems = joins.Select(c => c.Item2.ToArray()[0].Type.GenericTypeArguments[0]).Append(type)
-        .Select(c => new FromItem { Type = c })
-        .ToArray();
 
       foreach (var join in joins)
       {
@@ -104,9 +97,9 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 
           var body = groupJoin != null ? groupJoin.Body : lambdaExpression.Body;
 
-          new KSqlTransparentIdentifierJoinSelectFieldsVisitor(StringBuilder, fromItems).Visit(body);
+          new KSqlTransparentIdentifierJoinSelectFieldsVisitor(StringBuilder, queryMetadata).Visit(body);
 
-          var fromItemAlias = fromItems.Where(c => c.Type == type && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).FirstOrDefault();
+          var fromItemAlias = queryMetadata.Joins.Where(c => c.Type == queryMetadata.FromItemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).FirstOrDefault();
           
           outerItemAlias = fromItemAlias ?? outerItemAlias;
 
@@ -124,7 +117,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 
         var itemType = join.Item2.First().Type.GetGenericArguments()[0];
         
-        var joinItemAlias = fromItems.Where(c => c.Type == itemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).FirstOrDefault();
+        var joinItemAlias = queryMetadata.Joins.Where(c => c.Type == itemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).FirstOrDefault();
 
         itemAlias = joinItemAlias ?? itemAlias;
 
@@ -160,9 +153,9 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
         return memberExpression;
       }
 
-      var fromItem = fromItems.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
+      var fromItem = queryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
 
-      if (fromItems != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
+      if (queryMetadata.Joins != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
       {
         Append(memberExpression.Member.Name);
       }

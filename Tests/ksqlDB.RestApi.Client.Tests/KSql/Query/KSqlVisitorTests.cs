@@ -24,7 +24,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query
     {
       base.TestInitialize();
 
-      ClassUnderTest = new KSqlVisitor();
+      ClassUnderTest = new KSqlVisitor(new KSqlQueryMetadata());
     }
 
     #region Constants

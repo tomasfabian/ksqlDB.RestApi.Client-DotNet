@@ -8,8 +8,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 {
   internal class KSqlFunctionVisitor : KSqlVisitor
   {
-    public KSqlFunctionVisitor(StringBuilder stringBuilder, bool useTableAlias)
-      : base(stringBuilder, useTableAlias)
+    public KSqlFunctionVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
+      : base(stringBuilder, queryMetadata)
     {
     }
 
