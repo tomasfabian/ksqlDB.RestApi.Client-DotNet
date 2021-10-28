@@ -265,21 +265,6 @@ ON {MovieAlias}.Title = {ActorAlias}.Title
                     paymentId = p1.Id,
                   };
 
-      var query2 = (from o in KSqlDBContext.CreateQueryStream<Order>()
-        join p1 in Source.Of<Payment>() on o.OrderId equals p1.Id
-        join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id into gj
-        from sa in gj.DefaultIfEmpty()
-        select new
-               {
-                 value,
-                 orderId = o.OrderId,
-                 shipmentId = sa.Id,
-                 paymentId = p1.Id,
-               })
-        .Take(5);
-
-      var s = query2.ToQueryString();
-
       //Act
       var ksql = query.ToQueryString();
 

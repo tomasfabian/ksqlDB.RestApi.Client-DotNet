@@ -5,7 +5,10 @@ using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models;
 using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
@@ -162,5 +165,89 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
 
       actualValues[2].Title.Should().BeOneOf(MoviesProvider.Movie1.Title, MoviesProvider.Movie2.Title, null);
     }
+
+    class Order
+    {
+      public int OrderId { get; set; }
+      public int PaymentId { get; set; }
+      public int ShipmentId { get; set; }
+    }
+
+    #region MultipleJoins
+
+    class Payment
+    {
+      [Key]
+      public int Id { get; set; }
+    }
+
+    record Shipment
+    {
+      [Key]
+      public int? Id { get; set; }
+    }
+
+    struct Foo
+    {
+      public int Prop { get; set; }
+    }
+
+    [TestMethod]
+    public async Task MultipleJoins_QuerySyntax()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+
+      var entityCreationMetadata = new EntityCreationMetadata
+      {
+        KafkaTopic = nameof(Order) + "-TestJoin",
+        Partitions = 1
+      };
+
+      var response = await RestApiProvider.CreateStreamAsync<Order>(entityCreationMetadata, ifNotExists: true);
+      response = await RestApiProvider.CreateTableAsync<Payment>(entityCreationMetadata with { KafkaTopic = nameof(Payment) + "-TestJoin" }, ifNotExists: true);
+      response = await RestApiProvider.CreateTableAsync<Shipment>(entityCreationMetadata with { KafkaTopic = nameof(Shipment) + "-TestJoin" }, ifNotExists: true);
+
+      var ksqlDbUrl = @"http:\\localhost:8088";
+
+      var context = new KSqlDBContext(ksqlDbUrl);
+
+      var value = new Foo { Prop = 42 };
+
+      var query = (from o in context.CreateQueryStream<Order>()
+                   join p1 in Source.Of<Payment>() on o.PaymentId equals p1.Id
+                   join s1 in Source.Of<Shipment>() on o.ShipmentId equals s1.Id into gj
+                   from sa in gj.DefaultIfEmpty()
+                   select new
+                   {
+                     value,
+                     orderId = o.OrderId,
+                     shipmentId = sa.Id,
+                     paymentId = p1.Id,
+                   })
+        .Take(1);
+      
+      var order = new Order { OrderId = 1, PaymentId = 1, ShipmentId = 1 };
+      var payment = new Payment { Id = 1 };
+      var shipment = new Shipment { Id = 1 };
+
+      response = await RestApiProvider.InsertIntoAsync(order);
+      response = await RestApiProvider.InsertIntoAsync(payment);
+      response = await RestApiProvider.InsertIntoAsync(shipment);
+
+      //Act
+      var actualValues = await CollectActualValues(query.ToAsyncEnumerable(), expectedItemsCount);
+
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+
+      actualValues[0].orderId.Should().Be(1);
+      actualValues[0].paymentId.Should().Be(1);
+      var shipmentId = actualValues[0].shipmentId;
+      if (shipmentId.HasValue)
+        shipmentId.Should().Be(1);
+    }
+
+    #endregion
   }
 }
