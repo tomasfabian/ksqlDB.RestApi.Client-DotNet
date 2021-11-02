@@ -6,6 +6,13 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 {
   public record EntityCreationMetadata : CreationMetadata, IEntityCreationProperties
   {
+    public EntityCreationMetadata(string kafkaTopic, short? partitions = null)
+      : this()
+    {
+      KafkaTopic = kafkaTopic;
+      Partitions = partitions;
+    }
+
     public EntityCreationMetadata()
     {
       ValueFormat = SerializationFormats.Json;
