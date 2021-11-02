@@ -95,9 +95,11 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 
           Append("SELECT ");
 
-          var body = groupJoin != null ? groupJoin.Body : lambdaExpression.Body;
+          var body = queryMetadata.Select?.Body ?? lambdaExpression?.Body;
 
-          new KSqlTransparentIdentifierJoinSelectFieldsVisitor(StringBuilder, queryMetadata).Visit(body);
+          body = groupJoin != null ? groupJoin.Body : body;
+
+          new KSqlJoinSelectFieldsVisitor(StringBuilder, queryMetadata).Visit(body);
 
           var fromItemAlias = queryMetadata.Joins.Where(c => c.Type == queryMetadata.FromItemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).FirstOrDefault();
           
@@ -126,7 +128,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
         Visit(expressions[1]);
         Append($" = {itemAlias}.");
         Visit(expressions[2]);
-        AppendLine(string.Empty);
+        Append(Environment.NewLine);
       }
     }
 

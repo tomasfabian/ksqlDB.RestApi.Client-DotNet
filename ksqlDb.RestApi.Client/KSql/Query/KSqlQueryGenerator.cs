@@ -60,8 +60,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query
       {
         kSqlVisitor.Append("SELECT ");
 
-        if (@select != null)
-          kSqlVisitor.Visit(@select.Body);
+        if (queryMetadata.Select != null)
+          kSqlVisitor.Visit(queryMetadata.Select.Body);
         else
           kSqlVisitor.Append("*");
 
@@ -74,7 +74,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query
       {
         if (isFirst)
         {
-          kSqlVisitor.AppendLine("");
+          kSqlVisitor.Append(HasJoins ? string.Empty : Environment.NewLine);
           kSqlVisitor.Append("WHERE ");
 
           isFirst = false;
@@ -106,7 +106,14 @@ namespace ksqlDB.RestApi.Client.KSql.Query
       }
 
       if (ShouldEmitChanges)
-        kSqlVisitor.Append(" EMIT CHANGES");
+      {
+        string separator = string.Empty;
+
+        if (!HasJoins || (HasJoins && whereClauses.Any()))
+          separator = " ";
+        
+        kSqlVisitor.Append($"{separator}EMIT CHANGES");
+      }
 
       if (Limit.HasValue)
         kSqlVisitor.Append($" LIMIT {Limit}");
@@ -115,6 +122,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query
 
       return kSqlVisitor.BuildKSql();
     }
+
+    private bool HasJoins => joins?.Any() ?? false;
 
     private void TryGenerateWindowAggregation()
     {
@@ -183,8 +192,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query
       {
         LambdaExpression lambda = (LambdaExpression)StripQuotes(methodCallExpression.Arguments[1]);
 
-        if (select == null)
-          select = lambda;
+        if (queryMetadata.Select == null)
+          queryMetadata.Select = lambda;
 
         VisitChained(methodCallExpression);
       }
@@ -287,7 +296,6 @@ namespace ksqlDB.RestApi.Client.KSql.Query
     }
 
     private Queue<Expression> whereClauses;
-    private LambdaExpression select;
     private LambdaExpression partitionBy;
     private AutoOffsetReset? autoOffsetReset;
     protected int? Limit;

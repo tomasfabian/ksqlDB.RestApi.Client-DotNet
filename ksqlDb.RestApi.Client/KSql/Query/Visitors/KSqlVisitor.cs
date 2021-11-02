@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
+using ksqlDb.RestApi.Client.KSql.Entities;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
@@ -628,13 +629,31 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 
       if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
       {
-        if (useTableAlias)
+        FromItem fromItem = null;
+
+        var propertyInfo = (memberExpression.Member as PropertyInfo)?.PropertyType;
+
+        if (queryMetadata.Joins?.Any() ?? false)
         {
-          Append(((ParameterExpression) memberExpression.Expression).Name);
+          fromItem = queryMetadata.Joins.FirstOrDefault(c => c.Type == propertyInfo);
+
+          if (fromItem != null)
+            fromItem.Alias = memberExpression.Member.Name;
+          else
+          {
+            fromItem = queryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
+
+            if (fromItem != null)
+              fromItem.Alias = ((ParameterExpression)memberExpression.Expression).Name;
+          }
+
+          string alias = fromItem?.Alias ?? ((ParameterExpression)memberExpression.Expression).Name;
+          Append(alias);
           Append(".");
         }
 
-        Append(memberExpression.Member.Name);
+        if (propertyInfo != fromItem?.Type)
+          Append(memberExpression.Member.Name);
       }
       else if (memberExpression.Expression.NodeType == ExpressionType.MemberInit)
       {
@@ -671,7 +690,12 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
     protected void Destructure(MemberExpression memberExpression)
     {
       Visit(memberExpression.Expression);
-      Append("->");
+
+      var fromItem = queryMetadata.Joins?.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
+
+      if (fromItem == null)
+        Append("->");
+
       Append(memberExpression.Member.Name);
     }
 
