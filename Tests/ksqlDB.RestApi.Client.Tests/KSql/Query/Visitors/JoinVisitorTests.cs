@@ -283,14 +283,19 @@ ON O.OrderId = P1.Id
     {
       public int Id { get; set; }
       public IDictionary<string, City> Dictionary { get; set; }
+      public Nested Nested { get; set; }
     }
     private class City
     {
       public int[] Values { get; set; }
     }
 
+    private class Nested
+    {
+      public string Prop { get; set; }
+    }
+
     [TestMethod]
-    [Ignore("TODO")]
     public void JoinWithInvocationFunction_BuildKSql_Prints()
     {
       var query = from o in KSqlDBContext.CreateQueryStream<Order>()
@@ -299,8 +304,57 @@ ON O.OrderId = P1.Id
         select new
                {
                  A = K.Functions.Transform(lm.Dictionary, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v.Values, x => x * x)),
-                 //orderId = o.OrderId,
-                 //shipmentId = s1.Id
+                 orderId = o.OrderId,
+                 shipmentId = s1.Id
+               };
+
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      string lambdaAlias = "lm";
+      string shipmentsAlias = "s1";
+
+      var expectedQuery = @$"SELECT TRANSFORM({lambdaAlias}.{nameof(LambdaMap.Dictionary)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->Values, (x) => x * x)) A, O.OrderId AS orderId, {shipmentsAlias}.Id AS shipmentId FROM Orders O
+INNER JOIN Shipments {shipmentsAlias}
+ON O.OrderId = {shipmentsAlias}.Id
+INNER JOIN LambdaMaps {lambdaAlias}
+ON O.OrderId = {lambdaAlias}.Id
+ EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedQuery);
+    }
+
+    [TestMethod]
+    [Ignore("TODO:")]
+    public void JoinWithSeveralOnConditions_BuildKSql_Prints()
+    {
+      var query = from o in KSqlDBContext.CreateQueryStream<Order>()
+        join lm in Source.Of<LambdaMap>() on new { OrderId = o.OrderId, NestedProp = "Nested" } equals new { OrderId = lm.Id, NestedProp = lm.Nested.Prop }
+        select new
+               {
+                 lm.Nested.Prop,
+                 orderId = o.OrderId,
+               };
+
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      //TODO:
+    }
+
+    [TestMethod]
+    [Ignore("TODO:")]
+    public void JoinWithNestedType_BuildKSql_Prints()
+    {
+      var query = from o in KSqlDBContext.CreateQueryStream<Order>()
+        join lm in Source.Of<LambdaMap>() on o.OrderId equals lm.Id
+        where lm.Nested.Prop == "Nested"
+        select new
+               {
+                 lm.Nested.Prop,
+                 orderId = o.OrderId,
                };
 
       //Act
@@ -309,14 +363,12 @@ ON O.OrderId = P1.Id
       //Assert
       string lambdaAlias = "lm";
 
-      //var expectedQuery = @$"SELECT TRANSFORM({lambdaAlias}.{nameof(LambdaMap.Dictionary)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->Values, (x) => x * x)) A, O.OrderId AS orderId, S1.Id AS shipmentId FROM Orders O
-      var expectedQuery = @$"SELECT TRANSFORM({lambdaAlias}.{nameof(LambdaMap.Dictionary)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->Values, (x) => x * x)) A FROM Orders O
+      var expectedQuery = @$"SELECT {lambdaAlias}.Nested->Prop Prop, O.OrderId AS orderId FROM Orders O
 INNER JOIN LambdaMaps {lambdaAlias}
 ON O.OrderId = {lambdaAlias}.Id
-INNER JOIN Payments P1
-ON O.OrderId = P1.Id
+WHERE {lambdaAlias}.Nested->Prop = 'Nested'
  EMIT CHANGES;";
-
+      //
       ksql.Should().BeEquivalentTo(expectedQuery);
     }
 
