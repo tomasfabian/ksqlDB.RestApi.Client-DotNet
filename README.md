@@ -1,4 +1,4 @@
-⚠ Package had to be renamed to ksqlDB.Api.Client
+⚠ The package had to be renamed to ksqlDB.Api.Client
 
 This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
 You can continually process computations over unbounded (theoretically never-ending) streams of data.
@@ -3049,6 +3049,31 @@ var shipment = new Shipment { Id = 1 };
 response = await restApiClient.InsertIntoAsync(order);
 response = await restApiClient.InsertIntoAsync(payment);
 response = await restApiClient.InsertIntoAsync(shipment);
+```
+
+Left joins can be also constructed in the following (less readable) way:
+
+```C#
+var query2 = KSqlDBContext.CreateQueryStream<Order>()
+  .GroupJoin(Source.Of<Payment>(), c => c.OrderId, c => c.Id, (order, gj) => new
+                                                                             {
+                                                                               order,
+                                                                               grouping = gj
+                                                                             })
+  .SelectMany(c => c.grouping.DefaultIfEmpty(), (o, s1) => new
+                                                           {
+                                                             o.order.OrderId,
+                                                             shipmentId = s1.Id,
+                                                           });
+```
+
+Equivalent KSQL:
+
+```KSQL
+SELECT order.OrderId OrderId, s1.Id AS shipmentId FROM Orders order
+LEFT JOIN Payments s1
+ON order.OrderId = s1.Id
+EMIT CHANGES;
 ```
 
 # LinqPad samples
