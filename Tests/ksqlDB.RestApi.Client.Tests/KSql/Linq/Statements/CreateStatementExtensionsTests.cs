@@ -179,7 +179,7 @@ AS SELECT * FROM Movies WINDOW TUMBLING (SIZE 2 MINUTES) GROUP BY Title EMIT CHA
 AS SELECT movie.Title Title, actor.Actor_Name AS ActorName FROM Movies movie
 INNER JOIN Actors actor
 ON movie.Title = actor.Title
- EMIT CHANGES;");
+EMIT CHANGES;");
       }
 
       [TestMethod]
@@ -206,7 +206,7 @@ ON movie.Title = actor.Title
 AS SELECT movie.Title Title, actor.Actor_Name AS ActorName FROM Movies movie
 FULL OUTER JOIN Actors actor
 ON movie.Title = actor.Title
- EMIT CHANGES;");
+EMIT CHANGES;");
       }
 
       [TestMethod]
@@ -233,7 +233,7 @@ ON movie.Title = actor.Title
 AS SELECT movie.Title Title, actor.Actor_Name AS ActorName FROM Movies movie
 LEFT JOIN Actors actor
 ON movie.Title = actor.Title
- EMIT CHANGES;");
+EMIT CHANGES;");
       }
     }
 }

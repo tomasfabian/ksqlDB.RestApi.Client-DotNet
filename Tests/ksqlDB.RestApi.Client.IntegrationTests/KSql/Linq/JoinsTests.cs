@@ -248,6 +248,57 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
         shipmentId.Should().Be(1);
     }
 
+    private class Nested
+    {
+      public string Prop { get; set; }
+    }
+
+    class PaymentExt
+    {
+      [Key]
+      public int Id { get; set; }
+      public Nested Nested { get; set; }
+    }
+
+    [TestMethod]
+    public async Task JoinWithNestedPropertyAccessor_QuerySyntax()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+
+      var response = await RestApiProvider.CreateTypeAsync<Nested>();
+      var entityCreationMetadata = new EntityCreationMetadata(nameof(PaymentExt) + "-TestJoin", partitions: 1);
+      response = await RestApiProvider.CreateTableAsync<PaymentExt>(entityCreationMetadata, ifNotExists: true);
+
+      var ksqlDbUrl = @"http:\\localhost:8088";
+
+      var context = new KSqlDBContext(ksqlDbUrl);
+      
+      string prop = "Nested";
+
+      var query = from o in context.CreateQueryStream<Order>()
+        join p in Source.Of<PaymentExt>() on o.OrderId equals p.Id
+        where p.Nested.Prop == prop
+        select new
+               {
+                 p.Nested.Prop,
+                 orderId = o.OrderId,
+               };
+
+      var order = new Order { OrderId = 1, PaymentId = 1, ShipmentId = 1 };
+      var payment = new PaymentExt { Id = 1, Nested = new Nested() { Prop = prop } };
+
+      response = await RestApiProvider.InsertIntoAsync(payment);
+      response = await RestApiProvider.InsertIntoAsync(order);
+
+      //Act
+      var actualValues = await CollectActualValues(query.ToAsyncEnumerable(), expectedItemsCount);
+
+      //Assert
+      actualValues[0].Prop.Should().Be(prop);
+      actualValues[0].orderId.Should().Be(1);
+    }
+
     #endregion
   }
 }
