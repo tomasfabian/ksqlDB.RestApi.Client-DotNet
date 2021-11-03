@@ -1,6 +1,6 @@
 ﻿# ksqlDB.RestApi.Client
 
-# v1.1.0-rc.1
+# v1.1.0
 - multiple joins with query comprehension syntax (GroupJoin, SelectMany, DefaultIfEmpty)
 
 # v1.0.0
