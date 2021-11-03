@@ -21,7 +21,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Environment (please complete the following information):**
  - ksqldb version: [e.g. 0.19.0]
- - Kafka.DotNet.ksqlDB nuget package version [e.g. 1.9.0]
+ - ksqlDB.RestApi.Client (previously Kafka.DotNet.ksqlDB) nuget package version [e.g. 1.9.0]
  - TFM [e.g. netstandard2.0, netcoreapp3.1, net5.0, etc.]
 
 **Additional context**
