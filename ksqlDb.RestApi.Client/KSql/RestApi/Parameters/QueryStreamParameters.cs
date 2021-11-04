@@ -47,5 +47,10 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters
 
       return queryParams;
     }
+
+    public override string ToString()
+    {
+      return this.ToLogInfo();
+    }
   }
 }
