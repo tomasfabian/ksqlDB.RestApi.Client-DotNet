@@ -6,14 +6,15 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query;
+using Microsoft.Extensions.Logging;
 using ErrorResponse = ksqlDB.RestApi.Client.KSql.RestApi.Responses.ErrorResponse;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Query
 {
   internal class KSqlDbQueryProvider : KSqlDbProvider
   {
-    public KSqlDbQueryProvider(IHttpClientFactory httpClientFactory)
-      : base(httpClientFactory)
+    public KSqlDbQueryProvider(IHttpClientFactory httpClientFactory, ILogger logger = null)
+      : base(httpClientFactory, logger)
     {
     }
 

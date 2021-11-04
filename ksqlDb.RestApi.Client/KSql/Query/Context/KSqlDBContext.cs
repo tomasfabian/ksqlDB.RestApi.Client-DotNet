@@ -11,6 +11,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Clauses;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 #if !NETSTANDARD
 using Microsoft.Extensions.DependencyInjection.Extensions;
 #endif
@@ -21,13 +22,13 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
   {
     private readonly KSqlDBContextOptions contextOptions;
 
-    public KSqlDBContext(string ksqlDbUrl)
-      : this(new KSqlDBContextOptions(ksqlDbUrl))
+    public KSqlDBContext(string ksqlDbUrl, ILoggerFactory loggerFactory = null)
+      : this(new KSqlDBContextOptions(ksqlDbUrl), loggerFactory)
     {
     }
 
-    public KSqlDBContext(KSqlDBContextOptions contextOptions)
-      : base(contextOptions)
+    public KSqlDBContext(KSqlDBContextOptions contextOptions, ILoggerFactory loggerFactory = null)
+      : base(contextOptions, loggerFactory)
     {
       this.contextOptions = contextOptions ?? throw new ArgumentNullException(nameof(contextOptions));
 

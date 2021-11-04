@@ -8,18 +8,21 @@ using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context
 {
   public abstract class KSqlDBContextDependenciesProvider : AsyncDisposableObject
   {
     private readonly KSqlDBContextOptions kSqlDbContextOptions;
+    private readonly ILoggerFactory loggerFactory;
     private readonly IServiceCollection serviceCollection;
 
-    protected KSqlDBContextDependenciesProvider(KSqlDBContextOptions kSqlDbContextOptions)
+    protected KSqlDBContextDependenciesProvider(KSqlDBContextOptions kSqlDbContextOptions, ILoggerFactory loggerFactory = null)
       : this()
     {
       this.kSqlDbContextOptions = kSqlDbContextOptions ?? throw new ArgumentNullException(nameof(kSqlDbContextOptions));
+      this.loggerFactory = loggerFactory;
     }
 
     protected KSqlDBContextDependenciesProvider()
@@ -57,8 +60,19 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
       receive?.Invoke(serviceCollection);
     }
 
+    protected ILogger Logger { get; private set; }
+
     protected virtual void OnConfigureServices(IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
     {
+      if (loggerFactory != null)
+      {
+        serviceCollection.TryAddScoped(_ => loggerFactory);
+
+        Logger = loggerFactory.CreateLogger("ksqlDb.RestApi.Client");
+
+        serviceCollection.TryAddSingleton(Logger);
+      }
+
       serviceCollection.AddSingleton(contextOptions);
 
       serviceCollection.TryAddScoped<IKSqlQbservableProvider, QbservableProvider>();

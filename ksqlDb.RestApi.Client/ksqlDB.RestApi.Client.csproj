@@ -15,8 +15,8 @@
       Targets .NET 5, .NET Core 3.1 and .NET Standard 2.0.
       Documentation for the library can be found at https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/ksqlDB.RestApi.Client/Wiki.md.</Description>
     <PackageTags>ksql ksqlDB LINQ .NET csharp push query</PackageTags>
-    <Version>1.1.0</Version>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <Version>1.2.0-rc.1</Version>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
     <LangVersion>9.0</LangVersion>
     <PackageReleaseNotes>https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/ksqlDB.RestApi.Client/ChangeLog.md</PackageReleaseNotes>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="System.Interactive.Async" Version="5.0.0" />
     <PackageReference Include="System.Reactive" Version="5.0.0" /> 
     <PackageReference Include="System.Text.Json" Version="5.0.0" />

@@ -10,16 +10,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
+using Microsoft.Extensions.Logging;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi
 {
   internal abstract class KSqlDbProvider : IKSqlDbProvider
   {
     private readonly IHttpClientFactory httpClientFactory;
+    private readonly ILogger logger;
 
-    protected KSqlDbProvider(IHttpClientFactory httpClientFactory)
+    protected KSqlDbProvider(IHttpClientFactory httpClientFactory, ILogger logger = null)
     {
       this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+      this.logger = logger;
     }
 
     public abstract string ContentType { get; }
@@ -50,6 +53,8 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
     /// <param name="cancellationToken">A token that can be used to request cancellation of the asynchronous operation.</param>
     public async IAsyncEnumerable<T> Run<T>(object parameters, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+      logger?.LogInformation($"Executing query: {parameters}");
+
       using var streamReader = await GetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
 
       await foreach (var entity in ConsumeAsync<T>(streamReader, cancellationToken).WithCancellation(cancellationToken).ConfigureAwait(false))
@@ -86,10 +91,12 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
         if (cancellationToken.IsCancellationRequested)
           yield break;
 
-        var rawJson = await streamReader.ReadLineAsync()
+        var rawData = await streamReader.ReadLineAsync()
           .ConfigureAwait(false);
 
-        var record = OnLineRead<T>(rawJson);
+        logger?.LogInformation($"Raw data received: {rawData}");
+
+        var record = OnLineRead<T>(rawData);
 
         if (record != null) yield return record.Value;
       }
@@ -97,10 +104,10 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
 
     private async Task<string> ReadHeaderAsync<T>(StreamReader streamReader)
     {
-      var rawJson = await streamReader.ReadLineAsync()
+      var rawData = await streamReader.ReadLineAsync()
         .ConfigureAwait(false);
 
-      return OnReadHeader<T>(rawJson);
+      return OnReadHeader<T>(rawData);
     }
 
     protected abstract string OnReadHeader<T>(string rawJson);

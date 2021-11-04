@@ -19,16 +19,21 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Topics;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Connectors;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+using Microsoft.Extensions.Logging;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi
 {
   public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   {
     private readonly IHttpClientFactory httpClientFactory;
+    private readonly ILogger logger;
 
-    public KSqlDbRestApiClient(IHttpClientFactory httpClientFactory)
+    public KSqlDbRestApiClient(IHttpClientFactory httpClientFactory, ILoggerFactory loggerFactory = null)
     {
       this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+
+      if(loggerFactory != null)
+        logger = loggerFactory.CreateLogger("ksqlDb.RestApi.Client");
     }
 
     internal static readonly string MediaType = "application/vnd.ksql.v1+json";
@@ -57,6 +62,8 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
     /// <returns></returns>
     public Task<HttpResponseMessage> ExecuteStatementAsync(KSqlDbStatement ksqlDbStatement, CancellationToken cancellationToken = default)
     {
+      logger?.LogInformation($"Executing command: {ksqlDbStatement.Sql}");
+
       return ExecuteStatementAsync(ksqlDbStatement, ksqlDbStatement.EndpointType, ksqlDbStatement.ContentEncoding, cancellationToken);
     }
 
