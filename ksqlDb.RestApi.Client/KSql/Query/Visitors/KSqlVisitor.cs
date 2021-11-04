@@ -629,31 +629,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 
       if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
       {
-        FromItem fromItem = null;
-
-        var propertyInfo = (memberExpression.Member as PropertyInfo)?.PropertyType;
-
-        if (queryMetadata.Joins?.Any() ?? false)
-        {
-          fromItem = queryMetadata.Joins.FirstOrDefault(c => c.Type == propertyInfo);
-
-          if (fromItem != null)
-            fromItem.Alias = memberExpression.Member.Name;
-          else
-          {
-            fromItem = queryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
-
-            if (fromItem != null)
-              fromItem.Alias = ((ParameterExpression)memberExpression.Expression).Name;
-          }
-
-          string alias = fromItem?.Alias ?? ((ParameterExpression)memberExpression.Expression).Name;
-          Append(alias);
-          Append(".");
-        }
-
-        if (propertyInfo != fromItem?.Type)
-          Append(memberExpression.Member.Name);
+        AppendVisitMemberParameter(memberExpression);
       }
       else if (memberExpression.Expression.NodeType == ExpressionType.MemberInit)
       {
@@ -685,6 +661,42 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
       }
 
       return memberExpression;
+    }
+
+    private void AppendVisitMemberParameter(MemberExpression memberExpression)
+    {
+      FromItem fromItem = null;
+
+      var propertyInfo = (memberExpression.Member as PropertyInfo)?.PropertyType;
+
+      if (queryMetadata.Joins?.Any() ?? false)
+      {
+        fromItem = TrySetFromItemAlias(memberExpression, propertyInfo);
+
+        string alias = fromItem?.Alias ?? ((ParameterExpression)memberExpression.Expression).Name;
+        Append(alias);
+        Append(".");
+      }
+
+      if (propertyInfo != fromItem?.Type)
+        Append(memberExpression.Member.Name);
+    }
+
+    private FromItem TrySetFromItemAlias(MemberExpression memberExpression, Type propertyInfo)
+    {
+      var fromItem = queryMetadata.Joins.FirstOrDefault(c => c.Type == propertyInfo);
+
+      if (fromItem != null)
+        fromItem.Alias = memberExpression.Member.Name;
+      else
+      {
+        fromItem = queryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
+
+        if (fromItem != null)
+          fromItem.Alias = ((ParameterExpression)memberExpression.Expression).Name;
+      }
+
+      return fromItem;
     }
 
     protected void Destructure(MemberExpression memberExpression)
