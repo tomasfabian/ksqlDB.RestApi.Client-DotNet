@@ -79,6 +79,13 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
       var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage, cancellationToken)
         .ConfigureAwait(false);
 
+      if (logger != null)
+      {
+        string response = await httpResponseMessage.Content.ReadAsStringAsync();
+
+        logger?.LogDebug($"Command response ({httpResponseMessage.StatusCode}): {response}");
+      }
+
       return httpResponseMessage;
     }
 

@@ -34,7 +34,9 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
 
       KSqlDBQueryContext = new KSqlDBContextQueryDependenciesProvider(contextOptions);
     }
-    
+
+    internal KSqlDBContextOptions ContextOptions => contextOptions;
+
     internal readonly KSqlDBContextQueryDependenciesProvider KSqlDBQueryContext;
     
 #if !NETSTANDARD

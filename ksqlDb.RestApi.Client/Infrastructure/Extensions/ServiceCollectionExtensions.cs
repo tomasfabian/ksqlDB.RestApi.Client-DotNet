@@ -9,5 +9,10 @@ namespace ksqlDB.RestApi.Client.Infrastructure.Extensions
     {
       return serviceCollection.Any(x => x.ServiceType == typeof(TType));
     }
+
+    internal static ServiceDescriptor TryGetRegistration<TType>(this IServiceCollection serviceCollection)
+    {
+      return serviceCollection.FirstOrDefault(x => x.ServiceType == typeof(TType));
+    }
   }
 }

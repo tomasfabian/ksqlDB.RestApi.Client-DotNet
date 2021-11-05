@@ -36,6 +36,8 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
 
     public async Task<QueryStream<T>> RunAsync<T>(object parameters, CancellationToken cancellationToken = default)
     {
+      logger?.LogInformation($"Executing query {parameters}");
+
       var streamReader = await GetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
 
       cancellationToken.Register(() => streamReader?.Dispose());
@@ -53,7 +55,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
     /// <param name="cancellationToken">A token that can be used to request cancellation of the asynchronous operation.</param>
     public async IAsyncEnumerable<T> Run<T>(object parameters, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-      logger?.LogInformation($"Executing query: {parameters}");
+      logger?.LogInformation($"Executing query {parameters}");
 
       using var streamReader = await GetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
 
@@ -94,7 +96,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
         var rawData = await streamReader.ReadLineAsync()
           .ConfigureAwait(false);
 
-        logger?.LogInformation($"Raw data received: {rawData}");
+        logger?.LogDebug($"Raw data received: {rawData}");
 
         var record = OnLineRead<T>(rawData);
 
