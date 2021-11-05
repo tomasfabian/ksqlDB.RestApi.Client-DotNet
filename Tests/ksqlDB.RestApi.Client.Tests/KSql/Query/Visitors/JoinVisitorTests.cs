@@ -7,6 +7,7 @@ using ksqlDB.Api.Client.Tests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 
@@ -216,6 +217,7 @@ EMIT CHANGES;";
     [TestMethod]
     public void InnerJoinQuerySyntax_BuildKSql_Prints()
     {
+      //Arrange
       var query = from movie in KSqlDBContext.CreateQueryStream<Movie>()
                   join actor in Source.Of<Lead_Actor>("Actors") on movie.Title equals actor.Title
                   select new
@@ -252,6 +254,7 @@ EMIT CHANGES;";
     [TestMethod]
     public void MultipleInnerJoinsQuerySyntax_BuildKSql_Prints()
     {
+      //Arrange
       var value = new Foo { Prop = 42 };
 
       var query = from o in KSqlDBContext.CreateQueryStream<Order>()
@@ -298,6 +301,7 @@ EMIT CHANGES;";
     [TestMethod]
     public void JoinWithInvocationFunction_BuildKSql_Prints()
     {
+      //Arrange
       var query = from o in KSqlDBContext.CreateQueryStream<Order>()
         join lm in Source.Of<LambdaMap>() on o.OrderId equals lm.Id
         join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id
@@ -329,6 +333,7 @@ EMIT CHANGES;";
     [Ignore("TODO:")]
     public void JoinWithSeveralOnConditions_BuildKSql_Prints()
     {
+      //Arrange
       var query = from o in KSqlDBContext.CreateQueryStream<Order>()
         join lm in Source.Of<LambdaMap>() on new { OrderId = o.OrderId, NestedProp = "Nested" } equals new { OrderId = lm.Id, NestedProp = lm.Nested.Prop }
         select new
@@ -347,6 +352,7 @@ EMIT CHANGES;";
     [TestMethod]
     public void JoinWithNestedType_BuildKSql_Prints()
     {
+      //Arrange
       var query = from o in KSqlDBContext.CreateQueryStream<Order>()
         join lm in Source.Of<LambdaMap>() on o.OrderId equals lm.Id
         where lm.Nested.Prop == "Nested"
@@ -373,6 +379,7 @@ WHERE {lambdaAlias}.Nested->Prop = 'Nested' EMIT CHANGES;";
     [TestMethod]
     public void JoinWithFunctionAndNestedType_BuildKSql_Prints()
     {
+      //Arrange
       var query = from o in KSqlDBContext.CreateQueryStream<Order>()
         join lm in Source.Of<LambdaMap>() on o.OrderId equals lm.Id
         select new
@@ -399,6 +406,7 @@ EMIT CHANGES;";
     [TestMethod]
     public void MultipleInnerJoinsQuerySyntax_WithTake_BuildKSql_Prints()
     {
+      //Arrange
       var query = from o in KSqlDBContext.CreateQueryStream<Order>()
         join p1 in Source.Of<Payment>() on o.OrderId equals p1.Id
         join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id
@@ -428,6 +436,7 @@ EMIT CHANGES LIMIT 2;";
     [TestMethod]
     public void JoinAndLeftJoin_WithTake_BuildKSql_Prints()
     {
+      //Arrange
       var query = from o in KSqlDBContext.CreateQueryStream<Order>()
         join p1 in Source.Of<Payment>() on o.OrderId equals p1.Id
         join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id into gj
@@ -436,7 +445,7 @@ EMIT CHANGES LIMIT 2;";
                {
                  orderId = o.OrderId,
                  shipmentId = sa.Id,
-                 paymentId = p1.Id,
+                 paymentId = p1.Id
                };
 
       //Act
@@ -455,19 +464,38 @@ EMIT CHANGES;";
       ksql.Should().BeEquivalentTo(expectedQuery);
     }
 
-    //TODO:
-    //SELECT
-    //o.id as orderId,
-    //o.itemid as itemId,
-    //s.id as shipmentId,
-    //p.id as paymentId
-    //FROM orders o
-    //INNER JOIN payments p WITHIN 1 HOURS ON p.id = o.id
-    //INNER JOIN shipments s WITHIN 2 HOURS ON s.id = o.id
-    //EMIT CHANGES;
+    [TestMethod]
+    [Ignore("TODO:")]
+    public void JoinWithinTimeUnit_WithTake_BuildKSql_Prints()
+    {
+      //Arrange
+      var query = from o in KSqlDBContext.CreateQueryStream<Order>()
+        //TODO: join p1 in Source.Of<Payment>().Within(Duration.OfDays(5)) on o.OrderId equals p1.Id
+        join p in Source.Of<Payment>() on o.OrderId equals p.Id
+        join s in Source.Of<Shipment>() on o.OrderId equals s.Id
+        select new
+               {
+                 orderId = o.OrderId,
+                 shipmentId = s.Id,
+                 paymentId = p.Id
+               };
+      
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      string ordersAlias = "o";
+
+      var expectedQuery = @$"SELECT {ordersAlias}.OrderId as orderId, s.id as shipmentId, p.id as paymentId FROM orders {ordersAlias}
+INNER JOIN payments p WITHIN 1 HOURS ON p.id = {ordersAlias}.OrderId
+INNER JOIN shipments s WITHIN 2 HOURS ON s.id = {ordersAlias}.OrderId
+EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedQuery);
+    }
 
     #endregion
-
+     
     #region LeftJoin
 
     [TestMethod]
@@ -505,6 +533,7 @@ EMIT CHANGES;";
     [TestMethod]
     public void LeftJoinQuerySyntax_BuildKSql_Prints()
     {
+      //Arrange
       var query = 
         from movie in KSqlDBContext.CreateQueryStream<Movie>()
         join actor in Source.Of<Lead_Actor>("Actors") 
@@ -532,6 +561,7 @@ EMIT CHANGES;";
     [TestMethod]
     public void GroupJoinSelectMany_BuildKSql_Prints()
     {
+      //Arrange
       var query = KSqlDBContext.CreateQueryStream<Movie>()
         .GroupJoin(Source.Of<Lead_Actor>("Actors"), c => c.Title, d => d.Title, (movie, gj) => new
         {
@@ -575,6 +605,7 @@ EMIT CHANGES;";
     [TestMethod]
     public void MultipleLeftJoinsQuerySyntax_BuildKSql_Prints()
     {
+      //Arrange
       var query = 
         from orders in KSqlDBContext.CreateQueryStream<Order>()
         join customer in Source.Of<Customer>() 
