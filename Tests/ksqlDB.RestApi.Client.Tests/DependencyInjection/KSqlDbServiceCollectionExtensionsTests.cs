@@ -145,5 +145,19 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
       //Assert
       httpClientFactory.Should().NotBeNull();
     }
+
+    [TestMethod]
+    public void ConfigureKSqlDb_BuildServiceProviderAndResolve_KSqlDBContextOptions()
+    {
+      //Arrange
+      ClassUnderTest.ConfigureKSqlDb(Helpers.TestParameters.KsqlDBUrl);
+
+      //Act
+      var options = ClassUnderTest.BuildServiceProvider().GetRequiredService<KSqlDBContextOptions>();
+
+      //Assert
+      options.Should().NotBeNull();
+      options.Url.Should().Be(Helpers.TestParameters.KsqlDBUrl);
+    }
   }
 }
