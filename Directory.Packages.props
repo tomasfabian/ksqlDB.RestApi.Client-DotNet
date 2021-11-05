@@ -7,6 +7,7 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.7" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="5.0.0" />
   </ItemGroup>
   
   <ItemGroup Label="Unit testing Nugets">
