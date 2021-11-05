@@ -3,26 +3,47 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using ksqlDB.Api.Client.Tests.Fakes.Logging;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Ninject;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi
 {
   [TestClass]
-  public class KSqlDbProviderTests: TestBase
+  public class KSqlDbProviderTests : TestBase
   {  
     private TestableKSqlDbQueryStreamProvider ClassUnderTest { get; set; }
 
+    private Mock<ILogger> LoggerMock { get; set; }
+    
     [TestInitialize]
     public override void TestInitialize()
     {
       base.TestInitialize();
 
+      LoggerMock = MockingKernel.GetMock<ILogger>();
+
       ClassUnderTest = MockingKernel.Get<TestableKSqlDbQueryStreamProvider>();
+    }
+
+    [TestMethod]
+    public async Task Run_LogInformation()
+    {
+      //Arrange
+      var queryParameters = new QueryStreamParameters();
+
+      //Act
+      var tweets = await ClassUnderTest.Run<Tweet>(queryParameters).ToListAsync();
+
+      //Assert
+      LoggerMock.VerifyLog(LogLevel.Information, Times.Once);
+      LoggerMock.VerifyLog(LogLevel.Debug, () => Times.Exactly(3));
     }
 
     [TestMethod]
