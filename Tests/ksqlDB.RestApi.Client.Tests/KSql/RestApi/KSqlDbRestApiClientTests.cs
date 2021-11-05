@@ -3,10 +3,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using ksqlDB.Api.Client.Tests.Fakes.Logging;
 using ksqlDB.Api.Client.Tests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Moq.Protected;
@@ -17,13 +19,20 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi
   public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
   {
     private KSqlDbRestApiClient ClassUnderTest { get; set; }
+    private Mock<ILogger> LoggerMock { get; set; }
+    private Mock<ILoggerFactory> LoggerFactoryMock { get; set; }
 
     [TestInitialize]
     public override void TestInitialize()
     {
       base.TestInitialize();
 
-      ClassUnderTest = new KSqlDbRestApiClient(HttpClientFactory);
+      LoggerFactoryMock = new Mock<ILoggerFactory>();
+      LoggerMock = new Mock<ILogger>();
+
+      LoggerFactoryMock.Setup(c => c.CreateLogger("ksqlDb.RestApi.Client")).Returns(LoggerMock.Object);
+
+      ClassUnderTest = new KSqlDbRestApiClient(HttpClientFactory, LoggerFactoryMock.Object);
     }
     
     string createOrReplaceTableStatement = "CREATE OR REPLACE TABLE movies";
@@ -47,7 +56,25 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi
 
       Mock.Get(HttpClientFactory).Verify(c => c.CreateClient(), Times.Once);
     }
-    
+
+    [TestMethod]
+    public async Task ExecuteStatementAsync_LogInformation()
+    {
+      //Arrange
+      CreateHttpMocks(StatementResponse);
+
+      var ksqlDbStatement = new KSqlDbStatement(createOrReplaceTableStatement);
+
+      //Act
+      var httpResponseMessage = await ClassUnderTest.ExecuteStatementAsync(ksqlDbStatement);
+
+      //Assert
+      httpResponseMessage.Should().NotBeNull();
+
+      LoggerMock.VerifyLog(LogLevel.Debug, Times.Once);
+      LoggerMock.VerifyLog(LogLevel.Information, Times.Once);
+    }
+
     [TestMethod]
     public void CreateHttpRequestMessage_HttpRequestMessage_WasConfigured()
     {
