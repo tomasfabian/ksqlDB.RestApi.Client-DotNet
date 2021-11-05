@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using Microsoft.Extensions.Logging;
 
 namespace ksqlDB.Api.Client.Samples.Providers
 {
@@ -17,8 +18,8 @@ namespace ksqlDB.Api.Client.Samples.Providers
       return new KSqlDbRestApiProvider(new HttpClientFactory(uri));
     }
 
-    public KSqlDbRestApiProvider(IHttpClientFactory httpClientFactory) 
-      : base(httpClientFactory)
+    public KSqlDbRestApiProvider(IHttpClientFactory httpClientFactory, ILoggerFactory loggerFactory = null) 
+      : base(httpClientFactory, loggerFactory)
     {
     }
 

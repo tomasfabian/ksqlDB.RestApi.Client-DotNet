@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ksqlDB.Api.Client.Samples.HostedServices;
 using ksqlDB.Api.Client.Samples.Models;
 using ksqlDB.Api.Client.Samples.Models.Events;
 using ksqlDB.Api.Client.Samples.Models.InvocationFunctions;
@@ -13,6 +14,7 @@ using ksqlDB.Api.Client.Samples.Models.Movies;
 using ksqlDB.Api.Client.Samples.Observers;
 using ksqlDB.Api.Client.Samples.Providers;
 using ksqlDB.Api.Client.Samples.PullQuery;
+using ksqlDb.RestApi.Client.DependencyInjection;
 using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
@@ -30,6 +32,11 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query.Descriptors;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Topics;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
+using Microsoft.Extensions.Options;
 using K = ksqlDB.RestApi.Client.KSql.Query.Functions.KSql;
 
 namespace ksqlDB.Api.Client.Samples
@@ -61,9 +68,11 @@ namespace ksqlDB.Api.Client.Samples
     public static async Task Main(string[] args)
     {
       var ksqlDbUrl = @"http:\\localhost:8088";
+      
+      var loggerFactory = CreateLoggerFactory();
 
       var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
-      var restApiProvider = new KSqlDbRestApiProvider(httpClientFactory);
+      var restApiProvider = new KSqlDbRestApiProvider(httpClientFactory, loggerFactory);
       restApiProvider.SetCredentials(new BasicAuthCredentials("fred", "letmein"));
       
       var moviesProvider = new MoviesProvider(restApiProvider);
@@ -72,7 +81,7 @@ namespace ksqlDB.Api.Client.Samples
 
       var contextOptions = CreateQueryStreamOptions(ksqlDbUrl);
 
-      await using var context = new KSqlDBContext(contextOptions);
+      await using var context = new KSqlDBContext(contextOptions, loggerFactory);
 
       var query = context.CreateQueryStream<Movie>() // Http 2.0
       // var query = context.CreateQuery<Movie>() // Http 1.0
@@ -904,5 +913,43 @@ Drop table {nameof(Event)};
         .Select(c => new { Col = K.Functions.FromBytes(c.Image, "hex") })
         .ToQueryString();
     }
+
+    public static ILoggerFactory CreateLoggerFactory()
+    {
+      var configureNamedOptions = new ConfigureNamedOptions<ConsoleLoggerOptions>("", null);
+      var optionsFactory = new OptionsFactory<ConsoleLoggerOptions>(new[] { configureNamedOptions }, Enumerable.Empty<IPostConfigureOptions<ConsoleLoggerOptions>>());
+      var optionsMonitor = new OptionsMonitor<ConsoleLoggerOptions>(optionsFactory, Enumerable.Empty<IOptionsChangeTokenSource<ConsoleLoggerOptions>>(), new OptionsCache<ConsoleLoggerOptions>());
+
+      var consoleLoggerProvider = new ConsoleLoggerProvider(optionsMonitor);
+
+      var loggerFactory = new LoggerFactory();
+      loggerFactory.AddProvider(consoleLoggerProvider);
+
+      return loggerFactory;
+    }
+
+    public static async Task Main2(string[] args)
+    {
+      await CreateHostBuilder(args).RunConsoleAsync();
+    }
+
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+      Host.CreateDefaultBuilder(args)
+        .ConfigureLogging((hostingContext, logging) =>
+                          {
+                            logging.AddConsole();
+                            logging.AddDebug();
+                          })
+        .ConfigureServices((hostContext, serviceCollection) =>
+                           {
+                             var ksqlDbUrl = @"http:\\localhost:8088";
+
+                             serviceCollection.ConfigureKSqlDb(ksqlDbUrl, setupParameters =>
+                                                                          {
+                                                                            setupParameters.SetAutoOffsetReset(AutoOffsetReset.Earliest);
+                                                                          });
+
+                             serviceCollection.AddHostedService<Worker>();
+                           });
   }
 }
