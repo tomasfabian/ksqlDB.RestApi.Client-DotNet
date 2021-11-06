@@ -59,10 +59,11 @@ namespace ConsoleAppKsqlDB
 
 LINQ code written in C# from the sample is equivalent to this ksql query:
 ```SQL
-SELECT Message, Id FROM Tweets
-WHERE Message != 'Hello world' OR Id = 1 
-EMIT CHANGES 
-LIMIT 2;
+SELECT Message, Id
+  FROM Tweets
+ WHERE Message != 'Hello world' OR Id = 1 
+  EMIT CHANGES 
+ LIMIT 2;
 ```
 
 In the above mentioned code snippet everything runs server side except of the ``` IQbservable<TEntity>.Subscribe``` method. It subscribes to your ksqlDB stream created in the following manner:
@@ -3084,10 +3085,10 @@ Bellow code demonstrates two new concepts. Logging and registration of services.
 
 `KSqlDbServiceCollectionExtensions.ConfigureKSqlDb` - registers the following dependencies:
 
-- IKSqlDBContext with ServiceLifetime.Scoped. Can be altered with `contextLifetime` parameter.
-- IKSqlDbRestApiClient with ServiceLifetime.Scoped
-- IHttpClientFactory with ServiceLifetime.Singleton
-- KSqlDBContextOptions with ServiceLifetime.Singleton
+- IKSqlDBContext with Scoped ServiceLifetime. Can be altered with `contextLifetime` parameter.
+- IKSqlDbRestApiClient with Scoped ServiceLifetime.
+- IHttpClientFactory with Singleton ServiceLifetime.
+- KSqlDBContextOptions with Singleton ServiceLifetime.
 
 ```XML
 <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
@@ -3125,10 +3126,12 @@ namespace ksqlDB.Api.Client.Samples
                            {
                              var ksqlDbUrl = @"http:\\localhost:8088";
 
-                             serviceCollection.ConfigureKSqlDb(ksqlDbUrl, setupParameters =>
-                                                                          {
-                                                                            setupParameters.SetAutoOffsetReset(AutoOffsetReset.Earliest);
-                                                                          });
+                             var setupAction = setupParameters =>
+                                               {
+                                                   setupParameters.SetAutoOffsetReset(AutoOffsetReset.Earliest);
+                                               };
+
+                             serviceCollection.ConfigureKSqlDb(ksqlDbUrl, setupAction);
 
                              serviceCollection.AddHostedService<Worker>();
                            });
@@ -3144,7 +3147,7 @@ appsettings.json
     "LogLevel": {
       "Default": "Information",
       "Microsoft": "Warning",
-      "ksqlDb.RestApi.Client": "Information"
+      "ksqlDb.RestApi.Client": "Information" // "Debug"
     }
   }
 }
@@ -3185,14 +3188,10 @@ public class Worker : IHostedService, IDisposable
     subscription = await context.CreateQueryStream<Movie>()
       .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
       .SubscribeAsync(
-        movie =>
-        {
-        },
-        onError: e =>
-                 {
-
-                 },
-        onCompleted: () => { }, cancellationToken: cancellationToken);
+        onNext: movie => { },
+        onError: e => { },
+        onCompleted: () => { },
+        cancellationToken: cancellationToken);
   }
   
   public Task StopAsync(CancellationToken cancellationToken)
