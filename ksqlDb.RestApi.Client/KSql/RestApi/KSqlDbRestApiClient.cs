@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using ksqlDb.RestApi.Client.Infrastructure.Logging;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
@@ -33,7 +34,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
       this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
 
       if(loggerFactory != null)
-        logger = loggerFactory.CreateLogger("ksqlDb.RestApi.Client");
+        logger = loggerFactory.CreateLogger(LoggingCategory.Name);
     }
 
     internal static readonly string MediaType = "application/vnd.ksql.v1+json";

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Fakes.Logging;
 using ksqlDB.Api.Client.Tests.Models.Movies;
+using ksqlDb.RestApi.Client.Infrastructure.Logging;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
@@ -30,7 +31,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi
       LoggerFactoryMock = new Mock<ILoggerFactory>();
       LoggerMock = new Mock<ILogger>();
 
-      LoggerFactoryMock.Setup(c => c.CreateLogger("ksqlDb.RestApi.Client")).Returns(LoggerMock.Object);
+      LoggerFactoryMock.Setup(c => c.CreateLogger(LoggingCategory.Name)).Returns(LoggerMock.Object);
 
       ClassUnderTest = new KSqlDbRestApiClient(HttpClientFactory, LoggerFactoryMock.Object);
     }

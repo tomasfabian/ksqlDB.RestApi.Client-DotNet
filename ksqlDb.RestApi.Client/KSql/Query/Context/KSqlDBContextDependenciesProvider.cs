@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
+using ksqlDb.RestApi.Client.Infrastructure.Logging;
 using ksqlDB.RestApi.Client.KSql.Disposables;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
@@ -68,7 +69,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
       {
         serviceCollection.TryAddScoped(_ => loggerFactory);
 
-        Logger = loggerFactory.CreateLogger("ksqlDb.RestApi.Client");
+        Logger = loggerFactory.CreateLogger(LoggingCategory.Name);
 
         serviceCollection.TryAddSingleton(Logger);
       }
