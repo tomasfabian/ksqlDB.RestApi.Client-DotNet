@@ -124,6 +124,12 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
         itemAlias = joinItemAlias ?? itemAlias;
 
         AppendLine($"{joinType} JOIN {fromItemName} {itemAlias}");
+
+        var sourceExpression = join.Item2.First() as ConstantExpression;
+
+        if (sourceExpression?.Value is SourceBase source && source.Duration != null)
+          Append($"WITHIN {source.Duration.Value} {source.Duration.TimeUnit} ");
+
         Append($"ON {outerItemAlias}.");
         Visit(expressions[1]);
         Append($" = {itemAlias}.");
