@@ -5,20 +5,20 @@
     <Authors>Tomas Fabian</Authors>
     <Company />
     <PackageLicenseFile></PackageLicenseFile>
-    <PackageProjectUrl>https://github.com/tomasfabian/ksqlDB.RestApi.Client/tree/main/ksqlDB.RestApi.Client</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/tomasfabian/ksqlDB.RestApi.Client</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/ksqlDb.RestApi.Client</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet</RepositoryUrl>
     <Copyright>@tomasfabian</Copyright>
     <Description>
       ksqlDB.RestApi.Client is a C# LINQ-enabled client API for issuing and consuming ksqlDB push queries.
       You can continually process computations over unbounded streams of data.
       It also enables the execution of SQL statements via the Rest API such as inserting records into streams and creating tables, types, etc. or executing admin operations such as listing streams.
       Targets .NET 5, .NET Core 3.1 and .NET Standard 2.0.
-      Documentation for the library can be found at https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/ksqlDB.RestApi.Client/Wiki.md.</Description>
+      Documentation for the library can be found at https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/README.md.</Description>
     <PackageTags>ksql ksqlDB LINQ .NET csharp push query</PackageTags>
-    <Version>1.2.0-rc.1</Version>
+    <Version>1.2.0</Version>
     <AssemblyVersion>1.2.0.0</AssemblyVersion>
     <LangVersion>9.0</LangVersion>
-    <PackageReleaseNotes>https://github.com/tomasfabian/ksqlDB.RestApi.Client/blob/main/ksqlDB.RestApi.Client/ChangeLog.md</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/ksqlDb.RestApi.Client/ChangeLog.md</PackageReleaseNotes>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 

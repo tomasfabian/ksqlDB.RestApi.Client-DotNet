@@ -1,6 +1,6 @@
 ﻿# ksqlDB.RestApi.Client
 
-# v1.2.0-rc.1
+# v1.2.0
 ## KSqlDbServiceCollectionExtensions.ConfigureKSqlDb
 - registers the following dependencies: IKSqlDBContext, KSqlDbRestApiClient, IHttpClientFactory, KSqlDBContextOptions
 - LogInformation about received data, executed commands and queries

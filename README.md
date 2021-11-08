@@ -3077,7 +3077,7 @@ ON order.OrderId = s1.Id
 EMIT CHANGES;
 ```
 
-# ksqldb.RestApi.Client v1.2.0-rc.1
+# ksqldb.RestApi.Client v1.2.0
 
 ### Logging info and ConfigureKSqlDb
 
