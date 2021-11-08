@@ -125,16 +125,35 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 
         AppendLine($"{joinType} JOIN {fromItemName} {itemAlias}");
 
-        var sourceExpression = join.Item2.First() as ConstantExpression;
-
-        if (sourceExpression?.Value is SourceBase source && source.Duration != null)
-          Append($"WITHIN {source.Duration.Value} {source.Duration.TimeUnit} ");
+        TryAppendWithin(@join);
 
         Append($"ON {outerItemAlias}.");
         Visit(expressions[1]);
         Append($" = {itemAlias}.");
         Visit(expressions[2]);
         Append(Environment.NewLine);
+      }
+    }
+
+    private void TryAppendWithin((MethodInfo, IEnumerable<Expression>, LambdaExpression) @join)
+    {
+      var sourceExpression = @join.Item2.First() as ConstantExpression;
+
+      if (sourceExpression?.Value is SourceBase source && (source.DurationBefore != null || source.DurationAfter != null))
+      {
+        Append("WITHIN ");
+
+        if (source.DurationBefore != null && source.DurationAfter != null)
+        {
+          Append($"({source.DurationBefore.Value} {source.DurationBefore.TimeUnit}, ");
+          Append($"{source.DurationAfter.Value} {source.DurationAfter.TimeUnit}) ");
+        }
+        else
+        {
+          var duration = source.DurationBefore ?? source.DurationAfter;
+
+          Append($"{duration.Value} {duration.TimeUnit} ");
+        }
       }
     }
 

@@ -1,14 +1,8 @@
 ﻿using System.Linq.Expressions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
-using ksqlDB.RestApi.Client.KSql.Query.Windows;
 
 namespace ksqlDB.RestApi.Client.KSql.Linq
 {
-  public class SourceBase
-  {
-    internal Duration Duration { get; set; }
-  }
-
   public class Source<T> : SourceBase, ISource<T>
   {
     public QueryContext QueryContext { get; set; }
