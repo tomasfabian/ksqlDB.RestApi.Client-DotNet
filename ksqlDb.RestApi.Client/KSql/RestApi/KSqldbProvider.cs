@@ -38,7 +38,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
     {
       logger?.LogInformation($"Executing query {parameters}");
 
-      var streamReader = await GetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
+      var streamReader = await TryGetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
 
       cancellationToken.Register(() => streamReader?.Dispose());
 
@@ -57,10 +57,24 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
     {
       logger?.LogInformation($"Executing query {parameters}");
 
-      using var streamReader = await GetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
+      using var streamReader = await TryGetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
 
       await foreach (var entity in ConsumeAsync<T>(streamReader, cancellationToken).WithCancellation(cancellationToken).ConfigureAwait(false))
         yield return entity;
+    }
+
+    private async Task<StreamReader> TryGetStreamReaderAsync<T>(object parameters, CancellationToken cancellationToken)
+    {
+      try
+      {
+        return await GetStreamReaderAsync<T>(parameters, cancellationToken);
+      }
+      catch (Exception exception)
+      {
+        logger?.LogError(exception, "Query execution failed.");
+
+        throw;
+      }
     }
 
     private async Task<StreamReader> GetStreamReaderAsync<T>(object parameters, CancellationToken cancellationToken)
@@ -141,7 +155,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
       var json = JsonSerializer.Serialize(parameters);
 
       var data = new StringContent(json, Encoding.UTF8, "application/json");
-      
+
       httpClient.DefaultRequestHeaders.Accept.Add(
         new MediaTypeWithQualityHeaderValue(ContentType));
 
@@ -149,7 +163,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
       {
         Content = data
       };
-      
+
       return httpRequestMessage;
     }
 
