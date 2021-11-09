@@ -7,8 +7,10 @@ using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
@@ -246,6 +248,48 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
       var shipmentId = actualValues[0].shipmentId;
       if (shipmentId.HasValue)
         shipmentId.Should().Be(1);
+    }
+
+    [TestMethod]
+    public async Task JoinWithin_QuerySyntax()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+
+      var entityCreationMetadata = new EntityCreationMetadata
+      {
+        EntityName = nameof(Payment) + "Stream",
+        KafkaTopic = nameof(Payment) + "TestJoin",
+        Partitions = 1
+      };
+
+      var response = await RestApiProvider.CreateStreamAsync<Payment>(entityCreationMetadata, ifNotExists: true);
+
+      var ksqlDbUrl = @"http:\\localhost:8088";
+
+      var context = new KSqlDBContext(ksqlDbUrl);
+
+      var query = from o in context.CreateQueryStream<Order>()
+        join p in Source.Of<Payment>(nameof(Payment) + "Stream").Within(Duration.OfSeconds(0), Duration.OfSeconds(25)) on o.OrderId equals p.Id
+                  select new
+               {
+                 orderId = o.OrderId,
+                 paymentId = p.Id
+               };
+
+      var order = new Order { OrderId = 1, PaymentId = 1, ShipmentId = 1 };
+      var payment = new Payment { Id = 1 };
+
+      response = await RestApiProvider.InsertIntoAsync(order);
+      response = await RestApiProvider.InsertIntoAsync(payment, new InsertProperties { EntityName = nameof(Payment) + "Stream" });
+
+      //Act
+      var actualValues = await CollectActualValues(query.ToAsyncEnumerable(), expectedItemsCount);
+
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+
+      actualValues[0].orderId.Should().Be(1);
     }
 
     private class Nested
