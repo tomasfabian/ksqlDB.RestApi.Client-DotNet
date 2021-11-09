@@ -465,14 +465,12 @@ EMIT CHANGES;";
     }
 
     [TestMethod]
-    [Ignore("TODO:")]
-    public void JoinWithinTimeUnit_WithTake_BuildKSql_Prints()
+    public void JoinWithinTimeUnit_BuildKSql_Prints()
     {
       //Arrange
       var query = from o in KSqlDBContext.CreateQueryStream<Order>()
-        //TODO: join p1 in Source.Of<Payment>().Within(Duration.OfDays(5)) on o.OrderId equals p1.Id
-        join p in Source.Of<Payment>() on o.OrderId equals p.Id
-        join s in Source.Of<Shipment>() on o.OrderId equals s.Id
+        join p in Source.Of<Payment>().Within(Duration.OfHours(1)) on o.OrderId equals p.Id
+        join s in Source.Of<Shipment>().Within(Duration.OfDays(5)) on o.OrderId equals s.Id
         select new
                {
                  orderId = o.OrderId,
@@ -486,9 +484,37 @@ EMIT CHANGES;";
       //Assert
       string ordersAlias = "o";
 
-      var expectedQuery = @$"SELECT {ordersAlias}.OrderId as orderId, s.id as shipmentId, p.id as paymentId FROM orders {ordersAlias}
-INNER JOIN payments p WITHIN 1 HOURS ON p.id = {ordersAlias}.OrderId
-INNER JOIN shipments s WITHIN 2 HOURS ON s.id = {ordersAlias}.OrderId
+      var expectedQuery = @$"SELECT {ordersAlias}.OrderId AS orderId, s.Id AS shipmentId, p.Id AS paymentId FROM Orders {ordersAlias}
+INNER JOIN Shipments s
+WITHIN 5 DAYS ON {ordersAlias}.OrderId = s.Id
+INNER JOIN Payments p
+WITHIN 1 HOURS ON {ordersAlias}.OrderId = p.Id
+EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedQuery);
+    }
+
+    [TestMethod]
+    public void JoinWithinTimeUnit_BeforeAfter_BuildKSql_Prints()
+    {
+      //Arrange
+      var query = from o in KSqlDBContext.CreateQueryStream<Order>()
+        join p in Source.Of<Payment>().Within(Duration.OfHours(1), Duration.OfDays(5)) on o.OrderId equals p.Id
+        select new
+               {
+                 orderId = o.OrderId,
+                 paymentId = p.Id
+               };
+      
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      string ordersAlias = "o";
+
+      var expectedQuery = @$"SELECT {ordersAlias}.OrderId AS orderId, p.Id AS paymentId FROM Orders {ordersAlias}
+INNER JOIN Payments p
+WITHIN (1 HOURS, 5 DAYS) ON {ordersAlias}.OrderId = p.Id
 EMIT CHANGES;";
 
       ksql.Should().BeEquivalentTo(expectedQuery);
