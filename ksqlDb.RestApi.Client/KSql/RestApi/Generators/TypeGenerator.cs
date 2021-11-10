@@ -9,21 +9,24 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators
   {
     private readonly StringBuilder stringBuilder = new();
 
-    internal string Print<T>()
+    internal string Print<T>(string typeName = null)
     {
       stringBuilder.Clear();
 
       var type = typeof(T);
       
-      var name = type.ExtractTypeName();
+      if(string.IsNullOrEmpty(typeName))
+      {
+        typeName = type.ExtractTypeName();
 
-      name = name.ToUpper();
+        typeName = typeName.ToUpper();
+      }
 
-      stringBuilder.Append(@$"CREATE TYPE {name} AS STRUCT<");
+      stringBuilder.Append($"CREATE TYPE {typeName} AS STRUCT<");
 
       PrintProperties<T>();
 
-      stringBuilder.Append(@">;");
+      stringBuilder.Append(">;");
 
       return stringBuilder.ToString();
     }

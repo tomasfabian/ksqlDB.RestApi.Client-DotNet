@@ -241,9 +241,10 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
     /// Any attempt to register the same type twice, without a corresponding DROP TYPE statement, will fail.
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    /// <param name="typeName">Optional name of the type. Otherwise the type name is inferred from the generic type name.</param>
     /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns>Http response object.</returns>
-    Task<HttpResponseMessage> CreateTypeAsync<T>(CancellationToken cancellationToken = default);
+    Task<HttpResponseMessage> CreateTypeAsync<T>(string typeName = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Removes a type alias from ksqlDB. This statement doesn't fail if the type is in use in active queries or user-defined functions.
