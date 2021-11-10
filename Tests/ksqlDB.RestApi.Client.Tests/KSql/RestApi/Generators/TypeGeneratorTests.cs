@@ -22,6 +22,19 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Generators
     }
 
     [Test]
+    public void CreateType_WithTypeName()
+    {      
+      //Arrange
+      string typeName = "MyType";
+
+      //Act
+      string statement = new TypeGenerator().Print<Address>(typeName);
+
+      //Assert
+      statement.Should().Be($@"CREATE TYPE {typeName} AS STRUCT<Number INT, Street VARCHAR, City VARCHAR>;");
+    }
+
+    [Test]
     public void CreateType_NestedType()
     {      
       //Arrange
