@@ -3,19 +3,20 @@
 	<metadata>
 		<id>SqlServer.Connector</id>
 		<title>SqlServer.Connector</title>
-		<version>0.3.0</version>
+		<version>0.3.1</version>
 		<authors>Tomas Fabian</authors>
 		<owners>@tomasfabian</owners>
 		<license type="expression">Apache-2.0</license>
-		<projectUrl>https://github.com/tomasfabian/ksqlDb.RestApi.Client/blob/main/SqlServer.Connector</projectUrl>
+		<projectUrl>https://github.com/tomasfabian/ksqlDb.RestApi.Client-DotNet/blob/main/SqlServer.Connector</projectUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
-		<description>SqlServer.Connector is a C# / .NET client API for consuming row-level table changes (CDC - Change Data Capture) from a SQL Server database with the Debezium connector streaming platform.
-With Kafka Connect and Debezium connectors you can stream data to and from Kafka and use it as your integral component of the ETL pipeline or create materialized views (caches) where it is needed, precompute the results of a query and store them for fast read access. See also https://www.nuget.org/packages/ksqlDb.RestApi.Client/
-      
-Targets .NET 5, .NET Core 3.1 and .NET Standard 2.0.
-    
-Documentation for the library can be found at https://github.com/tomasfabian/ksqlDb.RestApi.Client/blob/main/SqlServer.Connector/Wiki.md.</description>
-		<releaseNotes>https://github.com/tomasfabian/ksqlDb.RestApi.Client/blob/main/SqlServer.Connector/ChangeLog.md</releaseNotes>
+		<description>
+      SqlServer.Connector is a C# / .NET client API for consuming row-level table changes (CDC - Change Data Capture) from a SQL Server database with the Debezium connector streaming platform.
+      With Kafka Connect and Debezium connectors you can stream data to and from Kafka and use it as your integral component of the ETL pipeline or create materialized views (caches) where it is needed, precompute the results of a query and store them for fast read access. See also https://www.nuget.org/packages/ksqlDb.RestApi.Client/
+
+      Targets .NET 5, .NET Core 3.1 and .NET Standard 2.0.
+
+      Documentation for the library can be found at https://github.com/tomasfabian/ksqlDb.RestApi.Client-DotNet/blob/main/SqlServer.Connector/Wiki.md. </description>
+		<releaseNotes>https://github.com/tomasfabian/ksqlDb.RestApi.Client-DotNet/blob/main/SqlServer.Connector/ChangeLog.md</releaseNotes>
 		<copyright>Copyright 2021</copyright>
 		<tags>Kafka Connect Monitoring SqlServer C# .NET push notifications</tags>
 

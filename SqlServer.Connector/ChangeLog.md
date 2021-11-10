@@ -4,6 +4,9 @@ SqlServer.Connector is a client API for consuming row-level table changes (CDC -
 
 Project [Wiki can be found here](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/SqlServer.Connector/Wiki.md)
 
+### v0.3.1
+- fixed nuget links
+
 ### v0.3.0
 # ⚠ Package had to be renamed to SqlServer.Connector
 
