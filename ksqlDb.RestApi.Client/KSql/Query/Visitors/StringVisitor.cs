@@ -1,5 +1,7 @@
-﻿using System.Linq.Expressions;
+﻿using System;
+using System.Linq.Expressions;
 using System.Text;
+using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 {
@@ -30,30 +32,66 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
           Append(")");
           break;
         case nameof(string.StartsWith):
-          VisitStartsWith(methodCallExpression);
-
+        case nameof(string.Contains):
+        case nameof(string.EndsWith):
+          VisitLike(methodCallExpression, methodInfo.Name);
           break;
       }
 
       return methodCallExpression;
     }
 
-    private void VisitStartsWith(MethodCallExpression methodCallExpression)
+    #region Like
+
+    private void AppendLike(MethodCallExpression methodCallExpression)
     {
       Visit(methodCallExpression.Object);
 
       Append(" LIKE ");
+    }
+
+    private string likeMethodName;
+
+    private void VisitLike(MethodCallExpression methodCallExpression, string methodName)
+    {
+      likeMethodName = methodName;
+
+      AppendLike(methodCallExpression);
 
       Visit(methodCallExpression.Arguments[0]);
 
-      StringBuilder.Replace("'", "%'", StringBuilder.Length - 1, 1);
+      likeMethodName = null;
     }
+
+    #endregion
 
     protected override Expression VisitParameter(ParameterExpression node)
     {
       Append(node.Name);
 
       return base.VisitParameter(node);
+    }
+
+    protected override Expression VisitConstant(ConstantExpression constantExpression)
+    {
+      if (likeMethodName.IsNotNullOrEmpty() && constantExpression.Value is string value)
+      {
+        Append("'");
+
+        if (likeMethodName.IsOneOfFollowing(nameof(String.EndsWith), nameof(String.Contains)))
+          Append("%");
+
+        Append(value);
+
+        if (likeMethodName.IsOneOfFollowing(nameof(String.StartsWith), nameof(String.Contains)))
+          Append("%");
+
+        Append("'");
+
+        return constantExpression;
+      }
+
+      return base.VisitConstant(constantExpression);
     }
   }
 }
