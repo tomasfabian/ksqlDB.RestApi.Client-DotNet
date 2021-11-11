@@ -67,7 +67,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
     {
       if (loggerFactory != null)
       {
-        serviceCollection.TryAddScoped(_ => loggerFactory);
+        serviceCollection.TryAddSingleton(_ => loggerFactory);
 
         Logger = loggerFactory.CreateLogger(LoggingCategory.Name);
 
