@@ -272,7 +272,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
         new OperatorBetweenKSqlVisitor(stringBuilder, queryMetadata).Visit(methodCallExpression);
       }
 
-      if (methodCallExpression.Type == typeof(string))
+      if (methodCallExpression.Object?.Type == typeof(string))
       {
         new StringVisitor(stringBuilder, queryMetadata).Visit(methodCallExpression);
       }

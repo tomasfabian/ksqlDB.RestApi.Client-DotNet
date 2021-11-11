@@ -12,7 +12,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 
     protected override Expression VisitMethodCall(MethodCallExpression methodCallExpression)
     {
-      if (methodCallExpression.Type != typeof(string)) 
+      if (methodCallExpression.Object?.Type != typeof(string)) 
         return methodCallExpression;
 
       var methodInfo = methodCallExpression.Method;
@@ -29,9 +29,24 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
           Visit(methodCallExpression.Object);
           Append(")");
           break;
+        case nameof(string.StartsWith):
+          VisitStartsWith(methodCallExpression);
+
+          break;
       }
 
       return methodCallExpression;
+    }
+
+    private void VisitStartsWith(MethodCallExpression methodCallExpression)
+    {
+      Visit(methodCallExpression.Object);
+
+      Append(" LIKE ");
+
+      Visit(methodCallExpression.Arguments[0]);
+
+      StringBuilder.Replace("'", "%'", StringBuilder.Length - 1, 1);
     }
 
     protected override Expression VisitParameter(ParameterExpression node)
