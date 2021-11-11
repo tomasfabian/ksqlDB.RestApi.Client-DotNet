@@ -596,10 +596,10 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query
 
     #endregion
 
-    #region Lenght
+    #region Length
 
     [TestMethod]
-    public void Lenght_BuildKSql_PrintsLenFunction()
+    public void Length_BuildKSql_PrintsLenFunction()
     {
       //Arrange
       Expression<Func<Tweet, int>> lengthExpression = c => c.Message.Length;
@@ -652,10 +652,56 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query
 
     #endregion
 
+    #region Like
+
+    [TestMethod]
+    public void StartsWith_BuildKSql_PrintsLike()
+    {
+      //Arrange
+      string text = "ET";
+      Expression<Func<Tweet, bool>> expression = c => c.Message.StartsWith("ET");
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"{nameof(Tweet.Message)} LIKE '{text}%'");
+    }
+
+    [TestMethod]
+    public void EndsWith_BuildKSql_PrintsLike()
+    {
+      //Arrange
+      string text = "ET";
+      Expression<Func<Tweet, bool>> expression = c => c.Message.EndsWith(text);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"{nameof(Tweet.Message)} LIKE '%{text}'");
+    }
+
+    [TestMethod]
+    public void Contains_BuildKSql_PrintsLike()
+    {
+      //Arrange
+      string text = "ET";
+      Expression<Func<Tweet, bool>> expression = c => c.Message.Contains(text);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"{nameof(Tweet.Message)} LIKE '%{text}%'");
+    }
+
+    #endregion
+
     #endregion
 
     #region Arithmetic
-    
+
     [TestMethod]
     public void Divide_BuildKSql_PrintsQuery()
     {

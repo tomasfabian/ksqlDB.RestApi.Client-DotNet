@@ -1390,7 +1390,7 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
 
       //Assert
       string expectedKsql =
-        @$"SELECT NOT {nameof(Tweet.IsRobot)} FROM {nameof(Tweet)}s EMIT CHANGES;";
+        $"SELECT NOT {nameof(Tweet.IsRobot)} FROM {nameof(Tweet)}s EMIT CHANGES;";
 
       ksql.Should().BeEquivalentTo(expectedKsql);
     }
@@ -1407,7 +1407,45 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
 
       //Assert
       string expectedKsql =
-        @$"SELECT NOT {nameof(Tweet.IsRobot)} NotRobot FROM {nameof(Tweet)}s EMIT CHANGES;";
+        $"SELECT NOT {nameof(Tweet.IsRobot)} NotRobot FROM {nameof(Tweet)}s EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void Contains_BuildKSql_PrintsLike()
+    {
+      //Arrange
+      var query = CreateTweetsStreamSource()
+        .Where(c => c.Message.ToLower().Contains("hard".ToLower()));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @$"SELECT * FROM {nameof(Tweet)}s
+WHERE LCASE(Message) LIKE LCASE('%hard%') EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void EndsWith_BuildKSql_PrintsLike()
+    {
+      //Arrange
+      string movie = "hard";
+
+      var query = CreateTweetsStreamSource()
+        .Where(c => c.Message.EndsWith(movie.ToUpper()));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @$"SELECT * FROM {nameof(Tweet)}s
+WHERE Message LIKE UCASE('%hard') EMIT CHANGES;";
 
       ksql.Should().BeEquivalentTo(expectedKsql);
     }
