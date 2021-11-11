@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -179,12 +180,49 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
 
     #endregion
 
+    #region SaveChanges
+
+    private readonly ChangesCache changesCache = new();
+
+    internal void Add<T>(T entity)
+    {
+      var serviceScopeFactory = Initialize(contextOptions);
+
+      using var scope = serviceScopeFactory.CreateScope();
+
+      var restApiClient = scope.ServiceProvider.GetRequiredService<IKSqlDbRestApiClient>();
+
+      var statement = restApiClient.ToInsertStatement(entity);
+
+      changesCache.Enqueue(statement);
+    }
+
+    private readonly CancellationTokenSource cts = new();
+
+    internal async Task<HttpResponseMessage> SaveChangesAsync()
+    {
+      if (changesCache.IsEmpty)
+        return null;
+
+      var serviceScopeFactory = Initialize(contextOptions);
+
+      using var scope = serviceScopeFactory.CreateScope();
+      
+      var restApiClient = scope.ServiceProvider.GetRequiredService<IKSqlDbRestApiClient>();
+
+      return await changesCache.SaveChangesAsync(restApiClient, cts.Token);
+    }
+
+    #endregion
+
     protected override async ValueTask OnDisposeAsync()
     {
+      cts.Dispose();
+
 #if !NETSTANDARD
       await base.OnDisposeAsync();
 #endif
-      if(KSqlDBQueryContext != null)
+      if (KSqlDBQueryContext != null)
         await KSqlDBQueryContext.DisposeAsync();
     }
   }
