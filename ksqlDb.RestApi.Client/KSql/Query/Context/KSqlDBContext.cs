@@ -11,6 +11,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Clauses;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 #if !NETSTANDARD
@@ -184,7 +185,13 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
 
     private readonly ChangesCache changesCache = new();
 
-    internal void Add<T>(T entity)
+    /// <summary>
+    /// Add entity for insertion. In order to save them call SaveChangesAsync.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="entity">Entity to add</param>
+    /// <param name="insertProperties">Optional insert properties.</param>
+    public void Add<T>(T entity, InsertProperties insertProperties = null)
     {
       var serviceScopeFactory = Initialize(contextOptions);
 
@@ -192,14 +199,18 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
 
       var restApiClient = scope.ServiceProvider.GetRequiredService<IKSqlDbRestApiClient>();
 
-      var statement = restApiClient.ToInsertStatement(entity);
+      var statement = restApiClient.ToInsertStatement(entity, insertProperties);
 
       changesCache.Enqueue(statement);
     }
 
     private readonly CancellationTokenSource cts = new();
 
-    internal async Task<HttpResponseMessage> SaveChangesAsync()
+    /// <summary>
+    /// Save the entities added to context.
+    /// </summary>
+    /// <returns>Save response.</returns>
+    public async Task<HttpResponseMessage> SaveChangesAsync()
     {
       if (changesCache.IsEmpty)
         return null;
