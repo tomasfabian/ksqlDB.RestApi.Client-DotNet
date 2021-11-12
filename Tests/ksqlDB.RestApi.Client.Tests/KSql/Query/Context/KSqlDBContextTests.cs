@@ -3,11 +3,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Helpers;
+using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UnitTests;
@@ -164,10 +166,10 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Context
     }
 
     [TestMethod]
-    public async Task CreateQueryStream_RawKSQL_ReturnAsyncEnumerable()
+    public void CreateQueryStream_RawKSQL_ReturnAsyncEnumerable()
     {
       //Arrange
-      string ksql = @"SELECT * FROM tweetsTest EMIT CHANGES LIMIT 2;";
+      string ksql = "SELECT * FROM tweetsTest EMIT CHANGES LIMIT 2;";
 
       QueryStreamParameters queryStreamParameters = new QueryStreamParameters
       {
@@ -185,10 +187,10 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Context
     }
 
     [TestMethod]
-    public async Task CreateQuery_RawKSQL_ReturnAsyncEnumerable()
+    public void CreateQuery_RawKSQL_ReturnAsyncEnumerable()
     {
       //Arrange
-      string ksql = @"SELECT * FROM tweetsTest EMIT CHANGES LIMIT 2;";
+      string ksql = "SELECT * FROM tweetsTest EMIT CHANGES LIMIT 2;";
 
       QueryParameters queryParameters = new QueryParameters
       {
@@ -203,6 +205,41 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Context
 
       //Assert
       source.Should().NotBeNull();
+    }
+
+    [TestMethod]
+    public async Task AddAndSaveChangesAsync()
+    {
+      //Arrange
+      var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
+      
+      var entity = new Tweet();
+      context.KSqlDbRestApiClientMock.Setup(c => c.ToInsertStatement(entity, null)).Returns(new KSqlDbStatement("Insert Into"));
+      
+      //Act
+      context.Add(entity);
+      await context.SaveChangesAsync();
+
+      //Assert
+      context.KSqlDbRestApiClientMock.Verify(c => c.ToInsertStatement(entity, null), Times.Once);
+      context.KSqlDbRestApiClientMock.Verify(c => c.ExecuteStatementAsync(It.IsAny<KSqlDbStatement>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [TestMethod]
+    public void AddTwice_SaveChangesAsyncWasNotCalled()
+    {
+      //Arrange
+      var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
+      var entity = new Tweet();
+      context.KSqlDbRestApiClientMock.Setup(c => c.ToInsertStatement(entity, null)).Returns(new KSqlDbStatement("Insert Into"));
+      
+      //Act
+      context.Add(entity);
+      context.Add(entity);
+
+      //Assert
+      context.KSqlDbRestApiClientMock.Verify(c => c.ToInsertStatement(entity, null), Times.Exactly(2));
+      context.KSqlDbRestApiClientMock.Verify(c => c.ExecuteStatementAsync(It.IsAny<KSqlDbStatement>(), It.IsAny<CancellationToken>()), Times.Never);
     }
   }
 }

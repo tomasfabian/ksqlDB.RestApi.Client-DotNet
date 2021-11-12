@@ -34,12 +34,14 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Context
 
     public readonly Mock<IKSqlDbProvider> KSqlDbProviderMock = new();
     public readonly Mock<IKSqlQueryGenerator> KSqlQueryGenerator = new();
+    public readonly Mock<IKSqlDbRestApiClient> KSqlDbRestApiClientMock = new();
 
     internal bool RegisterKSqlQueryGenerator { get; set; } = true;
 
     protected override void OnConfigureServices(IServiceCollection serviceCollection, KSqlDBContextOptions options)
     {
       serviceCollection.AddSingleton(KSqlDbProviderMock.Object);
+      serviceCollection.AddSingleton(KSqlDbRestApiClientMock.Object);
 
       if(RegisterKSqlQueryGenerator)
         serviceCollection.AddSingleton(KSqlQueryGenerator.Object);
