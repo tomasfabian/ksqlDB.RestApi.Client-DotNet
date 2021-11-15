@@ -3254,6 +3254,20 @@ SELECT * FROM Movies
 WHERE Title LIKE 'Die%' EMIT CHANGES;
 ```
 
+## IKSqlDBContext Add and SaveChangesAsync
+
+With IKSqlDBContext.Add and IKSqlDBContext.SaveChangesAsync you can add multiple entities to the context and save them asynchronously in one request (as "batch inserts").
+
+```C#
+private static async Task AddAndSaveChangesAsync(IKSqlDBContext context)
+{
+  context.Add(new Movie { Id = 1 });
+  context.Add(new Movie { Id = 1 });
+
+  var saveResponse = await context.SaveChangesAsync();
+}
+```   
+
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
 
