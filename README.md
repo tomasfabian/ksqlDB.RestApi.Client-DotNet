@@ -3207,6 +3207,29 @@ public class Worker : IHostedService, IDisposable
 }
 ```
 
+# ksqldb.RestApi.Client v1.3.0-rc.1
+
+### Join within
+
+- specifies a time window for stream-stream joins
+
+```C#
+var query = from o in KSqlDBContext.CreateQueryStream<Order>()
+  join p in Source.Of<Payment>().Within(Duration.OfHours(1), Duration.OfDays(5)) on o.OrderId equals p.Id
+  select new
+         {
+           orderId = o.OrderId,
+           paymentId = p.Id
+         };
+```
+
+```SQL
+SELECT o.OrderId AS orderId, p.Id AS paymentId FROM Orders o
+INNER JOIN Payments p
+WITHIN (1 HOURS, 5 DAYS) ON o.OrderId = p.Id
+EMIT CHANGES;
+```  
+
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
 
@@ -3216,11 +3239,9 @@ public class Worker : IHostedService, IDisposable
 https://www.nuget.org/packages/ksqlDB.RestApi.Client/
 
 **TODO:**
-- [CREATE STREAM AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream-as-select/) - [ WITHIN [(before TIMEUNIT, after TIMEUNIT) | N TIMEUNIT] ]
 - [CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/) - EMIT output_refinement
 - rest of the [ksql query syntax](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/) (supported operators etc.)
-- backpressure support
-
+ 
 # ksqldb links
 [Scalar functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#as_value)
 
