@@ -3228,7 +3228,31 @@ SELECT o.OrderId AS orderId, p.Id AS paymentId FROM Orders o
 INNER JOIN Payments p
 WITHIN (1 HOURS, 5 DAYS) ON o.OrderId = p.Id
 EMIT CHANGES;
-```  
+```
+
+### Operator LIKE - String.StartsWith, String.EndsWith, String.Contains
+
+Match a string with a specified pattern:
+
+```C#
+var query = context.CreateQueryStream<Movie>()
+  .Where(c => c.Title.ToLower().Contains("hard".ToLower());
+```
+
+```SQL
+SELECT * FROM Movies
+WHERE LCASE(Title) LIKE LCASE('%hard%') EMIT CHANGES;
+```
+
+```C#
+var query = context.CreateQueryStream<Movie>()
+  .Where(c => c.Title.StartsWith("Die");
+```
+
+```SQL
+SELECT * FROM Movies
+WHERE Title LIKE 'Die%' EMIT CHANGES;
+```
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
