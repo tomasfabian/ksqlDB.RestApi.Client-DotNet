@@ -14,7 +14,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi
 {
   internal class TestableKSqlDbQueryStreamProvider : KSqlDbQueryStreamProvider
   {
-    public TestableKSqlDbQueryStreamProvider(IHttpClientFactory httpClientFactory, ILogger logger = null) 
+    public TestableKSqlDbQueryStreamProvider(IHttpClientFactory httpClientFactory, ILogger logger = null)
       : base(httpClientFactory, logger)
     {
     }
@@ -30,8 +30,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi
       @"{""@type"":""generic_error"",""error_code"":40001,""message"":""Line: 1, Col: 21: SELECT column 'Foo' cannot be resolved.\nStatement: SELECT Message, Id, Foo FROM Tweets\r\nWHERE Message = 'Hello world' EMIT CHANGES LIMIT 2;""}";
 
     protected override HttpClient OnCreateHttpClient()
-    {      
-
+    {
       var handlerMock = new Mock<HttpMessageHandler>();
 
       handlerMock
@@ -42,16 +41,26 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi
           ItExpr.IsAny<CancellationToken>()
         )
         .ReturnsAsync(new HttpResponseMessage()
-        {
-          StatusCode = HttpStatusCode.OK,
-          Content = new StringContent(ShouldThrowException ? ErrorResponse : QueryResponse),
-        })
+                      {
+                        StatusCode = HttpStatusCode.OK,
+                        Content = new StringContent(ShouldThrowException ? ErrorResponse : QueryResponse),
+                      })
         .Verifiable();
 
       return new HttpClient(handlerMock.Object)
-      {
-        BaseAddress = new Uri(TestParameters.KsqlDBUrl)
-      };
+             {
+               BaseAddress = new Uri(TestParameters.KsqlDBUrl)
+             };
+    }
+
+    public Exception Exception { get; set; }
+
+    protected override HttpRequestMessage CreateQueryHttpRequestMessage(HttpClient httpClient, object parameters)
+    {
+      if (Exception != null)
+        throw Exception;
+
+      return base.CreateQueryHttpRequestMessage(httpClient, parameters);
     }
   }
 }

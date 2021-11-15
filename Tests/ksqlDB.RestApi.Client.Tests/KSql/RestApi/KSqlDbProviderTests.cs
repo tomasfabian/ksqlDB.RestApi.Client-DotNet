@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -172,6 +173,27 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi
       await foreach (var tweet in tweets)
       {
         tweet.Should().NotBeNull();
+      }
+    }
+
+    [TestMethod]
+    public async Task LogError()
+    {
+      //Arrange
+      ClassUnderTest.Exception = new Exception("test");
+
+      var queryParameters = new QueryStreamParameters();
+
+      try
+      {
+        //Act
+        var tweets = await ClassUnderTest.Run<Tweet>(queryParameters).ToListAsync();
+
+        //Assert
+      }
+      catch (Exception e)
+      {
+        LoggerMock.VerifyLog(LogLevel.Error, Times.Once);
       }
     }
 

@@ -10,6 +10,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UnitTests;
@@ -240,6 +241,34 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Context
       //Assert
       context.KSqlDbRestApiClientMock.Verify(c => c.ToInsertStatement(entity, null), Times.Exactly(2));
       context.KSqlDbRestApiClientMock.Verify(c => c.ExecuteStatementAsync(It.IsAny<KSqlDbStatement>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [TestMethod]
+    public void AddWithInsertProperties()
+    {
+      //Arrange
+      var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl); 
+      var entity = new Tweet();
+      var insertProperties = new InsertProperties();
+
+      //Act
+      context.Add(entity, insertProperties);
+
+      //Assert
+      context.KSqlDbRestApiClientMock.Verify(c => c.ToInsertStatement(entity, insertProperties), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task NothingWasAdded_SaveChangesAsync_WasNotCalled()
+    {
+      //Arrange
+      var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
+      
+      //Act
+      var response = await context.SaveChangesAsync();
+
+      //Assert
+      response.Should().BeNull();
     }
   }
 }
