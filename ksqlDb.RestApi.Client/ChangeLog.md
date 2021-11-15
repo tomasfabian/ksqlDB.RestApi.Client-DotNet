@@ -1,8 +1,26 @@
 ﻿# ksqlDB.RestApi.Client
 
+# v1.3.0-rc.1
+## Join Within
+- specify a time window for stream-stream joins
+
+## KSqlDbRestApiClient
+- CreateTypeAsync added optional type name argument
+
+## Operator LIKE - String.StartsWith, String.EndsWith, String.Contains 
+Match a string with a specified pattern
+
+## IKSqlDBContext Add and SaveChangesAsync
+Saving multiple entities with one request
+
+## Fixes:
+- KSqlDbContext services collection - injected ILoggerFactory instance is registered as Singleton
+
 # v1.2.0
 ## KSqlDbServiceCollectionExtensions.ConfigureKSqlDb
 - registers the following dependencies: IKSqlDBContext, KSqlDbRestApiClient, IHttpClientFactory, KSqlDBContextOptions
+
+## Logging 
 - LogInformation about received data, executed commands and queries
 - added package reference - Microsoft.Extensions.Logging.Abstractions
 
