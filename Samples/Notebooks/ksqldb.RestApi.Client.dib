@@ -1,0 +1,149 @@
+#!markdown
+
+Install the package with nuget package manager:
+```
+Install-Package ksqlDB.RestApi.Client
+```
+
+#!csharp
+
+#r "nuget:ksqlDb.RestApi.Client, 1.2.0"
+
+#!markdown
+
+Create a ksqldb context:
+
+#!csharp
+
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+var context = new KSqlDBContext(ksqlDbUrl);
+
+#!markdown
+
+Prepare the domain model:
+
+#!csharp
+
+public record Tweet
+{
+  public int Id { get; init; }
+
+  public string Message { get; init; }
+
+  public string Author { get; init; }
+}
+
+#!markdown
+
+Run ksqldb in docker containers (this step may take a few minutes). The following code snippet clones the **ksqlDB.RestApi.Client-DotNet** repository in order to download the docker compose yaml file.
+The containerized environment requires a running Docker engine. You can download and install it from [here](https://www.docker.com/products/docker-desktop).
+
+#!pwsh
+
+git clone https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet.git c:\ksqlDB.RestApi.Client-DotNet
+cd c:\ksqlDB.RestApi.Client-DotNet\Samples\ksqlDB.RestApi.Client.Sample\
+
+docker-compose up -d
+
+#!markdown
+
+Create a ksqldb stream:
+
+#!csharp
+
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using System;
+
+EntityCreationMetadata metadata = new()
+{
+  KafkaTopic = nameof(Tweet),
+  Partitions = 1,
+  Replicas = 1
+};
+
+var ksqlDbUri = new Uri(ksqlDbUrl);
+var httpClientFactory = new HttpClientFactory(ksqlDbUri);
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+      
+var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<Tweet>(metadata);
+
+Console.WriteLine(httpResponseMessage);
+
+#!markdown
+
+Insert some values to the prepared ksqlb stream named `Tweets`. The pluralized name is inferred from the Tweet class name. 
+
+#!csharp
+
+var responseMessage = await restApiClient
+  .InsertIntoAsync(new Tweet { Id = 1, Message = "The answer is 42" });
+
+responseMessage = await restApiClient
+  .InsertIntoAsync(new Tweet { Id = 2, Message = "ksqlDB rulez!" });
+
+#!markdown
+
+Now you can subscribe to the underlying stream of events created in the previous step. The following compile time safe query filters the messages server side based on the provided predicate. In our contrived example the messages cannot be equal to `Hello world` or the Id must be equal to 1. 
+
+`WithOffsetResetPolicy` is used to receive messages from the beginning.
+
+The `Take` operator instructs the ksqldb query engine to Limit the number of requested messages to 2. 
+
+`Select` is used to project the resulting shape of the message. In our case we've excluded the Author field.
+
+
+And finally we are ready to start a new subscription. The `Subscribe` method has 3 arguments onNext, onError and onCompleted. Semantics of the subcription are that you can receive 0-N values. The termination of the stream is indicated with an exception messages in case of error or by onCompleted event. 
+
+#!csharp
+
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+using System.Threading;
+
+var semaphoreSlim = new SemaphoreSlim(0, 1);
+
+var subscription = context.CreateQueryStream<Tweet>()
+  .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
+  .Where(p => p.Message != "Hello world" || p.Id == 1)
+  .Select(l => new { l.Message, l.Id })
+  .Take(2)
+  .Subscribe(onNext: tweetMessage =>
+  {
+    Console.WriteLine($"{nameof(Tweet)}: {tweetMessage.Id} - {tweetMessage.Message}");
+  }, 
+  onError: error => { 
+    Console.WriteLine($"Exception: {error.Message}"); 
+    
+    semaphoreSlim.Release();
+  },
+  onCompleted: () => {
+    Console.WriteLine("Completed");
+    
+    semaphoreSlim.Release();
+  });
+
+  await semaphoreSlim.WaitAsync();
+  
+  using(subscription) {}
+
+#!markdown
+
+Dispose the context when you finished your work with it:
+
+#!csharp
+
+await context.DisposeAsync();
+
+#!markdown
+
+Stop the containers:
+
+#!pwsh
+
+echo $pwd
+docker-compose down
