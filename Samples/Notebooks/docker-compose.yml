@@ -1,0 +1,40 @@
+version: '3.4'
+
+services:
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    ports:
+      - '2181:2181'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  broker01:
+    image: 'bitnami/kafka:latest'
+    ports:
+      - '29092:29092'
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://broker01:9092,EXTERNAL://broker01:29092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://broker01:9092,EXTERNAL://localhost:29092
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+  #    - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
+    depends_on:
+      - zookeeper
+
+  ksqldb-server:
+    image: confluentinc/ksqldb-server:${KSQLDB_VERSION}
+    hostname: ksqldb-server
+    container_name: ksqldb-server
+    depends_on:
+      - broker01
+    ports:
+      - "8088:8088"
+    environment:
+      KSQL_CONFIG_DIR: "/etc/ksql"
+      KSQL_BOOTSTRAP_SERVERS: "broker01:9092"
+      KSQL_HOST_NAME: ksqldb-server      
+      KSQL_LISTENERS: "http://0.0.0.0:8088"
+      KSQL_CACHE_MAX_BYTES_BUFFERING: 0
