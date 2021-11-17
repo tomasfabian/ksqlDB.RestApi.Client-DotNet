@@ -27,7 +27,6 @@ services:
   ksqldb-server:
     image: confluentinc/ksqldb-server:${KSQLDB_VERSION}
     hostname: ksqldb-server
-    container_name: ksqldb-server
     depends_on:
       - broker01
     ports:

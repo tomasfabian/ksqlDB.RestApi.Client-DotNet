@@ -43,8 +43,9 @@ The containerized environment requires a running Docker engine. You can download
 
 #!pwsh
 
-git clone https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet.git c:\ksqlDB.RestApi.Client-DotNet
-cd c:\ksqlDB.RestApi.Client-DotNet\Samples\ksqlDB.RestApi.Client.Sample\
+git clone https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet.git c:\ksqlDB-DotNet
+
+cd c:\ksqlDB-DotNet\Samples\Notebooks\
 
 docker-compose up -d
 
@@ -90,14 +91,15 @@ responseMessage = await restApiClient
 
 Now you can subscribe to the underlying stream of events created in the previous step. The following compile time safe query filters the messages server side based on the provided predicate. In our contrived example the messages cannot be equal to `Hello world` or the Id must be equal to 1. 
 
-`WithOffsetResetPolicy` is used to receive messages from the beginning.
+`WithOffsetResetPolicy` is used to receive messages from the beginning of the log.
 
 The `Take` operator instructs the ksqldb query engine to Limit the number of requested messages to 2. 
 
-`Select` is used to project the resulting shape of the message. In our case we've excluded the Author field.
+`Select` is used to project the resulting shape of the messages. In our case we've excluded the Author field.
 
 
-And finally we are ready to start a new subscription. The `Subscribe` method has 3 arguments onNext, onError and onCompleted. Semantics of the subcription are that you can receive 0-N values. The termination of the stream is indicated with an exception messages in case of error or by onCompleted event. 
+And finally we are ready to start a new subscription. The `Subscribe` method has 3 arguments: onNext, onError and onCompleted. Semantics of the subcription are that you can receive 0-N values. The termination of the stream is indicated with an exception message in case of some error or by calling the onCompleted lambda which allows you to react to successfully finished subscriptions. 
+After the completion of the query no more values will be received.
 
 #!csharp
 
