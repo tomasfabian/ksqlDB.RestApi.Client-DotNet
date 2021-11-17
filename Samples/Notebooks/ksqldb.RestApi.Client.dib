@@ -7,7 +7,7 @@ Install-Package ksqlDB.RestApi.Client
 
 #!csharp
 
-#r "nuget:ksqlDb.RestApi.Client, 1.2.0"
+#r "nuget:ksqlDb.RestApi.Client, 1.3.0-rc.1"
 
 #!markdown
 
@@ -41,9 +41,18 @@ public record Tweet
 Run ksqldb in docker containers (this step may take a few minutes). The following code snippet clones the **ksqlDB.RestApi.Client-DotNet** repository in order to download the docker compose yaml file.
 The containerized environment requires a running Docker engine. You can download and install it from [here](https://www.docker.com/products/docker-desktop).
 
+Clone the repository:
+
 #!pwsh
 
 git clone https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet.git c:\ksqlDB-DotNet
+
+#!markdown
+
+The result of the bellow commands should be an instance of zookeeper, kafka broker and ksqldb server.
+The content of the docker compose file can be checked [here](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/Samples/Notebooks/docker-compose.yml).
+
+#!pwsh
 
 cd c:\ksqlDB-DotNet\Samples\Notebooks\
 
@@ -89,6 +98,22 @@ responseMessage = await restApiClient
 
 #!markdown
 
+or with the help of the ksqldb context:
+
+#!csharp
+
+var tweet3 = new Tweet { Id = 3, Message = "Message 3" };
+
+context.Add(tweet3);
+
+var tweet4 = new Tweet { Id = 4, Message = "Message 4" };
+
+context.Add(tweet4);
+
+var saveResponse = await context.SaveChangesAsync();
+
+#!markdown
+
 Now you can subscribe to the underlying stream of events created in the previous step. The following compile time safe query filters the messages server side based on the provided predicate. In our contrived example the messages cannot be equal to `Hello world` or the Id must be equal to 1. 
 
 `WithOffsetResetPolicy` is used to receive messages from the beginning of the log.
@@ -98,7 +123,7 @@ The `Take` operator instructs the ksqldb query engine to Limit the number of req
 `Select` is used to project the resulting shape of the messages. In our case we've excluded the Author field.
 
 
-And finally we are ready to start a new subscription. The `Subscribe` method has 3 arguments: onNext, onError and onCompleted. Semantics of the subcription are that you can receive 0-N values. The termination of the stream is indicated with an exception message in case of some error or by calling the onCompleted lambda which allows you to react to successfully finished subscriptions. 
+And finally we are ready to start a new subscription. The `Subscribe` method has 3 arguments: onNext, onError and onCompleted. Semantics of the subscription are that you can receive 0-N values. The termination of the stream is indicated with an exception message in case of some error or by calling the onCompleted lambda which allows you to react to successfully finished subscriptions. 
 After the completion of the query no more values will be received.
 
 #!csharp
@@ -147,5 +172,4 @@ Stop the containers:
 
 #!pwsh
 
-echo $pwd
 docker-compose down
