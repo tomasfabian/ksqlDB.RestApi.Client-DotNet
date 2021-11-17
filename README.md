@@ -20,6 +20,9 @@ This adds a `<PackageReference>` to your csproj file, similar to the following:
 ```XML
 <PackageReference Include="ksqlDB.RestApi.Client" Version="1.0.0" />
 ```
+
+The following example can be tried with a [.NET interactive Notebook](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/Notebooks):
+
 ```C#
 using System;
 using ConsoleAppKsqlDB;
@@ -66,8 +69,13 @@ SELECT Message, Id
  LIMIT 2;
 ```
 
-In the above mentioned code snippet everything runs server side except of the ``` IQbservable<TEntity>.Subscribe``` method. It subscribes to your ksqlDB stream created in the following manner:
+In the above mentioned code snippet everything runs server side except of the ```IQbservable<TEntity>.Subscribe``` method. It subscribes to your ksqlDB stream created in the following manner:
 ```C#
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using System;
+
 EntityCreationMetadata metadata = new()
 {
   KafkaTopic = nameof(Tweet),
