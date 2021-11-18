@@ -1,6 +1,7 @@
 #!markdown
 
-Install the package with nuget package manager:
+### Install the ksqlDB.RestApi.Client package
+Install the package with NUGET package manager:
 ```
 Install-Package ksqlDB.RestApi.Client
 ```
@@ -11,35 +12,10 @@ Install-Package ksqlDB.RestApi.Client
 
 #!markdown
 
-Create a ksqldb context:
+# Run ksqldb in Docker
 
-#!csharp
-
-using ksqlDB.RestApi.Client.KSql.Query.Context;
-
-var ksqlDbUrl = @"http:\\localhost:8088";
-
-var context = new KSqlDBContext(ksqlDbUrl);
-
-#!markdown
-
-Prepare the domain model:
-
-#!csharp
-
-public record Tweet
-{
-  public int Id { get; init; }
-
-  public string Message { get; init; }
-
-  public string Author { get; init; }
-}
-
-#!markdown
-
-Run ksqldb in docker containers (this step may take a few minutes). The following code snippet clones the **ksqlDB.RestApi.Client-DotNet** repository in order to download the docker compose yaml file.
-The containerized environment requires a running Docker engine. You can download and install it from [here](https://www.docker.com/products/docker-desktop).
+Run **ksqldb** in a docker container (this step may take a few minutes). The following code snippet clones the **ksqlDB.RestApi.Client-DotNet** repository in order to download the docker compose yaml file.
+The containerized environment requires a running **Docker engine**. You can download and install **Docker Desktop** from [here](https://www.docker.com/products/docker-desktop).
 
 Clone the repository:
 
@@ -60,7 +36,26 @@ docker-compose up -d
 
 #!markdown
 
-Create a ksqldb stream:
+# Insert some values
+
+Prepare the domain model:
+
+#!csharp
+
+public record Tweet
+{
+  public int Id { get; init; }
+
+  public string Message { get; init; }
+
+  public string Author { get; init; }
+}
+
+#!markdown
+
+**KSqlDbRestApiClient** class is used to execute SQL statements via the Rest API such as inserting records into streams and creating tables, types, etc. or executing admin operations such as listing streams.
+
+Create a ksqldb stream in the following way:
 
 #!csharp
 
@@ -76,6 +71,8 @@ EntityCreationMetadata metadata = new()
   Replicas = 1
 };
 
+var ksqlDbUrl = @"http:\\localhost:8088";
+
 var ksqlDbUri = new Uri(ksqlDbUrl);
 var httpClientFactory = new HttpClientFactory(ksqlDbUri);
 var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
@@ -87,6 +84,9 @@ Console.WriteLine(httpResponseMessage);
 #!markdown
 
 Insert some values to the prepared ksqlb stream named `Tweets`. The pluralized name is inferred from the Tweet class name. 
+> Run the code.
+>
+> Then try inserting your own messages.
 
 #!csharp
 
@@ -98,19 +98,17 @@ responseMessage = await restApiClient
 
 #!markdown
 
-or with the help of the ksqldb context:
+# Create a query
+
+**KSqlDBContext**'s primary responsibilities are to interact with your ksqldb with LINQ queries which are converted to KSQL, materializing raw data into your POCOs and persisting data into streams or tables.
+`CreateQueryStream<TEnity>` is the entry point for composing LINQ queries.
+Lets create a ksqldb context by providing it an url:
 
 #!csharp
 
-var tweet3 = new Tweet { Id = 3, Message = "Message 3" };
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 
-context.Add(tweet3);
-
-var tweet4 = new Tweet { Id = 4, Message = "Message 4" };
-
-context.Add(tweet4);
-
-var saveResponse = await context.SaveChangesAsync();
+var context = new KSqlDBContext(ksqlDbUrl);
 
 #!markdown
 
@@ -159,6 +157,24 @@ var subscription = context.CreateQueryStream<Tweet>()
   using(subscription) {}
 
 #!markdown
+
+You can also insert some values with the help of the ksqldb context:
+
+#!csharp
+
+var tweet3 = new Tweet { Id = 3, Message = "Hello world" };
+
+context.Add(tweet3);
+
+var tweet4 = new Tweet { Id = 4, Message = "Message 4" };
+
+context.Add(tweet4);
+
+var saveResponse = await context.SaveChangesAsync();
+
+#!markdown
+
+# Clean up
 
 Dispose the context when you finished your work with it:
 
