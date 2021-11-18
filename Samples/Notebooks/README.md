@@ -11,4 +11,4 @@ Welcome to .NET interactive notebooks for ksqldb.RestApi.Client!
 
 | Topic  | Link                                                                                                                             |
 |--------|----------------------------------------------------------------------------------------------------------------------------------|
-| Basics | [01 Notebook](vscode://ms-dotnettools.dotnet-interactive-vscode/openNotebook?url=https://raw.githubusercontent.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/main/Samples/Notebooks/ksqldb.RestApi.Client.dib) |
+| Basics | [01 Notebook](https://tinyurl.com/ksqldb-dotnet01) |
