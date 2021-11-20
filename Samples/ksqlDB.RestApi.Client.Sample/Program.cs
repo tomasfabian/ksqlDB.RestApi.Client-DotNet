@@ -86,7 +86,7 @@ namespace ksqlDB.Api.Client.Samples
       var query = context.CreateQueryStream<Movie>() // Http 2.0
       // var query = context.CreateQuery<Movie>() // Http 1.0
         .Where(p => p.Title != "E.T.")
-        .Where(c => K.Functions.Like(c.Title.ToLower(), "%hard%".ToLower()) || c.Id == 1)
+        .Where(c => c.Title.ToLower().Contains("hard".ToLower()) || c.Id == 1)
         .Where(p => p.RowTime >= 1510923225000)
         .Select(l => new { Id = l.Id, l.Title, l.Release_Year, l.RowTime })
         .Take(2); // LIMIT 2    
@@ -134,6 +134,14 @@ namespace ksqlDB.Api.Client.Samples
       await moviesProvider.DropTablesAsync();
 
       Console.WriteLine("Finished.");
+    }
+
+    private static async Task AddAndSaveChangesAsync(KSqlDBContext context)
+    {
+      context.Add(MoviesProvider.Movie1);
+      context.Add(MoviesProvider.Movie2);
+
+      var saveResponse = await context.SaveChangesAsync();
     }
 
     private static async Task SubscribeAsync(IKSqlDBContext context)
