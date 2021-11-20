@@ -3215,7 +3215,7 @@ public class Worker : IHostedService, IDisposable
 }
 ```
 
-# ksqldb.RestApi.Client v1.3.0-rc.1
+# ksqldb.RestApi.Client v1.3.0
 
 ### Join within
 

@@ -1,6 +1,6 @@
 ﻿# ksqlDB.RestApi.Client
 
-# v1.3.0-rc.1
+# v1.3.0
 ## Join Within
 - specify a time window for stream-stream joins
 
