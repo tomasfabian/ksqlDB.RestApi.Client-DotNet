@@ -16,7 +16,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       var columnsStringBuilder = new StringBuilder();
       var valuesStringBuilder = new StringBuilder();
 
-      foreach (var memberInfo in Members<T>())
+      foreach (var memberInfo in Members<T>(insertProperties?.IncludeReadOnlyProperties))
       {
         if (isFirst)
         {

@@ -8,6 +8,8 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties
 
     public bool ShouldPluralizeEntityName { get; set; } = true;
 
+    public bool IncludeReadOnlyProperties { get; set; } = false;
+
     public Func<decimal, string> FormatDecimalValue { get; set; }
 
     public Func<double, string> FormatDoubleValue { get; set; }

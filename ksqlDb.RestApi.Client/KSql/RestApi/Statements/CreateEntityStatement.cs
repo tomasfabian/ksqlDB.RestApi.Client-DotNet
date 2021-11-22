@@ -12,18 +12,19 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
   {
     protected static readonly IPluralize EnglishPluralizationService = new Pluralizer();
 
-    protected IEnumerable<MemberInfo> Members<T>()
+    protected IEnumerable<MemberInfo> Members<T>(bool? includeReadOnly = null)
     {
-      return Members(typeof(T));
+      return Members(typeof(T), includeReadOnly);
     }
 
-    protected IEnumerable<MemberInfo> Members(Type type)
+    protected IEnumerable<MemberInfo> Members(Type type, bool? includeReadOnly = null)
     {
       var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
 
       var properties = type
         .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-        .Where(c => c.CanWrite).OfType<MemberInfo>()
+        .Where(c => c.CanWrite || (includeReadOnly.HasValue && includeReadOnly.Value))
+        .OfType<MemberInfo>()
         .Concat(fields);
       
       return properties.Where(c => !c.GetCustomAttributes().OfType<IgnoreByInsertsAttribute>().Any());
