@@ -1,4 +1,5 @@
-﻿using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+﻿using System.Collections.Generic;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
 namespace ksqlDB.Api.Client.Tests.Models.Movies
 {
@@ -13,5 +14,7 @@ namespace ksqlDB.Api.Client.Tests.Models.Movies
 
     [IgnoreByInserts]
     public int IgnoreMe { get; set; }
+
+    public IEnumerable<int> ReadOnly { get; } = new[] { 1, 2 };
   }
 }

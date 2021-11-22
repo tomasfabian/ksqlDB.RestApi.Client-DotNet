@@ -214,10 +214,29 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements
       statement.Should().Be("INSERT INTO Events (Id, Category) VALUES (1, NULL);");
     }
 
-    record Kafka_table_order
+    public class Kafka_table_order
     {
       public int Id { get; set; }
       public IEnumerable<double> Items { get; set; }
+    }
+
+    [Test]
+    public void IncludeReadOnlyProperties()
+    {
+      //Arrange
+      var order = new Movie { Id = 1 };
+      
+
+      var insertProperties = new InsertProperties
+                             {
+                               IncludeReadOnlyProperties = true
+                             };
+
+      //Act
+      string statement = new CreateInsert().Generate(order, insertProperties);
+
+      //Assert
+      statement.Should().Be($"INSERT INTO {nameof(Movie)}s (Title, Id, Release_Year, ReadOnly) VALUES (NULL, 1, 0, ARRAY[1, 2]);");
     }
 
     [Test]
@@ -243,6 +262,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements
       {
         FormatDoubleValue = value => value.ToString(CultureInfo.InvariantCulture)
       };
+
       //Act
       string statement = new CreateInsert().Generate(order, insertProperties);
 
