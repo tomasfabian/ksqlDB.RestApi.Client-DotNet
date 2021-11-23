@@ -1,5 +1,12 @@
 ﻿# ksqlDB.RestApi.Client
 
+# v1.3.1
+### InsertProperties IncludeReadOnlyProperties
+- #12 include readonly properties in Inserts config
+
+### KSqlDBContext.SaveChangesAsync
+- added CancellationToken argument
+
 # v1.3.0
 ## Join Within
 - specify a time window for stream-stream joins

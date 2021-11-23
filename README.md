@@ -2956,6 +2956,9 @@ Is equivalent with:
 SELECT STRUCT(Property := 42) AS Value FROM Locations EMIT CHANGES;
 ```
 
+# ksqldb.RestApi.Client v1.0.0
+⚠ The package had to be renamed from Kafka.DotNet.ksqlDB to ksqlDB.RestApi.Client
+
 # ksqldb.RestApi.Client v1.1.0
 
 ### multiple joins with query comprehension syntax (GroupJoin, SelectMany, DefaultIfEmpty)
@@ -3275,6 +3278,17 @@ private static async Task AddAndSaveChangesAsync(IKSqlDBContext context)
   var saveResponse = await context.SaveChangesAsync();
 }
 ```   
+
+# ksqldb.RestApi.Client v1.3.1
+```C#
+var insertProperties = new InsertProperties
+                       {
+                         IncludeReadOnlyProperties = true
+                       };
+```
+
+### InsertProperties IncludeReadOnlyProperties
+- include readonly properties in Inserts config
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
