@@ -24,17 +24,17 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
     ValueTask<TEntity> ExecutePullQuery<TEntity>(string ksql, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Save the entities added to context.
-    /// </summary>
-    /// <returns>Save response.</returns>
-    Task<HttpResponseMessage> SaveChangesAsync();
-
-    /// <summary>
     /// Add entity for insertion. In order to save them call SaveChangesAsync.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="entity">Entity to add</param>
     /// <param name="insertProperties">Optional insert properties.</param>
     void Add<T>(T entity, InsertProperties insertProperties = null);
+
+    /// <summary>
+    /// Save the entities added to context.
+    /// </summary>
+    /// <returns>Save response.</returns>
+    Task<HttpResponseMessage> SaveChangesAsync(CancellationToken cancellationToken = default);
   }
 }

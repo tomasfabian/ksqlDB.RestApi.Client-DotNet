@@ -210,7 +210,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
     /// Save the entities added to context.
     /// </summary>
     /// <returns>Save response.</returns>
-    public async Task<HttpResponseMessage> SaveChangesAsync()
+    public async Task<HttpResponseMessage> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
       if (changesCache.IsEmpty)
         return null;
@@ -221,7 +221,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
       
       var restApiClient = scope.ServiceProvider.GetRequiredService<IKSqlDbRestApiClient>();
 
-      return await changesCache.SaveChangesAsync(restApiClient, cts.Token);
+      return await changesCache.SaveChangesAsync(restApiClient, cancellationToken).ConfigureAwait(false);
     }
 
     #endregion
