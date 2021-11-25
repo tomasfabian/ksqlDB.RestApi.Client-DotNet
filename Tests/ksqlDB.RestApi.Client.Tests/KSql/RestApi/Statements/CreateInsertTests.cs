@@ -76,13 +76,33 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(movie, insertProperties);
 
       //Assert
-      statement.Should().Be(@$"INSERT INTO {nameof(Movie)} (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
+      statement.Should().Be($"INSERT INTO {nameof(Movie)} (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
+    }
+
+    public record Book(string Title, string Author);
+
+    [Test]
+    public void Generate_ImmutableRecordType()
+    {
+      //Arrange
+      var book = new Book("Title", "Author");
+
+      var insertProperties = new InsertProperties
+                             {
+                               ShouldPluralizeEntityName = false
+                             };
+
+      //Act
+      string statement = new CreateInsert().Generate(book, insertProperties);
+
+      //Assert
+      statement.Should().Be($"INSERT INTO {nameof(Book)} (Title, Author) VALUES ('Title', 'Author');");
     }
 
     record EventCategory
     {
       public int Count { get; set; }
-      public string Name { get; set; }
+      public string Name { get; init; }
     }
 
     record Event
