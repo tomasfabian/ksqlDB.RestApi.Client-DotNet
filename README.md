@@ -3316,7 +3316,12 @@ var insertProperties = new InsertProperties
                        };
 
 await using KSqlDBContext context = new KSqlDBContext(@"http:\\localhost:8088");
-context.Add(model, properties);
+
+var model = new Foo("Bar") {
+  Count = 3
+};
+
+context.Add(model, insertProperties);
 
 var responseMessage = await context.SaveChangesAsync();
 ```
