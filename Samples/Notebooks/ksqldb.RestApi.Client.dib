@@ -1,10 +1,67 @@
 #!markdown
 
-### Install the ksqlDB.RestApi.Client package
-Install the package with NUGET package manager:
+# Early access note
+The following tutorial will be grammatically corrected in the future (Work in progress).
+
+#!markdown
+
+# ksqldb for .NET developers
+
+#!markdown
+
+**ksqlDB** is a streaming database that allows you to build highly reactive distributed microservices, use the outbox pattern in conjunction with Kafka Connect and more to name only a few impressive usages of it.
+
+#!markdown
+
+There are two different kinds of queries in ksqlDB that you can leverage:
+- **pull queries**
+- **push queries**
+
+#!markdown
+
+## Pull queries
+You are probably familiar with this kind of queries from more classical databases for structured data like SQL server or for unstructured data like MongoDb. 
+The former uses hopefully very well-known SQL and the latter MQL (Mongo query language).
+
+Pull queries are used to fetch data at rest on demand. The client is responsible for triggering the initial GET and after all available data has been received the query is terminated. In this scenario it is usual to periodically call the same query again to acquire new data and refresh the stale one.
+
+[ksqlDB's pull](https://docs.ksqldb.io/en/v0.7.0-ksqldb/developer-guide/ksqldb-reference/select-pull-query/) capabilities are limited at the moment to only a few KSQL clauses, but the ksqlDB team is working diligently to provide more features in the future. It is also possible to work around some of these limitations with KTables (Kafka compacted topics).
+
+#!markdown
+
+## Push queries
+Push queries are the opposite of pull queries. The client is only responsible for the initial subscription and the data in motion is constantly sent to the client theoretically forever. The query could be terminated by the client or due to an error. By constantly we don't mean periodically, there could actually be differently long time lags between individual messages, based on when the server publishes (pushes) them. 
+
+In this interactive notebook we are going to learn how to take advantage of this powerful concept with a type safe .NET client called ksqlDB.RestApi.Client.
+
+#!markdown
+
+### Installation of the ksqlDB.RestApi.Client package
+Install the package with NUGET package manager or from a CLI:
+
+#!markdown
+
 ```
 Install-Package ksqlDB.RestApi.Client
 ```
+
+#!markdown
+
+```
+dotnet add package ksqlDB.RestApi.Client
+```
+
+#!markdown
+
+This adds a `<PackageReference>` to your csproj file, similar to the following:
+
+```XML
+<PackageReference Include="ksqlDB.RestApi.Client" Version="1.0.0" />
+```
+
+#!markdown
+
+In this interactive notebook run the bellow command:
 
 #!csharp
 
@@ -25,8 +82,58 @@ git clone https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet.git c:\ksq
 
 #!markdown
 
-The result of the bellow commands should be an instance of zookeeper, kafka broker and ksqldb server.
+The result of the bellow commands should be an instance of zookeeper, kafka broker and ksqlDB server.
 The content of the docker compose file can be checked [here](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/Samples/Notebooks/docker-compose.yml).
+
+#!markdown
+
+<details>
+	<summary>docker-compose.yaml</summary>
+	<h5>Create a containerized development environment with docker:</h5>
+
+```YAML
+version: '3.4'
+
+services:
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    ports:
+      - '2181:2181'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  broker01:
+    image: 'bitnami/kafka:latest'
+    ports:
+      - '29092:29092'
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://broker01:9092,EXTERNAL://broker01:29092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://broker01:9092,EXTERNAL://localhost:29092
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+  #    - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
+    depends_on:
+      - zookeeper
+
+  ksqldb-server:
+    image: confluentinc/ksqldb-server:0.22
+    hostname: ksqldb-server
+    depends_on:
+      - broker01
+    ports:
+      - "8088:8088"
+    environment:
+      KSQL_CONFIG_DIR: "/etc/ksql"
+      KSQL_BOOTSTRAP_SERVERS: "broker01:9092"
+      KSQL_HOST_NAME: ksqldb-server      
+      KSQL_LISTENERS: "http://0.0.0.0:8088"
+      KSQL_CACHE_MAX_BYTES_BUFFERING: 0
+```
+
+</details>
 
 #!pwsh
 
@@ -55,7 +162,7 @@ public record Tweet
 
 **KSqlDbRestApiClient** class is used to execute SQL statements via the Rest API such as inserting records into streams and creating tables, types, etc. or executing admin operations such as listing streams.
 
-Create a ksqldb stream in the following way:
+Create a ksqlDB **stream** in the following way:
 
 #!csharp
 
@@ -98,11 +205,12 @@ responseMessage = await restApiClient
 
 #!markdown
 
-# Create a query
+### Create a context
 
-**KSqlDBContext**'s primary responsibilities are to interact with your ksqldb with LINQ queries which are converted to KSQL, materializing raw data into your POCOs and persisting data into streams or tables.
-`CreateQueryStream<TEnity>` is the entry point for composing LINQ queries.
-Lets create a ksqldb context by providing it an url:
+**KSqlDBContext**'s primary responsibilities are to interact with your ksqlDB by executing LINQ queries which are converted to KSQL, materializing raw data into your POCOs and persisting data into streams or tables.
+`CreateQueryStream<TEntity>` is the entry point for composing LINQ queries.
+
+We can start by creating a ksqlDB context providing it an URL as a constructor argument:
 
 #!csharp
 
@@ -112,6 +220,24 @@ var context = new KSqlDBContext(ksqlDbUrl);
 
 #!markdown
 
+You can also insert some values with the help of the ksqlDB context:
+
+#!csharp
+
+var tweet3 = new Tweet { Id = 3, Message = "Hello world" };
+
+context.Add(tweet3);
+
+var tweet4 = new Tweet { Id = 4, Message = "Message 4" };
+
+context.Add(tweet4);
+
+var saveResponse = await context.SaveChangesAsync();
+
+#!markdown
+
+### Create a query
+ 
 Now you can subscribe to the underlying stream of events created in the previous step. The following compile time safe query filters the messages server side based on the provided predicate. In our contrived example the messages cannot be equal to `Hello world` or the Id must be equal to 1. 
 
 `WithOffsetResetPolicy` is used to receive messages from the beginning of the log.
@@ -132,11 +258,13 @@ using System.Threading;
 
 var semaphoreSlim = new SemaphoreSlim(0, 1);
 
-var subscription = context.CreateQueryStream<Tweet>()
+var ksqldbQuery = context.CreateQueryStream<Tweet>()
   .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
   .Where(p => p.Message != "Hello world" || p.Id == 1)
   .Select(l => new { l.Message, l.Id })
-  .Take(2)
+  .Take(2);
+
+var subscription = ksqldbQuery
   .Subscribe(onNext: tweetMessage =>
   {
     Console.WriteLine($"{nameof(Tweet)}: {tweetMessage.Id} - {tweetMessage.Message}");
@@ -158,19 +286,215 @@ var subscription = context.CreateQueryStream<Tweet>()
 
 #!markdown
 
-You can also insert some values with the help of the ksqldb context:
+The above code is probably familiar to you. You are used to use the same syntax with LINQ to objects, Rx.NET or Entity Framework Core, so you don't have to learn a completely new API or you can start from here and continue learning the previously mentioned frameworks since there is an overlap, and some could say even symmetry among them.
+
+For example you can use the same query language for data spread in space (SSD, HDD) and data spread in time (PubSub). The data is at the end obviously spread in space-time. We are looking here for a reasonable analogy. We usually refer to data in motion (flight) that is being transported from one system into another. This data in transit could be fetched from an already known source of values stored in a database (replicating the past) or it could be a subscription to newly arising events in case of Event sourcing, etc.     
+
+#!markdown
+
+Let's contrast this symmetry with an iterator pattern example. The following example is a pull query from data stored in memory:
 
 #!csharp
 
-var tweet3 = new Tweet { Id = 3, Message = "Hello world" };
+var tweets = new List<Tweet> {
+    new() { Id = 1, Message = "The answer is 42" },
+    new() { Id = 2, Message = "ksqlDB rulez!" },
+    new() { Id = 3, Message = "Hello world" }
+};
 
-context.Add(tweet3);
+var tweetsQuery = tweets.Where(p => p.Message != "Hello world" || p.Id == 1)
+.Select(l => new { l.Message, l.Id })
+.Take(2);
 
-var tweet4 = new Tweet { Id = 4, Message = "Message 4" };
+try {
+    foreach(var tweetMessage in tweetsQuery) {
+        Console.WriteLine($"{nameof(Tweet)}: {tweetMessage.Id} - {tweetMessage.Message}");
+    }
 
-context.Add(tweet4);
+    Console.WriteLine("Completed");
+} catch(Exception error) {
+    Console.WriteLine($"Exception: {error.Message}"); 
+}
 
-var saveResponse = await context.SaveChangesAsync();
+#!markdown
+
+To demonstrate the symmetry between `IEnumerable<T>` and `IQbservable<T>` let's rewrite the previous `Subscribe` method into an asynchronous foreach statement. In this case the underlying abstraction is called `IAsyncEnumerable<T>`. In order to show the IAsyncEnumerable interface we are calling `ToAsyncEnumerable` to move from one monad into another. After this step we have to convert an anonymous type into a value tuple. We should achieve the same by leveraging the DLR (Dynamic Language Runtime) with the help of the dynamic keyword:
+
+#!csharp
+
+IAsyncEnumerable<(int Id, string Message)> asyncEnumerableTweets = ksqldbQuery.ToAsyncEnumerable().Select(c => (c.Id, c.Message));
+
+IAsyncEnumerable<dynamic> asyncEnumerableDynamicTweets = ksqldbQuery.ToAsyncEnumerable();
+
+await foreach (var consumeResult in asyncEnumerableTweets)
+{
+  Console.WriteLine(consumeResult.Message);
+}
+
+#!markdown
+
+`IQbservable<T>` `ksqldbQuery` was evaluated lazily. It hasn't executed until we called it in the foreach statement. 
+
+The following table depicts different .NET types used in synchronous and asynchronous programming, where T is a value or reference type (eg int, string, etc.), to even further expand our knowledge. 
+
+#!markdown
+
+|       | Zero or One value   |      Zero or Many values                   |
+|-------|:-------------------:|:------------------------------------------:|
+| sync  |        T            | `IEnumerable<T>`                           |
+| async |   `Task<T>`         | `IAsyncEnumerable<T>` and `IObservable<T>` |
+
+#!markdown
+
+### Code as data
+
+To further extend our knowledge base, the in memory representations of the previous abstractions have symmetrical solutions for remote locations (over the wire). In C# these are presented as ASTs (Abstract Syntax Trees). This is a great C# feature and provides us the option to treat our code as data. We usually don't need to be aware of this, because the expression visitor that traverses and translates the AST is hidden from us inside a .NET package like EF Core or ksqlDB.RestApi.Client. 
+
+#!markdown
+
+|       |         CLR        |        AST       |
+|-------|:------------------:|:----------------:|
+| pull  |  `IEnumerable<T>`  |  `IQueryable<T>` |
+| push  |  `IObservable<T>`  | `IQbservable<T>` |
+
+#!markdown
+
+Let's discuss the observer pattern this time. The not immediately obvious difference between IObservable and strangely named IQbservable is that the latter uses Expressions as arguments in its extension methods instead of `Func`s. 
+
+The `Where` extension method expects a predicate that is used to filter the messages:
+
+#!csharp
+
+using System.Reactive.Linq;
+
+IObservable<Tweet> observable = tweets.ToObservable();
+
+Func<Tweet, bool> predicate = tweet => tweet.Id == 1;
+
+observable = observable.Where(predicate);
+
+#!csharp
+
+using KSqlLinq = ksqlDB.RestApi.Client.KSql.Linq;
+using System.Linq.Expressions;
+
+Expression<Func<Tweet, bool>> expression = tweet => tweet.Id == 1;
+
+KSqlLinq.IQbservable<Tweet> qbservable = context.CreateQueryStream<Tweet>();
+
+#!markdown
+
+Now we can subscribe to these observables with the `Subscribe` method. There are two options how to provide the required paramters to this method. At the beginning we used lambda expressions, this time we are going to create an observer:
+
+#!csharp
+
+using System.Threading;
+
+public class TweetsObserver : System.IObserver<Tweet>
+{
+  public void OnNext(Tweet tweetMessage)
+  {
+    Console.WriteLine($"Observed on thread id: {Thread.CurrentThread.ManagedThreadId}");
+
+    Console.WriteLine($"{nameof(Tweet)}: {tweetMessage.Id} - {tweetMessage.Message}");
+  }
+
+  public void OnError(Exception error)
+  {
+    Console.WriteLine($"{nameof(Tweet)}: {error.Message}");
+  }
+
+  public void OnCompleted()
+  {
+    Console.WriteLine($"{nameof(Tweet)}: completed successfully");
+  }
+}
+
+TweetsObserver observer = new();
+
+#!markdown
+
+The first subscription will filter the messages client side and the ksql version will do the same server side:
+
+#!csharp
+
+IDisposable subscription = observable.Subscribe(observer);
+
+#!markdown
+
+The next interesting endeavour is to declaratively tell the query WHERE to observe the events, such as on the UI or background thread. In case of `IQbservable` queries you can add the same `IScheduler`s from Rx.NET to the query pipeline with `ObserveOn`:
+
+#!csharp
+
+using System.Reactive.Concurrency;
+
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
+IScheduler scheduler = TaskPoolScheduler.Default;
+
+Console.WriteLine($"Calling from Thread id {Thread.CurrentThread.ManagedThreadId}");
+
+IDisposable ksqlDbSubscription = qbservable
+    .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
+    .Take(2)
+    .ObserveOn(syncContextScheduler)
+    .Subscribe(observer);
+
+await Task.Delay(TimeSpan.FromSeconds(5));
+
+Console.WriteLine("done");
+
+#!markdown
+
+As you've just seen these basic building blocks can make you really productive during your daily programming tasks.
+
+#!markdown
+
+To mimic a database call in our example we can convert the previously created list (`IEnumerable<T>`) into an `IQueryable<T>` with the `AsQueryable` extension method:
+
+#!csharp
+
+IQueryable<Tweet> queryableTweets = tweets.AsQueryable();
+
+var queryable = queryableTweets
+  .Where(p => p.Message != "Hello world" || p.Id == 1)
+  .Select(l => new { l.Message, l.Id })
+  .Take(2);
+
+foreach (var consumeResult in queryable)
+{
+  Console.WriteLine(consumeResult.Message);
+}
+
+#!markdown
+
+If you would use Entity Framework's `DbContext` the underlying `IQueryProvider` would execute the bellow SQL command in SQL Server:
+
+#!sql
+
+SELECT Message, Id
+  FROM Tweets
+ WHERE Message != 'Hello world' OR Id = 1
+ LIMIT 2;
+
+#!markdown
+
+**KsqlDbContext** from **ksqlDB.RestApi.Client** package translates the same LINQ query in the following manner. The noticeable difference is the `EMIT CHANGES` clause:
+
+#!sql
+
+SELECT Message, Id
+  FROM Tweets
+ WHERE Message != 'Hello world' OR Id = 1
+  EMIT CHANGES
+ LIMIT 2;
+
+#!markdown
+
+The `EMIT CHANGES` clause instructs the ksqldb query engine that the requested query is a **push query**.
 
 #!markdown
 
@@ -184,8 +508,14 @@ await context.DisposeAsync();
 
 #!markdown
 
-Stop the containers:
+Stop the containers with the following command in PowerShell:
 
 #!pwsh
 
 docker-compose down
+
+#!markdown
+
+### Summary
+
+Congratulations! You've just successfully completed this exercise.
