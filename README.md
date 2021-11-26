@@ -3289,6 +3289,9 @@ private static async Task AddAndSaveChangesAsync(IKSqlDBContext context)
 ```   
 
 # ksqldb.RestApi.Client v1.3.1
+
+### InsertProperties IncludeReadOnlyProperties
+
 - Inserts - include readonly properties configuration
 
 The initial convention is that all writeable public instance properties and fields are taken into account during the Insert into statement generation.
@@ -3317,9 +3320,6 @@ context.Add(model, properties);
 
 var responseMessage = await context.SaveChangesAsync();
 ```
-
-### InsertProperties IncludeReadOnlyProperties
-- include readonly properties in Inserts config
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
