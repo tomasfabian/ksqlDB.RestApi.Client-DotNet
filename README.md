@@ -116,6 +116,15 @@ var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
   .InsertIntoAsync(new Tweet { Id = 2, Message = "ksqlDB rulez!" });
 ```
 
+or with KSqlDbContext:
+
+```C#
+context.Add(new Tweet { Id = 1, Message = "Hello world" });
+context.Add(new Tweet { Id = 2, Message = "ksqlDB rulez!" });
+
+var saveChangesResponse = await context.SaveChangesAsync();
+```
+
 Sample project can be found under [Samples](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.Sample) solution folder in ksqlDB.RestApi.Client.sln 
 
 
@@ -3273,18 +3282,40 @@ With IKSqlDBContext.Add and IKSqlDBContext.SaveChangesAsync you can add multiple
 private static async Task AddAndSaveChangesAsync(IKSqlDBContext context)
 {
   context.Add(new Movie { Id = 1 });
-  context.Add(new Movie { Id = 1 });
+  context.Add(new Movie { Id = 2 });
 
   var saveResponse = await context.SaveChangesAsync();
 }
 ```   
 
 # ksqldb.RestApi.Client v1.3.1
+- Inserts - include readonly properties configuration
+
+The initial convention is that all writeable public instance properties and fields are taken into account during the Insert into statement generation.
+
+```C#
+public record Foo
+{
+  public Foo(string name)
+  {
+    Name = name;
+  }
+
+  public string Name { get; }
+  public int Count { get; set; }
+}
+```
+
 ```C#
 var insertProperties = new InsertProperties
                        {
                          IncludeReadOnlyProperties = true
                        };
+
+await using KSqlDBContext context = new KSqlDBContext(@"http:\\localhost:8088");
+context.Add(model, properties);
+
+var responseMessage = await context.SaveChangesAsync();
 ```
 
 ### InsertProperties IncludeReadOnlyProperties
