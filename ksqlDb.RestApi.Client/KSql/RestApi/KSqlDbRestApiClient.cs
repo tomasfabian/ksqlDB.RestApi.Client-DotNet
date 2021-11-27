@@ -238,7 +238,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
     /// <param name="typeName">Optional name of the type. Otherwise the type name is inferred from the generic type name.</param>
     /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns>Http response object.</returns>
-    public Task<HttpResponseMessage> CreateTypeAsync<T>(string typeName = null, CancellationToken cancellationToken = default)
+    public Task<HttpResponseMessage> CreateTypeAsync<T>(string typeName, CancellationToken cancellationToken = default)
     {
       var ksql = new TypeGenerator().Print<T>();
 
