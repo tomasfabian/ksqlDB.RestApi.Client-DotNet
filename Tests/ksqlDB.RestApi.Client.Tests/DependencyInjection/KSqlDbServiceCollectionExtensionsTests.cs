@@ -161,6 +161,55 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
       options.Should().NotBeNull();
       options.Url.Should().Be(Helpers.TestParameters.KsqlDBUrl);
     }
+
+    #region AddDbContext
+
+    [TestMethod]
+    public void AddDbContext_RegisterAsInterface()
+    {
+      //Arrange
+      ClassUnderTest.AddDbContext<KSqlDBContext, IKSqlDBContext>(options => options.UseKSqlDb(TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
+
+      //Act
+      var context = ClassUnderTest.BuildServiceProvider().GetRequiredService<IKSqlDBContext>();
+
+      //Assert
+      context.Should().NotBeNull();
+    }
+    
+    [TestMethod]
+    public void AddDbContext_DefaultScoped()
+    {
+      //Arrange
+      ClassUnderTest.AddDbContext<KSqlDBContext>(options => options.UseKSqlDb(TestParameters.KsqlDBUrl));
+
+      //Act
+      var descriptor = ClassUnderTest.TryGetRegistration<KSqlDBContext>();
+
+      //Assert
+      descriptor.Should().NotBeNull();
+      descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
+    }
+    
+    [TestMethod]
+    public void AddDbContext_TransientScope()
+    {
+      //Arrange
+      ClassUnderTest.AddDbContext<KSqlDBContext>(options => options.UseKSqlDb(TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
+
+      //Act
+      var context = ClassUnderTest.BuildServiceProvider().GetRequiredService<KSqlDBContext>();
+
+      //Assert
+      context.Should().NotBeNull();
+
+      var descriptor = ClassUnderTest.TryGetRegistration<KSqlDBContext>();
+
+      descriptor.Should().NotBeNull();
+      descriptor.Lifetime.Should().Be(ServiceLifetime.Transient);
+    }
+    
+    #endregion
     
     #region ContextFactory
 
