@@ -9,24 +9,46 @@ namespace ksqlDb.RestApi.Client.DependencyInjection
 {
   public static class KSqlDbServiceCollectionExtensions
   {
-    public static void ConfigureKSqlDb(this IServiceCollection services, 
+    /// <summary>
+    /// Registers the given ksqldb context factory as a service in the <see cref="IServiceCollection" />.
+    /// </summary>
+    public static IServiceCollection AddDbContextFactory<TContext>(this IServiceCollection services, ServiceLifetime factoryLifetime)
+      where TContext : IKSqlDBContext
+    {
+      var contextFactoryDescriptor = new ServiceDescriptor(
+        typeof(IKSqlDBContextFactory<TContext>),
+        typeof(KSqlDBContextFactory<TContext>),
+        factoryLifetime);
+      
+      services.Add(contextFactoryDescriptor);
+
+      return services;
+    }
+
+    public static IServiceCollection ConfigureKSqlDb(this IServiceCollection services,
       string ksqlDbUrl,
       Action<ISetupParameters> setupAction = null,
       ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
     {
-      var builder = new KSqlDbContextOptionsBuilder();
+      return services.ConfigureKSqlDb<KSqlDBContext, IKSqlDBContext>(ksqlDbUrl, setupAction, contextLifetime);
+    }
 
-      var setupParameters = builder.UseKSqlDb(ksqlDbUrl);
-
-      setupAction?.Invoke(setupParameters);
-
-      var contextOptions = setupParameters.Options;
+    /// <summary>
+    /// Registers the given ksqldb context and its dependencies as services in the <see cref="IServiceCollection" />.
+    /// </summary>
+    internal static IServiceCollection ConfigureKSqlDb<TFromContext, TToContext>(this IServiceCollection services,
+      KSqlDbContextOptionsBuilder builder,
+      ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
+      where TFromContext : IKSqlDBContext
+      where TToContext : IKSqlDBContext
+    {
+      var contextOptions = builder.InternalOptions;
 
       services.AddSingleton(contextOptions);
 
       var contextDescriptor = new ServiceDescriptor(
-        typeof(IKSqlDBContext),
-        typeof(KSqlDBContext),
+        typeof(TToContext),
+        typeof(TFromContext),
         contextLifetime);
 
       services.Add(contextDescriptor);
@@ -35,6 +57,27 @@ namespace ksqlDb.RestApi.Client.DependencyInjection
 
       services.AddSingleton<IHttpClientFactory, HttpClientFactory>(_ => new HttpClientFactory(uri));
       services.AddScoped<IKSqlDbRestApiClient, KSqlDbRestApiClient>();
+
+      return services;
+    }
+
+    /// <summary>
+    /// Registers the given ksqldb context and its dependencies as services in the <see cref="IServiceCollection" />.
+    /// </summary>
+    public static IServiceCollection ConfigureKSqlDb<TFromContext, TToContext>(this IServiceCollection services, 
+      string ksqlDbUrl,
+      Action<ISetupParameters> setupAction = null,
+      ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
+      where TFromContext : IKSqlDBContext
+      where TToContext : IKSqlDBContext
+    {
+      var builder = new KSqlDbContextOptionsBuilder();
+
+      var setupParameters = builder.UseKSqlDb(ksqlDbUrl);
+
+      setupAction?.Invoke(setupParameters);
+
+      return services.ConfigureKSqlDb<TFromContext, TToContext>(builder, contextLifetime);
     }
   }
 }
