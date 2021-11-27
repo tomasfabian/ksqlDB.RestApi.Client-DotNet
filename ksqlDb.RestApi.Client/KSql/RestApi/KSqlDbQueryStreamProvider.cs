@@ -50,13 +50,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
       }      
       else if (IsErrorRow(rawJson))//{"@type":"generic_error"
       {
-        var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(rawJson);
-
-        if (errorResponse != null)
-          throw new KSqlQueryException(errorResponse.Message)
-          {
-            ErrorCode = errorResponse.ErrorCode
-          };
+        OnError<T>(rawJson);
       }
       else
       {
@@ -66,6 +60,17 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
       }
 
       return default;
+    }
+
+    private static void OnError<T>(string rawJson)
+    {
+      var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(rawJson);
+
+      if (errorResponse != null)
+        throw new KSqlQueryException(errorResponse.Message)
+              {
+                ErrorCode = errorResponse.ErrorCode
+              };
     }
 
     protected override HttpRequestMessage CreateQueryHttpRequestMessage(HttpClient httpClient, object parameters)
@@ -89,6 +94,11 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
         var queryStreamHeader = JsonSerializer.Deserialize<QueryStreamHeader>(rawJson);
 
         return queryStreamHeader?.QueryId;
+      }
+      
+      if (IsErrorRow(rawJson))//{"@type":"generic_error"
+      {
+        OnError<T>(rawJson);
       }
 
       return null;

@@ -41,14 +41,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Query
 
       if (IsErrorRow(rawJson))
       {
-        var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(rawJson);
-
-        if (errorResponse != null)
-          throw new KSqlQueryException(errorResponse.Message)
-          {
-            Statement = errorResponse.StatementText,
-            ErrorCode = errorResponse.ErrorCode
-          };
+        OnError<T>(rawJson);
       }
 
       if (rawJson.StartsWith("{\"header\""))
@@ -58,6 +51,18 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Query
         return CreateRowValue<T>(rawJson);
 
       return default;
+    }
+
+    private static void OnError<T>(string rawJson)
+    {
+      var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(rawJson);
+
+      if (errorResponse != null)
+        throw new KSqlQueryException(errorResponse.Message)
+              {
+                Statement = errorResponse.StatementText,
+                ErrorCode = errorResponse.ErrorCode
+              };
     }
 
     private RowValue<T> CreateRowValue<T>(string rawJson)
@@ -91,6 +96,9 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Query
 
         return headerResponse?.Header.QueryId;
       }
+
+      if (IsErrorRow(rawJson))
+        OnError<T>(rawJson);
 
       return null;
     }
