@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
+using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDb.RestApi.Client.DependencyInjection;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Config;
@@ -159,5 +161,70 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
       options.Should().NotBeNull();
       options.Url.Should().Be(Helpers.TestParameters.KsqlDBUrl);
     }
+    
+    #region ContextFactory
+
+    [TestMethod]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void AddDbContextFactory_DbContextWasNotRegistered_Throws()
+    {
+      //Arrange
+      ClassUnderTest.AddDbContextFactory<IKSqlDBContext>(factoryLifetime: ServiceLifetime.Scoped);
+
+      //Act
+      var context = ClassUnderTest.BuildServiceProvider().GetRequiredService<IKSqlDBContext>();
+
+      //Assert
+      context.Should().NotBeNull();
+    }
+
+    [TestMethod]
+    public void AddDbContextFactory_BuildServiceProviderAndResolve()
+    {
+      //Arrange
+      ClassUnderTest.AddDbContext<KSqlDBContext, IKSqlDBContext>(options => options.UseKSqlDb(Helpers.TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
+      ClassUnderTest.AddDbContextFactory<IKSqlDBContext>(factoryLifetime: ServiceLifetime.Scoped);
+
+      //Act
+      var contextFactory = ClassUnderTest.BuildServiceProvider().GetRequiredService<IKSqlDBContextFactory<IKSqlDBContext>>();
+
+      //Assert
+      contextFactory.Should().NotBeNull();
+    }
+
+    [TestMethod]
+    public void ContextFactory_Create()
+    {
+      //Arrange
+      ClassUnderTest.AddDbContext<KSqlDBContext, IKSqlDBContext>(options => options.UseKSqlDb(Helpers.TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
+      ClassUnderTest.AddDbContextFactory<IKSqlDBContext>(factoryLifetime: ServiceLifetime.Scoped);
+
+      var contextFactory = ClassUnderTest.BuildServiceProvider().GetRequiredService<IKSqlDBContextFactory<IKSqlDBContext>>();
+
+      //Act
+      var context1 = contextFactory.Create();
+      var context2 = contextFactory.Create();
+
+      //Assert
+      context1.Should().NotBeNull();
+      context1.Should().NotBeSameAs(context2);
+    }
+
+    [TestMethod]
+    public void AddDbContextFactory_Scope()
+    {
+      //Arrange
+      ClassUnderTest.AddDbContext<KSqlDBContext>(options => options.UseKSqlDb(Helpers.TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
+      ClassUnderTest.AddDbContextFactory<KSqlDBContext>(factoryLifetime: ServiceLifetime.Scoped);
+
+      //Act
+      var descriptor = ClassUnderTest.TryGetRegistration<IKSqlDBContextFactory<KSqlDBContext>>();
+
+      //Assert
+      descriptor.Should().NotBeNull();
+      descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
+    }
+
+    #endregion
   }
 }
