@@ -25,6 +25,36 @@ namespace ksqlDb.RestApi.Client.DependencyInjection
       return services;
     }
 
+    /// <summary>
+    /// Registers the given ksqldb context as a service in the <see cref="IServiceCollection" />.
+    /// </summary>
+    public static IServiceCollection AddDbContext<TContext>(this IServiceCollection services,
+      Action<KSqlDbContextOptionsBuilder> optionsAction, ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
+      where TContext : IKSqlDBContext
+    {
+      if (optionsAction == null) throw new ArgumentNullException(nameof(optionsAction));
+
+      return services.AddDbContext<TContext, TContext>(optionsAction, contextLifetime);
+    }
+    
+    /// <summary>
+    /// Registers the given ksqldb context as a service in the <see cref="IServiceCollection" />.
+    /// </summary>
+    public static IServiceCollection AddDbContext<TFromContext, TToContext>(this IServiceCollection services, Action<KSqlDbContextOptionsBuilder> optionsAction, ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
+      where TFromContext : IKSqlDBContext
+      where TToContext : IKSqlDBContext
+    {
+      if (optionsAction == null) throw new ArgumentNullException(nameof(optionsAction));
+
+      var builder = new KSqlDbContextOptionsBuilder();
+
+      optionsAction(builder);
+
+      services.ConfigureKSqlDb<TFromContext, TToContext>(builder, contextLifetime);
+
+      return services;
+    }
+
     public static IServiceCollection ConfigureKSqlDb(this IServiceCollection services,
       string ksqlDbUrl,
       Action<ISetupParameters> setupAction = null,
