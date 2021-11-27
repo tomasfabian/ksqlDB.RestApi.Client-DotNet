@@ -224,6 +224,20 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
     /// <param name="typeName">Optional name of the type. Otherwise the type name is inferred from the generic type name.</param>
     /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns>Http response object.</returns>
+    public Task<HttpResponseMessage> CreateTypeAsync<T>(CancellationToken cancellationToken = default)
+    {
+      return ExecuteAsync<T>(null, cancellationToken);
+    }
+
+    /// <summary>
+    /// Create an alias for a complex type declaration.
+    /// The CREATE TYPE statement registers a type alias directly in KSQL. Any types registered by using this command can be leveraged in future statements. The CREATE TYPE statement works in interactive and headless modes.
+    /// Any attempt to register the same type twice, without a corresponding DROP TYPE statement, will fail.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="typeName">Optional name of the type. Otherwise the type name is inferred from the generic type name.</param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+    /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> CreateTypeAsync<T>(string typeName = null, CancellationToken cancellationToken = default)
     {
       var ksql = new TypeGenerator().Print<T>();
