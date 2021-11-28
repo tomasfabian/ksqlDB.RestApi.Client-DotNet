@@ -1,5 +1,23 @@
 ﻿# ksqlDB.RestApi.Client
 
+# v1.4.0-rc.1
+## IKSqlDBContextFactory
+A factory for creating derived KSqlDBContext instances.
+
+## KSqlDbServiceCollectionExtensions.AddDbContext
+Registers the given ksqldb context as a service in the IServiceCollection
+
+## KSqlDbServiceCollectionExtensions.AddDbContextFactory
+Registers the given ksqldb context factory as a service in the IServiceCollection
+
+## KSqlDbRestApiClient
+- CreateTypeAsync - added overload without type name argument
+- CreateSourceStreamAsync - creates a read-only stream
+- CreateSourceTableAsync - creates a read-only table
+
+Bug fix:
+- SubscribeAsync - error propagation fix
+
 # v1.3.1
 ### InsertProperties IncludeReadOnlyProperties
 - #12 include readonly properties in Inserts config

@@ -152,7 +152,9 @@ run in command line:
 
 # CDC - Push notifications from Sql Server tables with Kafka
 Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with SqlServer.Connector package together with the Debezium connector streaming platform. 
-⚠ Package had to be renamed to SqlServer.Connector
+
+⚠ The package had to be renamed to SqlServer.Connector
+
 ### Nuget
 ```
 Install-Package SqlServer.Connector -Version 0.3.0
@@ -3324,6 +3326,78 @@ var model = new Foo("Bar") {
 context.Add(model, insertProperties);
 
 var responseMessage = await context.SaveChangesAsync();
+```
+
+# v1.4.0-rc.1
+## KSqlDbServiceCollectionExtensions - AddDbContext and AddDbContextFactory
+
+- AddDbContext - Registers the given ksqldb context as a service in the IServiceCollection
+- AddDbContextFactory - Registers the given ksqldb context factory as a service in the IServiceCollection
+
+```C#
+using ksqlDB.Api.Client.Samples;
+using ksqlDB.Api.Client.Samples.Models.Movies;
+using ksqlDb.RestApi.Client.DependencyInjection;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+```
+
+```C#
+var serviceCollection = new ServiceCollection();
+
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+serviceCollection.AddDbContext<ApplicationKSqlDbContext, IApplicationKSqlDbContext>(options =>
+  options.UseKSqlDb(ksqlDbUrl), ServiceLifetime.Transient);
+
+serviceCollection.AddDbContextFactory<IApplicationKSqlDbContext>(factoryLifetime: ServiceLifetime.Scoped);
+```
+
+```C#
+internal class ApplicationKSqlDbContext : KSqlDBContext, Program.IApplicationKSqlDbContext
+{
+  public ApplicationKSqlDbContext(string ksqlDbUrl, ILoggerFactory loggerFactory = null)
+    : base(ksqlDbUrl, loggerFactory)
+  {
+  }
+
+  public ApplicationKSqlDbContext(KSqlDBContextOptions contextOptions, ILoggerFactory loggerFactory = null)
+    : base(contextOptions, loggerFactory)
+  {
+  }
+
+  public ksqlDB.RestApi.Client.KSql.Linq.IQbservable<Movie> Movies => CreateQueryStream<Movie>();
+}
+
+public interface IApplicationKSqlDbContext : IKSqlDBContext
+{
+  ksqlDB.RestApi.Client.KSql.Linq.IQbservable<Movie> Movies { get; }
+}
+```
+
+### IKSqlDBContextFactory
+A factory for creating derived KSqlDBContext instances.
+
+```C#
+var contextFactory = serviceCollection.BuildServiceProvider().GetRequiredService<IKSqlDBContextFactory<IKSqlDBContext>>();
+
+var context = contextFactory.Create();
+```
+
+## IKSqlDbRestApiClient CreateSourceStreamAsync and CreateSourceTableAsync
+- CreateSourceStreamAsync - creates a read-only stream
+- CreateSourceTableAsync - creates a read-only table
+
+```C#
+string entityName = nameof(IoTSensor;
+
+var metadata = new EntityCreationMetadata(entityName, 1)
+               {
+                 EntityName = entityName
+               };
+
+var httpResponseMessage = await restApiClient.CreateSourceTableAsync<IoTSensor>(metadata, ifNotExists: true);
 ```
 
 # LinqPad samples
