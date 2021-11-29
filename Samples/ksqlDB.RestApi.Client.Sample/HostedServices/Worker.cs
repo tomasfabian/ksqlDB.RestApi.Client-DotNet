@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ksqlDB.Api.Client.Samples.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
@@ -13,12 +12,14 @@ namespace ksqlDB.Api.Client.Samples.HostedServices
 {
   public class Worker : IHostedService, IDisposable
   {
+    private readonly IKSqlDBContextFactory<Program.IApplicationKSqlDbContext> contextFactory;
     private readonly IKSqlDBContext context;
     private readonly IKSqlDbRestApiClient restApiClient;
     private readonly ILogger logger;
 
-    public Worker(IKSqlDBContext context, IKSqlDbRestApiClient restApiClient, ILoggerFactory loggerFactory)
+    public Worker(IKSqlDBContextFactory<Program.IApplicationKSqlDbContext> contextFactory, Program.IApplicationKSqlDbContext context, IKSqlDbRestApiClient restApiClient, ILoggerFactory loggerFactory)
     {
+      this.contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
       this.context = context ?? throw new ArgumentNullException(nameof(context));
       this.restApiClient = restApiClient ?? throw new ArgumentNullException(nameof(restApiClient));
 
@@ -31,19 +32,29 @@ namespace ksqlDB.Api.Client.Samples.HostedServices
     {
       logger.LogInformation("Starting");
 
-      subscription = await context.CreateQueryStream<Movie>()
-        .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
-        .SubscribeAsync(
-          movie =>
-          {
-          },
-          onError: e =>
-           {
+      var newContext = contextFactory.Create();
 
-           },
-          onCompleted: () => { }, cancellationToken: cancellationToken);
+      try
+      {
+        subscription = await newContext.Movies
+          .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
+          .SubscribeAsync(
+            movie =>
+            {
+            },
+            onError: e =>
+                     {
+
+                     },
+            onCompleted: () => { }, cancellationToken: cancellationToken);
+
+        Console.WriteLine($"Query id {subscription.QueryId}");
+      }
+      catch (Exception e)
+      {
+        Console.WriteLine(e);
+      }
     }
-
 
     public Task StopAsync(CancellationToken cancellationToken)
     {

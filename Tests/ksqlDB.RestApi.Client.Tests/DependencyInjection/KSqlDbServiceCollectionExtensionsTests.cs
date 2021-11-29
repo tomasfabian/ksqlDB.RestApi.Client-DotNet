@@ -168,7 +168,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
     public void AddDbContext_RegisterAsInterface()
     {
       //Arrange
-      ClassUnderTest.AddDbContext<KSqlDBContext, IKSqlDBContext>(options => options.UseKSqlDb(TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
+      ClassUnderTest.AddDbContext<IKSqlDBContext, KSqlDBContext>(options => options.UseKSqlDb(TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
 
       //Act
       var context = ClassUnderTest.BuildServiceProvider().GetRequiredService<IKSqlDBContext>();
@@ -224,6 +224,19 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
       var context = ClassUnderTest.BuildServiceProvider().GetRequiredService<IKSqlDBContext>();
 
       //Assert
+    }
+
+    [TestMethod]
+    public void ConfigureKSqlDb_AddDbContextFactory_DbContextWasRegistered()
+    {
+      //Arrange
+      ClassUnderTest.ConfigureKSqlDb(Helpers.TestParameters.KsqlDBUrl);
+      ClassUnderTest.AddDbContextFactory<IKSqlDBContext>(factoryLifetime: ServiceLifetime.Scoped);
+
+      //Act
+      var context = ClassUnderTest.BuildServiceProvider().GetRequiredService<IKSqlDBContext>();
+
+      //Assert
       context.Should().NotBeNull();
     }
 
@@ -231,7 +244,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
     public void AddDbContextFactory_BuildServiceProviderAndResolve()
     {
       //Arrange
-      ClassUnderTest.AddDbContext<KSqlDBContext, IKSqlDBContext>(options => options.UseKSqlDb(Helpers.TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
+      ClassUnderTest.AddDbContext<IKSqlDBContext, KSqlDBContext>(options => options.UseKSqlDb(Helpers.TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
       ClassUnderTest.AddDbContextFactory<IKSqlDBContext>(factoryLifetime: ServiceLifetime.Scoped);
 
       //Act
@@ -245,7 +258,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
     public void ContextFactory_Create()
     {
       //Arrange
-      ClassUnderTest.AddDbContext<KSqlDBContext, IKSqlDBContext>(options => options.UseKSqlDb(Helpers.TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
+      ClassUnderTest.AddDbContext<IKSqlDBContext, KSqlDBContext>(options => options.UseKSqlDb(Helpers.TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
       ClassUnderTest.AddDbContextFactory<IKSqlDBContext>(factoryLifetime: ServiceLifetime.Scoped);
 
       var contextFactory = ClassUnderTest.BuildServiceProvider().GetRequiredService<IKSqlDBContextFactory<IKSqlDBContext>>();
