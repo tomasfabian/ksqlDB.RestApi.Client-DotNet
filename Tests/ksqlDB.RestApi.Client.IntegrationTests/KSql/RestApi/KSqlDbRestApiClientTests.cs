@@ -473,5 +473,52 @@ Drop type Address;
 
       public int DontFindMe2 { get; }
     }
+    
+    [TestMethod]
+    public async Task CreateSourceStream()
+    {
+      //Arrange
+      string entityName = "Test_Source_Stream";
+
+      var metadata = new EntityCreationMetadata(entityName, 1)
+                     {
+                       EntityName = entityName
+                     };
+
+      //Act
+      var httpResponseMessage = await restApiClient.CreateSourceStreamAsync<Movie>(metadata, ifNotExists: true);
+      var content = await httpResponseMessage.ToStatementResponsesAsync();
+
+      //Assert
+      httpResponseMessage.IsSuccessStatusCode.Should().BeTrue();
+      content[0].CommandStatus?.Status.Should().BeOneOf(default(string), SuccessStatus);
+    }
+
+    record IoTSensor
+    {
+      [Key]
+      public string SensorId { get; set; }
+      public int Value { get; set; }
+    }
+
+    [TestMethod]
+    public async Task CreateSourceTable()
+    {
+      //Arrange
+      string entityName = "Test_Source_Table";
+
+      var metadata = new EntityCreationMetadata(entityName, 1)
+                     {
+                       EntityName = entityName
+                     };
+
+      //Act
+      var httpResponseMessage = await restApiClient.CreateSourceTableAsync<IoTSensor>(metadata, ifNotExists: true);
+      var content = await httpResponseMessage.ToStatementResponsesAsync();
+
+      //Assert
+      httpResponseMessage.IsSuccessStatusCode.Should().BeTrue();
+      content[0].CommandStatus?.Status.Should().BeOneOf(default(string), SuccessStatus);
+    }
   }
 }

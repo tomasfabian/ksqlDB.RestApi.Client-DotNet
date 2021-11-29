@@ -81,6 +81,20 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Generators
     }
 
     [Test]
+    public void CreateSourceTable()
+    {
+      //Arrange
+      var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
+      creationMetadata.IsReadOnly = true;
+
+      //Act
+      string statement = StatementGenerator.CreateTable<CreateEntityTests.MyMovie>(creationMetadata);
+
+      //Assert
+      statement.Should().Be($"CREATE SOURCE TABLE{GetExpectedClauses(isTable: true)}");
+    }
+
+    [Test]
     public void CreateStream()
     {
       //Arrange
@@ -117,6 +131,20 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Generators
 
       //Assert
       statement.Should().Be($"CREATE OR REPLACE STREAM{GetExpectedClauses(isTable: false)}");
+    }
+
+    [Test]
+    public void CreateSourceStream()
+    {
+      //Arrange
+      var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
+      creationMetadata.IsReadOnly = true;
+
+      //Act
+      string statement = StatementGenerator.CreateStream<CreateEntityTests.MyMovie>(creationMetadata);
+
+      //Assert
+      statement.Should().Be($"CREATE SOURCE STREAM{GetExpectedClauses(isTable: false)}");
     }
   }
 }

@@ -94,14 +94,16 @@ WHERE Id < 3 PARTITION BY Id EMIT CHANGES;");
     }
 
     private const string TableName = "IntegrationTestTable";
-    private const string EntityName = "MOVIES_TEST";
+    private const string EntityName = "movies_test112";
 
     [TestMethod]
     public async Task CreateOrReplaceTableStatement_ExecuteStatementAsync_ResponseWasReceived()
     {
       //Arrange
       var restApiClient = KSqlDbRestApiProvider.Create();
-      
+
+      await restApiClient.CreateStreamAsync<Movie>(new EntityCreationMetadata(EntityName, 1) { EntityName = EntityName, ShouldPluralizeEntityName = false });
+
       var statement = new KSqlDbStatement(StatementTemplates.DropTable(TableName));
       var response = await restApiClient.ExecuteStatementAsync(statement);
 
