@@ -777,6 +777,8 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
       //OR
       //httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MovieNullableFields>(metadata);
 
+      httpResponseMessage = await restApiClient.CreateSourceStreamAsync<MovieNullableFields>(metadata, ifNotExists: true);
+
       string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
     }
 
@@ -941,6 +943,26 @@ Drop table {nameof(Event)};
       await CreateHostBuilder(args).RunConsoleAsync();
     }
 
+    internal class ApplicationKSqlDbContext : KSqlDBContext, IApplicationKSqlDbContext
+    {
+      public ApplicationKSqlDbContext(string ksqlDbUrl, ILoggerFactory loggerFactory = null) 
+        : base(ksqlDbUrl, loggerFactory)
+      {
+      }
+
+      public ApplicationKSqlDbContext(KSqlDBContextOptions contextOptions, ILoggerFactory loggerFactory = null) 
+        : base(contextOptions, loggerFactory)
+      {
+      }
+
+      public RestApi.Client.KSql.Linq.IQbservable<Movie> Movies => CreateQueryStream<Movie>();
+    }
+
+    public interface IApplicationKSqlDbContext : IKSqlDBContext
+    {
+      RestApi.Client.KSql.Linq.IQbservable<Movie> Movies { get; }
+    }
+
     public static IHostBuilder CreateHostBuilder(string[] args) =>
       Host.CreateDefaultBuilder(args)
         .ConfigureLogging((hostingContext, logging) =>
@@ -952,10 +974,16 @@ Drop table {nameof(Event)};
                            {
                              var ksqlDbUrl = @"http:\\localhost:8088";
 
-                             serviceCollection.ConfigureKSqlDb(ksqlDbUrl, setupParameters =>
-                                                                          {
-                                                                            setupParameters.SetAutoOffsetReset(AutoOffsetReset.Earliest);
-                                                                          });
+                             serviceCollection.AddDbContext<IApplicationKSqlDbContext, ApplicationKSqlDbContext>(
+                               options =>
+                               {
+                                 var setupParameters = options.UseKSqlDb(ksqlDbUrl);
+
+                                 setupParameters.SetAutoOffsetReset(AutoOffsetReset.Earliest);
+
+                               }, ServiceLifetime.Transient);
+
+                             serviceCollection.AddDbContextFactory<IApplicationKSqlDbContext>(factoryLifetime: ServiceLifetime.Scoped);
 
                              serviceCollection.AddHostedService<Worker>();
                            });
