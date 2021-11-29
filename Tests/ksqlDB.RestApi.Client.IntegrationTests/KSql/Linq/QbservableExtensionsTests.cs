@@ -11,6 +11,7 @@ using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
+using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -179,6 +180,40 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
       //Assert
       Assert.AreEqual(expectedItemsCount, actualValues.Count);
       subscription.QueryId.Should().NotBeNullOrEmpty();
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(KSqlQueryException))]
+    public async Task SubscribeAsync_UnknownTopic()
+    {
+      //Arrange
+      var source = Context.CreateQueryStream<Tweet>(StreamName+"xyz");
+
+      //Act
+      var subscription = await source.SubscribeAsync(c => { }, e => { }, () => {});
+
+      //Assert
+      subscription.QueryId.Should().BeNull();
+    }
+
+    [TestMethod]
+    public async Task SubscribeAsync_UnknownTopic_NullQueryId()
+    {
+      //Arrange
+      var source = Context.CreateQueryStream<Tweet>(StreamName+"xyz");
+
+      Subscription subscription = null;
+
+      //Act
+      try
+      {
+        subscription = await source.SubscribeAsync(c => { }, e => { }, () => {});
+      }
+      catch (Exception e)
+      {
+        //Assert
+        subscription?.QueryId.Should().BeNull();
+      }
     }
 
     [TestMethod]
