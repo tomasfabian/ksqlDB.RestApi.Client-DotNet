@@ -151,7 +151,9 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 
       statementContext.EntityName = GetEntityName<T>(metadata);
 
-      stringBuilder.Append($"{creationTypeText} {entityTypeText}");
+      string source = metadata.IsReadOnly ? " SOURCE" : String.Empty;
+
+      stringBuilder.Append($"{creationTypeText}{source} {entityTypeText}");
     }
 
     private string TryAttachKey(KSqlEntityType entityType, MemberInfo memberInfo)

@@ -153,13 +153,15 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
     /// <summary>
     /// Create a new stream with the specified columns and properties.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The type that represents the stream.</typeparam>
     /// <param name="creationMetadata">Stream properties, specify details about your stream by using the WITH clause.</param>
     /// <param name="ifNotExists">If the IF NOT EXISTS clause is present, the statement won't fail if a stream with the same name already exists.</param>
     /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> CreateStreamAsync<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false, CancellationToken cancellationToken = default)
     {
+      if (creationMetadata == null) throw new ArgumentNullException(nameof(creationMetadata));
+
       var ksql = StatementGenerator.CreateStream<T>(creationMetadata, ifNotExists);
 
       return ExecuteAsync<T>(ksql, cancellationToken);
@@ -168,13 +170,34 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
     /// <summary>
     /// Create a new stream or replace an existing one with the specified columns and properties.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The type that represents the stream.</typeparam>
     /// <param name="creationMetadata">Stream properties, specify details about your stream by using the WITH clause.</param>
     /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
     /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> CreateOrReplaceStreamAsync<T>(EntityCreationMetadata creationMetadata, CancellationToken cancellationToken = default)
     {
+      if (creationMetadata == null) throw new ArgumentNullException(nameof(creationMetadata));
+
       var ksql = StatementGenerator.CreateOrReplaceStream<T>(creationMetadata);
+
+      return ExecuteAsync<T>(ksql, cancellationToken);
+    }
+
+    /// <summary>
+    /// Create a new read-only source stream with the specified columns and properties.
+    /// </summary>
+    /// <typeparam name="T">The type that represents the stream.</typeparam>
+    /// <param name="creationMetadata">Stream properties, specify details about your stream by using the WITH clause.</param>
+    /// <param name="ifNotExists">If the IF NOT EXISTS clause is present, the statement won't fail if a stream with the same name already exists.</param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+    /// <returns>Http response object.</returns>
+    public Task<HttpResponseMessage> CreateSourceStreamAsync<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false, CancellationToken cancellationToken = default)
+    {
+      if (creationMetadata == null) throw new ArgumentNullException(nameof(creationMetadata));
+
+      creationMetadata.IsReadOnly = true;
+
+      var ksql = StatementGenerator.CreateStream<T>(creationMetadata, ifNotExists);
 
       return ExecuteAsync<T>(ksql, cancellationToken);
     }
@@ -189,6 +212,27 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
     /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> CreateTableAsync<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false, CancellationToken cancellationToken = default)
     {
+      if (creationMetadata == null) throw new ArgumentNullException(nameof(creationMetadata));
+
+      var ksql = StatementGenerator.CreateTable<T>(creationMetadata, ifNotExists);
+
+      return ExecuteAsync<T>(ksql, cancellationToken);
+    }
+
+    /// <summary>
+    /// Create a new read-only table with the specified columns and properties.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="creationMetadata">Table properties, specify details about your table by using the WITH clause.</param>
+    /// <param name="ifNotExists">If the IF NOT EXISTS clause is present, the statement won't fail if a table with the same name already exists.</param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+    /// <returns>Http response object.</returns>
+    public Task<HttpResponseMessage> CreateSourceTableAsync<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false, CancellationToken cancellationToken = default)
+    {
+      if (creationMetadata == null) throw new ArgumentNullException(nameof(creationMetadata));
+
+      creationMetadata.IsReadOnly = true;
+
       var ksql = StatementGenerator.CreateTable<T>(creationMetadata, ifNotExists);
 
       return ExecuteAsync<T>(ksql, cancellationToken);
@@ -203,6 +247,8 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
     /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> CreateOrReplaceTableAsync<T>(EntityCreationMetadata creationMetadata, CancellationToken cancellationToken = default)
     {
+      if (creationMetadata == null) throw new ArgumentNullException(nameof(creationMetadata));
+
       var ksql = StatementGenerator.CreateOrReplaceTable<T>(creationMetadata);
 
       return ExecuteAsync<T>(ksql, cancellationToken);
