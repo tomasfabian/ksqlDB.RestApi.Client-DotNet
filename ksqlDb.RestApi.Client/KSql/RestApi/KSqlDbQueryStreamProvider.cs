@@ -3,6 +3,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
+using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses;
@@ -14,8 +15,8 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
   {
     private readonly IHttpClientFactory httpClientFactory;
 
-    public KSqlDbQueryStreamProvider(IHttpClientFactory httpClientFactory, ILogger logger = null)
-      : base(httpClientFactory, logger)
+    public KSqlDbQueryStreamProvider(IHttpClientFactory httpClientFactory, KSqlDbProviderOptions options, ILogger logger = null)
+      : base(httpClientFactory, options, logger)
     {
       this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
 

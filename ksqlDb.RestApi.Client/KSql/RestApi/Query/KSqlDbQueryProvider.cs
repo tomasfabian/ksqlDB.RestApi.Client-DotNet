@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.Json;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
+using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parsers;
@@ -13,8 +14,8 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Query
 {
   internal class KSqlDbQueryProvider : KSqlDbProvider
   {
-    public KSqlDbQueryProvider(IHttpClientFactory httpClientFactory, ILogger logger = null)
-      : base(httpClientFactory, logger)
+    public KSqlDbQueryProvider(IHttpClientFactory httpClientFactory, KSqlDbProviderOptions options, ILogger logger = null)
+      : base(httpClientFactory, options, logger)
     {
     }
 

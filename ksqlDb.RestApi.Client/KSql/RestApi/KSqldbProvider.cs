@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using Microsoft.Extensions.Logging;
@@ -17,11 +19,13 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
   internal abstract class KSqlDbProvider : IKSqlDbProvider
   {
     private readonly IHttpClientFactory httpClientFactory;
+    private readonly KSqlDbProviderOptions options;
     private readonly ILogger logger;
 
-    protected KSqlDbProvider(IHttpClientFactory httpClientFactory, ILogger logger = null)
+    protected KSqlDbProvider(IHttpClientFactory httpClientFactory, KSqlDbProviderOptions options, ILogger logger = null)
     {
       this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+      this.options = options ?? throw new ArgumentNullException(nameof(options));
       this.logger = logger;
     }
 
@@ -142,12 +146,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
 
     protected virtual JsonSerializerOptions OnCreateJsonSerializerOptions()
     {
-      jsonSerializerOptions = new JsonSerializerOptions
-      {
-        PropertyNameCaseInsensitive = true
-      };
-
-      return jsonSerializerOptions;
+      return options.JsonSerializerOptions;
     }
 
     protected virtual HttpRequestMessage CreateQueryHttpRequestMessage(HttpClient httpClient, object parameters)

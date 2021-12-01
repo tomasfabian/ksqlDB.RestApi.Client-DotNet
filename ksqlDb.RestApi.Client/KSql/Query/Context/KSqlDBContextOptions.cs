@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Globalization;
+using System.Text.Json;
 using ksqlDB.RestApi.Client.KSql.Config;
+using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context
 {
-  public sealed class KSqlDBContextOptions
+  public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   {
     public KSqlDBContextOptions(string url)
     {
@@ -29,7 +31,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
     public bool ShouldPluralizeFromItemName { get; set; } = true;
 
     public string Url { get; }
-
+    
     public QueryStreamParameters QueryStreamParameters { get; internal set; }
 
     public IKSqlDbParameters QueryParameters { get; internal set; }
@@ -55,6 +57,18 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
 
       QueryStreamParameters[QueryStreamParameters.AutoOffsetResetPropertyName] =
         autoOffsetReset.ToKSqlValue();
+    }
+
+    /// <summary>
+    /// Interception of JsonSerializerOptions.
+    /// </summary>
+    /// <param name="optionsAction">Action to configure the JsonSerializerOptions for the materialization of the incoming values.</param>
+    /// <returns>The original KSqlDb context options builder</returns>
+    public void SetJsonSerializerOptions(Action<JsonSerializerOptions> optionsAction)
+    {
+      JsonSerializerOptions ??= KSqlDbJsonSerializerOptions.CreateInstance();
+
+      optionsAction?.Invoke(JsonSerializerOptions);
     }
 
     internal KSqlDBContextOptions Clone()

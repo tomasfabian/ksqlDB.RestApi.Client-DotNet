@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text.Json;
+using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
@@ -8,7 +10,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context.Options
   {
     public ISetupParameters UseKSqlDb(string url)
     {
-      if(string.IsNullOrEmpty(url))
+      if (string.IsNullOrEmpty(url))
         throw new ArgumentNullException(nameof(url));
 
       Url = url;
@@ -31,6 +33,20 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context.Options
     ISetupParameters ISetupParameters.SetBasicAuthCredentials(string username, string password)
     {
       InternalOptions.SetBasicAuthCredentials(username, password);
+
+      return this;
+    }
+
+    private readonly JsonSerializerOptions jsonSerializerOptions = KSqlDbJsonSerializerOptions.CreateInstance();
+
+    /// <summary>
+    /// Interception of JsonSerializerOptions.
+    /// </summary>
+    /// <param name="optionsAction">Action to configure the JsonSerializerOptions for the materialization of the incoming values.</param>
+    /// <returns>The original KSqlDb context options builder</returns>
+    ISetupParameters ISetupParameters.SetJsonSerializerOptions(Action<JsonSerializerOptions> optionsAction)
+    {
+      optionsAction(jsonSerializerOptions);
 
       return this;
     }
@@ -67,7 +83,13 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context.Options
 
     internal KSqlDBContextOptions InternalOptions
     {
-      get { return contextOptions ??= new KSqlDBContextOptions(Url); }
+      get
+      {
+        return contextOptions ??= new KSqlDBContextOptions(Url)
+        {
+          JsonSerializerOptions = jsonSerializerOptions
+        };
+      }
     }
   }
 }

@@ -5,6 +5,7 @@ using ksqlDb.RestApi.Client.Infrastructure.Logging;
 using ksqlDB.RestApi.Client.KSql.Disposables;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
+using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -74,6 +75,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
         serviceCollection.TryAddSingleton(Logger);
       }
 
+      serviceCollection.AddSingleton<KSqlDbProviderOptions>(contextOptions);
       serviceCollection.AddSingleton(contextOptions);
 
       serviceCollection.TryAddScoped<IKSqlQbservableProvider, QbservableProvider>();
