@@ -1,4 +1,5 @@
-﻿using ksqlDB.RestApi.Client.KSql.Query.Context;
+﻿using System;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
@@ -30,11 +31,13 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators
     
     public static string CreateTable<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false)
     {
+      if (creationMetadata == null) throw new ArgumentNullException(nameof(creationMetadata));
+
       var statementContext = new StatementContext
-      {
-        CreationType = CreationType.Create,
-        KSqlEntityType = KSqlEntityType.Table
-      };
+                             {
+                               CreationType = CreationType.Create,
+                               KSqlEntityType = KSqlEntityType.Table
+                             };
 
       return CreateOrReplace<T>(statementContext, creationMetadata, ifNotExists);
     }

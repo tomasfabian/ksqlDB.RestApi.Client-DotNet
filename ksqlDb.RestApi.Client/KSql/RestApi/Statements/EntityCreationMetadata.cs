@@ -38,5 +38,11 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
     /// </summary>
     [JsonIgnore]
     internal bool IsReadOnly { get; set; }
+
+    /// <summary>
+    /// Include read-only properties during entity generation.
+    /// </summary>
+    [JsonIgnore]
+    public bool IncludeReadOnlyProperties { get; set; }
   }
 }

@@ -272,7 +272,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
     /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> CreateTypeAsync<T>(CancellationToken cancellationToken = default)
     {
-      return ExecuteAsync<T>(null, cancellationToken);
+      return CreateTypeAsync<T>(null, cancellationToken);
     }
 
     /// <summary>
@@ -286,7 +286,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
     /// <returns>Http response object.</returns>
     public Task<HttpResponseMessage> CreateTypeAsync<T>(string typeName, CancellationToken cancellationToken = default)
     {
-      var ksql = new TypeGenerator().Print<T>();
+      var ksql = new TypeGenerator().Print<T>(typeName);
 
       return ExecuteAsync<T>(ksql, cancellationToken);
     }

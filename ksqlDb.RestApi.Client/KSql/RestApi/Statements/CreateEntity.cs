@@ -91,7 +91,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 
       stringBuilder.Append(" (" + Environment.NewLine);
 
-      PrintProperties<T>(statementContext);
+      PrintProperties<T>(statementContext, metadata);
 
       stringBuilder.Append(")");
 
@@ -115,11 +115,11 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       return string.Empty;
     }
 
-    private void PrintProperties<T>(StatementContext statementContext)
+    private void PrintProperties<T>(StatementContext statementContext, EntityCreationMetadata metadata)
     {
       var ksqlProperties = new List<string>();
 
-      foreach (var memberInfo in Members<T>())
+      foreach (var memberInfo in Members<T>(metadata?.IncludeReadOnlyProperties))
       {
         var type = GetMemberType<T>(memberInfo);
 
