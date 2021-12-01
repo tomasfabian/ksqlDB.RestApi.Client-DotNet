@@ -429,6 +429,28 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements
       statement.Should().Be(CreateExpectedStatement("CREATE OR REPLACE TABLE", hasPrimaryKey: true));
     }
 
+    [Test]
+    public void Print_CreateOrReplaceTable_IncludeReadOnlyProperties()
+    {
+      //Arrange
+      var statementContext = new StatementContext
+      {
+        CreationType = CreationType.CreateOrReplace,
+        KSqlEntityType = KSqlEntityType.Table
+      };
+
+      creationMetadata.IncludeReadOnlyProperties = true;
+
+      //Act
+      string statement = new CreateEntity().Print<MyItems>(statementContext, creationMetadata, null);
+
+      //Assert
+      statement.Should().Be(@"CREATE OR REPLACE TABLE MyItems (
+	Id INT PRIMARY KEY,
+	Items ARRAY<INT>
+) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );");
+    }
+
     public abstract record AbstractProducerClass
     {
       [Key]
@@ -529,6 +551,15 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements
       public double Field;
 
       public int DontFindMe { get; }
+
+    }
+
+    internal class MyItems
+    {
+      [Key]
+      public int Id { get; set; }
+
+      public IEnumerable<int> Items { get; } = new List<int>();
     }
   }
 }
