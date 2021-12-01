@@ -15,7 +15,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi
   internal class TestableKSqlDbQueryStreamProvider : KSqlDbQueryStreamProvider
   {
     public TestableKSqlDbQueryStreamProvider(IHttpClientFactory httpClientFactory, ILogger logger = null)
-      : base(httpClientFactory, logger)
+      : base(httpClientFactory, TestKSqlDBContextOptions.Instance, logger)
     {
     }
 

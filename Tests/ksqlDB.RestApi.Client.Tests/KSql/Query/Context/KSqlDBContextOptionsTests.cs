@@ -145,5 +145,17 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Context
       clone.QueryParameters[parameterName].Should().Be(expectedValue);
       clone.QueryStreamParameters[parameterName].Should().Be(expectedValue);
     }
+    
+    [TestMethod]
+    public void JsonSerializerOptions()
+    {
+      //Arrange
+
+      //Act
+      var jsonSerializerOptions = ClassUnderTest.JsonSerializerOptions;
+
+      //Assert
+      jsonSerializerOptions.Should().NotBeNull();
+    }
   }
 }

@@ -20,7 +20,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Context
     public async Task AddAndSaveChangesAsync()
     {
       //Arrange
-      var config = new InsertProperties { EntityName = EntityName };
+      var config = new InsertProperties { EntityName = EntityName, ShouldPluralizeEntityName = false };
       var entity1 = new Movie { Id = 1, Title = "T1" };
       var entity2 = new Movie { Id = 2, Title = "T2" };
 
@@ -29,6 +29,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Context
       Context.Add(entity2, config);
 
       var response = await Context.SaveChangesAsync();
+      var c = await response.Content.ReadAsStringAsync();
 
       //Assert
       response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -40,12 +41,12 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Context
       //Arrange
       var serviceCollection = new ServiceCollection();
 
-      serviceCollection.AddDbContext<KSqlDBContext, IKSqlDBContext>(options => options.UseKSqlDb(KSqlDbRestApiProvider.KsqlDbUrl), ServiceLifetime.Transient);
+      serviceCollection.AddDbContext<IKSqlDBContext, KSqlDBContext>(options => options.UseKSqlDb(KSqlDbRestApiProvider.KsqlDbUrl), ServiceLifetime.Transient);
       serviceCollection.AddDbContextFactory<IKSqlDBContext>(factoryLifetime: ServiceLifetime.Scoped);
 
       var contextFactory = serviceCollection.BuildServiceProvider().GetRequiredService<IKSqlDBContextFactory<IKSqlDBContext>>();
 
-      var config = new InsertProperties { EntityName = EntityName };
+      var config = new InsertProperties { EntityName = EntityName, ShouldPluralizeEntityName = false };
       var entity1 = new Movie { Id = 3, Title = "T3" };
       var entity2 = new Movie { Id = 4, Title = "T4" };
 

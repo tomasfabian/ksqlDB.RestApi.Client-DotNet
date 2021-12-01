@@ -138,6 +138,33 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Context.Options
       options.QueryParameters.Properties[QueryParameters.AutoOffsetResetPropertyName].Should().Be(expectedValue);
       options.QueryStreamParameters[QueryStreamParameters.AutoOffsetResetPropertyName].Should().Be(expectedValue);
     }
+    
+    [TestMethod]
+    public void SetJsonSerializerOptions_DefaultPropertyNameCaseInsensitiveIsTrue()
+    {
+      //Arrange
+      var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl);
+
+      //Act
+      var options = setupParameters.Options;
+
+      //Assert
+      options.JsonSerializerOptions.PropertyNameCaseInsensitive.Should().BeTrue();
+    }
+    
+    [TestMethod]
+    public void SetJsonSerializerOptions()
+    {
+      //Arrange
+      var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl);
+
+      //Act
+      var options = setupParameters
+        .SetJsonSerializerOptions(c => c.PropertyNameCaseInsensitive = false).Options;
+
+      //Assert
+      options.JsonSerializerOptions.PropertyNameCaseInsensitive.Should().BeFalse();
+    }
 
     #region QueryStream
 
