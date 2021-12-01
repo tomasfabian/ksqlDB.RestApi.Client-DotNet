@@ -15,8 +15,15 @@ Registers the given ksqldb context factory as a service in the IServiceCollectio
 - CreateSourceStreamAsync - creates a read-only stream
 - CreateSourceTableAsync - creates a read-only table
 
+## EntityCreationMetadata
+- IncludeReadOnlyProperties - Include read-only properties during entity generation.
+
+## KSqlDbContextOptionsBuilder and KSqlDbContextOptions
+- SetJsonSerializerOptions - a way to configure the JsonSerializerOptions for the materialization of the incoming values.
+
 Bug fix:
 - SubscribeAsync - error propagation fix
+- CreateTypeAsync - applied type name fix
 
 # v1.3.1
 ### InsertProperties IncludeReadOnlyProperties
