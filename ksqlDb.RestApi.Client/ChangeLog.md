@@ -1,6 +1,6 @@
 ﻿# ksqlDB.RestApi.Client
 
-# v1.4.0-rc.1
+# v1.4.0
 ## IKSqlDBContextFactory
 A factory for creating derived KSqlDBContext instances.
 

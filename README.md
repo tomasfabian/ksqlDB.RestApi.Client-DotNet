@@ -3328,7 +3328,7 @@ context.Add(model, insertProperties);
 var responseMessage = await context.SaveChangesAsync();
 ```
 
-# v1.4.0-rc.1
+# v1.4.0
 ## KSqlDbServiceCollectionExtensions - AddDbContext and AddDbContextFactory
 
 - AddDbContext - Registers the given ksqldb context as a service in the IServiceCollection
@@ -3398,6 +3398,25 @@ var metadata = new EntityCreationMetadata(entityName, 1)
                };
 
 var httpResponseMessage = await restApiClient.CreateSourceTableAsync<IoTSensor>(metadata, ifNotExists: true);
+```
+
+## KSqlDbContextOptionsBuilder and KSqlDbContextOptions
+- SetJsonSerializerOptions - a way to configure the JsonSerializerOptions for the materialization of the incoming values.
+
+```C#
+var contextOptions = new KSqlDbContextOptionsBuilder()
+        .UseKSqlDb(ksqlDbUrl)
+        .SetJsonSerializerOptions(c =>
+        {
+          c.Converters.Add(new CustomJsonConverter());
+        }).Options;
+
+//or
+contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
+  .SetJsonSerializerOptions(serializerOptions =>
+                            {
+                              serializerOptions.Converters.Add(new CustomJsonConverter());
+                            });
 ```
 
 # LinqPad samples
