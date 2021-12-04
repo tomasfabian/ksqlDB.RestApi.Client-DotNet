@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
@@ -34,24 +35,29 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
           case nameof(KSqlInvocationFunctionsExtensions.Reduce):
 
             Append($"{methodInfo.Name.ToKSqlFunctionName()}(");
-            
-            if(isNestedInvocationFunction)
-              VisitArgument(methodCallExpression.Arguments[1]);
+
+            var arguments = methodCallExpression.Arguments.ToList();
+
+            if (arguments[0].Type == typeof(KSqlFunctions))
+              arguments = arguments.Skip(1).ToList();
+
+            if (isNestedInvocationFunction)
+              VisitArgument(arguments[0]);
             else
-              base.Visit(methodCallExpression.Arguments[1]);
+              base.Visit(arguments[0]);
 
             isNestedInvocationFunction = true;
 
             Append(", ");
             
-            if (methodCallExpression.Arguments.Count >= 3)
-              VisitArgument(methodCallExpression.Arguments[2]);
+            if (arguments.Count >= 2)
+              VisitArgument(arguments[1]);
 
-            if (methodCallExpression.Arguments.Count == 4)
+            if (arguments.Count == 3)
             {
               Append(", ");
 
-              VisitArgument(methodCallExpression.Arguments[3]);
+              VisitArgument(arguments[2]);
             }
 
             Append(")");
