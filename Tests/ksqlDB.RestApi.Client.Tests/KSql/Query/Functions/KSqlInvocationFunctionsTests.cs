@@ -53,6 +53,32 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Functions
     }
 
     [TestMethod]
+    public void TransformExtensionMethod()
+    {
+      //Arrange
+      Expression<Func<Tweets, string[]>> expression = c => c.Messages.Transform(x => x.ToUpper());
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      ksql.Should().Be($"TRANSFORM({nameof(Tweets.Messages)}, (x) => UCASE(x))");
+    }
+
+    [TestMethod]
+    public void TransformExtensionMethod_Dictionary()
+    {
+      //Arrange
+      Expression<Func<Tweets, IDictionary<string, string>>> expression = c => c.Dictionary3.Transform((k,v) => k, (k, v) => v.RegionCode);
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      ksql.Should().Be($"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => k, (k, v) => v->RegionCode)");
+    }
+
+    [TestMethod]
     public void Transform_Constant()
     {
       //Arrange
@@ -145,10 +171,36 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Functions
     }
 
     [TestMethod]
+    public void FilterExtensionMethod()
+    {
+      //Arrange
+      Expression<Func<Tweets, string[]>> expression = c => c.Messages.Filter(x => x == "E.T.");
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      ksql.Should().Be($"FILTER({nameof(Tweets.Messages)}, (x) => x = 'E.T.')");
+    }
+
+    [TestMethod]
     public void Reduce()
     {
       //Arrange
       Expression<Func<Tweets, int>> expression = c => K.Functions.Reduce(c.Values, 0, (x,y) => x + y);
+      
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      ksql.Should().Be($"REDUCE({nameof(Tweets.Values)}, 0, (x, y) => x + y)");
+    }
+
+    [TestMethod]
+    public void ReduceExtensionMethod()
+    {
+      //Arrange
+      Expression<Func<Tweets, int>> expression = c => c.Values.Reduce(0, (x,y) => x + y);
       
       //Act
       var ksql = ClassUnderTest.BuildKSql(expression);
