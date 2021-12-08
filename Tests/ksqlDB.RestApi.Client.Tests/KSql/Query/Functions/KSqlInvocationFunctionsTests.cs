@@ -79,6 +79,20 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Functions
     }
 
     [TestMethod]
+    [Ignore("TODO:")]
+    public void TransformExtensionMethod_Dictionary_ToUpper()
+    {
+      //Arrange
+      Expression<Func<Tweets, IDictionary<string, string>>> expression = c => c.Dictionary3.Transform((k, v) => k, (k, v) => v.RegionCode.ToUpper());
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      ksql.Should().Be($"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => k, (k, v) => UCASE(v->RegionCode))");
+    }
+
+    [TestMethod]
     public void Transform_Constant()
     {
       //Arrange
