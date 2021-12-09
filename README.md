@@ -3419,6 +3419,32 @@ contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
                             });
 ```
 
+# v1.5.0-rc.1
+
+- improved invocation function extensions
+
+```C#
+var ksql = ksqlDbContext.CreateQueryStream<Lambda>()
+  .Select(c => new
+  {
+    Transformed = c.Lambda_Arr.Transform(x => x + 1),
+    Filtered = c.Lambda_Arr.Filter(x => x > 1),
+    Acc = c.Lambda_Arr.Reduce(0, (x, y) => x + y)
+  })
+  .ToQueryString();
+```
+
+```C#
+record Lambda
+{
+  public int Id { get; set; }
+  public int[] Lambda_Arr { get; set; }
+
+  public IDictionary<string, int[]> DictionaryArrayValues { get; set; }
+  public IDictionary<string, int> DictionaryInValues { get; set; }
+}
+```
+
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
 
