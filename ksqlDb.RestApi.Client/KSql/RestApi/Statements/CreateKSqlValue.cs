@@ -39,6 +39,13 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
         value = timeSpan.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture);
         value = $"'{value}'";
       }
+      else if (type == typeof(DateTime))
+      {
+        DateTime date = (DateTime)value;
+
+        value = date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+        value = $"'{value}'";
+      }
       else if (type == typeof(double))
       {
         Debug.Assert(value != null, nameof(value) + " != null");
