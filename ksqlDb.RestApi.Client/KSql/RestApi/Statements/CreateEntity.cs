@@ -7,6 +7,7 @@ using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using DateTime = System.DateTime;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 {
@@ -45,6 +46,12 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
         ksqlType = "BOOLEAN";
       else if (type == typeof(decimal))
         ksqlType = "DECIMAL";
+      else if (type == typeof(DateTime))
+        ksqlType = "DATE";
+      else if (type == typeof(TimeSpan))
+        ksqlType = "TIME";
+      // else if (type == typeof(DateTimeOffset))
+        //ksqlType = "TIMESPAN";
       else if (!type.IsGenericType && (type.IsClass || type.IsStruct()))
       {
         ksqlType = type.Name.ToUpper();
