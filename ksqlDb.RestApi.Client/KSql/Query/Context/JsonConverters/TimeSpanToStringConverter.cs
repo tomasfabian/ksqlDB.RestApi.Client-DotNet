@@ -10,7 +10,10 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context.JsonConverters
     {
       var value = reader.GetString();
 
-      return TimeSpan.Parse(value);
+      if (value != null)
+        return TimeSpan.Parse(value);
+
+      return TimeSpan.MinValue;
     }
 
     public override void Write(Utf8JsonWriter writer, TimeSpan value, JsonSerializerOptions options)

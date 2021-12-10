@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -30,6 +31,13 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
         Debug.Assert(value != null, nameof(value) + " != null");
 
         value = valueFormatters.FormatDecimalValue((decimal)value);
+      }
+      else if (type == typeof(TimeSpan))
+      {
+        TimeSpan timeSpan = (TimeSpan)value;
+
+        value = timeSpan.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture);
+        value = $"'{value}'";
       }
       else if (type == typeof(double))
       {
