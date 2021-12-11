@@ -50,8 +50,8 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
         ksqlType = "DATE";
       else if (type == typeof(TimeSpan))
         ksqlType = "TIME";
-      // else if (type == typeof(DateTimeOffset))
-        //ksqlType = "TIMESPAN";
+      else if (type == typeof(DateTimeOffset))
+        ksqlType = "TIMESTAMP";
       else if (!type.IsGenericType && (type.IsClass || type.IsStruct()))
       {
         ksqlType = type.Name.ToUpper();
