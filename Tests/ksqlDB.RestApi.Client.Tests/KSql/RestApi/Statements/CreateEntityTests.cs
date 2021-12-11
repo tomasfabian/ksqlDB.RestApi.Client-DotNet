@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FluentAssertions;
 using Joker.Extensions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -560,6 +561,39 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements
       public int Id { get; set; }
 
       public IEnumerable<int> Items { get; } = new List<int>();
+    }
+
+    internal record TimeTypes
+    {
+      public DateTime Dt { get; set; }
+      public TimeSpan Ts { get; set; }
+    }
+
+    [Test]
+    public void TestCreateEntityWithEnumerable()
+    {
+      //Arrange
+      var statementContext = new StatementContext
+      {
+        CreationType = CreationType.Create,
+        KSqlEntityType = KSqlEntityType.Stream
+      };
+
+      var streamCreationMetadata = new EntityCreationMetadata()
+      {
+        EntityName = nameof(TimeTypes),
+        KafkaTopic = "enrichedevents",
+        Partitions = 1
+      };
+
+      //Act
+      string statement = new CreateEntity().Print<TimeTypes>(statementContext, streamCreationMetadata, false);
+
+      //Assert
+      statement.Should().Be(@$"CREATE STREAM {nameof(TimeTypes)} (
+	Dt DATE,
+	Ts TIME
+) WITH ( KAFKA_TOPIC='enrichedevents', VALUE_FORMAT='Json', PARTITIONS='1' );");
     }
   }
 }
