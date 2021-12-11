@@ -575,6 +575,24 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements
       statement.Should().Be("INSERT INTO FooNestedStructInArrays (Arr) VALUES (ARRAY[STRUCT(X := 'go', Y := 2), STRUCT(X := 'test', Y := 1)]);");
     }
 
+
+    [Test]
+    public void TimeTypes()
+    {
+      //Arrange
+      var value = new CreateEntityTests.TimeTypes()
+      {
+        Dt = new DateTime(2021, 2, 3),
+        Ts = new TimeSpan(2, 3, 4)
+      };
+
+      //Act
+      string statement = new CreateInsert().Generate(value);
+
+      //Assert
+      statement.Should().Be("INSERT INTO TimeTypes (Dt, Ts) VALUES ('2021-02-03', '02:03:04');");
+    }
+
     #region TODO insert with functions
 
     struct MovieBytes
