@@ -1,10 +1,20 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using ksqlDb.RestApi.Client.DependencyInjection;
+using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -61,5 +71,74 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Context
       //Assert
       response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
+
+    #region Time types
+
+    private record TimeTypes
+    {
+      public DateTime Dt { get; set; }
+      public TimeSpan Ts { get; set; }
+    }
+
+    private readonly EntityCreationMetadata metadata = new EntityCreationMetadata
+    {
+      KafkaTopic = nameof(TimeTypes),
+      Partitions = 1,
+      Replicas = 1,
+      ValueFormat = SerializationFormats.Json
+    };
+
+    [TestMethod]
+    public async Task TimeTypes_InsertValues_ValuesReceived()
+    {
+      //Arrange
+      var serviceCollection = new ServiceCollection();
+
+      serviceCollection.AddDbContext<IKSqlDBContext, KSqlDBContext>(options => options.UseKSqlDb(KSqlDbRestApiProvider.KsqlDbUrl), ServiceLifetime.Transient);
+
+      var buildServiceProvider = serviceCollection.BuildServiceProvider();
+      var httpResponseMessage = await buildServiceProvider.GetRequiredService<IKSqlDbRestApiClient>().CreateStreamAsync<TimeTypes>(metadata);
+      var statementResponses = await httpResponseMessage.ToStatementResponsesAsync().ConfigureAwait(false);
+
+      await using var context = buildServiceProvider.GetRequiredService<IKSqlDBContext>();
+
+      var semaphoreSlim = new SemaphoreSlim(0, 1);
+
+      var receivedValues = new List<TimeTypes>();
+
+      //Act
+      using var subscription = context.CreateQueryStream<TimeTypes>()
+        .Take(1)
+        .Subscribe(value =>
+          {
+            receivedValues.Add(value);
+          }, error =>
+          {
+            semaphoreSlim.Release();
+          },
+          () =>
+          {
+            semaphoreSlim.Release();
+          });
+
+      var value = new TimeTypes
+      {
+        Dt = new DateTime(2021, 4, 1),
+        Ts = new TimeSpan(1,2,3)
+      };
+
+      context.Add(value);
+
+      var response = await context.SaveChangesAsync();
+
+      await semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(5));
+
+      //Assert
+      response.StatusCode.Should().Be(HttpStatusCode.OK);
+      receivedValues[0].Dt.Should().Be(value.Dt);
+      receivedValues[0].Ts.Should().Be(value.Ts);
+    }
+
+    #endregion
   }
 }
