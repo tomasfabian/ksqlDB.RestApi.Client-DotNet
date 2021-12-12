@@ -46,6 +46,15 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
         value = date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
         value = $"'{value}'";
       }
+      else if (type == typeof(DateTimeOffset))
+      {
+        var dateTimeOffset = (DateTimeOffset)value;
+
+        string dateFormat = @"yyyy-MM-ddTHH\:mm\:ss.fffzzz";
+        value = dateTimeOffset.ToString(dateFormat, CultureInfo.InvariantCulture);
+
+        value = $"'{value}'";
+      }
       else if (type == typeof(double))
       {
         Debug.Assert(value != null, nameof(value) + " != null");
