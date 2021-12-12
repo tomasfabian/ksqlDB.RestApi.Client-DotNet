@@ -13,6 +13,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using DateTime = System.DateTime;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 {
@@ -564,9 +565,32 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 
           VisitMemberWithArguments(memberWithArguments.First, memberWithArguments.Second);
         }
+      } 
+      else if (newExpression.Type == typeof(DateTime))
+      {
+        Visit(GetValue<DateTime>(newExpression));
+      }
+      else if (newExpression.Type == typeof(TimeSpan))
+      {
+        Visit(GetValue<TimeSpan>(newExpression));
+      }
+      else if (newExpression.Type == typeof(DateTimeOffset))
+      {
+        Visit(GetValue<DateTimeOffset>(newExpression));
       }
 
       return newExpression;
+    }
+
+    private static ConstantExpression GetValue<TType>(NewExpression newExpression)
+    {
+      var factory = Expression
+        .Lambda<Func<TType>>(newExpression)
+        .Compile();
+
+      var constantExpression = Expression.Constant(factory());
+
+      return constantExpression;
     }
 
     private void VisitMemberWithArguments(MemberInfo memberInfo, Expression expression)
@@ -601,7 +625,11 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
         return;
       }
 
-
+      if (expression.NodeType == ExpressionType.New)
+      {
+        Visit(expression);
+        Append(" ");
+      }
 
       if (expression is MemberExpression { Expression: { NodeType: ExpressionType.MemberAccess } } me)
         Destructure(me);
@@ -609,9 +637,6 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
         Visit(expression);
       else
         Append(memberInfo.Name);
-
-      if (expression.NodeType == ExpressionType.New)
-        Visit(expression);
     }
 
     protected override Expression VisitMember(MemberExpression memberExpression)
