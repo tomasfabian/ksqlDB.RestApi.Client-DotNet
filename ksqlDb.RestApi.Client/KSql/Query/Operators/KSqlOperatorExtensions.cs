@@ -54,9 +54,33 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Operators
     {
       throw new InvalidOperationException(KSqlFunctionsExtensions.ServerSideOperationErrorMessage);
     }
+    
+    /// <summary>
+    /// The BETWEEN operator is used to indicate that a certain value must be within a specified range, including boundaries.
+    /// </summary>
+    public static bool Between(this TimeSpan expression, TimeSpan startExpression, TimeSpan endExpression)
+    {
+      throw new InvalidOperationException(KSqlFunctionsExtensions.ServerSideOperationErrorMessage);
+    }
+    
+    /// <summary>
+    /// The BETWEEN operator is used to indicate that a certain value must be within a specified range, including boundaries.
+    /// </summary>
+    public static bool Between(this DateTime expression, DateTime startExpression, DateTime endExpression)
+    {
+      throw new InvalidOperationException(KSqlFunctionsExtensions.ServerSideOperationErrorMessage);
+    }
+    
+    /// <summary>
+    /// The BETWEEN operator is used to indicate that a certain value must be within a specified range, including boundaries.
+    /// </summary>
+    public static bool Between(this DateTimeOffset expression, DateTimeOffset startExpression, DateTimeOffset endExpression)
+    {
+      throw new InvalidOperationException(KSqlFunctionsExtensions.ServerSideOperationErrorMessage);
+    }
 
     #endregion
-        
+
     #region NotBetween
 
     /// <summary>
@@ -103,6 +127,30 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Operators
     /// The NOT BETWEEN operator is used to indicate that a certain value must not be within a specified range, including boundaries.
     /// </summary>
     public static bool NotBetween(this string expression, string startExpression, string endExpression)
+    {
+      throw new InvalidOperationException(KSqlFunctionsExtensions.ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// The NOT BETWEEN operator is used to indicate that a certain value must not be within a specified range, including boundaries.
+    /// </summary>
+    public static bool NotBetween(this TimeSpan expression, TimeSpan startExpression, TimeSpan endExpression)
+    {
+      throw new InvalidOperationException(KSqlFunctionsExtensions.ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// The NOT BETWEEN operator is used to indicate that a certain value must not be within a specified range, including boundaries.
+    /// </summary>
+    public static bool NotBetween(this DateTime expression, DateTime startExpression, DateTime endExpression)
+    {
+      throw new InvalidOperationException(KSqlFunctionsExtensions.ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// The NOT BETWEEN operator is used to indicate that a certain value must not be within a specified range, including boundaries.
+    /// </summary>
+    public static bool NotBetween(this DateTimeOffset expression, DateTimeOffset startExpression, DateTimeOffset endExpression)
     {
       throw new InvalidOperationException(KSqlFunctionsExtensions.ServerSideOperationErrorMessage);
     }
