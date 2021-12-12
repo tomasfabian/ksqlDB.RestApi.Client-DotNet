@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.KSql.Linq;
+using ksqlDB.Api.Client.Tests.KSql.RestApi.Statements;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query;
@@ -308,6 +310,105 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
 
     #endregion
 
+    #region Time types
+
+    [TestMethod]
+    public void Select_TimeField_PrintsBetween()
+    {
+      //Arrange
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<TimeTypes>()
+        .Select(p => new DateTimeOffset(2021, 7, 4, 13, 29, 45, 447, TimeSpan.FromHours(4)));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @"SELECT '2021-07-04T13:29:45.447+04:00' FROM TimeTypes EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void Select_CapturedTimeVariable_PrintsBetween()
+    {
+      //Arrange
+      var dateTimeOffset = new DateTimeOffset(2021, 7, 4, 13, 29, 45, 447, TimeSpan.FromHours(4));
+
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<TimeTypes>()
+        .Select(p => dateTimeOffset);
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @"SELECT '2021-07-04T13:29:45.447+04:00' FROM TimeTypes EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void Select_NewTimeVariable_PrintsBetween()
+    {
+      //Arrange
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<TimeTypes>()
+        .Select(p => new { Time = new DateTime(2021, 4, 1) });
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @"SELECT '2021-04-01' Time FROM TimeTypes EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    [Ignore("TODO:")]
+    public void Select_MinValue_PrintsBetween()
+    {
+      //Arrange
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<TimeTypes>()
+        .Where(c => c.Dt.Between(DateTime.MinValue, DateTime.MaxValue));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @"SELECT * FROM TimeTypes
+WHERE Dt BETWEEN '' AND '' EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    [Ignore("TODO:")]
+    public void Select_DatetimeNow_PrintsBetween()
+    {
+      //Arrange
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<TimeTypes>()
+        .Select(c => DateTime.Now);
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @"SELECT '' FROM TimeTypes EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+    
+    #endregion
+
     #endregion
 
     #region Where
@@ -568,6 +669,54 @@ WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;";
       string expectedKsql =
         @$"SELECT * FROM Tweets
 WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    private record TimeTypes
+    {
+      public DateTime Dt { get; set; }
+      public TimeSpan Ts { get; set; }
+      public DateTimeOffset DtOffset { get; set; }
+    }
+
+    [TestMethod]
+    public void WhereBetween_TimeClosure_PrintsBetween()
+    {
+      //Arrange
+      var from = new DateTime(2021, 10, 1);
+      var to = new DateTime(2021, 10, 12);
+
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<TimeTypes>()
+        .Where(p => p.Dt.Between(from, to));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @$"SELECT * FROM TimeTypes
+WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10-12' EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void WhereBetween_TimeField_PrintsBetween()
+    {
+      //Arrange
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<TimeTypes>()
+        .Where(p => p.Dt.Between(new DateTime(2021, 10, 1), new DateTime(2021, 10, 12)));
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @$"SELECT * FROM TimeTypes
+WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10-12' EMIT CHANGES;";
 
       ksql.Should().BeEquivalentTo(expectedKsql);
     }
