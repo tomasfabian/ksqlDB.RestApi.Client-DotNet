@@ -1,5 +1,12 @@
 ﻿# ksqlDB.RestApi.Client
 
+# v1.5.0-rc.1
+- improved invocation function extensions
+
+- TimeSpanToStringConverter
+- added support for Time types DATE, TIME AND TIMESTAMP (ksqldb 0.20.0)
+- operator (Not) Between for Time type values
+
 # v1.4.0
 ## IKSqlDBContextFactory
 A factory for creating derived KSqlDBContext instances.
