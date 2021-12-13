@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Formats;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
@@ -36,22 +37,21 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       {
         TimeSpan timeSpan = (TimeSpan)value;
 
-        value = timeSpan.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture);
+        value = timeSpan.ToString(ValueFormats.TimeFormat, CultureInfo.InvariantCulture);
         value = $"'{value}'";
       }
       else if (type == typeof(DateTime))
       {
         DateTime date = (DateTime)value;
 
-        value = date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+        value = date.ToString(ValueFormats.DateFormat, CultureInfo.InvariantCulture);
         value = $"'{value}'";
       }
       else if (type == typeof(DateTimeOffset))
       {
         var dateTimeOffset = (DateTimeOffset)value;
-
-        string dateFormat = @"yyyy-MM-ddTHH\:mm\:ss.fffzzz";
-        value = dateTimeOffset.ToString(dateFormat, CultureInfo.InvariantCulture);
+        
+        value = dateTimeOffset.ToString(ValueFormats.DateTimeOffsetFormat, CultureInfo.InvariantCulture);
 
         value = $"'{value}'";
       }
