@@ -514,7 +514,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
       {
         bool isFirst = true;
 
-        foreach (var memberWithArguments in newExpression.Members.Zip(newExpression.Arguments, (x, y) => new {First = x, Second = y }))
+        foreach (var memberWithArguments in newExpression.Members.Zip(newExpression.Arguments,
+                   (x, y) => new {First = x, Second = y}))
         {
           if (isFirst)
             isFirst = false;
@@ -535,20 +536,30 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
               Append(" ");
               break;
             case ExpressionType.MemberAccess:
-              if (memberWithArguments.Second is MemberExpression {Expression: MemberInitExpression memberInitExpression} && memberInitExpression.Type.IsStruct())
+              if (memberWithArguments.Second is MemberExpression
+                  {
+                    Expression: MemberInitExpression memberInitExpression
+                  } && memberInitExpression.Type.IsStruct())
               {
                 Visit(memberWithArguments.Second);
                 Append(" ");
               }
               else if (memberWithArguments.Second.NodeType == ExpressionType.MemberAccess &&
-                       memberWithArguments.Second is MemberExpression me5 && me5.Expression.Type.IsKsqlGrouping())
+                       memberWithArguments.Second is MemberExpression me5 && me5.Expression?.Type != null &&
+                       me5.Expression.Type.IsKsqlGrouping())
               {
                 VisitMemberWithArguments(memberWithArguments.First, memberWithArguments.Second);
 
                 continue;
               }
+
+              if (memberWithArguments.Second is MemberExpression {Expression: null} && TryVisitTimeTypes(memberWithArguments.Second))
+              {
+                Append(" ");
+              }
+
               break;
-            
+
             case ExpressionType.Conditional:
               Append("CASE");
               Visit(memberWithArguments.Second);
@@ -556,7 +567,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
               break;
           }
 
-          if(memberWithArguments.Second is BinaryExpression)
+          if (memberWithArguments.Second is BinaryExpression)
           {
             PrintColumnWithAlias(memberWithArguments.First, memberWithArguments.Second);
 
@@ -565,24 +576,34 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 
           VisitMemberWithArguments(memberWithArguments.First, memberWithArguments.Second);
         }
-      } 
-      else if (newExpression.Type == typeof(DateTime))
-      {
-        Visit(GetValue<DateTime>(newExpression));
       }
-      else if (newExpression.Type == typeof(TimeSpan))
-      {
-        Visit(GetValue<TimeSpan>(newExpression));
-      }
-      else if (newExpression.Type == typeof(DateTimeOffset))
-      {
-        Visit(GetValue<DateTimeOffset>(newExpression));
-      }
+      else
+        TryVisitTimeTypes(newExpression);
 
       return newExpression;
     }
 
-    private static ConstantExpression GetValue<TType>(NewExpression newExpression)
+    private bool TryVisitTimeTypes(Expression expression)
+    {
+      if (expression.Type == typeof(DateTime))
+      {
+        Visit(GetValue<DateTime>(expression));
+      }
+      else if (expression.Type == typeof(TimeSpan))
+      {
+        Visit(GetValue<TimeSpan>(expression));
+      }
+      else if (expression.Type == typeof(DateTimeOffset))
+      {
+        Visit(GetValue<DateTimeOffset>(expression));
+      }
+      else
+        return false;
+
+      return true;
+    }
+
+    private static ConstantExpression GetValue<TType>(Expression newExpression)
     {
       var factory = Expression
         .Lambda<Func<TType>>(newExpression)
@@ -633,7 +654,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 
       if (expression is MemberExpression { Expression: { NodeType: ExpressionType.MemberAccess } } me)
         Destructure(me);
-      else if (expression is MemberExpression me2 && me2.Expression.NodeType == ExpressionType.Constant)
+      else if (expression is MemberExpression me2 && me2.Expression?.NodeType == ExpressionType.Constant)
         Visit(expression);
       else
         Append(memberInfo.Name);
@@ -645,6 +666,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 
       if (memberExpression.Expression == null)
       {
+        TryVisitTimeTypes(memberExpression);
+
         new KSqlWindowBoundsVisitor(StringBuilder, queryMetadata).Visit(memberExpression);
 
         return memberExpression;
