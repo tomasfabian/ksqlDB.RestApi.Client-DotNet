@@ -575,9 +575,8 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements
       statement.Should().Be("INSERT INTO FooNestedStructInArrays (Arr) VALUES (ARRAY[STRUCT(X := 'go', Y := 2), STRUCT(X := 'test', Y := 1)]);");
     }
 
-
     [Test]
-    public void TimeTypes()
+    public void TimeTypes_DateAndTime()
     {
       //Arrange
       var value = new CreateEntityTests.TimeTypes()
@@ -590,7 +589,28 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements
       string statement = new CreateInsert().Generate(value);
 
       //Assert
-      statement.Should().Be("INSERT INTO TimeTypes (Dt, Ts) VALUES ('2021-02-03', '02:03:04');");
+      statement.Should().Be("INSERT INTO TimeTypes (Dt, Ts, DtOffset) VALUES ('2021-02-03', '02:03:04', '0001-01-01T00:00:00.000+00:00');");
+    }
+
+    private record TimeTypes
+    {
+      public DateTimeOffset DtOffset { get; set; }
+    }
+
+    [Test]
+    public void TimeTypes_Timespan()
+    {
+      //Arrange
+      var value = new TimeTypes()
+      {
+        DtOffset = new DateTimeOffset(2021, 7, 4, 13, 29, 45, 447, TimeSpan.FromHours(4))
+      };
+
+      //Act
+      string statement = new CreateInsert().Generate(value);
+
+      //Assert
+      statement.Should().Be("INSERT INTO TimeTypes (DtOffset) VALUES ('2021-07-04T13:29:45.447+04:00');");
     }
 
     #region TODO insert with functions

@@ -567,6 +567,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements
     {
       public DateTime Dt { get; set; }
       public TimeSpan Ts { get; set; }
+      public DateTimeOffset DtOffset { get; set; }
     }
 
     [Test]
@@ -592,7 +593,8 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements
       //Assert
       statement.Should().Be(@$"CREATE STREAM {nameof(TimeTypes)} (
 	Dt DATE,
-	Ts TIME
+	Ts TIME,
+	DtOffset TIMESTAMP
 ) WITH ( KAFKA_TOPIC='enrichedevents', VALUE_FORMAT='Json', PARTITIONS='1' );");
     }
   }
