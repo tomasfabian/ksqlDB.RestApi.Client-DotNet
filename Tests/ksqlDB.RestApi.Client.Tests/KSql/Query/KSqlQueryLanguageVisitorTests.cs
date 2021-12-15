@@ -11,6 +11,7 @@ using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Formats;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 using Location = ksqlDB.Api.Client.Tests.Models.Location;
@@ -369,7 +370,6 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     }
 
     [TestMethod]
-    [Ignore("TODO:")]
     public void Select_MinValue_PrintsBetween()
     {
       //Arrange
@@ -383,14 +383,13 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
       //Assert
       string expectedKsql =
         @"SELECT * FROM TimeTypes
-WHERE Dt BETWEEN '' AND '' EMIT CHANGES;";
+WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;";
 
       ksql.Should().BeEquivalentTo(expectedKsql);
     }
 
     [TestMethod]
-    [Ignore("TODO:")]
-    public void Select_DatetimeNow_PrintsBetween()
+    public void Select_DateTimeNow_PrintsBetween()
     {
       //Arrange
       var query = new TestableDbProvider(contextOptions)
@@ -402,7 +401,47 @@ WHERE Dt BETWEEN '' AND '' EMIT CHANGES;";
 
       //Assert
       string expectedKsql =
-        @"SELECT '' FROM TimeTypes EMIT CHANGES;";
+        @$"SELECT '{DateTime.Now.ToString(ValueFormats.DateFormat)}' FROM TimeTypes EMIT CHANGES;";
+
+      ksql.Should().Be(expectedKsql);
+    }
+
+    [TestMethod]
+    public void Select_CapturedDateTime_PrintsBetween()
+    {
+      //Arrange
+      var from = new DateTime(2021, 10, 1);
+
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<TimeTypes>()
+        .Select(c => from);
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @"SELECT '2021-10-01' FROM TimeTypes EMIT CHANGES;";
+
+      ksql.Should().BeEquivalentTo(expectedKsql);
+    }
+
+    [TestMethod]
+    public void Select_CapturedDateTimeNew_PrintsBetween()
+    {
+      //Arrange
+      var from = new DateTime(2021, 10, 1);
+
+      var query = new TestableDbProvider(contextOptions)
+        .CreateQueryStream<TimeTypes>()
+        .Select(c => new { Ts = from, DateTime.MinValue });
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+      //Assert
+      string expectedKsql =
+        @"SELECT '2021-10-01' AS Ts, '0001-01-01' MinValue FROM TimeTypes EMIT CHANGES;";
 
       ksql.Should().BeEquivalentTo(expectedKsql);
     }

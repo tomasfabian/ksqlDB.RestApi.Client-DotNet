@@ -128,5 +128,18 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Functions
       //Assert
       ksql.Should().Be("(k, v) => (k != 'E.T') AND (v > 0)");
     }
+
+    [TestMethod]
+    public void DateType()
+    {
+      //Arrange
+      Expression<Func<IDictionary<string, int>, object>> expression = c => new DateTime(2021, 3, 7);
+
+      //Act
+      var ksql = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      ksql.Should().Be("(c) => '2021-03-07'");
+    }
   }
 }
