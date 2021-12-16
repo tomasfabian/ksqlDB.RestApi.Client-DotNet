@@ -129,6 +129,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.RestApi
 
       //Act
       var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MyMoviesStreamTest>(metadata);
+      var c = await httpResponseMessage.ToStatementResponsesAsync().ConfigureAwait(false);
 
       //Assert
       httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);

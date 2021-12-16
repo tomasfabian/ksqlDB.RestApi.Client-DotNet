@@ -4,13 +4,11 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using ksqlDb.RestApi.Client.DependencyInjection;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
-using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
@@ -78,6 +76,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Context
     {
       public DateTime Dt { get; set; }
       public TimeSpan Ts { get; set; }
+      public DateTimeOffset DtOffset { get; set; }
     }
 
     private readonly EntityCreationMetadata metadata = new EntityCreationMetadata
@@ -124,7 +123,9 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Context
       var value = new TimeTypes
       {
         Dt = new DateTime(2021, 4, 1),
-        Ts = new TimeSpan(1,2,3)
+        Ts = new TimeSpan(1,2,3),
+        DtOffset = new DateTimeOffset(2021, 7, 4, 13, 29, 45, 447, TimeSpan.Zero)
+        //DtOffset = new DateTimeOffset(2021, 7, 4, 13, 29, 45, 447, TimeSpan.FromHours(4))
       };
 
       context.Add(value);
@@ -137,6 +138,17 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Context
       response.StatusCode.Should().Be(HttpStatusCode.OK);
       receivedValues[0].Dt.Should().Be(value.Dt);
       receivedValues[0].Ts.Should().Be(value.Ts);
+      
+      //TODO: rest api bug? missing offset
+      //["2021-04-01","01:02:03","2021-07-04T09:29:45.447"]
+      //receivedValues[0].DtOffset.Should().Be(value.DtOffset);
+
+      string json = @"{
+""DT"": ""2021-04-01""
+,""TS"": ""01:02:03""
+,""DTOFFSET"": ""2021-07-04T09:29:45.447""
+}
+";
     }
 
     #endregion
