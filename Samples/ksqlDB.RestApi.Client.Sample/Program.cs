@@ -48,6 +48,10 @@ namespace ksqlDB.Api.Client.Samples
       var contextOptions = new KSqlDbContextOptionsBuilder()
         .UseKSqlDb(ksqlDbUrl)
         .SetBasicAuthCredentials("fred", "letmein")
+        .SetJsonSerializerOptions(jsonOptions =>
+        {
+          jsonOptions.IgnoreReadOnlyFields = true;
+        })
         //.SetAutoOffsetReset(AutoOffsetReset.Earliest) // global setting
         .SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce) // global setting
         .SetupQueryStream(options =>
@@ -68,7 +72,7 @@ namespace ksqlDB.Api.Client.Samples
     public static async Task Main(string[] args)
     {
       var ksqlDbUrl = @"http:\\localhost:8088";
-      
+
       var loggerFactory = CreateLoggerFactory();
 
       var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
@@ -899,9 +903,9 @@ Drop table {nameof(Event)};
       var ksql = ksqlDbContext.CreateQueryStream<Lambda>()
         .Select(c => new
         {
-          Transformed = KSqlFunctions.Instance.Transform(c.Lambda_Arr, x => x + 1),
-          Filtered = KSqlFunctions.Instance.Filter(c.Lambda_Arr, x => x > 1),
-          Acc = K.Functions.Reduce(c.Lambda_Arr, 0, (x, y) => x + y)
+          Transformed = c.Lambda_Arr.Transform(x => x + 1),
+          Filtered = c.Lambda_Arr.Filter(x => x > 1),
+          Acc = c.Lambda_Arr.Reduce(0, (x, y) => x + y)
         })
         .ToQueryString();
 
@@ -923,6 +927,58 @@ Drop table {nameof(Event)};
         .Select(c => new { Col = K.Functions.FromBytes(c.Image, "hex") })
         .ToQueryString();
     }
+
+    public class MyClass
+    {
+      public DateTime Dt { get; set; }
+      public TimeSpan Ts { get; set; }
+      public DateTimeOffset DtOffset { get; set; }
+      public long UnixDt => (long)Dt.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
+    }
+
+    #region TimeTypes
+
+    private static async Task TimeTypes(IKSqlDbRestApiClient restApiClient, IKSqlDBContext context)
+    {
+      EntityCreationMetadata metadata = new EntityCreationMetadata
+      {
+        KafkaTopic = nameof(MyClass),
+        Partitions = 1,
+        Replicas = 1,
+        ValueFormat = SerializationFormats.Json
+      };
+
+      var httpResponseMessage = await restApiClient.CreateStreamAsync<MyClass>(metadata);
+
+      var from = new TimeSpan(1, 0, 0);
+      var to = new TimeSpan(22, 0, 0);
+      
+      var query = context.CreateQueryStream<MyClass>()
+        .Select(c => new { c.Ts, to, FromTime = from, DateTime.Now, New = new TimeSpan(1, 0, 0) })
+        .ToQueryString();
+
+      //.Select(c => new { c.Ts, to, FromTime = from, DateTime.Now, New = new TimeSpan(1, 0, 0) })
+      using var subscription = context.CreateQueryStream<MyClass>()
+        .Where(c => c.Ts.Between(from, to))
+        .Subscribe(onNext: m =>
+        {
+          Console.WriteLine($"{nameof(MyClass)}: {m.Dt} : {m.Ts} : {m.DtOffset}");
+
+          Console.WriteLine();
+        }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
+
+      var value = new MyClass
+      {
+        Dt = new DateTime(2021, 4, 1),
+        Ts = new TimeSpan(1, 2, 3),
+        DtOffset = new DateTimeOffset(2021, 7, 4, 13, 29, 45, 447, TimeSpan.FromHours(4))
+      };
+
+      httpResponseMessage = await restApiClient.InsertIntoAsync(value);
+      var statementResponses = await httpResponseMessage.ToStatementResponsesAsync().ConfigureAwait(false);
+    }
+
+    #endregion
 
     public static ILoggerFactory CreateLoggerFactory()
     {

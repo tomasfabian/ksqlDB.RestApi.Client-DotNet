@@ -3511,10 +3511,10 @@ ksqldb 0.22.0 REST API doesn't contain the offset in the payload for the TIMESTA
 
 ## operator Between for Time type values
 ```C#
-      var from = new TimeSpan(11, 0, 0);
-      var to = new TimeSpan(15,0 , 0);
+var from = new TimeSpan(11, 0, 0);
+var to = new TimeSpan(15,0 , 0);
 
-      Expression<Func<MyTimeSpan, TimeSpan>> expression = t => t.Ts.Between(from, to);
+Expression<Func<MyTimeSpan, TimeSpan>> expression = t => t.Ts.Between(from, to);
 ```
 
 ```SQL
@@ -3527,6 +3527,7 @@ var to = new TimeSpan(15, 0, 0);
 
 var query = context.CreateQueryStream<MyClass>()
   .Where(c => c.Ts.Between(from, to))
+  .Select(c => new { c.Ts, to, FromTime = from, DateTime.Now, New = new TimeSpan(1, 0, 0) }
   .ToQueryString();
 ```
 

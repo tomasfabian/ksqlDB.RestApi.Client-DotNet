@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ksqlDB.RestApi.Client" Version="1.4.0-rc.1" />
+    <PackageReference Include="ksqlDB.RestApi.Client" Version="1.5.0-rc.1" />
     <!-- <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" /> -->
 
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
