@@ -1,6 +1,6 @@
 ﻿# ksqlDB.RestApi.Client
 
-# v1.5.0-rc.1
+# v1.5.0
 - improved invocation function extensions
 
 - TimeSpanToStringConverter
