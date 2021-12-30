@@ -4,18 +4,26 @@
 
   <PropertyGroup>
     <TargetFramework>$(NetStandardVersion)</TargetFramework>
+
+	  <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <Import Project="..\..\NugetProjects\UnitTests\Microsoft.NET.Test.Sdk.csprojimport" />
-  <Import Project="..\..\NugetProjects\UnitTests\MSTest.TestAdapter.csprojimport" />
-  <Import Project="..\..\NugetProjects\UnitTests\MSTest.TestFramework.csprojimport" />
-  <Import Project="..\..\NugetProjects\UnitTests\coverlet.collector.csprojimport" />
+  <PropertyGroup>
+	  <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
 
-  <Import Project="..\..\NugetProjects\UnitTests\FluentAssertions.csprojimport" />
-  <Import Project="..\..\NugetProjects\UnitTests\Microsoft.Reactive.Testing.csprojimport" />
-  <Import Project="..\..\NugetProjects\UnitTests\Ninject.MockingKernel.Moq.csprojimport" />
   <ItemGroup>
-    <PackageReference Include="Joker" Version="2.0.0" />
+	  <PackageReference Include="FluentAssertions" />
+	  <PackageReference Include="Microsoft.Reactive.Testing" />
+	  <PackageReference Include="Moq" />
+	  <PackageReference Include="MSTest.TestAdapter" />
+	  <PackageReference Include="MSTest.TestFramework" />
+	  <PackageReference Include="NUnit" />
+	  <PackageReference Include="NUnit3TestAdapter" />
+	  <PackageReference Include="Microsoft.NET.Test.Sdk" />
+	  <PackageReference Include="Microsoft.Extensions.Logging" />
+	  <PackageReference Include="Ninject.MockingKernel.Moq" />
+	  <PackageReference Include="Joker" />
   </ItemGroup>
 
 </Project>
