@@ -1,5 +1,3 @@
-⚠ The package had to be renamed to ksqlDB.RestApi.Client
-
 This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
 You can continually process computations over unbounded (theoretically never-ending) streams of data.
 It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the Rest API such as inserting records into streams and creating tables, types, etc. or executing admin operations such as listing streams.
@@ -151,9 +149,7 @@ run in command line:
 - set docker-compose.csproj as startup project in InsideOut.sln for an embedded Kafka connect integration and stream processing examples. 
 
 # CDC - Push notifications from Sql Server tables with Kafka
-Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with SqlServer.Connector package together with the Debezium connector streaming platform. 
-
-⚠ The package had to be renamed to SqlServer.Connector
+Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with SqlServer.Connector package together with the Debezium connector streaming platform.
 
 ### Nuget
 ```
