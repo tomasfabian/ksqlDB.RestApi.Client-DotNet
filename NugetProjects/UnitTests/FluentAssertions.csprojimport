@@ -1,5 +1,0 @@
-﻿<Project>
-  <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="5.10.3" />
-  </ItemGroup>
-</Project>
