@@ -20,13 +20,22 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
   {
     private static MoviesProvider moviesProvider;
 
+
+    static readonly EntityCreationMetadata OrderEntityCreationMetadata = new()
+    {
+      KafkaTopic = nameof(Order) + "-TestJoin",
+      Partitions = 1
+    };
+
     [ClassInitialize]
     public static async Task ClassInitialize(TestContext context)
     {
       RestApiProvider = KSqlDbRestApiProvider.Create();
       
       moviesProvider = new MoviesProvider(RestApiProvider);
-      
+
+      var response = await RestApiProvider.CreateStreamAsync<Order>(OrderEntityCreationMetadata, ifNotExists: true);
+
       await moviesProvider.DropTablesAsync();
       
       await Task.Delay(TimeSpan.FromSeconds(1));
@@ -200,15 +209,9 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
       //Arrange
       int expectedItemsCount = 1;
 
-      var entityCreationMetadata = new EntityCreationMetadata
-      {
-        KafkaTopic = nameof(Order) + "-TestJoin",
-        Partitions = 1
-      };
-
-      var response = await RestApiProvider.CreateStreamAsync<Order>(entityCreationMetadata, ifNotExists: true);
-      response = await RestApiProvider.CreateTableAsync<Payment>(entityCreationMetadata with { KafkaTopic = nameof(Payment) + "-TestJoin" }, ifNotExists: true);
-      response = await RestApiProvider.CreateTableAsync<Shipment>(entityCreationMetadata with { KafkaTopic = nameof(Shipment) + "-TestJoin" }, ifNotExists: true);
+      var response = await RestApiProvider.CreateStreamAsync<Order>(OrderEntityCreationMetadata, ifNotExists: true);
+      response = await RestApiProvider.CreateTableAsync<Payment>(OrderEntityCreationMetadata with { KafkaTopic = nameof(Payment) + "-TestJoin" }, ifNotExists: true);
+      response = await RestApiProvider.CreateTableAsync<Shipment>(OrderEntityCreationMetadata with { KafkaTopic = nameof(Shipment) + "-TestJoin" }, ifNotExists: true);
 
       var ksqlDbUrl = @"http:\\localhost:8088";
 
