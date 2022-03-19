@@ -20,7 +20,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq.PullQueries
     /// </summary>
     /// <typeparam name="TSource">The type of the elements of source.</typeparam>
     /// <typeparam name="TResult">The type of the value returned by selector.</typeparam>
-    /// <param name="source"></param>
+    /// <param name="source">The sequence to take elements from.</param>
     /// <param name="selector">A transform function to apply to the single response.</param>
     /// <returns></returns>
     public static IPullable<TResult> Select<TSource, TResult>(this IPullable<TSource> source, Expression<Func<TSource, TResult>> selector)
@@ -52,8 +52,8 @@ namespace ksqlDB.RestApi.Client.KSql.Linq.PullQueries
     /// <summary>
     /// The WHERE clause must contain a value for each primary-key column to retrieve and may optionally include bounds on WINDOWSTART and WINDOWEND if the materialized table is windowed.
     /// </summary>
-    /// <typeparam name="TSource"></typeparam>
-    /// <param name="source"></param>
+    /// <typeparam name="TSource">The type of the elements of source.</typeparam>
+    /// <param name="source">The sequence to take elements from.</param>
     /// <param name="predicate"></param>
     /// <returns></returns>
     public static IPullable<TSource> Where<TSource>(this IPullable<TSource> source, Expression<Func<TSource, bool>> predicate)
@@ -69,6 +69,33 @@ namespace ksqlDB.RestApi.Client.KSql.Linq.PullQueries
           null,
           WhereTSource(typeof(TSource)),
           source.Expression, Expression.Quote(predicate)
+        ));
+    }
+
+    #endregion
+
+    #region Take
+
+    private static MethodInfo takeTSource;
+
+    private static MethodInfo TakeTSource(Type TSource) =>
+      (takeTSource ??= new Func<IPullable<object>, int, IPullable<object>>(Take).GetMethodInfo().GetGenericMethodDefinition())
+      .MakeGenericMethod(TSource);
+
+    /// <summary>
+    /// Restrict the number of rows returned by executing a pull query over a STREAM or a TABLE.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the source sequence.</typeparam>
+    /// <param name="source">The sequence to take elements from.</param>
+    /// <param name="count">The number of elements to return.</param>
+    /// <returns>An observable sequence that contains the specified number of elements from the start of the input sequence.</returns>
+    public static IPullable<TSource> Take<TSource>(this IPullable<TSource> source, int count)
+    {
+      return source.Provider.CreateQuery<TSource>(
+        Expression.Call(
+          null,
+          TakeTSource(typeof(TSource)),
+          source.Expression, Expression.Constant(count)
         ));
     }
 
