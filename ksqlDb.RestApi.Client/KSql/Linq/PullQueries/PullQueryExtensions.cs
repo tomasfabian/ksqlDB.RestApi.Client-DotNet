@@ -83,7 +83,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq.PullQueries
       .MakeGenericMethod(TSource);
 
     /// <summary>
-    /// Restrict the number of rows returned by executing a pull query over a STREAM or a TABLE.
+    /// Restrict the number of rows returned by executing a pull query over a STREAM or a TABLE. ksqldb 0.24.0
     /// </summary>
     /// <typeparam name="TSource">The type of the elements in the source sequence.</typeparam>
     /// <param name="source">The sequence to take elements from.</param>

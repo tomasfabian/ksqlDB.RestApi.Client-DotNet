@@ -3527,6 +3527,16 @@ var query = context.CreateQueryStream<MyClass>()
   .ToQueryString();
 ```
 
+### Pull query Take (Limit) (ksqldb v0.24.0)
+Returns a specified number of contiguous elements from the start of a stream or a table.
+```C#
+context.CreatePullQuery<Tweet>()
+  .Take(2);
+```
+```SQL
+SELECT * from tweets LIMIT 2;
+```
+
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
 

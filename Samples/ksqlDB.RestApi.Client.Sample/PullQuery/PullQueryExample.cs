@@ -59,7 +59,8 @@ namespace ksqlDB.Api.Client.Samples.PullQuery
 
       var pullQuery = context.CreatePullQuery<IoTSensorStats>(MaterializedViewName)
         .Where(c => c.SensorId == "sensor-1")
-        .Where(c => Bounds.WindowStart > windowStart && Bounds.WindowEnd <= windowEnd);
+        .Where(c => Bounds.WindowStart > windowStart && Bounds.WindowEnd <= windowEnd)
+        .Take(5);
 
       var sql = pullQuery.ToQueryString();
 
