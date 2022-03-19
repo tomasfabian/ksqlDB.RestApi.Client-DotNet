@@ -43,7 +43,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       return entityName;
     }
 
-    protected static Type GetMemberType<T>(MemberInfo memberInfo)
+    protected static Type GetMemberType(MemberInfo memberInfo)
     {
       var type = memberInfo.MemberType switch
       {

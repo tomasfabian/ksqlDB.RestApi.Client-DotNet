@@ -128,7 +128,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 
       foreach (var memberInfo in Members<T>(metadata?.IncludeReadOnlyProperties))
       {
-        var type = GetMemberType<T>(memberInfo);
+        var type = GetMemberType(memberInfo);
 
         var ksqlType = KSqlTypeTranslator(type);
 

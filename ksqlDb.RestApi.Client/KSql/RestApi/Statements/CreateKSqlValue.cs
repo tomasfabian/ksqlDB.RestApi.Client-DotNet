@@ -135,7 +135,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
         else
           sb.Append(", ");
 
-        type = GetMemberType<T>(memberInfo2);
+        type = GetMemberType(memberInfo2);
 
         var innerValue = ExtractValue(value, valueFormatters, memberInfo2, type);
         sb.Append($"{memberInfo2.Name} := {innerValue}");

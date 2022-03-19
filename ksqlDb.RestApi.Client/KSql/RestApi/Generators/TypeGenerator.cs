@@ -37,7 +37,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators
 
       foreach (var memberInfo in Members<T>())
       {
-        var type = GetMemberType<T>(memberInfo);
+        var type = GetMemberType(memberInfo);
 
         var ksqlType = CreateEntity.KSqlTypeTranslator(type);
 

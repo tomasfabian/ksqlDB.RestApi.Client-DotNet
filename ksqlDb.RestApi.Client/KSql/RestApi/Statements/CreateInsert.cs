@@ -30,7 +30,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 
         columnsStringBuilder.Append(memberInfo.Name);
 
-        var type = GetMemberType<T>(memberInfo);
+        var type = GetMemberType(memberInfo);
 
         var value = new CreateKSqlValue().ExtractValue(entity, insertProperties, memberInfo, type);
 
