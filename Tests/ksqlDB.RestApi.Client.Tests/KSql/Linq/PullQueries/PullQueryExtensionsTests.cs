@@ -140,5 +140,20 @@ WHERE SensorId = '{sensorId}' AND (WINDOWSTART > {windowStart}) AND (WINDOWEND <
       ksql.Should().BeEquivalentTo(@$"SELECT * FROM {MaterializedViewName}
 WHERE SensorId = '{sensorId}' AND (WINDOWSTART > '{windowStart}') AND (WINDOWEND <= '{windowEnd}');");
     }
+
+    [TestMethod]
+    public void Take()
+    {
+      //Arrange
+      int limit = 5;
+
+      //Act
+      var ksql = DbProvider.CreatePullQuery<IoTSensorStats>(MaterializedViewName)
+        .Take(limit)
+        .ToQueryString();
+
+      //Assert
+      ksql.Should().BeEquivalentTo(@$"SELECT * FROM {MaterializedViewName} LIMIT {limit};");
+    }
   }
 }
