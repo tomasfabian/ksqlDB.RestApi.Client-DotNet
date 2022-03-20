@@ -52,7 +52,13 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 
       if (metadata.WrapSingleValue.HasValue)
         properties.Add(@$"WRAP_SINGLE_VALUE='{metadata.WrapSingleValue}'");
-		
+
+      if (metadata.KeySchemaId.HasValue)
+        properties.Add(@$"KEY_SCHEMA_ID={metadata.KeySchemaId}");
+
+      if (metadata.ValueSchemaId.HasValue)
+        properties.Add(@$"VALUE_SCHEMA_ID={metadata.ValueSchemaId}");
+
       string result = string.Join(", ", properties);
 		
       if(!string.IsNullOrEmpty(result))

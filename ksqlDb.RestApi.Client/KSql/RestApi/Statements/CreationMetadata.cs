@@ -29,5 +29,15 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
     public string TimestampFormat { get; set; }
 
     public bool? WrapSingleValue { get; set; }
+
+    /// <summary>
+    /// The schema specified by the ID will be looked up in the schema registry and used to create the logical schema as well as serialize and deserialize key data.
+    /// </summary>
+    public int? KeySchemaId { get; set; }
+    
+    /// <summary>
+    /// The schema specified by the ID will be looked up in the schema registry and used to create the logical schema as well as serialize and deserialize value data.
+    /// </summary>
+    public int? ValueSchemaId { get; set; }
   }
 }
