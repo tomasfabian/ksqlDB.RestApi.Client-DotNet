@@ -343,5 +343,19 @@ namespace ksqlDB.Api.Client.Tests.Infrastructure.Extensions
       //Assert
       name.Should().Be("List");
     }
+
+    [TestMethod]
+    public void TryGetAttribute()
+    {
+      //Arrange
+      var type = typeof(Test);
+
+      //Act
+      var attribute = type.GetProperty(nameof(Test.Key)).TryGetAttribute<KeyAttribute>();
+
+      //Assert
+      attribute.Should().NotBeNull();
+      attribute.Should().BeOfType<KeyAttribute>();
+    }
   }
 }
