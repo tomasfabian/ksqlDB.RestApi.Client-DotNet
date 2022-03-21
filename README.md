@@ -3418,7 +3418,7 @@ contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
                             });
 ```
 
-# v1.5.0-rc.1
+# v1.5.0
 
 - improved invocation function extensions
 
@@ -3527,7 +3527,9 @@ var query = context.CreateQueryStream<MyClass>()
   .ToQueryString();
 ```
 
-### Pull query Take (Limit) (ksqldb v0.24.0)
+# v1.6.0-rc.1
+
+### Pull query Take extension method (Limit) (ksqldb v0.24.0)
 Returns a specified number of contiguous elements from the start of a stream or a table.
 ```C#
 context.CreatePullQuery<Tweet>()
@@ -3536,6 +3538,66 @@ context.CreatePullQuery<Tweet>()
 ```SQL
 SELECT * from tweets LIMIT 2;
 ```
+
+### Stream and table properties KEY_SCHEMA_ID and VALUE_SCHEMA_ID (ksqldb v0.24.0)
+KEY_SCHEMA_ID - The schema ID of the key schema in Schema Registry. The schema is used for schema inference and data serialization.
+VALUE_SCHEMA_ID - The schema ID of the value schema in Schema Registry. The schema is used for schema inference and data serialization.
+
+```C#
+EntityCreationMetadata metadata2 = new()
+{
+  KafkaTopic = "tweets",
+  Partitions = 1,
+  Replicas = 3,
+  KeySchemaId = 1,
+  ValueSchemaId = 2
+};
+```
+
+Generated KSQL statement:
+
+```
+ WITH ( KAFKA_TOPIC='tweets', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='3', KEY_SCHEMA_ID=1, VALUE_SCHEMA_ID=2 )
+```
+
+### Access record header data
+Starting in ksqlDB 0.24, you can mark a column with [HEADERS](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#headers) or HEADER('<key>') to indicate that it is populated by the header field of the underlying Kafka record.
+
+
+```C#
+[Struct]
+internal record KeyValue
+{
+  public string Key { get; set; }
+  public byte[] Value { get; set; }
+}
+
+internal class ValueWithHeader
+{
+  [Headers]
+  public KeyValue[] H1 { get; set; }
+}
+
+```
+
+The KeyValue record type has to be annotated with the StructAttribute:
+```
+H1 ARRAY<STRUCT<Key VARCHAR, Value BYTES>> HEADERS
+```
+
+```C#
+internal class BytesHeader
+{
+  [Headers("abc")]
+  public byte[] H1 { get; set; }
+}
+```
+
+KSQL:
+```
+H1 BYTES HEADERS('abc')
+```
+
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
