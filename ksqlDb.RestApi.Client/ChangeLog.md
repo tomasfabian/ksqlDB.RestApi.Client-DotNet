@@ -1,5 +1,10 @@
 ﻿# ksqlDB.RestApi.Client
 
+# v1.6.0-rc.1
+- Pull query Take extension method (Limit)
+- Stream and table properties KEY_SCHEMA_ID and VALUE_SCHEMA_ID
+- Access record header data
+
 # v1.5.0
 - improved invocation function extensions
 
