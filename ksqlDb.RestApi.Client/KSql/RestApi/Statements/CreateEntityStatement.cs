@@ -17,7 +17,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       return Members(typeof(T), includeReadOnly);
     }
 
-    protected IEnumerable<MemberInfo> Members(Type type, bool? includeReadOnly = null)
+    protected static IEnumerable<MemberInfo> Members(Type type, bool? includeReadOnly = null)
     {
       var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
 

@@ -52,6 +52,12 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
         ksqlType = "TIME";
       else if (type == typeof(DateTimeOffset))
         ksqlType = "TIMESTAMP";
+      else if (!type.IsGenericType && TryGetAttribute<StructAttribute>(type) != null)
+      {
+        var ksqlProperties = GetProperties(type);
+
+        ksqlType = $"STRUCT<{string.Join(", ", ksqlProperties)}>";
+      }
       else if (!type.IsGenericType && (type.IsClass || type.IsStruct()))
       {
         ksqlType = type.Name.ToUpper();
@@ -72,7 +78,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
           }
         }
 
-        if(elementType != null)
+        if (elementType != null)
         {
           string ksqlElementType = KSqlTypeTranslator(elementType);
 
@@ -109,14 +115,39 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       return stringBuilder.ToString();
     }
 
+    private static TAttribute TryGetAttribute<TAttribute>(MemberInfo memberInfo)
+      where TAttribute : Attribute
+    {
+      var attribute = memberInfo.GetCustomAttributes()
+        .OfType<TAttribute>()
+        .FirstOrDefault();
+
+      return attribute;
+    }
+
     internal static string ExploreAttributes(MemberInfo memberInfo, Type type)
     {
       if (type == typeof(decimal))
       {
         var decimalMember = memberInfo.GetCustomAttributes().OfType<DecimalAttribute>().FirstOrDefault();
 
-        if(decimalMember != null)
+        if (decimalMember != null)
           return $"({decimalMember.Precision},{decimalMember.Scale})";
+      }
+
+      if (type.IsArray)
+      {
+        var headersAttribute = TryGetAttribute<HeadersAttribute>(memberInfo);
+
+        if (headersAttribute != null)
+        {
+          const string headers = " HEADERS";
+
+          if (string.IsNullOrEmpty(headersAttribute.Key))
+            return headers;
+
+          return $"{headers}('{headersAttribute.Key}')";
+        }
       }
 
       return string.Empty;
@@ -140,6 +171,24 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       }
 
       stringBuilder.AppendLine(string.Join($",{Environment.NewLine}", ksqlProperties));
+    }
+
+    internal static IEnumerable<string> GetProperties(Type type)
+    {
+      var ksqlProperties = new List<string>();
+
+      foreach (var memberInfo in Members(type, false))
+      {
+        var memberType = GetMemberType(memberInfo);
+
+        var ksqlType = KSqlTypeTranslator(memberType);
+
+        string columnDefinition = $"{memberInfo.Name} {ksqlType}{ExploreAttributes(memberInfo, memberType)}";
+
+        ksqlProperties.Add(columnDefinition);
+      }
+
+      return ksqlProperties;
     }
 
     private void PrintCreateOrReplace<T>(StatementContext statementContext, EntityCreationMetadata metadata)
