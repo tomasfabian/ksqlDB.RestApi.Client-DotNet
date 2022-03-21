@@ -92,5 +92,15 @@ namespace ksqlDB.RestApi.Client.Infrastructure.Extensions
 
       return name;
     }
+    
+    internal static TAttribute TryGetAttribute<TAttribute>(this MemberInfo memberInfo)
+      where TAttribute : Attribute
+    {
+      var attribute = memberInfo.GetCustomAttributes()
+        .OfType<TAttribute>()
+        .FirstOrDefault();
+
+      return attribute;
+    }
   }
 }

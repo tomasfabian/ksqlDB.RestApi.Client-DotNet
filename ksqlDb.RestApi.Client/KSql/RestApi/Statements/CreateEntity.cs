@@ -52,7 +52,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
         ksqlType = "TIME";
       else if (type == typeof(DateTimeOffset))
         ksqlType = "TIMESTAMP";
-      else if (!type.IsGenericType && TryGetAttribute<StructAttribute>(type) != null)
+      else if (!type.IsGenericType && type.TryGetAttribute<StructAttribute>() != null)
       {
         var ksqlProperties = GetProperties(type);
 
@@ -115,21 +115,11 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       return stringBuilder.ToString();
     }
 
-    private static TAttribute TryGetAttribute<TAttribute>(MemberInfo memberInfo)
-      where TAttribute : Attribute
-    {
-      var attribute = memberInfo.GetCustomAttributes()
-        .OfType<TAttribute>()
-        .FirstOrDefault();
-
-      return attribute;
-    }
-
     internal static string ExploreAttributes(MemberInfo memberInfo, Type type)
     {
       if (type == typeof(decimal))
       {
-        var decimalMember = memberInfo.GetCustomAttributes().OfType<DecimalAttribute>().FirstOrDefault();
+        var decimalMember = memberInfo.TryGetAttribute<DecimalAttribute>();
 
         if (decimalMember != null)
           return $"({decimalMember.Precision},{decimalMember.Scale})";
@@ -137,7 +127,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 
       if (type.IsArray)
       {
-        var headersAttribute = TryGetAttribute<HeadersAttribute>(memberInfo);
+        var headersAttribute = memberInfo.TryGetAttribute<HeadersAttribute>();
 
         if (headersAttribute != null)
         {
