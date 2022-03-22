@@ -5,6 +5,9 @@
 - Stream and table properties KEY_SCHEMA_ID and VALUE_SCHEMA_ID
 - Access record header data
 
+Scalar functions:
+- IsJsonString, JsonArrayLength, JsonConcat, JsonKeys, JsonRecords
+
 # v1.5.0
 - improved invocation function extensions
 

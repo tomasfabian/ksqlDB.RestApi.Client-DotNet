@@ -82,6 +82,9 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
           case nameof(KSqlFunctionsExtensions.ArrayUnion):
           case nameof(KSqlFunctionsExtensions.AsMap):
           case nameof(KSqlFunctionsExtensions.JsonArrayContains):
+          case nameof(KSqlFunctionsExtensions.IsJsonString):
+          case nameof(KSqlFunctionsExtensions.JsonArrayLength):
+          case nameof(KSqlFunctionsExtensions.JsonKeys):
           case nameof(KSqlFunctionsExtensions.MapKeys):
           case nameof(KSqlFunctionsExtensions.ToBytes):
           case nameof(KSqlFunctionsExtensions.FromBytes):
@@ -90,6 +93,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
             PrintFunctionArguments(methodCallExpression.Arguments.Skip(1));
             break;
           case nameof(KSqlFunctionsExtensions.Concat):
+          case nameof(KSqlFunctionsExtensions.JsonConcat):
             Append($"{methodInfo.Name.ToKSqlFunctionName()}");
             var newArrayExpression = methodCallExpression.Arguments.Skip(1).OfType<NewArrayExpression>().First();
             VisitParams(newArrayExpression);

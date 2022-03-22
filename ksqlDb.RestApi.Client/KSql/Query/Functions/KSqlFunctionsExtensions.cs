@@ -1872,6 +1872,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
 
+    #region Json
+
     /// <summary>
     /// Given a STRING that contains JSON data, extract the value at the specified JSONPath or NULL if the specified path does not exist.
     /// </summary>
@@ -1883,6 +1885,63 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
+    
+    /// <summary>
+    /// Given a string, returns true if it can be parsed as a valid JSON value, false otherwise
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">The input JSON string</param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static bool IsJsonString(this KSqlFunctions kSqlFunctions, string input)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Given a string, parses it as a JSON value and returns the length of the top-level array. Returns NULL if
+    /// the string can't be interpreted as a JSON array, for example, when the string is `NULL` or it does not
+    /// contain valid JSON, or the JSON value is not an array.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="jsonArray"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static int? JsonArrayLength(this KSqlFunctions kSqlFunctions, string jsonArray)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Given N strings, parse them as JSON values and return a string representing their concatenation.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="jsonStrings"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static string JsonConcat(this KSqlFunctions kSqlFunctions, params string[] jsonStrings)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Given a string, parses it as a JSON object and returns a ksqlDB array of strings representing the
+    /// top-level keys.Returns NULL if the string can't be interpreted as a JSON object, for example, when the
+    /// string is NULL or it does not contain valid JSON, or the JSON value is not an object.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="jsonString"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static string[] JsonKeys(this KSqlFunctions kSqlFunctions, string jsonString)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    //JSON_RECORDS
+    //TO_JSON_STRING
+
+    #endregion
 
     //CONCAT_WS
 
