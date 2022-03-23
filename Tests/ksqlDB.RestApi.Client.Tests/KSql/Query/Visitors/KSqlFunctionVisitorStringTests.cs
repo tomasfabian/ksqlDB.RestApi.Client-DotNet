@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
@@ -374,6 +375,8 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
 
     #endregion
 
+    #region Json
+
     #region ExtractJsonField
 
     [TestMethod]
@@ -391,7 +394,86 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
     }
 
     #endregion
-    
+
+    #region IsJsonString
+
+    [TestMethod]
+    public void IsJsonString_BuildKSql_PrintsTheFunction()
+    {
+      //Arrange
+      string jsonInput = "{}";
+      Expression<Func<Tweet, bool>> expression = c => K.Functions.IsJsonString(jsonInput);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"IS_JSON_STRING('{jsonInput}')");
+    }
+
+    #endregion
+
+    #region JsonArrayLength
+
+    [TestMethod]
+    public void JsonArrayLength_BuildKSql_PrintsTheFunction()
+    {
+      //Arrange
+      string jsonInput = "[1, 2, 3]";
+      Expression<Func<Tweet, int?>> expression = c => K.Functions.JsonArrayLength(jsonInput);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"JSON_ARRAY_LENGTH('{jsonInput}')");
+    }
+
+    [TestMethod]
+    public void JsonArrayLength_Null_BuildKSql_PrintsTheFunction()
+    {
+      //Arrange
+      string jsonInput = null;
+      Expression<Func<Tweet, int?>> expression = c => K.Functions.JsonArrayLength(jsonInput);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo("JSON_ARRAY_LENGTH(NULL)");
+    }
+
+    [TestMethod]
+    public void JsonConcat_BuildKSql_PrintsTheFunction()
+    {
+      //Arrange
+      Expression<Func<Tweet, string>> expression = c => K.Functions.JsonConcat("[1, 2]", "[3, 4]");
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo("JSON_CONCAT('[1, 2]', '[3, 4]')");
+    }
+
+    [TestMethod]
+    public void JsonKeys_BuildKSql_PrintsTheFunction()
+    {
+      //Arrange
+      string jsonInput = "[1, 2, 3]";
+      Expression<Func<Tweet, string[]>> expression = c => K.Functions.JsonKeys(jsonInput);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"JSON_KEYS('{jsonInput}')");
+    }
+
+    #endregion
+
+    #endregion
+
     #endregion
   }
 }
