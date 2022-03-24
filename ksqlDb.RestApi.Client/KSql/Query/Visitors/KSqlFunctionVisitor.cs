@@ -85,6 +85,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
           case nameof(KSqlFunctionsExtensions.IsJsonString):
           case nameof(KSqlFunctionsExtensions.JsonArrayLength):
           case nameof(KSqlFunctionsExtensions.JsonKeys):
+          case nameof(KSqlFunctionsExtensions.JsonRecords):
+          case nameof(KSqlFunctionsExtensions.ToJsonString):
           case nameof(KSqlFunctionsExtensions.MapKeys):
           case nameof(KSqlFunctionsExtensions.ToBytes):
           case nameof(KSqlFunctionsExtensions.FromBytes):

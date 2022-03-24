@@ -1930,7 +1930,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     /// string is NULL or it does not contain valid JSON, or the JSON value is not an object.
     /// </summary>
     /// <param name="kSqlFunctions"></param>
-    /// <param name="jsonString"></param>
+    /// <param name="jsonString">The input JSON string</param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
     public static string[] JsonKeys(this KSqlFunctions kSqlFunctions, string jsonString)
@@ -1938,8 +1938,32 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
 
-    //JSON_RECORDS
-    //TO_JSON_STRING
+    /// <summary>
+    /// Given a string, parses it as a JSON object and returns a map representing the top-level keys and values.
+    /// Returns `NULL` if the string can't be interpreted as a JSON object, i.e. it is `NULL` or it does not
+    /// contain valid JSON, or the JSON value is not an object.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="jsonString"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static IDictionary<string, string> JsonRecords(this KSqlFunctions kSqlFunctions, string jsonString)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Given any ksqlDB type returns the equivalent JSON string.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static string ToJsonString<T>(this KSqlFunctions kSqlFunctions, T input)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
 
     #endregion
 
