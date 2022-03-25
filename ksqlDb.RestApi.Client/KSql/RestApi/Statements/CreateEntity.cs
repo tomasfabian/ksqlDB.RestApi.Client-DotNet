@@ -131,12 +131,12 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 
         if (headersAttribute != null)
         {
-          const string headers = " HEADERS";
+          const string header = " HEADER";
 
           if (string.IsNullOrEmpty(headersAttribute.Key))
-            return headers;
+            return $"{header}S";
 
-          return $"{headers}('{headersAttribute.Key}')";
+          return $"{header}('{headersAttribute.Key}')";
         }
       }
 
