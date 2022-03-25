@@ -1,12 +1,12 @@
 ﻿# ksqlDB.RestApi.Client
 
-# v1.6.0-rc.1
+# v1.6.0
 - Pull query Take extension method (Limit)
 - Stream and table properties KEY_SCHEMA_ID and VALUE_SCHEMA_ID
 - Access record header data
 
 Scalar functions:
-- IsJsonString, JsonArrayLength, JsonConcat, JsonKeys, JsonRecords
+- IsJsonString, JsonArrayLength, JsonConcat, JsonKeys, JsonRecords, ToJsonString
 
 # v1.5.0
 - improved invocation function extensions
@@ -457,3 +457,4 @@ Fixes:
 
 # TODO:
 - missing scalar functions https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#date-and-time
+- - GRACE PERIOD on stream-stream joins ksqldb 0.23.1
