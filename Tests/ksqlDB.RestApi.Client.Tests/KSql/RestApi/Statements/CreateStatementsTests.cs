@@ -202,5 +202,37 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements
       //Assert
       withClause.Should().BeEquivalentTo(@$" WITH ( TIMESTAMP_FORMAT='{metadata.TimestampFormat}', WRAP_SINGLE_VALUE='{metadata.WrapSingleValue}' )");
     }
+
+    [TestMethod]
+    public void GenerateWithClause_KeySchemaId()
+    {
+      //Arrange
+      var metadata = new CreationMetadata
+      {
+        KeySchemaId = 1
+      };
+
+      //Act
+      var withClause = CreateStatements.GenerateWithClause(metadata);
+
+      //Assert
+      withClause.Should().BeEquivalentTo(@$" WITH ( KEY_SCHEMA_ID={metadata.KeySchemaId} )");
+    }
+
+    [TestMethod]
+    public void GenerateWithClause_ValueSchemaId()
+    {
+      //Arrange
+      var metadata = new CreationMetadata
+      {
+        ValueSchemaId = 2
+      };
+
+      //Act
+      var withClause = CreateStatements.GenerateWithClause(metadata);
+
+      //Assert
+      withClause.Should().BeEquivalentTo(@$" WITH ( VALUE_SCHEMA_ID={metadata.ValueSchemaId} )");
+    }
   }
 }
