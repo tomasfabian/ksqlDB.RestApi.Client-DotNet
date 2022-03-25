@@ -470,6 +470,106 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
       query.Should().BeEquivalentTo($"JSON_KEYS('{jsonInput}')");
     }
 
+    [TestMethod]
+    public void JsonRecords_BuildKSql_PrintsTheFunction()
+    {
+      //Arrange
+      string jsonInput = "{\"a\": \"abc\", \"b\": { \"c\": \"a\" }, \"d\": 1}";
+      Expression<Func<Tweet, IDictionary<string, string>>> expression = c => K.Functions.JsonRecords(jsonInput);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"JSON_RECORDS('{jsonInput}')");
+    }
+
+    [TestMethod]
+    public void ToJsonString_Bool_BuildKSql_PrintsTheFunction()
+    {
+      //Arrange
+      var input = true;
+      Expression<Func<Tweet, string>> expression = c => K.Functions.ToJsonString(input);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"TO_JSON_STRING({input})");
+    }
+
+    [TestMethod]
+    public void ToJsonString_String_BuildKSql_PrintsTheFunction()
+    {
+      //Arrange
+      var input = "abc";
+      Expression<Func<Tweet, string>> expression = c => K.Functions.ToJsonString(input);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"TO_JSON_STRING('{input}')");
+    }
+
+    [TestMethod]
+    public void ToJsonString_Array_BuildKSql_PrintsTheFunction()
+    {
+      //Arrange
+      var input = new[] { 1,2,3 };
+      Expression<Func<Tweet, string>> expression = c => K.Functions.ToJsonString(input);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo("TO_JSON_STRING(Array[1, 2, 3])");
+    }
+
+    [TestMethod]
+    public void ToJsonString_Dictionary_BuildKSql_PrintsTheFunction()
+    {
+      //Arrange
+      var input = new Dictionary<string, int>
+      {
+        ["c"] = 2, 
+        ["d"] = 4
+      };
+
+      Expression<Func<Tweet, string>> expression = c => K.Functions.ToJsonString(input);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo("TO_JSON_STRING(Map('c' := 2, 'd' := 4))");
+    }
+
+    private class MyType
+    {
+      public int id { get; set; }
+      public string name { get; set; }
+    }
+
+    [TestMethod]
+    public void ToJsonString_Struct_BuildKSql_PrintsTheFunction()
+    {
+      //Arrange
+      var input = new MyType
+      {
+        id = 1,
+        name = "A"
+      };
+
+      Expression<Func<Tweet, string>> expression = c => K.Functions.ToJsonString(input);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo("TO_JSON_STRING(STRUCT(id := 1, name := 'A'))");
+    }
+
     #endregion
 
     #endregion
