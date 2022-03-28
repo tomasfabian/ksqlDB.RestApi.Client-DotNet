@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <!--<TargetFramework>net5.0</TargetFramework>-->
+    <!-- <TargetFramework>net6.0</TargetFramework> -->
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ksqlDB.RestApi.Client" Version="1.5.0-rc.1" />
+    <PackageReference Include="ksqlDB.RestApi.Client" Version="1.6.0-rc.1" />
     <!-- <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" /> -->
 
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
