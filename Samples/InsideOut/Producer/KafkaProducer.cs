@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
@@ -54,6 +55,10 @@ namespace InsideOut.Producer
       {
         Key = key,
         Value = value,
+        Headers = new Headers
+        {
+          new Header("abc", Encoding.UTF8.GetBytes("value"))
+        }
       };
 
       var deliveryResult = await Producer.ProduceAsync(TopicName, message, cancellationToken);
