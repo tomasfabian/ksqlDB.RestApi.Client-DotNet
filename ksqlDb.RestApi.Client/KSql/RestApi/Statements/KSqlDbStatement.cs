@@ -1,11 +1,11 @@
-﻿using System;
+﻿using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+using System;
 using System.Text;
 using System.Text.Json.Serialization;
-using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 {
-  public sealed class KSqlDbStatement : QueryParameters
+    public sealed class KSqlDbStatement : QueryParameters
   {
     public KSqlDbStatement(string statement)
     {
@@ -14,7 +14,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 
       Sql = statement;
 
-      EndpointType = EndpointType.KSql;
+      EndpointType = statement.StartsWith("SELECT", StringComparison.OrdinalIgnoreCase) ? EndpointType.Query : EndpointType.KSql;
     }
 
     [JsonIgnore]
