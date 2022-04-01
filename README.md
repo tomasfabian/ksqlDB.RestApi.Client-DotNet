@@ -3527,7 +3527,7 @@ var query = context.CreateQueryStream<MyClass>()
   .ToQueryString();
 ```
 
-# v1.6.0-rc.1
+# v1.6.0
 
 ### Pull query Take extension method (Limit) (ksqldb v0.24.0)
 Returns a specified number of contiguous elements from the start of a stream or a table.
@@ -3617,7 +3617,7 @@ var message = new Message<string, IoTSensor>
 var deliveryResult = await producer.ProduceAsync(TopicName, message, cancellationToken);
 ```
 
-```
+```C#
 CREATE STREAM sensors (
   sensorId VARCHAR,
   headers ARRAY<STRUCT<Key VARCHAR, Value BYTES>> HEADERS
@@ -3668,12 +3668,12 @@ https://www.nuget.org/packages/ksqlDB.RestApi.Client/
 [Push query](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/)
 
 # Acknowledgements:
+- [ksql](https://github.com/confluentinc/ksql)
+
 - [Microsoft.Extensions.DependencyInjection](https://www.nuget.org/packages/Microsoft.Extensions.DependencyInjection/)
 - [Pluralize.NET](https://www.nuget.org/packages/Pluralize.NET/)
 - [System.Interactive.Async](https://www.nuget.org/packages/System.Interactive.Async/)
 - [System.Reactive](https://www.nuget.org/packages/System.Reactive/)
 - [System.Text.Json](https://www.nuget.org/packages/System.Text.Json/)
-
-- [ksql](https://github.com/confluentinc/ksql)
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/tomasfabian)
