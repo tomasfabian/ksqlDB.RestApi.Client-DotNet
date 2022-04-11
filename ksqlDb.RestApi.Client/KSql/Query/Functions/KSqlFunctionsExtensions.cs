@@ -2082,6 +2082,20 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
 
+    /// <summary>
+    /// Converts a DATE value to a string using the given format pattern. The format pattern should be in the
+    /// format expected by java.time.format.DateTimeFormatter.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="date">The date to convert</param>
+    /// <param name="formatPattern">The format pattern should be in the format expected by java.time.format.DateTimeFormatter</param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static string FormatDate(this KSqlFunctions kSqlFunctions, DateTime date, string formatPattern)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
     #endregion
   }
 }

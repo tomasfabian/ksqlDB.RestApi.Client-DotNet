@@ -1,5 +1,10 @@
 ﻿# ksqlDB.RestApi.Client
 
+# v1.7.0-rc.1
+
+Scalar functions:
+- FormatDate
+
 # v1.6.0
 - Pull query Take extension method (Limit)
 - Stream and table properties KEY_SCHEMA_ID and VALUE_SCHEMA_ID
