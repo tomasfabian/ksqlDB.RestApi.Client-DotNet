@@ -176,6 +176,21 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
       kSqlFunction.Should().BeEquivalentTo($"FORMAT_DATE('2022-04-11', '{format}')");
     }
 
+    [TestMethod]
+    public void FormatTime_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      TimeSpan time = new TimeSpan(10, 1, 22);
+      string format = "''T''HH:mm:ssX";
+      Expression<Func<Tweet, string>> expression = _ => KSqlFunctions.Instance.FormatTime(time, format);
+
+      //Act
+      var kSqlFunction = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      kSqlFunction.Should().BeEquivalentTo($"FORMAT_TIME('10:01:22', '{format}')");
+    }
+
     #endregion
   }
 }
