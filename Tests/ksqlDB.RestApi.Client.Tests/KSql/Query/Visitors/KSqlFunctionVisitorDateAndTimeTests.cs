@@ -161,6 +161,21 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
       kSqlFunction.Should().BeEquivalentTo($"TIMESTAMPTOSTRING({epochMilli}, '{format}', '{timeZone}')");
     }
 
+    [TestMethod]
+    public void FormatDate_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      DateTime date = new DateTime(2022,4, 11);
+      string format = "yyyy-MM-dd''T''HH:mm:ssX";
+      Expression<Func<Tweet, string>> expression = _ => KSqlFunctions.Instance.FormatDate(date, format);
+
+      //Act
+      var kSqlFunction = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      kSqlFunction.Should().BeEquivalentTo($"FORMAT_DATE('2022-04-11', '{format}')");
+    }
+
     #endregion
   }
 }
