@@ -2096,6 +2096,19 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
 
+    /// <summary>
+    /// Converts a TIME value into the string representation of the time in the given format.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="time">TIME value.</param>
+    /// <param name="formatPattern">The format pattern should be in the format expected by java.time.format.DateTimeFormatter.</param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static string FormatTime(this KSqlFunctions kSqlFunctions, TimeSpan time, string formatPattern)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
     #endregion
   }
 }
