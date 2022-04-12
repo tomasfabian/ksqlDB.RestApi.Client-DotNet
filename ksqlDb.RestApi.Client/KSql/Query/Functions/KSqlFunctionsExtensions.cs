@@ -2109,6 +2109,19 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
 
+    /// <summary>
+    /// Converts a string representation of a time in the given format into a TIME value.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="formattedTime">The string representation of a time.</param>
+    /// <param name="formatPattern">The format pattern should be in the format expected by java.time.format.DateTimeFormatter.</param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static TimeSpan ParseTime(this KSqlFunctions kSqlFunctions, string formattedTime, string formatPattern)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
     #endregion
   }
 }

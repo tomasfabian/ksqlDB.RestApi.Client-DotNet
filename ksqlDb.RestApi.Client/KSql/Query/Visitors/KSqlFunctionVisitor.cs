@@ -93,6 +93,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
           case nameof(KSqlFunctionsExtensions.Instr):
           case nameof(KSqlFunctionsExtensions.FormatDate):
           case nameof(KSqlFunctionsExtensions.FormatTime):
+          case nameof(KSqlFunctionsExtensions.ParseTime):
             Append($"{methodInfo.Name.ToKSqlFunctionName()}");
             PrintFunctionArguments(methodCallExpression.Arguments.Skip(1));
             break;
