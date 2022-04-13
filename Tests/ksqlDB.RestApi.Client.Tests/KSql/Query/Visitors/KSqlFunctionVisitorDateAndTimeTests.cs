@@ -191,6 +191,21 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
       kSqlFunction.Should().BeEquivalentTo($"FORMAT_TIME('10:01:22', '{format}')");
     }
 
+    [TestMethod]
+    public void ParseTime_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      string formattedTime = "10:01:22";
+      string format = "''T''HH:mm:ssX";
+      Expression<Func<Tweet, TimeSpan>> expression = _ => KSqlFunctions.Instance.ParseTime(formattedTime, format);
+
+      //Act
+      var kSqlFunction = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      kSqlFunction.Should().BeEquivalentTo($"PARSE_TIME('{formattedTime}', '{format}')");
+    }
+
     #endregion
   }
 }
