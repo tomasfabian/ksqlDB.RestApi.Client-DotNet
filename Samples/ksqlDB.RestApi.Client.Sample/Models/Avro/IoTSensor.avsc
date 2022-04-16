@@ -1,0 +1,9 @@
+﻿{
+ "namespace": "Sensors",
+ "type": "record",
+ "name": "IoTSensro",
+ "fields": [
+     {"name": "sensorId", "type": "string"},
+     {"name": "value",  "type": "int"}
+ ]
+}
