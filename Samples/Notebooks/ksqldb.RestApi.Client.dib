@@ -440,7 +440,7 @@ Console.WriteLine($"Calling from Thread id {Thread.CurrentThread.ManagedThreadId
 IDisposable ksqlDbSubscription = qbservable
     .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
     .Take(2)
-    .ObserveOn(syncContextScheduler)
+    .ObserveOn(scheduler)
     .Subscribe(observer);
 
 await Task.Delay(TimeSpan.FromSeconds(5));
