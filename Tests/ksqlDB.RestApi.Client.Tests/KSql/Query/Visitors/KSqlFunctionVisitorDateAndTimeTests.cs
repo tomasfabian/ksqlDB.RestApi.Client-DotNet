@@ -192,6 +192,21 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
     }
 
     [TestMethod]
+    public void ParseDate_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      string formattedDate = "2022-04-16";
+      string format = "yyyy-MM-dd''T''";
+      Expression<Func<Tweet, DateTime>> expression = _ => KSqlFunctions.Instance.ParseDate(formattedDate, format);
+
+      //Act
+      var kSqlFunction = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      kSqlFunction.Should().BeEquivalentTo($"PARSE_DATE('{formattedDate}', '{format}')");
+    }
+
+    [TestMethod]
     public void ParseTime_BuildKSql_PrintsFunction()
     {
       //Arrange
