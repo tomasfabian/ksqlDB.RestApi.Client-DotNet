@@ -6,7 +6,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
   public static class KSqlFunctionsExtensions
   {
     internal static string ServerSideOperationErrorMessage = "Operator is not intended for client side operations";
-    
+
     public static object Dynamic(this KSqlFunctions kSqlFunctions, string functionCall)
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
@@ -39,7 +39,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Returns the absolute value of its argument. If the argument is not negative, the argument is returned. If
     /// the argument is negative, the negation of the argument is returned.
@@ -51,7 +51,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Returns the absolute value of its argument. If the argument is not negative, the argument is returned. If
     /// the argument is negative, the negation of the argument is returned.
@@ -63,7 +63,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Returns the absolute value of its argument. If the argument is not negative, the argument is returned. If
     /// the argument is negative, the negation of the argument is returned.
@@ -76,10 +76,14 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
 
-    #endregion    
-    
+    #endregion
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#as_value
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#cast
+
     #region Ceil
-    
+
     /// <summary>
     /// Returns the smallest integer greater than or equal to the specified numeric expression.
     /// </summary>
@@ -90,7 +94,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Returns the smallest integer greater than or equal to the specified numeric expression.
     /// </summary>
@@ -101,7 +105,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Returns the smallest integer greater than or equal to the specified numeric expression.
     /// </summary>
@@ -112,7 +116,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Returns the smallest integer greater than or equal to the specified numeric expression.
     /// </summary>
@@ -123,7 +127,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Returns the smallest integer greater than or equal to the specified numeric expression.
     /// </summary>
@@ -143,7 +147,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     //Returns     : ARRAY<STRUCT<K VARCHAR, V VARCHAR>>
     //map         : The map to create entries from
     //sorted      : If true then the resulting entries are sorted by key
-    
+
     /// <summary>
     /// Constructs an array of Entry structs from the entries in a map. Each struct has a field named K containing the key, which is a string, and a field named V, which holds the value.
     /// </summary>
@@ -160,7 +164,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     //Returns     : ARRAY<STRUCT<K VARCHAR, V BIGINT>>
     //map         : The map to create entries from
     //sorted      : If true then the resulting entries are sorted by key
-    
+
     /// <summary>
     /// Constructs an array of Entry structs from the entries in a map. Each struct has a field named K containing the key, which is a string, and a field named V, which holds the value.
     /// </summary>
@@ -177,7 +181,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     //Returns     : ARRAY<STRUCT<K VARCHAR, V INT>>
     //map         : The map to create entries from
     //sorted      : If true then the resulting entries are sorted by key
-        
+
     /// <summary>
     /// Constructs an array of Entry structs from the entries in a map. Each struct has a field named K containing the key, which is a string, and a field named V, which holds the value.
     /// </summary>
@@ -194,7 +198,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     //Returns     : ARRAY<STRUCT<K VARCHAR, V DOUBLE>>
     //map         : The map to create entries from
     //sorted      : If true then the resulting entries are sorted by key
-        
+
     /// <summary>
     /// Constructs an array of Entry structs from the entries in a map. Each struct has a field named K containing the key, which is a string, and a field named V, which holds the value.
     /// </summary>
@@ -211,7 +215,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     //Returns     : ARRAY<STRUCT<K VARCHAR, V BOOLEAN>>
     //map         : The map to create entries from
     //sorted      : If true then the resulting entries are sorted by key
-    
+
     /// <summary>
     /// Constructs an array of Entry structs from the entries in a map. Each struct has a field named K containing the key, which is a string, and a field named V, which holds the value.
     /// </summary>
@@ -238,7 +242,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// The exponential of a value.
     /// </summary>
@@ -249,7 +253,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// The exponential of a value.
     /// </summary>
@@ -264,7 +268,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     #endregion
 
     #region Floor
-    
+
     /// <summary>
     /// Returns the largest integer less than or equal to the specified numeric expression.
     /// </summary>
@@ -275,7 +279,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Returns the largest integer less than or equal to the specified numeric expression.
     /// </summary>
@@ -286,7 +290,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Returns the largest integer less than or equal to the specified numeric expression.
     /// </summary>
@@ -297,7 +301,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Returns the largest integer less than or equal to the specified numeric expression.
     /// </summary>
@@ -308,7 +312,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Returns the largest integer less than or equal to the specified numeric expression.
     /// </summary>
@@ -347,7 +351,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Constructs an array of values between start and end (inclusive).
     /// </summary>
@@ -359,7 +363,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Constructs an array of values between start and end (inclusive).
     /// </summary>
@@ -411,6 +415,10 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     }
 
     #endregion
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#greatest
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#least
 
     #region LN
 
@@ -465,7 +473,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     #endregion
 
     #region Round
-    
+
     /// <summary>
     /// Round a value to the number of decimal places as specified by scale to the right of the decimal point. If
     /// scale is negative then value is rounded to the right of the decimal point. Numbers equidistant to the
@@ -476,7 +484,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Round a value to the number of decimal places as specified by scale to the right of the decimal point. If
     /// scale is negative then value is rounded to the right of the decimal point. Numbers equidistant to the
@@ -498,7 +506,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Round a value to the number of decimal places as specified by scale to the right of the decimal point. If
     /// scale is negative then value is rounded to the right of the decimal point. Numbers equidistant to the
@@ -554,7 +562,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// The sign of a value.
     /// </summary>
@@ -565,7 +573,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// The sign of a value.
     /// </summary>
@@ -619,7 +627,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     #endregion
 
     #region Sqrt
-    
+
     /// <summary>
     /// The square root of a value.
     /// </summary>
@@ -630,7 +638,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// The square root of a value.
     /// </summary>
@@ -641,7 +649,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// The square root of a value.
     /// </summary>
@@ -660,6 +668,9 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     #region Collections
 
     //TODO:
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#array
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#array_concat
 
     #region ArrayContains
 
@@ -864,7 +875,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     #endregion
 
     #region ArrayIntersect 
-    
+
     /// <summary>
     /// Returns an array of all the distinct elements from the intersection of both input arrays, or NULL if
     /// either input array is NULL. The order of entries in the output is the same as in the first input array.
@@ -1115,7 +1126,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     #endregion
 
     #region ArrayMin
-    
+
     /// <summary>
     /// Given an array, return the minimum value. Array entries are compared according to their natural sort order, which sorts the various data-types.
     /// </summary>
@@ -1572,8 +1583,10 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     }
 
     #endregion
-    
+
     // TODO: ELT, FIELD
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#elt
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#field
 
     #region JSON_ARRAY_CONTAINS
 
@@ -1614,6 +1627,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     }
 
     #endregion
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#map
 
     #region MapKeys
 
@@ -1687,9 +1702,13 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
 
     #region MAP_VALUES
 
-    
+
 
     #endregion
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#map_union
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#slice
 
     #endregion
 
@@ -1701,10 +1720,23 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
 
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#chr
+
+    /// <summary>
+    /// Concatenate two or more string expressions. Any input strings which evaluate to NULL are replaced with empty string in the output.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">The varchar (string) fields to concatenate</param>
+    /// <returns></returns>
+    public static string Concat(this KSqlFunctions kSqlFunctions, params string[] input)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
     #region Instr
 
     /// <summary>
-    /// Returns the position of substring in the provided string.
+    /// Returns the position of substring in the provided string. Since: 0.10.0
     /// </summary>
     /// <param name="kSqlFunctions"></param>
     /// <param name="str"></param>
@@ -1744,6 +1776,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
 
     #endregion
 
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#len
+
     /// <summary>
     /// Pads the input string, beginning from the left, with the specified padding string until the target length
     /// is reached. If the input string is longer than the specified target length it will be truncated. If the
@@ -1759,6 +1793,12 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
 
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#mask
+
+    //REGEXP*
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#replace
+
     /// <summary>
     /// Pads the input string, starting from the end, with the specified padding string until the target length is
     /// reached. If the input string is longer than the specified target length it will be truncated. If the
@@ -1773,6 +1813,10 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#split
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#split_to_map
 
     /// <summary>
     /// Returns a substring of str that starts at pos and is of length len
@@ -1800,28 +1844,6 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     }
 
     /// <summary>
-    /// Remove whitespace from the beginning and end of a string.
-    /// </summary>
-    /// <param name="kSqlFunctions"></param>
-    /// <param name="input">The string to trim</param>
-    /// <returns>Trimmed string</returns>
-    public static string Trim(this KSqlFunctions kSqlFunctions, string input)
-    {
-      throw new InvalidOperationException(ServerSideOperationErrorMessage);
-    }
-
-    /// <summary>
-    /// Concatenate two or more string expressions. Any input strings which evaluate to NULL are replaced with empty string in the output.
-    /// </summary>
-    /// <param name="kSqlFunctions"></param>
-    /// <param name="input">The varchar (string) fields to concatenate</param>
-    /// <returns></returns>
-    public static string Concat(this KSqlFunctions kSqlFunctions, params string[] input)
-    {
-      throw new InvalidOperationException(ServerSideOperationErrorMessage);
-    }    
-    
-    /// <summary>
     /// Converts a STRING value in the specified encoding to BYTES. The accepted encoders are 'hex', 'utf8', 'ascii' and 'base64'. Since: - ksqldb 0.21
     /// </summary>
     /// <param name="kSqlFunctions"></param>
@@ -1832,6 +1854,21 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
+
+    /// <summary>
+    /// Remove whitespace from the beginning and end of a string.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="input">The string to trim</param>
+    /// <returns>Trimmed string</returns>
+    public static string Trim(this KSqlFunctions kSqlFunctions, string input)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#ucase
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#uuid
 
     /// <summary>
     /// Converts a BYTES value to STRING in the specified encoding. The accepted encoders are 'hex', 'utf8',
@@ -1887,7 +1924,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     #region Json
 
     /// <summary>
-    /// Given a STRING that contains JSON data, extract the value at the specified JSONPath or NULL if the specified path does not exist.
+    /// Given a STRING that contains JSON data, extract the value at the specified JSONPath or NULL if the specified path does not exist. Since: 0.11.0
     /// </summary>
     /// <param name="kSqlFunctions"></param>
     /// <param name="input">The input JSON string.</param>
@@ -1897,9 +1934,9 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
-    /// Given a string, returns true if it can be parsed as a valid JSON value, false otherwise
+    /// Given a string, returns true if it can be parsed as a valid JSON value, false otherwise. Since: 0.24.0
     /// </summary>
     /// <param name="kSqlFunctions"></param>
     /// <param name="input">The input JSON string</param>
@@ -1913,7 +1950,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     /// <summary>
     /// Given a string, parses it as a JSON value and returns the length of the top-level array. Returns NULL if
     /// the string can't be interpreted as a JSON array, for example, when the string is `NULL` or it does not
-    /// contain valid JSON, or the JSON value is not an array.
+    /// contain valid JSON, or the JSON value is not an array. Since: 0.24.0
     /// </summary>
     /// <param name="kSqlFunctions"></param>
     /// <param name="jsonArray"></param>
@@ -1925,7 +1962,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     }
 
     /// <summary>
-    /// Given N strings, parse them as JSON values and return a string representing their concatenation.
+    /// Given N strings, parse them as JSON values and return a string representing their concatenation. Since: 0.24.0
     /// </summary>
     /// <param name="kSqlFunctions"></param>
     /// <param name="jsonStrings"></param>
@@ -1939,7 +1976,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     /// <summary>
     /// Given a string, parses it as a JSON object and returns a ksqlDB array of strings representing the
     /// top-level keys.Returns NULL if the string can't be interpreted as a JSON object, for example, when the
-    /// string is NULL or it does not contain valid JSON, or the JSON value is not an object.
+    /// string is NULL or it does not contain valid JSON, or the JSON value is not an object. Since: 0.24.0
     /// </summary>
     /// <param name="kSqlFunctions"></param>
     /// <param name="jsonString">The input JSON string</param>
@@ -1953,7 +1990,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     /// <summary>
     /// Given a string, parses it as a JSON object and returns a map representing the top-level keys and values.
     /// Returns `NULL` if the string can't be interpreted as a JSON object, i.e. it is `NULL` or it does not
-    /// contain valid JSON, or the JSON value is not an object.
+    /// contain valid JSON, or the JSON value is not an object. Since: 0.24.0
     /// </summary>
     /// <param name="kSqlFunctions"></param>
     /// <param name="jsonString"></param>
@@ -1965,7 +2002,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     }
 
     /// <summary>
-    /// Given any ksqlDB type returns the equivalent JSON string.
+    /// Given any ksqlDB type returns the equivalent JSON string. Since: 0.24.0
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="kSqlFunctions"></param>
@@ -1979,11 +2016,11 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
 
     #endregion
 
-    //CONCAT_WS
-
     #endregion
 
     #region Nulls
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#coalesce
 
     /// <summary>
     /// If the provided expression is NULL, returns altValue, otherwise, returns expression.
@@ -1998,27 +2035,17 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
 
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#nullif
+
     #endregion
 
     #region Date and time functions
-    
-    /// <summary>
-    /// Gets an integer representing days since epoch.
-    /// </summary>
-    /// <returns></returns>
-    public static int UnixDate(this KSqlFunctions kSqlFunctions)
-    {
-      throw new InvalidOperationException(ServerSideOperationErrorMessage);
-    }
 
-    /// <summary>
-    /// Gets the Unix timestamp in milliseconds, represented as a long (BIGINT).
-    /// </summary>
-    /// <returns></returns>
-    public static long UnixTimestamp(this KSqlFunctions kSqlFunctions)
-    {
-      throw new InvalidOperationException(ServerSideOperationErrorMessage);
-    }
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#convert_tz
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#dateadd
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#datesub
 
     /// <summary>
     /// Converts an integer representing days since epoch to a date string using the given format pattern.
@@ -2043,7 +2070,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Converts a string representation of a date in the given format into the BIGINT value that represents the millisecond timestamp.
     /// </summary>
@@ -2068,7 +2095,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
-    
+
     /// <summary>
     /// Converts a BIGINT millisecond timestamp value into the string representation of the timestamp in the given format.
     /// </summary>
@@ -2102,7 +2129,6 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     /// <param name="date">The date to convert</param>
     /// <param name="formatPattern">The format pattern should be in the format expected by java.time.format.DateTimeFormatter</param>
     /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
     public static string FormatDate(this KSqlFunctions kSqlFunctions, DateTime date, string formatPattern)
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
@@ -2115,11 +2141,16 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     /// <param name="time">TIME value.</param>
     /// <param name="formatPattern">The format pattern should be in the format expected by java.time.format.DateTimeFormatter.</param>
     /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
     public static string FormatTime(this KSqlFunctions kSqlFunctions, TimeSpan time, string formatPattern)
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#format_timestamp
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#from_days
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#from_unixtime
 
     /// <summary>
     /// Converts a string representation of a date in the specified format into a DATE value.
@@ -2140,8 +2171,35 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     /// <param name="formattedTime">The string representation of a time.</param>
     /// <param name="formatPattern">The format pattern should be in the format expected by java.time.format.DateTimeFormatter.</param>
     /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
     public static TimeSpan ParseTime(this KSqlFunctions kSqlFunctions, string formattedTime, string formatPattern)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#parse_timestamp
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#timeadd
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#timesub
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#timestampadd
+
+    //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#timestampsub
+
+    /// <summary>
+    /// Gets an integer representing days since epoch.
+    /// </summary>
+    /// <returns></returns>
+    public static int UnixDate(this KSqlFunctions kSqlFunctions)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Gets the Unix timestamp in milliseconds, represented as a long (BIGINT).
+    /// </summary>
+    /// <returns></returns>
+    public static long UnixTimestamp(this KSqlFunctions kSqlFunctions)
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
