@@ -280,6 +280,23 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
 
     #endregion
 
+    #region InitCap
+
+    [TestMethod]
+    public void InitCap_BuildKSql_PrintsFunction()
+    {
+      //Arrange
+      Expression<Func<Tweet, string>> expression = c => K.Functions.InitCap(c.Message);
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"INITCAP({nameof(Tweet.Message)})");
+    }
+
+    #endregion
+
     #region Cast
 
     [TestMethod]
