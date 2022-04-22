@@ -63,6 +63,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
           case nameof(KSqlFunctionsExtensions.TimestampToString):
           case nameof(KSqlFunctionsExtensions.ExtractJsonField):
           case nameof(KSqlFunctionsExtensions.Encode):
+          case nameof(KSqlFunctionsExtensions.InitCap):
           case nameof(KSqlFunctionsExtensions.IfNull):
             Append($"{methodInfo.Name.ToUpper()}");
             PrintFunctionArguments(methodCallExpression.Arguments.Skip(1));
@@ -93,6 +94,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
           case nameof(KSqlFunctionsExtensions.Instr):
           case nameof(KSqlFunctionsExtensions.FormatDate):
           case nameof(KSqlFunctionsExtensions.FormatTime):
+          case nameof(KSqlFunctionsExtensions.ParseDate):
           case nameof(KSqlFunctionsExtensions.ParseTime):
             Append($"{methodInfo.Name.ToKSqlFunctionName()}");
             PrintFunctionArguments(methodCallExpression.Arguments.Skip(1));

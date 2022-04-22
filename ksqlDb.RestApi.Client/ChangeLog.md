@@ -3,7 +3,7 @@
 # v1.7.0-rc.1
 
 Scalar functions:
-- FormatDate, FormatTime, ParseTime
+- FormatDate, FormatTime, ParseDate, ParseTime, InitCap
 
 # v1.6.0
 - Pull query Take extension method (Limit)

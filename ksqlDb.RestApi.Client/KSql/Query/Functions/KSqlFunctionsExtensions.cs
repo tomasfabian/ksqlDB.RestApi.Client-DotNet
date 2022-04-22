@@ -1872,6 +1872,18 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
 
+    /// <summary>
+    /// Capitalizes the first letter of each word in a string and the rest lowercased. Words are delimited by
+    /// whitespace. Since: 0.6.0
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="str">The source string. If null, then function returns null.</param>
+    /// <returns>Returns the string with the the first letter of each word capitalized and the rest lowercased</returns>
+    public static string InitCap(this KSqlFunctions kSqlFunctions, string str)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
     #region Json
 
     /// <summary>
@@ -2105,6 +2117,18 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Functions
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
     public static string FormatTime(this KSqlFunctions kSqlFunctions, TimeSpan time, string formatPattern)
+    {
+      throw new InvalidOperationException(ServerSideOperationErrorMessage);
+    }
+
+    /// <summary>
+    /// Converts a string representation of a date in the specified format into a DATE value.
+    /// </summary>
+    /// <param name="kSqlFunctions"></param>
+    /// <param name="formattedDate">The string representation of a date.</param>
+    /// <param name="formatPattern">The format pattern should be in the format expected by java.text.SimpleDateFormat.</param>
+    /// <returns></returns>
+    public static DateTime ParseDate(this KSqlFunctions kSqlFunctions, string formattedDate, string formatPattern)
     {
       throw new InvalidOperationException(ServerSideOperationErrorMessage);
     }
