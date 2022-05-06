@@ -219,5 +219,32 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi
       receivedTweets.Should().BeEmpty();
       cts.Dispose();
     }
+
+    [TestMethod]
+    public async Task Run_HttpClientWasDisposed()
+    {
+      //Arrange
+      var queryParameters = new QueryStreamParameters();
+
+      //Act
+      _ = await ClassUnderTest.Run<Tweet>(queryParameters).ToListAsync();
+
+      //Assert
+      ClassUnderTest.LastUsedHttpClient.IsDisposed.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task Run_DonNotDisposeHttpClient()
+    {
+      //Arrange
+      var queryParameters = new QueryStreamParameters();
+      ClassUnderTest.Options.DisposeHttpClient = false;
+
+      //Act
+      _ = await ClassUnderTest.Run<Tweet>(queryParameters).ToListAsync();
+
+      //Assert
+      ClassUnderTest.LastUsedHttpClient.IsDisposed.Should().BeFalse();
+    }
   }
 }

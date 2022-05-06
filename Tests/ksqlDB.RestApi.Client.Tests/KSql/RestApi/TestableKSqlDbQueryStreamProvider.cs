@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using ksqlDB.Api.Client.Tests.Helpers;
+using ksqlDB.Api.Client.Tests.Helpers.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Microsoft.Extensions.Logging;
@@ -29,6 +30,8 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi
     protected string ErrorResponse =
       @"{""@type"":""generic_error"",""error_code"":40001,""message"":""Line: 1, Col: 21: SELECT column 'Foo' cannot be resolved.\nStatement: SELECT Message, Id, Foo FROM Tweets\r\nWHERE Message = 'Hello world' EMIT CHANGES LIMIT 2;""}";
 
+    internal IsDisposedHttpClient LastUsedHttpClient { get; private set; }
+
     protected override HttpClient OnCreateHttpClient()
     {
       var handlerMock = new Mock<HttpMessageHandler>();
@@ -47,7 +50,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi
                       })
         .Verifiable();
 
-      return new HttpClient(handlerMock.Object)
+      return LastUsedHttpClient = new IsDisposedHttpClient(handlerMock.Object)
              {
                BaseAddress = new Uri(TestParameters.KsqlDBUrl)
              };
