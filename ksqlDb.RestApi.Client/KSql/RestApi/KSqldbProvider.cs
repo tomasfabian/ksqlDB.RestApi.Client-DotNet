@@ -33,6 +33,8 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
 
     protected abstract string QueryEndPointName { get; }
 
+    internal KSqlDbProviderOptions Options => options;
+
     protected virtual HttpClient OnCreateHttpClient()
     {
       //TODO: refactor to use System.Net.Http.IHttpClientFactory

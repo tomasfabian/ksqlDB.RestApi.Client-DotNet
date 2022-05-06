@@ -66,7 +66,7 @@ namespace ksqlDB.Api.Client.Samples
         })
         .Options;
 
-      contextOptions.DisposeHttpClient = true;
+      contextOptions.DisposeHttpClient = false;
 
       return contextOptions;
     }
@@ -78,7 +78,10 @@ namespace ksqlDB.Api.Client.Samples
       var loggerFactory = CreateLoggerFactory();
 
       var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
-      var restApiProvider = new KSqlDbRestApiProvider(httpClientFactory, loggerFactory);
+      var restApiProvider = new KSqlDbRestApiProvider(httpClientFactory, loggerFactory)
+      {
+        DisposeHttpClient = false
+      };
       restApiProvider.SetCredentials(new BasicAuthCredentials("fred", "letmein"));
       
       var moviesProvider = new MoviesProvider(restApiProvider);
