@@ -37,6 +37,8 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
         logger = loggerFactory.CreateLogger(LoggingCategory.Name);
     }
 
+    public bool DisposeHttpClient { get; set; } = true;
+
     internal static readonly string MediaType = "application/vnd.ksql.v1+json";
 
     private string NullOrWhiteSpaceErrorMessage => "Can't be null, empty, or contain only whitespace.";
@@ -70,7 +72,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
 
     private async Task<HttpResponseMessage> ExecuteStatementAsync(object content, EndpointType endPointType, Encoding encoding, CancellationToken cancellationToken = default)
     {
-      using var httpClient = httpClientFactory.CreateClient();
+      var httpClient = httpClientFactory.CreateClient();
 
       var httpRequestMessage = CreateHttpRequestMessage(content, endPointType, encoding);
 
@@ -86,6 +88,9 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
 
         logger?.LogDebug($"Command response ({httpResponseMessage.StatusCode}): {response}");
       }
+
+      if(DisposeHttpClient)
+        httpClient.Dispose();
 
       return httpResponseMessage;
     }

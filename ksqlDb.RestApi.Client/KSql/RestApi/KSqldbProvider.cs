@@ -35,6 +35,8 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
 
     protected virtual HttpClient OnCreateHttpClient()
     {
+      //TODO: refactor to use System.Net.Http.IHttpClientFactory
+      //https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests?view=aspnetcore-6.0
       return httpClientFactory.CreateClient();
     }
 
@@ -83,7 +85,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
 
     private async Task<StreamReader> GetStreamReaderAsync<T>(object parameters, CancellationToken cancellationToken)
     {
-      using var httpClient = OnCreateHttpClient();
+      var httpClient = OnCreateHttpClient();
 
       var httpRequestMessage = CreateQueryHttpRequestMessage(httpClient, parameters);
 
@@ -100,6 +102,9 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
 #endif
 
       var streamReader = new StreamReader(stream);
+
+      if (options.DisposeHttpClient)
+        httpClient.Dispose();
 
       return streamReader;
     }

@@ -31,8 +31,6 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Query
       if (rawJson == String.Empty)
         return default;
 
-      //Console.WriteLine(rawJson);
-
       if (rawJson.StartsWith("["))
         rawJson = rawJson.Substring(startIndex: 1);
       if (rawJson.EndsWith(","))

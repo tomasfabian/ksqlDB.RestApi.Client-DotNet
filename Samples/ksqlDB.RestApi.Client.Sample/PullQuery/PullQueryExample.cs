@@ -28,13 +28,17 @@ namespace ksqlDB.Api.Client.Samples.PullQuery
         .SetBasicAuthCredentials("fred", "letmein")
         .Options;
 
+      contextOptions.DisposeHttpClient = false;
+
       await using var context = new KSqlDBContext(contextOptions);
 
       var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
-      
+
       restApiClient = new KSqlDbRestApiClient(httpClientFactory)
         .SetCredentials(new BasicAuthCredentials("fred", "letmein"));
-
+      
+      ((KSqlDbRestApiClient)restApiClient).DisposeHttpClient = false;
+      
       await CreateOrReplaceStreamAsync();
 
       var statement = context.CreateTableStatement(MaterializedViewName)

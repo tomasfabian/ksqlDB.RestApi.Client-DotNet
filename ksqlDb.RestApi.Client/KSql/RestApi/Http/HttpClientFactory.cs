@@ -5,19 +5,22 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Http
 {
   public class HttpClientFactory : IHttpClientFactory
   {
-    private readonly Uri uri;
+    private readonly HttpClient httpClient;
 
     public HttpClientFactory(Uri uri)
     {
-      this.uri = uri ?? throw new ArgumentNullException(nameof(uri));
+      if(uri == null)
+        throw new ArgumentNullException(nameof(uri));
+
+      httpClient = new()
+      {
+        BaseAddress = uri
+      };
     }
 
     public HttpClient CreateClient()
     {
-      return new()
-      {
-        BaseAddress = uri
-      };
+      return httpClient;
     }
   }
 }

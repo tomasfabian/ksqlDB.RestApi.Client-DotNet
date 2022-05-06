@@ -1,6 +1,8 @@
 ﻿# ksqlDB.RestApi.Client
 
 # v1.7.0-rc.1
+- KSqlDbProviderOptions.DisposeHttpClient option
+- KSqlDbRestApiProvider.DisposeHttpClient option
 
 Scalar functions:
 - FormatDate, FormatTime, ParseDate, ParseTime, InitCap

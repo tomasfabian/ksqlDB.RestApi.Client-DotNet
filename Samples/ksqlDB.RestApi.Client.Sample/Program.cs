@@ -65,7 +65,9 @@ namespace ksqlDB.Api.Client.Samples
           options.Properties[KSqlDbConfigs.ProcessingGuarantee] = ProcessingGuarantee.ExactlyOnce.ToKSqlValue();
         })
         .Options;
-      
+
+      contextOptions.DisposeHttpClient = true;
+
       return contextOptions;
     }
 
