@@ -38,6 +38,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
 using K = ksqlDB.RestApi.Client.KSql.Query.Functions.KSql;
+using HttpClientFactory = ksqlDB.Api.Client.Samples.Http.HttpClientFactory;
 
 namespace ksqlDB.Api.Client.Samples
 {

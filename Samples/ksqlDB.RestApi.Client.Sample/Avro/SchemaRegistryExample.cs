@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Confluent.SchemaRegistry;
+using ksqlDB.Api.Client.Samples.Http;
 using Sensors;
 using ksqlDB.Api.Client.Samples.Providers;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 

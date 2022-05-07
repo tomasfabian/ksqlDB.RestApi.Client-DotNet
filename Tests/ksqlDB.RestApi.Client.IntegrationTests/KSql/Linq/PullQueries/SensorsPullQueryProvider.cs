@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ksqlDB.Api.Client.IntegrationTests.Http;
 using ksqlDB.Api.Client.IntegrationTests.Models.Sensors;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq.PullQueries

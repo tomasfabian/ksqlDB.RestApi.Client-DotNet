@@ -12,6 +12,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using HttpClientFactory = ksqlDB.Api.Client.Samples.Http.HttpClientFactory;
 
 namespace ksqlDB.Api.Client.Samples.PullQuery
 {
