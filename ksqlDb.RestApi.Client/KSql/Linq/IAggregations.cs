@@ -168,6 +168,12 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
     /// <returns>collect values of a Double field into a single Array</returns>float[] CollectList(Func<TSource, float> selector);
     double[] CollectList(Func<TSource, double> selector);
 
+    TValue[] CollectList<TValue>(Func<TSource, TValue> selector);
+
+    TValue[][] CollectList<TValue>(Func<TSource, TValue[]> selector);
+
+    TValue[] CollectList<TKey, TValue>(Func<TSource, IDictionary<TKey, TValue>> selector);
+
     [Obsolete]
     decimal[] CollectList(Func<TSource, decimal> selector);
 
@@ -193,6 +199,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
     /// </summary>
     /// <param name="selector"></param>
     /// <returns></returns>
+    
     string[] CollectSet(Func<TSource, string> selector);
     /// <summary>
     /// Gather all of the distinct values from an input grouping into a single Array.
@@ -203,6 +210,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
     /// <param name="selector"></param>
     /// <returns></returns>
     short[] CollectSet(Func<TSource, short> selector);
+
     /// <summary>
     /// Gather all of the distinct values from an input grouping into a single Array.
     /// Not available for aggregating values from an input Table.
@@ -212,6 +220,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
     /// <param name="selector"></param>
     /// <returns></returns>
     int[] CollectSet(Func<TSource, int> selector);
+
     /// <summary>
     /// Gather all of the distinct values from an input grouping into a single Array.
     /// Not available for aggregating values from an input Table.
@@ -221,6 +230,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
     /// <param name="selector"></param>
     /// <returns></returns>
     long[] CollectSet(Func<TSource, long> selector);
+
     /// <summary>
     /// Gather all of the distinct values from an input grouping into a single Array.
     /// Not available for aggregating values from an input Table.
@@ -230,6 +240,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
     /// <param name="selector"></param>
     /// <returns></returns>
     float[] CollectSet(Func<TSource, float> selector);
+
     /// <summary>
     /// Gather all of the distinct values from an input grouping into a single Array.
     /// Not available for aggregating values from an input Table.
@@ -239,6 +250,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
     /// <param name="selector"></param>
     /// <returns></returns>
     double[] CollectSet(Func<TSource, double> selector);
+
     /// <summary>
     /// Gather all of the distinct values from an input grouping into a single Array.
     /// Not available for aggregating values from an input Table.
@@ -248,6 +260,12 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
     /// <param name="selector"></param>
     /// <returns></returns>
     decimal[] CollectSet(Func<TSource, decimal> selector);
+
+    TValue[] CollectSet<TValue>(Func<TSource, TValue> selector);
+
+    TValue[][] CollectSet<TValue>(Func<TSource, TValue[]> selector);
+
+    TValue[] CollectSet<TKey, TValue>(Func<TSource, IDictionary<TKey, TValue>> selector);
 
     #endregion
 
@@ -603,6 +621,12 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
     /// <returns></returns>
     decimal EarliestByOffset(Func<TSource, decimal> selector);
 
+    TValue EarliestByOffset<TValue>(Func<TSource, TValue> selector);
+
+    TValue[] EarliestByOffset<TValue>(Func<TSource, TValue[]> selector);
+
+    IDictionary<TKey, TValue> EarliestByOffset<TKey, TValue>(Func<TSource, IDictionary<TKey, TValue>> selector);
+
     #endregion
 
     #region EarliestByOffsetAllowNulls
@@ -880,10 +904,17 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
     /// <returns></returns>
     decimal[] LatestByOffset(Func<TSource, decimal> selector, int latestN);
 
+
+    TValue LatestByOffset<TValue>(Func<TSource, TValue> selector);
+
+    TValue[] LatestByOffset<TValue>(Func<TSource, TValue[]> selector);
+
+    IDictionary<TKey, TValue> LatestByOffset<TKey, TValue>(Func<TSource, IDictionary<TKey, TValue>> selector);
+
     #endregion
 
     #region LatestByOffsetAllowNulls
-    
+
     /// <summary>
     /// Returns the latest N values for the specified column as an ARRAY. The latest values have the largest offset. Includes NULL values.
     /// </summary>
