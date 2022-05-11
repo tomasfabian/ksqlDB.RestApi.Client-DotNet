@@ -3648,6 +3648,51 @@ SELECT * FROM sensors EMIT CHANGES;
 ```
 
 
+# v1.7.0-rc.1
+### KSqlDBContextOptions DisposeHttpClient
+For better HttpClient lifecycle management set DisposeHttpClient to `false`. 
+
+```C#
+var contextOptions2 = new KSqlDBContextOptions(ksqlDbUrl)
+{
+  DisposeHttpClient = false
+};
+```
+
+```C#
+var kSqlDbRestApiClient = new KSqlDbRestApiClient(new HttpClientFactory(new Uri(ksqlDbUrl)))
+{
+  DisposeHttpClient = false
+};
+```
+
+The provided HttpClientFactory should be also changed accordingly. The default implementation recreats the httpClient during each call of `IHttpClientFactory.Create`.
+For more fine grained control use:
+```C#
+public class HttpClientFactory : IHttpClientFactory
+{
+  private readonly HttpClient httpClient;
+
+  public HttpClientFactory(Uri uri)
+  {
+    if (uri == null)
+      throw new ArgumentNullException(nameof(uri));
+
+    httpClient = new()
+    {
+      BaseAddress = uri
+    };
+  }
+
+  public HttpClient CreateClient()
+  {
+    return httpClient;
+  }
+}
+```
+
+**TODO:** use [System.Net.Http.IHttpClientFactory](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests?view=aspnetcore-6.0) (breaking change)
+
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
 
