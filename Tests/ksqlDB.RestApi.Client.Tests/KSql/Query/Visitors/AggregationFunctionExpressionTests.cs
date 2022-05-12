@@ -104,6 +104,19 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
     }
     
     [TestMethod]
+    public void CollectSet_BuildKSql_Map()
+    {
+      //Arrange
+      Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression = l => new { Key = l.Key, CollectSet = l.CollectSet(c => c.Dictionary) };
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"Key, COLLECT_SET({nameof(Transaction.Dictionary)}) CollectSet");
+    }
+    
+    [TestMethod]
     public void CollectList_BuildKSql_PrintsCollectListWithColumn()
     {
       //Arrange
@@ -114,6 +127,32 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
 
       //Assert
       query.Should().BeEquivalentTo($"Key, COLLECT_LIST({nameof(Transaction.Amount)}) CollectList");
+    }
+    
+    [TestMethod]
+    public void CollectList_BuildKSql_Array()
+    {
+      //Arrange
+      Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression = l => new { Key = l.Key, CollectList = l.CollectList(c => c.Array) };
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"Key, COLLECT_LIST({nameof(Transaction.Array)}) CollectList");
+    }
+    
+    [TestMethod]
+    public void CollectList_BuildKSql_Map()
+    {
+      //Arrange
+      Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression = l => new { Key = l.Key, CollectList = l.CollectList(c => c.Dictionary) };
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"Key, COLLECT_LIST({nameof(Transaction.Dictionary)}) CollectList");
     }
 
     [TestMethod]
@@ -153,6 +192,19 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
 
       //Assert
       query.Should().BeEquivalentTo($"Key, EARLIEST_BY_OFFSET({nameof(Transaction.Amount)}, true) EarliestByOffset");
+    }
+
+    [TestMethod]
+    public void EarliestByOffset_BuildKSql_Map()
+    {
+      //Arrange
+      Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression = l => new { Key = l.Key, EarliestByOffset = l.EarliestByOffset(c => c.Dictionary) };
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"Key, EARLIEST_BY_OFFSET({nameof(Transaction.Dictionary)}, true) EarliestByOffset");
     }
 
     [TestMethod]
@@ -206,6 +258,19 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
 
       //Assert
       query.Should().BeEquivalentTo($"Key, LATEST_BY_OFFSET({nameof(Transaction.Amount)}, true) LatestByOffset");
+    }
+
+    [TestMethod]
+    public void LatestByOffset_BuildKSql_Map()
+    {
+      //Arrange
+      Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression = l => new { Key = l.Key, LatestByOffset = l.LatestByOffset(c => c.Dictionary) };
+
+      //Act
+      var query = ClassUnderTest.BuildKSql(expression);
+
+      //Assert
+      query.Should().BeEquivalentTo($"Key, LATEST_BY_OFFSET({nameof(Transaction.Dictionary)}, true) LatestByOffset");
     }
 
     [TestMethod]
