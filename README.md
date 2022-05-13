@@ -3647,8 +3647,8 @@ SELECT * FROM sensors EMIT CHANGES;
 |Sensor-4                                                  |ZXQ=                                                      |
 ```
 
-
 # v1.7.0-rc.1
+
 ### KSqlDBContextOptions DisposeHttpClient
 For better HttpClient lifecycle management set DisposeHttpClient to `false`. 
 
@@ -3691,7 +3691,21 @@ public class HttpClientFactory : IHttpClientFactory
 }
 ```
 
-**TODO:** use [System.Net.Http.IHttpClientFactory](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests?view=aspnetcore-6.0) (breaking change)
+# aggregate functions COLLECT_LIST, COLLECT_SET, EARLIEST_BY_OFFSET, LATEST_BY_OFFSET - with Structs, Arrays, and Maps
+
+The list of available `kslqdb` aggregate functions is available [here](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
+
+```C#
+var dict = new Dictionary<string, int>()
+{
+  ["Karen"] = 3,
+  ["Thomas"] = 42,
+};
+
+var source = Context.CreateQueryStream<Tweet>(TweetsStreamName)
+  .GroupBy(c => c.Id)
+  .Select(l => new { Id = l.Key, Maps = l.CollectList(c => dict) })
+```
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
@@ -3704,7 +3718,8 @@ https://www.nuget.org/packages/ksqlDB.RestApi.Client/
 **TODO:**
 - [CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/) - EMIT output_refinement
 - rest of the [ksql query syntax](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/) (supported operators etc.)
- 
+- use [System.Net.Http.IHttpClientFactory](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests?view=aspnetcore-6.0) (breaking change)
+
 # ksqldb links
 [Scalar functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#as_value)
 
