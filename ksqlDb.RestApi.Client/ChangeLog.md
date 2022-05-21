@@ -1,5 +1,8 @@
 ﻿# ksqlDB.RestApi.Client
 
+# v2.0.0-rc.1
+- 
+
 # v1.7.0-rc.1
 - aggregate function COLLECT_LIST, COLLECT_SET, EARLIEST_BY_OFFSET, LATEST_BY_OFFSET - with Structs, Arrays, and Maps
 

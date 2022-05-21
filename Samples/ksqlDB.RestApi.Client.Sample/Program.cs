@@ -146,6 +146,39 @@ namespace ksqlDB.Api.Client.Samples
       Console.WriteLine("Finished.");
     }
 
+    private static async Task ConfigureKSqlDbWithServicesCollection_AndSubscribe(string ksqlDbUrl)
+    {
+      var services = new ServiceCollection();
+
+      services.ConfigureKSqlDb(ksqlDbUrl);
+
+      var provider = services.BuildServiceProvider();
+
+      var context = provider.GetRequiredService<IKSqlDBContext>();
+
+      var semaphoreSlim = new SemaphoreSlim(0, 1);
+
+      using var d1 = context.CreateQueryStream<Movie>().Subscribe(onNext: movie =>
+        {
+          Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
+          Console.WriteLine();
+        }, onError: error =>
+        {
+          semaphoreSlim.Release();
+
+          Console.WriteLine($"Exception: {error.Message}");
+        },
+        onCompleted: () =>
+        {
+          semaphoreSlim.Release();
+          Console.WriteLine("Completed");
+        });
+
+      await semaphoreSlim.WaitAsync();
+
+      await context.DisposeAsync();
+    }
+
     private static async Task AddAndSaveChangesAsync(KSqlDBContext context)
     {
       context.Add(MoviesProvider.Movie1);

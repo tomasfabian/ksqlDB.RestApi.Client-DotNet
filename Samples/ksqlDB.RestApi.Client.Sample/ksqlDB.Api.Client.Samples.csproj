@@ -8,15 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- <PackageReference Include="ksqlDB.RestApi.Client" Version="1.6.0-rc.1" /> -->
-    <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />
+    <PackageReference Include="ksqlDB.RestApi.Client" Version="2.0.0-rc.1" />
+    <!-- <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" /> -->
     <PackageReference Include="Apache.Avro" Version="1.11.0" />
     <PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" Version="1.8.2" />
 
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
