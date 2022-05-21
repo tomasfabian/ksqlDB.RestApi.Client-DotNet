@@ -21,6 +21,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Connectors;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.Extensions.Logging;
+using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi
 {
@@ -37,7 +38,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
         logger = loggerFactory.CreateLogger(LoggingCategory.Name);
     }
 
-    public bool DisposeHttpClient { get; set; } = true;
+    public bool DisposeHttpClient { get; set; }
 
     internal static readonly string MediaType = "application/vnd.ksql.v1+json";
 

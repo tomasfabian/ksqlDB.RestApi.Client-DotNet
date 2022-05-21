@@ -6,6 +6,6 @@ namespace ksqlDb.RestApi.Client.KSql.Query.Context.Options
   {
     internal JsonSerializerOptions JsonSerializerOptions { get; set; } = KSqlDbJsonSerializerOptions.CreateInstance();
 
-    public bool DisposeHttpClient { get; set; } = true;
+    public bool DisposeHttpClient { get; set; }
   }
 }
