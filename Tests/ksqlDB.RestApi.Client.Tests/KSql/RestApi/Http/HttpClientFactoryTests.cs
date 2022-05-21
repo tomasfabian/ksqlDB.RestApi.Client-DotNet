@@ -15,14 +15,20 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Http
     public void CreateClient_BaseAddressWasSet()
     {
       //Arrange
-      var httpClientFactory = new HttpClientFactory(new Uri(TestParameters.KsqlDBUrl));
+      var httpClient = new HttpClient()
+      {
+        BaseAddress = new Uri(TestParameters.KsqlDBUrl)
+      };
+
+      var httpClientFactory = new HttpClientFactory(httpClient);
 
       //Act
-      var httpClient = httpClientFactory.CreateClient();
+      var receivedHttpClient = httpClientFactory.CreateClient();
 
       //Assert
-      httpClient.Should().BeOfType<HttpClient>();
-      httpClient.BaseAddress.OriginalString.Should().BeEquivalentTo(TestParameters.KsqlDBUrl);
+      receivedHttpClient.Should().BeSameAs(httpClient);
+      receivedHttpClient.Should().BeOfType<HttpClient>();
+      receivedHttpClient.BaseAddress!.OriginalString.Should().BeEquivalentTo(TestParameters.KsqlDBUrl);
     }
   }
 }

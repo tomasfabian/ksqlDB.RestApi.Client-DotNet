@@ -1,17 +1,14 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Fakes.Http;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.Api.Client.Tests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Linq.Statements
@@ -28,12 +25,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Linq.Statements
       {
         base.TestInitialize();
 
-        var httpClientFactory = Mock.Of<IHttpClientFactory>();
-        var httpClient = FakeHttpClient.CreateWithResponse(StatementResponse);
-
-        Mock.Get(httpClientFactory).Setup(c => c.CreateClient()).Returns(() => httpClient);
-
-        DbProvider = new TestableDbProvider(TestParameters.KsqlDBUrl, httpClientFactory);
+        DbProvider = new TestableDbProvider(TestParameters.KsqlDBUrl, StatementResponse);
       }
 
       private const string StreamName = "TestStream";

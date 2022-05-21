@@ -221,7 +221,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi
     }
 
     [TestMethod]
-    public async Task Run_HttpClientWasDisposed()
+    public async Task Run_HttpClientWasNotDisposed()
     {
       //Arrange
       var queryParameters = new QueryStreamParameters();
@@ -230,7 +230,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi
       _ = await ClassUnderTest.Run<Tweet>(queryParameters).ToListAsync();
 
       //Assert
-      ClassUnderTest.LastUsedHttpClient.IsDisposed.Should().BeTrue();
+      ClassUnderTest.LastUsedHttpClient.IsDisposed.Should().BeFalse();
     }
 
     [TestMethod]
@@ -238,13 +238,13 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi
     {
       //Arrange
       var queryParameters = new QueryStreamParameters();
-      ClassUnderTest.Options.DisposeHttpClient = false;
+      ClassUnderTest.Options.DisposeHttpClient = true;
 
       //Act
       _ = await ClassUnderTest.Run<Tweet>(queryParameters).ToListAsync();
 
       //Assert
-      ClassUnderTest.LastUsedHttpClient.IsDisposed.Should().BeFalse();
+      ClassUnderTest.LastUsedHttpClient.IsDisposed.Should().BeTrue();
     }
   }
 }

@@ -117,7 +117,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
       var descriptor = ClassUnderTest.TryGetRegistration<IHttpClientFactory>();
         
       descriptor.Should().NotBeNull();
-      descriptor.Lifetime.Should().Be(ServiceLifetime.Singleton);
+      descriptor.Lifetime.Should().Be(ServiceLifetime.Transient);
     }
 
     [TestMethod]

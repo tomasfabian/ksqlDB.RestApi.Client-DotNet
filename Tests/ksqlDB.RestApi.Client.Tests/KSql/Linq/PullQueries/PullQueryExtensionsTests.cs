@@ -1,13 +1,10 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Fakes.Http;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.Models.Sensors;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Linq.PullQueries
@@ -24,13 +21,8 @@ namespace ksqlDB.Api.Client.Tests.KSql.Linq.PullQueries
     public override void TestInitialize()
     {
       base.TestInitialize();
-
-      var httpClientFactory = Mock.Of<IHttpClientFactory>();
-      var httpClient = FakeHttpClient.CreateWithResponse(PullQueryResponse);
-
-      Mock.Get(httpClientFactory).Setup(c => c.CreateClient()).Returns(() => httpClient);
-
-      DbProvider = new TestableDbProvider(TestParameters.KsqlDBUrl, httpClientFactory);
+      
+      DbProvider = new TestableDbProvider(TestParameters.KsqlDBUrl, PullQueryResponse);
     }
 
     [TestMethod]

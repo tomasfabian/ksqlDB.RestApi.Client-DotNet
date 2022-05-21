@@ -21,7 +21,8 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Http
         Password = "letmein"
       };
 
-      var handler = new BasicAuthHandler(credentials);    
+      var handler = new BasicAuthHandler(credentials);
+      handler.InnerHandler = new HttpClientHandler();
       var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://tests.com/");
       var invoker = new HttpMessageInvoker(handler);
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using ksqlDB.Api.Client.Tests.Fakes.Http;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.KSql.Query.Context;
 using ksqlDB.Api.Client.Tests.Models;
@@ -500,24 +501,26 @@ WHERE RegionCode != 'xx' GROUP BY RegionCode EMIT CHANGES;");
 
   class TestableDbProvider : TestableDbProvider<QbservableGroupByExtensionsTests.City>
   {
-    private readonly IHttpClientFactory httpClientFactory;
-
     public TestableDbProvider(string ksqlDbUrl) 
       : base(ksqlDbUrl)
     {
       RegisterKSqlQueryGenerator = false;
     }
 
-    public TestableDbProvider(string ksqlDbUrl, IHttpClientFactory httpClientFactory) 
+    public TestableDbProvider(string ksqlDbUrl, string httpResponse) 
       : base(ksqlDbUrl)
     {
-      this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
-
       RegisterKSqlQueryGenerator = false;    
       
       KSqlDBQueryContext.Configure(sc =>
       {
-        sc.AddSingleton(httpClientFactory);
+        sc.AddHttpClient<IHttpV1ClientFactory, HttpClientFactory>(c => c.BaseAddress = new Uri(ksqlDbUrl))
+          .AddHttpMessageHandler(_ => FakeHttpClient.CreateDelegatingHandler(httpResponse).Object);
+
+        sc.AddHttpClient<IHttpClientFactory, HttpClientFactory>(c => c.BaseAddress = new Uri(ksqlDbUrl))
+          .AddHttpMessageHandler(_ => FakeHttpClient.CreateDelegatingHandler(httpResponse).Object);
+
+        // sc.AddSingleton(httpClientFactory);
       });
     }
 

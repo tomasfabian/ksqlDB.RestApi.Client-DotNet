@@ -2,9 +2,9 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.RestApi;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using HttpClientFactory = ksqlDB.Api.Client.IntegrationTests.Http.HttpClientFactory;
+using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.RestApi
 {
