@@ -10,9 +10,9 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using Microsoft.Extensions.Logging;
+using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi
 {
@@ -37,8 +37,6 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
 
     protected virtual HttpClient OnCreateHttpClient()
     {
-      //TODO: refactor to use System.Net.Http.IHttpClientFactory
-      //https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests?view=aspnetcore-6.0
       return httpClientFactory.CreateClient();
     }
 

@@ -14,7 +14,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Query
 {
   internal class KSqlDbQueryProvider : KSqlDbProvider
   {
-    public KSqlDbQueryProvider(IHttpClientFactory httpClientFactory, KSqlDbProviderOptions options, ILogger logger = null)
+    public KSqlDbQueryProvider(IHttpV1ClientFactory httpClientFactory, KSqlDbProviderOptions options, ILogger logger = null)
       : base(httpClientFactory, options, logger)
     {
     }

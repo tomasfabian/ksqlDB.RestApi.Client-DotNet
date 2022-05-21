@@ -5,21 +5,17 @@ using System.Net.Http;
 using System.Text.Json;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses;
 using Microsoft.Extensions.Logging;
+using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi
 {
   internal class KSqlDbQueryStreamProvider : KSqlDbProvider
   {
-    private readonly IHttpClientFactory httpClientFactory;
-
     public KSqlDbQueryStreamProvider(IHttpClientFactory httpClientFactory, KSqlDbProviderOptions options, ILogger logger = null)
       : base(httpClientFactory, options, logger)
     {
-      this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
-
 #if NETCOREAPP3_1
       AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 #endif
@@ -29,20 +25,10 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
 
     protected override string QueryEndPointName => "query-stream";
 
-    protected override HttpClient OnCreateHttpClient()
-    {
-      var httpClient = base.OnCreateHttpClient();
-
-      httpClient.DefaultRequestVersion = new Version(2, 0);
-
-      return httpClient;
-    }
-
     private RowValueJsonSerializer serializer;
 
     protected override RowValue<T> OnLineRead<T>(string rawJson)
     {
-      //Console.WriteLine(rawJson);
       if (rawJson.StartsWith("{\"queryId\""))
       {
         var queryStreamHeader = JsonSerializer.Deserialize<QueryStreamHeader>(rawJson);
