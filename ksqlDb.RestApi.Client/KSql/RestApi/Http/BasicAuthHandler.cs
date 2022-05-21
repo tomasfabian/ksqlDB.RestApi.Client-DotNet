@@ -12,8 +12,6 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Http
     public BasicAuthHandler(BasicAuthCredentials basicAuthCredentials)
     {
       this.basicAuthCredentials = basicAuthCredentials ?? throw new ArgumentNullException(nameof(basicAuthCredentials));
-
-      InnerHandler = new HttpClientHandler();
     }
 	
     protected override Task<HttpResponseMessage> SendAsync(

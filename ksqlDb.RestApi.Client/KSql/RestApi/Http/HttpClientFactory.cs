@@ -3,21 +3,18 @@ using System.Net.Http;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Http
 {
-  public class HttpClientFactory : IHttpClientFactory
+  public class HttpClientFactory : IHttpV1ClientFactory
   {
-    private readonly Uri uri;
+    private readonly HttpClient httpClient;
 
-    public HttpClientFactory(Uri uri)
+    public HttpClientFactory(HttpClient httpClient)
     {
-      this.uri = uri ?? throw new ArgumentNullException(nameof(uri));
+      this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
     }
 
     public HttpClient CreateClient()
     {
-      return new()
-      {
-        BaseAddress = uri
-      };
+      return httpClient;
     }
   }
 }
