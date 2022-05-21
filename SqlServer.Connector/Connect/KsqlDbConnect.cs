@@ -104,7 +104,12 @@ namespace SqlServer.Connector.Connect
 
     private Task<HttpResponseMessage> ExecuteStatementAsync(KSqlDbStatement ksqlDbStatement, CancellationToken cancellationToken = default)
     {
-      var httpClientFactory = new HttpClientFactory(ksqlDbUrl);
+      var httpClient = new HttpClient()
+      {
+        BaseAddress = ksqlDbUrl
+      };
+
+      var httpClientFactory = new HttpClientFactory(httpClient);
 
       var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
       

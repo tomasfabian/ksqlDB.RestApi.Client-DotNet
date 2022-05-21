@@ -5,8 +5,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using SqlServer.Connector.Cdc.Connectors;
+using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
 namespace SqlServer.Connector.Connect
 {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using SqlServer.Connector.Cdc.Connectors;
@@ -15,8 +16,13 @@ namespace Connect.SqlServer
       SqlServerConnectorMetadata connectorMetadata = CreateConnectorMetadata();
 
       string connectorName = "MSSQL_CDC_CONNECTOR";
-	
-      var httpClientFactory = new HttpClientFactory(new Uri(ConnectUrl));
+
+      var httpClient = new HttpClient()
+      {
+        BaseAddress = new Uri(ConnectUrl)
+      };
+
+      var httpClientFactory = new HttpClientFactory(httpClient);
 	
       var connectRestApiClient = new ConnectRestApiClient(httpClientFactory);
 	
