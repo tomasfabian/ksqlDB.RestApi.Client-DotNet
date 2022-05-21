@@ -89,7 +89,31 @@ namespace ksqlDb.RestApi.Client.DependencyInjection
 
       var uri = new Uri(contextOptions.Url);
 
-      services.AddSingleton<IHttpClientFactory, HttpClientFactory>(_ => new HttpClientFactory(uri));
+      var httpClientV1Builder = services.AddHttpClient<IHttpV1ClientFactory, HttpClientFactory>(httpClient =>
+      {
+        httpClient.BaseAddress = uri;
+      });
+
+#if !NETSTANDARD
+      var httpClientBuilder = services.AddHttpClient<IHttpClientFactory, HttpClientFactory>(httpClient =>
+        {
+          httpClient.BaseAddress = uri;
+          httpClient.DefaultRequestVersion = new Version(2, 0);
+        });
+#endif
+
+      if (contextOptions.UseBasicAuth)
+      {
+        var basicAuthCredentials = new BasicAuthCredentials(contextOptions.BasicAuthUserName, contextOptions.BasicAuthPassword);
+
+        httpClientV1Builder.AddHttpMessageHandler(_ => new BasicAuthHandler(basicAuthCredentials));
+
+#if !NETSTANDARD
+        httpClientBuilder.AddHttpMessageHandler(_ => new BasicAuthHandler(basicAuthCredentials));
+#endif
+      }
+
+
       services.AddScoped<IKSqlDbRestApiClient, KSqlDbRestApiClient>();
 
       return services;
