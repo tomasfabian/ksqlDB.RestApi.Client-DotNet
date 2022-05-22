@@ -3402,12 +3402,16 @@ var httpResponseMessage = await restApiClient.CreateSourceTableAsync<IoTSensor>(
 ## KSqlDbContextOptionsBuilder and KSqlDbContextOptions
 - SetJsonSerializerOptions - a way to configure the JsonSerializerOptions for the materialization of the incoming values.
 
+For better performance you can use the new `System.Text.Json` source generator:
+
 ```C#
 var contextOptions = new KSqlDbContextOptionsBuilder()
         .UseKSqlDb(ksqlDbUrl)
         .SetJsonSerializerOptions(c =>
         {
           c.Converters.Add(new CustomJsonConverter());
+
+          jsonOptions.AddContext<SourceGenerationContext>();
         }).Options;
 
 //or
@@ -3415,7 +3419,20 @@ contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
   .SetJsonSerializerOptions(serializerOptions =>
                             {
                               serializerOptions.Converters.Add(new CustomJsonConverter());
+
+                              jsonOptions.AddContext<SourceGenerationContext>();
                             });
+```
+
+```C#
+using System.Text.Json.Serialization;
+using ksqlDB.Api.Client.Samples.Models.Movies;
+
+[JsonSourceGenerationOptions(WriteIndented = true)]
+[JsonSerializable(typeof(Movie))]
+internal partial class SourceGenerationContext : JsonSerializerContext
+{
+}
 ```
 
 # v1.5.0
@@ -3649,20 +3666,39 @@ SELECT * FROM sensors EMIT CHANGES;
 
 # v1.7.0-rc.1
 
-### KSqlDBContextOptions DisposeHttpClient
-For better HttpClient lifecycle management set DisposeHttpClient to `false`. 
+# aggregate functions COLLECT_LIST, COLLECT_SET, EARLIEST_BY_OFFSET, LATEST_BY_OFFSET - with Structs, Arrays, and Maps
+
+The list of available `kslqdb` aggregate functions is available [here](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
 ```C#
-var contextOptions2 = new KSqlDBContextOptions(ksqlDbUrl)
+var dict = new Dictionary<string, int>()
 {
-  DisposeHttpClient = false
+  ["Karen"] = 3,
+  ["Thomas"] = 42,
+};
+
+var source = Context.CreateQueryStream<Tweet>(TweetsStreamName)
+  .GroupBy(c => c.Id)
+  .Select(l => new { Id = l.Key, Maps = l.CollectList(c => dict) })
+```
+
+# v2.0.0-rc.1
+**Breaking changes:**
+### DisposeHttpClient
+`KSqlDBContextOptions` and `KSqlDbRestApiClient` - `DisposeHttpClient` property is by default set to `false`. 
+
+The above mentioned behaviour can be overriden in the following ways:
+```C#
+var contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
+{
+  DisposeHttpClient = true
 };
 ```
 
 ```C#
 var kSqlDbRestApiClient = new KSqlDbRestApiClient(new HttpClientFactory(new Uri(ksqlDbUrl)))
 {
-  DisposeHttpClient = false
+  DisposeHttpClient = true
 };
 ```
 
@@ -3691,20 +3727,49 @@ public class HttpClientFactory : IHttpClientFactory
 }
 ```
 
-# aggregate functions COLLECT_LIST, COLLECT_SET, EARLIEST_BY_OFFSET, LATEST_BY_OFFSET - with Structs, Arrays, and Maps
+### HttpClientFactory
+constructor argument was changed from `Uri` to `HttpClient`. The `IHttpClientFactory` is registered with `System.Net.Http.AddHttpClient` for better lifecycle management
 
-The list of available `kslqdb` aggregate functions is available [here](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
+### Package references
+- upgraded package references `Microsoft.Extensions.DependencyInjection` and `Microsoft.Extensions.Logging.Abstractions` to v6.0.0
+- added package reference `Microsoft.Extensions.Http` v6.0.0
+
+### KSqlDbContextOptionsBuilder.ReplaceHttpClient
 
 ```C#
-var dict = new Dictionary<string, int>()
-{
-  ["Karen"] = 3,
-  ["Thomas"] = 42,
-};
+using System;
+using System.Threading.Tasks;
+using ksqlDb.RestApi.Client.DependencyInjection;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using Microsoft.Extensions.DependencyInjection;
 
-var source = Context.CreateQueryStream<Tweet>(TweetsStreamName)
-  .GroupBy(c => c.Id)
-  .Select(l => new { Id = l.Key, Maps = l.CollectList(c => dict) })
+private static void Configure(this IServiceCollection serviceCollection, string ksqlDbUrl)
+{
+  serviceCollection.AddDbContext<IKSqlDBContext, KSqlDBContext>(c =>
+  {
+    c.UseKSqlDb(ksqlDbUrl);
+
+    c.ReplaceHttpClient<IHttpClientFactory, HttpClientFactory>(httpClient =>
+    {
+      httpClient.BaseAddress = new Uri(ksqlDbUrl);
+      httpClient.DefaultRequestVersion = new Version(2, 0);
+    }).AddHttpMessageHandler(_ => new BearerAuthHandler());
+  });
+}
+
+internal class BearerAuthHandler : System.Net.Http.DelegatingHandler
+{
+  protected override Task<System.Net.Http.HttpResponseMessage> SendAsync(
+    System.Net.Http.HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
+  {
+    var token = "xoidiag"; //CreateToken();
+
+    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", token);
+
+    return base.SendAsync(request, cancellationToken);
+  }
+}
 ```
 
 # LinqPad samples
