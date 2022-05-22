@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Net.Http;
 using System.Text.Json;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context.Options
 {
   public class KSqlDbContextOptionsBuilder : ISetupParameters
   {
+    private readonly ServiceCollection serviceCollection = new();
+
     public ISetupParameters UseKSqlDb(string url)
     {
       if (string.IsNullOrEmpty(url))
@@ -19,6 +23,13 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context.Options
     }
 
     private string Url { get; set; }
+
+    public IHttpClientBuilder ReplaceHttpClient<TClient, TImplementation>(Action<HttpClient> configureClient)
+      where TClient : class
+      where TImplementation : class, TClient
+    {
+      return serviceCollection.AddHttpClient<TClient, TImplementation>(configureClient);
+    }
 
 #if !NETSTANDARD
     ISetupParameters ISetupParameters.SetupQueryStream(Action<IKSqlDbParameters> configure)
@@ -87,7 +98,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context.Options
       {
         return contextOptions ??= new KSqlDBContextOptions(Url)
         {
-          JsonSerializerOptions = jsonSerializerOptions
+          JsonSerializerOptions = jsonSerializerOptions,
+          ServiceCollection = serviceCollection
         };
       }
     }

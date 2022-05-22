@@ -1,4 +1,5 @@
 using System;
+using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi;
@@ -78,45 +79,64 @@ namespace ksqlDb.RestApi.Client.DependencyInjection
     {
       var contextOptions = builder.InternalOptions;
 
-      services.AddSingleton(contextOptions);
+      contextOptions.ServiceCollection.AddSingleton(contextOptions);
 
       var contextDescriptor = new ServiceDescriptor(
         typeof(TContextService),
         typeof(TContextImplementation),
         contextLifetime);
 
-      services.Add(contextDescriptor);
+      contextOptions.ServiceCollection.Add(contextDescriptor);
 
+      contextOptions.ServiceCollection.ConfigureHttpClients(contextOptions);
+
+      contextOptions.ServiceCollection.AddScoped<IKSqlDbRestApiClient, KSqlDbRestApiClient>();
+
+      contextOptions.Apply(services);
+
+      return services;
+    }
+
+    internal static IServiceCollection ConfigureHttpClients(this IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
+    {
       var uri = new Uri(contextOptions.Url);
 
-      var httpClientV1Builder = services.AddHttpClient<IHttpV1ClientFactory, HttpClientFactory>(httpClient =>
+      if (!serviceCollection.HasRegistration<IHttpV1ClientFactory>())
       {
-        httpClient.BaseAddress = uri;
-      });
+        var httpClientV1Builder = serviceCollection.AddHttpClient<IHttpV1ClientFactory, HttpClientFactory>(httpClient =>
+        {
+          httpClient.BaseAddress = uri;
+        });
+
+        if (contextOptions.UseBasicAuth)
+        {
+          var basicAuthCredentials =
+            new BasicAuthCredentials(contextOptions.BasicAuthUserName, contextOptions.BasicAuthPassword);
+
+          httpClientV1Builder.AddHttpMessageHandler(_ => new BasicAuthHandler(basicAuthCredentials));
+        }
+      }
 
 #if !NETSTANDARD
-      var httpClientBuilder = services.AddHttpClient<IHttpClientFactory, HttpClientFactory>(httpClient =>
+      if (!serviceCollection.HasRegistration<IHttpClientFactory>())
+      {
+        var httpClientBuilder = serviceCollection.AddHttpClient<IHttpClientFactory, HttpClientFactory>(httpClient =>
         {
           httpClient.BaseAddress = uri;
           httpClient.DefaultRequestVersion = new Version(2, 0);
         });
-#endif
 
-      if (contextOptions.UseBasicAuth)
-      {
-        var basicAuthCredentials = new BasicAuthCredentials(contextOptions.BasicAuthUserName, contextOptions.BasicAuthPassword);
+        if (contextOptions.UseBasicAuth)
+        {
+          var basicAuthCredentials =
+            new BasicAuthCredentials(contextOptions.BasicAuthUserName, contextOptions.BasicAuthPassword);
 
-        httpClientV1Builder.AddHttpMessageHandler(_ => new BasicAuthHandler(basicAuthCredentials));
-
-#if !NETSTANDARD
-        httpClientBuilder.AddHttpMessageHandler(_ => new BasicAuthHandler(basicAuthCredentials));
-#endif
+          httpClientBuilder.AddHttpMessageHandler(_ => new BasicAuthHandler(basicAuthCredentials));
+        }
       }
+#endif
 
-
-      services.AddScoped<IKSqlDbRestApiClient, KSqlDbRestApiClient>();
-
-      return services;
+      return serviceCollection;
     }
 
     /// <summary>

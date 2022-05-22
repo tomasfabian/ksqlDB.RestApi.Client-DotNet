@@ -5,6 +5,7 @@ using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context
 {
@@ -27,6 +28,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
         [QueryStreamParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToString().ToLower(),
       };
     }
+
+    internal IServiceCollection ServiceCollection { get; set; } = new ServiceCollection();
 
     public bool ShouldPluralizeFromItemName { get; set; } = true;
 
@@ -95,6 +98,14 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
     {
       this.userName = userName;
       this.password = password;
+    }
+
+    internal void Apply(IServiceCollection externalServicesCollection)
+    {
+      foreach (var service in ServiceCollection)
+      {
+        externalServicesCollection.Add(service);
+      }
     }
   }
 }

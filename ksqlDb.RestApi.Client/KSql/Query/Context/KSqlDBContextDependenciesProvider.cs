@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+using ksqlDb.RestApi.Client.DependencyInjection;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDb.RestApi.Client.Infrastructure.Logging;
 using ksqlDB.RestApi.Client.KSql.Disposables;
@@ -25,6 +27,9 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
     {
       this.kSqlDbContextOptions = kSqlDbContextOptions ?? throw new ArgumentNullException(nameof(kSqlDbContextOptions));
       this.loggerFactory = loggerFactory;
+
+      if (kSqlDbContextOptions.ServiceCollection.Any())
+        serviceCollection = kSqlDbContextOptions.ServiceCollection;
     }
 
     protected KSqlDBContextDependenciesProvider()
@@ -75,15 +80,15 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
         serviceCollection.TryAddSingleton(Logger);
       }
 
-      serviceCollection.AddSingleton<KSqlDbProviderOptions>(contextOptions);
-      serviceCollection.AddSingleton(contextOptions);
+      serviceCollection.TryAddSingleton<KSqlDbProviderOptions>(contextOptions);
+      serviceCollection.TryAddSingleton(contextOptions);
 
       serviceCollection.TryAddScoped<IKSqlQbservableProvider, QbservableProvider>();
       serviceCollection.TryAddScoped<ICreateStatementProvider, CreateStatementProvider>();
 
       serviceCollection.TryAddTransient<IKSqlQueryGenerator, KSqlQueryGenerator>();
 
-      RegisterHttpClients(serviceCollection, contextOptions);
+      serviceCollection.ConfigureHttpClients(contextOptions);
 
       serviceCollection.TryAddSingleton(contextOptions);
       serviceCollection.TryAddScoped<IKStreamSetDependencies, KStreamSetDependencies>();
@@ -130,18 +135,6 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
 #endif
     }
 
-    private void RegisterHttpClientFactory<TFactory>()
-      where TFactory: class, IHttpClientFactory
-    {
-      serviceCollection.AddSingleton<IHttpClientFactory, TFactory>();
-    }
-
-    private void RegisterKSqlDbProvider<TProvider>()
-      where TProvider: class, IKSqlDbProvider
-    {
-      serviceCollection.AddScoped<IKSqlDbProvider, TProvider>();
-    }
-    
     protected override async ValueTask OnDisposeAsync()
     {
       if(ServiceProvider != null)
