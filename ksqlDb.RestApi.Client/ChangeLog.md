@@ -1,7 +1,22 @@
 ﻿# ksqlDB.RestApi.Client
 
 # v2.0.0-rc.1
-- 
+
+**Breaking changes:**
+
+### DisposeHttpClient
+`KSqlDBContextOptions` and `KSqlDbRestApiClient` - `DisposeHttpClient` property is by default set to `false`. 
+
+### HttpClientFactory
+constructor argument was changed from `Uri` to `HttpClient`. The `IHttpClientFactory` is registered with `System.Net.Http.AddHttpClient` for better lifecycle management
+
+### Package references
+- upgraded package references `Microsoft.Extensions.DependencyInjection` and `Microsoft.Extensions.Logging.Abstractions` to v6.0.0
+- added package reference `Microsoft.Extensions.Http` v6.0.0
+
+Added:
+- added IHttpV1ClientFactory
+- KSqlDbContextOptionsBuilder.ReplaceHttpClient
 
 # v1.7.0-rc.1
 - aggregate function COLLECT_LIST, COLLECT_SET, EARLIEST_BY_OFFSET, LATEST_BY_OFFSET - with Structs, Arrays, and Maps
