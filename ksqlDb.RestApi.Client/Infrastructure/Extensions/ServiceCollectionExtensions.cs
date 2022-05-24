@@ -44,13 +44,14 @@ namespace ksqlDB.RestApi.Client.Infrastructure.Extensions
         }
       }
 
-#if !NETSTANDARD
       if (!serviceCollection.HasRegistration<IHttpClientFactory>())
       {
         var httpClientBuilder = serviceCollection.AddHttpClient<IHttpClientFactory, HttpClientFactory>(httpClient =>
         {
           httpClient.BaseAddress = uri;
+#if !NETSTANDARD
           httpClient.DefaultRequestVersion = new Version(2, 0);
+#endif
         });
 
         if (contextOptions.UseBasicAuth)
@@ -61,7 +62,6 @@ namespace ksqlDB.RestApi.Client.Infrastructure.Extensions
           httpClientBuilder.AddHttpMessageHandler(_ => new BasicAuthHandler(basicAuthCredentials));
         }
       }
-#endif
 
       return serviceCollection;
     }
