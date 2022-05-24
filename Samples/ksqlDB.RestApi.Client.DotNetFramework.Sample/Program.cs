@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
         .UseKSqlDb(ksqlDbUrl)
         .SetupQuery(options =>
         {
-          options.Properties[QueryParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Latest.ToString().ToLower(); // "latest"
+          options.Properties[QueryParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToString().ToLower(); // "latest"
         })
         .Options;
 
@@ -36,8 +37,13 @@ namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
     public static async Task Main(string[] args)
     {
       var ksqlDbUrl = @"http:\\localhost:8088";
-      
-      var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
+      var httpClient = new HttpClient()
+      {
+        BaseAddress = new Uri(ksqlDbUrl)
+      };
+
+      var httpClientFactory = new HttpClientFactory(httpClient);
       var restApiProvider = new KSqlDbRestApiProvider(httpClientFactory);
       var moviesProvider = new MoviesProvider(restApiProvider);
 
@@ -54,6 +60,7 @@ namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
         .Select(l => new { Id2 = l.Id, l.Title, l.Release_Year, l.RowTime })
         .Take(2) // LIMIT 2    
         .ToObservable() // client side processing starts here lazily after subscription. Switches to Rx.NET
+        .Finally(() => { Console.WriteLine("Finally"); })
         .ObserveOn(TaskPoolScheduler.Default)
         .Subscribe(onNext: movie =>
         {
@@ -64,7 +71,7 @@ namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
       await moviesProvider.InsertMovieAsync(MoviesProvider.Movie1);
       await moviesProvider.InsertMovieAsync(MoviesProvider.Movie2);
       await moviesProvider.InsertLeadAsync(MoviesProvider.LeadActor1);
-
+      
       try
       {
         await new PullQueryExample().ExecuteAsync();
