@@ -3682,7 +3682,7 @@ var source = Context.CreateQueryStream<Tweet>(TweetsStreamName)
   .Select(l => new { Id = l.Key, Maps = l.CollectList(c => dict) })
 ```
 
-# v2.0.0-rc.1
+# v2.0.0
 **Breaking changes:**
 ### DisposeHttpClient
 `KSqlDBContextOptions` and `KSqlDbRestApiClient` - `DisposeHttpClient` property is by default set to `false`. 
@@ -3700,31 +3700,6 @@ var kSqlDbRestApiClient = new KSqlDbRestApiClient(new HttpClientFactory(new Uri(
 {
   DisposeHttpClient = true
 };
-```
-
-The provided HttpClientFactory should be also changed accordingly. The default implementation recreats the httpClient during each call of `IHttpClientFactory.Create`.
-For more fine grained control use:
-```C#
-public class HttpClientFactory : IHttpClientFactory
-{
-  private readonly HttpClient httpClient;
-
-  public HttpClientFactory(Uri uri)
-  {
-    if (uri == null)
-      throw new ArgumentNullException(nameof(uri));
-
-    httpClient = new()
-    {
-      BaseAddress = uri
-    };
-  }
-
-  public HttpClient CreateClient()
-  {
-    return httpClient;
-  }
-}
 ```
 
 ### HttpClientFactory
