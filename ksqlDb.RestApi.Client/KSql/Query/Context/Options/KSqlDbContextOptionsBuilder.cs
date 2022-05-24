@@ -28,7 +28,18 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context.Options
       where TClient : class
       where TImplementation : class, TClient
     {
-      return serviceCollection.AddHttpClient<TClient, TImplementation>(configureClient);
+      void OuterConfigureClient(HttpClient httpClient)
+      {
+        httpClient.BaseAddress = new Uri(Url);
+
+#if !NETSTANDARD
+        httpClient.DefaultRequestVersion = new Version(2, 0);
+#endif
+
+        configureClient(httpClient);
+      }
+
+      return serviceCollection.AddHttpClient<TClient, TImplementation>(OuterConfigureClient);
     }
 
 #if !NETSTANDARD
