@@ -74,9 +74,8 @@ namespace ksqlDB.Api.Client.Samples.Providers
 
     public async Task<HttpResponseMessage> InsertMovieAsync(Movie movie)
     {
-      //TODO: release
-      //var insertStatement = restApiProvider.ToInsertStatement(movie);
-      //Console.WriteLine(insertStatement.Sql);
+      var insertStatement = restApiProvider.ToInsertStatement(movie);
+      Console.WriteLine(insertStatement.Sql);
 
       var result = await restApiProvider.InsertIntoAsync(movie, new InsertProperties { ShouldPluralizeEntityName = true });
 

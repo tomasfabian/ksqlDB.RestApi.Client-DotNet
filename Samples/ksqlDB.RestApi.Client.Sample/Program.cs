@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ksqlDB.Api.Client.Samples.HostedServices;
+using ksqlDB.Api.Client.Samples.Json;
 using ksqlDB.Api.Client.Samples.Models;
 using ksqlDB.Api.Client.Samples.Models.Events;
 using ksqlDB.Api.Client.Samples.Models.InvocationFunctions;
@@ -146,11 +147,28 @@ namespace ksqlDB.Api.Client.Samples
       Console.WriteLine("Finished.");
     }
 
-    private static async Task ConfigureKSqlDbWithServicesCollection_AndSubscribe(string ksqlDbUrl)
+    internal class DebugHandler : System.Net.Http.DelegatingHandler
+    {
+      protected override Task<System.Net.Http.HttpResponseMessage> SendAsync(
+        System.Net.Http.HttpRequestMessage request, CancellationToken cancellationToken)
+      {
+        System.Diagnostics.Debug.WriteLine($"Process request: {request.RequestUri}");
+        
+        return base.SendAsync(request, cancellationToken);
+      }
+    }
+
+    private static async Task ConfigureKSqlDbWithServicesCollection_AndTryAsync(string ksqlDbUrl)
     {
       var services = new ServiceCollection();
 
-      services.ConfigureKSqlDb(ksqlDbUrl);
+      services.AddDbContext<IKSqlDBContext, KSqlDBContext>(c =>
+      {
+        c.UseKSqlDb(ksqlDbUrl);
+        
+        c.ReplaceHttpClient<IHttpClientFactory, ksqlDB.RestApi.Client.KSql.RestApi.Http.HttpClientFactory>(_ => {})
+          .AddHttpMessageHandler(_ => new DebugHandler());
+      });
 
       var provider = services.BuildServiceProvider();
 
@@ -158,7 +176,10 @@ namespace ksqlDB.Api.Client.Samples
 
       var semaphoreSlim = new SemaphoreSlim(0, 1);
 
-      using var d1 = context.CreateQueryStream<Movie>().Subscribe(onNext: movie =>
+      using var d1 = context.CreateQueryStream<Movie>()
+        .Take(2)
+        //Movies are deserialized with SourceGenerationContext (see SetJsonSerializerOptions above)
+        .Subscribe(onNext: movie =>
         {
           Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
           Console.WriteLine();

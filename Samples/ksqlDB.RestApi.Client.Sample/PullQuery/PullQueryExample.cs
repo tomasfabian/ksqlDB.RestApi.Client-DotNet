@@ -12,7 +12,6 @@ using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-using HttpClientFactory = ksqlDB.Api.Client.Samples.Http.HttpClientFactory;
 
 namespace ksqlDB.Api.Client.Samples.PullQuery
 {
@@ -33,7 +32,12 @@ namespace ksqlDB.Api.Client.Samples.PullQuery
 
       await using var context = new KSqlDBContext(contextOptions);
 
-      var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+      var httpClient = new HttpClient()
+      {
+        BaseAddress = new Uri(ksqlDbUrl)
+      };
+
+      var httpClientFactory = new HttpClientFactory(httpClient);
 
       restApiClient = new KSqlDbRestApiClient(httpClientFactory)
         .SetCredentials(new BasicAuthCredentials("fred", "letmein"));

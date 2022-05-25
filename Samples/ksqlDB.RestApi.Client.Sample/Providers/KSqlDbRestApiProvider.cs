@@ -2,8 +2,8 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Microsoft.Extensions.Logging;
-using HttpClientFactory = ksqlDB.Api.Client.Samples.Http.HttpClientFactory;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
 namespace ksqlDB.Api.Client.Samples.Providers
@@ -16,7 +16,12 @@ namespace ksqlDB.Api.Client.Samples.Providers
     {
       var uri = new Uri(ksqlDbUrl ?? KsqlDbUrl);
 
-      return new KSqlDbRestApiProvider(new HttpClientFactory(uri));
+      var httpClient = new HttpClient()
+      {
+        BaseAddress = uri
+      };
+
+      return new KSqlDbRestApiProvider(new HttpClientFactory(httpClient));
     }
 
     public KSqlDbRestApiProvider(IHttpClientFactory httpClientFactory, ILoggerFactory loggerFactory = null) 
