@@ -53,6 +53,7 @@ namespace ksqlDB.Api.Client.Samples
         .SetJsonSerializerOptions(jsonOptions =>
         {
           jsonOptions.IgnoreReadOnlyFields = true;
+          jsonOptions.AddContext<SourceGenerationContext>();
         })
         //.SetAutoOffsetReset(AutoOffsetReset.Earliest) // global setting
         .SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce) // global setting
