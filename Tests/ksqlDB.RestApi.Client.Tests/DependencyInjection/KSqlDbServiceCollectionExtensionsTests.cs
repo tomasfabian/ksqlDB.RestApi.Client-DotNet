@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDb.RestApi.Client.DependencyInjection;
@@ -10,7 +11,9 @@ using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using UnitTests;
+using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
 namespace ksqlDB.Api.Client.Tests.DependencyInjection
 {
@@ -33,7 +36,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
       //Arrange
 
       //Act
-      ClassUnderTest.ConfigureKSqlDb(Helpers.TestParameters.KsqlDBUrl);
+      ClassUnderTest.ConfigureKSqlDb(TestParameters.KsqlDBUrl);
 
       //Assert
       var descriptor = ClassUnderTest.TryGetRegistration<IKSqlDBContext>();
@@ -48,7 +51,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
       //Arrange
 
       //Act
-      ClassUnderTest.ConfigureKSqlDb(Helpers.TestParameters.KsqlDBUrl, setupParameters =>
+      ClassUnderTest.ConfigureKSqlDb(TestParameters.KsqlDBUrl, setupParameters =>
                                                                        {
                                                                          setupParameters.SetAutoOffsetReset(AutoOffsetReset.Earliest);
                                                                        });
@@ -64,7 +67,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
     public void ConfigureKSqlDb_BuildServiceProviderAndResolve()
     {
       //Arrange
-      ClassUnderTest.ConfigureKSqlDb(Helpers.TestParameters.KsqlDBUrl, setupParameters =>
+      ClassUnderTest.ConfigureKSqlDb(TestParameters.KsqlDBUrl, setupParameters =>
                                                                        {
                                                                          setupParameters.SetProcessingGuarantee(ProcessingGuarantee.AtLeastOnce);
                                                                        });
@@ -83,7 +86,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
       //Arrange
 
       //Act
-      ClassUnderTest.ConfigureKSqlDb(Helpers.TestParameters.KsqlDBUrl);
+      ClassUnderTest.ConfigureKSqlDb(TestParameters.KsqlDBUrl);
 
       //Assert
       var descriptor = ClassUnderTest.TryGetRegistration<IKSqlDbRestApiClient>();
@@ -96,7 +99,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
     public void ConfigureKSqlDb_BuildServiceProviderAndResolve_IKSqlDbRestApiClient()
     {
       //Arrange
-      ClassUnderTest.ConfigureKSqlDb(Helpers.TestParameters.KsqlDBUrl);
+      ClassUnderTest.ConfigureKSqlDb(TestParameters.KsqlDBUrl);
 
       //Act
       var kSqlDbRestApiClient = ClassUnderTest.BuildServiceProvider().GetRequiredService<IKSqlDbRestApiClient>();
@@ -111,7 +114,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
       //Arrange
 
       //Act
-      ClassUnderTest.ConfigureKSqlDb(Helpers.TestParameters.KsqlDBUrl);
+      ClassUnderTest.ConfigureKSqlDb(TestParameters.KsqlDBUrl);
 
       //Assert
       var descriptor = ClassUnderTest.TryGetRegistration<IHttpClientFactory>();
@@ -126,7 +129,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
       //Arrange
 
       //Act
-      ClassUnderTest.ConfigureKSqlDb(Helpers.TestParameters.KsqlDBUrl);
+      ClassUnderTest.ConfigureKSqlDb(TestParameters.KsqlDBUrl);
 
       //Assert
       var descriptor = ClassUnderTest.TryGetRegistration<KSqlDBContextOptions>();
@@ -139,7 +142,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
     public void ConfigureKSqlDb_BuildServiceProviderAndResolve_IHttpClientFactory()
     {
       //Arrange
-      ClassUnderTest.ConfigureKSqlDb(Helpers.TestParameters.KsqlDBUrl);
+      ClassUnderTest.ConfigureKSqlDb(TestParameters.KsqlDBUrl);
 
       //Act
       var httpClientFactory = ClassUnderTest.BuildServiceProvider().GetRequiredService<IHttpClientFactory>();
@@ -152,14 +155,14 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
     public void ConfigureKSqlDb_BuildServiceProviderAndResolve_KSqlDBContextOptions()
     {
       //Arrange
-      ClassUnderTest.ConfigureKSqlDb(Helpers.TestParameters.KsqlDBUrl);
+      ClassUnderTest.ConfigureKSqlDb(TestParameters.KsqlDBUrl);
 
       //Act
       var options = ClassUnderTest.BuildServiceProvider().GetRequiredService<KSqlDBContextOptions>();
 
       //Assert
       options.Should().NotBeNull();
-      options.Url.Should().Be(Helpers.TestParameters.KsqlDBUrl);
+      options.Url.Should().Be(TestParameters.KsqlDBUrl);
     }
 
     #region AddDbContext
@@ -230,7 +233,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
     public void ConfigureKSqlDb_AddDbContextFactory_DbContextWasRegistered()
     {
       //Arrange
-      ClassUnderTest.ConfigureKSqlDb(Helpers.TestParameters.KsqlDBUrl);
+      ClassUnderTest.ConfigureKSqlDb(TestParameters.KsqlDBUrl);
       ClassUnderTest.AddDbContextFactory<IKSqlDBContext>(factoryLifetime: ServiceLifetime.Scoped);
 
       //Act
@@ -244,7 +247,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
     public void AddDbContextFactory_BuildServiceProviderAndResolve()
     {
       //Arrange
-      ClassUnderTest.AddDbContext<IKSqlDBContext, KSqlDBContext>(options => options.UseKSqlDb(Helpers.TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
+      ClassUnderTest.AddDbContext<IKSqlDBContext, KSqlDBContext>(options => options.UseKSqlDb(TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
       ClassUnderTest.AddDbContextFactory<IKSqlDBContext>(factoryLifetime: ServiceLifetime.Scoped);
 
       //Act
@@ -258,7 +261,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
     public void ContextFactory_Create()
     {
       //Arrange
-      ClassUnderTest.AddDbContext<IKSqlDBContext, KSqlDBContext>(options => options.UseKSqlDb(Helpers.TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
+      ClassUnderTest.AddDbContext<IKSqlDBContext, KSqlDBContext>(options => options.UseKSqlDb(TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
       ClassUnderTest.AddDbContextFactory<IKSqlDBContext>(factoryLifetime: ServiceLifetime.Scoped);
 
       var contextFactory = ClassUnderTest.BuildServiceProvider().GetRequiredService<IKSqlDBContextFactory<IKSqlDBContext>>();
@@ -276,7 +279,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
     public void AddDbContextFactory_Scope()
     {
       //Arrange
-      ClassUnderTest.AddDbContext<KSqlDBContext>(options => options.UseKSqlDb(Helpers.TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
+      ClassUnderTest.AddDbContext<KSqlDBContext>(options => options.UseKSqlDb(TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
       ClassUnderTest.AddDbContextFactory<KSqlDBContext>(factoryLifetime: ServiceLifetime.Scoped);
 
       //Act
@@ -288,5 +291,32 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection
     }
 
     #endregion
+
+    [TestMethod]
+    public void ReplaceHttpClient_HttpClientUriAndTimeoutWereSet()
+    {
+      //Arrange
+      var services = new ServiceCollection();
+
+      services.AddDbContext<IKSqlDBContext, KSqlDBContext>(c =>
+      {
+        c.UseKSqlDb(TestParameters.KsqlDBUrl);
+
+        c.ReplaceHttpClient<IHttpClientFactory, HttpClientFactory>(httpClient =>
+        {
+          httpClient.Timeout = TimeSpan.FromMinutes(5);
+        }).AddHttpMessageHandler(_ => Mock.Of<DelegatingHandler>());
+      });
+
+      var provider = services.BuildServiceProvider();
+
+      //Act
+      var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
+      var httpClient = httpClientFactory.CreateClient();
+
+      //Assert
+      httpClient.Timeout.Should().Be(TimeSpan.FromMinutes(5));
+      httpClient.BaseAddress!.OriginalString.Should().Be(TestParameters.KsqlDBUrl);
+    }
   }
 }
