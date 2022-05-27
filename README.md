@@ -3666,7 +3666,7 @@ SELECT * FROM sensors EMIT CHANGES;
 
 # v1.7.0-rc.1
 
-# aggregate functions COLLECT_LIST, COLLECT_SET, EARLIEST_BY_OFFSET, LATEST_BY_OFFSET - with Structs, Arrays, and Maps
+# Aggregate functions COLLECT_LIST, COLLECT_SET, EARLIEST_BY_OFFSET, LATEST_BY_OFFSET - with Structs, Arrays, and Maps
 
 The list of available `kslqdb` aggregate functions is available [here](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
@@ -3684,10 +3684,38 @@ var source = Context.CreateQueryStream<Tweet>(TweetsStreamName)
 
 # v2.0.0
 **Breaking changes:**
-### DisposeHttpClient
-`KSqlDBContextOptions` and `KSqlDbRestApiClient` - `DisposeHttpClient` property is by default set to `false`. 
 
-The above mentioned behaviour can be overriden in the following ways:
+### HttpClientFactory
+The constructor argument of `HttpClientFactory` was changed from `Uri` to `HttpClient`. The `IHttpClientFactory` is registered with `System.Net.Http.AddHttpClient` for better lifecycle management of the resources used by `HttpClients`.
+`HttpClientFactory` in this case should be probably renamed to `HttpClientProvider` or something similar, but I decided to avoid such a "big"
+ breaking change. In case of too much confusion please let me know.
+
+This design decision was made based on the eBook ".NET Microservices Architecture for Containerized .NET Applications" to be able to take advantage of the AddHttpClient extension method. 
+
+> Though this class (HtppClient) implements IDisposable, declaring and instantiating it within a using statement is not preferred because when the HttpClient object gets disposed of, the underlying socket is not immediately released, which can lead to a socket exhaustion problem.
+
+Therefore, HttpClient is intended to be [instantiated once and reused](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net) throughout the life of an application. `KSqlDbServiceCollectionExtensions.AddDbContext<>` internally registers `IHttpClientFactory` in the following manner:
+```C#
+internal static IServiceCollection ConfigureHttpClients(this IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
+{
+  //...
+
+  serviceCollection.AddHttpClient<IHttpClientFactory, HttpClientFactory>(httpClient =>
+        {
+          httpClient.BaseAddress = uri;
+          httpClient.DefaultRequestVersion = new Version(2, 0);
+        });
+}
+```
+
+### Package references
+- upgraded package references `Microsoft.Extensions.DependencyInjection` and `Microsoft.Extensions.Logging.Abstractions` to v6.0.0
+- added package reference `Microsoft.Extensions.Http` v6.0.0
+
+### DisposeHttpClient
+`KSqlDBContextOptions` and `KSqlDbRestApiClient` - `DisposeHttpClient` property is by default set to `false`. From v2.0.0 the used `HttpClients` will not be disposed by default.
+
+The above mentioned behavior can be overridden in the following ways:
 ```C#
 var contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
 {
@@ -3702,14 +3730,8 @@ var kSqlDbRestApiClient = new KSqlDbRestApiClient(new HttpClientFactory(new Uri(
 };
 ```
 
-### HttpClientFactory
-constructor argument was changed from `Uri` to `HttpClient`. The `IHttpClientFactory` is registered with `System.Net.Http.AddHttpClient` for better lifecycle management
-
-### Package references
-- upgraded package references `Microsoft.Extensions.DependencyInjection` and `Microsoft.Extensions.Logging.Abstractions` to v6.0.0
-- added package reference `Microsoft.Extensions.Http` v6.0.0
-
 ### KSqlDbContextOptionsBuilder.ReplaceHttpClient
+In cases when you would like to provide your own or 3rd party `HttpMessageHandlers` you can do it like in the bellow example:
 
 ```C#
 using System;
@@ -3729,18 +3751,16 @@ private static void Configure(this IServiceCollection serviceCollection, string 
     {
       httpClient.BaseAddress = new Uri(ksqlDbUrl);
       httpClient.DefaultRequestVersion = new Version(2, 0);
-    }).AddHttpMessageHandler(_ => new BearerAuthHandler());
+    }).AddHttpMessageHandler(_ => new DebugHandler());
   });
 }
 
-internal class BearerAuthHandler : System.Net.Http.DelegatingHandler
+internal class DebugHandler : System.Net.Http.DelegatingHandler
 {
   protected override Task<System.Net.Http.HttpResponseMessage> SendAsync(
-    System.Net.Http.HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
+    System.Net.Http.HttpRequestMessage request, CancellationToken cancellationToken)
   {
-    var token = "xoidiag"; //CreateToken();
-
-    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", token);
+    System.Diagnostics.Debug.WriteLine($"Process request: {request.RequestUri}");
 
     return base.SendAsync(request, cancellationToken);
   }
