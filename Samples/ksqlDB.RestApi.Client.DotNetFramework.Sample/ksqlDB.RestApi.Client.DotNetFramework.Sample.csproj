@@ -83,6 +83,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="ksqlDB.RestApi.Client">
+      <Version>2.0.1-rc.1</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection">
       <Version>6.0.0</Version>
     </PackageReference>
@@ -105,11 +108,13 @@
       <Version>5.0.0</Version>
     </PackageReference>
   </ItemGroup>
+  <!--
   <ItemGroup>
     <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj">
       <Project>{b2767b87-921e-46bd-8c50-0049edc10536}</Project>
       <Name>ksqlDb.RestApi.Client</Name>
     </ProjectReference>
   </ItemGroup>
+-->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
