@@ -30,6 +30,7 @@ public class Worker : IHostedService
   private void SubscribeToMovies()
   {
     subscription = context.CreateQueryStream<Movie>()
+      .Where( c => !c.Title.StartsWith("Star"))
       .Subscribe(onNext: movie =>
       {
         Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
