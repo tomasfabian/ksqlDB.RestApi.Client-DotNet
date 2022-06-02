@@ -6,7 +6,7 @@
     <PackageLicenseFile>License.txt</PackageLicenseFile>
     <Copyright>@tomasfabian</Copyright>
     <Version>0.1.0</Version>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <NuspecFile>Package.nuspec</NuspecFile>
     <Description>SqlServer.Connector is a client API for consuming row-level table changes (CDC - Change Data Capture) from a Sql Server database with the Debezium connector streaming platform.
 

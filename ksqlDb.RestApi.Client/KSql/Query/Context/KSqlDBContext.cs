@@ -18,29 +18,29 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 #endif
 
-namespace ksqlDB.RestApi.Client.KSql.Query.Context
+namespace ksqlDB.RestApi.Client.KSql.Query.Context;
+
+public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 {
-  public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
+  private readonly KSqlDBContextOptions contextOptions;
+
+  public KSqlDBContext(string ksqlDbUrl, ILoggerFactory loggerFactory = null)
+    : this(new KSqlDBContextOptions(ksqlDbUrl), loggerFactory)
   {
-    private readonly KSqlDBContextOptions contextOptions;
+  }
 
-    public KSqlDBContext(string ksqlDbUrl, ILoggerFactory loggerFactory = null)
-      : this(new KSqlDBContextOptions(ksqlDbUrl), loggerFactory)
-    {
-    }
+  public KSqlDBContext(KSqlDBContextOptions contextOptions, ILoggerFactory loggerFactory = null)
+    : base(contextOptions, loggerFactory)
+  {
+    this.contextOptions = contextOptions ?? throw new ArgumentNullException(nameof(contextOptions));
 
-    public KSqlDBContext(KSqlDBContextOptions contextOptions, ILoggerFactory loggerFactory = null)
-      : base(contextOptions, loggerFactory)
-    {
-      this.contextOptions = contextOptions ?? throw new ArgumentNullException(nameof(contextOptions));
+    KSqlDBQueryContext = new KSqlDBContextQueryDependenciesProvider(contextOptions);
+  }
 
-      KSqlDBQueryContext = new KSqlDBContextQueryDependenciesProvider(contextOptions);
-    }
+  internal KSqlDBContextOptions ContextOptions => contextOptions;
 
-    internal KSqlDBContextOptions ContextOptions => contextOptions;
+  internal readonly KSqlDBContextQueryDependenciesProvider KSqlDBQueryContext;
 
-    internal readonly KSqlDBContextQueryDependenciesProvider KSqlDBQueryContext;
-    
 #if !NETSTANDARD
 
     protected override void OnConfigureServices(IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
@@ -77,164 +77,163 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
     }
 
 #endif
-    
-    public IAsyncEnumerable<TEntity> CreateQuery<TEntity>(QueryParameters queryParameters, CancellationToken cancellationToken = default)
+
+  public IAsyncEnumerable<TEntity> CreateQuery<TEntity>(QueryParameters queryParameters, CancellationToken cancellationToken = default)
+  {
+    var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
+
+    var ksqlDBProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IKSqlDbProvider>();
+
+    return ksqlDBProvider.Run<TEntity>(queryParameters, cancellationToken);
+  }
+
+  public IQbservable<TEntity> CreateQuery<TEntity>(string fromItemName = null)
+  {
+    var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
+
+    if (fromItemName == String.Empty)
+      fromItemName = null;
+
+    var queryStreamContext = new QueryContext
     {
-      var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
+      FromItemName = fromItemName
+    };
 
-      var ksqlDBProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IKSqlDbProvider>();
+    return new KQueryStreamSet<TEntity>(serviceScopeFactory, queryStreamContext);
+  }
 
-      return ksqlDBProvider.Run<TEntity>(queryParameters, cancellationToken);
-    }
+  #region CreateStatements
 
-    public IQbservable<TEntity> CreateQuery<TEntity>(string fromItemName = null)
+  public IWithOrAsClause CreateStreamStatement(string streamName)
+  {
+    return CreateStatement(streamName, CreationType.Create, KSqlEntityType.Stream);
+  }
+
+  public IWithOrAsClause CreateOrReplaceStreamStatement(string streamName)
+  {
+    return CreateStatement(streamName, CreationType.CreateOrReplace, KSqlEntityType.Stream);
+  }
+
+  public IWithOrAsClause CreateTableStatement(string tableName)
+  {
+    return CreateStatement(tableName, CreationType.Create, KSqlEntityType.Table);
+  }
+
+  public IWithOrAsClause CreateOrReplaceTableStatement(string tableName)
+  {
+    return CreateStatement(tableName, CreationType.CreateOrReplace, KSqlEntityType.Table);
+  }
+
+  private IWithOrAsClause CreateStatement(string fromItemName, CreationType creationType, KSqlEntityType entityType)
+  {
+    var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
+
+    if (fromItemName == String.Empty)
+      fromItemName = null;
+
+    var statementContext = new StatementContext
     {
-      var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
+      EntityName = fromItemName,
+      CreationType = creationType,
+      KSqlEntityType = entityType
+    };
 
-      if (fromItemName == String.Empty)
-        fromItemName = null;
+    return new WithOrAsClause(serviceScopeFactory, statementContext);
+  }
 
-      var queryStreamContext = new QueryContext
-      {
-        FromItemName = fromItemName
-      };
+  #endregion
 
-      return new KQueryStreamSet<TEntity>(serviceScopeFactory, queryStreamContext);
-    }
+  #region Pull queries
 
-    #region CreateStatements
+  public IPullable<TEntity> CreatePullQuery<TEntity>(string tableName = null)
+  {
+    var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
 
-    public IWithOrAsClause CreateStreamStatement(string streamName)
+    if (tableName == String.Empty)
+      tableName = null;
+
+    var queryContext = new QueryContext
     {
-      return CreateStatement(streamName, CreationType.Create, KSqlEntityType.Stream);
-    }
+      FromItemName = tableName
+    };
 
-    public IWithOrAsClause CreateOrReplaceStreamStatement(string streamName)
-    {
-      return CreateStatement(streamName, CreationType.CreateOrReplace, KSqlEntityType.Stream);
-    }
+    return new KPullSet<TEntity>(serviceScopeFactory, queryContext);
+  }
 
-    public IWithOrAsClause CreateTableStatement(string tableName)
-    {
-      return CreateStatement(tableName, CreationType.Create, KSqlEntityType.Table);
-    }
+  public ValueTask<TEntity> ExecutePullQuery<TEntity>(string ksql, CancellationToken cancellationToken = default)
+  {
+    if (string.IsNullOrEmpty(ksql))
+      throw new ArgumentException(nameof(ksql));
 
-    public IWithOrAsClause CreateOrReplaceTableStatement(string tableName)
-    {
-      return CreateStatement(tableName, CreationType.CreateOrReplace, KSqlEntityType.Table);
-    }
+    var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
 
-    private IWithOrAsClause CreateStatement(string fromItemName, CreationType creationType, KSqlEntityType entityType)
-    {
-      var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
+    using var scope = serviceScopeFactory.CreateScope();
 
-      if (fromItemName == String.Empty)
-        fromItemName = null;
+    var dependencies = scope.ServiceProvider.GetRequiredService<IKStreamSetDependencies>();
 
-      var statementContext = new StatementContext
-      {
-        EntityName = fromItemName, 
-        CreationType = creationType, 
-        KSqlEntityType = entityType
-      };
+    var queryParameters = dependencies.QueryStreamParameters;
+    queryParameters.Sql = ksql;
 
-      return new WithOrAsClause(serviceScopeFactory, statementContext);
-    }
+    return dependencies.KsqlDBProvider
+      .Run<TEntity>(queryParameters, cancellationToken)
+      .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+  }
 
-    #endregion
+  #endregion
 
-    #region Pull queries
+  #region SaveChanges
 
-    public IPullable<TEntity> CreatePullQuery<TEntity>(string tableName = null)
-    {      
-      var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
+  private readonly ChangesCache changesCache = new();
 
-      if (tableName == String.Empty)
-        tableName = null;
+  /// <summary>
+  /// Add entity for insertion. In order to save them call SaveChangesAsync.
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
+  /// <param name="entity">Entity to add</param>
+  /// <param name="insertProperties">Optional insert properties.</param>
+  public void Add<T>(T entity, InsertProperties insertProperties = null)
+  {
+    var serviceScopeFactory = Initialize(contextOptions);
 
-      var queryContext = new QueryContext
-      {
-        FromItemName = tableName
-      };
+    using var scope = serviceScopeFactory.CreateScope();
 
-      return new KPullSet<TEntity>(serviceScopeFactory, queryContext);
-    }
+    var restApiClient = scope.ServiceProvider.GetRequiredService<IKSqlDbRestApiClient>();
 
-    public ValueTask<TEntity> ExecutePullQuery<TEntity>(string ksql, CancellationToken cancellationToken = default)
-    {
-      if (string.IsNullOrEmpty(ksql))
-        throw new ArgumentException(nameof(ksql));
+    var statement = restApiClient.ToInsertStatement(entity, insertProperties);
 
-      var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
+    changesCache.Enqueue(statement);
+  }
 
-      using var scope = serviceScopeFactory.CreateScope();
+  private readonly CancellationTokenSource cts = new();
 
-      var dependencies = scope.ServiceProvider.GetRequiredService<IKStreamSetDependencies>();
+  /// <summary>
+  /// Save the entities added to context.
+  /// </summary>
+  /// <returns>Save response.</returns>
+  public async Task<HttpResponseMessage> SaveChangesAsync(CancellationToken cancellationToken = default)
+  {
+    if (changesCache.IsEmpty)
+      return null;
 
-      var queryParameters = dependencies.QueryStreamParameters;
-      queryParameters.Sql = ksql;
+    var serviceScopeFactory = Initialize(contextOptions);
 
-      return dependencies.KsqlDBProvider
-        .Run<TEntity>(queryParameters, cancellationToken)
-        .FirstOrDefaultAsync(cancellationToken: cancellationToken);
-    }
+    using var scope = serviceScopeFactory.CreateScope();
 
-    #endregion
+    var restApiClient = scope.ServiceProvider.GetRequiredService<IKSqlDbRestApiClient>();
 
-    #region SaveChanges
+    return await changesCache.SaveChangesAsync(restApiClient, cancellationToken).ConfigureAwait(false);
+  }
 
-    private readonly ChangesCache changesCache = new();
+  #endregion
 
-    /// <summary>
-    /// Add entity for insertion. In order to save them call SaveChangesAsync.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="entity">Entity to add</param>
-    /// <param name="insertProperties">Optional insert properties.</param>
-    public void Add<T>(T entity, InsertProperties insertProperties = null)
-    {
-      var serviceScopeFactory = Initialize(contextOptions);
-
-      using var scope = serviceScopeFactory.CreateScope();
-
-      var restApiClient = scope.ServiceProvider.GetRequiredService<IKSqlDbRestApiClient>();
-
-      var statement = restApiClient.ToInsertStatement(entity, insertProperties);
-
-      changesCache.Enqueue(statement);
-    }
-
-    private readonly CancellationTokenSource cts = new();
-
-    /// <summary>
-    /// Save the entities added to context.
-    /// </summary>
-    /// <returns>Save response.</returns>
-    public async Task<HttpResponseMessage> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-      if (changesCache.IsEmpty)
-        return null;
-
-      var serviceScopeFactory = Initialize(contextOptions);
-
-      using var scope = serviceScopeFactory.CreateScope();
-      
-      var restApiClient = scope.ServiceProvider.GetRequiredService<IKSqlDbRestApiClient>();
-
-      return await changesCache.SaveChangesAsync(restApiClient, cancellationToken).ConfigureAwait(false);
-    }
-
-    #endregion
-
-    protected override async ValueTask OnDisposeAsync()
-    {
-      cts.Dispose();
+  protected override async ValueTask OnDisposeAsync()
+  {
+    cts.Dispose();
 
 #if !NETSTANDARD
       await base.OnDisposeAsync();
 #endif
-      if (KSqlDBQueryContext != null)
-        await KSqlDBQueryContext.DisposeAsync();
-    }
+    if (KSqlDBQueryContext != null)
+      await KSqlDBQueryContext.DisposeAsync();
   }
 }

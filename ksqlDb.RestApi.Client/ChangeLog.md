@@ -1,6 +1,6 @@
 ﻿# ksqlDB.RestApi.Client
 
-# v2.0.1-rc.1
+# v2.0.1
 - fixed missing IHttpClientFactory registration for NETSTANDARD
 
 # v2.0.0
