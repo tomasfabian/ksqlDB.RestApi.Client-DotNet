@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ksqlDB.Api.Client.Samples.HostedServices
 {
-  public class Worker : IHostedService, IDisposable
+  public class Worker : IHostedService
   {
     private readonly IKSqlDBContextFactory<Program.IApplicationKSqlDbContext> contextFactory;
     private readonly IKSqlDBContext context;
@@ -41,12 +41,13 @@ namespace ksqlDB.Api.Client.Samples.HostedServices
           .SubscribeAsync(
             movie =>
             {
+              Console.WriteLine(movie.Title);
             },
             onError: e =>
-                     {
-
-                     },
-            onCompleted: () => { }, cancellationToken: cancellationToken);
+            {
+              Console.WriteLine($"Error: {e.Message}");
+            },
+            onCompleted: () => { Console.WriteLine("Completed"); }, cancellationToken: cancellationToken);
 
         Console.WriteLine($"Query id {subscription.QueryId}");
       }
@@ -61,10 +62,6 @@ namespace ksqlDB.Api.Client.Samples.HostedServices
       logger.LogInformation("Stopping.");
 
       return Task.CompletedTask;
-    }
-
-    public void Dispose()
-    {
     }
   }
 }
