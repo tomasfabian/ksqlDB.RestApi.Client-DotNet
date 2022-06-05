@@ -40,7 +40,7 @@ async Task Main()
 		.Select(l => new { Id = l.Id, l.Title, l.Release_Year, l.RowTime })
 		.Take(2) // LIMIT 2    
 		.ToObservable() // client side processing starts here lazily after subscription. Switches to Rx.NET
-		.ObserveOn(TaskPoolScheduler.Default)
+		//.ObserveOn(TaskPoolScheduler.Default)
 		.Subscribe(onNext: movie =>
 		{
 			$"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}".Dump("OnNext");
