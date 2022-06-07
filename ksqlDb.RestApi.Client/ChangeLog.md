@@ -1,5 +1,8 @@
 ﻿# ksqlDB.RestApi.Client
 
+# v2.1.0-rc.1
+- MIN and MAX aggregates support for DATE, TIME, and TIMESTAMP types
+
 # v2.0.1
 - fixed missing IHttpClientFactory registration for NETSTANDARD
 

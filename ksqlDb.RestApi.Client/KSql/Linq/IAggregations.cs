@@ -277,60 +277,90 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
     /// <param name="selector">the value to aggregate</param>
     /// <returns></returns>
     int Min(Func<TSource, int?> selector);
+
     /// <summary>
     /// Computes the minimum integer value for a key.
     /// </summary>
     /// <param name="selector">the value to aggregate</param>
     /// <returns></returns>
     long Min(Func<TSource, long?> selector);
+
     /// <summary>
     /// Computes the minimum integer value for a key.
     /// </summary>
     /// <param name="selector">the value to aggregate</param>
     /// <returns></returns>
     decimal Min(Func<TSource, decimal?> selector);
+
     /// <summary>
     /// Computes the minimum integer value for a key.
     /// </summary>
     /// <param name="selector">the value to aggregate</param>
     /// <returns></returns>
     decimal Min(Func<TSource, float?> selector);
+
     /// <summary>
     /// Computes the minimum integer value for a key.
     /// </summary>
     /// <param name="selector">the value to aggregate</param>
     /// <returns></returns>
     decimal Min(Func<TSource, double?> selector);
+
     /// <summary>
     /// Computes the minimum integer value for a key.
     /// </summary>
     /// <param name="selector">the value to aggregate</param>
     /// <returns></returns>
     int Min(Func<TSource, int> selector);
+
     /// <summary>
     /// Computes the minimum integer value for a key.
     /// </summary>
     /// <param name="selector">the value to aggregate</param>
     /// <returns></returns>
     long Min(Func<TSource, long> selector);
+
     /// <summary>
-    /// Computes the minimum integer value for a key.
+    /// Computes the minimum decimal value for a key.
     /// </summary>
     /// <param name="selector">the value to aggregate</param>
     /// <returns></returns>
     decimal Min(Func<TSource, float> selector);
+
     /// <summary>
-    /// Computes the minimum integer value for a key.
+    /// Computes the minimum decimal value for a key.
     /// </summary>
     /// <param name="selector">the value to aggregate</param>
     /// <returns></returns>
     decimal Min(Func<TSource, double> selector);
+
     /// <summary>
-    /// Computes the minimum integer value for a key.
+    /// Computes the minimum decimal value for a key.
     /// </summary>
     /// <param name="selector">the value to aggregate</param>
     /// <returns></returns>
     decimal Min(Func<TSource, decimal> selector);
+
+    /// <summary>
+    /// Computes the minimum DateTime value for a key.
+    /// </summary>
+    /// <param name="selector">the value to aggregate</param>
+    /// <returns></returns>
+    DateTime Min(Func<TSource, DateTime> selector);
+
+    /// <summary>
+    /// Computes the minimum TimeSpan value for a key.
+    /// </summary>
+    /// <param name="selector">the value to aggregate</param>
+    /// <returns></returns>
+    TimeSpan Min(Func<TSource, TimeSpan> selector);
+
+    /// <summary>
+    /// Computes the minimum DateTimeOffset value for a key.
+    /// </summary>
+    /// <param name="selector">the value to aggregate</param>
+    /// <returns></returns>
+    DateTimeOffset Min(Func<TSource, DateTimeOffset> selector);
     
     #endregion
 
@@ -396,7 +426,29 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
     /// <param name="selector">the value to aggregate</param>
     /// <returns></returns>
     decimal Max(Func<TSource, decimal> selector);
-    
+
+
+    /// <summary>
+    /// Computes the minimum DateTime value for a key.
+    /// </summary>
+    /// <param name="selector">the value to aggregate</param>
+    /// <returns></returns>
+    DateTime Max(Func<TSource, DateTime> selector);
+
+    /// <summary>
+    /// Computes the minimum TimeSpan value for a key.
+    /// </summary>
+    /// <param name="selector">the value to aggregate</param>
+    /// <returns></returns>
+    TimeSpan Max(Func<TSource, TimeSpan> selector);
+
+    /// <summary>
+    /// Computes the minimum DateTimeOffset value for a key.
+    /// </summary>
+    /// <param name="selector">the value to aggregate</param>
+    /// <returns></returns>
+    DateTimeOffset Max(Func<TSource, DateTimeOffset> selector);
+
     #endregion
 
     #region Histogram
