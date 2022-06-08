@@ -247,7 +247,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
       var actualValues = await CollectActualValues(source, expectedItemsCount);
 
       //Assert
-      var id1 = actualValues.FirstOrDefault(c => c.Id == MoviesProvider.Movie1.Id);
+      var id1 = actualValues.FirstOrDefault(c => c.Id == TweetsProvider.Tweet1.Id);
       id1.Maps["Karen"].Should().Be(42);
     }
 
@@ -273,7 +273,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
       var actualValues = await CollectActualValues(source, expectedItemsCount);
 
       //Assert
-      var id1 = actualValues.FirstOrDefault(c => c.Id == MoviesProvider.Movie1.Id);
+      var id1 = actualValues.FirstOrDefault(c => c.Id == TweetsProvider.Tweet1.Id);
       id1.Struct.Name.Should().Be("Karen");
     }
   }
