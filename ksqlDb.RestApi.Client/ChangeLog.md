@@ -7,6 +7,9 @@
 Support explicit message types for `Protobuf` with multiple definitions:
 -added KeySchemaFullName and ValueSchemaFullName
 
+# Right Join
+- Select all records for the right side of the join and the matching records from the left side. If the matching records on the left side are missing, the corresponding columns will contain null values.
+
 # v2.0.1
 - fixed missing IHttpClientFactory registration for NETSTANDARD
 

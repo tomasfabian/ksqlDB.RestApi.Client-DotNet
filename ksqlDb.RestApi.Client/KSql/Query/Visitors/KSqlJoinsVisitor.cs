@@ -112,6 +112,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
         {
           nameof(QbservableExtensions.Join) => "INNER",
           nameof(QbservableExtensions.LeftJoin) => "LEFT",
+          nameof(QbservableExtensions.RightJoin) => "RIGHT",
           nameof(QbservableExtensions.GroupJoin) => "LEFT",
           nameof(QbservableExtensions.FullOuterJoin) => "FULL OUTER",
           _ => throw new ArgumentOutOfRangeException()

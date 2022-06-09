@@ -275,6 +275,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query
       {
         case nameof(QbservableExtensions.Join):
         case nameof(QbservableExtensions.LeftJoin):
+        case nameof(QbservableExtensions.RightJoin):
         case nameof(QbservableExtensions.FullOuterJoin):
           var joinTable = methodCallExpression.Arguments.Skip(1);
         

@@ -720,6 +720,43 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
 
     #endregion
 
+    #region RightJoin
+
+    private static MethodInfo rightJoinTOuterTInnerTKeyTResult;
+
+    private static MethodInfo RightJoinTOuterTInnerTKeyTResult(Type TOuter, Type TInner, Type TKey, Type TResult) =>
+      (rightJoinTOuterTInnerTKeyTResult ??= new Func<IQbservable<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, IQbservable<object>>(RightJoin).GetMethodInfo().GetGenericMethodDefinition())
+      .MakeGenericMethod(TOuter, TInner, TKey, TResult);
+
+    /// <summary>
+    /// Select all records for the right side of the join and the matching records from the left side. If the matching records on the left side are missing, the corresponding columns will contain null values. ksqldb v0.26.0
+    /// </summary>
+    /// <typeparam name="TOuter"></typeparam>
+    /// <typeparam name="TInner"></typeparam>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="outer"></param>
+    /// <param name="inner"></param>
+    /// <param name="outerKeySelector"></param>
+    /// <param name="innerKeySelector"></param>
+    /// <param name="resultSelector"></param>
+    /// <returns></returns>
+    public static IQbservable<TResult> RightJoin<TOuter, TInner, TKey, TResult>(this IQbservable<TOuter> outer, ISource<TInner> inner, Expression<Func<TOuter, TKey>> outerKeySelector, Expression<Func<TInner, TKey>> innerKeySelector, Expression<Func<TOuter, TInner, TResult>> resultSelector)
+    {
+      if (outer == null) throw new ArgumentNullException(nameof(outer));
+      if (inner == null) throw new ArgumentNullException(nameof(inner));
+      if (outerKeySelector == null) throw new ArgumentNullException(nameof(outerKeySelector));
+      if (innerKeySelector == null) throw new ArgumentNullException(nameof(innerKeySelector));
+      if (resultSelector == null) throw new ArgumentNullException(nameof(resultSelector));
+
+      return outer.Provider.CreateQuery<TResult>(
+        Expression.Call(
+          null,
+          RightJoinTOuterTInnerTKeyTResult(typeof(TOuter), typeof(TInner), typeof(TKey), typeof(TResult)), outer.Expression, inner.Expression, outerKeySelector, innerKeySelector, resultSelector));
+    }
+
+    #endregion
+
     #region FullOuterJoin
 
     private static MethodInfo fullOuterJoinTOuterTInnerTKeyTResult;
