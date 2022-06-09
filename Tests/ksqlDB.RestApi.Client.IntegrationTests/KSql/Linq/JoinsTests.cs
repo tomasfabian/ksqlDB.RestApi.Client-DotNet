@@ -184,6 +184,46 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
       public int ShipmentId { get; set; }
     }
 
+    #region RightJoin
+
+    [TestMethod]
+    public async Task RightJoin()
+    {
+      //Arrange
+      int expectedItemsCount = 1;
+
+      var source = Context.CreateQueryStream<Lead_Actor>(ActorsTableName)
+        .RightJoin(
+          Source.Of<Movie>(MoviesTableName),
+          actor => actor.Title,
+          movie => movie.Title,
+          ( actor, movie) => new
+          {
+            movie.Id,
+            Title = movie.Title,
+            movie.Release_Year,
+            Substr = K.Functions.Substring(movie.Title, 2, 4),
+            ActorTitle = actor.Title,
+          }
+        )
+        .ToAsyncEnumerable();
+
+      //Act
+      var actualValues = await CollectActualValues(source, expectedItemsCount);
+
+      //Assert
+      Assert.AreEqual(expectedItemsCount, actualValues.Count);
+
+      Assert.AreEqual(MoviesProvider.Movie1.Title, actualValues[0].Title);
+      Assert.AreEqual(MoviesProvider.LeadActor1.Title, actualValues[0].Title);
+
+      actualValues[0].Substr.Length.Should().Be(4);
+      actualValues[0].Release_Year.Should().BeOneOf(MoviesProvider.Movie1.Release_Year, MoviesProvider.Movie2.Release_Year);
+      actualValues[0].ActorTitle.Should().BeOneOf(null, MoviesProvider.Movie1.Title, MoviesProvider.Movie2.Title);
+    }
+
+    #endregion
+
     #region MultipleJoins
 
     class Payment
