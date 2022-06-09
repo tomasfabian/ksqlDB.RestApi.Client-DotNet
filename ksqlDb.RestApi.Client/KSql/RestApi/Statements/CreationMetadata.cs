@@ -39,5 +39,15 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
     /// The schema specified by the ID will be looked up in the schema registry and used to create the logical schema as well as serialize and deserialize value data.
     /// </summary>
     public int? ValueSchemaId { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public string KeySchemaFullName { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public string ValueSchemaFullName { get; set; }
   }
 }

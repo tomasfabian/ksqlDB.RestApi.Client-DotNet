@@ -3,6 +3,10 @@
 # v2.1.0-rc.1
 - MIN and MAX aggregates support for DATE, TIME, and TIMESTAMP types
 
+# CreationMetadata
+Support explicit message types for `Protobuf` with multiple definitions:
+-added KeySchemaFullName and ValueSchemaFullName
+
 # v2.0.1
 - fixed missing IHttpClientFactory registration for NETSTANDARD
 

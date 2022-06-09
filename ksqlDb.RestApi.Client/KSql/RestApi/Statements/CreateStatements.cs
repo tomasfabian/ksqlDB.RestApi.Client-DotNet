@@ -59,6 +59,12 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       if (metadata.ValueSchemaId.HasValue)
         properties.Add(@$"VALUE_SCHEMA_ID={metadata.ValueSchemaId}");
 
+      if (metadata.KeySchemaFullName.IsNotNullOrEmpty())
+        properties.Add(@$"KEY_SCHEMA_FULL_NAME={metadata.KeySchemaFullName}");
+
+      if (metadata.ValueSchemaFullName.IsNotNullOrEmpty())
+        properties.Add(@$"VALUE_SCHEMA_FULL_NAME={metadata.ValueSchemaFullName}");
+
       string result = string.Join(", ", properties);
 		
       if(!string.IsNullOrEmpty(result))
