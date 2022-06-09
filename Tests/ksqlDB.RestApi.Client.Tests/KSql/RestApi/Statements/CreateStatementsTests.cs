@@ -234,5 +234,37 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements
       //Assert
       withClause.Should().BeEquivalentTo(@$" WITH ( VALUE_SCHEMA_ID={metadata.ValueSchemaId} )");
     }
+
+    [TestMethod]
+    public void GenerateWithClause_KeySchemaFullName()
+    {
+      //Arrange
+      var metadata = new CreationMetadata
+      {
+        KeySchemaFullName = "ProductKey"
+      };
+
+      //Act
+      var withClause = CreateStatements.GenerateWithClause(metadata);
+
+      //Assert
+      withClause.Should().BeEquivalentTo(@$" WITH ( KEY_SCHEMA_FULL_NAME={metadata.KeySchemaFullName} )");
+    }
+
+    [TestMethod]
+    public void GenerateWithClause_ValueSchemaFullName()
+    {
+      //Arrange
+      var metadata = new CreationMetadata
+      {
+        ValueSchemaFullName = "ProductInfo"
+      };
+
+      //Act
+      var withClause = CreateStatements.GenerateWithClause(metadata);
+
+      //Assert
+      withClause.Should().BeEquivalentTo(@$" WITH ( VALUE_SCHEMA_FULL_NAME={metadata.ValueSchemaFullName} )");
+    }
   }
 }
