@@ -723,5 +723,37 @@ EMIT CHANGES;";
     }
 
     #endregion
+
+    #region RightJoin
+
+    [TestMethod]
+    public void RightJoinOverrideStreamName_BuildKSql_Prints()
+    {
+      //Arrange
+      var query = KSqlDBContext.CreateQueryStream<Movie>()
+        .RightJoin(
+          Source.Of<Lead_Actor>("Actors"),
+          movie => movie.Title,
+          actor => actor.Title,
+          (movie, actor) => new
+          {
+            Title = movie.Title,
+            ActorName = actor.Actor_Name
+          }
+        );
+
+      //Act
+      var ksql = query.ToQueryString();
+
+      //Assert
+      var expectedQuery = @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
+RIGHT JOIN Actors {ActorAlias}
+ON {MovieAlias}.Title = {ActorAlias}.Title
+EMIT CHANGES;";
+
+      ksql.Should().Be(expectedQuery);
+    }
+
+    #endregion
   }
 }
