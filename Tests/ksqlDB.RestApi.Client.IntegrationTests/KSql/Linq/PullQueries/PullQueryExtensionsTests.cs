@@ -30,7 +30,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq.PullQueries
 
       await pullQueryProvider.ExecuteAsync();
 
-      await Task.Delay(TimeSpan.FromSeconds(7));
+      await Task.Delay(TimeSpan.FromSeconds(6));
     }
 
     [TestMethod]

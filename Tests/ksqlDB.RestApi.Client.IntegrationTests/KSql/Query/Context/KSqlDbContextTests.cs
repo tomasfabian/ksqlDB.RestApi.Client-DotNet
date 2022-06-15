@@ -24,6 +24,14 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Context
   {
     private const string EntityName = "movies_test112";
 
+    [ClassInitialize]
+    public static async Task ClassInitialize(TestContext context)
+    {
+      var restApiClient = KSqlDbRestApiProvider.Create();
+      
+      await restApiClient.CreateStreamAsync<Movie>(new EntityCreationMetadata(EntityName, 1) { EntityName = EntityName, ShouldPluralizeEntityName = false });
+    }
+
     [TestMethod]
     public async Task AddAndSaveChangesAsync()
     {
@@ -65,6 +73,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Context
       context.Add(entity2, config);
 
       var response = await context.SaveChangesAsync();
+      var c = await response.Content.ReadAsStringAsync();
 
       //Assert
       response.StatusCode.Should().Be(HttpStatusCode.OK);
