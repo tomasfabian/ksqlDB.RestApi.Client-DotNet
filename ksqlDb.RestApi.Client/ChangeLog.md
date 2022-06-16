@@ -1,6 +1,6 @@
 ﻿# ksqlDB.RestApi.Client
 
-# v2.1.0-rc.1
+# v2.1.0
 - MIN and MAX aggregates support for DATE, TIME, and TIMESTAMP types
 
 # CreationMetadata
