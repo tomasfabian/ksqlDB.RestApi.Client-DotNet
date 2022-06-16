@@ -311,6 +311,18 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
 
     private static IDisposable JoinTables(KSqlDBContext context)
     {
+      var rightJoinQueryString = context.CreateQueryStream<Movie>()
+        .RightJoin(
+          Source.Of<Lead_Actor>(nameof(Lead_Actor)),
+          movie => movie.Title,
+          actor => actor.Title,
+          (movie, actor) => new
+          {
+            movie.Id,
+            actor.Title,
+          }
+        ).ToQueryString();
+
       var query = context.CreateQueryStream<Movie>()
         .Join(
           //.LeftJoin(
