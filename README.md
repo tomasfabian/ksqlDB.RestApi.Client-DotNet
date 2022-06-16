@@ -3807,6 +3807,17 @@ SELECT movie.Id Id, movie.Title Title, movie.Release_Year Release_Year, SUBSTRIN
   EMIT CHANGES;
 ```
 
+### Support explicit message types for Protobuf with multiple definitions
+- the following 2 new fields were added to `CreationMetadata`: `KeySchemaFullName` and `ValueSchemaFullName`
+
+```C#
+var creationMetadata = new CreationMetadata
+{
+  KeySchemaFullName = "ProductKey"
+  ValueSchemaFullName = "ProductInfo"
+};
+```
+
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
 
