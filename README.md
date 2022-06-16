@@ -3687,7 +3687,7 @@ var source = Context.CreateQueryStream<Tweet>(TweetsStreamName)
 
 ### HttpClientFactory
 The constructor argument of `HttpClientFactory` was changed from `Uri` to `HttpClient`. The `IHttpClientFactory` is registered with `System.Net.Http.AddHttpClient` for better lifecycle management of the resources used by `HttpClients`.
-`HttpClientFactory` in this case should be probably renamed to `HttpClientProvider` or something similar, but I decided to avoid such a "big"
+`IHttpClientFactory` in this case should be probably renamed to `IHttpClientProvider` or something similar, but I decided to avoid such a "big"
  breaking change. In case of too much confusion please let me know.
 
 This design decision was made based on the eBook ".NET Microservices Architecture for Containerized .NET Applications" to be able to take advantage of the AddHttpClient extension method. 
@@ -3701,10 +3701,9 @@ internal static IServiceCollection ConfigureHttpClients(this IServiceCollection 
   //...
 
   serviceCollection.AddHttpClient<IHttpClientFactory, HttpClientFactory>(httpClient =>
-        {
-          httpClient.BaseAddress = uri;
-          httpClient.DefaultRequestVersion = new Version(2, 0);
-        });
+  {
+    httpClient.DefaultRequestHeaders.Add("ApiKey", "admin123");
+  });
 }
 ```
 
@@ -3747,11 +3746,21 @@ private static void Configure(this IServiceCollection serviceCollection, string 
   {
     c.UseKSqlDb(ksqlDbUrl);
 
-    c.ReplaceHttpClient<IHttpClientFactory, HttpClientFactory>(httpClient =>
-    {
-      httpClient.BaseAddress = new Uri(ksqlDbUrl);
-      httpClient.DefaultRequestVersion = new Version(2, 0);
-    }).AddHttpMessageHandler(_ => new DebugHandler());
+    c.ReplaceHttpClient<IHttpClientFactory, HttpClientFactory>(_ => {})
+     .ConfigurePrimaryHttpMessageHandler(sp =>
+     {
+       X509Certificate2 clientCertificate = CreateClientCertificate();
+
+       var httpClientHandler = new HttpClientHandler
+       {
+         ClientCertificateOptions = ClientCertificateOption.Manual
+       };
+
+       httpClientHandler.ClientCertificates.Add(clientCertificate);
+
+       return httpClientHandler;
+     })
+     .AddHttpMessageHandler(_ => new DebugHandler());
   });
 }
 
@@ -3765,6 +3774,37 @@ internal class DebugHandler : System.Net.Http.DelegatingHandler
     return base.SendAsync(request, cancellationToken);
   }
 }
+```
+
+# v2.1.0
+
+### RightJoin
+- Select all records for the right side of the join and the matching records from the left side. If the matching records on the left side are missing, the corresponding columns will contain null values.
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Linq;
+
+var query = KSqlDBContext.CreateQueryStream<Lead_Actor>(ActorsTableName)
+  .RightJoin(
+    Source.Of<Movie>(MoviesTableName),
+    actor => actor.Title,
+    movie => movie.Title,
+    (actor, movie) => new
+    {
+      movie.Id,
+      Title = movie.Title,
+      movie.Release_Year,
+      Substr = K.Functions.Substring(movie.Title, 2, 4),
+      ActorTitle = actor.Title,
+    }
+  ));
+```
+
+```SQL
+SELECT movie.Id Id, movie.Title Title, movie.Release_Year Release_Year, SUBSTRING(movie.Title, 2, 4) Substr, actor.Title AS ActorTitle FROM lead_actor_test actor
+ RIGHT JOIN movies_test movie
+    ON actor.Title = movie.Title
+  EMIT CHANGES;
 ```
 
 # LinqPad samples
