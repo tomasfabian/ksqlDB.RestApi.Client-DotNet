@@ -25,7 +25,7 @@ services:
       - zookeeper
 
   kafdrop:
-    image: obsidiandynamics/kafdrop:3.27.0
+    image: obsidiandynamics/kafdrop:3.30.0
     depends_on:
       - broker01
     environment:
@@ -36,7 +36,7 @@ services:
       - "9000:9000"
             
   connect:
-    image: debezium/connect:1.6
+    image: debezium/connect:2.0
     ports:
      - 8083:8083
     links:
