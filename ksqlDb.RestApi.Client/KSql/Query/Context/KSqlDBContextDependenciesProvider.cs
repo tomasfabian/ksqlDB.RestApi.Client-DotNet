@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDb.RestApi.Client.Infrastructure.Logging;
@@ -10,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context
 {
-  public abstract class KSqlDBContextDependenciesProvider : AsyncDisposableObject
+  public abstract class KSqlDBContextDependenciesProvider : AsyncDisposableObject, IDisposable
   {
     private readonly KSqlDBContextOptions kSqlDbContextOptions;
     private readonly ILoggerFactory loggerFactory;
@@ -24,7 +23,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
     protected IServiceCollection ServiceCollection => kSqlDbContextOptions.ServiceCollection;
 
     protected ServiceProvider ServiceProvider { get; private set; }
-    
+
     private bool wasConfigured;
 
     internal IServiceScopeFactory Initialize(KSqlDBContextOptions contextOptions)
@@ -73,6 +72,21 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
     {
       if(ServiceProvider != null)
         await ServiceProvider.DisposeAsync();
+      Dispose(false);
+    }
+
+    public void Dispose()
+    {
+      Dispose(true);
+      GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+      if (!disposing) return;
+
+      ServiceProvider?.Dispose();
+      ServiceProvider = null;
     }
   }
 }
