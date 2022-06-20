@@ -10,7 +10,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context
 {
-  public interface IKSqlDBContext : IKSqlDBStatementsContext, IAsyncDisposable
+  public interface IKSqlDBContext : IKSqlDBStatementsContext, IAsyncDisposable, IDisposable
   {
 #if !NETSTANDARD
     IQbservable<TEntity> CreateQueryStream<TEntity>(string fromItemName = null);
@@ -19,7 +19,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
 
     IQbservable<TEntity> CreateQuery<TEntity>(string fromItemName = null);
     IAsyncEnumerable<TEntity> CreateQuery<TEntity>(QueryParameters queryParameters, CancellationToken cancellationToken = default);
-    
+
     IPullable<TEntity> CreatePullQuery<TEntity>(string tableName = null);
     ValueTask<TEntity> ExecutePullQuery<TEntity>(string ksql, CancellationToken cancellationToken = default);
 

@@ -46,9 +46,9 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
     protected override void OnConfigureServices(IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
     {
       base.OnConfigureServices(serviceCollection, contextOptions);
-          
+
       serviceCollection.TryAddScoped<IKSqlDbProvider, KSqlDbQueryStreamProvider>();
-          
+
       serviceCollection.TryAddSingleton<IKSqlDbParameters>(contextOptions.QueryStreamParameters);
     }
 
@@ -72,7 +72,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
       {
         FromItemName = fromItemName
       };
-      
+
       return new KQueryStreamSet<TEntity>(serviceScopeFactory, queryStreamContext);
     }
 
@@ -234,6 +234,15 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
       await base.OnDisposeAsync();
 #endif
     if (KSqlDBQueryContext != null)
-      await KSqlDBQueryContext.DisposeAsync();
+      await KSqlDBQueryContext.DisposeAsync().ConfigureAwait(false);
+    Dispose(false);
+  }
+
+  protected override void Dispose(bool disposing)
+  {
+    if (!disposing) return;
+
+    (KSqlDBQueryContext as IDisposable)?.Dispose();
+    base.Dispose(true);
   }
 }
