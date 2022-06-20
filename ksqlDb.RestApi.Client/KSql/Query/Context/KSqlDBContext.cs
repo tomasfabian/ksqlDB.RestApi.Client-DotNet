@@ -234,7 +234,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
       await base.OnDisposeAsync();
 #endif
     if (KSqlDBQueryContext != null)
-      await KSqlDBQueryContext.DisposeAsync();
+      await KSqlDBQueryContext.DisposeAsync().ConfigureAwait(false);
     Dispose(false);
   }
 

@@ -71,7 +71,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context
     protected override async ValueTask OnDisposeAsync()
     {
       if(ServiceProvider != null)
-        await ServiceProvider.DisposeAsync();
+        await ServiceProvider.DisposeAsync().ConfigureAwait(false);
       Dispose(false);
     }
 
