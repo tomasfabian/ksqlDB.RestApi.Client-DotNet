@@ -1,14 +1,18 @@
 ﻿# ksqlDB.RestApi.Client
 
+# v2.1.1
+- `KSqlDBContext` - added support for IDisposable
+
 # v2.1.0
+### Aggregation functions
 - MIN and MAX aggregates support for DATE, TIME, and TIMESTAMP types
 
 # CreationMetadata
 Support explicit message types for `Protobuf` with multiple definitions:
--added KeySchemaFullName and ValueSchemaFullName
+- added KeySchemaFullName and ValueSchemaFullName
 
 # Right Join
-- Select all records for the right side of the join and the matching records from the left side. If the matching records on the left side are missing, the corresponding columns will contain null values.
+- select all records for the right side of the join and the matching records from the left side. If the matching records on the left side are missing, the corresponding columns will contain null values.
 
 # v2.0.1
 - fixed missing IHttpClientFactory registration for NETSTANDARD
