@@ -46,13 +46,15 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
 
       var streamReader = await TryGetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
 
-      cancellationToken.Register(() => streamReader?.Dispose());
+      var semaphoreSlim = new SemaphoreSlim(0, 1);
+
+      cancellationToken.Register(() => semaphoreSlim.Release());
 
       var queryId = await ReadHeaderAsync<T>(streamReader).ConfigureAwait(false);
 
       return new QueryStream<T>
       {
-        EnumerableQuery = ConsumeAsync<T>(streamReader, cancellationToken),
+        EnumerableQuery = ConsumeAsync<T>(streamReader, semaphoreSlim, cancellationToken),
         QueryId = queryId
       };
     }
@@ -65,7 +67,14 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
 
       using var streamReader = await TryGetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
 
-      await foreach (var entity in ConsumeAsync<T>(streamReader, cancellationToken).WithCancellation(cancellationToken).ConfigureAwait(false))
+      var semaphoreSlim = new SemaphoreSlim(0, 1);
+
+      cancellationToken.Register(() =>
+      {
+        semaphoreSlim.Release();
+      });
+
+      await foreach (var entity in ConsumeAsync<T>(streamReader, semaphoreSlim, cancellationToken).WithCancellation(cancellationToken).ConfigureAwait(false))
         yield return entity;
     }
 
@@ -109,13 +118,41 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
       return streamReader;
     }
 
-    private async IAsyncEnumerable<T> ConsumeAsync<T>(StreamReader streamReader, [EnumeratorCancellation] CancellationToken cancellationToken)
+    private static Task<bool> EndOfStreamAsync(StreamReader streamReader, CancellationToken cancellationToken)
     {
-      while (!streamReader.EndOfStream)
+      return Task.Run(() =>
+      {
+        try
+        {
+          return !streamReader.EndOfStream;
+        }
+        catch (Exception)
+        {
+          if (!cancellationToken.IsCancellationRequested)
+            throw;
+
+          return true;
+        }
+
+      }, cancellationToken);
+    }
+
+    private async IAsyncEnumerable<T> ConsumeAsync<T>(StreamReader streamReader, SemaphoreSlim semaphoreSlim, [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+      if (cancellationToken.IsCancellationRequested)
+        yield break;
+
+      var cancellationTask = Task.Run(async () =>
+      {
+        await semaphoreSlim.WaitAsync().ConfigureAwait(false);
+        return false;
+      }, cancellationToken);
+
+      while (await await Task.WhenAny(EndOfStreamAsync(streamReader, cancellationToken), cancellationTask).ConfigureAwait(false))
       {
         if (cancellationToken.IsCancellationRequested)
           yield break;
-
+        
         var rawData = await streamReader.ReadLineAsync()
           .ConfigureAwait(false);
 
@@ -125,6 +162,9 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
 
         if (record != null) yield return record.Value;
       }
+
+      if (!cancellationToken.IsCancellationRequested)
+        semaphoreSlim.Release();
     }
 
     private async Task<string> ReadHeaderAsync<T>(StreamReader streamReader)
