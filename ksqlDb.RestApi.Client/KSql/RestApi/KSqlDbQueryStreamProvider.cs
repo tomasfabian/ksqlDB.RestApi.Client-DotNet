@@ -65,7 +65,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
       var httpRequestMessage = base.CreateQueryHttpRequestMessage(httpClient, parameters);
 
       httpRequestMessage.Version = HttpVersion.Version20;
-#if NET5_0
+#if NET5_0_OR_GREATER 
       httpRequestMessage.VersionPolicy = HttpVersionPolicy.RequestVersionOrHigher;
 #endif
 

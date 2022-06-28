@@ -1,8 +1,11 @@
 ﻿# ksqlDB.RestApi.Client
 
-# v2.1.2
+# v2.1.3
 - #25 ConsumeAsync is not responding on CancellationToken (while waiting on ReadLineAsync or EndOfStream)
 
+# v2.1.2
+- was unlisted - contains a breaking change
+- 
 # v2.1.1
 - `KSqlDBContext` - added support for IDisposable
 
