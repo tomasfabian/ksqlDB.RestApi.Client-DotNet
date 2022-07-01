@@ -1,9 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <Import Project="..\..\ProjectDefinitions\Constants.csprojimport" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>$(NetStandardVersion)</TargetFramework>
+	  <TargetFramework>net5.0</TargetFramework>
 
 	  <IsPackable>false</IsPackable>
   </PropertyGroup>

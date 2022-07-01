@@ -191,7 +191,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi
 
         //Assert
       }
-      catch (Exception e)
+      catch (Exception)
       {
         LoggerMock.VerifyLog(LogLevel.Error, Times.Once);
       }

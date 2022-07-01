@@ -209,7 +209,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
       {
         subscription = await source.SubscribeAsync(c => { }, e => { }, () => {});
       }
-      catch (Exception e)
+      catch (Exception)
       {
         //Assert
         subscription?.QueryId.Should().BeNull();

@@ -422,7 +422,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
 
     #region GroupBy
 
-    private static MethodInfo? groupByTSourceTKey;
+    private static MethodInfo groupByTSourceTKey;
 
     private static MethodInfo GroupByTSourceTKey(Type TSource, Type TKey) =>
       (groupByTSourceTKey ??= new Func<IQbservable<object>, Expression<Func<object, object>>, IQbservable<IKSqlGrouping<object, object>>>(GroupBy).GetMethodInfo().GetGenericMethodDefinition())
@@ -449,7 +449,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
         );
     }
     
-    private static MethodInfo? groupByTSourceTKeyTElement3;
+    private static MethodInfo groupByTSourceTKeyTElement3;
 
     private static MethodInfo GroupBy_TSource_TKey_TElement_3(Type TSource, Type TKey, Type TElement) =>
       (groupByTSourceTKeyTElement3 ??= new Func<IQbservable<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, IQbservable<IKSqlGrouping<object, object>>>(GroupBy).GetMethodInfo().GetGenericMethodDefinition())
@@ -521,7 +521,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
 
     #region DefaultIfEmpty
 
-    private static MethodInfo? defaultIfEmptyTSource1;
+    private static MethodInfo defaultIfEmptyTSource1;
 
     private static MethodInfo DefaultIfEmptyTSource1(Type source) =>
       (defaultIfEmptyTSource1 ??= new Func<IQbservable<object>, IQbservable<object>>(DefaultIfEmpty).GetMethodInfo().GetGenericMethodDefinition())
@@ -619,7 +619,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq
 
     #region WindowedBy
 
-    private static MethodInfo? windowedByTSourceTKey;
+    private static MethodInfo windowedByTSourceTKey;
 
     private static MethodInfo WindowedByTSourceTKey(Type TSource, Type TKey) =>
       (windowedByTSourceTKey ??= new Func<IQbservable<IKSqlGrouping<object, object>>, TimeWindows, IQbservable<IWindowedKSql<object, object>>>(WindowedBy).GetMethodInfo().GetGenericMethodDefinition())

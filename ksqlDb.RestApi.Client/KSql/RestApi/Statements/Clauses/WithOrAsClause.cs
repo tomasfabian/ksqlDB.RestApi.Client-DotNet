@@ -22,12 +22,14 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Clauses
       {
         CreationType.Create => "CREATE",
         CreationType.CreateOrReplace => "CREATE OR REPLACE",
+        _ => throw new ArgumentOutOfRangeException(nameof(statementContext.CreationType))
       };
 
       string entityTypeText = statementContext.KSqlEntityType switch
       {
         KSqlEntityType.Table => KSqlEntityType.Table.ToString().ToUpper(),
         KSqlEntityType.Stream => KSqlEntityType.Stream.ToString().ToUpper(),
+        _ => throw new ArgumentOutOfRangeException(nameof(statementContext.KSqlEntityType))
       };
 
       statementContext.Statement = @$"{creationTypeText} {entityTypeText} {statementContext.EntityName}";

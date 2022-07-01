@@ -344,6 +344,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
           nameof(Convert.ToInt64) => "BIGINT",
           nameof(KSQLConvert.ToDecimal) => $"DECIMAL({methodCallExpression.Arguments[1]},{methodCallExpression.Arguments[2]})",
           nameof(Convert.ToDouble) => "DOUBLE",
+          _ => throw new ArgumentOutOfRangeException(nameof(methodName))
         };
 
         Append($" AS {ksqlType})");
@@ -487,6 +488,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
         ExpressionType.LessThanOrEqual => "<=",
         ExpressionType.GreaterThan => ">",
         ExpressionType.GreaterThanOrEqual => ">=",
+        _ => throw new ArgumentOutOfRangeException(nameof(binaryExpression.NodeType))
       };
 
       @operator = $" {@operator} ";

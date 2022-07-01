@@ -152,12 +152,12 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Context
       //["2021-04-01","01:02:03","2021-07-04T09:29:45.447"]
       //receivedValues[0].DtOffset.Should().Be(value.DtOffset);
 
-      string json = @"{
-""DT"": ""2021-04-01""
-,""TS"": ""01:02:03""
-,""DTOFFSET"": ""2021-07-04T09:29:45.447""
-}
-";
+//       string json = @"{
+// ""DT"": ""2021-04-01""
+// ,""TS"": ""01:02:03""
+// ,""DTOFFSET"": ""2021-07-04T09:29:45.447""
+// }
+// ";
     }
 
     #endregion

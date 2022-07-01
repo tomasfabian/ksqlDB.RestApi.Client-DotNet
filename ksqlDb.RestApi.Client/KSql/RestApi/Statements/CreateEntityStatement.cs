@@ -49,6 +49,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       {
         MemberTypes.Field => ((FieldInfo) memberInfo).FieldType,
         MemberTypes.Property => ((PropertyInfo) memberInfo).PropertyType,
+        _ => throw new ArgumentOutOfRangeException(nameof(memberInfo.MemberType))
       };
 
       return type;

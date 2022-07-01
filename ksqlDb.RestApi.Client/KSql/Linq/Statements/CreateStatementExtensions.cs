@@ -82,7 +82,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq.Statements
 
     #region GroupBy
 
-    private static MethodInfo? groupByTSourceTKey;
+    private static MethodInfo groupByTSourceTKey;
 
     private static MethodInfo GroupByTSourceTKey(Type TSource, Type TKey) =>
       (groupByTSourceTKey ??= new Func<ICreateStatement<object>, Expression<Func<object, object>>, ICreateStatement<IKSqlGrouping<object, object>>>(GroupBy).GetMethodInfo().GetGenericMethodDefinition())
@@ -131,7 +131,7 @@ namespace ksqlDB.RestApi.Client.KSql.Linq.Statements
 
     #region WindowedBy
 
-    private static MethodInfo? windowedByTSourceTKey;
+    private static MethodInfo windowedByTSourceTKey;
 
     private static MethodInfo WindowedByTSourceTKey(Type TSource, Type TKey) =>
       (windowedByTSourceTKey ??= new Func<ICreateStatement<IKSqlGrouping<object, object>>, TimeWindows, ICreateStatement<IWindowedKSql<object, object>>>(WindowedBy).GetMethodInfo().GetGenericMethodDefinition())
