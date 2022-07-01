@@ -10,7 +10,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
     {
     }
     
-    public override Expression? Visit(Expression? expression)
+    public override Expression Visit(Expression expression)
     {
       if (expression == null)
         return null;

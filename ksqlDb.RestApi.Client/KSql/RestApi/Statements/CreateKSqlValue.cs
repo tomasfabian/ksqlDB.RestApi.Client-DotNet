@@ -13,7 +13,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 {
   internal sealed class CreateKSqlValue : CreateEntityStatement
   {
-    public object? ExtractValue<T>(T inputValue, IValueFormatters valueFormatters, MemberInfo memberInfo, Type type)
+    public object ExtractValue<T>(T inputValue, IValueFormatters valueFormatters, MemberInfo memberInfo, Type type)
     {
       Type valueType = inputValue.GetType();
 

@@ -33,7 +33,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 
       stringBuilder = new();
     }
-
+     
     internal KSqlVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
       : this(queryMetadata)
     {
@@ -58,7 +58,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
       return stringBuilder.ToString();
     }
 
-    public override Expression? Visit(Expression? expression)
+    public override Expression Visit(Expression expression)
     {
       if (expression == null)
         return null;

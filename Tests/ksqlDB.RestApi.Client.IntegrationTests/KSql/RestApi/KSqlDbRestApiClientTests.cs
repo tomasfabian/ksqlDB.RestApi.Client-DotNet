@@ -470,7 +470,9 @@ Drop type Address;
       public IDictionary<string, int> Dictionary { get; set; }
       public Dictionary<string, int> Dictionary2 { get; set; }
 
+      //#pragma warning disable CS0649
       public int DontFindMe;
+      //#pragma warning restore CS0649
 
       public int DontFindMe2 { get; }
     }

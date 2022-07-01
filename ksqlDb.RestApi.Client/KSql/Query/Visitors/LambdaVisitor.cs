@@ -21,7 +21,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
       return new KSqlFunctionLambdaVisitor(stringBuilder, queryMetadata);
     }
 
-    public override Expression? Visit(Expression? expression)
+    public override Expression Visit(Expression expression)
     {
       if (expression == null)
         return null;
