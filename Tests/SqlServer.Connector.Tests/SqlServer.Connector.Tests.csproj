@@ -1,7 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\ProjectDefinitions\Constants.csprojimport" />
-
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
 
