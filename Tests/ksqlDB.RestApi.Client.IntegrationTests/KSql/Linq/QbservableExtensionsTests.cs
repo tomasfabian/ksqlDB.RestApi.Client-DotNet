@@ -239,6 +239,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
       subscription.QueryId.Should().NotBeNullOrEmpty();
     }
 
+    [Ignore]
     [TestMethod]
     public async Task SubscribeOn_Blocks()
     {
