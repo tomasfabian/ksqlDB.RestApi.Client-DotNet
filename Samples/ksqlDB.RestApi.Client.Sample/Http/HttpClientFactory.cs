@@ -2,26 +2,25 @@
 using System.Net.Http;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
-namespace ksqlDB.Api.Client.Samples.Http
+namespace ksqlDB.Api.Client.Samples.Http;
+
+public class HttpClientFactory : IHttpClientFactory
 {
-  public class HttpClientFactory : IHttpClientFactory
+  private readonly HttpClient httpClient;
+
+  public HttpClientFactory(Uri uri)
   {
-    private readonly HttpClient httpClient;
+    if (uri == null)
+      throw new ArgumentNullException(nameof(uri));
 
-    public HttpClientFactory(Uri uri)
+    httpClient = new()
     {
-      if(uri == null)
-        throw new ArgumentNullException(nameof(uri));
+      BaseAddress = uri
+    };
+  }
 
-      httpClient = new()
-      {
-        BaseAddress = uri
-      };
-    }
-
-    public HttpClient CreateClient()
-    {
-      return httpClient;
-    }
+  public HttpClient CreateClient()
+  {
+    return httpClient;
   }
 }

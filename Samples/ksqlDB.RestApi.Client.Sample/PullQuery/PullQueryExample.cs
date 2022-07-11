@@ -13,92 +13,92 @@ using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-namespace ksqlDB.Api.Client.Samples.PullQuery
+namespace ksqlDB.Api.Client.Samples.PullQuery;
+
+public class PullQueryExample
 {
-  public class PullQueryExample
+  IKSqlDbRestApiClient restApiClient;
+
+  public async Task ExecuteAsync()
   {
-    IKSqlDbRestApiClient restApiClient;
+    string ksqlDbUrl = @"http:\\localhost:8088";
 
-    public async Task ExecuteAsync()
+    var contextOptions = new KSqlDbContextOptionsBuilder()
+      .UseKSqlDb(ksqlDbUrl)
+      .SetBasicAuthCredentials("fred", "letmein")
+      .Options;
+
+    contextOptions.DisposeHttpClient = false;
+
+    await using var context = new KSqlDBContext(contextOptions);
+
+    var httpClient = new HttpClient()
     {
-      string ksqlDbUrl = @"http:\\localhost:8088";
+      BaseAddress = new Uri(ksqlDbUrl)
+    };
 
-      var contextOptions = new KSqlDbContextOptionsBuilder()
-        .UseKSqlDb(ksqlDbUrl)
-        .SetBasicAuthCredentials("fred", "letmein")
-        .Options;
+    var httpClientFactory = new HttpClientFactory(httpClient);
 
-      contextOptions.DisposeHttpClient = false;
+    restApiClient = new KSqlDbRestApiClient(httpClientFactory)
+      .SetCredentials(new BasicAuthCredentials("fred", "letmein"));
 
-      await using var context = new KSqlDBContext(contextOptions);
+    ((KSqlDbRestApiClient)restApiClient).DisposeHttpClient = false;
 
-      var httpClient = new HttpClient()
-      {
-        BaseAddress = new Uri(ksqlDbUrl)
-      };
+    await CreateOrReplaceStreamAsync();
 
-      var httpClientFactory = new HttpClientFactory(httpClient);
+    var statement = context.CreateTableStatement(MaterializedViewName)
+      .As<IoTSensor>("sensor_values")
+      .GroupBy(c => c.SensorId)
+      .WindowedBy(new TimeWindows(Duration.OfSeconds(5)).WithGracePeriod(Duration.OfHours(2)))
+      .Select(c => new { SensorId = c.Key, AvgValue = c.Avg(g => g.Value) });
 
-      restApiClient = new KSqlDbRestApiClient(httpClientFactory)
-        .SetCredentials(new BasicAuthCredentials("fred", "letmein"));
-      
-      ((KSqlDbRestApiClient)restApiClient).DisposeHttpClient = false;
-      
-      await CreateOrReplaceStreamAsync();
+    var query = statement.ToStatementString();
 
-      var statement = context.CreateTableStatement(MaterializedViewName)
-        .As<IoTSensor>("sensor_values")
-        .GroupBy(c => c.SensorId)
-        .WindowedBy(new TimeWindows(Duration.OfSeconds(5)).WithGracePeriod(Duration.OfHours(2)))
-        .Select(c => new { SensorId = c.Key, AvgValue = c.Avg(g => g.Value) });
+    var response = await statement.ExecuteStatementAsync();
 
-      var query = statement.ToStatementString();
+    response = await InsertAsync(new IoTSensor { SensorId = "sensor-1", Value = 11 });
 
-      var response = await statement.ExecuteStatementAsync();
+    await PullSensor(context);
+  }
 
-      response = await InsertAsync(new IoTSensor { SensorId = "sensor-1", Value = 11 });
-      
-      await PullSensor(context);
-    }
+  private static async Task PullSensor(KSqlDBContext context)
+  {
+    string windowStart = "2019-10-03T21:31:16";
+    string windowEnd = "2025-10-03T21:31:16";
 
-    private static async Task PullSensor(KSqlDBContext context)
-    {
-      string windowStart = "2019-10-03T21:31:16";
-      string windowEnd = "2025-10-03T21:31:16";
+    var pullQuery = context.CreatePullQuery<IoTSensorStats>(MaterializedViewName)
+      .Where(c => c.SensorId == "sensor-1")
+      .Where(c => Bounds.WindowStart > windowStart && Bounds.WindowEnd <= windowEnd)
+      .Take(5);
 
-      var pullQuery = context.CreatePullQuery<IoTSensorStats>(MaterializedViewName)
-        .Where(c => c.SensorId == "sensor-1")
-        .Where(c => Bounds.WindowStart > windowStart && Bounds.WindowEnd <= windowEnd)
-        .Take(5);
+    var sql = pullQuery.ToQueryString();
 
-      var sql = pullQuery.ToQueryString();
+    await foreach (var item in pullQuery.GetManyAsync().OrderBy(c => c.SensorId).ConfigureAwait(false))
+      Console.WriteLine($"Pull query - GetMany result => Id: {item?.SensorId} - Avg Value: {item?.AvgValue} - Window Start {item?.WindowStart}");
 
-      await foreach(var item in pullQuery.GetManyAsync().OrderBy(c => c.SensorId).ConfigureAwait(false))
-        Console.WriteLine($"Pull query - GetMany result => Id: {item?.SensorId} - Avg Value: {item?.AvgValue} - Window Start {item?.WindowStart}");
+    var list = await pullQuery.GetManyAsync().OrderBy(c => c.SensorId).ToListAsync();
+    string ksql = "SELECT * FROM avg_sensor_values WHERE SensorId = 'sensor-1';";
 
-      var list = await pullQuery.GetManyAsync().OrderBy(c => c.SensorId).ToListAsync();
-      string ksql = "SELECT * FROM avg_sensor_values WHERE SensorId = 'sensor-1';";
+    var result2 = await context.ExecutePullQuery<IoTSensorStats>(ksql);
+  }
 
-      var result2 = await context.ExecutePullQuery<IoTSensorStats>(ksql);
-    }
+  private static async Task GetAsync(IPullable<IoTSensorStats> pullQuery)
+  {
+    var result = await pullQuery
+      .FirstOrDefaultAsync();
 
-    private static async Task GetAsync(IPullable<IoTSensorStats> pullQuery)
-    {
-      var result = await pullQuery
-        .FirstOrDefaultAsync();
+    Console.WriteLine(
+      $"Pull query GetAsync result => Id: {result?.SensorId} - Avg Value: {result?.AvgValue} - Window Start {result?.WindowStart}");
 
-      Console.WriteLine(
-        $"Pull query GetAsync result => Id: {result?.SensorId} - Avg Value: {result?.AvgValue} - Window Start {result?.WindowStart}");
+    Console.WriteLine();
+  }
 
-      Console.WriteLine();
-    }
+  const string MaterializedViewName = "avg_sensor_values";
 
-    const string MaterializedViewName = "avg_sensor_values";
-
-    async Task<HttpResponseMessage> CreateOrReplaceStreamAsync()
-    {
-      const string createOrReplaceStream =
-    @"CREATE STREAM sensor_values (
+  async Task<HttpResponseMessage> CreateOrReplaceStreamAsync()
+  {
+    const string createOrReplaceStream =
+  @"CREATE STREAM sensor_values (
     SensorId VARCHAR KEY,
     Value INT
 ) WITH (
@@ -107,27 +107,26 @@ namespace ksqlDB.Api.Client.Samples.PullQuery
     value_format = 'json'
 );";
 
-      return await ExecuteAsync(createOrReplaceStream);
-    }
+    return await ExecuteAsync(createOrReplaceStream);
+  }
 
-    async Task<HttpResponseMessage> InsertAsync(IoTSensor sensor)
-    {
-      string insert =
-        $"INSERT INTO sensor_values (SensorId, Value) VALUES ('{sensor.SensorId}', {sensor.Value});";
+  async Task<HttpResponseMessage> InsertAsync(IoTSensor sensor)
+  {
+    string insert =
+      $"INSERT INTO sensor_values (SensorId, Value) VALUES ('{sensor.SensorId}', {sensor.Value});";
 
-      return await ExecuteAsync(insert);
-    }
+    return await ExecuteAsync(insert);
+  }
 
-    async Task<HttpResponseMessage> ExecuteAsync(string statement)
-    {
-      KSqlDbStatement ksqlDbStatement = new(statement);
+  async Task<HttpResponseMessage> ExecuteAsync(string statement)
+  {
+    KSqlDbStatement ksqlDbStatement = new(statement);
 
-      var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement)
-        .ConfigureAwait(false);
+    var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement)
+      .ConfigureAwait(false);
 
-      string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
+    string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
 
-      return httpResponseMessage;
-    }
+    return httpResponseMessage;
   }
 }

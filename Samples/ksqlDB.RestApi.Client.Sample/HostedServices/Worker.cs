@@ -8,60 +8,59 @@ using ksqlDB.RestApi.Client.KSql.RestApi;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace ksqlDB.Api.Client.Samples.HostedServices
+namespace ksqlDB.Api.Client.Samples.HostedServices;
+
+public class Worker : IHostedService
 {
-  public class Worker : IHostedService
+  private readonly IKSqlDBContextFactory<Program.IApplicationKSqlDbContext> contextFactory;
+  private readonly IKSqlDBContext context;
+  private readonly IKSqlDbRestApiClient restApiClient;
+  private readonly ILogger logger;
+
+  public Worker(IKSqlDBContextFactory<Program.IApplicationKSqlDbContext> contextFactory, Program.IApplicationKSqlDbContext context, IKSqlDbRestApiClient restApiClient, ILoggerFactory loggerFactory)
   {
-    private readonly IKSqlDBContextFactory<Program.IApplicationKSqlDbContext> contextFactory;
-    private readonly IKSqlDBContext context;
-    private readonly IKSqlDbRestApiClient restApiClient;
-    private readonly ILogger logger;
+    this.contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
+    this.context = context ?? throw new ArgumentNullException(nameof(context));
+    this.restApiClient = restApiClient ?? throw new ArgumentNullException(nameof(restApiClient));
 
-    public Worker(IKSqlDBContextFactory<Program.IApplicationKSqlDbContext> contextFactory, Program.IApplicationKSqlDbContext context, IKSqlDbRestApiClient restApiClient, ILoggerFactory loggerFactory)
+    logger = loggerFactory.CreateLogger<Worker>();
+  }
+
+  private Subscription subscription;
+
+  public async Task StartAsync(CancellationToken cancellationToken)
+  {
+    logger.LogInformation("Starting");
+
+    var newContext = contextFactory.Create();
+
+    try
     {
-      this.contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
-      this.context = context ?? throw new ArgumentNullException(nameof(context));
-      this.restApiClient = restApiClient ?? throw new ArgumentNullException(nameof(restApiClient));
+      subscription = await newContext.Movies
+        .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
+        .SubscribeAsync(
+          movie =>
+          {
+            Console.WriteLine(movie.Title);
+          },
+          onError: e =>
+          {
+            Console.WriteLine($"Error: {e.Message}");
+          },
+          onCompleted: () => { Console.WriteLine("Completed"); }, cancellationToken: cancellationToken);
 
-      logger = loggerFactory.CreateLogger<Worker>();
+      Console.WriteLine($"Query id {subscription.QueryId}");
     }
-
-    private Subscription subscription;
-
-    public async Task StartAsync(CancellationToken cancellationToken)
+    catch (Exception e)
     {
-      logger.LogInformation("Starting");
-
-      var newContext = contextFactory.Create();
-
-      try
-      {
-        subscription = await newContext.Movies
-          .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
-          .SubscribeAsync(
-            movie =>
-            {
-              Console.WriteLine(movie.Title);
-            },
-            onError: e =>
-            {
-              Console.WriteLine($"Error: {e.Message}");
-            },
-            onCompleted: () => { Console.WriteLine("Completed"); }, cancellationToken: cancellationToken);
-
-        Console.WriteLine($"Query id {subscription.QueryId}");
-      }
-      catch (Exception e)
-      {
-        Console.WriteLine(e);
-      }
+      Console.WriteLine(e);
     }
+  }
 
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-      logger.LogInformation("Stopping.");
+  public Task StopAsync(CancellationToken cancellationToken)
+  {
+    logger.LogInformation("Stopping.");
 
-      return Task.CompletedTask;
-    }
+    return Task.CompletedTask;
   }
 }

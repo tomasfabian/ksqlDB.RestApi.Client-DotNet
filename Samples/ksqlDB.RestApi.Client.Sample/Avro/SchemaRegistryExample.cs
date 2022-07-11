@@ -7,50 +7,49 @@ using ksqlDB.Api.Client.Samples.Providers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-namespace ksqlDB.Api.Client.Samples.Avro
+namespace ksqlDB.Api.Client.Samples.Avro;
+
+public class SchemaRegistryExample
 {
-  public class SchemaRegistryExample
+  public async Task AvroExampleAsync(string ksqlDbUrl)
   {
-    public async Task AvroExampleAsync(string ksqlDbUrl)
+    var schemaRegistryConfig = new SchemaRegistryConfig
     {
-      var schemaRegistryConfig = new SchemaRegistryConfig
-      {
-        Url = "http://localhost:8081"
-      };
-      
-      using var schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryConfig);
+      Url = "http://localhost:8081"
+    };
 
-      var schema = IoTSensor._SCHEMA.ToString();
+    using var schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryConfig);
 
-      var subject = "IoTSensors-value";
+    var schema = IoTSensor._SCHEMA.ToString();
 
-      var registrationResult = await schemaRegistry.RegisterSchemaAsync(subject, schema);
+    var subject = "IoTSensors-value";
 
-      //http://localhost:8081/subjects/IoTSensors-value/versions/latest/schema
-      var latestSchema = await schemaRegistry.GetLatestSchemaAsync(subject);
+    var registrationResult = await schemaRegistry.RegisterSchemaAsync(subject, schema);
 
-      var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
-      var restApiClient = new KSqlDbRestApiProvider(httpClientFactory);
+    //http://localhost:8081/subjects/IoTSensors-value/versions/latest/schema
+    var latestSchema = await schemaRegistry.GetLatestSchemaAsync(subject);
 
-      EntityCreationMetadata metadata = new()
-      {
-        EntityName = "avroSensors",
-        KafkaTopic = "IoTSensors",
-        ValueFormat = SerializationFormats.Avro,
-        Partitions = 1,
-        Replicas = 1
-      };
-      
-      var httpResponseMessage = await restApiClient.CreateStreamAsync<IoTSensor>(metadata, ifNotExists: false)
-        .ConfigureAwait(false);
+    var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+    var restApiClient = new KSqlDbRestApiProvider(httpClientFactory);
 
-      var httpResponse = await httpResponseMessage.Content.ReadAsStringAsync();
+    EntityCreationMetadata metadata = new()
+    {
+      EntityName = "avroSensors",
+      KafkaTopic = "IoTSensors",
+      ValueFormat = SerializationFormats.Avro,
+      Partitions = 1,
+      Replicas = 1
+    };
 
-      Console.WriteLine(httpResponse);
+    var httpResponseMessage = await restApiClient.CreateStreamAsync<IoTSensor>(metadata, ifNotExists: false)
+      .ConfigureAwait(false);
 
-      // Stream Name         | Kafka Topic | Key Format | Value Format | Windowed
-      //   ------------------------------------------------------------------------------------------------------
-      // AVROSENSORS | IoTSensors | KAFKA | AVRO | false
-    }
+    var httpResponse = await httpResponseMessage.Content.ReadAsStringAsync();
+
+    Console.WriteLine(httpResponse);
+
+    // Stream Name         | Kafka Topic | Key Format | Value Format | Windowed
+    //   ------------------------------------------------------------------------------------------------------
+    // AVROSENSORS | IoTSensors | KAFKA | AVRO | false
   }
 }
