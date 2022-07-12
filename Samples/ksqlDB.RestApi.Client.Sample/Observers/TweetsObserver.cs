@@ -1,5 +1,4 @@
-﻿using System;
-using ksqlDB.Api.Client.Samples.Models;
+﻿using ksqlDB.Api.Client.Samples.Models;
 
 namespace ksqlDB.Api.Client.Samples.Observers;
 

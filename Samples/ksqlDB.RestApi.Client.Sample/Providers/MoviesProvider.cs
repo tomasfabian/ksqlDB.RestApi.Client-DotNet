@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-using ksqlDB.Api.Client.Samples.Models.Movies;
+﻿using ksqlDB.Api.Client.Samples.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;

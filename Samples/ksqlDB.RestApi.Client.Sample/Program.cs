@@ -4,8 +4,6 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using ksqlDB.Api.Client.Samples.HostedServices;
 using ksqlDB.Api.Client.Samples.Json;
 using ksqlDB.Api.Client.Samples.Models;
@@ -148,10 +146,9 @@ public static class Program
     Console.WriteLine("Finished.");
   }
 
-  internal class DebugHandler : System.Net.Http.DelegatingHandler
+  internal class DebugHandler : DelegatingHandler
   {
-    protected override Task<System.Net.Http.HttpResponseMessage> SendAsync(
-      System.Net.Http.HttpRequestMessage request, CancellationToken cancellationToken)
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
       System.Diagnostics.Debug.WriteLine($"Process request: {request.RequestUri}");
 
@@ -167,7 +164,7 @@ public static class Program
     {
       c.UseKSqlDb(ksqlDbUrl);
 
-      c.ReplaceHttpClient<IHttpClientFactory, ksqlDB.RestApi.Client.KSql.RestApi.Http.HttpClientFactory>(_ => { })
+      c.ReplaceHttpClient<ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory, ksqlDB.RestApi.Client.KSql.RestApi.Http.HttpClientFactory>(_ => { })
         .AddHttpMessageHandler(_ => new DebugHandler());
     });
 

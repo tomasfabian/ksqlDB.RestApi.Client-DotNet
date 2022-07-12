@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ksqlDB.Api.Client.Samples.Models.InvocationFunctions
+﻿namespace ksqlDB.Api.Client.Samples.Models.InvocationFunctions
 {
   record Lambda
   {

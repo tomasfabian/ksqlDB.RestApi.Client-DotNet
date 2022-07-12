@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Confluent.SchemaRegistry;
+﻿using Confluent.SchemaRegistry;
 using ksqlDB.Api.Client.Samples.Http;
 using Sensors;
 using ksqlDB.Api.Client.Samples.Providers;
