@@ -498,8 +498,8 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
       }, error => { Console.WriteLine($"Exception: {error.Message}"); }, () => Console.WriteLine("Completed"));
 
     var groupBySubscription = context.CreateQueryStream<IoTSensorChange>("sqlserversensors")
-      .GroupBy(c => new { c.Op, c.After.Value })
-      .Select(g => new { g.Source.Op, g.Source.After.Value, num_times = g.Count() })
+      .GroupBy(c => new { c.Op, c.After!.Value })
+      .Select(g => new { g.Source.Op, g.Source.After!.Value, num_times = g.Count() })
       .Subscribe(c =>
       {
         Console.WriteLine($"{c}");
@@ -526,7 +526,7 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
     return context.CreateQueryStream<Tweet>()
       .Select(c => K.Functions.Dynamic("ARRAY_DISTINCT(ARRAY[1, 1, 2, 3, 1, 2])") as int[])
       .Subscribe(
-        message => Console.WriteLine($"{message[0]} - {message[^1]}"),
+        array => Console.WriteLine($"{array![0]} - {array[^1]}"),
         error => Console.WriteLine($"Exception: {error.Message}"));
   }
 
@@ -1071,12 +1071,12 @@ Drop table {nameof(Event)};
 
   internal class ApplicationKSqlDbContext : KSqlDBContext, IApplicationKSqlDbContext
   {
-    public ApplicationKSqlDbContext(string ksqlDbUrl, ILoggerFactory loggerFactory = null)
+    public ApplicationKSqlDbContext(string ksqlDbUrl, ILoggerFactory? loggerFactory = null)
       : base(ksqlDbUrl, loggerFactory)
     {
     }
 
-    public ApplicationKSqlDbContext(KSqlDBContextOptions contextOptions, ILoggerFactory loggerFactory = null)
+    public ApplicationKSqlDbContext(KSqlDBContextOptions contextOptions, ILoggerFactory? loggerFactory = null)
       : base(contextOptions, loggerFactory)
     {
     }

@@ -23,7 +23,7 @@ public class Worker : IHostedService
     logger = loggerFactory.CreateLogger<Worker>();
   }
 
-  private Subscription subscription;
+  private Subscription? subscription;
 
   public async Task StartAsync(CancellationToken cancellationToken)
   {

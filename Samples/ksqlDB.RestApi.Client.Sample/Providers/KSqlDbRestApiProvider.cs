@@ -9,7 +9,7 @@ public class KSqlDbRestApiProvider : KSqlDbRestApiClient, IKSqlDbRestApiProvider
 {
   public static string KsqlDbUrl { get; } = @"http:\\localhost:8088";
 
-  public static KSqlDbRestApiProvider Create(string ksqlDbUrl = null)
+  public static KSqlDbRestApiProvider Create(string? ksqlDbUrl = null)
   {
     var uri = new Uri(ksqlDbUrl ?? KsqlDbUrl);
 
@@ -21,7 +21,7 @@ public class KSqlDbRestApiProvider : KSqlDbRestApiClient, IKSqlDbRestApiProvider
     return new KSqlDbRestApiProvider(new HttpClientFactory(httpClient));
   }
 
-  public KSqlDbRestApiProvider(IHttpClientFactory httpClientFactory, ILoggerFactory loggerFactory = null)
+  public KSqlDbRestApiProvider(IHttpClientFactory httpClientFactory, ILoggerFactory? loggerFactory = null)
     : base(httpClientFactory, loggerFactory)
   {
   }

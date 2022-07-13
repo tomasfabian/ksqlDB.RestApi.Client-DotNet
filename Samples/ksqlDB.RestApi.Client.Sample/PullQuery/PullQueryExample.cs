@@ -13,7 +13,7 @@ namespace ksqlDB.Api.Client.Samples.PullQuery;
 
 public class PullQueryExample
 {
-  IKSqlDbRestApiClient restApiClient;
+  IKSqlDbRestApiClient? restApiClient;
 
   public async Task ExecuteAsync()
   {
@@ -118,7 +118,7 @@ public class PullQueryExample
   {
     KSqlDbStatement ksqlDbStatement = new(statement);
 
-    var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement)
+    var httpResponseMessage = await restApiClient!.ExecuteStatementAsync(ksqlDbStatement)
       .ConfigureAwait(false);
 
     string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
