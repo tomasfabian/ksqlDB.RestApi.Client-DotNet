@@ -4,7 +4,7 @@ namespace ksqlDB.Api.Client.Samples.Models.Movies
 {
   public class MovieNullableFields
   {
-    public string Title { get; set; }    
+    public string Title { get; set; } = null!;
     [Key]
     public int? Id { get; set; }
     public int? Release_Year { get; set; }

@@ -9,9 +9,9 @@ namespace ksqlDB.Api.Client.Samples.Models
     public int Id { get; set; }
 
     [JsonPropertyName("MESSAGE")]
-    public string Message { get; set; }
+    public string Message { get; set; } = null!;
 
-    
+
     public double Amount { get; set; }
     
     [Decimal(3,2)]

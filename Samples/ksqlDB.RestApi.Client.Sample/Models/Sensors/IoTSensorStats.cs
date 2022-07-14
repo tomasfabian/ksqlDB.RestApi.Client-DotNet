@@ -2,7 +2,7 @@
 {
   public record IoTSensorStats
   {
-    public string SensorId { get; set; }
+    public string SensorId { get; set; } = null!;
     public double AvgValue { get; set; }
 
     public long WindowStart { get; set; }

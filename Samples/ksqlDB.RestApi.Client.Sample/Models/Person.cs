@@ -4,7 +4,7 @@ namespace ksqlDB.Api.Client.Samples.Models
 {
   public class Person : Record
   {
-    public string Name { get; set; }
-    public Address Address { get; set; }
+    public string Name { get; set; } = null!;
+    public Address? Address { get; set; }
   }
 }

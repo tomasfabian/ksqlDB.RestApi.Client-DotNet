@@ -7,10 +7,10 @@ namespace ksqlDB.Api.Client.Samples.Models.Events
     [Key]
     public int Id { get; set; }
 
-    public string[] Places { get; set; }
+    public string[] Places { get; set; } = null!;
 
     //public EventCategory[] Categories { get; init; }
     [IgnoreByInserts]
-    public IEnumerable<EventCategory> Categories { get; set; }
+    public IEnumerable<EventCategory> Categories { get; set; } = null!;
   }
 }
