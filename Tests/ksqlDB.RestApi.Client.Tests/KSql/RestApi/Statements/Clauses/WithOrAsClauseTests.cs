@@ -6,94 +6,93 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements.Clauses
+namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements.Clauses;
+
+public class WithOrAsClauseTests
 {
-  public class WithOrAsClauseTests
+  [Test]
+  public void Ctor_Create_Table()
   {
-    [Test]
-    public void Ctor_Create_Table()
+    //Arrange
+    var statementContext = new StatementContext
     {
-      //Arrange
-      var statementContext = new StatementContext
-      {
-        CreationType = CreationType.Create,
-        KSqlEntityType = KSqlEntityType.Table
-      };
+      CreationType = CreationType.Create,
+      KSqlEntityType = KSqlEntityType.Table
+    };
 
-      //Act
-      var withOrAsClause = new WithOrAsClause(Mock.Of<IServiceScopeFactory>(), statementContext);
+    //Act
+    var withOrAsClause = new WithOrAsClause(Mock.Of<IServiceScopeFactory>(), statementContext);
 
-      //Assert
-      statementContext.Statement.Should().Be("CREATE TABLE ");
-    }
+    //Assert
+    statementContext.Statement.Should().Be("CREATE TABLE ");
+  }
 
-    [Test]
-    public void Ctor_Create_Stream()
+  [Test]
+  public void Ctor_Create_Stream()
+  {
+    //Arrange
+    var statementContext = new StatementContext
     {
-      //Arrange
-      var statementContext = new StatementContext
-      {
-        CreationType = CreationType.Create,
-        KSqlEntityType = KSqlEntityType.Stream
-      };
+      CreationType = CreationType.Create,
+      KSqlEntityType = KSqlEntityType.Stream
+    };
 
-      //Act
-      var withOrAsClause = new WithOrAsClause(Mock.Of<IServiceScopeFactory>(), statementContext);
+    //Act
+    var withOrAsClause = new WithOrAsClause(Mock.Of<IServiceScopeFactory>(), statementContext);
 
-      //Assert
-      statementContext.Statement.Should().Be("CREATE STREAM ");
-    }
+    //Assert
+    statementContext.Statement.Should().Be("CREATE STREAM ");
+  }
 
-    [Test]
-    public void Ctor_CreateOrReplace_Table()
+  [Test]
+  public void Ctor_CreateOrReplace_Table()
+  {
+    //Arrange
+    var statementContext = new StatementContext
     {
-      //Arrange
-      var statementContext = new StatementContext
-      {
-        CreationType = CreationType.CreateOrReplace,
-        KSqlEntityType = KSqlEntityType.Table
-      };
+      CreationType = CreationType.CreateOrReplace,
+      KSqlEntityType = KSqlEntityType.Table
+    };
 
-      //Act
-      var withOrAsClause = new WithOrAsClause(Mock.Of<IServiceScopeFactory>(), statementContext);
+    //Act
+    var withOrAsClause = new WithOrAsClause(Mock.Of<IServiceScopeFactory>(), statementContext);
 
-      //Assert
-      statementContext.Statement.Should().Be("CREATE OR REPLACE TABLE ");
-    }
+    //Assert
+    statementContext.Statement.Should().Be("CREATE OR REPLACE TABLE ");
+  }
 
-    [Test]
-    public void Ctor_CreateOrReplace_Stream()
+  [Test]
+  public void Ctor_CreateOrReplace_Stream()
+  {
+    //Arrange
+    var statementContext = new StatementContext
     {
-      //Arrange
-      var statementContext = new StatementContext
-      {
-        CreationType = CreationType.CreateOrReplace,
-        KSqlEntityType = KSqlEntityType.Stream
-      };
+      CreationType = CreationType.CreateOrReplace,
+      KSqlEntityType = KSqlEntityType.Stream
+    };
 
-      //Act
-      var withOrAsClause = new WithOrAsClause(Mock.Of<IServiceScopeFactory>(), statementContext);
+    //Act
+    var withOrAsClause = new WithOrAsClause(Mock.Of<IServiceScopeFactory>(), statementContext);
 
-      //Assert
-      statementContext.Statement.Should().Be("CREATE OR REPLACE STREAM ");
-    }
+    //Assert
+    statementContext.Statement.Should().Be("CREATE OR REPLACE STREAM ");
+  }
 
-    private static readonly string TestTableName = "";
+  private static readonly string TestTableName = "";
 
-    [Test]
-    public void Ctor_EntityName_CreateTableWithName()
+  [Test]
+  public void Ctor_EntityName_CreateTableWithName()
+  {
+    //Arrange
+    var statementContext = new StatementContext
     {
-      //Arrange
-      var statementContext = new StatementContext
-      {
-        EntityName = TestTableName
-      };
+      EntityName = TestTableName
+    };
 
-      //Act
-      var withOrAsClause = new WithOrAsClause(Mock.Of<IServiceScopeFactory>(), statementContext);
+    //Act
+    var withOrAsClause = new WithOrAsClause(Mock.Of<IServiceScopeFactory>(), statementContext);
 
-      //Assert
-      statementContext.Statement.Should().Be($"CREATE TABLE {TestTableName}");
-    }
+    //Assert
+    statementContext.Statement.Should().Be($"CREATE TABLE {TestTableName}");
   }
 }

@@ -6,31 +6,31 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Generators
-{
-  public class StatementGeneratorTests
-  {    
-    private static EntityCreationMetadata GetEntityCreationMetadata(string topicName)
+namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Generators;
+
+public class StatementGeneratorTests
+{    
+  private static EntityCreationMetadata GetEntityCreationMetadata(string topicName)
+  {
+    EntityCreationMetadata metadata = new EntityCreationMetadata()
     {
-      EntityCreationMetadata metadata = new EntityCreationMetadata()
-      {
-        KeyFormat = SerializationFormats.Json,
-        KafkaTopic = topicName,
-        Partitions = 1,
-        Replicas = 1,
-        WindowType = WindowType.Tumbling,
-        WindowSize = "10 SECONDS",
-        TimestampFormat = "yyyy-MM-dd''T''HH:mm:ssX"
-      };
+      KeyFormat = SerializationFormats.Json,
+      KafkaTopic = topicName,
+      Partitions = 1,
+      Replicas = 1,
+      WindowType = WindowType.Tumbling,
+      WindowSize = "10 SECONDS",
+      TimestampFormat = "yyyy-MM-dd''T''HH:mm:ssX"
+    };
 
-      return metadata;
-    }
+    return metadata;
+  }
 
-    private string GetExpectedClauses(bool isTable)
-    {
-      var keyClause = isTable ? " PRIMARY" : string.Empty;
+  private string GetExpectedClauses(bool isTable)
+  {
+    var keyClause = isTable ? " PRIMARY" : string.Empty;
 
-      return @$" MyMovies (
+    return @$" MyMovies (
 	Id INT{keyClause} KEY,
 	Title VARCHAR,
 	Release_Year INT,
@@ -39,112 +39,111 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Generators
 	Dictionary2 MAP<VARCHAR, INT>,
 	Field DOUBLE
 ) WITH ( WINDOW_TYPE='Tumbling', WINDOW_SIZE='10 SECONDS', KAFKA_TOPIC='my_movie', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1', TIMESTAMP_FORMAT='yyyy-MM-dd''T''HH:mm:ssX' );";
-    }
+  }
 
-    [Test]
-    public void CreateTable()
-    {
-      //Arrange
-      var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
+  [Test]
+  public void CreateTable()
+  {
+    //Arrange
+    var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
 
-      //Act
-      string statement = StatementGenerator.CreateTable<CreateEntityTests.MyMovie>(creationMetadata);
+    //Act
+    string statement = StatementGenerator.CreateTable<CreateEntityTests.MyMovie>(creationMetadata);
 
-      //Assert
-      statement.Should().Be($"CREATE TABLE{GetExpectedClauses(isTable: true)}");
-    }
+    //Assert
+    statement.Should().Be($"CREATE TABLE{GetExpectedClauses(isTable: true)}");
+  }
 
-    [Test]
-    public void CreateTable_IfNotExists()
-    {
-      //Arrange
-      var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
+  [Test]
+  public void CreateTable_IfNotExists()
+  {
+    //Arrange
+    var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
 
-      //Act
-      string statement = StatementGenerator.CreateTable<CreateEntityTests.MyMovie>(creationMetadata, ifNotExists: true);
+    //Act
+    string statement = StatementGenerator.CreateTable<CreateEntityTests.MyMovie>(creationMetadata, ifNotExists: true);
 
-      //Assert
-      statement.Should().Be($"CREATE TABLE IF NOT EXISTS{GetExpectedClauses(isTable: true)}");
-    }
+    //Assert
+    statement.Should().Be($"CREATE TABLE IF NOT EXISTS{GetExpectedClauses(isTable: true)}");
+  }
 
-    [Test]
-    public void CreateOrReplaceTable()
-    {
-      //Arrange
-      var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
+  [Test]
+  public void CreateOrReplaceTable()
+  {
+    //Arrange
+    var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
 
-      //Act
-      string statement = StatementGenerator.CreateOrReplaceTable<CreateEntityTests.MyMovie>(creationMetadata);
+    //Act
+    string statement = StatementGenerator.CreateOrReplaceTable<CreateEntityTests.MyMovie>(creationMetadata);
 
-      //Assert
-      statement.Should().Be($"CREATE OR REPLACE TABLE{GetExpectedClauses(isTable: true)}");
-    }
+    //Assert
+    statement.Should().Be($"CREATE OR REPLACE TABLE{GetExpectedClauses(isTable: true)}");
+  }
 
-    [Test]
-    public void CreateSourceTable()
-    {
-      //Arrange
-      var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
-      creationMetadata.IsReadOnly = true;
+  [Test]
+  public void CreateSourceTable()
+  {
+    //Arrange
+    var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
+    creationMetadata.IsReadOnly = true;
 
-      //Act
-      string statement = StatementGenerator.CreateTable<CreateEntityTests.MyMovie>(creationMetadata);
+    //Act
+    string statement = StatementGenerator.CreateTable<CreateEntityTests.MyMovie>(creationMetadata);
 
-      //Assert
-      statement.Should().Be($"CREATE SOURCE TABLE{GetExpectedClauses(isTable: true)}");
-    }
+    //Assert
+    statement.Should().Be($"CREATE SOURCE TABLE{GetExpectedClauses(isTable: true)}");
+  }
 
-    [Test]
-    public void CreateStream()
-    {
-      //Arrange
-      var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
+  [Test]
+  public void CreateStream()
+  {
+    //Arrange
+    var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
 
-      //Act
-      string statement = StatementGenerator.CreateStream<CreateEntityTests.MyMovie>(creationMetadata);
+    //Act
+    string statement = StatementGenerator.CreateStream<CreateEntityTests.MyMovie>(creationMetadata);
 
-      //Assert
-      statement.Should().Be($"CREATE STREAM{GetExpectedClauses(isTable: false)}");
-    }
+    //Assert
+    statement.Should().Be($"CREATE STREAM{GetExpectedClauses(isTable: false)}");
+  }
 
-    [Test]
-    public void CreateStream_IfNotExists()
-    {
-      //Arrange
-      var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
+  [Test]
+  public void CreateStream_IfNotExists()
+  {
+    //Arrange
+    var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
 
-      //Act
-      string statement = StatementGenerator.CreateStream<CreateEntityTests.MyMovie>(creationMetadata, ifNotExists: true);
+    //Act
+    string statement = StatementGenerator.CreateStream<CreateEntityTests.MyMovie>(creationMetadata, ifNotExists: true);
 
-      //Assert
-      statement.Should().Be($"CREATE STREAM IF NOT EXISTS{GetExpectedClauses(isTable: false)}");
-    }
+    //Assert
+    statement.Should().Be($"CREATE STREAM IF NOT EXISTS{GetExpectedClauses(isTable: false)}");
+  }
 
-    [Test]
-    public void CreateOrReplaceStream()
-    {
-      //Arrange
-      var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
+  [Test]
+  public void CreateOrReplaceStream()
+  {
+    //Arrange
+    var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
 
-      //Act
-      string statement = StatementGenerator.CreateOrReplaceStream<CreateEntityTests.MyMovie>(creationMetadata);
+    //Act
+    string statement = StatementGenerator.CreateOrReplaceStream<CreateEntityTests.MyMovie>(creationMetadata);
 
-      //Assert
-      statement.Should().Be($"CREATE OR REPLACE STREAM{GetExpectedClauses(isTable: false)}");
-    }
+    //Assert
+    statement.Should().Be($"CREATE OR REPLACE STREAM{GetExpectedClauses(isTable: false)}");
+  }
 
-    [Test]
-    public void CreateSourceStream()
-    {
-      //Arrange
-      var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
-      creationMetadata.IsReadOnly = true;
+  [Test]
+  public void CreateSourceStream()
+  {
+    //Arrange
+    var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
+    creationMetadata.IsReadOnly = true;
 
-      //Act
-      string statement = StatementGenerator.CreateStream<CreateEntityTests.MyMovie>(creationMetadata);
+    //Act
+    string statement = StatementGenerator.CreateStream<CreateEntityTests.MyMovie>(creationMetadata);
 
-      //Assert
-      statement.Should().Be($"CREATE SOURCE STREAM{GetExpectedClauses(isTable: false)}");
-    }
+    //Assert
+    statement.Should().Be($"CREATE SOURCE STREAM{GetExpectedClauses(isTable: false)}");
   }
 }

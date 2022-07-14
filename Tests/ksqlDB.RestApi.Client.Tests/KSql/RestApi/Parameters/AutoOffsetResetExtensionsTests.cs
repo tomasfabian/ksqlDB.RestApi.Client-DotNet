@@ -2,33 +2,32 @@
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Parameters
+namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Parameters;
+
+[TestClass]
+public class AutoOffsetResetExtensionsTests
 {
-  [TestClass]
-  public class AutoOffsetResetExtensionsTests
+  [TestMethod]
+  public void ToKSqlValue()
   {
-    [TestMethod]
-    public void ToKSqlValue()
-    {
-      //Arrange
+    //Arrange
 
-      //Act
-      var result = AutoOffsetReset.Latest.ToKSqlValue();
+    //Act
+    var result = AutoOffsetReset.Latest.ToKSqlValue();
 
-      //Assert
-      result.Should().Be("latest");
-    }
+    //Assert
+    result.Should().Be("latest");
+  }
 
-    [TestMethod]
-    public void ToAutoOffsetReset()
-    {
-      //Arrange
+  [TestMethod]
+  public void ToAutoOffsetReset()
+  {
+    //Arrange
 
-      //Act
-      var result = "latest".ToAutoOffsetReset();
+    //Act
+    var result = "latest".ToAutoOffsetReset();
 
-      //Assert
-      result.Should().Be(AutoOffsetReset.Latest);
-    }
+    //Assert
+    result.Should().Be(AutoOffsetReset.Latest);
   }
 }

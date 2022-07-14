@@ -1,10 +1,9 @@
 ﻿using ksqlDB.RestApi.Client.KSql.Query;
 
-namespace ksqlDB.Api.Client.Tests.Models.Movies
+namespace ksqlDB.Api.Client.Tests.Models.Movies;
+
+public class Lead_Actor : Record
 {
-  public class Lead_Actor : Record
-  {
-    public string Title { get; set; }
-    public string Actor_Name { get; set; }
-  }
+  public string Title { get; set; }
+  public string Actor_Name { get; set; }
 }

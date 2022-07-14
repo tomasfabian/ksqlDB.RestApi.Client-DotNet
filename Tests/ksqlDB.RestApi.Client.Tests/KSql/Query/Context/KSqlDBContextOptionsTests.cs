@@ -8,154 +8,153 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Context
+namespace ksqlDB.Api.Client.Tests.KSql.Query.Context;
+
+[TestClass]
+public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
 {
-  [TestClass]
-  public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
+  [TestInitialize]
+  public override void TestInitialize()
   {
-    [TestInitialize]
-    public override void TestInitialize()
-    {
-      base.TestInitialize();
+    base.TestInitialize();
 
-      ClassUnderTest = new KSqlDBContextOptions(TestParameters.KsqlDBUrl);
-    }
+    ClassUnderTest = new KSqlDBContextOptions(TestParameters.KsqlDBUrl);
+  }
 
-    [TestMethod]
-    public void Url_ShouldNotBeEmpty()
-    {
-      //Arrange
+  [TestMethod]
+  public void Url_ShouldNotBeEmpty()
+  {
+    //Arrange
 
-      //Act
-      var url = ClassUnderTest.Url;
+    //Act
+    var url = ClassUnderTest.Url;
 
-      //Assert
-      url.Should().Be(TestParameters.KsqlDBUrl);
-    }
+    //Assert
+    url.Should().Be(TestParameters.KsqlDBUrl);
+  }
     
-    [TestMethod]
-    public void NotSetBasicAuthCredentials()
-    {
-      //Arrange
+  [TestMethod]
+  public void NotSetBasicAuthCredentials()
+  {
+    //Arrange
 
-      //Act
+    //Act
 
-      //Assert
-      ClassUnderTest.UseBasicAuth.Should().BeFalse();
-      ClassUnderTest.BasicAuthUserName.Should().BeEmpty();
-      ClassUnderTest.BasicAuthPassword.Should().BeEmpty();
-    }
+    //Assert
+    ClassUnderTest.UseBasicAuth.Should().BeFalse();
+    ClassUnderTest.BasicAuthUserName.Should().BeEmpty();
+    ClassUnderTest.BasicAuthPassword.Should().BeEmpty();
+  }
     
-    [TestMethod]
-    public void SetBasicAuthCredentials()
-    {
-      //Arrange
-      string userName = "fred";
-      string password = "letmein";
+  [TestMethod]
+  public void SetBasicAuthCredentials()
+  {
+    //Arrange
+    string userName = "fred";
+    string password = "letmein";
 
-      //Act
-      ClassUnderTest
-        .SetBasicAuthCredentials(userName, password);
+    //Act
+    ClassUnderTest
+      .SetBasicAuthCredentials(userName, password);
 
-      //Assert
-      ClassUnderTest.UseBasicAuth.Should().BeTrue();
-      ClassUnderTest.BasicAuthUserName.Should().Be(userName);
-      ClassUnderTest.BasicAuthPassword.Should().Be(password);
-    }
+    //Assert
+    ClassUnderTest.UseBasicAuth.Should().BeTrue();
+    ClassUnderTest.BasicAuthUserName.Should().Be(userName);
+    ClassUnderTest.BasicAuthPassword.Should().Be(password);
+  }
 
-    [TestMethod]
-    [ExpectedException(typeof(KeyNotFoundException))]
-    public void SetProcessingGuarantee_WasNotSet()
-    {
-      //Arrange
-      string parameterName = KSqlDbConfigs.ProcessingGuarantee;
+  [TestMethod]
+  [ExpectedException(typeof(KeyNotFoundException))]
+  public void SetProcessingGuarantee_WasNotSet()
+  {
+    //Arrange
+    string parameterName = KSqlDbConfigs.ProcessingGuarantee;
 
-      //Act
+    //Act
 
-      //Assert
-      ClassUnderTest.QueryParameters[parameterName].Should().BeEmpty();
-    }
+    //Assert
+    ClassUnderTest.QueryParameters[parameterName].Should().BeEmpty();
+  }
 
-    [TestMethod]
-    public void SetProcessingGuarantee_SetToAtLeastOnce()
-    {
-      //Arrange
-      var processingGuarantee = ProcessingGuarantee.AtLeastOnce;
-      string parameterName = KSqlDbConfigs.ProcessingGuarantee;
+  [TestMethod]
+  public void SetProcessingGuarantee_SetToAtLeastOnce()
+  {
+    //Arrange
+    var processingGuarantee = ProcessingGuarantee.AtLeastOnce;
+    string parameterName = KSqlDbConfigs.ProcessingGuarantee;
 
-      //Act
-      ClassUnderTest.SetProcessingGuarantee(processingGuarantee);
+    //Act
+    ClassUnderTest.SetProcessingGuarantee(processingGuarantee);
 
-      //Assert
-      string expectedValue = "at_least_once";
+    //Assert
+    string expectedValue = "at_least_once";
 
-      ClassUnderTest.QueryParameters[parameterName].Should().Be(expectedValue);
-      ClassUnderTest.QueryStreamParameters[parameterName].Should().Be(expectedValue);
-    }
+    ClassUnderTest.QueryParameters[parameterName].Should().Be(expectedValue);
+    ClassUnderTest.QueryStreamParameters[parameterName].Should().Be(expectedValue);
+  }
 
-    [TestMethod]
-    public void SetProcessingGuarantee_SetToExactlyOnce()
-    {
-      //Arrange
-      var processingGuarantee = ProcessingGuarantee.ExactlyOnce;
-      string parameterName = KSqlDbConfigs.ProcessingGuarantee;
+  [TestMethod]
+  public void SetProcessingGuarantee_SetToExactlyOnce()
+  {
+    //Arrange
+    var processingGuarantee = ProcessingGuarantee.ExactlyOnce;
+    string parameterName = KSqlDbConfigs.ProcessingGuarantee;
 
-      //Act
-      ClassUnderTest.SetProcessingGuarantee(processingGuarantee);
+    //Act
+    ClassUnderTest.SetProcessingGuarantee(processingGuarantee);
 
-      //Assert
-      string expectedValue = "exactly_once";
+    //Assert
+    string expectedValue = "exactly_once";
 
-      ClassUnderTest.QueryParameters[parameterName].Should().Be(expectedValue);
-      ClassUnderTest.QueryStreamParameters[parameterName].Should().Be(expectedValue);
-    }
+    ClassUnderTest.QueryParameters[parameterName].Should().Be(expectedValue);
+    ClassUnderTest.QueryStreamParameters[parameterName].Should().Be(expectedValue);
+  }
 
-    [TestMethod]
-    public void SetAutoOffsetReset()
-    {
-      //Arrange
-      var autoOffsetReset = AutoOffsetReset.Latest;
+  [TestMethod]
+  public void SetAutoOffsetReset()
+  {
+    //Arrange
+    var autoOffsetReset = AutoOffsetReset.Latest;
 
-      //Act
-      ClassUnderTest.SetAutoOffsetReset(autoOffsetReset);
+    //Act
+    ClassUnderTest.SetAutoOffsetReset(autoOffsetReset);
 
-      //Assert
-      string expectedValue = autoOffsetReset.ToString().ToLower();
+    //Assert
+    string expectedValue = autoOffsetReset.ToString().ToLower();
 
-      ClassUnderTest.QueryParameters[QueryParameters.AutoOffsetResetPropertyName].Should().Be(expectedValue);
-      ClassUnderTest.QueryStreamParameters[QueryStreamParameters.AutoOffsetResetPropertyName].Should().Be(expectedValue);
-    }
+    ClassUnderTest.QueryParameters[QueryParameters.AutoOffsetResetPropertyName].Should().Be(expectedValue);
+    ClassUnderTest.QueryStreamParameters[QueryStreamParameters.AutoOffsetResetPropertyName].Should().Be(expectedValue);
+  }
     
-    [TestMethod]
-    public void Clone()
-    {
-      //Arrange
-      var processingGuarantee = ProcessingGuarantee.AtLeastOnce;
-      string parameterName = KSqlDbConfigs.ProcessingGuarantee;
-      ClassUnderTest.SetProcessingGuarantee(processingGuarantee);
+  [TestMethod]
+  public void Clone()
+  {
+    //Arrange
+    var processingGuarantee = ProcessingGuarantee.AtLeastOnce;
+    string parameterName = KSqlDbConfigs.ProcessingGuarantee;
+    ClassUnderTest.SetProcessingGuarantee(processingGuarantee);
 
-      //Act
-      var clone = ClassUnderTest.Clone();
+    //Act
+    var clone = ClassUnderTest.Clone();
 
-      //Assert
-      string expectedValue = "at_least_once";
+    //Assert
+    string expectedValue = "at_least_once";
       
-      ClassUnderTest.Url.Should().Be(TestParameters.KsqlDBUrl);
+    ClassUnderTest.Url.Should().Be(TestParameters.KsqlDBUrl);
 
-      clone.QueryParameters[parameterName].Should().Be(expectedValue);
-      clone.QueryStreamParameters[parameterName].Should().Be(expectedValue);
-    }
+    clone.QueryParameters[parameterName].Should().Be(expectedValue);
+    clone.QueryStreamParameters[parameterName].Should().Be(expectedValue);
+  }
     
-    [TestMethod]
-    public void JsonSerializerOptions()
-    {
-      //Arrange
+  [TestMethod]
+  public void JsonSerializerOptions()
+  {
+    //Arrange
 
-      //Act
-      var jsonSerializerOptions = ClassUnderTest.JsonSerializerOptions;
+    //Act
+    var jsonSerializerOptions = ClassUnderTest.JsonSerializerOptions;
 
-      //Assert
-      jsonSerializerOptions.Should().NotBeNull();
-    }
+    //Assert
+    jsonSerializerOptions.Should().NotBeNull();
   }
 }

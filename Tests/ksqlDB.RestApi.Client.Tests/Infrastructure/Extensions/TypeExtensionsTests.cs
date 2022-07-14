@@ -9,353 +9,352 @@ using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ksqlDB.Api.Client.Tests.Infrastructure.Extensions
+namespace ksqlDB.Api.Client.Tests.Infrastructure.Extensions;
+
+[TestClass]
+public class TypeExtensionsTests
 {
-  [TestClass]
-  public class TypeExtensionsTests
+  [TestMethod]
+  public void IsAnonymousType()
   {
-    [TestMethod]
-    public void IsAnonymousType()
-    {
-      //Arrange
-      var type = new { a = "1"}.GetType();
+    //Arrange
+    var type = new { a = "1"}.GetType();
 
-      //Act
-      var isAnonymousType = type.IsAnonymousType();
+    //Act
+    var isAnonymousType = type.IsAnonymousType();
 
-      //Assert
-      isAnonymousType.Should().BeTrue();
-    }
+    //Assert
+    isAnonymousType.Should().BeTrue();
+  }
 
-    [TestMethod]
-    public void IsAnonymousType_Class_ReturnsFalse()
-    {
-      //Arrange
-      var type = typeof(StringBuilder);
+  [TestMethod]
+  public void IsAnonymousType_Class_ReturnsFalse()
+  {
+    //Arrange
+    var type = typeof(StringBuilder);
 
-      //Act
-      var isAnonymousType = type.IsAnonymousType();
+    //Act
+    var isAnonymousType = type.IsAnonymousType();
 
-      //Assert
-      isAnonymousType.Should().BeFalse();
-    }
+    //Assert
+    isAnonymousType.Should().BeFalse();
+  }
 
-    [TestMethod]
-    public void TryFindProviderAncestor()
-    {
-      //Arrange
-      var type = typeof(KQueryStreamSet<string>);
+  [TestMethod]
+  public void TryFindProviderAncestor()
+  {
+    //Arrange
+    var type = typeof(KQueryStreamSet<string>);
 
-      //Act
-      var providerAncestorType = type.TryFindProviderAncestor();
+    //Act
+    var providerAncestorType = type.TryFindProviderAncestor();
 
-      //Assert
-      providerAncestorType.Should().Be(typeof(KSet));
-    }
+    //Assert
+    providerAncestorType.Should().Be(typeof(KSet));
+  }
 
-    [TestMethod]
-    public void IsStruct()
-    {
-      //Arrange
-      var type = typeof(ValueTask);
+  [TestMethod]
+  public void IsStruct()
+  {
+    //Arrange
+    var type = typeof(ValueTask);
 
-      //Act
-      var typeDefinition = type.IsStruct();
+    //Act
+    var typeDefinition = type.IsStruct();
 
-      //Assert
-      typeDefinition.Should().BeTrue();
-    }
+    //Assert
+    typeDefinition.Should().BeTrue();
+  }
 
-    [TestMethod]
-    public void IsStruct_PrimitiveType_ReturnsFalse()
-    {
-      //Arrange
-      var type = typeof(int);
+  [TestMethod]
+  public void IsStruct_PrimitiveType_ReturnsFalse()
+  {
+    //Arrange
+    var type = typeof(int);
 
-      //Act
-      var typeDefinition = type.IsStruct();
+    //Act
+    var typeDefinition = type.IsStruct();
 
-      //Assert
-      typeDefinition.Should().BeFalse();
-    }
+    //Assert
+    typeDefinition.Should().BeFalse();
+  }
 
-    enum TestTypes{}
+  enum TestTypes{}
 
-    [TestMethod]
-    public void IsStruct_EnumType_ReturnsFalse()
-    {
-      //Arrange
-      var type = typeof(TestTypes);
+  [TestMethod]
+  public void IsStruct_EnumType_ReturnsFalse()
+  {
+    //Arrange
+    var type = typeof(TestTypes);
 
-      //Act
-      var typeDefinition = type.IsStruct();
+    //Act
+    var typeDefinition = type.IsStruct();
 
-      //Assert
-      typeDefinition.Should().BeFalse();
-    }
+    //Assert
+    typeDefinition.Should().BeFalse();
+  }
 
-    [TestMethod]
-    public void IsDictionary()
-    {
-      //Arrange
-      var type = typeof(IDictionary<string, int>);
+  [TestMethod]
+  public void IsDictionary()
+  {
+    //Arrange
+    var type = typeof(IDictionary<string, int>);
 
-      //Act
-      var typeDefinition = type.IsDictionary();
+    //Act
+    var typeDefinition = type.IsDictionary();
 
-      //Assert
-      typeDefinition.Should().BeTrue();
-    }
+    //Assert
+    typeDefinition.Should().BeTrue();
+  }
 
-    [TestMethod]
-    public void IsList()
-    {
-      //Arrange
-      var type = typeof(List<string>);
+  [TestMethod]
+  public void IsList()
+  {
+    //Arrange
+    var type = typeof(List<string>);
 
-      //Act
-      var typeDefinition = type.IsList();
+    //Act
+    var typeDefinition = type.IsList();
 
-      //Assert
-      typeDefinition.Should().BeTrue();
-    }
+    //Assert
+    typeDefinition.Should().BeTrue();
+  }
 
-    [TestMethod]
-    public void IsList_Interface()
-    {
-      //Arrange
-      var type = typeof(IList<string>);
+  [TestMethod]
+  public void IsList_Interface()
+  {
+    //Arrange
+    var type = typeof(IList<string>);
 
-      //Act
-      var typeDefinition = type.IsList();
+    //Act
+    var typeDefinition = type.IsList();
 
-      //Assert
-      typeDefinition.Should().BeTrue();
-    }
+    //Assert
+    typeDefinition.Should().BeTrue();
+  }
 
-    [TestMethod]
-    public void IsList_PrimitiveType_ReturnsFalse()
-    {
-      //Arrange
-      var type = typeof(string);
+  [TestMethod]
+  public void IsList_PrimitiveType_ReturnsFalse()
+  {
+    //Arrange
+    var type = typeof(string);
 
-      //Act
-      var typeDefinition = type.IsList();
+    //Act
+    var typeDefinition = type.IsList();
 
-      //Assert
-      typeDefinition.Should().BeFalse();
-    }
+    //Assert
+    typeDefinition.Should().BeFalse();
+  }
 
-    [TestMethod]
-    public void HasKey_PropertyIsNotAnnotatedWithAKeyAttribute_ReturnsFalse()
-    {
-      //Arrange
-      var type = typeof(Test).GetProperty(nameof(Test.Value));
+  [TestMethod]
+  public void HasKey_PropertyIsNotAnnotatedWithAKeyAttribute_ReturnsFalse()
+  {
+    //Arrange
+    var type = typeof(Test).GetProperty(nameof(Test.Value));
 
-      //Act
-      var hasKey = type.HasKey();
+    //Act
+    var hasKey = type.HasKey();
 
-      //Assert
-      hasKey.Should().BeFalse();
-    }
+    //Assert
+    hasKey.Should().BeFalse();
+  }
 
-    private record Test
-    {
-      [Key]
-      public int Key { get; set; }
+  private record Test
+  {
+    [Key]
+    public int Key { get; set; }
 
-      public int Value { get; set; }
-    }
+    public int Value { get; set; }
+  }
 
-    [TestMethod]
-    public void HasKey()
-    {
-      //Arrange
-      var type = typeof(Test).GetProperty(nameof(Test.Key));
+  [TestMethod]
+  public void HasKey()
+  {
+    //Arrange
+    var type = typeof(Test).GetProperty(nameof(Test.Key));
 
-      //Act
-      var hasKey = type.HasKey();
+    //Act
+    var hasKey = type.HasKey();
 
-      //Assert
-      hasKey.Should().BeTrue();
-    }
+    //Assert
+    hasKey.Should().BeTrue();
+  }
 
-    #region GetEnumerableTypeDefinition
+  #region GetEnumerableTypeDefinition
     
-    [TestMethod]
-    public void GetEnumerableTypeDefinition_FindsEnumerableType()
-    {
-      //Arrange
-      var type = typeof(IEnumerable);
+  [TestMethod]
+  public void GetEnumerableTypeDefinition_FindsEnumerableType()
+  {
+    //Arrange
+    var type = typeof(IEnumerable);
 
-      //Act
-      var typeDefinition = type.GetEnumerableTypeDefinition();
+    //Act
+    var typeDefinition = type.GetEnumerableTypeDefinition();
 
-      //Assert
-      typeDefinition.Should().Contain(typeof(IEnumerable));
-    }
+    //Assert
+    typeDefinition.Should().Contain(typeof(IEnumerable));
+  }
     
-    class TestEnumerable : IEnumerable<string>
+  class TestEnumerable : IEnumerable<string>
+  {
+    public IEnumerator<string> GetEnumerator()
     {
-      public IEnumerator<string> GetEnumerator()
-      {
-        throw new System.NotImplementedException();
-      }
-
-      IEnumerator IEnumerable.GetEnumerator()
-      {
-        return GetEnumerator();
-      }
+      throw new System.NotImplementedException();
     }
 
-    [TestMethod]
-    public void GetEnumerableTypeDefinition_EnumerableOfStringBaseType_FindsEnumerableType()
+    IEnumerator IEnumerable.GetEnumerator()
     {
-      //Arrange
-      var type = typeof(TestEnumerable);
-
-      //Act
-      var typeDefinition = type.GetEnumerableTypeDefinition();
-
-      //Assert
-      typeDefinition.Should().Contain(typeof(IEnumerable<string>));
+      return GetEnumerator();
     }
+  }
 
-    class TestList : List<string>
-    {
-    }
+  [TestMethod]
+  public void GetEnumerableTypeDefinition_EnumerableOfStringBaseType_FindsEnumerableType()
+  {
+    //Arrange
+    var type = typeof(TestEnumerable);
 
-    [TestMethod]
-    public void GetEnumerableTypeDefinition_ListBaseType_FindsEnumerableType()
-    {
-      //Arrange
-      var type = typeof(TestList);
+    //Act
+    var typeDefinition = type.GetEnumerableTypeDefinition();
 
-      //Act
-      var typeDefinition = type.GetEnumerableTypeDefinition();
+    //Assert
+    typeDefinition.Should().Contain(typeof(IEnumerable<string>));
+  }
 
-      //Assert
-      typeDefinition.Should().Contain(typeof(IEnumerable<string>));
-    }
+  class TestList : List<string>
+  {
+  }
 
-    [TestMethod]
-    public void GetEnumerableTypeDefinition_ReturnsNullForNonEnumerableTypes()
-    {
-      //Arrange
-      var type = typeof(int);
+  [TestMethod]
+  public void GetEnumerableTypeDefinition_ListBaseType_FindsEnumerableType()
+  {
+    //Arrange
+    var type = typeof(TestList);
 
-      //Act
-      var typeDefinition = type.GetEnumerableTypeDefinition();
+    //Act
+    var typeDefinition = type.GetEnumerableTypeDefinition();
 
-      //Assert
-      typeDefinition.Should().BeEmpty();
-    }
+    //Assert
+    typeDefinition.Should().Contain(typeof(IEnumerable<string>));
+  }
 
-    [TestMethod]
-    public void GetEnumerableOfStringTypeDefinition_FindsEnumerableType()
-    {
-      //Arrange
-      var type = typeof(IEnumerable<string>);
+  [TestMethod]
+  public void GetEnumerableTypeDefinition_ReturnsNullForNonEnumerableTypes()
+  {
+    //Arrange
+    var type = typeof(int);
 
-      //Act
-      var typeDefinitions = type.GetEnumerableTypeDefinition();
+    //Act
+    var typeDefinition = type.GetEnumerableTypeDefinition();
 
-      //Assert
-      typeDefinitions.Should().Contain(typeof(IEnumerable<string>));
-    }
+    //Assert
+    typeDefinition.Should().BeEmpty();
+  }
 
-    [TestMethod]
-    public void GetEnumerableOfStringTypeDefinition_IList_FindsEnumerableType()
-    {
-      //Arrange
-      var type = typeof(IList<string>);
+  [TestMethod]
+  public void GetEnumerableOfStringTypeDefinition_FindsEnumerableType()
+  {
+    //Arrange
+    var type = typeof(IEnumerable<string>);
 
-      //Act
-      var typeDefinitions = type.GetEnumerableTypeDefinition();
+    //Act
+    var typeDefinitions = type.GetEnumerableTypeDefinition();
 
-      //Assert
-      typeDefinitions.Should().Contain(typeof(IEnumerable<string>));
-    }
+    //Assert
+    typeDefinitions.Should().Contain(typeof(IEnumerable<string>));
+  }
 
-    [TestMethod]
-    public void GetEnumerableOfStringTypeDefinition_List_FindsEnumerableType()
-    {
-      //Arrange
-      var type = typeof(List<string>);
+  [TestMethod]
+  public void GetEnumerableOfStringTypeDefinition_IList_FindsEnumerableType()
+  {
+    //Arrange
+    var type = typeof(IList<string>);
 
-      //Act
-      var typeDefinitions = type.GetEnumerableTypeDefinition();
+    //Act
+    var typeDefinitions = type.GetEnumerableTypeDefinition();
 
-      //Assert
-      typeDefinitions.Should().Contain(typeof(IEnumerable<string>));
-    }
+    //Assert
+    typeDefinitions.Should().Contain(typeof(IEnumerable<string>));
+  }
 
-    #endregion
+  [TestMethod]
+  public void GetEnumerableOfStringTypeDefinition_List_FindsEnumerableType()
+  {
+    //Arrange
+    var type = typeof(List<string>);
 
-    [TestMethod]
-    public void IsKsqlGrouping_List_FindsEnumerableType()
-    {
-      //Arrange
-      var type = typeof(List<string>);
+    //Act
+    var typeDefinitions = type.GetEnumerableTypeDefinition();
 
-      //Act
-      var isKsqlGrouping = type.IsKsqlGrouping();
+    //Assert
+    typeDefinitions.Should().Contain(typeof(IEnumerable<string>));
+  }
 
-      //Assert
-      isKsqlGrouping.Should().BeFalse();
-    }
+  #endregion
 
-    [TestMethod]
-    public void IsKsqlGrouping_KsqlGrouping_ReturnsTrue()
-    {
-      //Arrange
-      var type = typeof(IKSqlGrouping<int, string>);
+  [TestMethod]
+  public void IsKsqlGrouping_List_FindsEnumerableType()
+  {
+    //Arrange
+    var type = typeof(List<string>);
 
-      //Act
-      var isKsqlGrouping = type.IsKsqlGrouping();
+    //Act
+    var isKsqlGrouping = type.IsKsqlGrouping();
 
-      //Assert
-      isKsqlGrouping.Should().BeTrue();
-    }
+    //Assert
+    isKsqlGrouping.Should().BeFalse();
+  }
 
-    [TestMethod]
-    public void ExtractName_Type()
-    {
-      //Arrange
-      var type = typeof(TestList);
+  [TestMethod]
+  public void IsKsqlGrouping_KsqlGrouping_ReturnsTrue()
+  {
+    //Arrange
+    var type = typeof(IKSqlGrouping<int, string>);
 
-      //Act
-      var name = type.ExtractTypeName();
+    //Act
+    var isKsqlGrouping = type.IsKsqlGrouping();
 
-      //Assert
-      name.Should().Be(nameof(TestList));
-    }
+    //Assert
+    isKsqlGrouping.Should().BeTrue();
+  }
 
-    [TestMethod]
-    public void ExtractName_GenericType()
-    {
-      //Arrange
-      var type = typeof(List<string>);
+  [TestMethod]
+  public void ExtractName_Type()
+  {
+    //Arrange
+    var type = typeof(TestList);
 
-      //Act
-      var name = type.ExtractTypeName();
+    //Act
+    var name = type.ExtractTypeName();
 
-      //Assert
-      name.Should().Be("List");
-    }
+    //Assert
+    name.Should().Be(nameof(TestList));
+  }
 
-    [TestMethod]
-    public void TryGetAttribute()
-    {
-      //Arrange
-      var type = typeof(Test);
+  [TestMethod]
+  public void ExtractName_GenericType()
+  {
+    //Arrange
+    var type = typeof(List<string>);
 
-      //Act
-      var attribute = type.GetProperty(nameof(Test.Key)).TryGetAttribute<KeyAttribute>();
+    //Act
+    var name = type.ExtractTypeName();
 
-      //Assert
-      attribute.Should().NotBeNull();
-      attribute.Should().BeOfType<KeyAttribute>();
-    }
+    //Assert
+    name.Should().Be("List");
+  }
+
+  [TestMethod]
+  public void TryGetAttribute()
+  {
+    //Arrange
+    var type = typeof(Test);
+
+    //Act
+    var attribute = type.GetProperty(nameof(Test.Key)).TryGetAttribute<KeyAttribute>();
+
+    //Assert
+    attribute.Should().NotBeNull();
+    attribute.Should().BeOfType<KeyAttribute>();
   }
 }

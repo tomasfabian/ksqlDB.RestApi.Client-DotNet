@@ -2,57 +2,56 @@
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ksqlDB.Api.Client.Tests.Infrastructure.Extensions
+namespace ksqlDB.Api.Client.Tests.Infrastructure.Extensions;
+
+[TestClass]
+public class EnumerableExtensionsTests
 {
-  [TestClass]
-  public class EnumerableExtensionsTests
+  [TestMethod]
+  public void IsOneOfFollowing()
   {
-    [TestMethod]
-    public void IsOneOfFollowing()
-    {
-      //Arrange
+    //Arrange
 
-      //Act
-      var isOneOf = 1.IsOneOfFollowing(1, 2, 3);
+    //Act
+    var isOneOf = 1.IsOneOfFollowing(1, 2, 3);
 
-      //Assert
-      isOneOf.Should().BeTrue();
-    }
+    //Assert
+    isOneOf.Should().BeTrue();
+  }
 
-    [TestMethod]
-    public void IsOneOfFollowing_ReturnsFalse()
-    {
-      //Arrange
+  [TestMethod]
+  public void IsOneOfFollowing_ReturnsFalse()
+  {
+    //Arrange
 
-      //Act
-      var isOneOf = 4.IsOneOfFollowing(1, 2, 3);
+    //Act
+    var isOneOf = 4.IsOneOfFollowing(1, 2, 3);
 
-      //Assert
-      isOneOf.Should().BeFalse();
-    }
+    //Assert
+    isOneOf.Should().BeFalse();
+  }
 
-    [TestMethod]
-    public void IsNotOneOfFollowing()
-    {
-      //Arrange
+  [TestMethod]
+  public void IsNotOneOfFollowing()
+  {
+    //Arrange
 
-      //Act
-      var isNotOneOf = 4.IsNotOneOfFollowing(1, 2, 3);
+    //Act
+    var isNotOneOf = 4.IsNotOneOfFollowing(1, 2, 3);
 
-      //Assert
-      isNotOneOf.Should().BeTrue();
-    }
+    //Assert
+    isNotOneOf.Should().BeTrue();
+  }
 
-    [TestMethod]
-    public void IsNotOneOfFollowing_ReturnsFalse()
-    {
-      //Arrange
+  [TestMethod]
+  public void IsNotOneOfFollowing_ReturnsFalse()
+  {
+    //Arrange
 
-      //Act
-      var isNotOneOf = 1.IsNotOneOfFollowing(1, 2, 3);
+    //Act
+    var isNotOneOf = 1.IsNotOneOfFollowing(1, 2, 3);
 
-      //Assert
-      isNotOneOf.Should().BeFalse();
-    }
+    //Assert
+    isNotOneOf.Should().BeFalse();
   }
 }

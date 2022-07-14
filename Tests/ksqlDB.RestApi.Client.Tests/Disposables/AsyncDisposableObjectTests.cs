@@ -6,101 +6,100 @@ using ksqlDB.RestApi.Client.KSql.Disposables;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 
-namespace ksqlDB.Api.Client.Tests.Disposables
+namespace ksqlDB.Api.Client.Tests.Disposables;
+
+[TestClass]
+public class AsyncDisposableObjectTests : TestBase<AsyncDisposableObjectTests.TestableAsyncDisposableObject>
 {
-  [TestClass]
-  public class AsyncDisposableObjectTests : TestBase<AsyncDisposableObjectTests.TestableAsyncDisposableObject>
+  [TestInitialize]
+  public override void TestInitialize()
   {
-    [TestInitialize]
-    public override void TestInitialize()
-    {
-      base.TestInitialize();
+    base.TestInitialize();
 
-      ClassUnderTest = new TestableAsyncDisposableObject();
-    }
+    ClassUnderTest = new TestableAsyncDisposableObject();
+  }
 
-    [TestMethod]
-    public async Task InitializeAsync_HasBeenInitialized()
-    {
-      //Arrange
+  [TestMethod]
+  public async Task InitializeAsync_HasBeenInitialized()
+  {
+    //Arrange
 
-      //Act
-      await ClassUnderTest.InitializeAsync();
+    //Act
+    await ClassUnderTest.InitializeAsync();
 
-      //Assert
-      ClassUnderTest.HasBeenInitialized.Should().BeTrue();
-    }
+    //Assert
+    ClassUnderTest.HasBeenInitialized.Should().BeTrue();
+  }
 
-    [TestMethod]
-    [ExpectedException(typeof(ObjectDisposedException))]
-    public async Task InitializeAsyncDisposed_Throws()
-    {
-      //Arrange
-      await ClassUnderTest.DisposeAsync().ConfigureAwait(false);
+  [TestMethod]
+  [ExpectedException(typeof(ObjectDisposedException))]
+  public async Task InitializeAsyncDisposed_Throws()
+  {
+    //Arrange
+    await ClassUnderTest.DisposeAsync().ConfigureAwait(false);
 
-      //Act
-      await ClassUnderTest.InitializeAsync();
+    //Act
+    await ClassUnderTest.InitializeAsync();
 
-      //Assert
-    }
+    //Assert
+  }
     
-    [TestMethod]
-    public async Task InitializeAsyncDisposed_IsCancellationRequested()
+  [TestMethod]
+  public async Task InitializeAsyncDisposed_IsCancellationRequested()
+  {
+    //Arrange
+    ClassUnderTest.ShouldDispose = true;
+
+    //Act
+    await ClassUnderTest.InitializeAsync();
+
+    //Assert
+    ClassUnderTest.CancellationToken.IsCancellationRequested.Should().BeTrue();
+  }
+
+  [TestMethod]
+  public async Task MultipleInitializeAsync_InitializedOnce()
+  {
+    //Arrange
+    await ClassUnderTest.InitializeAsync();
+
+    //Act
+    await ClassUnderTest.InitializeAsync();
+
+    //Assert
+    ClassUnderTest.InitializationCounter.Should().Be(1);
+  }
+
+  [TestMethod]
+  public async Task DisposeAsync_IsDisposed()
+  {
+    //Arrange
+
+    //Act
+    await ClassUnderTest.DisposeAsync().ConfigureAwait(false);
+
+    //Assert
+    ClassUnderTest.IsDisposed.Should().BeTrue();
+  }
+
+  public class TestableAsyncDisposableObject : AsyncDisposableObject
+  {
+    public int InitializationCounter { get; set; }
+
+    public bool ShouldDispose { get; set; }
+
+    public CancellationToken CancellationToken { get; set; }
+
+    protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
     {
-      //Arrange
-      ClassUnderTest.ShouldDispose = true;
+      InitializationCounter++;
 
-      //Act
-      await ClassUnderTest.InitializeAsync();
-
-      //Assert
-      ClassUnderTest.CancellationToken.IsCancellationRequested.Should().BeTrue();
-    }
-
-    [TestMethod]
-    public async Task MultipleInitializeAsync_InitializedOnce()
-    {
-      //Arrange
-      await ClassUnderTest.InitializeAsync();
-
-      //Act
-      await ClassUnderTest.InitializeAsync();
-
-      //Assert
-      ClassUnderTest.InitializationCounter.Should().Be(1);
-    }
-
-    [TestMethod]
-    public async Task DisposeAsync_IsDisposed()
-    {
-      //Arrange
-
-      //Act
-      await ClassUnderTest.DisposeAsync().ConfigureAwait(false);
-
-      //Assert
-      ClassUnderTest.IsDisposed.Should().BeTrue();
-    }
-
-    public class TestableAsyncDisposableObject : AsyncDisposableObject
-    {
-      public int InitializationCounter { get; set; }
-
-      public bool ShouldDispose { get; set; }
-
-      public CancellationToken CancellationToken { get; set; }
-
-      protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
-      {
-        InitializationCounter++;
-
-        CancellationToken = cancellationToken;
+      CancellationToken = cancellationToken;
         
-        if(ShouldDispose)
-          await DisposeAsync().ConfigureAwait(false);
+      if(ShouldDispose)
+        await DisposeAsync().ConfigureAwait(false);
         
-        await base.OnInitializeAsync(cancellationToken);
-      }
+      await base.OnInitializeAsync(cancellationToken);
     }
   }
 }

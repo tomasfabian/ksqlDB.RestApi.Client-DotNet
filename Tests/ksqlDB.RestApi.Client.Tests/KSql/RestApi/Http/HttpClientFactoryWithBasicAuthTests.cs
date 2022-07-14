@@ -6,29 +6,28 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Http
+namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Http;
+
+[TestClass]
+public class HttpClientFactoryWithBasicAuthTests : TestBase
 {
-  [TestClass]
-  public class HttpClientFactoryWithBasicAuthTests : TestBase
+  [TestMethod]
+  public void CreateClient_BaseAddressWasSet()
   {
-    [TestMethod]
-    public void CreateClient_BaseAddressWasSet()
+    //Arrange
+    var credentials = new BasicAuthCredentials
     {
-      //Arrange
-      var credentials = new BasicAuthCredentials
-      {
-        UserName = "fred",
-        Password = "letmein"
-      };
+      UserName = "fred",
+      Password = "letmein"
+    };
 
-      var httpClientFactory = new HttpClientFactoryWithBasicAuth(new Uri(TestParameters.KsqlDBUrl), credentials);
+    var httpClientFactory = new HttpClientFactoryWithBasicAuth(new Uri(TestParameters.KsqlDBUrl), credentials);
 
-      //Act
-      var httpClient = httpClientFactory.CreateClient();
+    //Act
+    var httpClient = httpClientFactory.CreateClient();
 
-      //Assert
-      httpClient.Should().BeOfType<HttpClient>();
-      httpClient.BaseAddress.OriginalString.Should().BeEquivalentTo(TestParameters.KsqlDBUrl);
-    }
+    //Assert
+    httpClient.Should().BeOfType<HttpClient>();
+    httpClient.BaseAddress.OriginalString.Should().BeEquivalentTo(TestParameters.KsqlDBUrl);
   }
 }

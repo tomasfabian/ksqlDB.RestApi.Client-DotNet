@@ -4,35 +4,34 @@ using ksqlDB.RestApi.Client.KSql.Query.Context.JsonConverters;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Context.Options
+namespace ksqlDB.Api.Client.Tests.KSql.Query.Context.Options;
+
+[TestClass]
+public class KSqlDbJsonSerializerOptionsTests
 {
-  [TestClass]
-  public class KSqlDbJsonSerializerOptionsTests
+  [TestMethod]
+  public void CreateInstance_PropertyNameCaseInsensitive()
   {
-    [TestMethod]
-    public void CreateInstance_PropertyNameCaseInsensitive()
-    {
-      //Arrange
-      var options = KSqlDbJsonSerializerOptions.CreateInstance();
+    //Arrange
+    var options = KSqlDbJsonSerializerOptions.CreateInstance();
 
-      //Act
-      var propertyNameCaseInsensitive = options.PropertyNameCaseInsensitive;
+    //Act
+    var propertyNameCaseInsensitive = options.PropertyNameCaseInsensitive;
 
-      //Assert
-      propertyNameCaseInsensitive.Should().BeTrue();
-    }
+    //Assert
+    propertyNameCaseInsensitive.Should().BeTrue();
+  }
 
-    [TestMethod]
-    public void CreateInstance_Converters()
-    {
-      //Arrange
-      var options = KSqlDbJsonSerializerOptions.CreateInstance();
+  [TestMethod]
+  public void CreateInstance_Converters()
+  {
+    //Arrange
+    var options = KSqlDbJsonSerializerOptions.CreateInstance();
 
-      //Act
-      var converters = options.Converters;
+    //Act
+    var converters = options.Converters;
 
-      //Assert
-      converters.OfType<TimeSpanToStringConverter>().Any().Should().BeTrue();
-    }
+    //Assert
+    converters.OfType<TimeSpanToStringConverter>().Any().Should().BeTrue();
   }
 }

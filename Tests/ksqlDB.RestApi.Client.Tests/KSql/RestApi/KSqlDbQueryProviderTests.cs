@@ -6,56 +6,55 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ninject;
 using UnitTests;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi
+namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
+
+[TestClass]
+public class KSqlDbQueryProviderTests : TestBase
 {
-  [TestClass]
-  public class KSqlDbQueryProviderTests : TestBase
+  private TestableKSqlDbQueryProvider ClassUnderTest { get; set; }
+
+  [TestInitialize]
+  public override void TestInitialize()
   {
-    private TestableKSqlDbQueryProvider ClassUnderTest { get; set; }
+    base.TestInitialize();
 
-    [TestInitialize]
-    public override void TestInitialize()
+    ClassUnderTest = MockingKernel.Get<TestableKSqlDbQueryProvider>();
+  }
+
+  [TestMethod]
+  public async Task Run_HttpStatusCodeOK_ReturnsTweets()
+  {
+    //Arrange
+    var queryParameters = new QueryStreamParameters();
+
+    //Act
+    var items = ClassUnderTest.Run<Nested>(queryParameters);
+
+    //Assert
+    var receivedTweets = new List<Nested>();
+    await foreach (var item in items)
     {
-      base.TestInitialize();
-
-      ClassUnderTest = MockingKernel.Get<TestableKSqlDbQueryProvider>();
+      item.Should().NotBeNull();
+      receivedTweets.Add(item);
     }
 
-    [TestMethod]
-    public async Task Run_HttpStatusCodeOK_ReturnsTweets()
-    {
-      //Arrange
-      var queryParameters = new QueryStreamParameters();
+    receivedTweets.Count.Should().Be(2);
+  }
 
-      //Act
-      var items = ClassUnderTest.Run<Nested>(queryParameters);
+  internal struct MovieStruct
+  {
+    public string Title { get; set; }
 
-      //Assert
-      var receivedTweets = new List<Nested>();
-      await foreach (var item in items)
-      {
-        item.Should().NotBeNull();
-        receivedTweets.Add(item);
-      }
+    public int Id { get; set; }
+  }
 
-      receivedTweets.Count.Should().Be(2);
-    }
-
-    internal struct MovieStruct
-    {
-      public string Title { get; set; }
-
-      public int Id { get; set; }
-    }
-
-    internal class Nested
-    {
-      public int Id { get; set; }
-      public MovieStruct[] Arr { get; set; }
-      public Dictionary<string, Dictionary<string, int>> MapValue { get; set; }
-      public Dictionary<int, string[]> MapArr { get; set; }
-      public MovieStruct Movie { get; set; }
-      public int Release_Year { get; set; }
-    }
+  internal class Nested
+  {
+    public int Id { get; set; }
+    public MovieStruct[] Arr { get; set; }
+    public Dictionary<string, Dictionary<string, int>> MapValue { get; set; }
+    public Dictionary<int, string[]> MapArr { get; set; }
+    public MovieStruct Movie { get; set; }
+    public int Release_Year { get; set; }
   }
 }

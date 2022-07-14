@@ -5,29 +5,28 @@ using Moq;
 using UnitTests;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi
+namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
+
+public abstract class KSqlDbRestApiClientTestsBase : TestBase
 {
-  public abstract class KSqlDbRestApiClientTestsBase : TestBase
+  protected IHttpClientFactory HttpClientFactory;
+  protected HttpClient HttpClient;
+  protected Mock<HttpMessageHandler> httpMessageHandlerMock;
+
+  [TestInitialize]
+  public override void TestInitialize()
   {
-    protected IHttpClientFactory HttpClientFactory;
-    protected HttpClient HttpClient;
-    protected Mock<HttpMessageHandler> httpMessageHandlerMock;
+    base.TestInitialize();
 
-    [TestInitialize]
-    public override void TestInitialize()
-    {
-      base.TestInitialize();
+    HttpClientFactory = Mock.Of<IHttpClientFactory>();
+  }
 
-      HttpClientFactory = Mock.Of<IHttpClientFactory>();
-    }
+  protected void CreateHttpMocks(string responseContents)
+  {
+    httpMessageHandlerMock = FakeHttpClient.CreateHttpMessageHandler(responseContents);
 
-    protected void CreateHttpMocks(string responseContents)
-    {
-      httpMessageHandlerMock = FakeHttpClient.CreateHttpMessageHandler(responseContents);
+    HttpClient = httpMessageHandlerMock.ToHttpClient();
 
-      HttpClient = httpMessageHandlerMock.ToHttpClient();
-
-      Mock.Get(HttpClientFactory).Setup(c => c.CreateClient()).Returns(HttpClient);
-    }
+    Mock.Get(HttpClientFactory).Setup(c => c.CreateClient()).Returns(HttpClient);
   }
 }

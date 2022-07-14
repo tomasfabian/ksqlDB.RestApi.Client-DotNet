@@ -1,22 +1,21 @@
 ﻿using System.Net.Http;
 
-namespace ksqlDB.Api.Client.Tests.Helpers.Http
+namespace ksqlDB.Api.Client.Tests.Helpers.Http;
+
+internal class IsDisposedHttpClient : HttpClient
 {
-  internal class IsDisposedHttpClient : HttpClient
+  public IsDisposedHttpClient(HttpMessageHandler handler)
+    : base(handler)
   {
-    public IsDisposedHttpClient(HttpMessageHandler handler)
-      : base(handler)
-    {
       
-    }
+  }
 
-    public bool IsDisposed { get; private set; }
+  public bool IsDisposed { get; private set; }
 
-    protected override void Dispose(bool disposing)
-    {
-      base.Dispose(disposing);
+  protected override void Dispose(bool disposing)
+  {
+    base.Dispose(disposing);
 
-      IsDisposed = true;
-    }
+    IsDisposed = true;
   }
 }
