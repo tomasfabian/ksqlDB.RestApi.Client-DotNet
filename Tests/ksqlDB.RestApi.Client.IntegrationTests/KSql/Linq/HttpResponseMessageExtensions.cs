@@ -4,31 +4,30 @@ using System.Net;
 using System.Net.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 
-namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
+namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
+
+internal static class HttpResponseMessageExtensions
 {
-  internal static class HttpResponseMessageExtensions
+  public static bool IsSuccess(this HttpResponseMessage httpResponseMessage)
   {
-    public static bool IsSuccess(this HttpResponseMessage httpResponseMessage)
+    try
     {
-      try
+      if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
       {
-        if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
-        {
-          var responsesObject = httpResponseMessage.ToStatementResponses();
+        var responsesObject = httpResponseMessage.ToStatementResponses();
 
-          var isSuccess = responsesObject != null && responsesObject.All(c => c.CommandStatus.Status == "SUCCESS");
+        var isSuccess = responsesObject != null && responsesObject.All(c => c.CommandStatus.Status == "SUCCESS");
 
-          return isSuccess;
-        }
+        return isSuccess;
       }
-      catch (Exception e)
-      {
-        Console.WriteLine(e);
+    }
+    catch (Exception e)
+    {
+      Console.WriteLine(e);
         
-        return false;
-      }
-
       return false;
     }
+
+    return false;
   }
 }

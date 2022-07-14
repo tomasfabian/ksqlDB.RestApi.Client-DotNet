@@ -6,23 +6,23 @@ using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
-namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
+namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
+
+public class MoviesProvider
 {
-  public class MoviesProvider
+  private readonly KSqlDbRestApiProvider restApiProvider;
+
+  public MoviesProvider(KSqlDbRestApiProvider restApiProvider)
   {
-    private readonly KSqlDbRestApiProvider restApiProvider;
+    this.restApiProvider = restApiProvider ?? throw new ArgumentNullException(nameof(restApiProvider));
+  }
 
-    public MoviesProvider(KSqlDbRestApiProvider restApiProvider)
-    {
-      this.restApiProvider = restApiProvider ?? throw new ArgumentNullException(nameof(restApiProvider));
-    }
+  public static readonly string MoviesTableName = "movies_test";
+  public static readonly string ActorsTableName = "lead_actor_test";
 
-    public static readonly string MoviesTableName = "movies_test";
-    public static readonly string ActorsTableName = "lead_actor_test";
-
-    public async Task<bool> CreateTablesAsync()
-    {
-      var createMoviesTable = $@"CREATE OR REPLACE TABLE {MoviesTableName} (
+  public async Task<bool> CreateTablesAsync()
+  {
+    var createMoviesTable = $@"CREATE OR REPLACE TABLE {MoviesTableName} (
         title VARCHAR PRIMARY KEY,
         id INT,
         release_year INT
@@ -32,14 +32,14 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
         VALUE_FORMAT = 'JSON'
       );";
       
-      KSqlDbStatement ksqlDbStatement = new(createMoviesTable);
+    KSqlDbStatement ksqlDbStatement = new(createMoviesTable);
 
-      var result = await restApiProvider.ExecuteStatementAsync(ksqlDbStatement);
-      var isSuccess = result.IsSuccess();
+    var result = await restApiProvider.ExecuteStatementAsync(ksqlDbStatement);
+    var isSuccess = result.IsSuccess();
       
-      isSuccess.Should().BeTrue();
+    isSuccess.Should().BeTrue();
 
-      var createActorsTable = $@"CREATE OR REPLACE TABLE {ActorsTableName} (
+    var createActorsTable = $@"CREATE OR REPLACE TABLE {ActorsTableName} (
         title VARCHAR PRIMARY KEY,
         actor_name VARCHAR
       ) WITH (
@@ -48,76 +48,75 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq
         VALUE_FORMAT='JSON'
       );";
 
-      ksqlDbStatement = new KSqlDbStatement(createActorsTable);
+    ksqlDbStatement = new KSqlDbStatement(createActorsTable);
 
-      result = await restApiProvider.ExecuteStatementAsync(ksqlDbStatement);
-      isSuccess = result.IsSuccess();
+    result = await restApiProvider.ExecuteStatementAsync(ksqlDbStatement);
+    isSuccess = result.IsSuccess();
       
-      isSuccess.Should().BeTrue();
+    isSuccess.Should().BeTrue();
 
-      return true;
-    }
+    return true;
+  }
 
-    public static readonly Movie Movie1 = new()
+  public static readonly Movie Movie1 = new()
+  {
+    Id = 1,
+    Release_Year = 1986,
+    Title = "Aliens"
+  };
+
+  public static readonly Movie Movie2 = new()
+  {
+    Id = 2,
+    Release_Year = 1998,
+    Title = "Die Hard"
+  };
+
+  public static readonly Lead_Actor LeadActor1 = new()
+  {
+    Actor_Name = "Sigourney Weaver",
+    Title = "Aliens"
+  };
+
+  public static readonly Lead_Actor LeadActor2 = new()
+  {
+    Actor_Name = "Al Pacino",
+    Title = "The Godfather"
+  };
+
+  public async Task<bool> InsertMovieAsync(Movie movie)
+  {
+    var insertProperties = new InsertProperties()
     {
-      Id = 1,
-      Release_Year = 1986,
-      Title = "Aliens"
+      EntityName = MoviesTableName,
+      ShouldPluralizeEntityName = false
     };
 
-    public static readonly Movie Movie2 = new()
+    var result = (await restApiProvider.InsertIntoAsync(movie, insertProperties)).IsSuccess(); 
+
+    result.Should().BeTrue();
+
+    return result;
+  }
+
+  public async Task<bool> InsertLeadAsync(Lead_Actor actor)
+  {
+    var insertProperties = new InsertProperties()
     {
-      Id = 2,
-      Release_Year = 1998,
-      Title = "Die Hard"
+      EntityName = ActorsTableName,
+      ShouldPluralizeEntityName = false
     };
-
-    public static readonly Lead_Actor LeadActor1 = new()
-    {
-      Actor_Name = "Sigourney Weaver",
-      Title = "Aliens"
-    };
-
-    public static readonly Lead_Actor LeadActor2 = new()
-    {
-      Actor_Name = "Al Pacino",
-      Title = "The Godfather"
-    };
-
-    public async Task<bool> InsertMovieAsync(Movie movie)
-    {
-      var insertProperties = new InsertProperties()
-      {
-        EntityName = MoviesTableName,
-        ShouldPluralizeEntityName = false
-      };
-
-      var result = (await restApiProvider.InsertIntoAsync(movie, insertProperties)).IsSuccess(); 
-
-      result.Should().BeTrue();
-
-      return result;
-    }
-
-    public async Task<bool> InsertLeadAsync(Lead_Actor actor)
-    {
-      var insertProperties = new InsertProperties()
-      {
-        EntityName = ActorsTableName,
-        ShouldPluralizeEntityName = false
-      };
       
-      var result = (await restApiProvider.InsertIntoAsync(actor, insertProperties)).IsSuccess(); 
+    var result = (await restApiProvider.InsertIntoAsync(actor, insertProperties)).IsSuccess(); 
 
-      result.Should().BeTrue();
+    result.Should().BeTrue();
 
-      return result;
-    }
+    return result;
+  }
 
-    public async Task DropTablesAsync()
-    {
-      await restApiProvider.DropTableAndTopic(ActorsTableName);
-      await restApiProvider.DropTableAndTopic(MoviesTableName);
-    }
+  public async Task DropTablesAsync()
+  {
+    await restApiProvider.DropTableAndTopic(ActorsTableName);
+    await restApiProvider.DropTableAndTopic(MoviesTableName);
   }
 }
