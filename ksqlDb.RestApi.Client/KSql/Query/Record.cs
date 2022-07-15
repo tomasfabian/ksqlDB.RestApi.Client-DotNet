@@ -1,10 +1,9 @@
 ﻿using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
-namespace ksqlDB.RestApi.Client.KSql.Query
+namespace ksqlDB.RestApi.Client.KSql.Query;
+
+public class Record
 {
-  public class Record
-  {
-    [IgnoreByInserts]
-    public long RowTime { get; set; }
-  }
+  [IgnoreByInserts]
+  public long RowTime { get; set; }
 }

@@ -4,70 +4,69 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
+namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
+
+internal sealed class KSqlJoinSelectFieldsVisitor : KSqlVisitor
 {
-  internal sealed class KSqlJoinSelectFieldsVisitor : KSqlVisitor
+  private readonly KSqlQueryMetadata queryMetadata;
+
+  internal KSqlJoinSelectFieldsVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
+    : base(stringBuilder, queryMetadata)
   {
-    private readonly KSqlQueryMetadata queryMetadata;
+    this.queryMetadata = queryMetadata;
+  }
 
-    internal KSqlJoinSelectFieldsVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
-      : base(stringBuilder, queryMetadata)
+  protected override void ProcessVisitNewMember(MemberInfo memberInfo, Expression expression)
+  {
+    if (expression.NodeType == ExpressionType.MemberAccess)
     {
-      this.queryMetadata = queryMetadata;
+      Visit(expression);
+
+      Append(" " + memberInfo.Name);
     }
-
-    protected override void ProcessVisitNewMember(MemberInfo memberInfo, Expression expression)
+    else
     {
-      if (expression.NodeType == ExpressionType.MemberAccess)
-      {
-        Visit(expression);
-
-        Append(" " + memberInfo.Name);
-      }
-      else
-      {
-        base.ProcessVisitNewMember(memberInfo, expression);
-      }
+      base.ProcessVisitNewMember(memberInfo, expression);
     }
+  }
 
-    protected override Expression VisitMember(MemberExpression memberExpression)
+  protected override Expression VisitMember(MemberExpression memberExpression)
+  {
+    if (memberExpression == null) throw new ArgumentNullException(nameof(memberExpression));
+
+    if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
     {
-      if (memberExpression == null) throw new ArgumentNullException(nameof(memberExpression));
+      string alias = ((ParameterExpression)memberExpression.Expression).Name;
 
-      if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
-      {
-        string alias = ((ParameterExpression)memberExpression.Expression).Name;
+      var fromItem2 = queryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Expression.Type);
 
-        var fromItem2 = queryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Expression.Type);
+      if (fromItem2 != null)
+        fromItem2.Alias = alias;
 
-        if (fromItem2 != null)
-          fromItem2.Alias = alias;
-
-        Append(alias);
-        Append(".");
-        Append(memberExpression.Member.Name);
-
-        return memberExpression;
-      }
-
-      var fromItem = queryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
-
-      if (fromItem != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
-      {
-        string alias = ((MemberExpression)memberExpression.Expression).Member.Name;
-
-        fromItem.Alias = alias;
-
-        Append(alias);
-        
-        Append(".");
-
-        Append(memberExpression.Member.Name);
-      }
-      else
-        base.VisitMember(memberExpression);
+      Append(alias);
+      Append(".");
+      Append(memberExpression.Member.Name);
 
       return memberExpression;
     }
+
+    var fromItem = queryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
+
+    if (fromItem != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
+    {
+      string alias = ((MemberExpression)memberExpression.Expression).Member.Name;
+
+      fromItem.Alias = alias;
+
+      Append(alias);
+        
+      Append(".");
+
+      Append(memberExpression.Member.Name);
+    }
+    else
+      base.VisitMember(memberExpression);
+
+    return memberExpression;
   }
 }

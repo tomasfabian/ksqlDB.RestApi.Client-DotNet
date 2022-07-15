@@ -2,25 +2,24 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace ksqlDB.RestApi.Client.KSql.Query.Context.JsonConverters
+namespace ksqlDB.RestApi.Client.KSql.Query.Context.JsonConverters;
+
+public class TimeSpanToStringConverter : JsonConverter<TimeSpan>
 {
-  public class TimeSpanToStringConverter : JsonConverter<TimeSpan>
+  public override TimeSpan Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
   {
-    public override TimeSpan Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    {
-      var value = reader.GetString();
+    var value = reader.GetString();
 
-      if (value != null)
-        return TimeSpan.Parse(value);
+    if (value != null)
+      return TimeSpan.Parse(value);
 
-      return TimeSpan.MinValue;
-    }
+    return TimeSpan.MinValue;
+  }
 
-    public override void Write(Utf8JsonWriter writer, TimeSpan value, JsonSerializerOptions options)
-    {
-      string convertedValue = value.ToString();
+  public override void Write(Utf8JsonWriter writer, TimeSpan value, JsonSerializerOptions options)
+  {
+    string convertedValue = value.ToString();
 
-      writer.WriteStringValue(convertedValue);
-    }
+    writer.WriteStringValue(convertedValue);
   }
 }

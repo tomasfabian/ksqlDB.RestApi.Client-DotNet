@@ -1,6 +1,5 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Linq
+﻿namespace ksqlDB.RestApi.Client.KSql.Linq;
+
+public interface IKSqlQbservableProvider : IQbservableProvider
 {
-  public interface IKSqlQbservableProvider : IQbservableProvider
-  {
-  }
 }

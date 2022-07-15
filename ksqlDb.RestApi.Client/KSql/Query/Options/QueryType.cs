@@ -1,8 +1,7 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Query.Options
+﻿namespace ksqlDB.RestApi.Client.KSql.Query.Options;
+
+public enum QueryType
 {
-  public enum QueryType
-  {
-    Query,
-    QueryStream
-  }
+  Query,
+  QueryStream
 }

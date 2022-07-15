@@ -1,7 +1,6 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Query.Context.Options
+﻿namespace ksqlDB.RestApi.Client.KSql.Query.Context.Options;
+
+public interface ICreateOptions
 {
-  public interface ICreateOptions
-  {
-    KSqlDBContextOptions Options { get; }
-  }
+  KSqlDBContextOptions Options { get; }
 }

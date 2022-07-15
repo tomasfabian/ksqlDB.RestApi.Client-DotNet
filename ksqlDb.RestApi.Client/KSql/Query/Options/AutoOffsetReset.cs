@@ -1,8 +1,7 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Query.Options
+﻿namespace ksqlDB.RestApi.Client.KSql.Query.Options;
+
+public enum AutoOffsetReset 
 {
-  public enum AutoOffsetReset 
-  {
-    Earliest,
-    Latest
-  }
+  Earliest,
+  Latest
 }

@@ -10,77 +10,76 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace ksqlDB.RestApi.Client.Infrastructure.Extensions
+namespace ksqlDB.RestApi.Client.Infrastructure.Extensions;
+
+internal static class ServiceCollectionExtensions
 {
-  internal static class ServiceCollectionExtensions
+  internal static bool HasRegistration<TType>(this IServiceCollection serviceCollection)
   {
-    internal static bool HasRegistration<TType>(this IServiceCollection serviceCollection)
-    {
-      return serviceCollection.Any(x => x.ServiceType == typeof(TType));
-    }
+    return serviceCollection.Any(x => x.ServiceType == typeof(TType));
+  }
 
-    internal static ServiceDescriptor TryGetRegistration<TType>(this IServiceCollection serviceCollection)
-    {
-      return serviceCollection.FirstOrDefault(x => x.ServiceType == typeof(TType));
-    }
+  internal static ServiceDescriptor TryGetRegistration<TType>(this IServiceCollection serviceCollection)
+  {
+    return serviceCollection.FirstOrDefault(x => x.ServiceType == typeof(TType));
+  }
 
-    internal static IServiceCollection ConfigureHttpClients(this IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
-    {
-      var uri = new Uri(contextOptions.Url);
+  internal static IServiceCollection ConfigureHttpClients(this IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
+  {
+    var uri = new Uri(contextOptions.Url);
 
-      if (!serviceCollection.HasRegistration<IHttpV1ClientFactory>())
+    if (!serviceCollection.HasRegistration<IHttpV1ClientFactory>())
+    {
+      var httpClientV1Builder = serviceCollection.AddHttpClient<IHttpV1ClientFactory, HttpClientFactory>(httpClient =>
       {
-        var httpClientV1Builder = serviceCollection.AddHttpClient<IHttpV1ClientFactory, HttpClientFactory>(httpClient =>
-        {
-          httpClient.BaseAddress = uri;
-        });
+        httpClient.BaseAddress = uri;
+      });
 
-        if (contextOptions.UseBasicAuth)
-        {
-          var basicAuthCredentials =
-            new BasicAuthCredentials(contextOptions.BasicAuthUserName, contextOptions.BasicAuthPassword);
+      if (contextOptions.UseBasicAuth)
+      {
+        var basicAuthCredentials =
+          new BasicAuthCredentials(contextOptions.BasicAuthUserName, contextOptions.BasicAuthPassword);
 
-          httpClientV1Builder.AddHttpMessageHandler(_ => new BasicAuthHandler(basicAuthCredentials));
-        }
+        httpClientV1Builder.AddHttpMessageHandler(_ => new BasicAuthHandler(basicAuthCredentials));
       }
+    }
 
-      if (!serviceCollection.HasRegistration<IHttpClientFactory>())
+    if (!serviceCollection.HasRegistration<IHttpClientFactory>())
+    {
+      var httpClientBuilder = serviceCollection.AddHttpClient<IHttpClientFactory, HttpClientFactory>(httpClient =>
       {
-        var httpClientBuilder = serviceCollection.AddHttpClient<IHttpClientFactory, HttpClientFactory>(httpClient =>
-        {
-          httpClient.BaseAddress = uri;
+        httpClient.BaseAddress = uri;
 #if !NETSTANDARD
-          httpClient.DefaultRequestVersion = new Version(2, 0);
+        httpClient.DefaultRequestVersion = new Version(2, 0);
 #endif
-        });
+      });
 
-        if (contextOptions.UseBasicAuth)
-        {
-          var basicAuthCredentials =
-            new BasicAuthCredentials(contextOptions.BasicAuthUserName, contextOptions.BasicAuthPassword);
+      if (contextOptions.UseBasicAuth)
+      {
+        var basicAuthCredentials =
+          new BasicAuthCredentials(contextOptions.BasicAuthUserName, contextOptions.BasicAuthPassword);
 
-          httpClientBuilder.AddHttpMessageHandler(_ => new BasicAuthHandler(basicAuthCredentials));
-        }
+        httpClientBuilder.AddHttpMessageHandler(_ => new BasicAuthHandler(basicAuthCredentials));
       }
-
-      return serviceCollection;
     }
 
-    internal static void RegisterKSqlDbContextDependencies(this IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
-    {
-      serviceCollection.TryAddSingleton<KSqlDbProviderOptions>(contextOptions);
-      serviceCollection.TryAddSingleton(contextOptions);
+    return serviceCollection;
+  }
 
-      serviceCollection.TryAddScoped<IKSqlQbservableProvider, QbservableProvider>();
-      serviceCollection.TryAddScoped<ICreateStatementProvider, CreateStatementProvider>();
+  internal static void RegisterKSqlDbContextDependencies(this IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
+  {
+    serviceCollection.TryAddSingleton<KSqlDbProviderOptions>(contextOptions);
+    serviceCollection.TryAddSingleton(contextOptions);
 
-      serviceCollection.TryAddTransient<IKSqlQueryGenerator, KSqlQueryGenerator>();
+    serviceCollection.TryAddScoped<IKSqlQbservableProvider, QbservableProvider>();
+    serviceCollection.TryAddScoped<ICreateStatementProvider, CreateStatementProvider>();
 
-      serviceCollection.ConfigureHttpClients(contextOptions);
+    serviceCollection.TryAddTransient<IKSqlQueryGenerator, KSqlQueryGenerator>();
 
-      serviceCollection.TryAddSingleton(contextOptions);
-      serviceCollection.TryAddScoped<IKStreamSetDependencies, KStreamSetDependencies>();
-      serviceCollection.TryAddScoped<IKSqlDbRestApiClient, KSqlDbRestApiClient>();
-    }
+    serviceCollection.ConfigureHttpClients(contextOptions);
+
+    serviceCollection.TryAddSingleton(contextOptions);
+    serviceCollection.TryAddScoped<IKStreamSetDependencies, KStreamSetDependencies>();
+    serviceCollection.TryAddScoped<IKSqlDbRestApiClient, KSqlDbRestApiClient>();
   }
 }

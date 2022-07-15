@@ -1,8 +1,7 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Linq
+﻿namespace ksqlDB.RestApi.Client.KSql.Linq;
+
+public interface IWindowedKSql<out TKey, out TElement> : IKSqlGrouping<TKey, TElement> 
 {
-  public interface IWindowedKSql<out TKey, out TElement> : IKSqlGrouping<TKey, TElement> 
-  {
-    long WindowStart { get; }
-    long WindowEnd { get; }
-  }
+  long WindowStart { get; }
+  long WindowEnd { get; }
 }

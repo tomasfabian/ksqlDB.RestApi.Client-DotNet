@@ -5,54 +5,53 @@ using ksqlDB.RestApi.Client.KSql.Query.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Clauses
-{
-  internal sealed class WithOrAsClause : IWithOrAsClause
-  {
-    private readonly IServiceScopeFactory serviceScopeFactory;
-    private readonly StatementContext statementContext;
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Clauses;
 
-    public WithOrAsClause(IServiceScopeFactory serviceScopeFactory, StatementContext statementContext)
-    {
-      this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
-      this.statementContext = statementContext ?? throw new ArgumentNullException(nameof(statementContext));
+internal sealed class WithOrAsClause : IWithOrAsClause
+{
+  private readonly IServiceScopeFactory serviceScopeFactory;
+  private readonly StatementContext statementContext;
+
+  public WithOrAsClause(IServiceScopeFactory serviceScopeFactory, StatementContext statementContext)
+  {
+    this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
+    this.statementContext = statementContext ?? throw new ArgumentNullException(nameof(statementContext));
 
       
-      string creationTypeText = statementContext.CreationType switch
-      {
-        CreationType.Create => "CREATE",
-        CreationType.CreateOrReplace => "CREATE OR REPLACE",
-        _ => throw new ArgumentOutOfRangeException(nameof(statementContext.CreationType))
-      };
-
-      string entityTypeText = statementContext.KSqlEntityType switch
-      {
-        KSqlEntityType.Table => KSqlEntityType.Table.ToString().ToUpper(),
-        KSqlEntityType.Stream => KSqlEntityType.Stream.ToString().ToUpper(),
-        _ => throw new ArgumentOutOfRangeException(nameof(statementContext.KSqlEntityType))
-      };
-
-      statementContext.Statement = @$"{creationTypeText} {entityTypeText} {statementContext.EntityName}";
-    }
-
-    public IAsClause With(CreationMetadata creationMetadata)
+    string creationTypeText = statementContext.CreationType switch
     {
-      string withClause = CreateStatements.GenerateWithClause(creationMetadata);
+      CreationType.Create => "CREATE",
+      CreationType.CreateOrReplace => "CREATE OR REPLACE",
+      _ => throw new ArgumentOutOfRangeException(nameof(statementContext.CreationType))
+    };
 
-      statementContext.Statement = @$"{statementContext.Statement}
+    string entityTypeText = statementContext.KSqlEntityType switch
+    {
+      KSqlEntityType.Table => KSqlEntityType.Table.ToString().ToUpper(),
+      KSqlEntityType.Stream => KSqlEntityType.Stream.ToString().ToUpper(),
+      _ => throw new ArgumentOutOfRangeException(nameof(statementContext.KSqlEntityType))
+    };
+
+    statementContext.Statement = @$"{creationTypeText} {entityTypeText} {statementContext.EntityName}";
+  }
+
+  public IAsClause With(CreationMetadata creationMetadata)
+  {
+    string withClause = CreateStatements.GenerateWithClause(creationMetadata);
+
+    statementContext.Statement = @$"{statementContext.Statement}
 {withClause}";
 
-      return this;
-    }
+    return this;
+  }
 
-    public ICreateStatement<T> As<T>(string entityName = null)
-    {
-      if (entityName == String.Empty)
-        entityName = null;
+  public ICreateStatement<T> As<T>(string entityName = null)
+  {
+    if (entityName == String.Empty)
+      entityName = null;
 
-      statementContext.FromItemName = entityName;
+    statementContext.FromItemName = entityName;
 
-      return new CreateStatement<T>(serviceScopeFactory, statementContext);
-    }
+    return new CreateStatement<T>(serviceScopeFactory, statementContext);
   }
 }

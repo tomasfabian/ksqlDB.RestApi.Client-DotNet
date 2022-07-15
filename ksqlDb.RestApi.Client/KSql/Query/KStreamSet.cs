@@ -14,173 +14,172 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ksqlDB.RestApi.Client.KSql.Query
+namespace ksqlDB.RestApi.Client.KSql.Query;
+
+internal abstract class KStreamSet : KSet, Linq.IQbservable
 {
-  internal abstract class KStreamSet : KSet, Linq.IQbservable
+  public IKSqlQbservableProvider Provider { get; internal set; }
+    
+  internal QueryContext QueryContext { get; set; }
+    
+  internal IScheduler ObserveOnScheduler { get; set; }
+    
+  internal IScheduler SubscribeOnScheduler { get; set; }
+}
+
+internal abstract class KStreamSet<TEntity> : KStreamSet, Linq.IQbservable<TEntity>
+{
+  private readonly IServiceScopeFactory serviceScopeFactory;
+  private IServiceScope serviceScope;
+
+  protected KStreamSet(IServiceScopeFactory serviceScopeFactory, QueryContext queryContext = null)
   {
-    public IKSqlQbservableProvider Provider { get; internal set; }
-    
-    internal QueryContext QueryContext { get; set; }
-    
-    internal IScheduler ObserveOnScheduler { get; set; }
-    
-    internal IScheduler SubscribeOnScheduler { get; set; }
+    this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
+      
+    QueryContext = queryContext;
+
+    Provider = new QbservableProvider(serviceScopeFactory, queryContext);
+      
+    Expression = Expression.Constant(this);
   }
 
-  internal abstract class KStreamSet<TEntity> : KStreamSet, Linq.IQbservable<TEntity>
+  protected KStreamSet(IServiceScopeFactory serviceScopeFactory, Expression expression, QueryContext queryContext = null)
   {
-    private readonly IServiceScopeFactory serviceScopeFactory;
-    private IServiceScope serviceScope;
-
-    protected KStreamSet(IServiceScopeFactory serviceScopeFactory, QueryContext queryContext = null)
-    {
-      this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
+    this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
       
-      QueryContext = queryContext;
+    QueryContext = queryContext;
 
-      Provider = new QbservableProvider(serviceScopeFactory, queryContext);
+    Provider = new QbservableProvider(serviceScopeFactory, queryContext);
+
+    Expression = expression ?? throw new ArgumentNullException(nameof(expression));
+  }
+
+  public override Type ElementType => typeof(TEntity);
+
+  public IDisposable Subscribe(IObserver<TEntity> observer)
+  {
+    var cancellationTokenSource = new CancellationTokenSource();
+
+    var observable = RunStreamAsObservable(cancellationTokenSource);
       
-      Expression = Expression.Constant(this);
-    }
-
-    protected KStreamSet(IServiceScopeFactory serviceScopeFactory, Expression expression, QueryContext queryContext = null)
-    {
-      this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
+    observable = TryApplySchedulers(observable);
       
-      QueryContext = queryContext;
+    var querySubscription = observable.Subscribe(observer);
 
-      Provider = new QbservableProvider(serviceScopeFactory, queryContext);
-
-      Expression = expression ?? throw new ArgumentNullException(nameof(expression));
-    }
-
-    public override Type ElementType => typeof(TEntity);
-
-    public IDisposable Subscribe(IObserver<TEntity> observer)
+    var compositeDisposable = new CompositeDisposable
     {
-      var cancellationTokenSource = new CancellationTokenSource();
+      Disposable.Create(() => cancellationTokenSource.Cancel()), 
+      querySubscription
+    };
 
-      var observable = RunStreamAsObservable(cancellationTokenSource);
+    return compositeDisposable;
+  }
+
+  public async Task<Subscription> SubscribeAsync(IObserver<TEntity> observer, CancellationToken cancellationToken = default)
+  {
+    var query = await RunStreamAsObservableAsync(cancellationToken).ConfigureAwait(false);
+
+    var observable = query.Source;
+
+    observable = TryApplySchedulers(observable);
+
+    observable.Subscribe(observer, cancellationToken);
       
-      observable = TryApplySchedulers(observable);
+    return new Subscription { QueryId = query.QueryId };
+  }
+
+  private IObservable<TEntity> TryApplySchedulers(IObservable<TEntity> observable)
+  {
+    if (SubscribeOnScheduler != null)
+      observable = observable.SubscribeOn(SubscribeOnScheduler);
+
+    if (ObserveOnScheduler != null)
+      observable = observable.ObserveOn(ObserveOnScheduler);
+
+    return observable;
+  }
+
+  internal IAsyncEnumerable<TEntity> RunStreamAsAsyncEnumerable(CancellationToken cancellationToken = default)
+  {
+    using var scope = serviceScopeFactory.CreateScope();
+
+    var dependencies = scope.ServiceProvider.GetRequiredService<IKStreamSetDependencies>();
       
-      var querySubscription = observable.Subscribe(observer);
+    var queryParameters = GetQueryParameters(dependencies);
 
-      var compositeDisposable = new CompositeDisposable
-      {
-        Disposable.Create(() => cancellationTokenSource.Cancel()), 
-        querySubscription
-      };
+    return dependencies.KsqlDBProvider
+      .Run<TEntity>(queryParameters, cancellationToken);
+  }
 
-      return compositeDisposable;
-    }
+  internal Task<QueryStream<TEntity>> RunStreamAsAsyncEnumerableAsync(CancellationToken cancellationToken = default)
+  {
+    using var scope = serviceScopeFactory.CreateScope();
 
-    public async Task<Subscription> SubscribeAsync(IObserver<TEntity> observer, CancellationToken cancellationToken = default)
-    {
-      var query = await RunStreamAsObservableAsync(cancellationToken).ConfigureAwait(false);
+    var dependencies = scope.ServiceProvider.GetRequiredService<IKStreamSetDependencies>();
 
-      var observable = query.Source;
+    var queryParameters = GetQueryParameters(dependencies);
 
-      observable = TryApplySchedulers(observable);
+    return dependencies.KsqlDBProvider
+      .RunAsync<TEntity>(queryParameters, cancellationToken);
+  }
 
-      observable.Subscribe(observer, cancellationToken);
+  private IQueryParameters GetQueryParameters(IKStreamSetDependencies dependencies)
+  {
+    var queryParameters = dependencies.QueryStreamParameters;
       
-      return new Subscription { QueryId = query.QueryId };
-    }
+    queryParameters.Sql = dependencies.KSqlQueryGenerator.BuildKSql(Expression, QueryContext);
 
-    private IObservable<TEntity> TryApplySchedulers(IObservable<TEntity> observable)
-    {
-      if (SubscribeOnScheduler != null)
-        observable = observable.SubscribeOn(SubscribeOnScheduler);
+    queryParameters = TryOverrideAutoOffsetResetPolicy(queryParameters);
 
-      if (ObserveOnScheduler != null)
-        observable = observable.ObserveOn(ObserveOnScheduler);
+    return queryParameters;
+  }
 
-      return observable;
-    }
-
-    internal IAsyncEnumerable<TEntity> RunStreamAsAsyncEnumerable(CancellationToken cancellationToken = default)
-    {
-      using var scope = serviceScopeFactory.CreateScope();
-
-      var dependencies = scope.ServiceProvider.GetRequiredService<IKStreamSetDependencies>();
+  private IKSqlDbParameters TryOverrideAutoOffsetResetPolicy(IKSqlDbParameters queryParameters)
+  {
+    if (!QueryContext.AutoOffsetReset.HasValue) return queryParameters;
       
-      var queryParameters = GetQueryParameters(dependencies);
+    var overridenParameters = queryParameters.Clone();
+    overridenParameters.AutoOffsetReset = QueryContext.AutoOffsetReset.Value;
 
-      return dependencies.KsqlDBProvider
-        .Run<TEntity>(queryParameters, cancellationToken);
-    }
+    return overridenParameters;
+  }
 
-    internal Task<QueryStream<TEntity>> RunStreamAsAsyncEnumerableAsync(CancellationToken cancellationToken = default)
-    {
-      using var scope = serviceScopeFactory.CreateScope();
+  internal IObservable<TEntity> RunStreamAsObservable(CancellationTokenSource cancellationTokenSource)
+  {
+    var query = RunStreamAsAsyncEnumerable(cancellationTokenSource.Token);
 
-      var dependencies = scope.ServiceProvider.GetRequiredService<IKStreamSetDependencies>();
+    var observableStream = query.ToObservable();
 
-      var queryParameters = GetQueryParameters(dependencies);
-
-      return dependencies.KsqlDBProvider
-        .RunAsync<TEntity>(queryParameters, cancellationToken);
-    }
-
-    private IQueryParameters GetQueryParameters(IKStreamSetDependencies dependencies)
-    {
-      var queryParameters = dependencies.QueryStreamParameters;
-      
-      queryParameters.Sql = dependencies.KSqlQueryGenerator.BuildKSql(Expression, QueryContext);
-
-      queryParameters = TryOverrideAutoOffsetResetPolicy(queryParameters);
-
-      return queryParameters;
-    }
-
-    private IKSqlDbParameters TryOverrideAutoOffsetResetPolicy(IKSqlDbParameters queryParameters)
-    {
-      if (!QueryContext.AutoOffsetReset.HasValue) return queryParameters;
-      
-      var overridenParameters = queryParameters.Clone();
-      overridenParameters.AutoOffsetReset = QueryContext.AutoOffsetReset.Value;
-
-      return overridenParameters;
-    }
-
-    internal IObservable<TEntity> RunStreamAsObservable(CancellationTokenSource cancellationTokenSource)
-    {
-      var query = RunStreamAsAsyncEnumerable(cancellationTokenSource.Token);
-
-      var observableStream = query.ToObservable();
-
-      return observableStream;
-    }
+    return observableStream;
+  }
     
-    internal async Task<(string QueryId, IObservable<TEntity> Source)> RunStreamAsObservableAsync(CancellationToken cancellationTokenSource = default)
-    {
-      var query = await RunStreamAsAsyncEnumerableAsync(cancellationTokenSource).ConfigureAwait(false);
+  internal async Task<(string QueryId, IObservable<TEntity> Source)> RunStreamAsObservableAsync(CancellationToken cancellationTokenSource = default)
+  {
+    var query = await RunStreamAsAsyncEnumerableAsync(cancellationTokenSource).ConfigureAwait(false);
 
-      var observableStream = query.EnumerableQuery.ToObservable();
+    var observableStream = query.EnumerableQuery.ToObservable();
 
-      return (query.QueryId, observableStream);
-    }
+    return (query.QueryId, observableStream);
+  }
 
-    internal string BuildKsql()
-    {
-      serviceScope = serviceScopeFactory.CreateScope();
+  internal string BuildKsql()
+  {
+    serviceScope = serviceScopeFactory.CreateScope();
       
-      var dependencies = serviceScope.ServiceProvider.GetService<IKStreamSetDependencies>();
+    var dependencies = serviceScope.ServiceProvider.GetService<IKStreamSetDependencies>();
       
-      var ksqlQuery = dependencies.KSqlQueryGenerator?.BuildKSql(Expression, QueryContext);
+    var ksqlQuery = dependencies.KSqlQueryGenerator?.BuildKSql(Expression, QueryContext);
       
-      serviceScope.Dispose();
+    serviceScope.Dispose();
 
-      return ksqlQuery;
-    }
+    return ksqlQuery;
+  }
 
-    internal IHttpClientFactory GetHttpClientFactory()
-    {
-      using var scope = serviceScopeFactory.CreateScope();
-      var httpClientFactory = scope.ServiceProvider.GetService<IHttpClientFactory>();
+  internal IHttpClientFactory GetHttpClientFactory()
+  {
+    using var scope = serviceScopeFactory.CreateScope();
+    var httpClientFactory = scope.ServiceProvider.GetService<IHttpClientFactory>();
 
-      return httpClientFactory;
-    }
+    return httpClientFactory;
   }
 }

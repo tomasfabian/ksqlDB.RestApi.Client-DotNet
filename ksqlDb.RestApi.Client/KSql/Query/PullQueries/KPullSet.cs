@@ -8,78 +8,77 @@ using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ksqlDB.RestApi.Client.KSql.Query.PullQueries
+namespace ksqlDB.RestApi.Client.KSql.Query.PullQueries;
+
+internal abstract class KPullSet : KSet, IPullable
 {
-  internal abstract class KPullSet : KSet, IPullable
-  {
-    public IPullQueryProvider Provider { get; internal set; }
+  public IPullQueryProvider Provider { get; internal set; }
     
-    internal QueryContext QueryContext { get; set; }
+  internal QueryContext QueryContext { get; set; }
+}
+
+internal sealed class KPullSet<TEntity> : KPullSet, IPullable<TEntity>
+{
+  private readonly IServiceScopeFactory serviceScopeFactory;
+
+  internal KPullSet(IServiceScopeFactory serviceScopeFactory, QueryContext queryContext = null)
+  {
+    this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
+
+    QueryContext = queryContext;
+
+    Provider = new PullQueryProvider(serviceScopeFactory, queryContext);
+
+    Expression = Expression.Constant(this);
   }
 
-  internal sealed class KPullSet<TEntity> : KPullSet, IPullable<TEntity>
+  internal KPullSet(IServiceScopeFactory serviceScopeFactory, Expression expression, QueryContext queryContext = null)
   {
-    private readonly IServiceScopeFactory serviceScopeFactory;
+    this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
 
-    internal KPullSet(IServiceScopeFactory serviceScopeFactory, QueryContext queryContext = null)
-    {
-      this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
+    QueryContext = queryContext;
 
-      QueryContext = queryContext;
+    Provider = new PullQueryProvider(serviceScopeFactory, queryContext);
 
-      Provider = new PullQueryProvider(serviceScopeFactory, queryContext);
+    Expression = expression ?? throw new ArgumentNullException(nameof(expression));
+  }
 
-      Expression = Expression.Constant(this);
-    }
+  public override Type ElementType => typeof(TEntity);
 
-    internal KPullSet(IServiceScopeFactory serviceScopeFactory, Expression expression, QueryContext queryContext = null)
-    {
-      this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
+  /// <summary>
+  /// Pulls the first value or returns NULL from the materialized view and terminates. 
+  /// </summary>
+  public ValueTask<TEntity> FirstOrDefaultAsync(CancellationToken cancellationToken = default)
+  {
+    var dependencies = GetDependencies();
 
-      QueryContext = queryContext;
+    return dependencies.KsqlDBProvider.Run<TEntity>(dependencies.QueryStreamParameters, cancellationToken)
+      .FirstOrDefaultAsync(cancellationToken);
+  }
 
-      Provider = new PullQueryProvider(serviceScopeFactory, queryContext);
+  /// <summary>
+  /// Pulls all values from the materialized view asynchronously and terminates. 
+  /// </summary>
+  public IAsyncEnumerable<TEntity> GetManyAsync(CancellationToken cancellationToken = default)
+  {
+    var dependencies = GetDependencies();
 
-      Expression = expression ?? throw new ArgumentNullException(nameof(expression));
-    }
+    return dependencies.KsqlDBProvider.Run<TEntity>(dependencies.QueryStreamParameters, cancellationToken);
+  }
 
-    public override Type ElementType => typeof(TEntity);
+  internal IKStreamSetDependencies GetDependencies()
+  {
+    using var serviceScope = serviceScopeFactory.CreateScope();
 
-    /// <summary>
-    /// Pulls the first value or returns NULL from the materialized view and terminates. 
-    /// </summary>
-    public ValueTask<TEntity> FirstOrDefaultAsync(CancellationToken cancellationToken = default)
-    {
-      var dependencies = GetDependencies();
+    var dependencies = serviceScope.ServiceProvider.GetRequiredService<IKStreamSetDependencies>();
 
-      return dependencies.KsqlDBProvider.Run<TEntity>(dependencies.QueryStreamParameters, cancellationToken)
-        .FirstOrDefaultAsync(cancellationToken);
-    }
+    dependencies.KSqlQueryGenerator.ShouldEmitChanges = false;
 
-    /// <summary>
-    /// Pulls all values from the materialized view asynchronously and terminates. 
-    /// </summary>
-    public IAsyncEnumerable<TEntity> GetManyAsync(CancellationToken cancellationToken = default)
-    {
-      var dependencies = GetDependencies();
+    var ksqlQuery = dependencies.KSqlQueryGenerator.BuildKSql(Expression, QueryContext);
 
-      return dependencies.KsqlDBProvider.Run<TEntity>(dependencies.QueryStreamParameters, cancellationToken);
-    }
+    var queryParameters = dependencies.QueryStreamParameters;
+    queryParameters.Sql = ksqlQuery;
 
-    internal IKStreamSetDependencies GetDependencies()
-    {
-      using var serviceScope = serviceScopeFactory.CreateScope();
-
-      var dependencies = serviceScope.ServiceProvider.GetRequiredService<IKStreamSetDependencies>();
-
-      dependencies.KSqlQueryGenerator.ShouldEmitChanges = false;
-
-      var ksqlQuery = dependencies.KSqlQueryGenerator.BuildKSql(Expression, QueryContext);
-
-      var queryParameters = dependencies.QueryStreamParameters;
-      queryParameters.Sql = ksqlQuery;
-
-      return dependencies;
-    }
+    return dependencies;
   }
 }

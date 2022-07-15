@@ -1,46 +1,45 @@
 ﻿using System.Text;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+
+internal sealed class CreateInsert : CreateEntityStatement 
 {
-  internal sealed class CreateInsert : CreateEntityStatement 
+  internal string Generate<T>(T entity, InsertProperties insertProperties = null)
   {
-    internal string Generate<T>(T entity, InsertProperties insertProperties = null)
-    {
-      insertProperties ??= new InsertProperties();
+    insertProperties ??= new InsertProperties();
 		
-      var entityName = GetEntityName<T>(insertProperties);
+    var entityName = GetEntityName<T>(insertProperties);
 
-      bool isFirst = true;
+    bool isFirst = true;
 
-      var columnsStringBuilder = new StringBuilder();
-      var valuesStringBuilder = new StringBuilder();
+    var columnsStringBuilder = new StringBuilder();
+    var valuesStringBuilder = new StringBuilder();
 
-      foreach (var memberInfo in Members<T>(insertProperties?.IncludeReadOnlyProperties))
+    foreach (var memberInfo in Members<T>(insertProperties?.IncludeReadOnlyProperties))
+    {
+      if (isFirst)
       {
-        if (isFirst)
-        {
-          isFirst = false;
-        }
-        else
-        {
-          columnsStringBuilder.Append(", ");
-          valuesStringBuilder.Append(", ");
-        }
-
-        columnsStringBuilder.Append(memberInfo.Name);
-
-        var type = GetMemberType(memberInfo);
-
-        var value = new CreateKSqlValue().ExtractValue(entity, insertProperties, memberInfo, type);
-
-        valuesStringBuilder.Append(value);
+        isFirst = false;
+      }
+      else
+      {
+        columnsStringBuilder.Append(", ");
+        valuesStringBuilder.Append(", ");
       }
 
-      string insert =
-        $"INSERT INTO {entityName} ({columnsStringBuilder}) VALUES ({valuesStringBuilder});";
-			
-      return insert;
+      columnsStringBuilder.Append(memberInfo.Name);
+
+      var type = GetMemberType(memberInfo);
+
+      var value = new CreateKSqlValue().ExtractValue(entity, insertProperties, memberInfo, type);
+
+      valuesStringBuilder.Append(value);
     }
+
+    string insert =
+      $"INSERT INTO {entityName} ({columnsStringBuilder}) VALUES ({valuesStringBuilder});";
+			
+    return insert;
   }
 }

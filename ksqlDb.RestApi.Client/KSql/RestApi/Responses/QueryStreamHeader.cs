@@ -1,16 +1,15 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses;
+
+public class QueryStreamHeader
 {
-  public class QueryStreamHeader
-  {
-    [JsonPropertyName("queryId")]
-    public string QueryId { get; set; }
+  [JsonPropertyName("queryId")]
+  public string QueryId { get; set; }
     
-    [JsonPropertyName("columnNames")]
-    public string[] ColumnNames { get; set; }
+  [JsonPropertyName("columnNames")]
+  public string[] ColumnNames { get; set; }
     
-    [JsonPropertyName("columnTypes")]
-    public string[] ColumnTypes { get; set; }
-  }
+  [JsonPropertyName("columnTypes")]
+  public string[] ColumnTypes { get; set; }
 }

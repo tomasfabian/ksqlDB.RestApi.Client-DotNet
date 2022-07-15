@@ -1,19 +1,18 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Connectors
-{
-  public record Connector
-  {
-    [JsonPropertyName("name")]
-    public string Name { get; set; }
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Connectors;
 
-    [JsonPropertyName("type")]
-    public string Type { get; set; }
+public record Connector
+{
+  [JsonPropertyName("name")]
+  public string Name { get; set; }
+
+  [JsonPropertyName("type")]
+  public string Type { get; set; }
     
-    [JsonPropertyName("className")]
-    public string ClassName { get; set; }
+  [JsonPropertyName("className")]
+  public string ClassName { get; set; }
     
-    [JsonPropertyName("state")]
-    public string State { get; set; }
-  }
+  [JsonPropertyName("state")]
+  public string State { get; set; }
 }

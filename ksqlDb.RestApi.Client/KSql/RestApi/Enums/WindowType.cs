@@ -1,9 +1,8 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Enums
+﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+
+public enum WindowType
 {
-  public enum WindowType
-  {
-    Session,
-    Hopping,
-    Tumbling
-  }
+  Session,
+  Hopping,
+  Tumbling
 }

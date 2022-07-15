@@ -3,56 +3,55 @@ using System.Text.Json.Serialization;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+
+public class QueryParameters : IKSqlDbParameters
 {
-  public class QueryParameters : IKSqlDbParameters
+  [JsonPropertyName("ksql")]
+  public string Sql { get; set; }
+
+  [JsonPropertyName("streamsProperties")]
+  public Dictionary<string, string> Properties { get; } = new();
+
+  public static readonly string AutoOffsetResetPropertyName = "ksql.streams.auto.offset.reset";
+
+  public string this[string key]
   {
-    [JsonPropertyName("ksql")]
-    public string Sql { get; set; }
-
-    [JsonPropertyName("streamsProperties")]
-    public Dictionary<string, string> Properties { get; } = new();
-
-    public static readonly string AutoOffsetResetPropertyName = "ksql.streams.auto.offset.reset";
-
-    public string this[string key]
-    {
-      get => Properties[key];
-      set => Properties[key] = value;
-    }
+    get => Properties[key];
+    set => Properties[key] = value;
+  }
     
-    [JsonIgnore]
-    public AutoOffsetReset AutoOffsetReset
+  [JsonIgnore]
+  public AutoOffsetReset AutoOffsetReset
+  {
+    get
     {
-      get
-      {
-        var value = this[AutoOffsetResetPropertyName];
+      var value = this[AutoOffsetResetPropertyName];
 
-        return value.ToAutoOffsetReset();
-      }
-
-      set => this[AutoOffsetResetPropertyName] = value.ToKSqlValue();
+      return value.ToAutoOffsetReset();
     }
 
-    internal EndpointType EndpointType { get; set; } = EndpointType.Query;
+    set => this[AutoOffsetResetPropertyName] = value.ToKSqlValue();
+  }
 
-    public IKSqlDbParameters Clone()
+  internal EndpointType EndpointType { get; set; } = EndpointType.Query;
+
+  public IKSqlDbParameters Clone()
+  {
+    var queryParams = new QueryParameters()
     {
-      var queryParams = new QueryParameters()
-      {
-        Sql = Sql,
-        EndpointType = EndpointType
-      };
+      Sql = Sql,
+      EndpointType = EndpointType
+    };
 
-      foreach (var entry in Properties)
-        queryParams.Properties.Add(entry.Key, entry.Value);
+    foreach (var entry in Properties)
+      queryParams.Properties.Add(entry.Key, entry.Value);
 
-      return queryParams;
-    }
+    return queryParams;
+  }
 
-    public override string ToString()
-    {
-      return this.ToLogInfo();
-    }
+  public override string ToString()
+  {
+    return this.ToLogInfo();
   }
 }

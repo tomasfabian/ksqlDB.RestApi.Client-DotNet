@@ -1,34 +1,33 @@
 ﻿using System;
 
-namespace ksqlDB.RestApi.Client.KSql.Query.Windows
+namespace ksqlDB.RestApi.Client.KSql.Query.Windows;
+
+public class HoppingWindows : TimeWindows
 {
-  public class HoppingWindows : TimeWindows
+  public HoppingWindows(Duration duration) 
+    : base(duration)
   {
-    public HoppingWindows(Duration duration) 
-      : base(duration)
-    {
-      AdvanceBy = duration;
-    }    
+    AdvanceBy = duration;
+  }    
 
-    public Duration AdvanceBy { get; private set; }
+  public Duration AdvanceBy { get; private set; }
 
-    public HoppingWindows WithAdvanceBy(Duration advanceBy)
-    {
-      AdvanceBy = advanceBy ?? throw new ArgumentNullException(nameof(advanceBy));
+  public HoppingWindows WithAdvanceBy(Duration advanceBy)
+  {
+    AdvanceBy = advanceBy ?? throw new ArgumentNullException(nameof(advanceBy));
 
-      if (AdvanceBy.TotalSeconds.Value > Duration.TotalSeconds.Value)
-        throw new InvalidOperationException("Window advancement interval should be more than zero and less than window duration");
+    if (AdvanceBy.TotalSeconds.Value > Duration.TotalSeconds.Value)
+      throw new InvalidOperationException("Window advancement interval should be more than zero and less than window duration");
 
-      return this;
-    }
+    return this;
+  }
 
-    public Duration Retention { get; private set; }
+  public Duration Retention { get; private set; }
 
-    public HoppingWindows WithRetention(Duration retention)
-    {
-      Retention = retention ?? throw new ArgumentNullException(nameof(retention));
+  public HoppingWindows WithRetention(Duration retention)
+  {
+    Retention = retention ?? throw new ArgumentNullException(nameof(retention));
 
-      return this;
-    }
+    return this;
   }
 }

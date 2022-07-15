@@ -1,8 +1,7 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Enums
+﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+
+internal enum KSqlEntityType
 {
-  internal enum KSqlEntityType
-  {
-    Table,
-    Stream
-  }
+  Table,
+  Stream
 }

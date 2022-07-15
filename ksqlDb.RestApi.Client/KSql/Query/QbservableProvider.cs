@@ -4,22 +4,21 @@ using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ksqlDB.RestApi.Client.KSql.Query
-{
-  internal class QbservableProvider : IKSqlQbservableProvider
-  {
-    private readonly IServiceScopeFactory serviceScopeFactory;
-    private readonly QueryContext queryContext;
+namespace ksqlDB.RestApi.Client.KSql.Query;
 
-    public QbservableProvider(IServiceScopeFactory serviceScopeFactory, QueryContext queryContext = null)
-    {
-      this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
-      this.queryContext = queryContext;
-    }
+internal class QbservableProvider : IKSqlQbservableProvider
+{
+  private readonly IServiceScopeFactory serviceScopeFactory;
+  private readonly QueryContext queryContext;
+
+  public QbservableProvider(IServiceScopeFactory serviceScopeFactory, QueryContext queryContext = null)
+  {
+    this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
+    this.queryContext = queryContext;
+  }
     
-    IQbservable<TResult> IQbservableProvider.CreateQuery<TResult>(Expression expression)
-    {
-      return new KQueryStreamSet<TResult>(serviceScopeFactory, queryContext, expression);
-    }
+  IQbservable<TResult> IQbservableProvider.CreateQuery<TResult>(Expression expression)
+  {
+    return new KQueryStreamSet<TResult>(serviceScopeFactory, queryContext, expression);
   }
 }

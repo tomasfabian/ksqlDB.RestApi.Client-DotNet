@@ -14,206 +14,205 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using Microsoft.Extensions.Logging;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
-namespace ksqlDB.RestApi.Client.KSql.RestApi
+namespace ksqlDB.RestApi.Client.KSql.RestApi;
+
+internal abstract class KSqlDbProvider : IKSqlDbProvider
 {
-  internal abstract class KSqlDbProvider : IKSqlDbProvider
+  private readonly IHttpClientFactory httpClientFactory;
+  private readonly KSqlDbProviderOptions options;
+  private readonly ILogger logger;
+
+  protected KSqlDbProvider(IHttpClientFactory httpClientFactory, KSqlDbProviderOptions options, ILogger logger = null)
   {
-    private readonly IHttpClientFactory httpClientFactory;
-    private readonly KSqlDbProviderOptions options;
-    private readonly ILogger logger;
+    this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+    this.options = options ?? throw new ArgumentNullException(nameof(options));
+    this.logger = logger;
+  }
 
-    protected KSqlDbProvider(IHttpClientFactory httpClientFactory, KSqlDbProviderOptions options, ILogger logger = null)
+  public abstract string ContentType { get; }
+
+  protected abstract string QueryEndPointName { get; }
+
+  internal KSqlDbProviderOptions Options => options;
+
+  protected virtual HttpClient OnCreateHttpClient()
+  {
+    return httpClientFactory.CreateClient();
+  }
+
+  public async Task<QueryStream<T>> RunAsync<T>(object parameters, CancellationToken cancellationToken = default)
+  {
+    logger?.LogInformation($"Executing query {parameters}");
+
+    var streamReader = await TryGetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
+
+    var semaphoreSlim = new SemaphoreSlim(0, 1);
+
+    cancellationToken.Register(() => semaphoreSlim.Release());
+
+    var queryId = await ReadHeaderAsync<T>(streamReader).ConfigureAwait(false);
+
+    return new QueryStream<T>
     {
-      this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
-      this.options = options ?? throw new ArgumentNullException(nameof(options));
-      this.logger = logger;
+      EnumerableQuery = ConsumeAsync<T>(streamReader, semaphoreSlim, cancellationToken),
+      QueryId = queryId
+    };
+  }
+
+  /// <param name="parameters">Query parameters</param>
+  /// <param name="cancellationToken">A token that can be used to request cancellation of the asynchronous operation.</param>
+  public async IAsyncEnumerable<T> Run<T>(object parameters, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+  {
+    logger?.LogInformation($"Executing query {parameters}");
+
+    using var streamReader = await TryGetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
+
+    var semaphoreSlim = new SemaphoreSlim(0, 1);
+
+    cancellationToken.Register(() =>
+    {
+      semaphoreSlim.Release();
+    });
+
+    await foreach (var entity in ConsumeAsync<T>(streamReader, semaphoreSlim, cancellationToken).WithCancellation(cancellationToken).ConfigureAwait(false))
+      yield return entity;
+  }
+
+  private async Task<StreamReader> TryGetStreamReaderAsync<T>(object parameters, CancellationToken cancellationToken)
+  {
+    try
+    {
+      return await GetStreamReaderAsync<T>(parameters, cancellationToken);
     }
-
-    public abstract string ContentType { get; }
-
-    protected abstract string QueryEndPointName { get; }
-
-    internal KSqlDbProviderOptions Options => options;
-
-    protected virtual HttpClient OnCreateHttpClient()
+    catch (Exception exception)
     {
-      return httpClientFactory.CreateClient();
+      logger?.LogError(exception, "Query execution failed.");
+
+      throw;
     }
+  }
 
-    public async Task<QueryStream<T>> RunAsync<T>(object parameters, CancellationToken cancellationToken = default)
-    {
-      logger?.LogInformation($"Executing query {parameters}");
+  private async Task<StreamReader> GetStreamReaderAsync<T>(object parameters, CancellationToken cancellationToken)
+  {
+    var httpClient = OnCreateHttpClient();
 
-      var streamReader = await TryGetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
+    var httpRequestMessage = CreateQueryHttpRequestMessage(httpClient, parameters);
 
-      var semaphoreSlim = new SemaphoreSlim(0, 1);
-
-      cancellationToken.Register(() => semaphoreSlim.Release());
-
-      var queryId = await ReadHeaderAsync<T>(streamReader).ConfigureAwait(false);
-
-      return new QueryStream<T>
-      {
-        EnumerableQuery = ConsumeAsync<T>(streamReader, semaphoreSlim, cancellationToken),
-        QueryId = queryId
-      };
-    }
-
-    /// <param name="parameters">Query parameters</param>
-    /// <param name="cancellationToken">A token that can be used to request cancellation of the asynchronous operation.</param>
-    public async IAsyncEnumerable<T> Run<T>(object parameters, [EnumeratorCancellation] CancellationToken cancellationToken = default)
-    {
-      logger?.LogInformation($"Executing query {parameters}");
-
-      using var streamReader = await TryGetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
-
-      var semaphoreSlim = new SemaphoreSlim(0, 1);
-
-      cancellationToken.Register(() =>
-      {
-        semaphoreSlim.Release();
-      });
-
-      await foreach (var entity in ConsumeAsync<T>(streamReader, semaphoreSlim, cancellationToken).WithCancellation(cancellationToken).ConfigureAwait(false))
-        yield return entity;
-    }
-
-    private async Task<StreamReader> TryGetStreamReaderAsync<T>(object parameters, CancellationToken cancellationToken)
-    {
-      try
-      {
-        return await GetStreamReaderAsync<T>(parameters, cancellationToken);
-      }
-      catch (Exception exception)
-      {
-        logger?.LogError(exception, "Query execution failed.");
-
-        throw;
-      }
-    }
-
-    private async Task<StreamReader> GetStreamReaderAsync<T>(object parameters, CancellationToken cancellationToken)
-    {
-      var httpClient = OnCreateHttpClient();
-
-      var httpRequestMessage = CreateQueryHttpRequestMessage(httpClient, parameters);
-
-      //https://docs.ksqldb.io/en/latest/developer-guide/api/
-      var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage,
-          HttpCompletionOption.ResponseHeadersRead,
-          cancellationToken)
-        .ConfigureAwait(false);
+    //https://docs.ksqldb.io/en/latest/developer-guide/api/
+    var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage,
+        HttpCompletionOption.ResponseHeadersRead,
+        cancellationToken)
+      .ConfigureAwait(false);
 
 #if NET
-      var stream = await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+    var stream = await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
 #else
       var stream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
 #endif
 
-      var streamReader = new StreamReader(stream);
+    var streamReader = new StreamReader(stream);
 
-      if (options.DisposeHttpClient)
-        httpClient.Dispose();
+    if (options.DisposeHttpClient)
+      httpClient.Dispose();
 
-      return streamReader;
-    }
+    return streamReader;
+  }
 
-    private static Task<bool> EndOfStreamAsync(StreamReader streamReader, CancellationToken cancellationToken)
+  private static Task<bool> EndOfStreamAsync(StreamReader streamReader, CancellationToken cancellationToken)
+  {
+    return Task.Run(() =>
     {
-      return Task.Run(() =>
+      try
       {
-        try
-        {
-          return !streamReader.EndOfStream;
-        }
-        catch (Exception)
-        {
-          if (!cancellationToken.IsCancellationRequested)
-            throw;
+        return !streamReader.EndOfStream;
+      }
+      catch (Exception)
+      {
+        if (!cancellationToken.IsCancellationRequested)
+          throw;
 
-          return true;
-        }
+        return true;
+      }
 
-      }, cancellationToken);
-    }
+    }, cancellationToken);
+  }
 
-    private async IAsyncEnumerable<T> ConsumeAsync<T>(StreamReader streamReader, SemaphoreSlim semaphoreSlim, [EnumeratorCancellation] CancellationToken cancellationToken)
+  private async IAsyncEnumerable<T> ConsumeAsync<T>(StreamReader streamReader, SemaphoreSlim semaphoreSlim, [EnumeratorCancellation] CancellationToken cancellationToken)
+  {
+    if (cancellationToken.IsCancellationRequested)
+      yield break;
+
+    var cancellationTask = Task.Run(async () =>
+    {
+      await semaphoreSlim.WaitAsync().ConfigureAwait(false);
+      return false;
+    }, cancellationToken);
+
+    while (await await Task.WhenAny(EndOfStreamAsync(streamReader, cancellationToken), cancellationTask).ConfigureAwait(false))
     {
       if (cancellationToken.IsCancellationRequested)
         yield break;
-
-      var cancellationTask = Task.Run(async () =>
-      {
-        await semaphoreSlim.WaitAsync().ConfigureAwait(false);
-        return false;
-      }, cancellationToken);
-
-      while (await await Task.WhenAny(EndOfStreamAsync(streamReader, cancellationToken), cancellationTask).ConfigureAwait(false))
-      {
-        if (cancellationToken.IsCancellationRequested)
-          yield break;
         
-        var rawData = await streamReader.ReadLineAsync()
-          .ConfigureAwait(false);
-
-        logger?.LogDebug($"Raw data received: {rawData}");
-
-        var record = OnLineRead<T>(rawData);
-
-        if (record != null) yield return record.Value;
-      }
-
-      if (!cancellationToken.IsCancellationRequested)
-        semaphoreSlim.Release();
-    }
-
-    private async Task<string> ReadHeaderAsync<T>(StreamReader streamReader)
-    {
       var rawData = await streamReader.ReadLineAsync()
         .ConfigureAwait(false);
 
-      return OnReadHeader<T>(rawData);
+      logger?.LogDebug($"Raw data received: {rawData}");
+
+      var record = OnLineRead<T>(rawData);
+
+      if (record != null) yield return record.Value;
     }
 
-    protected abstract string OnReadHeader<T>(string rawJson);
+    if (!cancellationToken.IsCancellationRequested)
+      semaphoreSlim.Release();
+  }
 
-    protected abstract RowValue<T> OnLineRead<T>(string rawJson);
+  private async Task<string> ReadHeaderAsync<T>(StreamReader streamReader)
+  {
+    var rawData = await streamReader.ReadLineAsync()
+      .ConfigureAwait(false);
 
-    private JsonSerializerOptions jsonSerializerOptions;
+    return OnReadHeader<T>(rawData);
+  }
 
-    protected JsonSerializerOptions GetOrCreateJsonSerializerOptions()
+  protected abstract string OnReadHeader<T>(string rawJson);
+
+  protected abstract RowValue<T> OnLineRead<T>(string rawJson);
+
+  private JsonSerializerOptions jsonSerializerOptions;
+
+  protected JsonSerializerOptions GetOrCreateJsonSerializerOptions()
+  {
+    if (jsonSerializerOptions == null)
+      jsonSerializerOptions = OnCreateJsonSerializerOptions();
+
+    return jsonSerializerOptions;
+  }
+
+  protected virtual JsonSerializerOptions OnCreateJsonSerializerOptions()
+  {
+    return options.JsonSerializerOptions;
+  }
+
+  protected virtual HttpRequestMessage CreateQueryHttpRequestMessage(HttpClient httpClient, object parameters)
+  {
+    var json = JsonSerializer.Serialize(parameters);
+
+    var data = new StringContent(json, Encoding.UTF8, "application/json");
+
+    httpClient.DefaultRequestHeaders.Accept.Add(
+      new MediaTypeWithQualityHeaderValue(ContentType));
+
+    var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, QueryEndPointName)
     {
-      if (jsonSerializerOptions == null)
-        jsonSerializerOptions = OnCreateJsonSerializerOptions();
+      Content = data
+    };
 
-      return jsonSerializerOptions;
-    }
+    return httpRequestMessage;
+  }
 
-    protected virtual JsonSerializerOptions OnCreateJsonSerializerOptions()
-    {
-      return options.JsonSerializerOptions;
-    }
-
-    protected virtual HttpRequestMessage CreateQueryHttpRequestMessage(HttpClient httpClient, object parameters)
-    {
-      var json = JsonSerializer.Serialize(parameters);
-
-      var data = new StringContent(json, Encoding.UTF8, "application/json");
-
-      httpClient.DefaultRequestHeaders.Accept.Add(
-        new MediaTypeWithQualityHeaderValue(ContentType));
-
-      var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, QueryEndPointName)
-      {
-        Content = data
-      };
-
-      return httpRequestMessage;
-    }
-
-    protected bool IsErrorRow(string rawJson)
-    {
-      return rawJson.StartsWith("{\"@type\":\"statement_error\"") || rawJson.StartsWith("{\"@type\":\"generic_error\"");
-    }
+  protected bool IsErrorRow(string rawJson)
+  {
+    return rawJson.StartsWith("{\"@type\":\"statement_error\"") || rawJson.StartsWith("{\"@type\":\"generic_error\"");
   }
 }

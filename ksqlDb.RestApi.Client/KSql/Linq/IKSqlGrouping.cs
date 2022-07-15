@@ -1,11 +1,10 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Linq
+﻿namespace ksqlDB.RestApi.Client.KSql.Linq;
+
+public interface IKSqlGrouping<out TKey, out TElement> : IAggregations<TElement>
 {
-  public interface IKSqlGrouping<out TKey, out TElement> : IAggregations<TElement>
-  {
-    /// <summary>
-    /// The type of the key of the IKSqlGrouping.
-    /// </summary>
-    TKey Key { get; }
-    TElement Source { get; }
-  }
+  /// <summary>
+  /// The type of the key of the IKSqlGrouping.
+  /// </summary>
+  TKey Key { get; }
+  TElement Source { get; }
 }

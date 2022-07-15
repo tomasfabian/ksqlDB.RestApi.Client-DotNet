@@ -1,25 +1,24 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Streams
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Streams;
+
+public record Stream
 {
-  public record Stream
-  {
-    [JsonPropertyName("type")]
-    public string Type { get; set; }
+  [JsonPropertyName("type")]
+  public string Type { get; set; }
     
-    [JsonPropertyName("name")]
-    public string Name { get; set; }
+  [JsonPropertyName("name")]
+  public string Name { get; set; }
     
-    [JsonPropertyName("topic")]
-    public string Topic { get; set; }
+  [JsonPropertyName("topic")]
+  public string Topic { get; set; }
     
-    [JsonPropertyName("keyFormat")]
-    public string KeyFormat { get; set; }
+  [JsonPropertyName("keyFormat")]
+  public string KeyFormat { get; set; }
     
-    [JsonPropertyName("valueFormat")]
-    public string ValueFormat { get; set; }
+  [JsonPropertyName("valueFormat")]
+  public string ValueFormat { get; set; }
     
-    [JsonPropertyName("isWindowed")]
-    public bool IsWindowed { get; set; }
-  }
+  [JsonPropertyName("isWindowed")]
+  public bool IsWindowed { get; set; }
 }

@@ -6,40 +6,39 @@ using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-namespace ksqlDB.RestApi.Client.KSql.Query.Context
+namespace ksqlDB.RestApi.Client.KSql.Query.Context;
+
+internal sealed class ChangesCache : ConcurrentQueue<KSqlDbStatement>
 {
-  internal sealed class ChangesCache : ConcurrentQueue<KSqlDbStatement>
+  private readonly SemaphoreSlim semaphoreSlim = new(1, 1);
+
+  internal async Task<HttpResponseMessage> SaveChangesAsync(IKSqlDbRestApiClient restApiClient, CancellationToken cancellationToken)
   {
-    private readonly SemaphoreSlim semaphoreSlim = new(1, 1);
+    await semaphoreSlim.WaitAsync(cancellationToken);
 
-    internal async Task<HttpResponseMessage> SaveChangesAsync(IKSqlDbRestApiClient restApiClient, CancellationToken cancellationToken)
+    try
     {
-      await semaphoreSlim.WaitAsync(cancellationToken);
+      return await SaveChangesIntAsync(restApiClient, cancellationToken);
+    }
+    finally
+    {
+      semaphoreSlim.Release();
+    }
+  }
 
-      try
-      {
-        return await SaveChangesIntAsync(restApiClient, cancellationToken);
-      }
-      finally
-      {
-        semaphoreSlim.Release();
-      }
+  internal Task<HttpResponseMessage> SaveChangesIntAsync(IKSqlDbRestApiClient restApiClient, CancellationToken cancellationToken)
+  {
+    var stringBuilder = new StringBuilder();
+
+    while (!IsEmpty)
+    {
+      TryDequeue(out var statement);
+
+      stringBuilder.AppendLine(statement.Sql);
     }
 
-    internal Task<HttpResponseMessage> SaveChangesIntAsync(IKSqlDbRestApiClient restApiClient, CancellationToken cancellationToken)
-    {
-      var stringBuilder = new StringBuilder();
+    var ksqlDbStatement = new KSqlDbStatement(stringBuilder.ToString());
 
-      while (!IsEmpty)
-      {
-        TryDequeue(out var statement);
-
-        stringBuilder.AppendLine(statement.Sql);
-      }
-
-      var ksqlDbStatement = new KSqlDbStatement(stringBuilder.ToString());
-
-      return restApiClient.ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
-    }
+    return restApiClient.ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
   }
 }

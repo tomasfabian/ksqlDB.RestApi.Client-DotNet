@@ -1,11 +1,10 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Query.Windows
+﻿namespace ksqlDB.RestApi.Client.KSql.Query.Windows;
+
+public enum TimeUnits
 {
-  public enum TimeUnits
-  {
-    MILLISECONDS,
-    SECONDS,
-    MINUTES,
-    HOURS,
-    DAYS
-  }
+  MILLISECONDS,
+  SECONDS,
+  MINUTES,
+  HOURS,
+  DAYS
 }

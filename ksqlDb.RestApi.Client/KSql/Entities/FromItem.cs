@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace ksqlDb.RestApi.Client.KSql.Entities
+namespace ksqlDb.RestApi.Client.KSql.Entities;
+
+internal record FromItem
 {
-  internal record FromItem
-  {
-    public Type Type { get; set; }
-    public string Name { get; set; }
-    public string Alias { get; set; }
-  }
+  public Type Type { get; set; }
+  public string Name { get; set; }
+  public string Alias { get; set; }
 }

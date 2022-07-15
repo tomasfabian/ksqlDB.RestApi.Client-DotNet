@@ -1,9 +1,8 @@
 ﻿using System.Net.Http;
 
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Http
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Http;
+
+public interface IHttpClientFactory
 {
-  public interface IHttpClientFactory
-  {
-    HttpClient CreateClient();
-  }
+  HttpClient CreateClient();
 }

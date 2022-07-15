@@ -1,9 +1,8 @@
 ﻿using System.Linq.Expressions;
 
-namespace ksqlDB.RestApi.Client.KSql.Linq.PullQueries
+namespace ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
+
+public interface IPullQueryProvider
 {
-  public interface IPullQueryProvider
-  {
-    IPullable<TResult> CreateQuery<TResult>(Expression expression);
-  }
+  IPullable<TResult> CreateQuery<TResult>(Expression expression);
 }

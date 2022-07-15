@@ -7,86 +7,85 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 
-namespace ksqlDB.RestApi.Client.KSql.Query.Context
+namespace ksqlDB.RestApi.Client.KSql.Query.Context;
+
+public abstract class KSqlDBContextDependenciesProvider : AsyncDisposableObject, IDisposable
 {
-  public abstract class KSqlDBContextDependenciesProvider : AsyncDisposableObject, IDisposable
+  private readonly KSqlDBContextOptions kSqlDbContextOptions;
+  private readonly ILoggerFactory loggerFactory;
+
+  protected KSqlDBContextDependenciesProvider(KSqlDBContextOptions kSqlDbContextOptions, ILoggerFactory loggerFactory = null)
   {
-    private readonly KSqlDBContextOptions kSqlDbContextOptions;
-    private readonly ILoggerFactory loggerFactory;
+    this.kSqlDbContextOptions = kSqlDbContextOptions ?? throw new ArgumentNullException(nameof(kSqlDbContextOptions));
+    this.loggerFactory = loggerFactory;
+  }
 
-    protected KSqlDBContextDependenciesProvider(KSqlDBContextOptions kSqlDbContextOptions, ILoggerFactory loggerFactory = null)
+  protected IServiceCollection ServiceCollection => kSqlDbContextOptions.ServiceCollection;
+
+  protected ServiceProvider ServiceProvider { get; private set; }
+
+  private bool wasConfigured;
+
+  internal IServiceScopeFactory Initialize(KSqlDBContextOptions contextOptions)
+  {
+    if (!wasConfigured)
     {
-      this.kSqlDbContextOptions = kSqlDbContextOptions ?? throw new ArgumentNullException(nameof(kSqlDbContextOptions));
-      this.loggerFactory = loggerFactory;
+      wasConfigured = true;
+
+      RegisterDependencies(contextOptions);
+
+      ServiceProvider = ServiceCollection.BuildServiceProvider(new ServiceProviderOptions {ValidateScopes = true});
     }
 
-    protected IServiceCollection ServiceCollection => kSqlDbContextOptions.ServiceCollection;
+    var serviceScopeFactory = ServiceProvider.GetService<IServiceScopeFactory>();
 
-    protected ServiceProvider ServiceProvider { get; private set; }
+    return serviceScopeFactory;
+  }
 
-    private bool wasConfigured;
+  private void RegisterDependencies(KSqlDBContextOptions contextOptions)
+  {
+    OnConfigureServices(ServiceCollection, contextOptions);
+  }
 
-    internal IServiceScopeFactory Initialize(KSqlDBContextOptions contextOptions)
+  internal void Configure(Action<IServiceCollection> receive)
+  {
+    receive?.Invoke(ServiceCollection);
+  }
+
+  protected ILogger Logger { get; private set; }
+
+  protected virtual void OnConfigureServices(IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
+  {
+    if (loggerFactory != null)
     {
-      if (!wasConfigured)
-      {
-        wasConfigured = true;
+      serviceCollection.TryAddSingleton(_ => loggerFactory);
 
-        RegisterDependencies(contextOptions);
+      Logger = loggerFactory.CreateLogger(LoggingCategory.Name);
 
-        ServiceProvider = ServiceCollection.BuildServiceProvider(new ServiceProviderOptions {ValidateScopes = true});
-      }
-
-      var serviceScopeFactory = ServiceProvider.GetService<IServiceScopeFactory>();
-
-      return serviceScopeFactory;
+      serviceCollection.TryAddSingleton(Logger);
     }
 
-    private void RegisterDependencies(KSqlDBContextOptions contextOptions)
-    {
-      OnConfigureServices(ServiceCollection, contextOptions);
-    }
+    serviceCollection.RegisterKSqlDbContextDependencies(contextOptions);
+  }
 
-    internal void Configure(Action<IServiceCollection> receive)
-    {
-      receive?.Invoke(ServiceCollection);
-    }
+  protected override async ValueTask OnDisposeAsync()
+  {
+    if(ServiceProvider != null)
+      await ServiceProvider.DisposeAsync().ConfigureAwait(false);
+    Dispose(false);
+  }
 
-    protected ILogger Logger { get; private set; }
+  public void Dispose()
+  {
+    Dispose(true);
+    GC.SuppressFinalize(this);
+  }
 
-    protected virtual void OnConfigureServices(IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
-    {
-      if (loggerFactory != null)
-      {
-        serviceCollection.TryAddSingleton(_ => loggerFactory);
+  protected virtual void Dispose(bool disposing)
+  {
+    if (!disposing) return;
 
-        Logger = loggerFactory.CreateLogger(LoggingCategory.Name);
-
-        serviceCollection.TryAddSingleton(Logger);
-      }
-
-      serviceCollection.RegisterKSqlDbContextDependencies(contextOptions);
-    }
-
-    protected override async ValueTask OnDisposeAsync()
-    {
-      if(ServiceProvider != null)
-        await ServiceProvider.DisposeAsync().ConfigureAwait(false);
-      Dispose(false);
-    }
-
-    public void Dispose()
-    {
-      Dispose(true);
-      GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-      if (!disposing) return;
-
-      ServiceProvider?.Dispose();
-      ServiceProvider = null;
-    }
+    ServiceProvider?.Dispose();
+    ServiceProvider = null;
   }
 }

@@ -1,20 +1,19 @@
 ﻿using System.Text;
 
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+
+internal static class QueryParametersExtensions
 {
-  internal static class QueryParametersExtensions
+  public static string ToLogInfo(this IQueryParameters queryParameters)
   {
-    public static string ToLogInfo(this IQueryParameters queryParameters)
-    {
-      var sb = new StringBuilder();
+    var sb = new StringBuilder();
 
-      sb.AppendLine($"Sql: {queryParameters.Sql}");
-      sb.AppendLine("Parameters:");
+    sb.AppendLine($"Sql: {queryParameters.Sql}");
+    sb.AppendLine("Parameters:");
 
-      foreach (var entry in queryParameters.Properties)
-        sb.AppendLine($"{entry.Key} = {entry.Value}");
+    foreach (var entry in queryParameters.Properties)
+      sb.AppendLine($"{entry.Key} = {entry.Value}");
 
-      return sb.ToString();
-    }
+    return sb.ToString();
   }
 }

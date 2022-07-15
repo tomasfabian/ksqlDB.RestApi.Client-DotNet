@@ -1,13 +1,12 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Serialization
+﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
+
+public enum SerializationFormats
 {
-  public enum SerializationFormats
-  {
-    None,
-    Delimited,
-    Json,
-    Json_SR,
-    Avro,
-    Kafka,
-    Protobuf
-  }
+  None,
+  Delimited,
+  Json,
+  Json_SR,
+  Avro,
+  Kafka,
+  Protobuf
 }

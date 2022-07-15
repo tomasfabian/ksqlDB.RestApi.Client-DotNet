@@ -2,52 +2,51 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ksqlDB.RestApi.Client.KSql.Disposables
+namespace ksqlDB.RestApi.Client.KSql.Disposables;
+
+sealed class AsyncLock
 {
-  sealed class AsyncLock
+  private readonly object gate = new();
+  private readonly SemaphoreSlim semaphore = new(1, 1);
+  private readonly AsyncLocal<int> recursionCount = new();
+
+  public ValueTask<Releaser> LockAsync()
   {
-    private readonly object gate = new();
-    private readonly SemaphoreSlim semaphore = new(1, 1);
-    private readonly AsyncLocal<int> recursionCount = new();
+    var shouldAcquire = false;
 
-    public ValueTask<Releaser> LockAsync()
+    lock (gate)
     {
-      var shouldAcquire = false;
-
-      lock (gate)
+      if (recursionCount.Value == 0)
       {
-        if (recursionCount.Value == 0)
-        {
-          shouldAcquire = true;
-          recursionCount.Value = 1;
-        }
-        else
-        {
-          recursionCount.Value++;
-        }
+        shouldAcquire = true;
+        recursionCount.Value = 1;
       }
-
-      return shouldAcquire ? new ValueTask<Releaser>(semaphore.WaitAsync().ContinueWith(_ => new Releaser(this))) : new ValueTask<Releaser>(new Releaser(this));
-    }
-
-    private void Release()
-    {
-      lock (gate)
+      else
       {
-        if (--recursionCount.Value == 0)
-        {
-          semaphore.Release();
-        }
+        recursionCount.Value++;
       }
     }
 
-    public struct Releaser : IDisposable
+    return shouldAcquire ? new ValueTask<Releaser>(semaphore.WaitAsync().ContinueWith(_ => new Releaser(this))) : new ValueTask<Releaser>(new Releaser(this));
+  }
+
+  private void Release()
+  {
+    lock (gate)
     {
-      private readonly AsyncLock parent;
-
-      public Releaser(AsyncLock parent) => this.parent = parent;
-
-      public void Dispose() => parent.Release();
+      if (--recursionCount.Value == 0)
+      {
+        semaphore.Release();
+      }
     }
+  }
+
+  public struct Releaser : IDisposable
+  {
+    private readonly AsyncLock parent;
+
+    public Releaser(AsyncLock parent) => this.parent = parent;
+
+    public void Dispose() => parent.Release();
   }
 }

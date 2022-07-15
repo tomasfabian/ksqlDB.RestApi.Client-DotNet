@@ -3,95 +3,94 @@ using System.Linq.Expressions;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 
-namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
+namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
+
+internal class StringVisitor : KSqlVisitor
 {
-  internal class StringVisitor : KSqlVisitor
+  public StringVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
+    : base(stringBuilder, queryMetadata)
   {
-    public StringVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
-      : base(stringBuilder, queryMetadata)
-    {
-    }
+  }
 
-    protected override Expression VisitMethodCall(MethodCallExpression methodCallExpression)
-    {
-      if (methodCallExpression.Object?.Type != typeof(string)) 
-        return methodCallExpression;
-
-      var methodInfo = methodCallExpression.Method;
-
-      switch (methodInfo.Name)
-      {
-        case nameof(string.ToUpper):
-          Append("UCASE(");
-          Visit(methodCallExpression.Object);
-          Append(")");
-          break;
-        case nameof(string.ToLower):
-          Append("LCASE(");
-          Visit(methodCallExpression.Object);
-          Append(")");
-          break;
-        case nameof(string.StartsWith):
-        case nameof(string.Contains):
-        case nameof(string.EndsWith):
-          VisitLike(methodCallExpression, methodInfo.Name);
-          break;
-      }
-
+  protected override Expression VisitMethodCall(MethodCallExpression methodCallExpression)
+  {
+    if (methodCallExpression.Object?.Type != typeof(string)) 
       return methodCallExpression;
-    }
 
-    #region Like
+    var methodInfo = methodCallExpression.Method;
 
-    private void AppendLike(MethodCallExpression methodCallExpression)
+    switch (methodInfo.Name)
     {
-      Visit(methodCallExpression.Object);
-
-      Append(" LIKE ");
+      case nameof(string.ToUpper):
+        Append("UCASE(");
+        Visit(methodCallExpression.Object);
+        Append(")");
+        break;
+      case nameof(string.ToLower):
+        Append("LCASE(");
+        Visit(methodCallExpression.Object);
+        Append(")");
+        break;
+      case nameof(string.StartsWith):
+      case nameof(string.Contains):
+      case nameof(string.EndsWith):
+        VisitLike(methodCallExpression, methodInfo.Name);
+        break;
     }
 
-    private string likeMethodName;
+    return methodCallExpression;
+  }
 
-    private void VisitLike(MethodCallExpression methodCallExpression, string methodName)
+  #region Like
+
+  private void AppendLike(MethodCallExpression methodCallExpression)
+  {
+    Visit(methodCallExpression.Object);
+
+    Append(" LIKE ");
+  }
+
+  private string likeMethodName;
+
+  private void VisitLike(MethodCallExpression methodCallExpression, string methodName)
+  {
+    likeMethodName = methodName;
+
+    AppendLike(methodCallExpression);
+
+    Visit(methodCallExpression.Arguments[0]);
+
+    likeMethodName = null;
+  }
+
+  #endregion
+
+  protected override Expression VisitParameter(ParameterExpression node)
+  {
+    Append(node.Name);
+
+    return base.VisitParameter(node);
+  }
+
+  protected override Expression VisitConstant(ConstantExpression constantExpression)
+  {
+    if (likeMethodName.IsNotNullOrEmpty() && constantExpression.Value is string value)
     {
-      likeMethodName = methodName;
+      Append("'");
 
-      AppendLike(methodCallExpression);
+      if (likeMethodName.IsOneOfFollowing(nameof(String.EndsWith), nameof(String.Contains)))
+        Append("%");
 
-      Visit(methodCallExpression.Arguments[0]);
+      Append(value);
 
-      likeMethodName = null;
+      if (likeMethodName.IsOneOfFollowing(nameof(String.StartsWith), nameof(String.Contains)))
+        Append("%");
+
+      Append("'");
+
+      return constantExpression;
     }
 
-    #endregion
-
-    protected override Expression VisitParameter(ParameterExpression node)
-    {
-      Append(node.Name);
-
-      return base.VisitParameter(node);
-    }
-
-    protected override Expression VisitConstant(ConstantExpression constantExpression)
-    {
-      if (likeMethodName.IsNotNullOrEmpty() && constantExpression.Value is string value)
-      {
-        Append("'");
-
-        if (likeMethodName.IsOneOfFollowing(nameof(String.EndsWith), nameof(String.Contains)))
-          Append("%");
-
-        Append(value);
-
-        if (likeMethodName.IsOneOfFollowing(nameof(String.StartsWith), nameof(String.Contains)))
-          Append("%");
-
-        Append("'");
-
-        return constantExpression;
-      }
-
-      return base.VisitConstant(constantExpression);
-    }
+    return base.VisitConstant(constantExpression);
   }
 }

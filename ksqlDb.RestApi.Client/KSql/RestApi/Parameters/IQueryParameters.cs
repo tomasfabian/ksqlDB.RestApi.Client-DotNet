@@ -1,9 +1,8 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters
+﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+
+public interface IQueryParameters : IQueryOptions
 {
-  public interface IQueryParameters : IQueryOptions
-  {
-    string Sql { get; set; }
+  string Sql { get; set; }
     
-    string this[string key] { get; set; }
-  }
+  string this[string key] { get; set; }
 }

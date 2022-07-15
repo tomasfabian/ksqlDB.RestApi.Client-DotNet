@@ -1,11 +1,10 @@
 ﻿using ksqlDB.RestApi.Client.KSql.Query.Options;
 
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters
-{
-  public interface IKSqlDbParameters : IQueryParameters
-  {
-    AutoOffsetReset AutoOffsetReset { get; set; }
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
-    IKSqlDbParameters Clone();
-  }
+public interface IKSqlDbParameters : IQueryParameters
+{
+  AutoOffsetReset AutoOffsetReset { get; set; }
+
+  IKSqlDbParameters Clone();
 }

@@ -1,11 +1,10 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Query.Functions
-{
-  public class KSqlFunctions
-  {
-    internal KSqlFunctions()
-    {
-    }
+﻿namespace ksqlDB.RestApi.Client.KSql.Query.Functions;
 
-    public static readonly KSqlFunctions Instance = new();
+public class KSqlFunctions
+{
+  internal KSqlFunctions()
+  {
   }
+
+  public static readonly KSqlFunctions Instance = new();
 }

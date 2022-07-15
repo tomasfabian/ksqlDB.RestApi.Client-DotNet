@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+
+public interface IQueryOptions
 {
-  public interface IQueryOptions
-  {
-    Dictionary<string, string> Properties { get; }
-  }
+  Dictionary<string, string> Properties { get; }
 }

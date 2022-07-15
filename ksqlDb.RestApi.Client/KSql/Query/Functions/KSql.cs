@@ -1,9 +1,8 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Query.Functions
-{
-  public static class KSql
-  {
-    public static KSqlFunctions Functions => F;
+﻿namespace ksqlDB.RestApi.Client.KSql.Query.Functions;
 
-    public static KSqlFunctions F => KSqlFunctions.Instance;
-  }
+public static class KSql
+{
+  public static KSqlFunctions Functions => F;
+
+  public static KSqlFunctions F => KSqlFunctions.Instance;
 }

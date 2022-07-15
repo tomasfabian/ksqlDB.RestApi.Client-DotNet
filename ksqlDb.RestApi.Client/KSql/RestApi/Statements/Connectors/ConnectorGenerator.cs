@@ -3,36 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Connectors
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Connectors;
+
+internal static class ConnectorGenerator
 {
-  internal static class ConnectorGenerator
+  public static string ToCreateConnectorStatement(this IDictionary<string, string> config, string connectorName, bool ifNotExists = false, ConnectorType connectorType = ConnectorType.Source)
   {
-    public static string ToCreateConnectorStatement(this IDictionary<string, string> config, string connectorName, bool ifNotExists = false, ConnectorType connectorType = ConnectorType.Source)
+    var stringBuilder = new StringBuilder();
+
+    string connectorTypeClause = connectorType switch
     {
-      var stringBuilder = new StringBuilder();
+      ConnectorType.Source => "SOURCE",
+      ConnectorType.Sink => "SINK",
+      _ => throw new ArgumentOutOfRangeException()
+    };
 
-      string connectorTypeClause = connectorType switch
-      {
-        ConnectorType.Source => "SOURCE",
-        ConnectorType.Sink => "SINK",
-        _ => throw new ArgumentOutOfRangeException()
-      };
+    string existsCondition = ifNotExists ? "IF NOT EXISTS " : string.Empty;
 
-      string existsCondition = ifNotExists ? "IF NOT EXISTS " : string.Empty;
+    string createConnector = $"CREATE {connectorTypeClause} CONNECTOR {existsCondition}`{connectorName}` WITH ({Environment.NewLine}";
 
-      string createConnector = $"CREATE {connectorTypeClause} CONNECTOR {existsCondition}`{connectorName}` WITH ({Environment.NewLine}";
+    stringBuilder.Append(createConnector);
 
-      stringBuilder.Append(createConnector);
+    var keyValuePairs = config.Select(c => $"\t'{c.Key}'= '{c.Value}'");
 
-      var keyValuePairs = config.Select(c => $"\t'{c.Key}'= '{c.Value}'");
+    var properties = string.Join($", {Environment.NewLine}", keyValuePairs);
 
-      var properties = string.Join($", {Environment.NewLine}", keyValuePairs);
+    stringBuilder.AppendLine(properties);
 
-      stringBuilder.AppendLine(properties);
+    stringBuilder.AppendLine(");");
 
-      stringBuilder.AppendLine(");");
-
-      return stringBuilder.ToString();
-    }
+    return stringBuilder.ToString();
   }
 }

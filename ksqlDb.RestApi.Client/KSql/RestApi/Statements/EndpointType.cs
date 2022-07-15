@@ -1,10 +1,9 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
+﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+
+public enum EndpointType
 {
-  public enum EndpointType
-  {
-    Query,
-    QueryStream,
-    KSql,
-    CloseQuery
-  }
+  Query,
+  QueryStream,
+  KSql,
+  CloseQuery
 }

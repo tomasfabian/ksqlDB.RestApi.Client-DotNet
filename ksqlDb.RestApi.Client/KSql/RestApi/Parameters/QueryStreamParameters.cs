@@ -2,55 +2,54 @@
 using System.Text.Json.Serialization;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+
+public sealed class QueryStreamParameters : IKSqlDbParameters
 {
-  public sealed class QueryStreamParameters : IKSqlDbParameters
+  [JsonPropertyName("sql")]
+  public string Sql { get; set; }
+
+  [JsonPropertyName("properties")]
+  public Dictionary<string, string> Properties { get; } = new();
+    
+  public static readonly string AutoOffsetResetPropertyName = "auto.offset.reset";
+
+  public string this[string key]
   {
-    [JsonPropertyName("sql")]
-    public string Sql { get; set; }
+    get => Properties[key];
+    set => Properties[key] = value;
+  }
 
-    [JsonPropertyName("properties")]
-    public Dictionary<string, string> Properties { get; } = new();
-    
-    public static readonly string AutoOffsetResetPropertyName = "auto.offset.reset";
-
-    public string this[string key]
+  [JsonIgnore]
+  public AutoOffsetReset AutoOffsetReset
+  {
+    get
     {
-      get => Properties[key];
-      set => Properties[key] = value;
-    }
-
-    [JsonIgnore]
-    public AutoOffsetReset AutoOffsetReset
-    {
-      get
-      {
-        var value = this[AutoOffsetResetPropertyName];
+      var value = this[AutoOffsetResetPropertyName];
         
-        return value.ToAutoOffsetReset();
-      }
-
-      set => this[AutoOffsetResetPropertyName] = value.ToKSqlValue();
+      return value.ToAutoOffsetReset();
     }
 
-    internal QueryType QueryType { get; } = QueryType.QueryStream;
+    set => this[AutoOffsetResetPropertyName] = value.ToKSqlValue();
+  }
+
+  internal QueryType QueryType { get; } = QueryType.QueryStream;
     
-    public IKSqlDbParameters Clone()
+  public IKSqlDbParameters Clone()
+  {
+    var queryParams = new QueryStreamParameters
     {
-      var queryParams = new QueryStreamParameters
-      {
-        Sql = Sql
-      };
+      Sql = Sql
+    };
 
-      foreach (var entry in Properties)
-        queryParams.Properties.Add(entry.Key, entry.Value);
+    foreach (var entry in Properties)
+      queryParams.Properties.Add(entry.Key, entry.Value);
 
-      return queryParams;
-    }
+    return queryParams;
+  }
 
-    public override string ToString()
-    {
-      return this.ToLogInfo();
-    }
+  public override string ToString()
+  {
+    return this.ToLogInfo();
   }
 }

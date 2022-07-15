@@ -1,8 +1,7 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Query.Functions
+﻿namespace ksqlDB.RestApi.Client.KSql.Query.Functions;
+
+public struct Entry<TValue>
 {
-  public struct Entry<TValue>
-  {
-    public string K { get; set; }
-    public TValue V { get; set; }
-  }
+  public string K { get; set; }
+  public TValue V { get; set; }
 }

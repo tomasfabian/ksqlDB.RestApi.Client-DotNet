@@ -5,137 +5,136 @@ using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ksqlDb.RestApi.Client.DependencyInjection
+namespace ksqlDb.RestApi.Client.DependencyInjection;
+
+public static class KSqlDbServiceCollectionExtensions
 {
-  public static class KSqlDbServiceCollectionExtensions
+  /// <summary>
+  /// Registers the given ksqldb context factory as a service in the <see cref="IServiceCollection" />.
+  /// </summary>
+  /// <typeparam name="TContext">The type of context factory to be registered.</typeparam>
+  /// <param name="services">The IServiceCollection to add services to.</param>
+  /// <param name="factoryLifetime">The lifetime with which to register the ksqldb context factory service in the container.</param>
+  /// <returns>The original IServiceCollection.</returns>
+  public static IServiceCollection AddDbContextFactory<TContext>(this IServiceCollection services, ServiceLifetime factoryLifetime)
+    where TContext : IKSqlDBContext
   {
-    /// <summary>
-    /// Registers the given ksqldb context factory as a service in the <see cref="IServiceCollection" />.
-    /// </summary>
-    /// <typeparam name="TContext">The type of context factory to be registered.</typeparam>
-    /// <param name="services">The IServiceCollection to add services to.</param>
-    /// <param name="factoryLifetime">The lifetime with which to register the ksqldb context factory service in the container.</param>
-    /// <returns>The original IServiceCollection.</returns>
-    public static IServiceCollection AddDbContextFactory<TContext>(this IServiceCollection services, ServiceLifetime factoryLifetime)
-      where TContext : IKSqlDBContext
-    {
-      var contextFactoryDescriptor = new ServiceDescriptor(
-        typeof(IKSqlDBContextFactory<TContext>),
-        typeof(KSqlDBContextFactory<TContext>),
-        factoryLifetime);
+    var contextFactoryDescriptor = new ServiceDescriptor(
+      typeof(IKSqlDBContextFactory<TContext>),
+      typeof(KSqlDBContextFactory<TContext>),
+      factoryLifetime);
       
-      services.Add(contextFactoryDescriptor);
+    services.Add(contextFactoryDescriptor);
 
-      return services;
-    }
+    return services;
+  }
 
-    /// <summary>
-    /// Registers the given ksqldb context as a service in the <see cref="IServiceCollection" />.
-    /// </summary>
-    /// <typeparam name="TContext">The type of context to be registered.</typeparam>
-    /// <param name="services">The IServiceCollection to add services to.</param>
-    /// <param name="optionsAction">Action to configure the KSqlDbContextOptions for the context.</param>
-    /// <param name="contextLifetime">The lifetime with which to register the TContext service in the container.</param>
-    /// <returns>The original IServiceCollection.</returns>
-    public static IServiceCollection AddDbContext<TContext>(this IServiceCollection services,
-      Action<KSqlDbContextOptionsBuilder> optionsAction, ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
-      where TContext : IKSqlDBContext
-    {
-      if (optionsAction == null) throw new ArgumentNullException(nameof(optionsAction));
+  /// <summary>
+  /// Registers the given ksqldb context as a service in the <see cref="IServiceCollection" />.
+  /// </summary>
+  /// <typeparam name="TContext">The type of context to be registered.</typeparam>
+  /// <param name="services">The IServiceCollection to add services to.</param>
+  /// <param name="optionsAction">Action to configure the KSqlDbContextOptions for the context.</param>
+  /// <param name="contextLifetime">The lifetime with which to register the TContext service in the container.</param>
+  /// <returns>The original IServiceCollection.</returns>
+  public static IServiceCollection AddDbContext<TContext>(this IServiceCollection services,
+    Action<KSqlDbContextOptionsBuilder> optionsAction, ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
+    where TContext : IKSqlDBContext
+  {
+    if (optionsAction == null) throw new ArgumentNullException(nameof(optionsAction));
 
-      return services.AddDbContext<TContext, TContext>(optionsAction, contextLifetime);
-    }
+    return services.AddDbContext<TContext, TContext>(optionsAction, contextLifetime);
+  }
 
-    /// <summary>
-    /// Registers the given ksqldb context as a service in the <see cref="IServiceCollection" />.
-    /// </summary>
-    /// <typeparam name="TContextService">The type of context to be registered as.</typeparam>
-    /// <typeparam name="TContextImplementation">The implementation type of the context to be registered.</typeparam>
-    /// <param name="services">The IServiceCollection to add services to.</param>
-    /// <param name="optionsAction">Action to configure the KSqlDbContextOptions for the context.</param>
-    /// <param name="contextLifetime">The lifetime with which to register the TContext service in the container.</param>
-    /// <returns>The original IServiceCollection.</returns>
-    public static IServiceCollection AddDbContext<TContextService, TContextImplementation>(this IServiceCollection services, Action<KSqlDbContextOptionsBuilder> optionsAction, ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
-      where TContextService : IKSqlDBContext
-      where TContextImplementation : IKSqlDBContext
-    {
-      if (optionsAction == null) throw new ArgumentNullException(nameof(optionsAction));
+  /// <summary>
+  /// Registers the given ksqldb context as a service in the <see cref="IServiceCollection" />.
+  /// </summary>
+  /// <typeparam name="TContextService">The type of context to be registered as.</typeparam>
+  /// <typeparam name="TContextImplementation">The implementation type of the context to be registered.</typeparam>
+  /// <param name="services">The IServiceCollection to add services to.</param>
+  /// <param name="optionsAction">Action to configure the KSqlDbContextOptions for the context.</param>
+  /// <param name="contextLifetime">The lifetime with which to register the TContext service in the container.</param>
+  /// <returns>The original IServiceCollection.</returns>
+  public static IServiceCollection AddDbContext<TContextService, TContextImplementation>(this IServiceCollection services, Action<KSqlDbContextOptionsBuilder> optionsAction, ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
+    where TContextService : IKSqlDBContext
+    where TContextImplementation : IKSqlDBContext
+  {
+    if (optionsAction == null) throw new ArgumentNullException(nameof(optionsAction));
 
-      var builder = new KSqlDbContextOptionsBuilder();
+    var builder = new KSqlDbContextOptionsBuilder();
 
-      optionsAction(builder);
+    optionsAction(builder);
 
-      services.ConfigureKSqlDb<TContextService, TContextImplementation>(builder, contextLifetime);
+    services.ConfigureKSqlDb<TContextService, TContextImplementation>(builder, contextLifetime);
 
-      return services;
-    }
+    return services;
+  }
 
-    internal static IServiceCollection ConfigureKSqlDb<TContextService, TContextImplementation>(this IServiceCollection services,
-      KSqlDbContextOptionsBuilder builder,
-      ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
-      where TContextService : IKSqlDBContext
-      where TContextImplementation : IKSqlDBContext
-    {
-      var contextOptions = builder.InternalOptions;
+  internal static IServiceCollection ConfigureKSqlDb<TContextService, TContextImplementation>(this IServiceCollection services,
+    KSqlDbContextOptionsBuilder builder,
+    ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
+    where TContextService : IKSqlDBContext
+    where TContextImplementation : IKSqlDBContext
+  {
+    var contextOptions = builder.InternalOptions;
 
-      contextOptions.ServiceCollection.AddSingleton(contextOptions);
+    contextOptions.ServiceCollection.AddSingleton(contextOptions);
 
-      var contextDescriptor = new ServiceDescriptor(
-        typeof(TContextService),
-        typeof(TContextImplementation),
-        contextLifetime);
+    var contextDescriptor = new ServiceDescriptor(
+      typeof(TContextService),
+      typeof(TContextImplementation),
+      contextLifetime);
 
-      contextOptions.ServiceCollection.Add(contextDescriptor);
+    contextOptions.ServiceCollection.Add(contextDescriptor);
 
-      contextOptions.ServiceCollection.ConfigureHttpClients(contextOptions);
+    contextOptions.ServiceCollection.ConfigureHttpClients(contextOptions);
 
-      contextOptions.ServiceCollection.AddScoped<IKSqlDbRestApiClient, KSqlDbRestApiClient>();
+    contextOptions.ServiceCollection.AddScoped<IKSqlDbRestApiClient, KSqlDbRestApiClient>();
 
-      contextOptions.Apply(services);
+    contextOptions.Apply(services);
 
-      return services;
-    }
+    return services;
+  }
 
-    /// <summary>
-    /// Registers IKSqlDBContext and its dependencies as services in the <see cref="IServiceCollection" />.
-    /// </summary>
-    /// <param name="services">The IServiceCollection to add services to.</param>
-    /// <param name="ksqlDbUrl">ksqlDb connection.</param>
-    /// <param name="setupAction">Action to configure the KSqlDbContextOptions for the context.</param>
-    /// <param name="contextLifetime">The lifetime with which to register the context service in the container.</param>
-    /// <returns>The original IServiceCollection.</returns>
-    public static IServiceCollection ConfigureKSqlDb(this IServiceCollection services,
-      string ksqlDbUrl,
-      Action<ISetupParameters> setupAction = null,
-      ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
-    {
-      return services.ConfigureKSqlDb<IKSqlDBContext, KSqlDBContext>(ksqlDbUrl, setupAction, contextLifetime);
-    }
+  /// <summary>
+  /// Registers IKSqlDBContext and its dependencies as services in the <see cref="IServiceCollection" />.
+  /// </summary>
+  /// <param name="services">The IServiceCollection to add services to.</param>
+  /// <param name="ksqlDbUrl">ksqlDb connection.</param>
+  /// <param name="setupAction">Action to configure the KSqlDbContextOptions for the context.</param>
+  /// <param name="contextLifetime">The lifetime with which to register the context service in the container.</param>
+  /// <returns>The original IServiceCollection.</returns>
+  public static IServiceCollection ConfigureKSqlDb(this IServiceCollection services,
+    string ksqlDbUrl,
+    Action<ISetupParameters> setupAction = null,
+    ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
+  {
+    return services.ConfigureKSqlDb<IKSqlDBContext, KSqlDBContext>(ksqlDbUrl, setupAction, contextLifetime);
+  }
 
-    /// <summary>
-    /// Registers the given ksqldb context and its dependencies as services in the <see cref="IServiceCollection" />.
-    /// </summary>
-    /// <typeparam name="TContextService">The type of context to be registered as.</typeparam>
-    /// <typeparam name="TContextImplementation">The implementation type of the context to be registered.</typeparam>
-    /// <param name="services">The IServiceCollection to add services to.</param>
-    /// <param name="ksqlDbUrl">ksqlDb connection.</param>
-    /// <param name="setupAction">Optional action to configure the KSqlDbContextOptions for the context.</param>
-    /// <param name="contextLifetime">The lifetime with which to register the context service in the container.</param>
-    /// <returns>The original IServiceCollection.</returns>
-    public static IServiceCollection ConfigureKSqlDb<TContextService, TContextImplementation>(this IServiceCollection services, 
-      string ksqlDbUrl,
-      Action<ISetupParameters> setupAction = null,
-      ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
-      where TContextService : IKSqlDBContext
-      where TContextImplementation : IKSqlDBContext
-    {
-      var builder = new KSqlDbContextOptionsBuilder();
+  /// <summary>
+  /// Registers the given ksqldb context and its dependencies as services in the <see cref="IServiceCollection" />.
+  /// </summary>
+  /// <typeparam name="TContextService">The type of context to be registered as.</typeparam>
+  /// <typeparam name="TContextImplementation">The implementation type of the context to be registered.</typeparam>
+  /// <param name="services">The IServiceCollection to add services to.</param>
+  /// <param name="ksqlDbUrl">ksqlDb connection.</param>
+  /// <param name="setupAction">Optional action to configure the KSqlDbContextOptions for the context.</param>
+  /// <param name="contextLifetime">The lifetime with which to register the context service in the container.</param>
+  /// <returns>The original IServiceCollection.</returns>
+  public static IServiceCollection ConfigureKSqlDb<TContextService, TContextImplementation>(this IServiceCollection services, 
+    string ksqlDbUrl,
+    Action<ISetupParameters> setupAction = null,
+    ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
+    where TContextService : IKSqlDBContext
+    where TContextImplementation : IKSqlDBContext
+  {
+    var builder = new KSqlDbContextOptionsBuilder();
 
-      var setupParameters = builder.UseKSqlDb(ksqlDbUrl);
+    var setupParameters = builder.UseKSqlDb(ksqlDbUrl);
 
-      setupAction?.Invoke(setupParameters);
+    setupAction?.Invoke(setupParameters);
 
-      return services.ConfigureKSqlDb<TContextService, TContextImplementation>(builder, contextLifetime);
-    }
+    return services.ConfigureKSqlDb<TContextService, TContextImplementation>(builder, contextLifetime);
   }
 }

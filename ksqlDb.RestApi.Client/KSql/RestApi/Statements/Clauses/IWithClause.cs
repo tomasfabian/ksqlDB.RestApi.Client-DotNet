@@ -1,7 +1,6 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Clauses
+﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Clauses;
+
+public interface IWithClause
 {
-  public interface IWithClause
-  {
-    IAsClause With(CreationMetadata creationMetadata);
-  }
+  IAsClause With(CreationMetadata creationMetadata);
 }

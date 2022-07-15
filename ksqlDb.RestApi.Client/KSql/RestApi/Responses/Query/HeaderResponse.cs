@@ -1,10 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query;
+
+internal class HeaderResponse
 {
-  internal class HeaderResponse
-  {
-    [JsonPropertyName("header")]
-    public Header Header { get; set; }
-  }
+  [JsonPropertyName("header")]
+  public Header Header { get; set; }
 }
