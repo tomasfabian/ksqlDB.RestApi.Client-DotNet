@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Blazor.Sample.Data.Sensors
+namespace Blazor.Sample.Data.Sensors;
+
+public record IoTSensor
 {
-  public record IoTSensor
-  {
-    [Key]
-    public string SensorId { get; set; }
-    public int Value { get; set; }
-  }
+  [Key]
+  public string SensorId { get; set; }
+  public int Value { get; set; }
 }

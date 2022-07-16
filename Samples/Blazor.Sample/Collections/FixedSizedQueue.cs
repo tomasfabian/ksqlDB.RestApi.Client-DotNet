@@ -5,31 +5,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Blazor.Sample.Collections
+namespace Blazor.Sample.Collections;
+
+public class FixedSizedQueue<T> : IEnumerable<T>
 {
-  public class FixedSizedQueue<T> : IEnumerable<T>
+  readonly ConcurrentQueue<T> queue = new();
+
+  public int Limit { get; set; } = 5;
+
+  public void Enqueue(T obj)
   {
-    readonly ConcurrentQueue<T> queue = new();
+    queue.Enqueue(obj);
 
-    public int Limit { get; set; } = 5;
-
-    public void Enqueue(T obj)
+    while (queue.Count > Limit && queue.TryDequeue(out _))
     {
-      queue.Enqueue(obj);
-
-      while (queue.Count > Limit && queue.TryDequeue(out _))
-      {
-      }
     }
+  }
 
-    public IEnumerator<T> GetEnumerator()
-    {
-      return queue.GetEnumerator();
-    }
+  public IEnumerator<T> GetEnumerator()
+  {
+    return queue.GetEnumerator();
+  }
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-      return ((IEnumerable)queue).GetEnumerator();
-    }
+  IEnumerator IEnumerable.GetEnumerator()
+  {
+    return ((IEnumerable)queue).GetEnumerator();
   }
 }

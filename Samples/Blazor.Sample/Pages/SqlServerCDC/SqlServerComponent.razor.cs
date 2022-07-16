@@ -19,135 +19,134 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using SqlServer.Connector.Cdc;
 using SqlServer.Connector.Cdc.Connectors;
 using SqlServer.Connector.Connect;
 using AutoOffsetReset = ksqlDB.RestApi.Client.KSql.Query.Options.AutoOffsetReset;
 
-namespace Blazor.Sample.Pages.SqlServerCDC
+namespace Blazor.Sample.Pages.SqlServerCDC;
+
+public partial class SqlServerComponent : IDisposable
 {
-  public partial class SqlServerComponent : IDisposable
+  [Inject] private IDbContextFactory<ApplicationDbContext> DbContextFactory { get; init; }
+
+  [Inject] private IConfiguration Configuration { get; init; }
+
+  [Inject] private ISqlServerCdcClient CdcProvider { get; init; }
+
+  [Inject] private IKsqlDbConnect KsqlDbConnect { get; init; }
+
+  private int TotalCount => sensors.Count;
+
+  private bool IsLoading { get; set; }
+
+  protected override async Task OnInitializedAsync()
   {
-    [Inject] private IDbContextFactory<ApplicationDbContext> DbContextFactory { get; init; }
+    SetNewModel();
 
-    [Inject] private IConfiguration Configuration { get; init; }
+    await LoadDataFromDbAsync();
 
-    [Inject] private ISqlServerCdcClient CdcProvider { get; init; }
+    const string tableName = "Sensors";
 
-    [Inject] private IKsqlDbConnect KsqlDbConnect { get; init; }
+    //!!! disclaimer - these steps shouldn't be part of a component initialization. It is intended only for demonstration purposes, to see the relevant parts together.
+    await CreateSensorsCdcStreamAsync();
 
-    private int TotalCount => sensors.Count;
+    await EnableCdcAsync(tableName);
 
-    private bool IsLoading { get; set; }
+    await CreateConnectorAsync(tableName);
+    //!!! disclaimer
 
-    protected override async Task OnInitializedAsync()
+    var connectorsResponse = await KsqlDbConnect.GetConnectorsAsync();
+    var connectors = await connectorsResponse.ToConnectorsResponseAsync();
+
+    var synchronizationContext = SynchronizationContext.Current;
+
+    if (useKsqlDbTypes)
+      await SubscribeToQuery(synchronizationContext);
+    else
+      await SubscribeToRawQuery(synchronizationContext);
+
+    await base.OnInitializedAsync();
+  }
+
+  private async Task LoadDataFromDbAsync()
+  {
+    IsLoading = true;
+
+    try
     {
-      SetNewModel();
+      var dbContext = DbContextFactory.CreateDbContext();
 
-      await LoadDataFromDbAsync();
-
-      const string tableName = "Sensors";
-
-      //!!! disclaimer - these steps shouldn't be part of a component initialization. It is intended only for demonstration purposes, to see the relevant parts together.
-      await CreateSensorsCdcStreamAsync();
-
-      await EnableCdcAsync(tableName);
-
-      await CreateConnectorAsync(tableName);
-      //!!! disclaimer
-
-      var connectorsResponse = await KsqlDbConnect.GetConnectorsAsync();
-      var connectors = await connectorsResponse.ToConnectorsResponseAsync();
-
-      var synchronizationContext = SynchronizationContext.Current;
-
-      if (useKsqlDbTypes)
-        await SubscribeToQuery(synchronizationContext);
-      else
-        await SubscribeToRawQuery(synchronizationContext);
-
-      await base.OnInitializedAsync();
+      sensors = await EntityFrameworkQueryableExtensions.ToListAsync(dbContext.Sensors);
     }
-
-    private async Task LoadDataFromDbAsync()
+    catch (Exception e)
     {
-      IsLoading = true;
-
-      try
-      {
-        var dbContext = DbContextFactory.CreateDbContext();
-
-        sensors = await EntityFrameworkQueryableExtensions.ToListAsync(dbContext.Sensors);
-      }
-      catch (Exception e)
-      {
-        Console.WriteLine(e);
-      }
-      finally
-      {
-        IsLoading = false;
-      }
+      Console.WriteLine(e);
     }
-
-    private async Task EnableCdcAsync(string tableName)
+    finally
     {
-      try
-      {
-        await CdcProvider.CdcEnableDbAsync();
-
-        if (!await CdcProvider.IsCdcTableEnabledAsync(tableName))
-          await CdcProvider.CdcEnableTableAsync(tableName);
-      }
-      catch (Exception e)
-      {
-        Console.WriteLine(e);
-      }
+      IsLoading = false;
     }
+  }
 
-    private bool useKsqlDbTypes = true;
-
-    private async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationToken = default)
+  private async Task EnableCdcAsync(string tableName)
+  {
+    try
     {
-      string fromName = "sqlserversensors";
-      string kafkaTopic = "sqlserver2019.dbo.Sensors";
+      await CdcProvider.CdcEnableDbAsync();
 
-      var ksqlDbUrl = Configuration[ConfigKeys.KSqlDb_Url];
+      if (!await CdcProvider.IsCdcTableEnabledAsync(tableName))
+        await CdcProvider.CdcEnableTableAsync(tableName);
+    }
+    catch (Exception e)
+    {
+      Console.WriteLine(e);
+    }
+  }
 
-      var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+  private bool useKsqlDbTypes = true;
 
-      var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+  private async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationToken = default)
+  {
+    string fromName = "sqlserversensors";
+    string kafkaTopic = "sqlserver2019.dbo.Sensors";
 
-      EntityCreationMetadata metadata = new()
-      {
-        EntityName = fromName,
-        KafkaTopic = kafkaTopic,
-        ValueFormat = SerializationFormats.Json,
-        Partitions = 1,
-        Replicas = 1
-      };
+    var ksqlDbUrl = Configuration[ConfigKeys.KSqlDb_Url];
 
-      if (useKsqlDbTypes)
-      {
-        var createTypeResponse = await restApiClient.CreateTypeAsync<IoTSensor>(cancellationToken);
-        createTypeResponse = await restApiClient.CreateTypeAsync<IoTSensorChange>(cancellationToken);
+    var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
+    var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+    EntityCreationMetadata metadata = new()
+    {
+      EntityName = fromName,
+      KafkaTopic = kafkaTopic,
+      ValueFormat = SerializationFormats.Json,
+      Partitions = 1,
+      Replicas = 1
+    };
+
+    if (useKsqlDbTypes)
+    {
+      var createTypeResponse = await restApiClient.CreateTypeAsync<IoTSensor>(cancellationToken);
+      createTypeResponse = await restApiClient.CreateTypeAsync<IoTSensorChange>(cancellationToken);
         
-        var httpResponseMessage = await restApiClient.CreateStreamAsync<IoTSensorChange>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
-          .ConfigureAwait(false);
-      }
-      else
-      {
-        var httpResponseMessage = await restApiClient.CreateStreamAsync<RawDatabaseChangeObject>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
-          .ConfigureAwait(false);
-      }
+      var httpResponseMessage = await restApiClient.CreateStreamAsync<IoTSensorChange>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
+        .ConfigureAwait(false);
     }
-
-    /// <summary>
-    /// Create stream from string statement example
-    /// </summary>
-    private async Task CreateSensorsChangeDataCaptureStreamAsync()
+    else
     {
-      var createSensorsCDCStream = @"
+      var httpResponseMessage = await restApiClient.CreateStreamAsync<RawDatabaseChangeObject>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
+        .ConfigureAwait(false);
+    }
+  }
+
+  /// <summary>
+  /// Create stream from string statement example
+  /// </summary>
+  private async Task CreateSensorsChangeDataCaptureStreamAsync()
+  {
+    var createSensorsCDCStream = @"
 CREATE STREAM IF NOT EXISTS sqlserversensors (
     op string, before string, after string, source string
   ) WITH (
@@ -155,41 +154,41 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
     value_format = 'JSON'
 );";
 
-      var ksqlDbStatement = new KSqlDbStatement(createSensorsCDCStream);
+    var ksqlDbStatement = new KSqlDbStatement(createSensorsCDCStream);
 
-      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement);
-    }
+    var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement);
+  }
 
-    /// <summary>
-    /// Create connector from metadata example
-    /// </summary>
-    private async Task CreateConnectorAsync(string tableName, string schemaName = "dbo")
-    {
-      string bootstrapServers = Configuration[ConfigKeys.Kafka_BootstrapServers];
-      var connectionString = Configuration.GetConnectionString("DefaultConnection");
+  /// <summary>
+  /// Create connector from metadata example
+  /// </summary>
+  private async Task CreateConnectorAsync(string tableName, string schemaName = "dbo")
+  {
+    string bootstrapServers = Configuration[ConfigKeys.Kafka_BootstrapServers];
+    var connectionString = Configuration.GetConnectionString("DefaultConnection");
 
-      var connectorMetadata = new SqlServerConnectorMetadata(connectionString)
-        .SetTableIncludeListPropertyName($"{schemaName}.{tableName}")
-        .SetJsonKeyConverter()
-        .SetJsonValueConverter()
-        .SetProperty("database.history.kafka.bootstrap.servers", bootstrapServers)
-        .SetProperty("database.history.kafka.topic", $"dbhistory.{tableName}")
-        .SetProperty("database.server.name", "sqlserver2019")
-        .SetProperty("key.converter.schemas.enable", "false")
-        .SetProperty("value.converter.schemas.enable", "false")
-        .SetProperty("include.schema.changes", "false") as SqlServerConnectorMetadata;
+    var connectorMetadata = new SqlServerConnectorMetadata(connectionString)
+      .SetTableIncludeListPropertyName($"{schemaName}.{tableName}")
+      .SetJsonKeyConverter()
+      .SetJsonValueConverter()
+      .SetProperty("database.history.kafka.bootstrap.servers", bootstrapServers)
+      .SetProperty("database.history.kafka.topic", $"dbhistory.{tableName}")
+      .SetProperty("database.server.name", "sqlserver2019")
+      .SetProperty("key.converter.schemas.enable", "false")
+      .SetProperty("value.converter.schemas.enable", "false")
+      .SetProperty("include.schema.changes", "false") as SqlServerConnectorMetadata;
 
-      var httpResponseMessage = await KsqlDbConnect.CreateConnectorAsync(connectorName: "MSSQL_SENSORS_CONNECTOR", connectorMetadata);
-    }
+    var httpResponseMessage = await KsqlDbConnect.CreateConnectorAsync(connectorName: "MSSQL_SENSORS_CONNECTOR", connectorMetadata);
+  }
 
-    /// <summary>
-    /// Create connector from string statement example
-    /// </summary>
-    private async Task CreateConnectorFromStringAsync(string tableName, string schemaName = "dbo")
-    {
-      string bootstrapServers = Configuration[ConfigKeys.Kafka_BootstrapServers];
+  /// <summary>
+  /// Create connector from string statement example
+  /// </summary>
+  private async Task CreateConnectorFromStringAsync(string tableName, string schemaName = "dbo")
+  {
+    string bootstrapServers = Configuration[ConfigKeys.Kafka_BootstrapServers];
 
-      var createConnector = @$"CREATE SOURCE CONNECTOR MSSQL_SENSORS_CONNECTOR WITH (
+    var createConnector = @$"CREATE SOURCE CONNECTOR MSSQL_SENSORS_CONNECTOR WITH (
   'connector.class' = 'io.debezium.connector.sqlserver.SqlServerConnector',
   'database.hostname'= 'sqlserver2019', 
   'database.port'= '1433',
@@ -207,192 +206,191 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
   'include.schema.changes'= 'false'
 );";
 
-      KSqlDbStatement ksqlDbStatement = new(createConnector);
+    KSqlDbStatement ksqlDbStatement = new(createConnector);
 
-      var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement);
-    }
+    var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement);
+  }
 
-    public Task<HttpResponseMessage> ExecuteStatementAsync(KSqlDbStatement ksqlDbStatement, CancellationToken cancellationToken = default)
+  public Task<HttpResponseMessage> ExecuteStatementAsync(KSqlDbStatement ksqlDbStatement, CancellationToken cancellationToken = default)
+  {
+    var ksqlDbUrl = Configuration[ConfigKeys.KSqlDb_Url];
+
+    var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
+    var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+    return restApiClient.ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
+  }
+
+  private string KsqlDbUrl => Configuration[ConfigKeys.KSqlDb_Url];
+
+  private IDisposable cdcSubscription;
+
+  private async Task SubscribeToQuery(SynchronizationContext? synchronizationContext)
+  {
+    var options = new KSqlDBContextOptions(KsqlDbUrl)
     {
-      var ksqlDbUrl = Configuration[ConfigKeys.KSqlDb_Url];
+      ShouldPluralizeFromItemName = false
+    };
 
-      var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+    await using var context = new KSqlDBContext(options);
 
-      var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
-
-      return restApiClient.ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
-    }
-
-    private string KsqlDbUrl => Configuration[ConfigKeys.KSqlDb_Url];
-
-    private IDisposable cdcSubscription;
-
-    private async Task SubscribeToQuery(SynchronizationContext? synchronizationContext)
-    {
-      var options = new KSqlDBContextOptions(KsqlDbUrl)
+    cdcSubscription = context.CreateQuery<IoTSensorChange>("sqlserversensors")
+      .WithOffsetResetPolicy(AutoOffsetReset.Latest)
+      .Where(c => c.Op != "r" && (c.After == null || c.After.SensorId != "d542a2b3-c"))
+      .ToObservable()
+      .ObserveOn(synchronizationContext)
+      .Subscribe(cdc =>
       {
-        ShouldPluralizeFromItemName = false
-      };
-
-      await using var context = new KSqlDBContext(options);
-
-      cdcSubscription = context.CreateQuery<IoTSensorChange>("sqlserversensors")
-        .WithOffsetResetPolicy(AutoOffsetReset.Latest)
-        .Where(c => c.Op != "r" && (c.After == null || c.After.SensorId != "d542a2b3-c"))
-        .ToObservable()
-        .ObserveOn(synchronizationContext)
-        .Subscribe(cdc =>
-        {
-          items.Enqueue(cdc);
+        items.Enqueue(cdc);
           
-          UpdateTable(cdc);
+        UpdateTable(cdc);
 
-          StateHasChanged();
-        }, error => { Console.WriteLine(error.Message); });
-    }
+        StateHasChanged();
+      }, error => { Console.WriteLine(error.Message); });
+  }
 
-    private async Task SubscribeToRawQuery(SynchronizationContext? synchronizationContext)
+  private async Task SubscribeToRawQuery(SynchronizationContext? synchronizationContext)
+  {
+    var options = new KSqlDBContextOptions(KsqlDbUrl)
     {
-      var options = new KSqlDBContextOptions(KsqlDbUrl)
+      ShouldPluralizeFromItemName = false
+    };
+
+    await using var context = new KSqlDBContext(options);
+
+    cdcSubscription = context.CreateQuery<IoTSensorRawChange>("sqlserversensors")
+      .WithOffsetResetPolicy(AutoOffsetReset.Latest)
+      .ToObservable()
+      .ObserveOn(synchronizationContext)
+      .Subscribe(cdc =>
       {
-        ShouldPluralizeFromItemName = false
-      };
+        items.Enqueue(cdc);
 
-      await using var context = new KSqlDBContext(options);
+        UpdateTable(cdc);
 
-      cdcSubscription = context.CreateQuery<IoTSensorRawChange>("sqlserversensors")
-        .WithOffsetResetPolicy(AutoOffsetReset.Latest)
-        .ToObservable()
-        .ObserveOn(synchronizationContext)
-        .Subscribe(cdc =>
-        {
-          items.Enqueue(cdc);
+        StateHasChanged();
+      }, error => { Console.WriteLine(error.Message); });
+  }
 
-          UpdateTable(cdc);
-
-          StateHasChanged();
-        }, error => { Console.WriteLine(error.Message); });
-    }
-
-    private void UpdateTable(IDbRecord<IoTSensor> rawDatabaseChangeObject)
+  private void UpdateTable(IDbRecord<IoTSensor> rawDatabaseChangeObject)
+  {
+    switch (rawDatabaseChangeObject.OperationType)
     {
-      switch (rawDatabaseChangeObject.OperationType)
-      {
-        case ChangeDataCaptureType.Created:
-          var sensor = rawDatabaseChangeObject.EntityAfter;
+      case ChangeDataCaptureType.Created:
+        var sensor = rawDatabaseChangeObject.EntityAfter;
 
-          var existing = sensors.FirstOrDefault(c => c.SensorId == sensor.SensorId);
+        var existing = sensors.FirstOrDefault(c => c.SensorId == sensor.SensorId);
 
-          if (existing == null)
-            sensors.Add(sensor);
-          break;
+        if (existing == null)
+          sensors.Add(sensor);
+        break;
 
-        case ChangeDataCaptureType.Updated:
-          TryUpdateSensor(rawDatabaseChangeObject);
+      case ChangeDataCaptureType.Updated:
+        TryUpdateSensor(rawDatabaseChangeObject);
 
-          break;
+        break;
 
-        case ChangeDataCaptureType.Deleted:
-          var sensorBefore = rawDatabaseChangeObject.EntityBefore;
-          var itemToRemove = sensors.FirstOrDefault(c => c.SensorId == sensorBefore.SensorId);
-          if (itemToRemove != null)
-            sensors.Remove(itemToRemove);
-          break;
-      }
+      case ChangeDataCaptureType.Deleted:
+        var sensorBefore = rawDatabaseChangeObject.EntityBefore;
+        var itemToRemove = sensors.FirstOrDefault(c => c.SensorId == sensorBefore.SensorId);
+        if (itemToRemove != null)
+          sensors.Remove(itemToRemove);
+        break;
     }
+  }
 
-    private void TryUpdateSensor(IDbRecord<IoTSensor> dbRecord)
+  private void TryUpdateSensor(IDbRecord<IoTSensor> dbRecord)
+  {
+    var sensorAfter = dbRecord.EntityAfter;
+
+    var found = sensors.FirstOrDefault(c => c.SensorId == sensorAfter.SensorId);
+    var index = sensors.IndexOf(found);
+
+    if (index != -1)
+      sensors[index] = sensorAfter;
+    else
+      sensors.Add(sensorAfter);
+  }
+
+  private string TranslateOperation(string operation)
+  {
+    return operation switch
     {
-      var sensorAfter = dbRecord.EntityAfter;
+      "c" => "Created",
+      "u" => "Updated",
+      "d" => "Deleted",
+      "r" => "Read",
+      _ => throw new ArgumentOutOfRangeException(nameof(operation), operation, null)
+    };
+  }
 
-      var found = sensors.FirstOrDefault(c => c.SensorId == sensorAfter.SensorId);
-      var index = sensors.IndexOf(found);
+  private IoTSensor Model { get; set; }
 
-      if (index != -1)
-        sensors[index] = sensorAfter;
-      else
-        sensors.Add(sensorAfter);
-    }
+  private async Task SaveAsync()
+  {
+    var dbContext = DbContextFactory.CreateDbContext();
 
-    private string TranslateOperation(string operation)
+    dbContext.Sensors.Add(Model);
+
+    await dbContext.SaveChangesAsync();
+
+    SetNewModel();
+  }
+
+  private async Task UpdateAsync(IoTSensor sensor)
+  {
+    if (sensor == null)
+      return;
+
+    var dbContext = DbContextFactory.CreateDbContext();
+
+    var updatedSensor = sensor with { Value = new Random().Next(1, 100) };
+
+    dbContext.Sensors.Update(updatedSensor);
+
+    await dbContext.SaveChangesAsync();
+  }
+
+  private async Task DeleteAsync(IoTSensor sensor)
+  {
+    var dbContext = DbContextFactory.CreateDbContext();
+
+    dbContext.Sensors.Remove(sensor);
+
+    await dbContext.SaveChangesAsync();
+  }
+
+  private void SetNewModel()
+  {
+    Model = new IoTSensor
     {
-      return operation switch
-      {
-        "c" => "Created",
-        "u" => "Updated",
-        "d" => "Deleted",
-        "r" => "Read",
-        _ => throw new ArgumentOutOfRangeException(nameof(operation), operation, null)
-      };
-    }
+      SensorId = Guid.NewGuid().ToString().Substring(0, 10)
+    };
+  }
 
-    private IoTSensor Model { get; set; }
-
-    private async Task SaveAsync()
+  async Task ConsumeFromTopicExampleAsync()
+  {
+    var consumerConfig = new ConsumerConfig
     {
-      var dbContext = DbContextFactory.CreateDbContext();
+      BootstrapServers = Configuration[ConfigKeys.Kafka_BootstrapServers],
+      GroupId = "BlazorClient-01",
+      AutoOffsetReset = Confluent.Kafka.AutoOffsetReset.Earliest
+    };
 
-      dbContext.Sensors.Add(Model);
+    var kafkaConsumer = new KafkaConsumer<string, Models.DatabaseChangeObject<IoTSensor>>("sqlserver2019.dbo.Sensors", consumerConfig);
 
-      await dbContext.SaveChangesAsync();
-
-      SetNewModel();
-    }
-
-    private async Task UpdateAsync(IoTSensor sensor)
+    await foreach (var consumeResult in kafkaConsumer.ConnectToTopic().ToAsyncEnumerable().Take(10))
     {
-      if (sensor == null)
-        return;
-
-      var dbContext = DbContextFactory.CreateDbContext();
-
-      var updatedSensor = sensor with { Value = new Random().Next(1, 100) };
-
-      dbContext.Sensors.Update(updatedSensor);
-
-      await dbContext.SaveChangesAsync();
+      Console.WriteLine(consumeResult.Message);
     }
 
-    private async Task DeleteAsync(IoTSensor sensor)
-    {
-      var dbContext = DbContextFactory.CreateDbContext();
+    using (kafkaConsumer)
+    { }
+  }
 
-      dbContext.Sensors.Remove(sensor);
-
-      await dbContext.SaveChangesAsync();
-    }
-
-    private void SetNewModel()
-    {
-      Model = new IoTSensor
-      {
-        SensorId = Guid.NewGuid().ToString().Substring(0, 10)
-      };
-    }
-
-    async Task ConsumeFromTopicExampleAsync()
-    {
-      var consumerConfig = new ConsumerConfig
-      {
-        BootstrapServers = Configuration[ConfigKeys.Kafka_BootstrapServers],
-        GroupId = "BlazorClient-01",
-        AutoOffsetReset = Confluent.Kafka.AutoOffsetReset.Earliest
-      };
-
-      var kafkaConsumer = new KafkaConsumer<string, Models.DatabaseChangeObject<IoTSensor>>("sqlserver2019.dbo.Sensors", consumerConfig);
-
-      await foreach (var consumeResult in kafkaConsumer.ConnectToTopic().ToAsyncEnumerable().Take(10))
-      {
-        Console.WriteLine(consumeResult.Message);
-      }
-
-      using (kafkaConsumer)
-      { }
-    }
-
-    public void Dispose()
-    {
-      cdcSubscription?.Dispose();
-    }
+  public void Dispose()
+  {
+    cdcSubscription?.Dispose();
   }
 }
