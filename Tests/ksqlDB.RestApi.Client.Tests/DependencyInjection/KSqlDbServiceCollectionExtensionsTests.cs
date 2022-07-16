@@ -181,7 +181,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
   }
     
   [TestMethod]
-  public void AddDbContext_DefaultScoped()
+  public void AddDbContext_KSqlDBContext_DefaultLifetimeIsScoped()
   {
     //Arrange
     ClassUnderTest.AddDbContext<KSqlDBContext>(options => options.UseKSqlDb(TestParameters.KsqlDBUrl));
@@ -195,10 +195,10 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
   }
     
   [TestMethod]
-  public void AddDbContext_TransientScope()
+  public void AddDbContext_KSqlDBContext_ContextLifetimeChangedToTransientScope()
   {
     //Arrange
-    ClassUnderTest.AddDbContext<KSqlDBContext>(options => options.UseKSqlDb(TestParameters.KsqlDBUrl), ServiceLifetime.Transient);
+    ClassUnderTest.AddDbContext<KSqlDBContext>(options => options.UseKSqlDb(TestParameters.KsqlDBUrl), contextLifetime: ServiceLifetime.Transient);
 
     //Act
     var context = ClassUnderTest.BuildServiceProvider().GetRequiredService<KSqlDBContext>();
@@ -207,6 +207,39 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
     context.Should().NotBeNull();
 
     var descriptor = ClassUnderTest.TryGetRegistration<KSqlDBContext>();
+
+    descriptor.Should().NotBeNull();
+    descriptor.Lifetime.Should().Be(ServiceLifetime.Transient);
+  }
+
+
+  [TestMethod]
+  public void AddDbContext_IKSqlDbRestApiClient_DefaultLifetimeIsScoped()
+  {
+    //Arrange
+    ClassUnderTest.AddDbContext<KSqlDBContext>(options => options.UseKSqlDb(TestParameters.KsqlDBUrl));
+
+    //Act
+    var descriptor = ClassUnderTest.TryGetRegistration<IKSqlDbRestApiClient>();
+
+    //Assert
+    descriptor.Should().NotBeNull();
+    descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
+  }
+
+  [TestMethod]
+  public void AddDbContext_RestApiLifetimeChangedToTransientScope()
+  {
+    //Arrange
+    ClassUnderTest.AddDbContext<KSqlDBContext>(options => options.UseKSqlDb(TestParameters.KsqlDBUrl), restApiLifetime: ServiceLifetime.Transient);
+
+    //Act
+    var context = ClassUnderTest.BuildServiceProvider().GetRequiredService<IKSqlDbRestApiClient>();
+
+    //Assert
+    context.Should().NotBeNull();
+
+    var descriptor = ClassUnderTest.TryGetRegistration<IKSqlDbRestApiClient>();
 
     descriptor.Should().NotBeNull();
     descriptor.Lifetime.Should().Be(ServiceLifetime.Transient);
