@@ -1,4 +1,6 @@
-﻿using ksqlDB.RestApi.Client.KSql.RestApi;
+﻿using System.Net.Http;
+using System.Threading.Tasks;
+using ksqlDB.RestApi.Client.KSql.RestApi;
 
 namespace ksqlDB.Api.Client.Samples.Providers;
 
