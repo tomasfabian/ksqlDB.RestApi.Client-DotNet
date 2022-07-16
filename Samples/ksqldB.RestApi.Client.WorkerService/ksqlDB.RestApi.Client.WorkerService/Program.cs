@@ -16,7 +16,7 @@ IHost host = Host.CreateDefaultBuilder(args)
 
           setupParameters.SetAutoOffsetReset(AutoOffsetReset.Earliest);
 
-        }, ServiceLifetime.Transient);
+        }, contextLifetime: ServiceLifetime.Transient, restApiLifetime: ServiceLifetime.Transient);
 
       services.AddHostedService<Worker>();
     })
