@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <ItemGroup Label="EF and configuration Nugets">
+  <ItemGroup Label="EF and configuration Nugets for SqlServer.Connector tests">
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="5.0.7" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.7" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.7" />

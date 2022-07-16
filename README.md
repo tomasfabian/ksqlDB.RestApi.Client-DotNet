@@ -3348,7 +3348,7 @@ var serviceCollection = new ServiceCollection();
 var ksqlDbUrl = @"http:\\localhost:8088";
 
 serviceCollection.AddDbContext<ApplicationKSqlDbContext, IApplicationKSqlDbContext>(options =>
-  options.UseKSqlDb(ksqlDbUrl), ServiceLifetime.Transient);
+  options.UseKSqlDb(ksqlDbUrl), contextLifetime: ServiceLifetime.Transient);
 
 serviceCollection.AddDbContextFactory<IApplicationKSqlDbContext>(factoryLifetime: ServiceLifetime.Scoped);
 ```

@@ -1107,7 +1107,7 @@ Drop table {nameof(Event)};
 
                                setupParameters.SetAutoOffsetReset(AutoOffsetReset.Earliest);
 
-                             }, ServiceLifetime.Transient);
+                             }, contextLifetime: ServiceLifetime.Transient, restApiLifetime: ServiceLifetime.Transient);
 
                            serviceCollection.AddDbContextFactory<IApplicationKSqlDbContext>(factoryLifetime: ServiceLifetime.Scoped);
 
