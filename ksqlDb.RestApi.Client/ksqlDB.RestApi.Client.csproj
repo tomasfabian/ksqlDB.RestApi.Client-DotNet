@@ -19,6 +19,7 @@
 		<Version>2.2.0-rc.1</Version>
 		<AssemblyVersion>1.7.0.0</AssemblyVersion>
 		<LangVersion>10.0</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<PackageReleaseNotes>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/ksqlDb.RestApi.Client/ChangeLog.md</PackageReleaseNotes>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 	</PropertyGroup>

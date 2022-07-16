@@ -7,6 +7,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

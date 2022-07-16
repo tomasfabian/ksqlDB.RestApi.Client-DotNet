@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+using ksqlDB.RestApi.Client.KSql.RestApi.Query;
+using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using ksqlDB.RestApi.Client.KSql.Linq;
-using ksqlDB.RestApi.Client.KSql.Query.Context;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
-using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
-using ksqlDB.RestApi.Client.KSql.RestApi.Query;
-using Microsoft.Extensions.DependencyInjection;
+using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
 namespace ksqlDB.RestApi.Client.KSql.Query;
 
