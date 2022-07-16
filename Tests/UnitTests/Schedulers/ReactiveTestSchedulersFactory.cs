@@ -8,31 +8,31 @@ public class ReactiveTestSchedulersFactory : ISchedulersFactory
 {
   private TestScheduler currentThread;
 
-  public TestScheduler CurrentThread => currentThread ?? (currentThread = new TestScheduler());
+  public TestScheduler CurrentThread => currentThread ??= new TestScheduler();
 
   private TestScheduler immediate;
 
-  public TestScheduler Immediate => immediate ?? (immediate = new TestScheduler());
+  public TestScheduler Immediate => immediate ??= new TestScheduler();
 
   private TestScheduler newThread;
 
-  public TestScheduler NewThread => newThread ?? (newThread = new TestScheduler());
+  public TestScheduler NewThread => newThread ??= new TestScheduler();
 
   private TestScheduler taskPool;
 
-  public TestScheduler TaskPool => taskPool ?? (taskPool = new TestScheduler());
+  public TestScheduler TaskPool => taskPool ??= new TestScheduler();
 
   private TestScheduler threadPool;
 
-  public TestScheduler ThreadPool => threadPool ?? (threadPool = new TestScheduler());
+  public TestScheduler ThreadPool => threadPool ??= new TestScheduler();
 
-  public IScheduler EventLoopScheduler => threadPool ?? (threadPool = new TestScheduler());
+  public IScheduler EventLoopScheduler => threadPool ??= new TestScheduler();
 
-  public IScheduler NewEventLoopScheduler => threadPool ?? (threadPool = new TestScheduler());
+  public IScheduler NewEventLoopScheduler => threadPool ??= new TestScheduler();
 
   private TestScheduler dispatcher;
 
-  public TestScheduler Dispatcher => dispatcher ?? (dispatcher = new TestScheduler());
+  public TestScheduler Dispatcher => dispatcher ??= new TestScheduler();
 
   #region ISchedulerProvider Members
 
