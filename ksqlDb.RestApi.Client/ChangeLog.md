@@ -1,5 +1,8 @@
 ﻿# ksqlDB.RestApi.Client
 
+# v2.1.4
+- added `IKSqlDbRestApiClient` lifetime configuration for registration with `IServiceCollection.AddDbContext`
+
 # v2.1.3
 - #25 ConsumeAsync is not responding on CancellationToken (while waiting on ReadLineAsync or EndOfStream)
 

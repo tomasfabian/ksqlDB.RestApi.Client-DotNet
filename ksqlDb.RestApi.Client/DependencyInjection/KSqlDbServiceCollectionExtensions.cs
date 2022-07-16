@@ -36,14 +36,17 @@ public static class KSqlDbServiceCollectionExtensions
   /// <param name="services">The IServiceCollection to add services to.</param>
   /// <param name="optionsAction">Action to configure the KSqlDbContextOptions for the context.</param>
   /// <param name="contextLifetime">The lifetime with which to register the TContext service in the container.</param>
+  /// <param name="restApiLifetime">The lifetime with which to register the IKSqlDbRestApiClient service in the container.</param>
   /// <returns>The original IServiceCollection.</returns>
   public static IServiceCollection AddDbContext<TContext>(this IServiceCollection services,
-    Action<KSqlDbContextOptionsBuilder> optionsAction, ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
+    Action<KSqlDbContextOptionsBuilder> optionsAction,
+    ServiceLifetime contextLifetime = ServiceLifetime.Scoped,
+    ServiceLifetime restApiLifetime = ServiceLifetime.Scoped)
     where TContext : IKSqlDBContext
   {
     if (optionsAction == null) throw new ArgumentNullException(nameof(optionsAction));
 
-    return services.AddDbContext<TContext, TContext>(optionsAction, contextLifetime);
+    return services.AddDbContext<TContext, TContext>(optionsAction, contextLifetime, restApiLifetime);
   }
 
   /// <summary>
@@ -54,8 +57,12 @@ public static class KSqlDbServiceCollectionExtensions
   /// <param name="services">The IServiceCollection to add services to.</param>
   /// <param name="optionsAction">Action to configure the KSqlDbContextOptions for the context.</param>
   /// <param name="contextLifetime">The lifetime with which to register the TContext service in the container.</param>
+  /// <param name="restApiLifetime">The lifetime with which to register the IKSqlDbRestApiClient service in the container.</param>
   /// <returns>The original IServiceCollection.</returns>
-  public static IServiceCollection AddDbContext<TContextService, TContextImplementation>(this IServiceCollection services, Action<KSqlDbContextOptionsBuilder> optionsAction, ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
+  public static IServiceCollection AddDbContext<TContextService, TContextImplementation>(this IServiceCollection services,
+    Action<KSqlDbContextOptionsBuilder> optionsAction,
+    ServiceLifetime contextLifetime = ServiceLifetime.Scoped,
+    ServiceLifetime restApiLifetime = ServiceLifetime.Scoped)
     where TContextService : IKSqlDBContext
     where TContextImplementation : IKSqlDBContext
   {
@@ -65,14 +72,15 @@ public static class KSqlDbServiceCollectionExtensions
 
     optionsAction(builder);
 
-    services.ConfigureKSqlDb<TContextService, TContextImplementation>(builder, contextLifetime);
+    services.ConfigureKSqlDb<TContextService, TContextImplementation>(builder, contextLifetime, restApiLifetime);
 
     return services;
   }
 
   internal static IServiceCollection ConfigureKSqlDb<TContextService, TContextImplementation>(this IServiceCollection services,
     KSqlDbContextOptionsBuilder builder,
-    ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
+    ServiceLifetime contextLifetime = ServiceLifetime.Scoped,
+    ServiceLifetime restApiLifetime = ServiceLifetime.Scoped)
     where TContextService : IKSqlDBContext
     where TContextImplementation : IKSqlDBContext
   {
@@ -80,16 +88,21 @@ public static class KSqlDbServiceCollectionExtensions
 
     contextOptions.ServiceCollection.AddSingleton(contextOptions);
 
-    var contextDescriptor = new ServiceDescriptor(
+    var contextServiceDescriptor = new ServiceDescriptor(
       typeof(TContextService),
       typeof(TContextImplementation),
       contextLifetime);
 
-    contextOptions.ServiceCollection.Add(contextDescriptor);
+    contextOptions.ServiceCollection.Add(contextServiceDescriptor);
 
     contextOptions.ServiceCollection.ConfigureHttpClients(contextOptions);
 
-    contextOptions.ServiceCollection.AddScoped<IKSqlDbRestApiClient, KSqlDbRestApiClient>();
+    var restApiServiceDescriptor = new ServiceDescriptor(
+      typeof(IKSqlDbRestApiClient),
+      typeof(KSqlDbRestApiClient),
+      restApiLifetime);
+
+    contextOptions.ServiceCollection.Add(restApiServiceDescriptor);
 
     contextOptions.Apply(services);
 
@@ -103,13 +116,15 @@ public static class KSqlDbServiceCollectionExtensions
   /// <param name="ksqlDbUrl">ksqlDb connection.</param>
   /// <param name="setupAction">Action to configure the KSqlDbContextOptions for the context.</param>
   /// <param name="contextLifetime">The lifetime with which to register the context service in the container.</param>
+  /// <param name="restApiLifetime">The lifetime with which to register the IKSqlDbRestApiClient service in the container.</param>
   /// <returns>The original IServiceCollection.</returns>
   public static IServiceCollection ConfigureKSqlDb(this IServiceCollection services,
     string ksqlDbUrl,
     Action<ISetupParameters> setupAction = null,
-    ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
+    ServiceLifetime contextLifetime = ServiceLifetime.Scoped,
+    ServiceLifetime restApiLifetime = ServiceLifetime.Scoped)
   {
-    return services.ConfigureKSqlDb<IKSqlDBContext, KSqlDBContext>(ksqlDbUrl, setupAction, contextLifetime);
+    return services.ConfigureKSqlDb<IKSqlDBContext, KSqlDBContext>(ksqlDbUrl, setupAction, contextLifetime, restApiLifetime);
   }
 
   /// <summary>
@@ -121,11 +136,13 @@ public static class KSqlDbServiceCollectionExtensions
   /// <param name="ksqlDbUrl">ksqlDb connection.</param>
   /// <param name="setupAction">Optional action to configure the KSqlDbContextOptions for the context.</param>
   /// <param name="contextLifetime">The lifetime with which to register the context service in the container.</param>
+  /// <param name="restApiLifetime">The lifetime with which to register the IKSqlDbRestApiClient service in the container.</param>
   /// <returns>The original IServiceCollection.</returns>
   public static IServiceCollection ConfigureKSqlDb<TContextService, TContextImplementation>(this IServiceCollection services, 
     string ksqlDbUrl,
     Action<ISetupParameters> setupAction = null,
-    ServiceLifetime contextLifetime = ServiceLifetime.Scoped)
+    ServiceLifetime contextLifetime = ServiceLifetime.Scoped,
+    ServiceLifetime restApiLifetime = ServiceLifetime.Scoped)
     where TContextService : IKSqlDBContext
     where TContextImplementation : IKSqlDBContext
   {
@@ -135,6 +152,6 @@ public static class KSqlDbServiceCollectionExtensions
 
     setupAction?.Invoke(setupParameters);
 
-    return services.ConfigureKSqlDb<TContextService, TContextImplementation>(builder, contextLifetime);
+    return services.ConfigureKSqlDb<TContextService, TContextImplementation>(builder, contextLifetime, restApiLifetime);
   }
 }
