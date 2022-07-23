@@ -3,7 +3,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Windows;
 
 namespace ksqlDB.RestApi.Client.KSql.Linq;
 
-internal static class SourceExtensions
+public static class SourceExtensions
 {
   public static ISource<TSource> Within<TSource>(this ISource<TSource> source, Duration duration)
   {
