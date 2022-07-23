@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using FluentAssertions;
 using Joker.Extensions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -598,5 +599,38 @@ public class CreateEntityTests
 	Ts TIME,
 	DtOffset TIMESTAMP
 ) WITH ( KAFKA_TOPIC='enrichedevents', VALUE_FORMAT='Json', PARTITIONS='1' );");
+  }
+
+  internal record Renamed
+  {
+    [JsonPropertyName("data_id")]
+    public string DataId { get; set; }
+  }
+
+  [Test]
+  public void JsonPropertyName()
+  {
+    //Arrange
+    var statementContext = new StatementContext
+    {
+      CreationType = CreationType.Create,
+      KSqlEntityType = KSqlEntityType.Stream
+    };
+
+    var streamCreationMetadata = new EntityCreationMetadata()
+    {
+      EntityName = nameof(Renamed),
+      KafkaTopic = "Renamed_values",
+      Partitions = 1,
+      ShouldPluralizeEntityName = false
+    };
+
+    //Act
+    string statement = new CreateEntity().Print<Renamed>(statementContext, streamCreationMetadata, false);
+
+    //Assert
+    statement.Should().Be(@$"CREATE STREAM {nameof(Renamed)} (
+	data_id VARCHAR
+) WITH ( KAFKA_TOPIC='Renamed_values', VALUE_FORMAT='Json', PARTITIONS='1' );");
   }
 }
