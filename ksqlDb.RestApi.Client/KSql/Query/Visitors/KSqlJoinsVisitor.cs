@@ -7,6 +7,7 @@ using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using Pluralize.NET;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
@@ -127,13 +128,47 @@ internal class KSqlJoinsVisitor : KSqlVisitor
       AppendLine($"{joinType} JOIN {fromItemName} {itemAlias}");
 
       TryAppendWithin(@join);
-
-      Append($"ON {outerItemAlias}.");
+      
+      Append(GetOn(outerItemAlias, expressions));
       Visit(expressions[1]);
-      Append($" = {itemAlias}.");
+
+      Append(GetEqualsTo(itemAlias, expressions));
       Visit(expressions[2]);
+      
       Append(Environment.NewLine);
     }
+  }
+
+  private string GetOn(string outerItemAlias, Expression[] expressions)
+  {
+    bool useAlias = !IsKSqlFunctionsExtension(expressions[1]);
+    
+    string on = useAlias ? $"{outerItemAlias}." : string.Empty;
+    
+    return $"ON {on}";
+  }
+
+  private string GetEqualsTo(string itemAlias, Expression[] expressions)
+  {
+    bool useAlias = !IsKSqlFunctionsExtension(expressions[2]);
+
+    string equalsTo = useAlias ? $"{itemAlias}." : string.Empty;
+
+    return $" = {equalsTo}";
+  }
+
+  private bool IsKSqlFunctionsExtension(Expression expression)
+  {
+    var lambdaExpression = expression as LambdaExpression;
+
+    var methodCallExpression = lambdaExpression?.Body as MethodCallExpression;
+
+    var methodInfo = methodCallExpression?.Method;
+
+    if (methodCallExpression?.Object == null && methodInfo?.DeclaringType is { Name: nameof(KSqlFunctionsExtensions) })
+      return true;
+
+    return false;
   }
 
   private void TryAppendWithin((MethodInfo, IEnumerable<Expression>, LambdaExpression) @join)
