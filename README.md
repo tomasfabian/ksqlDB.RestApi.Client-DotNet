@@ -1735,6 +1735,11 @@ public record IoTSensorStats
 }
 ```
 
+We can use **backticks** to control the casing of the table's name.
+```C#
+context.CreatePullQuery<IoTSensorStats>("`IoT_sensor_stats`");
+```
+
 ### Window Bounds (v0.10.0)
 The WHERE clause must contain a value for each primary-key column to retrieve and may optionally include bounds on WINDOWSTART and WINDOWEND if the materialized table is windowed.
 ```C#
@@ -3816,6 +3821,39 @@ var creationMetadata = new CreationMetadata
   KeySchemaFullName = "ProductKey"
   ValueSchemaFullName = "ProductInfo"
 };
+```
+
+# v2.2.0
+
+### Rename stream or table column names with the `JsonPropertyNameAttribute`
+In cases when you need to use a different name for the C# representation of your ksqldb stream/table column names you can use the `JsonPropertyNameAttribute`:
+
+```C#
+using System.Text.Json.Serialization;
+
+internal record Data
+{
+  [JsonPropertyName("data_id")]
+  public string DataId { get; set; }
+}
+```
+
+```C#
+var creationMetadata = new EntityCreationMetadata()
+{
+  KafkaTopic = "data_values",
+  Partitions = 1,
+  Replicas = 1,
+};
+
+string statement = StatementGenerator.CreateOrReplaceStream<Data>(creationMetadata);
+```
+
+
+```SQL
+CREATE OR REPLACE STREAM Data (
+	data_id VARCHAR
+) WITH ( KAFKA_TOPIC='data_values', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );
 ```
 
 # LinqPad samples
