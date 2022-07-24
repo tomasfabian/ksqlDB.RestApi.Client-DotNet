@@ -1,5 +1,10 @@
 ﻿# ksqlDB.RestApi.Client
 
+# v2.2.0
+- #27 Rename stream or table column names with the `JsonPropertyNameAttribute`
+- #28 Source extensions were made public - bug fix
+- #28 join on KSqlFunctions without aliases - bug fix
+
 # v2.1.4
 - added `IKSqlDbRestApiClient` lifetime configuration for registration with `IServiceCollection.AddDbContext`
 
