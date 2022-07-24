@@ -520,8 +520,30 @@ EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
 
+  [TestMethod]
+  public void Join_KSqlFunctionKeySelector_ShouldBeWithoutAlias()
+  {
+    //Arrange
+    var query = KSqlDBContext
+      .CreateQueryStream<Movie>("movies")
+      .Join(Source.Of<Lead_Actor>("actors").Within(Duration.OfDays(1)),
+        movie => K.Functions.ExtractJsonField(movie!.Title, "$.movie_title"),
+        actor => K.Functions.ExtractJsonField(actor!.Actor_Name, "$.actor_name"),
+        (movie, actor) => new { EnduserId = actor.Title, Name = actor.Actor_Name, Raw = movie.Title });
+
+    //Act
+    var ksql = query.ToQueryString();
+
+    //Assert
+    var expectedQuery = @"SELECT actor.Title AS EnduserId, actor.Actor_Name AS Name, movie.Title AS Raw FROM movies movie
+INNER JOIN actors actor
+WITHIN 1 DAYS ON EXTRACTJSONFIELD(movie.Title, '$.movie_title') = EXTRACTJSONFIELD(actor.Actor_Name, '$.actor_name')
+EMIT CHANGES;";
+
+    ksql.Should().BeEquivalentTo(expectedQuery);
+  }
   #endregion
-     
+
   #region LeftJoin
 
   [TestMethod]
