@@ -35,12 +35,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-			<_Parameter1>ksqlDB.Api.Client.Tests</_Parameter1>
-		</AssemblyAttribute>
-		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-			<_Parameter1>ksqlDB.Api.Client.IntegrationTests</_Parameter1>
-		</AssemblyAttribute>
+		<InternalsVisibleTo Include="ksqlDB.Api.Client.Tests" />
+		<InternalsVisibleTo Include="ksqlDB.Api.Client.IntegrationTests" />
 	</ItemGroup>
 
 </Project>
