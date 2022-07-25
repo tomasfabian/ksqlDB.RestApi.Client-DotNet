@@ -79,6 +79,7 @@ public static class Program
     var loggerFactory = CreateLoggerFactory();
 
     var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
     var restApiProvider = new KSqlDbRestApiProvider(httpClientFactory, loggerFactory)
     {
       DisposeHttpClient = false
@@ -94,7 +95,7 @@ public static class Program
     await using var context = new KSqlDBContext(contextOptions, loggerFactory);
 
     var query = context.CreateQueryStream<Movie>() // Http 2.0
-                                                   // var query = context.CreateQuery<Movie>() // Http 1.0
+      // var query = context.CreateQuery<Movie>() // Http 1.0
       .Where(p => p.Title != "E.T.")
       .Where(c => c.Title.ToLower().Contains("hard".ToLower()) || c.Id == 1)
       .Where(p => p.RowTime >= 1510923225000)
@@ -308,6 +309,8 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
 
   private static IDisposable JoinTables(KSqlDBContext context)
   {
+    var queryWithin = Source.Of<Lead_Actor>().Within(Duration.OfHours(1), Duration.OfDays(5));
+
     var rightJoinQueryString = context.CreateQueryStream<Movie>()
       .RightJoin(
         Source.Of<Lead_Actor>(nameof(Lead_Actor)),
