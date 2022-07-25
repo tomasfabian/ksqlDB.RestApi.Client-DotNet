@@ -7,6 +7,9 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ksqlDb.RestApi.Client.Infrastructure.Logging;
+using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
+using ksqlDb.RestApi.Client.KSql.RestApi.Responses.Asserts;
+using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
@@ -34,7 +37,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   {
     this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
 
-    if(loggerFactory != null)
+    if (loggerFactory != null)
       logger = loggerFactory.CreateLogger(LoggingCategory.Name);
   }
 
@@ -43,7 +46,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   internal static readonly string MediaType = "application/vnd.ksql.v1+json";
 
   private string NullOrWhiteSpaceErrorMessage => "Can't be null, empty, or contain only whitespace.";
-    
+
   private BasicAuthCredentials credentials;
 
   /// <summary>
@@ -90,7 +93,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
       logger?.LogDebug($"Command response ({httpResponseMessage.StatusCode}): {response}");
     }
 
-    if(DisposeHttpClient)
+    if (DisposeHttpClient)
       httpClient.Dispose();
 
     return httpResponseMessage;
@@ -599,7 +602,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns></returns>
   public Task<HttpResponseMessage> DropStreamAsync(string streamName, bool useIfExistsClause, bool deleteTopic, CancellationToken cancellationToken = default)
-  {      
+  {
     string dropStatement = StatementTemplates.DropStream(streamName, useIfExistsClause, deleteTopic);
 
     KSqlDbStatement ksqlDbStatement = new(dropStatement);
@@ -640,7 +643,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 
     return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
   }
-    
+
   /// <summary>
   /// Drops an existing table.
   /// DROP TABLE table_name;
@@ -691,9 +694,9 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     {
       QueryId = queryId
     };
-		
+
     var response = await ExecuteStatementAsync(closeQuery, EndpointType.CloseQuery, Encoding.UTF8, cancellationToken);
-		
+
     return response;
   }
 
@@ -708,6 +711,71 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     string explainStatement = StatementTemplates.ExplainBy(queryId);
 
     return ExecuteStatementAsync<ExplainResponse>(explainStatement, cancellationToken);
+  }
+
+  /// <summary>
+  /// Asserts that a topic exists or does not exist.
+  /// </summary>
+  /// <param name="topicName">The name of the topic.</param>
+  /// <param name="properties">Optional dictionary of topic properties. The only properties that will be checked are PARTITIONS and REPLICAS.</param>
+  /// <param name="timeout">The TIMEOUT clause specifies the amount of time to wait for the assertion to succeed before failing. If the TIMEOUT clause is not present, then ksqlDB will use the timeout specified by the server configuration ksql.assert.topic.default.timeout.ms, which is 1000 ms by default.</param>
+  /// <param name="cancellationToken"></param>
+  /// <returns>Assert topic responses. If the assertion fails, then an error will be returned.</returns>
+  public Task<AssertTopicResponse[]> AssertTopicNotExistsAsync(string topicName, Duration timeout = null, CancellationToken cancellationToken = default)
+  {
+    return AssertTopicExistsAsync(topicName, exists: false, properties: null, timeout, cancellationToken);
+  }
+
+  /// <summary>
+  /// Asserts that a topic exists or does not exist.
+  /// </summary>
+  /// <param name="topicName">The name of the topic.</param>
+  /// <param name="properties">Optional dictionary of topic properties. The only properties that will be checked are PARTITIONS and REPLICAS.</param>
+  /// <param name="timeout">The TIMEOUT clause specifies the amount of time to wait for the assertion to succeed before failing. If the TIMEOUT clause is not present, then ksqlDB will use the timeout specified by the server configuration ksql.assert.topic.default.timeout.ms, which is 1000 ms by default.</param>
+  /// <param name="cancellationToken"></param>
+  /// <returns>Assert topic responses. If the assertion fails, then an error will be returned.</returns>
+  public Task<AssertTopicResponse[]> AssertTopicNotExistsAsync(string topicName, IDictionary<string, string> properties = null, Duration timeout = null, CancellationToken cancellationToken = default)
+  {
+    return AssertTopicExistsAsync(topicName, exists: false, properties, timeout, cancellationToken);
+  }
+
+  /// <summary>
+  /// Asserts that a topic exists or does not exist.
+  /// </summary>
+  /// <param name="topicName">The name of the topic.</param>
+  /// <param name="properties">Optional dictionary of topic properties. The only properties that will be checked are PARTITIONS and REPLICAS.</param>
+  /// <param name="timeout">The TIMEOUT clause specifies the amount of time to wait for the assertion to succeed before failing. If the TIMEOUT clause is not present, then ksqlDB will use the timeout specified by the server configuration ksql.assert.topic.default.timeout.ms, which is 1000 ms by default.</param>
+  /// <param name="cancellationToken"></param>
+  /// <returns>Assert topic responses. If the assertion fails, then an error will be returned.</returns>
+  public Task<AssertTopicResponse[]> AssertTopicExistsAsync(string topicName, Duration timeout = null, CancellationToken cancellationToken = default)
+  {
+    return AssertTopicExistsAsync(topicName, exists: true, properties: null, timeout, cancellationToken);
+  }
+
+  /// <summary>
+  /// Asserts that a topic exists or does not exist.
+  /// </summary>
+  /// <param name="topicName">The name of the topic.</param>
+  /// <param name="properties">Optional dictionary of topic properties. The only properties that will be checked are PARTITIONS and REPLICAS.</param>
+  /// <param name="timeout">The TIMEOUT clause specifies the amount of time to wait for the assertion to succeed before failing. If the TIMEOUT clause is not present, then ksqlDB will use the timeout specified by the server configuration ksql.assert.topic.default.timeout.ms, which is 1000 ms by default.</param>
+  /// <param name="cancellationToken"></param>
+  /// <returns>Assert topic responses. If the assertion fails, then an error will be returned.</returns>
+  public Task<AssertTopicResponse[]> AssertTopicExistsAsync(string topicName, IDictionary<string, string> properties = null, Duration timeout = null, CancellationToken cancellationToken = default)
+  {
+    return AssertTopicExistsAsync(topicName, exists: true, properties, timeout, cancellationToken);
+  }
+
+  private async Task<AssertTopicResponse[]> AssertTopicExistsAsync(string topicName, bool exists, IDictionary<string, string> properties = null, Duration timeout = null, CancellationToken cancellationToken = default)
+  {
+    string assertStatement = AssertTopic.CreateStatement(exists, topicName, properties, timeout);
+
+    KSqlDbStatement ksqlDbStatement = new(assertStatement);
+
+    var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
+
+    var statementResponse = await httpResponseMessage.ToStatementResponsesAsync<AssertTopicResponse>().ConfigureAwait(false);
+
+    return statementResponse;
   }
 
   private async Task<TResponse[]> ExecuteStatementAsync<TResponse>(string statement, CancellationToken cancellationToken = default)
