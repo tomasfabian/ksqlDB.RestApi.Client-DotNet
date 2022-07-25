@@ -1,5 +1,8 @@
 ﻿# ksqlDB.RestApi.Client
 
+# v2.3.0
+- added `Protobuf_NoSR` serialization format
+
 # v2.2.0
 - #27 Rename stream or table column names with the `JsonPropertyNameAttribute`
 - #28 Source extensions were made public - bug fix

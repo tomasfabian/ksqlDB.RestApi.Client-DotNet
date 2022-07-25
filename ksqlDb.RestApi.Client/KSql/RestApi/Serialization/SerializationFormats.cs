@@ -8,5 +8,7 @@ public enum SerializationFormats
   Json_SR,
   Avro,
   Kafka,
-  Protobuf
+  Protobuf,
+  // Protobuf No Schema Registry. ksqldb 0.27.1
+  Protobuf_NoSR
 }
