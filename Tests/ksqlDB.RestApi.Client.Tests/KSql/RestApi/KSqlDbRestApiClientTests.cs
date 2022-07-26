@@ -6,7 +6,9 @@ using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Fakes.Logging;
 using ksqlDB.Api.Client.Tests.Models.Movies;
 using ksqlDb.RestApi.Client.Infrastructure.Logging;
+using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using Microsoft.Extensions.Logging;
@@ -495,5 +497,49 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
     //Assert
     insertStatement.Sql.Should().Be("INSERT INTO Movies (Title, Id, Release_Year) VALUES (NULL, 1, 0);");
+  }
+  
+  [TestMethod]
+  public async Task AssertTopicExistsAsync_ReturnsTrue()
+  {
+    //Arrange
+    string topicName = "tweetsByTitle";
+    var timeout = Duration.OfSeconds(10);
+
+    var options = new AssertTopicOptions(topicName)
+    {
+      Timeout = timeout
+    };
+
+    CreateHttpMocks(@"[{""@type"":""assert_topic"",""statementText"":""ASSERT TOPIC tweetsByTitle TIMEOUT 3 SECONDS;"",""topicName"":""tweetsByTitle"",""exists"":true,""warnings"":[]}]");
+
+    //Act
+    var response = await ClassUnderTest.AssertTopicExistsAsync(options);
+
+    //Assert
+    response[0].TopicName.Should().Be(topicName);
+    response[0].Exists.Should().BeTrue();
+  }
+  
+  [TestMethod]
+  public async Task AssertTopicExistsAsync_ReturnsFalse()
+  {
+    //Arrange
+    string topicName = "tweetsByTitleX";
+    var timeout = Duration.OfSeconds(10);
+
+    var options = new AssertTopicOptions(topicName)
+    {
+      Timeout = timeout
+    };
+
+    CreateHttpMocks(@"[{""@type"":""generic_error"",""error_code"":41700,""message"":""Topic tweetsByTitleX does not exist""}]");
+
+    //Act
+    var response = await ClassUnderTest.AssertTopicExistsAsync(options);
+
+    //Assert
+    // response[0].TopicName.Should().Be(topicName);
+    response[0].Exists.Should().BeFalse();
   }
 }
