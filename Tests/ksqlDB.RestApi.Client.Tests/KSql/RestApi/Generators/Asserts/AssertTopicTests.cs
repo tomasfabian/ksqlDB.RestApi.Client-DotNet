@@ -13,9 +13,10 @@ public class AssertTopicTests
   public void CreateStatement_TopicExists()
   {
     //Arrange
+    var options = new AssertTopicOptions(topicName);
 
     //Act
-    string statement = AssertTopic.CreateStatement(exists:true, topicName);
+    string statement = AssertTopic.CreateStatement(exists: true, options);
 
     //Assert
     statement.Should().Be($@"ASSERT TOPIC {topicName};");
@@ -25,9 +26,10 @@ public class AssertTopicTests
   public void CreateStatement_TopicNotExists()
   {
     //Arrange
+    var options = new AssertTopicOptions(topicName);
 
     //Act
-    string statement = AssertTopic.CreateStatement(exists:false, topicName);
+    string statement = AssertTopic.CreateStatement(exists: false, options);
 
     //Assert
     statement.Should().Be($@"ASSERT NOT EXISTS TOPIC {topicName};");
@@ -38,9 +40,14 @@ public class AssertTopicTests
   {
     //Arrange
     var timeout = Duration.OfSeconds(10);
+    
+    var options = new AssertTopicOptions(topicName)
+    {
+      Timeout = timeout
+    };
 
     //Act
-    string statement = AssertTopic.CreateStatement(exists: true, topicName, properties: null, timeout);
+    string statement = AssertTopic.CreateStatement(exists: true, options);
 
     //Assert
     statement.Should().Be($@"ASSERT TOPIC {topicName} TIMEOUT {timeout.TotalSeconds.Value} SECONDS;");
@@ -56,8 +63,13 @@ public class AssertTopicTests
       { "partitions", "1" },
     };
 
+    var options = new AssertTopicOptions(topicName)
+    {
+      Properties = properties
+    };
+
     //Act
-    string statement = AssertTopic.CreateStatement(exists: true, topicName, properties);
+    string statement = AssertTopic.CreateStatement(exists: true, options);
 
     //Assert
     statement.Should().Be($@"ASSERT TOPIC {topicName} WITH ( replicas=3, partitions=1 );");
@@ -69,8 +81,13 @@ public class AssertTopicTests
     //Arrange
     var properties = new Dictionary<string, string>();
 
+    var options = new AssertTopicOptions(topicName)
+    {
+      Properties = properties
+    };
+
     //Act
-    string statement = AssertTopic.CreateStatement(exists: true, topicName, properties);
+    string statement = AssertTopic.CreateStatement(exists: true, options);
 
     //Assert
     statement.Should().Be($@"ASSERT TOPIC {topicName};");
