@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using ksqlDb.RestApi.Client.Infrastructure.Logging;
 using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using ksqlDb.RestApi.Client.KSql.RestApi.Responses.Asserts;
-using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
@@ -716,58 +712,28 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <summary>
   /// Asserts that a topic exists or does not exist.
   /// </summary>
-  /// <param name="topicName">The name of the topic.</param>
-  /// <param name="properties">Optional dictionary of topic properties. The only properties that will be checked are PARTITIONS and REPLICAS.</param>
-  /// <param name="timeout">The TIMEOUT clause specifies the amount of time to wait for the assertion to succeed before failing. If the TIMEOUT clause is not present, then ksqlDB will use the timeout specified by the server configuration ksql.assert.topic.default.timeout.ms, which is 1000 ms by default.</param>
+  /// <param name="options">The assert topic options such as topic name and timeout.</param>
   /// <param name="cancellationToken"></param>
   /// <returns>Assert topic responses. If the assertion fails, then an error will be returned.</returns>
-  public Task<AssertTopicResponse[]> AssertTopicNotExistsAsync(string topicName, Duration timeout = null, CancellationToken cancellationToken = default)
+  public Task<AssertTopicResponse[]> AssertTopicExistsAsync(AssertTopicOptions options, CancellationToken cancellationToken = default)
   {
-    return AssertTopicExistsAsync(topicName, exists: false, properties: null, timeout, cancellationToken);
+    return AssertTopicExistsAsync(options, exists: true, cancellationToken);
   }
 
   /// <summary>
   /// Asserts that a topic exists or does not exist.
   /// </summary>
-  /// <param name="topicName">The name of the topic.</param>
-  /// <param name="properties">Optional dictionary of topic properties. The only properties that will be checked are PARTITIONS and REPLICAS.</param>
-  /// <param name="timeout">The TIMEOUT clause specifies the amount of time to wait for the assertion to succeed before failing. If the TIMEOUT clause is not present, then ksqlDB will use the timeout specified by the server configuration ksql.assert.topic.default.timeout.ms, which is 1000 ms by default.</param>
+  /// <param name="options">The assert topic options such as topic name and timeout.</param>
   /// <param name="cancellationToken"></param>
   /// <returns>Assert topic responses. If the assertion fails, then an error will be returned.</returns>
-  public Task<AssertTopicResponse[]> AssertTopicNotExistsAsync(string topicName, IDictionary<string, string> properties = null, Duration timeout = null, CancellationToken cancellationToken = default)
+  public Task<AssertTopicResponse[]> AssertTopicNotExistsAsync(AssertTopicOptions options, CancellationToken cancellationToken = default)
   {
-    return AssertTopicExistsAsync(topicName, exists: false, properties, timeout, cancellationToken);
+    return AssertTopicExistsAsync(options, exists: false, cancellationToken);
   }
 
-  /// <summary>
-  /// Asserts that a topic exists or does not exist.
-  /// </summary>
-  /// <param name="topicName">The name of the topic.</param>
-  /// <param name="properties">Optional dictionary of topic properties. The only properties that will be checked are PARTITIONS and REPLICAS.</param>
-  /// <param name="timeout">The TIMEOUT clause specifies the amount of time to wait for the assertion to succeed before failing. If the TIMEOUT clause is not present, then ksqlDB will use the timeout specified by the server configuration ksql.assert.topic.default.timeout.ms, which is 1000 ms by default.</param>
-  /// <param name="cancellationToken"></param>
-  /// <returns>Assert topic responses. If the assertion fails, then an error will be returned.</returns>
-  public Task<AssertTopicResponse[]> AssertTopicExistsAsync(string topicName, Duration timeout = null, CancellationToken cancellationToken = default)
+  private async Task<AssertTopicResponse[]> AssertTopicExistsAsync(AssertTopicOptions options, bool exists, CancellationToken cancellationToken = default)
   {
-    return AssertTopicExistsAsync(topicName, exists: true, properties: null, timeout, cancellationToken);
-  }
-
-  /// <summary>
-  /// Asserts that a topic exists or does not exist.
-  /// </summary>
-  /// <param name="topicName">The name of the topic.</param>
-  /// <param name="properties">Optional dictionary of topic properties. The only properties that will be checked are PARTITIONS and REPLICAS.</param>
-  /// <param name="timeout">The TIMEOUT clause specifies the amount of time to wait for the assertion to succeed before failing. If the TIMEOUT clause is not present, then ksqlDB will use the timeout specified by the server configuration ksql.assert.topic.default.timeout.ms, which is 1000 ms by default.</param>
-  /// <param name="cancellationToken"></param>
-  /// <returns>Assert topic responses. If the assertion fails, then an error will be returned.</returns>
-  public Task<AssertTopicResponse[]> AssertTopicExistsAsync(string topicName, IDictionary<string, string> properties = null, Duration timeout = null, CancellationToken cancellationToken = default)
-  {
-    return AssertTopicExistsAsync(topicName, exists: true, properties, timeout, cancellationToken);
-  }
-
-  private async Task<AssertTopicResponse[]> AssertTopicExistsAsync(string topicName, bool exists, IDictionary<string, string> properties = null, Duration timeout = null, CancellationToken cancellationToken = default)
-  {
-    string assertStatement = AssertTopic.CreateStatement(exists, topicName, properties, timeout);
+    string assertStatement = AssertTopic.CreateStatement(exists, options);
 
     KSqlDbStatement ksqlDbStatement = new(assertStatement);
 

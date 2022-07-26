@@ -1,18 +1,16 @@
-﻿using ksqlDB.RestApi.Client.KSql.Query.Windows;
-
-namespace ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
+﻿namespace ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 
 internal class AssertTopic
 {
-  public static string CreateStatement(bool exists, string topicName, IDictionary<string, string> properties = null, Duration timeout = null)
+  public static string CreateStatement(bool exists, AssertTopicOptions options)
   {
     var notExists = exists ? string.Empty : "NOT EXISTS ";
 
-    var withProperties = properties != null ? CreateWith(properties) : string.Empty;
+    var withProperties = options.Properties != null ? CreateWith(options.Properties) : string.Empty;
 
-    var timeOut = timeout != null ? $" TIMEOUT {timeout.Value} {timeout.TimeUnit}" : string.Empty;
+    var timeOut = options.Timeout != null ? $" TIMEOUT {options.Timeout.Value} {options.Timeout.TimeUnit}" : string.Empty;
 
-    var statement = $@"ASSERT {notExists}TOPIC {topicName}{withProperties}{timeOut};";
+    var statement = $@"ASSERT {notExists}TOPIC {options.TopicName}{withProperties}{timeOut};";
 
     return statement;
   }
