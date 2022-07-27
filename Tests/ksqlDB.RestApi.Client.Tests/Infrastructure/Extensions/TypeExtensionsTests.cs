@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using FluentAssertions;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
@@ -356,5 +357,42 @@ public class TypeExtensionsTests
     //Assert
     attribute.Should().NotBeNull();
     attribute.Should().BeOfType<KeyAttribute>();
+  }
+
+  private record MySensor
+  {
+    [JsonPropertyName("SensorId")]
+    public string SensorId2 { get; set; }
+
+    public string Title { get; set; }
+  }
+
+  [TestMethod]
+  public void GetMemberName()
+  {
+    //Arrange
+    var type = typeof(MySensor);
+    var member = type.GetProperty(nameof(MySensor.Title));
+
+    //Act
+    var memberName = member.GetMemberName();
+
+    //Assert
+    memberName.Should().Be(nameof(MySensor.Title));
+  }
+
+  [TestMethod]
+  public void GetMemberName_JsonPropertyNameOverride()
+  {
+    //Arrange
+    var type = typeof(MySensor);
+
+    //Act
+    var member = type.GetProperty(nameof(MySensor.SensorId2));
+
+    var memberName = member.GetMemberName();
+
+    //Assert
+    memberName.Should().Be("SensorId");
   }
 }
