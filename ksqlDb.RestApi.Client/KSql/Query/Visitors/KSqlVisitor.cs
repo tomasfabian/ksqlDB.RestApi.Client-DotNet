@@ -165,8 +165,10 @@ internal class KSqlVisitor : ExpressionVisitor
         isFirst = false;
       else
         Append(ColumnsSeparator);
-        
-      Append($"{memberBinding.Member.Name} := ");
+
+      var memberName = memberBinding.Member.GetMemberName();
+
+      Append($"{memberName} := ");
 
       Visit(memberBinding.Expression);
     }
@@ -674,8 +676,8 @@ internal class KSqlVisitor : ExpressionVisitor
 
       return memberExpression;
     }
-      
-    var memberName = memberExpression.Member.Name;
+
+    var memberName = memberExpression.Member.GetMemberName();
 
     if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
     {
@@ -729,7 +731,7 @@ internal class KSqlVisitor : ExpressionVisitor
     }
 
     if (propertyInfo != fromItem?.Type)
-      Append(memberExpression.Member.Name);
+      Append(memberExpression.Member.GetMemberName());
   }
 
   private FromItem TrySetFromItemAlias(MemberExpression memberExpression, Type propertyInfo)
@@ -758,7 +760,9 @@ internal class KSqlVisitor : ExpressionVisitor
     if (fromItem == null)
       Append("->");
 
-    Append(memberExpression.Member.Name);
+    var memberName = memberExpression.Member.GetMemberName();
+
+    Append(memberName);
   }
 
   internal static object ExtractFieldValue(MemberExpression memberExpression)

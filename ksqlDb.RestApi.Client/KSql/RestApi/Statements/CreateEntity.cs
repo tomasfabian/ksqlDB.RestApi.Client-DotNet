@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Text.Json.Serialization;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
@@ -154,7 +153,7 @@ internal sealed class CreateEntity : CreateEntityStatement
 
       var ksqlType = KSqlTypeTranslator(type);
 
-      var columnName = GetPropertyName(memberInfo);
+      var columnName = memberInfo.GetMemberName();
 
       string columnDefinition = $"\t{columnName} {ksqlType}{ExploreAttributes(memberInfo, type)}";
 
@@ -164,16 +163,6 @@ internal sealed class CreateEntity : CreateEntityStatement
     }
 
     stringBuilder.AppendLine(string.Join($",{Environment.NewLine}", ksqlProperties));
-  }
-
-  private string GetPropertyName(MemberInfo memberInfo)
-  {
-    var jsonPropertyName = memberInfo.GetCustomAttribute<JsonPropertyNameAttribute>();
-
-    if (jsonPropertyName != null)
-      return jsonPropertyName.Name;
-
-    return memberInfo.Name;
   }
 
   internal static IEnumerable<string> GetProperties(Type type)

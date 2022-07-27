@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
@@ -101,5 +102,14 @@ internal static class TypeExtensions
       .FirstOrDefault();
 
     return attribute;
+  }
+  
+  internal static string GetMemberName(this MemberInfo memberInfo)
+  {
+    var jsonPropertyNameAttribute = memberInfo.GetCustomAttribute<JsonPropertyNameAttribute>();
+
+    var memberName = jsonPropertyNameAttribute?.Name ?? memberInfo.Name;
+
+    return memberName;
   }
 }
