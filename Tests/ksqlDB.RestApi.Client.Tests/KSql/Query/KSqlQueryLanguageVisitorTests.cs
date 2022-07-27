@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.KSql.Linq;
@@ -55,6 +56,32 @@ public class KSqlQueryLanguageVisitorTests : TestBase
   }
 
   #region Select
+
+  private record MySensor
+  {
+    [JsonPropertyName("SensorId")]
+    public string SensorId2 { get; set; }
+  }
+
+  [TestMethod]
+  public void BuildKSql_SelectPropertyWithJsonPropertyNameAttribute()
+  {
+    //Arrange
+    var query = new TestableDbProvider(contextOptions)
+      .CreateQueryStream<MySensor>()
+      .Where(c => c.SensorId2 == "1")
+      .Select(c => c.SensorId2);
+
+    //Act
+    var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+    //Assert
+    string expectedKsql =
+      @$"SELECT SensorId FROM {nameof(MySensor)}s
+WHERE SensorId = '1' EMIT CHANGES;";
+
+    ksql.Should().BeEquivalentTo(expectedKsql);
+  }
 
   [TestMethod]
   public void SelectAlias_BuildKSql_PrintsProjection()
