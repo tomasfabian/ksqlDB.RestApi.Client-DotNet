@@ -743,6 +743,41 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 
     return statementResponse;
   }
+  
+  /// <summary>
+  /// Asserts that a schema exists or does not exist.
+  /// </summary>
+  /// <param name="options">The assert schema options such as subject name, id and timeout.</param>
+  /// <param name="cancellationToken"></param>
+  /// <returns>Assert schema responses. If the assertion fails, then an error will be returned.</returns>
+  public Task<AssertSchemaResponse[]> AssertSchemaExistsAsync(AssertSchemaOptions options, CancellationToken cancellationToken = default)
+  {
+    return AssertSchemaExistsAsync(options, exists: true, cancellationToken);
+  }
+
+  /// <summary>
+  /// Asserts that a schema exists or does not exist.
+  /// </summary>
+  /// <param name="options">The assert schema options such as subject name, id and timeout.</param>
+  /// <param name="cancellationToken"></param>
+  /// <returns>Assert schema responses. If the assertion fails, then an error will be returned.</returns>
+  public Task<AssertSchemaResponse[]> AssertSchemaNotExistsAsync(AssertSchemaOptions options, CancellationToken cancellationToken = default)
+  {
+    return AssertSchemaExistsAsync(options, exists: false, cancellationToken);
+  }
+
+  private async Task<AssertSchemaResponse[]> AssertSchemaExistsAsync(AssertSchemaOptions options, bool exists, CancellationToken cancellationToken = default)
+  {
+    string assertStatement = AssertSchema.CreateStatement(exists, options);
+
+    KSqlDbStatement ksqlDbStatement = new(assertStatement);
+
+    var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
+
+    var statementResponse = await httpResponseMessage.ToStatementResponsesAsync<AssertSchemaResponse>().ConfigureAwait(false);
+
+    return statementResponse;
+  }
 
   private async Task<TResponse[]> ExecuteStatementAsync<TResponse>(string statement, CancellationToken cancellationToken = default)
   {
