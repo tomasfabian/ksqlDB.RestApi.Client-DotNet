@@ -539,7 +539,49 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     var response = await ClassUnderTest.AssertTopicExistsAsync(options);
 
     //Assert
-    // response[0].TopicName.Should().Be(topicName);
+    response[0].Exists.Should().BeFalse();
+  }
+
+  [TestMethod]
+  public async Task AssertSchemaExistsAsync_ReturnsTrue()
+  {
+    //Arrange
+    string subject = "Kafka-key";
+    var timeout = Duration.OfSeconds(10);
+
+    var options = new AssertSchemaOptions(subject)
+    {
+      Timeout = timeout
+    };
+
+    CreateHttpMocks(@"[{""@type"":""assert_schema"",""statementText"":""ASSERT SCHEMA SUBJECT 'Kafka-key' TIMEOUT 3 SECONDS;"",""subject"":""Kafka-key"",""id"":null,""exists"":true,""warnings"":[]}]  ");
+
+    //Act
+    var response = await ClassUnderTest.AssertSchemaExistsAsync(options);
+
+    //Assert
+    response[0].Subject.Should().Be(subject);
+    response[0].Exists.Should().BeTrue();
+  }
+
+  [TestMethod]
+  public async Task AssertSchemaExistsAsync_ReturnsFalse()
+  {
+    //Arrange
+    string subject = "Kafka-key";
+    var timeout = Duration.OfSeconds(10);
+
+    var options = new AssertSchemaOptions(subject)
+    {
+      Timeout = timeout
+    };
+
+    CreateHttpMocks(@"[{""@type"":""generic_error"",""error_code"":41700,""message"":""Schema with subject name Kafka-key exists""}]");
+
+    //Act
+    var response = await ClassUnderTest.AssertSchemaExistsAsync(options);
+
+    //Assert
     response[0].Exists.Should().BeFalse();
   }
 }
