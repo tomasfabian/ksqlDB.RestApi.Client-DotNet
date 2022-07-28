@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ksqlDb.RestApi.Client.KSql.RestApi.Responses.Asserts;
-using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Connectors;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Queries;
@@ -14,7 +12,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi;
 
-public interface IKSqlDbRestApiClient
+public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient
 {
   /// <summary>
   /// Sets Basic HTTP authentication mechanism.
@@ -294,37 +292,4 @@ public interface IKSqlDbRestApiClient
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Http response object.</returns>
   Task<HttpResponseMessage> DropTypeIfExistsAsync(string typeName, CancellationToken cancellationToken = default);
-
-  /// <summary>
-  /// Asserts that a topic exists or does not exist.
-  /// </summary>
-  /// <param name="options">The assert topic options such as topic name and timeout.</param>
-  /// <param name="cancellationToken"></param>
-  /// <returns>Assert topic responses. If the assertion fails, then an error will be returned.</returns>
-  Task<AssertTopicResponse[]> AssertTopicExistsAsync(AssertTopicOptions options, CancellationToken cancellationToken = default);
-
-  /// <summary>
-  /// Asserts that a topic exists or does not exist.
-  /// </summary>
-  /// <param name="options">The assert topic options such as topic name and timeout.</param>
-  /// <param name="cancellationToken"></param>
-  /// <returns>Assert topic responses. If the assertion fails, then an error will be returned.</returns>
-  Task<AssertTopicResponse[]> AssertTopicNotExistsAsync(AssertTopicOptions options, CancellationToken cancellationToken = default);
-
-
-  /// <summary>
-  /// Asserts that a schema exists or does not exist.
-  /// </summary>
-  /// <param name="options">The assert schema options such as subject name, id and timeout.</param>
-  /// <param name="cancellationToken"></param>
-  /// <returns>Assert schema responses. If the assertion fails, then an error will be returned.</returns>
-  Task<AssertSchemaResponse[]> AssertSchemaExistsAsync(AssertSchemaOptions options, CancellationToken cancellationToken = default);
-
-  /// <summary>
-  /// Asserts that a schema exists or does not exist.
-  /// </summary>
-  /// <param name="options">The assert schema options such as subject name, id and timeout.</param>
-  /// <param name="cancellationToken"></param>
-  /// <returns>Assert schema responses. If the assertion fails, then an error will be returned.</returns>
-  Task<AssertSchemaResponse[]> AssertSchemaNotExistsAsync(AssertSchemaOptions options, CancellationToken cancellationToken = default);
 }

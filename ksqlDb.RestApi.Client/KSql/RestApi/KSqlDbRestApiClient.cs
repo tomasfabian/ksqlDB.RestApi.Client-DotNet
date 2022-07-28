@@ -710,7 +710,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   }
 
   /// <summary>
-  /// Asserts that a topic exists or does not exist.
+  /// Asserts that a topic exists or does not exist. ksqldb v 0.27.1
   /// </summary>
   /// <param name="options">The assert topic options such as topic name and timeout.</param>
   /// <param name="cancellationToken"></param>
@@ -721,7 +721,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   }
 
   /// <summary>
-  /// Asserts that a topic exists or does not exist.
+  /// Asserts that a topic exists or does not exist. ksqldb v 0.27.1
   /// </summary>
   /// <param name="options">The assert topic options such as topic name and timeout.</param>
   /// <param name="cancellationToken"></param>
@@ -743,9 +743,9 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 
     return statementResponse;
   }
-  
+
   /// <summary>
-  /// Asserts that a schema exists or does not exist.
+  /// Asserts that a schema exists or does not exist. ksqldb v 0.27.1
   /// </summary>
   /// <param name="options">The assert schema options such as subject name, id and timeout.</param>
   /// <param name="cancellationToken"></param>
@@ -756,7 +756,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   }
 
   /// <summary>
-  /// Asserts that a schema exists or does not exist.
+  /// Asserts that a schema exists or does not exist. ksqldb v 0.27.1
   /// </summary>
   /// <param name="options">The assert schema options such as subject name, id and timeout.</param>
   /// <param name="cancellationToken"></param>
