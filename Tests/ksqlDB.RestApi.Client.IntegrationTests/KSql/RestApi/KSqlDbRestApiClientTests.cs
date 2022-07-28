@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Reactive.Concurrency;
 using System.Text.Json;
 using System.Threading;
@@ -375,7 +374,7 @@ Drop type Address;
     var content = await httpResponseMessage.ToStatementResponsesAsync();
 
     //Assert
-    content[0].Type.Should().Be("error_entity");
+    content[0].Type.Should().Contain("error");
   }
 
   record Movie2
