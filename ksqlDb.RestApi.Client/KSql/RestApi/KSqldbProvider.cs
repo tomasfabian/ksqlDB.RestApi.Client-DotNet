@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using Microsoft.Extensions.Logging;

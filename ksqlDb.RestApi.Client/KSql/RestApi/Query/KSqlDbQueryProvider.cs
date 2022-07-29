@@ -31,19 +31,14 @@ internal class KSqlDbQueryProvider : KSqlDbProvider
     if (rawJson == String.Empty)
       return default;
 
-    if (rawJson.StartsWith("["))
-      rawJson = rawJson.Substring(startIndex: 1);
-    if (rawJson.EndsWith(","))
-      rawJson = rawJson.Substring(0, rawJson.Length - 1);
-    if (rawJson.EndsWith("]"))
-      rawJson = rawJson.Substring(0, rawJson.Length - 1);
+    rawJson = ExtractRow(rawJson);
 
     if (IsErrorRow(rawJson))
     {
-      OnError<T>(rawJson);
+      OnError(rawJson);
     }
 
-    if (rawJson.StartsWith("{\"header\""))
+    if (headerResponse == null && rawJson.StartsWith("{\"header\""))
       headerResponse = JsonSerializer.Deserialize<HeaderResponse>(rawJson);
 
     if (rawJson.StartsWith("{\"row\""))
@@ -52,7 +47,22 @@ internal class KSqlDbQueryProvider : KSqlDbProvider
     return default;
   }
 
-  private static void OnError<T>(string rawJson)
+  private string ExtractRow(string rawData)
+  {
+    if (string.IsNullOrEmpty(rawData))
+      return rawData;
+
+    if (rawData.StartsWith("["))
+      rawData = rawData.Substring(startIndex: 1);
+    if (rawData.EndsWith(","))
+      rawData = rawData.Substring(0, rawData.Length - 1);
+    if (rawData.EndsWith("]"))
+      rawData = rawData.Substring(0, rawData.Length - 1);
+
+    return rawData;
+  }
+
+  private static void OnError(string rawJson)
   {
     var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(rawJson);
 
@@ -71,7 +81,7 @@ internal class KSqlDbQueryProvider : KSqlDbProvider
       var schema = headerResponse.Header.Schema;
       headerColumns = new HeaderColumnExtractor().GetColumnsFromSchema(schema).ToArray();
     }
-      
+
     var jsonSerializerOptions = GetOrCreateJsonSerializerOptions();
 
     var columnValues = HeaderColumnExtractor.ExtractColumnValues(rawJson);
@@ -91,13 +101,11 @@ internal class KSqlDbQueryProvider : KSqlDbProvider
     {
       OnLineRead<T>(rawJson);
 
-      var headerResponse = JsonSerializer.Deserialize<HeaderResponse>(rawJson.Substring(startIndex: 1, rawJson.Length - 2));
-
-      return headerResponse?.Header.QueryId;
+      return headerResponse?.Header?.QueryId;
     }
-
+    
     if (IsErrorRow(rawJson))
-      OnError<T>(rawJson);
+      OnError(rawJson);
 
     return null;
   }
