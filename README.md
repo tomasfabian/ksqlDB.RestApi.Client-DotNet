@@ -1648,6 +1648,9 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
 
 See also [GetManyAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet#ipullable---getmanyasync-v170).
 
+
+> ⚠ `IPullable<T>.GetAsync` was renamed to `IPullable<T>.FirstOrDefaultAsync` in version 2.0.0.
+
 ```C#
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -3854,6 +3857,49 @@ string statement = StatementGenerator.CreateOrReplaceStream<Data>(creationMetada
 CREATE OR REPLACE STREAM Data (
 	data_id VARCHAR
 ) WITH ( KAFKA_TOPIC='data_values', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );
+```
+
+# v2.2.1
+
+- Renaming of stream or table column names with the `JsonPropertyNameAttribute` was also added for selects
+
+# v2.3.0
+
+### IKSqlDbRestApiClient.AssertTopicExistsAsync and IKSqlDbRestApiClient.AssertTopicNotExistsAsync
+[Assert Topic](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/assert-topic/) - asserts that a topic exists or does not exist.
+
+```C#
+using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
+using ksqlDB.RestApi.Client.KSql.Query.Windows;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+
+private static async Task AssertTopicsAsync(IKSqlDbRestApiClient restApiClient)
+{
+  string topicName = "tweetsByTitle";
+
+  var topicProperties = new Dictionary<string, string>
+  {
+    { "replicas", "3" },
+    { "partitions", "1" },
+  };
+
+  var options = new AssertTopicOptions(topicName)
+  {
+    Properties = topicProperties,
+    Timeout = Duration.OfSeconds(3)
+  };
+
+  var responses = await restApiClient.AssertTopicNotExistsAsync(options);
+
+  Console.WriteLine(responses[0].Exists);
+
+  responses = await restApiClient.AssertTopicExistsAsync(options);
+}
+```
+
+```SQL
+ASSERT NOT EXISTS TOPIC tweetsByTitle WITH ( replicas=3, partitions=1 ) 3 SECONDS;
+ASSERT TOPIC tweetsByTitle WITH ( replicas=3, partitions=1 ) 3 SECONDS;
 ```
 
 # LinqPad samples
