@@ -1,7 +1,22 @@
 ﻿# ksqlDB.RestApi.Client
 
 # v2.3.0
+- added TFM for .NET 6.0
+
+### Assert topic 
+- asserts that a topic exists or does not exist.
+- IKSqlDbRestApiClient.AssertTopicExistsAsync, IKSqlDbRestApiClient.AssertTopicNotExistsAsync, AssertTopicResponse, AssertTopicOptions
+ 
+### Assert schema
+- Asserts that a schema exists or does not exist.
+- IKSqlDbRestApiClient.AssertSchemaExistsAsync, IKSqlDbRestApiClient.AssertSchemaNotExistsAsync, AssertSchemaResponse, AssertSchemaOptions 
+- IKSqlDbAssertionsRestApiClient
+
+### Serialization formats
 - added `Protobuf_NoSR` serialization format
+
+# v2.2.1
+- #27 added support to use `JsonPropertyNameAttribute` for selects in queries
 
 # v2.2.0
 - #27 Rename stream or table column names with the `JsonPropertyNameAttribute`
