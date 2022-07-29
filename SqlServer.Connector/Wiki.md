@@ -17,6 +17,20 @@ Install-Package SqlServer.Connector -Version 0.3.0-rc.1
 Install-Package ksqlDb.RestApi.Client
 ```
 
+# v1.0.0
+KsqlDbConnect's constructor argument was change from an Uri to `ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory.IHttpClientFactory`
+
+```
+var httpClient = new HttpClient
+{
+  BaseAddress = new Uri(ksqlDbUrl)
+};
+
+var httpClientFactory = new HttpClientFactory(httpClient);
+
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+```
+
 ### Subscribing to a CDC stream (v0.1.0)
 The Debezium connector produces change events from row-level table changes into a kafka topic. The following program shows how to subscribe to such streams with ksqldb
 ```C#

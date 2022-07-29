@@ -4,6 +4,9 @@ SqlServer.Connector is a client API for consuming row-level table changes (CDC -
 
 Project [Wiki can be found here](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/SqlServer.Connector/Wiki.md)
 
+### v1.0.0
+KsqlDbConnect's constructor argument was change from an Uri to `ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory.IHttpClientFactory`
+
 ### v0.3.1
 - fixed nuget links
 

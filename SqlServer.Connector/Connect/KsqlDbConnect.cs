@@ -3,9 +3,9 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.RestApi;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using SqlServer.Connector.Cdc.Connectors;
+using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
 namespace SqlServer.Connector.Connect
 {
@@ -14,11 +14,11 @@ namespace SqlServer.Connector.Connect
   /// </summary>
   public class KsqlDbConnect : IKsqlDbConnect
   {
-    private readonly Uri ksqlDbUrl;
+    private readonly IHttpClientFactory httpClientFactory;
 
-    public KsqlDbConnect(Uri ksqlDbUrl)
+    public KsqlDbConnect(IHttpClientFactory httpClientFactory)
     {
-      this.ksqlDbUrl = ksqlDbUrl ?? throw new ArgumentNullException(nameof(ksqlDbUrl));
+      this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
     }
 
     /// <summary>
@@ -104,13 +104,6 @@ namespace SqlServer.Connector.Connect
 
     private Task<HttpResponseMessage> ExecuteStatementAsync(KSqlDbStatement ksqlDbStatement, CancellationToken cancellationToken = default)
     {
-      var httpClient = new HttpClient()
-      {
-        BaseAddress = ksqlDbUrl
-      };
-
-      var httpClientFactory = new HttpClientFactory(httpClient);
-
       var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
       
       return restApiClient.ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
