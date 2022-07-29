@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using FluentAssertions;
 using InsideOut.Consumer;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Connectors;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -57,8 +59,15 @@ namespace SqlServer.Connector.Tests.Connect
     private static async Task DropConnectorAsync()
     {
       var ksqlDbUrl = Configuration["ksqlDb:Url"];
+      
+      var httpClient = new HttpClient
+      {
+        BaseAddress = new Uri(ksqlDbUrl)
+      };
 
-      var ksqlDbConnect = new KsqlDbConnect(new Uri(ksqlDbUrl));
+      var httpClientFactory = new HttpClientFactory(httpClient);
+
+      var ksqlDbConnect = new KsqlDbConnect(httpClientFactory);
       
       await ksqlDbConnect.DropConnectorIfExistsAsync(connectorName);
     }
@@ -80,7 +89,14 @@ namespace SqlServer.Connector.Tests.Connect
 
       var ksqlDbUrl = Configuration["ksqlDb:Url"];
 
-      ClassUnderTest = new KsqlDbConnect(new Uri(ksqlDbUrl));
+      var httpClient = new HttpClient
+      {
+        BaseAddress = new Uri(ksqlDbUrl)
+      };
+
+      var httpClientFactory = new HttpClientFactory(httpClient);
+
+      ClassUnderTest = new KsqlDbConnect(httpClientFactory);
     }
 
     private static string tableName = "Sensors";
@@ -206,7 +222,14 @@ namespace SqlServer.Connector.Tests.Connect
     {
       var ksqlDbUrl = Configuration["ksqlDb:Url"];
 
-      var ksqlDbConnect = new KsqlDbConnect(new Uri(ksqlDbUrl));
+      var httpClient = new HttpClient
+      {
+        BaseAddress = new Uri(ksqlDbUrl)
+      };
+
+      var httpClientFactory = new HttpClientFactory(httpClient);
+
+      var ksqlDbConnect = new KsqlDbConnect(httpClientFactory);
       
       var response = await ksqlDbConnect.GetConnectorsAsync();
 
