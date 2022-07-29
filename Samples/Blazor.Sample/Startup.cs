@@ -12,6 +12,8 @@ using InsideOut.Producer;
 using Microsoft.EntityFrameworkCore;
 using SqlServer.Connector.Cdc;
 using SqlServer.Connector.Connect;
+using ksqlDb.RestApi.Client.DependencyInjection;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 
 namespace Blazor.Sample;
 
@@ -29,14 +31,24 @@ public class Startup
     services.AddRazorPages();
     services.AddServerSideBlazor();
 
+    services.AddDbContext<IKSqlDBContext, KSqlDBContext>(options =>
+      {
+        string ksqlDbUrl = Configuration["ksqlDb:Url"];
+
+        var setupParameters = options.UseKSqlDb(ksqlDbUrl);
+
+      }, contextLifetime: ServiceLifetime.Transient, restApiLifetime: ServiceLifetime.Transient);
+
+    ConfigureEntityFramework(services);
+  }
+
+  private void ConfigureEntityFramework(IServiceCollection services)
+  {
     var connectionString = Configuration.GetConnectionString("DefaultConnection");
 
-    services.AddDbContextFactory<ApplicationDbContext>(options =>
-    {
-      options.UseSqlServer(connectionString);
-    });
+    services.AddDbContextFactory<ApplicationDbContext>(options => { options.UseSqlServer(connectionString); });
 
-    services.AddScoped(p => 
+    services.AddScoped(p =>
       p.GetRequiredService<IDbContextFactory<ApplicationDbContext>>()
         .CreateDbContext());
   }

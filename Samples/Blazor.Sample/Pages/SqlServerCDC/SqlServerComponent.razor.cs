@@ -14,7 +14,6 @@ using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using Microsoft.AspNetCore.Components;
@@ -35,6 +34,8 @@ public partial class SqlServerComponent : IDisposable
   [Inject] private ISqlServerCdcClient CdcProvider { get; init; }
 
   [Inject] private IKsqlDbConnect KsqlDbConnect { get; init; }
+  
+  [Inject] private IKSqlDbRestApiClient KSqlDbRestApiClient { get; init; }
 
   private int TotalCount => sensors.Count;
 
@@ -111,12 +112,6 @@ public partial class SqlServerComponent : IDisposable
     string fromName = "sqlserversensors";
     string kafkaTopic = "sqlserver2019.dbo.Sensors";
 
-    var ksqlDbUrl = Configuration[ConfigKeys.KSqlDb_Url];
-
-    var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
-
-    var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
-
     EntityCreationMetadata metadata = new()
     {
       EntityName = fromName,
@@ -128,15 +123,15 @@ public partial class SqlServerComponent : IDisposable
 
     if (useKsqlDbTypes)
     {
-      var createTypeResponse = await restApiClient.CreateTypeAsync<IoTSensor>(cancellationToken);
-      createTypeResponse = await restApiClient.CreateTypeAsync<IoTSensorChange>(cancellationToken);
+      var createTypeResponse = await KSqlDbRestApiClient.CreateTypeAsync<IoTSensor>(cancellationToken);
+      createTypeResponse = await KSqlDbRestApiClient.CreateTypeAsync<IoTSensorChange>(cancellationToken);
         
-      var httpResponseMessage = await restApiClient.CreateStreamAsync<IoTSensorChange>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
+      var httpResponseMessage = await KSqlDbRestApiClient.CreateStreamAsync<IoTSensorChange>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
         .ConfigureAwait(false);
     }
     else
     {
-      var httpResponseMessage = await restApiClient.CreateStreamAsync<RawDatabaseChangeObject>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
+      var httpResponseMessage = await KSqlDbRestApiClient.CreateStreamAsync<RawDatabaseChangeObject>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
         .ConfigureAwait(false);
     }
   }
@@ -156,7 +151,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
 
     var ksqlDbStatement = new KSqlDbStatement(createSensorsCDCStream);
 
-    var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement);
+    var httpResponseMessage = await KSqlDbRestApiClient.ExecuteStatementAsync(ksqlDbStatement);
   }
 
   /// <summary>
@@ -208,18 +203,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
 
     KSqlDbStatement ksqlDbStatement = new(createConnector);
 
-    var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement);
-  }
-
-  public Task<HttpResponseMessage> ExecuteStatementAsync(KSqlDbStatement ksqlDbStatement, CancellationToken cancellationToken = default)
-  {
-    var ksqlDbUrl = Configuration[ConfigKeys.KSqlDb_Url];
-
-    var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
-
-    var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
-
-    return restApiClient.ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
+    var httpResponseMessage = await KSqlDbRestApiClient.ExecuteStatementAsync(ksqlDbStatement);
   }
 
   private string KsqlDbUrl => Configuration[ConfigKeys.KSqlDb_Url];

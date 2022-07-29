@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<LangVersion>10.0</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UserSecretsId>df205641-c0bc-4548-b48b-9a0a25941283</UserSecretsId>
@@ -19,8 +19,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ksqlDb.RestApi.Client" Version="1.0.0-rc.1" />
-		<PackageReference Include="SqlServer.Connector" Version="0.3.0-rc.1" />
+		<PackageReference Include="ksqlDb.RestApi.Client" Version="2.2.1" />
+		<PackageReference Include="SqlServer.Connector" Version="1.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
