@@ -25,6 +25,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query.Descriptors;
@@ -84,6 +85,7 @@ public static class Program
     {
       DisposeHttpClient = false
     };
+
     restApiProvider.SetCredentials(new BasicAuthCredentials("fred", "letmein"));
 
     var moviesProvider = new MoviesProvider(restApiProvider);
@@ -1052,6 +1054,36 @@ Drop table {nameof(Event)};
   }
 
   #endregion
+
+  private static async Task AssertsAsync(IKSqlDbRestApiClient restApiClient)
+  {
+    var assertSchemaOptions = new AssertSchemaOptions("Kafka-key3", 1)
+    {
+      Timeout = Duration.OfSeconds(3)
+    };
+
+    var assertSchemaResponse = await restApiClient.AssertSchemaNotExistsAsync(assertSchemaOptions);
+    assertSchemaResponse = await restApiClient.AssertSchemaExistsAsync(assertSchemaOptions);
+
+    Console.WriteLine(assertSchemaResponse[0].Subject);
+
+    var topicProperties = new Dictionary<string, string>
+    {
+      { "replicas", "1" },
+      { "partitions", "1" },
+    };
+
+    var options = new AssertTopicOptions("tweetsByTitle")
+    {
+      Properties = topicProperties,
+      Timeout = Duration.OfSeconds(3)
+    };
+
+    var assertTopicResponse = await restApiClient.AssertTopicNotExistsAsync(options);
+    assertTopicResponse = await restApiClient.AssertTopicExistsAsync(options);
+
+    Console.WriteLine(assertTopicResponse[0].TopicName);
+  }
 
   public static ILoggerFactory CreateLoggerFactory()
   {
