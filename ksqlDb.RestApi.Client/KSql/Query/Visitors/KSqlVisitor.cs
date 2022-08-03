@@ -742,14 +742,29 @@ internal class KSqlVisitor : ExpressionVisitor
       fromItem.Alias = memberExpression.Member.Name;
     else
     {
-      fromItem = queryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
-
-      if (fromItem != null)
-        fromItem.Alias = ((ParameterExpression)memberExpression.Expression).Name;
+      fromItem = queryMetadata.TrySetAlias(memberExpression, (fromItem, alias) => fromItem.Alias == alias);
     }
 
     return fromItem;
   }
+
+  private string SetAlias(MemberExpression memberExpression)
+  {
+    string alias = ((ParameterExpression)memberExpression.Expression).Name;
+
+    var joinsOfType = queryMetadata.Joins.Where(c => c.Type == memberExpression.Expression.Type).ToArray();
+
+    var fromItem2 = joinsOfType.FirstOrDefault();
+
+    if (joinsOfType.Length > 1)
+      fromItem2 = joinsOfType.FirstOrDefault(c => string.IsNullOrEmpty(c.Alias));
+
+    if (fromItem2 != null)
+      fromItem2.Alias = alias;
+
+    return alias;
+  }
+
 
   protected void Destructure(MemberExpression memberExpression)
   {

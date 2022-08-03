@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
 
@@ -36,16 +37,15 @@ internal sealed class KSqlJoinSelectFieldsVisitor : KSqlVisitor
 
     if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
     {
+      var foundFromItem = queryMetadata.TrySetAlias(memberExpression, (_, alias) => string.IsNullOrEmpty(alias));
+
+      var memberName = memberExpression.Member.GetMemberName();
+
       string alias = ((ParameterExpression)memberExpression.Expression).Name;
 
-      var fromItem2 = queryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Expression.Type);
-
-      if (fromItem2 != null)
-        fromItem2.Alias = alias;
-
-      Append(alias);
+      Append(foundFromItem?.Alias ?? alias);
       Append(".");
-      Append(memberExpression.Member.Name);
+      Append(memberName);
 
       return memberExpression;
     }
@@ -62,11 +62,28 @@ internal sealed class KSqlJoinSelectFieldsVisitor : KSqlVisitor
         
       Append(".");
 
-      Append(memberExpression.Member.Name);
+      var memberName = memberExpression.Member.GetMemberName();
+      Append(memberName);
     }
     else
       base.VisitMember(memberExpression);
 
     return memberExpression;
+  }
+
+  private string SetAlias(MemberExpression memberExpression)
+  {
+    string alias = ((ParameterExpression) memberExpression.Expression).Name;
+
+    var joinsOfType = queryMetadata.Joins.Where(c => c.Type == memberExpression.Expression.Type).ToArray();
+
+    var fromItem2 = joinsOfType.FirstOrDefault();
+
+    if (joinsOfType.Length > 1)
+      fromItem2 = joinsOfType.FirstOrDefault(c => string.IsNullOrEmpty(c.Alias));
+
+    if (fromItem2 != null)
+      fromItem2.Alias = alias;
+    return alias;
   }
 }

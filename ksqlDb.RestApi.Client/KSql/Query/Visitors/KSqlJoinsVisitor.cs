@@ -63,7 +63,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
   internal void VisitJoinTable(IEnumerable<(MethodInfo, IEnumerable<Expression>, LambdaExpression)> joins)
   {
-    bool isFirst = true;
+    int i = 0;
 
     foreach (var join in joins)
     {
@@ -89,11 +89,11 @@ internal class KSqlJoinsVisitor : KSqlVisitor
       }
 
       var lambdaExpression = expressions[3] as LambdaExpression;
+      
+      bool isFirst = i == 0;
 
       if (isFirst)
       {
-        isFirst = false;
-
         Append("SELECT ");
 
         var body = queryMetadata.Select?.Body ?? lambdaExpression?.Body;
@@ -102,7 +102,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
         new KSqlJoinSelectFieldsVisitor(StringBuilder, queryMetadata).Visit(body);
 
-        var fromItemAlias = queryMetadata.Joins.Where(c => c.Type == queryMetadata.FromItemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).FirstOrDefault();
+        var fromItemAlias = queryMetadata.Joins.Skip(i).Where(c => c.Type == queryMetadata.FromItemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).LastOrDefault();
           
         outerItemAlias = fromItemAlias ?? outerItemAlias;
 
@@ -136,6 +136,8 @@ internal class KSqlJoinsVisitor : KSqlVisitor
       Visit(expressions[2]);
       
       Append(Environment.NewLine);
+
+      i++;
     }
   }
 
@@ -211,12 +213,12 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
     if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
     {
-      Append(memberExpression.Member.Name);
+      var memberName = memberExpression.Member.GetMemberName();
+
+      Append(memberName);
 
       return memberExpression;
     }
-
-    var fromItem = queryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
 
     if (queryMetadata.Joins != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
     {

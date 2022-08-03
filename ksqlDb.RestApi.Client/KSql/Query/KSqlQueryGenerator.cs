@@ -48,10 +48,29 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
 
     if (joins.Any())
     {
-      queryMetadata.Joins = joins.Select(c => c.Item2.ToArray()[0].Type.GenericTypeArguments[0]).Append(queryMetadata.FromItemType)
-        .Select(c => new FromItem { Type = c })
+      var fromItem = joins.Last();
+
+      var lambdaExpression = StripQuotes(fromItem.Item2.ToArray()[1]) as LambdaExpression;
+      var alias = lambdaExpression.Parameters[0].Name;
+
+      var fromTable = new FromItem
+      {
+        Type = queryMetadata.FromItemType,
+        Alias = alias
+      };
+
+      queryMetadata.Joins = joins.Select(c =>
+        {
+          var items = c.Item2.ToArray();
+          var lambdaExpression = StripQuotes(items[2]) as LambdaExpression;
+          var alias = lambdaExpression.Parameters[0].Name; 
+
+          var type = items[0].Type.GenericTypeArguments[0];
+
+          return new FromItem {Type = type, Alias = alias};
+        }).Append(fromTable)
         .ToArray();
-        
+
       var joinsVisitor = new KSqlJoinsVisitor(kSqlVisitor.StringBuilder, options, new QueryContext { FromItemName = finalFromItemName }, queryMetadata);
 
       joinsVisitor.VisitJoinTable(joins);
