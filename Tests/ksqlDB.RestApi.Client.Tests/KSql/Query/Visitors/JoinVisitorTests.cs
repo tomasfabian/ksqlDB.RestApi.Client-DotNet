@@ -140,8 +140,8 @@ EMIT CHANGES;";
       .Join(
         Source.Of<MovieExt>(),
         movie => movie.Title,
-        actor => actor.Title,
-        (movie, actor) => new
+        ext => ext.Title,
+        (movie, ext) => new
         {
           Title = movie.Title,
         }
@@ -152,8 +152,8 @@ EMIT CHANGES;";
 
     //Assert
     var expectedQuery = @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
-INNER JOIN MovieExts M1
-ON {MovieAlias}.Title = M1.Title
+INNER JOIN MovieExts ext
+ON {MovieAlias}.Title = ext.Title
 EMIT CHANGES;";
 
     ksql.Should().Be(expectedQuery);
@@ -179,8 +179,8 @@ EMIT CHANGES;";
 
     //Assert
     var expectedQuery = @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
-INNER JOIN Actors A
-ON {MovieAlias}.Title = A.Title
+INNER JOIN Actors {ActorAlias}
+ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;";
 
     ksql.Should().Be(expectedQuery);
@@ -454,11 +454,11 @@ EMIT CHANGES LIMIT 2;";
     //Assert
     string shipmentsAlias = "sa";
 
-    var expectedQuery = @$"SELECT O.OrderId AS orderId, {shipmentsAlias}.Id AS shipmentId, P1.Id AS paymentId FROM Orders O
+    var expectedQuery = @$"SELECT o.OrderId AS orderId, {shipmentsAlias}.Id AS shipmentId, p1.Id AS paymentId FROM Orders o
 LEFT JOIN Shipments {shipmentsAlias}
-ON O.OrderId = {shipmentsAlias}.Id
-INNER JOIN Payments P1
-ON O.OrderId = P1.Id
+ON o.OrderId = {shipmentsAlias}.Id
+INNER JOIN Payments p1
+ON o.OrderId = p1.Id
 EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedQuery);

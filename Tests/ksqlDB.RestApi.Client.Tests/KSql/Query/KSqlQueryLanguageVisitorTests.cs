@@ -12,6 +12,7 @@ using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
+using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Formats;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
@@ -57,10 +58,15 @@ public class KSqlQueryLanguageVisitorTests : TestBase
 
   #region Select
 
-  private record MySensor
+  public class MySensor
   {
     [JsonPropertyName("SensorId")]
     public string SensorId2 { get; set; }
+    
+    public string Data { get; set; }
+
+    [JsonPropertyName("data_id")]
+    public string DataId { get; set; }
   }
 
   [TestMethod]
@@ -79,6 +85,112 @@ public class KSqlQueryLanguageVisitorTests : TestBase
     string expectedKsql =
       @$"SELECT SensorId FROM {nameof(MySensor)}s
 WHERE SensorId = '1' EMIT CHANGES;";
+
+    ksql.Should().BeEquivalentTo(expectedKsql);
+  }
+
+  [TestMethod]
+  public void BuildKSql_SelectFromJoinPropertyWithJsonPropertyNameAttribute()
+  {
+    //Arrange
+    contextOptions.ShouldPluralizeFromItemName = false;
+    string stream1TableName = "stream1";
+    string stream2TableName = "stream2";
+
+    var query = new TestableDbProvider(contextOptions)
+      .CreateQueryStream<MySensor>(stream1TableName)
+      .Join(Source.Of<MySensor>(stream2TableName).Within(Duration.OfDays(1)),
+        endusers => K.Functions.ExtractJsonField(endusers.Data, "$.customer_id"),
+        transactions => K.Functions.ExtractJsonField(transactions.Data, "$.customer_id"),
+        (endusers, transactions) => new
+        {
+          EnduserId = endusers.DataId,
+          TransactionsId = transactions.DataId,
+          CustomerId = K.Functions.ExtractJsonField(endusers.Data, "$.customer_id"),
+          EndusersData = endusers.Data,
+          TransactionsData = transactions.Data
+        });
+
+    queryContext.FromItemName = "stream1";
+
+    //Act
+    var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+    //Assert
+    string expectedKsql =
+      @$"SELECT endusers.data_id AS EnduserId, transactions.data_id AS TransactionsId, EXTRACTJSONFIELD(endusers.Data, '$.customer_id') CustomerId, endusers.Data AS EndusersData, transactions.Data AS TransactionsData FROM {stream1TableName} endusers
+INNER JOIN {stream2TableName} transactions
+WITHIN 1 DAYS ON EXTRACTJSONFIELD(endusers.Data, '$.customer_id') = EXTRACTJSONFIELD(transactions.Data, '$.customer_id')
+EMIT CHANGES;";
+
+    ksql.Should().BeEquivalentTo(expectedKsql);
+  }
+
+  [TestMethod]
+  public void BuildKSql_SelectFromMultiJoinPropertyWithJsonPropertyNameAttribute()
+  {
+    //Arrange
+    contextOptions.ShouldPluralizeFromItemName = false;
+    string stream1TableName = "stream1";
+    string stream2TableName = "stream2";
+    string stream3TableName = "stream3";
+
+    var query = (from a in new TestableDbProvider(contextOptions).CreateQueryStream<MySensor>(stream1TableName)
+      join b in Source.Of<MySensor>(stream2TableName) on a.DataId equals b.DataId
+      select new
+      {
+        a.DataId
+      });
+
+    queryContext.FromItemName = "stream1";
+
+    //Act
+    var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+    //Assert
+    string expectedKsql =
+      @$"SELECT a.data_id DataId FROM {stream1TableName} a
+INNER JOIN {stream2TableName} b
+ON a.data_id = b.data_id
+EMIT CHANGES;";
+
+    ksql.Should().BeEquivalentTo(expectedKsql);
+  }
+
+  [TestMethod]
+  [Ignore]
+  public void BuildKSql_SelectFrom3MultiJoinSameTypePropertyWithJsonPropertyNameAttribute()
+  {
+    //Arrange
+    contextOptions.ShouldPluralizeFromItemName = false;
+
+    string stream1TableName = "stream1";
+    string stream2TableName = "stream2";
+    string stream3TableName = "stream3";
+
+    var query = (from a in new TestableDbProvider(contextOptions).CreateQueryStream<MySensor>(stream1TableName)
+      join b in Source.Of<MySensor>(stream2TableName) on a.DataId equals b.DataId
+      join c in Source.Of<MySensor>(stream3TableName) on a.DataId equals c.DataId
+      select new
+      {
+        a.DataId,
+        b.Data,
+        c.SensorId2,
+      });
+
+    queryContext.FromItemName = "stream1";
+
+    //Act
+    var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+    //Assert
+    string expectedKsql =
+      @$"SELECT a.data_id DataId, b.Data Data, c.SensorId SensorId2 FROM {stream1TableName} a
+INNER JOIN {stream3TableName} c
+ON a.data_id = c.data_id
+INNER JOIN {stream2TableName} b
+ON a.data_id = b.data_id
+EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
