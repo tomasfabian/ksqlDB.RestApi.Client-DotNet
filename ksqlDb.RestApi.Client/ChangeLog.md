@@ -15,6 +15,8 @@
 ### Serialization formats
 - added `Protobuf_NoSR` serialization format
 
+- #27 added support to use `JsonPropertyNameAttribute` for anonymous objects in selects for queries
+
 # v2.2.1
 - #27 added support to use `JsonPropertyNameAttribute` for selects in queries
 
