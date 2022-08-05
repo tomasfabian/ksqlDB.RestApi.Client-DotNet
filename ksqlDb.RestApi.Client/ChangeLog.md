@@ -1,5 +1,8 @@
 ﻿# ksqlDB.RestApi.Client
 
+# v2.3.1-rc.1
+- adds support for Protobuf content type via the ksqlDB.RestApi.Client.Protobuf package
+
 # v2.3.0
 - added TFM for .NET 6.0
 

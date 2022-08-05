@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using ksqlDB.RestApi.Client.KSql.Linq;
+﻿using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.PullQueries;
 using ksqlDB.RestApi.Client.KSql.RestApi;
@@ -20,6 +14,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context;
 
+/// <summary>
+/// KSqlDBContext enables the creation of push and pull queries.
+/// </summary>
 public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 {
   private readonly KSqlDBContextOptions contextOptions;
@@ -39,42 +36,48 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 
   internal KSqlDBContextOptions ContextOptions => contextOptions;
 
-  internal readonly KSqlDBContextQueryDependenciesProvider KSqlDBQueryContext;
+  internal KSqlDBContextQueryDependenciesProvider KSqlDBQueryContext { get; set; }
 
 #if !NETSTANDARD
 
-    protected override void OnConfigureServices(IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
+  protected override void OnConfigureServices(IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
+  {
+    base.OnConfigureServices(serviceCollection, contextOptions);
+
+    serviceCollection.TryAddScoped<IKSqlDbProvider, KSqlDbQueryStreamProvider>();
+
+    serviceCollection.TryAddSingleton<IKSqlDbParameters>(contextOptions.QueryStreamParameters);
+  }
+
+  public IAsyncEnumerable<TEntity> CreateQueryStream<TEntity>(QueryStreamParameters queryStreamParameters, CancellationToken cancellationToken = default)
+  {
+    var serviceScopeFactory = Initialize(contextOptions);
+
+    var ksqlDBProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IKSqlDbProvider>();
+
+    return ksqlDBProvider.Run<TEntity>(queryStreamParameters, cancellationToken);
+  }
+
+  /// <summary>
+  /// Creates a push query for the query-stream endpoint.
+  /// </summary>
+  /// <typeparam name="TEntity">The type of the data in the data source.</typeparam>
+  /// <param name="fromItemName">Overrides the name of the stream or table which by default is derived from TEntity</param>
+  /// <returns>A Qbservable for query composition and execution.</returns>
+  public IQbservable<TEntity> CreateQueryStream<TEntity>(string fromItemName = null)
+  {
+    var serviceScopeFactory = Initialize(contextOptions);
+
+    if (fromItemName == String.Empty)
+      fromItemName = null;
+
+    var queryStreamContext = new QueryContext
     {
-      base.OnConfigureServices(serviceCollection, contextOptions);
+      FromItemName = fromItemName
+    };
 
-      serviceCollection.TryAddScoped<IKSqlDbProvider, KSqlDbQueryStreamProvider>();
-
-      serviceCollection.TryAddSingleton<IKSqlDbParameters>(contextOptions.QueryStreamParameters);
-    }
-
-    public IAsyncEnumerable<TEntity> CreateQueryStream<TEntity>(QueryStreamParameters queryStreamParameters, CancellationToken cancellationToken = default)
-    {
-      var serviceScopeFactory = Initialize(contextOptions);
-
-      var ksqlDBProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IKSqlDbProvider>();
-
-      return ksqlDBProvider.Run<TEntity>(queryStreamParameters, cancellationToken);
-    }
-
-    public IQbservable<TEntity> CreateQueryStream<TEntity>(string fromItemName = null)
-    {
-      var serviceScopeFactory = Initialize(contextOptions);
-
-      if (fromItemName == String.Empty)
-        fromItemName = null;
-
-      var queryStreamContext = new QueryContext
-      {
-        FromItemName = fromItemName
-      };
-
-      return new KQueryStreamSet<TEntity>(serviceScopeFactory, queryStreamContext);
-    }
+    return new KQueryStreamSet<TEntity>(serviceScopeFactory, queryStreamContext);
+  }
 
 #endif
 
@@ -87,6 +90,12 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
     return ksqlDBProvider.Run<TEntity>(queryParameters, cancellationToken);
   }
 
+  /// <summary>
+  /// Creates a push query for the query endpoint.
+  /// </summary>
+  /// <typeparam name="TEntity">The type of the data in the data source.</typeparam>
+  /// <param name="fromItemName">Overrides the name of the stream or table which by default is derived from TEntity</param>
+  /// <returns>A Qbservable for query composition and execution.</returns>
   public IQbservable<TEntity> CreateQuery<TEntity>(string fromItemName = null)
   {
     var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
@@ -145,6 +154,12 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 
   #region Pull queries
 
+  /// <summary>
+  /// Creates a pull query.
+  /// </summary>
+  /// <typeparam name="TEntity">The type of the data in the data source.</typeparam>
+  /// <param name="tableName">Overrides the name of the table which by default is derived from TEntity</param>
+  /// <returns>An IPullable for query composition and execution.</returns>
   public IPullable<TEntity> CreatePullQuery<TEntity>(string tableName = null)
   {
     var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
@@ -160,6 +175,13 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
     return new KPullSet<TEntity>(serviceScopeFactory, queryContext);
   }
 
+  /// <summary>
+  /// Executes the provided ksql query.
+  /// </summary>
+  /// <typeparam name="TEntity"></typeparam>
+  /// <param name="ksql">The KSQL query to execute.</param>
+  /// <param name="cancellationToken"></param>
+  /// <returns>The first item.</returns>
   public ValueTask<TEntity> ExecutePullQuery<TEntity>(string ksql, CancellationToken cancellationToken = default)
   {
     if (string.IsNullOrEmpty(ksql))
@@ -231,7 +253,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
     cts.Dispose();
 
 #if !NETSTANDARD
-      await base.OnDisposeAsync();
+    await base.OnDisposeAsync();
 #endif
     if (KSqlDBQueryContext != null)
       await KSqlDBQueryContext.DisposeAsync().ConfigureAwait(false);
