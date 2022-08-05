@@ -152,6 +152,65 @@ run in command line:
 # CDC - Push notifications from Sql Server tables with Kafka
 Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with SqlServer.Connector package together with the Debezium connector streaming platform.
 
+# ksqlDB.RestApi.Client.ProtoBuf
+- adds support for Protobuf content type. The package uses [protobuf-net](https://github.com/protobuf-net/protobuf-net).
+
+Install with NuGet package manager:
+
+```
+Install-Package ksqlDB.RestApi.Client.ProtoBuf
+```
+
+Content-type
+```
+application/vnd.ksql.v1+protobuf
+```
+
+```C#
+using System.Reactive.Linq;
+using ksqlDB.Api.Client.Samples.Models.Movies;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDb.RestApi.Client.ProtoBuf.KSql.Query;
+
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+await using var context = new ProtoBufKSqlDbContext(ksqlDbUrl);
+
+var query = context.CreateQueryStream<MovieProto>("movie") // query-stream endpoint
+  // var query = context.CreateQuery<MovieProto>("movie") // query endpoint
+  .Where(p => p.Title != "E.T.")
+  .Where(c => c.Title.ToLower().Contains("hard".ToLower()) || c.Id == 1)
+  .Select(l => new { Id = l.Id, l.Title, l.Release_Year })
+  .Take(2); // LIMIT 2    
+
+var ksql = query.ToQueryString();
+
+Console.WriteLine("Generated ksql:");
+Console.WriteLine(ksql);
+Console.WriteLine();
+
+using var disposable = query
+  .ToObservable() // client side processing starts here lazily after subscription. Switches to Rx.NET
+  .Finally(() => { Console.WriteLine("Finally"); })
+  .Subscribe(onNext: movie =>
+  {
+    Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title}");
+    Console.WriteLine();
+  }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
+
+using ProtoBuf;
+
+[ProtoContract]
+record MovieProto
+{
+  [ProtoMember(1)]
+  public string Title { get; set; } = null!;
+
+  [ProtoMember(2)]
+  public int Id { get; set; }
+}
+```
+
 ### Nuget
 ```
 Install-Package SqlServer.Connector -Version 0.3.0
@@ -2933,6 +2992,19 @@ var restApiClient = new KSqlDbRestApiClient(httpClientFactory)
 
 ## `IPullable<T>.FirstOrDefaultAsync` (v2.0.0)
 `IPullable<T>.GetAsync` was renamed to `IPullable<T>.FirstOrDefaultAsync`
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
+
+private static async Task GetAsync(IPullable<IoTSensorStats> pullQuery)
+{
+  var result = await pullQuery
+    .FirstOrDefaultAsync();
+
+  Console.WriteLine(
+    $"Pull query GetAsync result => Id: {result?.SensorId} - Avg Value: {result?.AvgValue} - Window Start {result?.WindowStart}");
+}
+```
 
 ## KSqlDbRestApiClient.InsertIntoAsync
 - added support for deeply nested types - Maps, Structs and Arrays
