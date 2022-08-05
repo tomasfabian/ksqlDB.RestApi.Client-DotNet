@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;netcoreapp3.1;net6.0</TargetFrameworks>
+		<Authors>Tomas Fabian</Authors>
+		<Company />
+		<PackageLicenseFile></PackageLicenseFile>
+		<PackageProjectUrl>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/ksqlDb.RestApi.Client.ProtoBuf</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet</RepositoryUrl>
+		<Copyright>@tomasfabian</Copyright>
+		<Description>
+			ksqlDB.RestApi.Client.Protobuf adds support for Protobuf content type. ksqlDB.RestApi.Client is a C# LINQ-enabled client API for issuing and consuming ksqlDB push queries.
+			Targets .NET 6, .NET Core 3.1 and .NET Standard 2.0.
+			Documentation for the library can be found at https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/README.md.
+		</Description>
+		<PackageTags>ksql ksqlDB Protobuf LINQ .NET csharp push query</PackageTags>
+		<Version>0.1.0-rc.1</Version>
+		<AssemblyVersion>0.1.0.0</AssemblyVersion>
+		<LangVersion>10.0</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<PackageReleaseNotes>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/ksqlDb.RestApi.Client.ProtoBuf/ChangeLog.md</PackageReleaseNotes>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<!-- <PackageReference Include="ksqlDb.RestApi.Client" Version="2.4.0" /> -->
+		<PackageReference Include="protobuf-net" Version="3.1.17" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />
+	</ItemGroup>
+
+</Project>
