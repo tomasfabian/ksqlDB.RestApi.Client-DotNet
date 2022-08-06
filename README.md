@@ -149,16 +149,12 @@ run in command line:
 
 - set docker-compose.csproj as startup project in InsideOut.sln for an embedded Kafka connect integration and stream processing examples. 
 
-# CDC - Push notifications from Sql Server tables with Kafka
-Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with SqlServer.Connector package together with the Debezium connector streaming platform.
-
 # ksqlDB.RestApi.Client.ProtoBuf
 - adds support for Protobuf content type. The package uses [protobuf-net](https://github.com/protobuf-net/protobuf-net).
 
-Install with NuGet package manager:
-
+Install:
 ```
-Install-Package ksqlDB.RestApi.Client.ProtoBuf
+dotnet add package ksqlDb.RestApi.Client.ProtoBuf --version 0.1.0-rc.1
 ```
 
 Content-type
@@ -210,6 +206,9 @@ record MovieProto
   public int Id { get; set; }
 }
 ```
+
+# CDC - Push notifications from Sql Server tables with Kafka
+Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with SqlServer.Connector package together with the Debezium connector streaming platform.
 
 ### Nuget
 ```
