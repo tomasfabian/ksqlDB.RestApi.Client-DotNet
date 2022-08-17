@@ -12,13 +12,13 @@ Set docker-compose.csproj as startup project in Samples\Connect\Connect.SqlServe
 
 ### Nuget
 ```
-Install-Package SqlServer.Connector -Version 0.3.0-rc.1
+Install-Package SqlServer.Connector -Version 1.0.0
 
 Install-Package ksqlDb.RestApi.Client
 ```
 
 # v1.0.0
-KsqlDbConnect's constructor argument was change from an Uri to `ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory.IHttpClientFactory`
+KsqlDbConnect's constructor argument was changed from an Uri to `ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory.IHttpClientFactory`
 
 ```
 var httpClient = new HttpClient
@@ -28,7 +28,7 @@ var httpClient = new HttpClient
 
 var httpClientFactory = new HttpClientFactory(httpClient);
 
-var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+var restApiClient = new KsqlDbConnect(httpClientFactory);
 ```
 
 ### Subscribing to a CDC stream (v0.1.0)
@@ -38,13 +38,14 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ksqlDb.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDb.RestApi.Client.KSql.Query.Context;
-using ksqlDb.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDb.RestApi.Client.KSql.RestApi;
 using ksqlDb.RestApi.Client.KSql.RestApi.Generators;
-using ksqlDb.RestApi.Client.KSql.RestApi.Serialization;
-using ksqlDb.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using SqlServer.Connector.Cdc;
 using SqlServer.Connector.Cdc.Connectors;
 using SqlServer.Connector.Cdc.Extensions;
