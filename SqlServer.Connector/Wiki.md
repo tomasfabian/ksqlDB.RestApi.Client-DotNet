@@ -320,8 +320,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using ksqlDb.RestApi.Client.KSql.Query.Context;
 using ksqlDb.RestApi.Client.KSql.RestApi;
-using ksqlDb.RestApi.Client.KSql.RestApi.Serialization;
-using ksqlDb.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using SqlServer.Connector.Cdc;
 
 private static async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationToken = default)
@@ -460,9 +460,9 @@ The following example demonstrates ksqldb server side filtering of database tran
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ksqlDb.RestApi.Client.KSql.Linq;
-using ksqlDb.RestApi.Client.KSql.Query.Context;
-using ksqlDb.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
 using SqlServer.Connector.Cdc;
 using SqlServer.Connector.Cdc.Extensions;
 
