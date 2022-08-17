@@ -212,7 +212,7 @@ Monitor Sql Server tables for changes and forward them to the appropriate Kafka 
 
 ### Nuget
 ```
-Install-Package SqlServer.Connector -Version 0.3.0
+Install-Package SqlServer.Connector -Version 1.0.0
 Install-Package ksqlDB.RestApi.Client
 ```
 
