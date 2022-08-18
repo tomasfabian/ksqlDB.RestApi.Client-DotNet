@@ -154,7 +154,7 @@ run in command line:
 
 Install:
 ```
-dotnet add package ksqlDb.RestApi.Client.ProtoBuf --version 0.1.0-rc.1
+dotnet add package ksqlDb.RestApi.Client.ProtoBuf
 ```
 
 Content-type
