@@ -1,20 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Blazor.Sample.Data;
-using Blazor.Sample.Data.Sensors;
+using Blazor.Sample.Extensions.Autofac;
 using Blazor.Sample.HostedServices;
-using Blazor.Sample.Kafka;
-using Blazor.Sample.Kafka.Consumers;
-using Confluent.Kafka;
-using InsideOut.Consumer;
-using InsideOut.Producer;
 using Microsoft.EntityFrameworkCore;
-using SqlServer.Connector.Cdc;
-using SqlServer.Connector.Connect;
 using ksqlDb.RestApi.Client.DependencyInjection;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 
@@ -31,9 +20,9 @@ builder.Services.AddHostedService<IoTSimulatorService>();
 
 ConfigureServices(builder.Services, builder.Configuration);
 
-builder.Host.ConfigureContainer<ContainerBuilder>(c =>
+builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
-  OnRegisterTypes(c, builder.Configuration);
+  containerBuilder.OnRegisterTypes(builder.Configuration);
 });
 
 var app = builder.Build();
@@ -75,93 +64,29 @@ static async Task TryMigrateDatabaseAsync(IHost host)
   }
 }
 
-void ConfigureServices(IServiceCollection services, IConfiguration Configuration)
+void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 {
   services.AddRazorPages();
   services.AddServerSideBlazor();
 
   services.AddDbContext<IKSqlDBContext, KSqlDBContext>(options =>
   {
-    string ksqlDbUrl = Configuration["ksqlDb:Url"];
+    string ksqlDbUrl = configuration["ksqlDb:Url"];
 
     var setupParameters = options.UseKSqlDb(ksqlDbUrl);
 
   }, contextLifetime: ServiceLifetime.Transient, restApiLifetime: ServiceLifetime.Transient);
 
-  ConfigureEntityFramework(services, Configuration);
+  ConfigureEntityFramework(services, configuration);
 }
 
-void ConfigureEntityFramework(IServiceCollection services, IConfiguration Configuration)
+void ConfigureEntityFramework(IServiceCollection services, IConfiguration configuration)
 {
-  var connectionString = Configuration.GetConnectionString("DefaultConnection");
+  var connectionString = configuration.GetConnectionString("DefaultConnection");
 
   services.AddDbContextFactory<ApplicationDbContext>(options => { options.UseSqlServer(connectionString); });
 
   services.AddScoped(p =>
     p.GetRequiredService<IDbContextFactory<ApplicationDbContext>>()
       .CreateDbContext());
-}
-
-void OnRegisterTypes(ContainerBuilder containerBuilder, IConfiguration Configuration)
-{
-  string connectionString = Configuration["ConnectionStrings:DefaultConnection"];
-
-  containerBuilder.RegisterType<CdcClient>()
-    .As<ISqlServerCdcClient>()
-    .SingleInstance()
-    .WithParameter(nameof(connectionString), connectionString);
-
-  Uri ksqlDbUrl = new Uri(Configuration["ksqlDb:Url"]);
-
-  containerBuilder.RegisterType<KsqlDbConnect>()
-    .As<IKsqlDbConnect>()
-    .SingleInstance()
-    .WithParameter(nameof(ksqlDbUrl), ksqlDbUrl);
-
-  string bootstrapServers = Configuration["Kafka:BootstrapServers"];
-
-  RegisterConsumers(containerBuilder, bootstrapServers);
-
-  RegisterProducers(containerBuilder, bootstrapServers);
-}
-
-static void RegisterProducers(ContainerBuilder containerBuilder, string bootstrapServers)
-{
-  var producerConfig = new ProducerConfig
-  {
-    BootstrapServers = bootstrapServers,
-    Acks = Acks.Leader
-  };
-
-  containerBuilder.RegisterInstance(producerConfig);
-
-  containerBuilder.RegisterType<KafkaProducer<int, IoTSensor>>()
-    .As<IKafkaProducer<int, IoTSensor>>()
-    .WithParameter("topicName", TopicNames.IotSensors)
-    .WithParameter(nameof(producerConfig), producerConfig);
-}
-
-static void RegisterConsumers(ContainerBuilder containerBuilder, string bootstrapServers)
-{
-  var consumerConfig = new ConsumerConfig
-  {
-    BootstrapServers = bootstrapServers,
-    ClientId = "Client01" + "_consumer",
-    GroupId = System.Diagnostics.Process.GetCurrentProcess().ProcessName,
-    AutoOffsetReset = AutoOffsetReset.Latest,
-    PartitionAssignmentStrategy = PartitionAssignmentStrategy.CooperativeSticky
-  };
-
-  containerBuilder.RegisterInstance(consumerConfig);
-
-  containerBuilder.RegisterType<SensorsStreamConsumer>()
-    .As<IKafkaConsumer<string, SensorsStream>>()
-    .WithParameter(nameof(consumerConfig), consumerConfig);
-
-  consumerConfig.ClientId = "Client02" + "_consumer";
-  consumerConfig.GroupId = $"{nameof(IoTSensorStats)}";
-
-  containerBuilder.RegisterType<SensorsTableConsumer>()
-    .As<IKafkaConsumer<string, IoTSensorStats>>()
-    .WithParameter(nameof(consumerConfig), consumerConfig);
 }
