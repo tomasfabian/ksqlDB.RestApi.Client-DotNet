@@ -209,6 +209,6 @@ internal abstract class KSqlDbProvider : IKSqlDbProvider
 
   protected bool IsErrorRow(string rawJson)
   {
-    return rawJson.StartsWith("{\"@type\":\"statement_error\"") || rawJson.StartsWith("{\"@type\":\"generic_error\"");
+    return KSqlDbProviderValueReader.IsErrorRow(rawJson);
   }
 }

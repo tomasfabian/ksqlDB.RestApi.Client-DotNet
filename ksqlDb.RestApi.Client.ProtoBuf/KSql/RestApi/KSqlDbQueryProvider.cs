@@ -2,7 +2,7 @@
 using System.Text.Json;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi;
-using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses;
 using ksqlDb.RestApi.Client.ProtoBuf.KSql.RestApi.Responses.Query;
 using Microsoft.Extensions.Logging;
@@ -25,21 +25,6 @@ internal class KSqlDbQueryProvider : KSqlDbProvider
 
   protected override string QueryEndPointName => "query";
 
-  private string ExtractRow(string rawData)
-  {
-    if (string.IsNullOrEmpty(rawData))
-      return rawData;
-
-    if (rawData.StartsWith("["))
-      rawData = rawData.Substring(startIndex: 1);
-    if (rawData.EndsWith(","))
-      rawData = rawData.Substring(0, rawData.Length - 1);
-    if (rawData.EndsWith("]"))
-      rawData = rawData.Substring(0, rawData.Length - 1);
-
-    return rawData;
-  }
-
   private HeaderResponse? headerResponse;
 
   protected override RowValue<T>? OnLineRead<T>(string rawJson)
@@ -47,11 +32,11 @@ internal class KSqlDbQueryProvider : KSqlDbProvider
     if (rawJson == String.Empty)
       return default;
 
-    rawJson = ExtractRow(rawJson);
+    rawJson = KSqlDbProviderValueReader.ExtractRow(rawJson);
 
     if (IsErrorRow(rawJson))
     {
-      OnError(rawJson);
+      KSqlDbProviderValueReader.OnError(rawJson, GetOrCreateJsonSerializerOptions());
     }
 
     if (headerResponse == null && rawJson.StartsWith("{\"header\""))
@@ -61,20 +46,6 @@ internal class KSqlDbQueryProvider : KSqlDbProvider
       return CreateRowValue<T>(rawJson);
 
     return default;
-  }
-
-  private void OnError(string rawJson)
-  {
-    var jsonSerializerOptions = GetOrCreateJsonSerializerOptions();
-
-    var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(rawJson, jsonSerializerOptions);
-
-    if (errorResponse != null)
-      throw new KSqlQueryException(errorResponse.Message)
-      {
-        Statement = errorResponse.StatementText,
-        ErrorCode = errorResponse.ErrorCode
-      };
   }
 
   protected override HttpRequestMessage CreateQueryHttpRequestMessage(HttpClient httpClient, object parameters)
@@ -105,7 +76,7 @@ internal class KSqlDbQueryProvider : KSqlDbProvider
 
     if (IsErrorRow(rawJson))
     {
-      OnError(rawJson);
+      KSqlDbProviderValueReader.OnError(rawJson, GetOrCreateJsonSerializerOptions());
     }
 
     return null;

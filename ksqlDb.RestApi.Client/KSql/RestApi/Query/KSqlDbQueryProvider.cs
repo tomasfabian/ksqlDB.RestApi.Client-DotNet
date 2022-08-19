@@ -3,12 +3,10 @@ using System.Linq;
 using System.Text.Json;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
-using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query;
 using Microsoft.Extensions.Logging;
-using ErrorResponse = ksqlDB.RestApi.Client.KSql.RestApi.Responses.ErrorResponse;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Query;
 
@@ -31,11 +29,11 @@ internal class KSqlDbQueryProvider : KSqlDbProvider
     if (rawJson == String.Empty)
       return default;
 
-    rawJson = ExtractRow(rawJson);
+    rawJson = KSqlDbProviderValueReader.ExtractRow(rawJson);
 
     if (IsErrorRow(rawJson))
     {
-      OnError(rawJson);
+      KSqlDbProviderValueReader.OnError(rawJson, GetOrCreateJsonSerializerOptions());
     }
 
     if (headerResponse == null && rawJson.StartsWith("{\"header\""))
@@ -45,33 +43,6 @@ internal class KSqlDbQueryProvider : KSqlDbProvider
       return CreateRowValue<T>(rawJson);
 
     return default;
-  }
-
-  private string ExtractRow(string rawData)
-  {
-    if (string.IsNullOrEmpty(rawData))
-      return rawData;
-
-    if (rawData.StartsWith("["))
-      rawData = rawData.Substring(startIndex: 1);
-    if (rawData.EndsWith(","))
-      rawData = rawData.Substring(0, rawData.Length - 1);
-    if (rawData.EndsWith("]"))
-      rawData = rawData.Substring(0, rawData.Length - 1);
-
-    return rawData;
-  }
-
-  private static void OnError(string rawJson)
-  {
-    var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(rawJson);
-
-    if (errorResponse != null)
-      throw new KSqlQueryException(errorResponse.Message)
-      {
-        Statement = errorResponse.StatementText,
-        ErrorCode = errorResponse.ErrorCode
-      };
   }
 
   private RowValue<T> CreateRowValue<T>(string rawJson)
@@ -105,7 +76,7 @@ internal class KSqlDbQueryProvider : KSqlDbProvider
     }
     
     if (IsErrorRow(rawJson))
-      OnError(rawJson);
+      KSqlDbProviderValueReader.OnError(rawJson, GetOrCreateJsonSerializerOptions());
 
     return null;
   }
