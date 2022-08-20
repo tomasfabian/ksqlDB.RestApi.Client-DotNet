@@ -2,10 +2,9 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Blazor.Sample.Data;
 using Blazor.Sample.Extensions.Autofac;
+using Blazor.Sample.Extensions.DependencyInjection;
 using Blazor.Sample.HostedServices;
 using Microsoft.EntityFrameworkCore;
-using ksqlDb.RestApi.Client.DependencyInjection;
-using ksqlDB.RestApi.Client.KSql.Query.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +17,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddHostedService<IoTSimulatorService>();
 
-ConfigureServices(builder.Services, builder.Configuration);
+builder.Services.ConfigureServices(builder.Configuration);
 
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
@@ -62,31 +61,4 @@ static async Task TryMigrateDatabaseAsync(IHost host)
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await db.Database.MigrateAsync();
   }
-}
-
-void ConfigureServices(IServiceCollection services, IConfiguration configuration)
-{
-  services.AddRazorPages();
-  services.AddServerSideBlazor();
-
-  services.AddDbContext<IKSqlDBContext, KSqlDBContext>(options =>
-  {
-    string ksqlDbUrl = configuration["ksqlDb:Url"];
-
-    var setupParameters = options.UseKSqlDb(ksqlDbUrl);
-
-  }, contextLifetime: ServiceLifetime.Transient, restApiLifetime: ServiceLifetime.Transient);
-
-  ConfigureEntityFramework(services, configuration);
-}
-
-void ConfigureEntityFramework(IServiceCollection services, IConfiguration configuration)
-{
-  var connectionString = configuration.GetConnectionString("DefaultConnection");
-
-  services.AddDbContextFactory<ApplicationDbContext>(options => { options.UseSqlServer(connectionString); });
-
-  services.AddScoped(p =>
-    p.GetRequiredService<IDbContextFactory<ApplicationDbContext>>()
-      .CreateDbContext());
 }
