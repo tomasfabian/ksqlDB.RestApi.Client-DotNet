@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using ksqlDB.Api.Client.Samples.Models.Sensors;
+using ksqlDB.RestApi.Client.DotNetFramework.Sample.Models.Sensors;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -13,7 +13,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-namespace ksqlDB.Api.Client.Samples.PullQuery;
+namespace ksqlDB.RestApi.Client.DotNetFramework.Sample.PullQuery;
 
 public class PullQueryExample
 {

@@ -6,7 +6,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Microsoft.Extensions.Logging;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
-namespace ksqlDB.Api.Client.Samples.Providers;
+namespace ksqlDB.RestApi.Client.DotNetFramework.Sample.Providers;
 
 public class KSqlDbRestApiProvider : KSqlDbRestApiClient, IKSqlDbRestApiProvider
 {

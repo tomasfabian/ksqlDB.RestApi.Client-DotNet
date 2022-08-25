@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using ksqlDB.Api.Client.Samples.Models.Movies;
+using ksqlDB.RestApi.Client.DotNetFramework.Sample.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
-namespace ksqlDB.Api.Client.Samples.Providers;
+namespace ksqlDB.RestApi.Client.DotNetFramework.Sample.Providers;
 
 public class MoviesProvider
 {

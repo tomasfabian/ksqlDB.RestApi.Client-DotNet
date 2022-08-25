@@ -1,4 +1,4 @@
-﻿namespace ksqlDB.Api.Client.Samples.Models.Sensors
+﻿namespace ksqlDB.RestApi.Client.DotNetFramework.Sample.Models.Sensors
 {
   public record IoTSensorStats
   {
