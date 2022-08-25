@@ -49,9 +49,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\ksqlDB.RestApi.Client.Sample\PullQuery\PullQueryExample.cs">
-      <Link>PullQuery\PullQueryExample.cs</Link>
-    </Compile>
     <Compile Include="Models\Movies\Lead_Actor.cs" />
     <Compile Include="Models\Movies\Movie.cs" />
     <Compile Include="Models\Sensors\IoTSensor.cs" />
@@ -62,6 +59,7 @@
     <Compile Include="Providers\IKSqlDbRestApiProvider.cs" />
     <Compile Include="Providers\KSqlDbRestApiProvider.cs" />
     <Compile Include="Providers\MoviesProvider.cs" />
+    <Compile Include="PullQuery\PullQueryExample.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
