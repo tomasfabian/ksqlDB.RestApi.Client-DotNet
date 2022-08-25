@@ -49,21 +49,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\ksqlDB.RestApi.Client.Sample\Models\Movies\Lead_Actor.cs">
-      <Link>Movies\Lead_Actor.cs</Link>
-    </Compile>
-    <Compile Include="..\ksqlDB.RestApi.Client.Sample\Models\Movies\Movie.cs">
-      <Link>Movies\Movie.cs</Link>
-    </Compile>
-    <Compile Include="..\ksqlDB.RestApi.Client.Sample\Models\Sensors\IoTSensor.cs">
-      <Link>Models\Sensors\IoTSensor.cs</Link>
-    </Compile>
-    <Compile Include="..\ksqlDB.RestApi.Client.Sample\Models\Sensors\IoTSensorStats.cs">
-      <Link>Models\Sensors\IoTSensorStats.cs</Link>
-    </Compile>
-    <Compile Include="..\ksqlDB.RestApi.Client.Sample\Models\Tweet.cs">
-      <Link>Models\Tweet.cs</Link>
-    </Compile>
     <Compile Include="..\ksqlDB.RestApi.Client.Sample\Providers\IKSqlDbRestApiProvider.cs">
       <Link>Providers\IKSqlDbRestApiProvider.cs</Link>
     </Compile>
@@ -76,6 +61,11 @@
     <Compile Include="..\ksqlDB.RestApi.Client.Sample\PullQuery\PullQueryExample.cs">
       <Link>PullQuery\PullQueryExample.cs</Link>
     </Compile>
+    <Compile Include="Models\Movies\Lead_Actor.cs" />
+    <Compile Include="Models\Movies\Movie.cs" />
+    <Compile Include="Models\Sensors\IoTSensor.cs" />
+    <Compile Include="Models\Sensors\IoTSensorStats.cs" />
+    <Compile Include="Models\Tweet.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -108,6 +98,7 @@
       <Version>5.0.0</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <!--
   <ItemGroup>
     <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj">
