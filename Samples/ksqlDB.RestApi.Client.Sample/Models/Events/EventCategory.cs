@@ -1,7 +1,6 @@
-﻿namespace ksqlDB.Api.Client.Samples.Models.Events
+﻿namespace ksqlDB.Api.Client.Samples.Models.Events;
+
+record EventCategory
 {
-  record EventCategory
-  {
-    public string Name { get; set; } = null!;
-  }
+  public string Name { get; set; } = null!;
 }

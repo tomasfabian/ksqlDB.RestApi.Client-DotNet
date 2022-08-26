@@ -1,7 +1,6 @@
-﻿namespace ksqlDB.Api.Client.Samples.Models
+﻿namespace ksqlDB.Api.Client.Samples.Models;
+
+struct Thumbnail
 {
-  struct Thumbnail
-  {
-    public byte[] Image { get; set; }
-  }
+  public byte[] Image { get; set; }
 }

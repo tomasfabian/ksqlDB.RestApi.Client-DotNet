@@ -1,8 +1,7 @@
-﻿namespace ksqlDB.Api.Client.Samples.Models
+﻿namespace ksqlDB.Api.Client.Samples.Models;
+
+public record Address
 {
-  public record Address
-  {
-    public int Number { get; set; }
-    public string Street { get; set; } = null!;
-  }
+  public int Number { get; set; }
+  public string Street { get; set; } = null!;
 }

@@ -1,11 +1,10 @@
 ﻿using ksqlDB.RestApi.Client.KSql.Query;
 
-namespace ksqlDB.Api.Client.Samples.Models.Movies
+namespace ksqlDB.Api.Client.Samples.Models.Movies;
+
+public class Movie : Record
 {
-  public class Movie : Record
-  {
-    public string Title { get; set; } = null!;
-    public int Id { get; set; }
-    public int Release_Year { get; set; }
-  }
+  public string Title { get; set; } = null!;
+  public int Id { get; set; }
+  public int Release_Year { get; set; }
 }

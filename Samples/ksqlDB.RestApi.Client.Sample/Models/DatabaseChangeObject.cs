@@ -1,22 +1,21 @@
 ﻿using ksqlDB.Api.Client.Samples.Models.Sensors;
 
-namespace ksqlDB.Api.Client.Samples.Models
+namespace ksqlDB.Api.Client.Samples.Models;
+
+public record IoTSensorChange : DatabaseChangeObject<IoTSensor>
 {
-  public record IoTSensorChange : DatabaseChangeObject<IoTSensor>
-  {
-  }
+}
 
-  public record DatabaseChangeObject<TEntity> : DatabaseChangeObject
-  {
-    public TEntity? Before { get; set; }
-    public TEntity? After { get; set; }
-    public TEntity? EntityBefore => Before;
-    public TEntity? EntityAfter => After;
-  }
+public record DatabaseChangeObject<TEntity> : DatabaseChangeObject
+{
+  public TEntity? Before { get; set; }
+  public TEntity? After { get; set; }
+  public TEntity? EntityBefore => Before;
+  public TEntity? EntityAfter => After;
+}
 
-  public record DatabaseChangeObject
-  {
-    public string Op { get; set; } = null!;
-    public long? TsMs { get; set; }
-  }
+public record DatabaseChangeObject
+{
+  public string Op { get; set; } = null!;
+  public long? TsMs { get; set; }
 }
