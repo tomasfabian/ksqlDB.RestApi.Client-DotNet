@@ -43,25 +43,29 @@ internal class JsonArrayParser
 
     bool isInsideString = false;
 
-    foreach(var ch in row)
+    char? previousChar = null;
+
+    foreach(var currentChar in row)
     {
-      if(structuredTypeStarted.Contains(ch))
+      if(structuredTypeStarted.Contains(currentChar))
         isStructuredType++;
 		 
-      if(structuredTypeEnded.Contains(ch))
+      if(structuredTypeEnded.Contains(currentChar))
         isStructuredType--;
 
-      if (ch == '"')
+      if (currentChar == '"' && (previousChar == null || previousChar != '\\'))
         isInsideString = !isInsideString;
 
-      if(ch != ',' || isInsideString || isStructuredType > 0)
-        stringBuilder.Append(ch);
+      if(currentChar != ',' || isInsideString || isStructuredType > 0)
+        stringBuilder.Append(currentChar);
 
-      if(ch == ',' && !isInsideString && !(isStructuredType > 0))
+      if(currentChar == ',' && !isInsideString && !(isStructuredType > 0))
       {
         yield return stringBuilder.ToString();
         stringBuilder.Clear();
       }
+
+      previousChar = currentChar;
     }
 	
     yield return stringBuilder.ToString();
