@@ -191,4 +191,19 @@ public class JsonArrayParserTests : TestBase
     string expectedJson = JObject.Parse($"{{\"KSQL_COL_0\": {mapValue},\"IsRobot\": true}}").ToString();
     JObject.Parse(json).ToString().Should().BeEquivalentTo(expectedJson);
   }
+
+  [TestMethod]
+  public void CreateJson_QuoteInValue()
+  {
+    //Arrange
+    string[] headerColumns = { "INTERNALID", "FILENAME", "TYPE", "NAME" };
+    string row = "\"7775dee282f011724d3108f25302b999\",\"test.json\",\"Monitor\",\"27\\\" XZ272UVBMIIPHX Black\",\"\"";
+
+    //Act
+    var json = ClassUnderTest.CreateJson(headerColumns, row);
+
+    //Assert
+    string expectedJson = JObject.Parse("{\r\n\"INTERNALID\": \"7775dee282f011724d3108f25302b999\"\r\n,\"FILENAME\": \"test.json\"\r\n,\"TYPE\": \"Monitor\"\r\n,\"NAME\": \"27\\\" XZ272UVBMIIPHX Black\"\r\n}").ToString();
+    JObject.Parse(json).ToString().Should().BeEquivalentTo(expectedJson);
+  }
 }
