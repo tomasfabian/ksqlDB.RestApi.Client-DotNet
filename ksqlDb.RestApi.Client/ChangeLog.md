@@ -1,5 +1,8 @@
 ﻿# ksqlDB.RestApi.Client
 
+# v2.3.2
+- #31 The "CreateJson" function in the "JsonArrayParser" class does not work correctly. bug fix
+
 # v2.3.1
 - adds support for Protobuf content type via the ksqlDb.RestApi.Client.Protobuf package
 
