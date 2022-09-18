@@ -2,15 +2,14 @@
 using System.Text.Json;
 using Confluent.Kafka;
 
-namespace InsideOut.Serdes
-{
-  public class KafkaJsonSerializer<TValue> : ISerializer<TValue>
-  {
-    public byte[] Serialize(TValue data, SerializationContext context)
-    {
-      var json = JsonSerializer.Serialize(data);
+namespace InsideOut.Serdes;
 
-      return Encoding.UTF8.GetBytes(json);
-    }
+public class KafkaJsonSerializer<TValue> : ISerializer<TValue>
+{
+  public byte[] Serialize(TValue data, SerializationContext context)
+  {
+    var json = JsonSerializer.Serialize(data);
+
+    return Encoding.UTF8.GetBytes(json);
   }
 }

@@ -1,13 +1,12 @@
 using System;
 using Confluent.Kafka;
 
-namespace InsideOut.Serdes
+namespace InsideOut.Serdes;
+
+public class KafkaRawDeserializer : IDeserializer<byte[]>
 {
-  public class KafkaRawDeserializer : IDeserializer<byte[]>
+  public byte[] Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
   {
-    public byte[] Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
-    {
-      return isNull ? default : data.ToArray();
-    }
+    return isNull ? default : data.ToArray();
   }
 }
