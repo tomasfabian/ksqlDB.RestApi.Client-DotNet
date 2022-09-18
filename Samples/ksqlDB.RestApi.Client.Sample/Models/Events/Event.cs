@@ -2,7 +2,7 @@
 
 namespace ksqlDB.Api.Client.Samples.Models.Events;
 
-record Event
+internal record Event
 {
   [Key]
   public int Id { get; set; }

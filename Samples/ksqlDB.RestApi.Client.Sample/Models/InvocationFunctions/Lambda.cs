@@ -1,8 +1,9 @@
 ﻿namespace ksqlDB.Api.Client.Samples.Models.InvocationFunctions;
 
-record Lambda
+internal record Lambda
 {
   public int Id { get; set; }
+
   public int[] Lambda_Arr { get; set; } = null!;
   // public IEnumerable<int> Lambda_Arr { get; set; }
 

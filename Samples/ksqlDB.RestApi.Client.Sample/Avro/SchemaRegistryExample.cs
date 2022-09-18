@@ -1,9 +1,9 @@
 ﻿using Confluent.SchemaRegistry;
 using ksqlDB.Api.Client.Samples.Http;
-using Sensors;
 using ksqlDB.Api.Client.Samples.Providers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using Sensors;
 
 namespace ksqlDB.Api.Client.Samples.Avro;
 
@@ -39,7 +39,7 @@ public class SchemaRegistryExample
       Replicas = 1
     };
 
-    var httpResponseMessage = await restApiClient.CreateStreamAsync<IoTSensor>(metadata, ifNotExists: false)
+    var httpResponseMessage = await restApiClient.CreateStreamAsync<IoTSensor>(metadata, false)
       .ConfigureAwait(false);
 
     var httpResponse = await httpResponseMessage.Content.ReadAsStringAsync();

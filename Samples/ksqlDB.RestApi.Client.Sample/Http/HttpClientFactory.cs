@@ -11,7 +11,7 @@ public class HttpClientFactory : IHttpClientFactory
     if (uri == null)
       throw new ArgumentNullException(nameof(uri));
 
-    httpClient = new()
+    httpClient = new HttpClient
     {
       BaseAddress = uri
     };
