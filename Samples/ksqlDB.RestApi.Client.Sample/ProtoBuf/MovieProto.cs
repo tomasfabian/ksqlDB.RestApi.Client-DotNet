@@ -3,7 +3,7 @@
 namespace ksqlDB.Api.Client.Samples.ProtoBuf;
 
 [ProtoContract]
-record MovieProto
+internal record MovieProto
 {
   [ProtoMember(1)]
   public string Title { get; set; } = null!;
