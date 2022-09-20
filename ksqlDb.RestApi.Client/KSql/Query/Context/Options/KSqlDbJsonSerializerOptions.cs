@@ -13,6 +13,7 @@ internal static class KSqlDbJsonSerializerOptions
     };
 
     jsonSerializerOptions.Converters.Add(new TimeSpanToStringConverter());
+    jsonSerializerOptions.Converters.Add(new JsonConverterGuid());
 
     return jsonSerializerOptions;
   }
