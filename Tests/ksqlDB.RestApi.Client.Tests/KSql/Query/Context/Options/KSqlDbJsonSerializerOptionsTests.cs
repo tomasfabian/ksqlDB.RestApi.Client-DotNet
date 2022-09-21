@@ -23,7 +23,7 @@ public class KSqlDbJsonSerializerOptionsTests
   }
 
   [TestMethod]
-  public void CreateInstance_Converters()
+  public void CreateInstance_Converters_ContainsTimeSpanToStringConverter()
   {
     //Arrange
     var options = KSqlDbJsonSerializerOptions.CreateInstance();
@@ -33,5 +33,18 @@ public class KSqlDbJsonSerializerOptionsTests
 
     //Assert
     converters.OfType<TimeSpanToStringConverter>().Any().Should().BeTrue();
+  }
+
+  [TestMethod]
+  public void CreateInstance_Converters_ContainsJsonConverterGuid()
+  {
+    //Arrange
+    var options = KSqlDbJsonSerializerOptions.CreateInstance();
+
+    //Act
+    var converters = options.Converters;
+
+    //Assert
+    converters.OfType<JsonConverterGuid>().Any().Should().BeTrue();
   }
 }
