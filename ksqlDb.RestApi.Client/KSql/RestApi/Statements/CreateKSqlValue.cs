@@ -47,6 +47,12 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
       value = date.ToString(ValueFormats.DateFormat, CultureInfo.InvariantCulture);
       value = $"'{value}'";
     }
+    else if (type == typeof(Guid))
+    {
+      var guid = ((Guid)value).ToString();
+
+      value = $"'{guid}'";
+    }
     else if (type == typeof(DateTimeOffset))
     {
       var dateTimeOffset = (DateTimeOffset)value;
