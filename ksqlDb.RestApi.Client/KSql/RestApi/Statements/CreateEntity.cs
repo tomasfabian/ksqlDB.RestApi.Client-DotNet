@@ -36,6 +36,8 @@ internal sealed class CreateEntity : CreateEntityStatement
     }
     else if (type == typeof(string))
       ksqlType = "VARCHAR";
+    else if (type == typeof(Guid))
+      ksqlType = "VARCHAR";
     else if (type.IsOneOfFollowing(typeof(int), typeof(int?), typeof(short), typeof(short?)))
       ksqlType = "INT";
     else if (type.IsOneOfFollowing(typeof(long), typeof(long?)))
