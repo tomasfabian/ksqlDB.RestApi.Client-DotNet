@@ -1,5 +1,8 @@
 ﻿# ksqlDB.RestApi.Client
 
+# v2.4.0
+- GUID as VARCHAR
+
 # v2.3.2
 - #31 The "CreateJson" function in the "JsonArrayParser" class does not work correctly. bug fix
 
