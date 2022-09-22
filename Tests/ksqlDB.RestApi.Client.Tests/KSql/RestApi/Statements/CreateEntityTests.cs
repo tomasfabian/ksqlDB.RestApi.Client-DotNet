@@ -631,6 +631,38 @@ public class CreateEntityTests
     //Assert
     statement.Should().Be(@$"CREATE STREAM {nameof(Renamed)} (
 	data_id VARCHAR
-) WITH ( KAFKA_TOPIC='Renamed_values', VALUE_FORMAT='Json', PARTITIONS='1' );");
+) WITH ( KAFKA_TOPIC='{streamCreationMetadata.KafkaTopic}', VALUE_FORMAT='Json', PARTITIONS='1' );");
+  }
+
+  internal record GuidKey
+  {
+    public Guid DataId { get; set; }
+  }
+
+  [Test]
+  public void GuidToVarcharProperty()
+  {
+    //Arrange
+    var statementContext = new StatementContext
+    {
+      CreationType = CreationType.Create,
+      KSqlEntityType = KSqlEntityType.Stream
+    };
+
+    var streamCreationMetadata = new EntityCreationMetadata()
+    {
+      EntityName = nameof(GuidKey),
+      KafkaTopic = "guid_key",
+      Partitions = 1,
+      ShouldPluralizeEntityName = false
+    };
+
+    //Act
+    string statement = new CreateEntity().Print<GuidKey>(statementContext, streamCreationMetadata, false);
+
+    //Assert
+    statement.Should().Be(@$"CREATE STREAM {nameof(GuidKey)} (
+	DataId VARCHAR
+) WITH ( KAFKA_TOPIC='{streamCreationMetadata.KafkaTopic}', VALUE_FORMAT='Json', PARTITIONS='1' );");
   }
 }
