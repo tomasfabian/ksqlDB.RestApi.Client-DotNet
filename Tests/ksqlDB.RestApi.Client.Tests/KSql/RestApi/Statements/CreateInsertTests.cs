@@ -613,6 +613,27 @@ public class CreateInsertTests
     statement.Should().Be("INSERT INTO TimeTypes (DtOffset) VALUES ('2021-07-04T13:29:45.447+04:00');");
   }
 
+  internal record GuidKey
+  {
+    public Guid DataId { get; set; }
+  }
+
+  [Test]
+  public void GuidType()
+  {
+    //Arrange
+    var value = new GuidKey
+    {
+      DataId = Guid.NewGuid()
+    };
+
+    //Act
+    string statement = new CreateInsert().Generate(value, new InsertProperties { EntityName = "GuidKeys" });
+
+    //Assert
+    statement.Should().Be($"INSERT INTO GuidKeys (DataId) VALUES ('{value.DataId}');");
+  }
+
   #region TODO insert with functions
 
   struct MovieBytes
