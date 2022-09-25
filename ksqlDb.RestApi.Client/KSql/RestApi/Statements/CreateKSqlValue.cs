@@ -17,12 +17,12 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
   {
     Type valueType = inputValue.GetType();
 
-    bool useValue = valueType.IsPrimitive || valueType == typeof(string) || valueType.IsClass || valueType.IsStruct() || typeof(IEnumerable).IsAssignableFrom(valueType);
+    object value = inputValue;
 
-    if (memberInfo?.MemberType == MemberTypes.Property)
-      useValue = !((PropertyInfo)memberInfo).GetAccessors().Any();
-
-    var value = useValue ? inputValue : valueType.GetProperty(memberInfo.Name)?.GetValue(inputValue);
+    if (memberInfo?.MemberType == MemberTypes.Property && ((PropertyInfo) memberInfo).GetAccessors().Any())
+      value = valueType.GetProperty(memberInfo.Name)?.GetValue(inputValue);
+    else if (memberInfo?.MemberType == MemberTypes.Field)
+      value = valueType.GetField(memberInfo.Name)?.GetValue(inputValue);
 
     if (value == null)
       return "NULL";
