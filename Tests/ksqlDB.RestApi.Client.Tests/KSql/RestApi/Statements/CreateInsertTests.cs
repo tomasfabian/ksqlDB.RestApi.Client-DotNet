@@ -634,6 +634,24 @@ public class CreateInsertTests
     statement.Should().Be($"INSERT INTO GuidKeys (DataId) VALUES ('{value.DataId}');");
   }
 
+  private record Update
+  {
+    public string ExtraField = "Test value";
+  }
+
+  [Test]
+  public void Field()
+  {
+    //Arrange
+    var value = new Update();
+
+    //Act
+    string statement = new CreateInsert().Generate(value);
+
+    //Assert
+    statement.Should().Be($"INSERT INTO Updates ({nameof(Update.ExtraField)}) VALUES ('{value.ExtraField}');");
+  }
+
   #region TODO insert with functions
 
   struct MovieBytes
