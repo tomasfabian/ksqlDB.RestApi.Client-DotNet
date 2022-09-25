@@ -719,18 +719,23 @@ internal class KSqlVisitor : ExpressionVisitor
   {
     FromItem fromItem = null;
 
-    var propertyInfo = (memberExpression.Member as PropertyInfo)?.PropertyType;
+    Type type = default(Type);
+
+    if (memberExpression.Member is PropertyInfo propertyInfo)
+      type = propertyInfo.PropertyType;
+    else if (memberExpression.Member is FieldInfo fieldInfo)
+      type = fieldInfo.FieldType;
 
     if (queryMetadata.Joins?.Any() ?? false)
     {
-      fromItem = TrySetFromItemAlias(memberExpression, propertyInfo);
+      fromItem = TrySetFromItemAlias(memberExpression, type);
 
       string alias = fromItem?.Alias ?? ((ParameterExpression)memberExpression.Expression).Name;
       Append(alias);
       Append(".");
     }
-
-    if (propertyInfo != fromItem?.Type)
+    
+    if (type != fromItem?.Type)
       Append(memberExpression.Member.GetMemberName());
   }
 
