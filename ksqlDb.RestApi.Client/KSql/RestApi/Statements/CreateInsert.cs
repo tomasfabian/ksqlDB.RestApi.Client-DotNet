@@ -18,7 +18,8 @@ internal sealed class CreateInsert : CreateEntityStatement
     var columnsStringBuilder = new StringBuilder();
     var valuesStringBuilder = new StringBuilder();
 
-    var entityType = entity.GetType();
+    var useEntityType = insertProperties is {UseInstanceType: true};
+    var entityType = useEntityType ? entity.GetType() : typeof(T);
 
     foreach (var memberInfo in Members(entityType, insertProperties?.IncludeReadOnlyProperties))
     {

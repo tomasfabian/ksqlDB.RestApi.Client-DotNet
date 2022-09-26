@@ -661,11 +661,36 @@ public class CreateInsertTests
   {
     public string ExtraField = "Test value";
     public string Field { get; set; }
-    public string Field2 { get; set; }
+    public string Field2 { get; init; }
   }
 
   [Test]
-  public void Generate_FromInterface()
+  public void Generate_FromInterface_UseEntityType()
+  {
+    //Arrange
+    IMyUpdate value = new MyUpdate
+    {
+      Field = "Value",
+      Field2 = "Value2",
+    };
+
+    var insertProperties = new InsertProperties
+    {
+      EntityName = nameof(MyUpdate),
+      ShouldPluralizeEntityName = false,
+      UseInstanceType = true
+    };
+
+    //Act
+    string statement = new CreateInsert().Generate(value, insertProperties);
+
+    //Assert
+    var myUpdate = (MyUpdate)value;
+    statement.Should().Be($"INSERT INTO {nameof(MyUpdate)} ({nameof(IMyUpdate.Field)}, {nameof(MyUpdate.Field2)}, {nameof(MyUpdate.ExtraField)}) VALUES ('{value.Field}', '{myUpdate.Field2}', '{myUpdate.ExtraField}');");
+  }
+
+  [Test]
+  public void Generate_FromInterface_DoNotUseEntityType()
   {
     //Arrange
     IMyUpdate value = new MyUpdate
@@ -684,8 +709,24 @@ public class CreateInsertTests
     string statement = new CreateInsert().Generate(value, insertProperties);
 
     //Assert
-    var myUpdate = (MyUpdate) value;
-    statement.Should().Be($"INSERT INTO {nameof(MyUpdate)} ({nameof(IMyUpdate.Field)}, {nameof(MyUpdate.Field2)}, {nameof(MyUpdate.ExtraField)}) VALUES ('{value.Field}', '{myUpdate.Field2}', '{myUpdate.ExtraField}');");
+    statement.Should().Be($"INSERT INTO {nameof(MyUpdate)} ({nameof(IMyUpdate.Field)}) VALUES ('{value.Field}');");
+  }
+
+  [Test]
+  public void Generate_FromInterface_WithNullInsertProperties_DoNotUseEntityType()
+  {
+    //Arrange
+    IMyUpdate value = new MyUpdate
+    {
+      Field = "Value",
+      Field2 = "Value2",
+    };
+
+    //Act
+    string statement = new CreateInsert().Generate(value, insertProperties: null);
+
+    //Assert
+    statement.Should().Be($"INSERT INTO {nameof(IMyUpdate)}s ({nameof(IMyUpdate.Field)}) VALUES ('{value.Field}');");
   }
 
   #region TODO insert with functions
