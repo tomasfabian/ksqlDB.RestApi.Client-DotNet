@@ -652,6 +652,42 @@ public class CreateInsertTests
     statement.Should().Be($"INSERT INTO Updates ({nameof(Update.ExtraField)}) VALUES ('{value.ExtraField}');");
   }
 
+  private interface IMyUpdate
+  {
+    public string Field { get; set; }
+  }
+
+  private record MyUpdate : IMyUpdate
+  {
+    public string ExtraField = "Test value";
+    public string Field { get; set; }
+    public string Field2 { get; set; }
+  }
+
+  [Test]
+  public void Generate_FromInterface()
+  {
+    //Arrange
+    IMyUpdate value = new MyUpdate
+    {
+      Field = "Value",
+      Field2 = "Value2",
+    };
+
+    var insertProperties = new InsertProperties
+    {
+      EntityName = nameof(MyUpdate),
+      ShouldPluralizeEntityName = false
+    };
+
+    //Act
+    string statement = new CreateInsert().Generate(value, insertProperties);
+
+    //Assert
+    var myUpdate = (MyUpdate) value;
+    statement.Should().Be($"INSERT INTO {nameof(MyUpdate)} ({nameof(IMyUpdate.Field)}, {nameof(MyUpdate.Field2)}, {nameof(MyUpdate.ExtraField)}) VALUES ('{value.Field}', '{myUpdate.Field2}', '{myUpdate.ExtraField}');");
+  }
+
   #region TODO insert with functions
 
   struct MovieBytes
