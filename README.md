@@ -453,8 +453,11 @@ context.CreateQueryStream<Tweet>()
   .Select(c => new { c.RowTime, c.Message });
 ```
 
-### Overriding stream name (v0.1.0)
+### Overriding stream names (v0.1.0)
 Stream names are generated based on the generic record types. They are pluralized with Pluralize.NET package
+
+**By default the generated from item names such as stream and table names are pluralized**. This behaviour could be switched off with the following `ShouldPluralizeStreamName` configuration. 
+
 ```C#
 context.CreateQueryStream<Person>();
 ```
@@ -3972,7 +3975,7 @@ private static async Task AssertTopicsAsync(IKSqlDbRestApiClient restApiClient)
 ```SQL
 ASSERT NOT EXISTS TOPIC tweetsByTitle WITH ( replicas=3, partitions=1 ) 3 SECONDS;
 ASSERT TOPIC tweetsByTitle WITH ( replicas=3, partitions=1 ) 3 SECONDS;
-```
+``` 
 
 ### IKSqlDbRestApiClient.AssertSchemaExistsAsync and IKSqlDbRestApiClient.AssertSchemaNotExistsAsync
 [Assert Schema](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/assert-schema/)
@@ -4003,6 +4006,50 @@ private static async Task AssertSchemaAsync(IKSqlDbRestApiClient restApiClient)
 ```SQL
 ASSERT NOT EXISTS SCHEMA SUBJECT 'Kafka-key' ID 21 TIMEOUT 3 SECONDS;
 ASSERT SCHEMA SUBJECT 'Kafka-key' ID 21 TIMEOUT 3 SECONDS;
+```
+
+# v2.4.0
+# System.GUID as ksqldb VARCHAR type
+
+```C#
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+
+public record LinkCreated
+{
+  public string Name { get; set; }
+
+  [Key]
+  public Guid AggregateRootId { get; set; }
+}
+``` 
+```C#
+EntityCreationMetadata metadata = new()
+{
+  KafkaTopic = "MyGuids",
+  ValueFormat = SerializationFormats.Json,
+  Partitions = 1,
+  Replicas = 1
+};
+
+var httpResponseMessage = await restApiProvider.CreateStreamAsync<LinkCreated>(metadata, ifNotExists: true)
+  .ConfigureAwait(false);
+```
+KSQL:
+
+```SQL
+CREATE STREAM IF NOT EXISTS LINKCREATEDS (
+  NAME STRING,
+  AGGREGATEROOTID STRING KEY
+) WITH (KAFKA_TOPIC='MyGuids', KEY_FORMAT='KAFKA', PARTITIONS='1', REPLICAS='1', VALUE_FORMAT='JSON');
+```
+
+# Added support for extracting field names and values (for insert and select statements)
+
+```C#
+internal record Update
+{
+  public string ExtraField = "Test value";
+}
 ```
 
 # LinqPad samples
