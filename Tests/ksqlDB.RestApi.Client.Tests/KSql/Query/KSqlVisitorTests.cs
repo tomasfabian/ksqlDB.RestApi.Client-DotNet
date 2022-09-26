@@ -343,6 +343,24 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{nameof(Location.Latitude)} != 'ahoj svet'");
   }
 
+  private record Update
+  {
+    public string ExtraField;
+  }
+
+  [TestMethod]
+  public void Field_BuildKSql_PrintsFieldName()
+  {
+    //Arrange
+    Expression<Func<Update, string>> predicate = l => l.ExtraField;
+
+    //Act
+    var query = ClassUnderTest.BuildKSql(predicate);
+
+    //Assert
+    query.Should().BeEquivalentTo($"{nameof(Update.ExtraField)}");
+  }
+
   [TestMethod]
   public void PredicateCompareWithVariable_BuildKSql_PrintsOperatorAndOperands()
   {
