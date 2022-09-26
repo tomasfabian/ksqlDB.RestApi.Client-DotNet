@@ -7,6 +7,8 @@ internal sealed class CreateInsert : CreateEntityStatement
 {
   internal string Generate<T>(T entity, InsertProperties insertProperties = null)
   {
+    if (entity == null) throw new ArgumentNullException(nameof(entity));
+
     insertProperties ??= new InsertProperties();
 		
     var entityName = GetEntityName<T>(insertProperties);
