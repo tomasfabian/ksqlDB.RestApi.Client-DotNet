@@ -4052,6 +4052,44 @@ internal record Update
 }
 ```
 
+# InsertProperties.UseInstanceType
+UseInstanceType set to true will include the public fields and properties from the instance type for the insert statements.
+
+```C#
+IMyUpdate value = new MyUpdate
+{
+  Field = "Value",
+  Field2 = "Value2",
+};
+
+var insertProperties = new InsertProperties
+{
+  EntityName = nameof(MyUpdate),
+  ShouldPluralizeEntityName = false,
+  UseInstanceType = true
+};
+
+string statement = new CreateInsert().Generate(value, insertProperties);
+```
+
+```C#
+private interface IMyUpdate
+{
+  public string Field { get; set; }
+}
+
+private record MyUpdate : IMyUpdate
+{
+  public string ExtraField = "Test value";
+  public string Field { get; set; }
+  public string Field2 { get; init; }
+}
+```
+
+```
+INSERT INTO MyUpdate (Field, Field2, ExtraField) VALUES ('Value', 'Value2', 'Test value');
+```
+
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
 
