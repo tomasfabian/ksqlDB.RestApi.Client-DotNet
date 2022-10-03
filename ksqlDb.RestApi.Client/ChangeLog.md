@@ -1,8 +1,9 @@
 ﻿# ksqlDB.RestApi.Client
 
 # v2.4.0
-- added System.GUID as VARCHAR ksqldb type
-- extract field names and values (for insert and select statements)
+- added System.GUID as VARCHAR ksqldb type #32
+- extract field names and values (for insert and select statements) #33
+- generate insert statements from entity types (covers use cases when an interface is used as the type). Added InsertProperties.UseInstanceType configuration. #33
 
 # v2.3.2
 - #31 The "CreateJson" function in the "JsonArrayParser" class does not work correctly. bug fix
