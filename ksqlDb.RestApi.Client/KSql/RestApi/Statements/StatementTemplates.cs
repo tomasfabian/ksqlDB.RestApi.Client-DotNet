@@ -35,6 +35,8 @@ internal static class StatementTemplates
     return $"DROP TABLE{ifExistsClause} {tableName}{deleteTopicClause};";
   }
 
+  public static string PausePersistentQuery(string queryId) => $"PAUSE {queryId};";
+
   public static string TerminatePersistentQuery(string queryId) => $"TERMINATE {queryId};";
 
   public static string Explain(string sqlExpression) => $"EXPLAIN {sqlExpression}";

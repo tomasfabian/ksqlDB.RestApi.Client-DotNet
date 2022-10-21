@@ -292,4 +292,6 @@ public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Http response object.</returns>
   Task<HttpResponseMessage> DropTypeIfExistsAsync(string typeName, CancellationToken cancellationToken = default);
+
+  Task<StatementResponse[]> PausePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default);
 }
