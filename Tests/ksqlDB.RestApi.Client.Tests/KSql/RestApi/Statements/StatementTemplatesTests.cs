@@ -233,6 +233,19 @@ public class StatementTemplatesTests
   }
 
   [Test]
+  public void PausePushQuery()
+  {
+    //Arrange
+    string queryId = "QUERY_ID";
+
+    //Act
+    var statement = StatementTemplates.PausePersistentQuery(queryId);
+
+    //Assert
+    statement.Should().Be($"PAUSE {queryId};");
+  }
+
+  [Test]
   public void Explain()
   {
     //Arrange
