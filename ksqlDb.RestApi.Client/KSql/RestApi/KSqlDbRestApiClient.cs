@@ -656,6 +656,12 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
   }
 
+  /// <summary>
+  /// Pause a persistent query.
+  /// </summary>
+  /// <param name="queryId">Id of the query to pause.</param>
+  /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+  /// <returns>Statement response</returns>
   public async Task<StatementResponse[]> PausePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default)
   {
     string pauseStatement = StatementTemplates.PausePersistentQuery(queryId);
@@ -669,6 +675,12 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     return statementResponse;
   }
 
+  /// <summary>
+  /// Resume a paused persistent query.
+  /// </summary>
+  /// <param name="queryId">Id of the query to resume.</param>
+  /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+  /// <returns>Statement response</returns>
   public async Task<StatementResponse[]> ResumePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default)
   {
     string resumePersistentQuery = StatementTemplates.ResumePersistentQuery(queryId);
@@ -687,7 +699,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// </summary>
   /// <param name="queryId">Id of the query to terminate.</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
-  /// <returns></returns>
+  /// <returns>Statement response</returns>
   public async Task<StatementResponse[]> TerminatePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default)
   {
     string terminateStatement = StatementTemplates.TerminatePersistentQuery(queryId);
@@ -706,7 +718,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// </summary>
   /// <param name="queryId">Id of the query to terminate.</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
-  /// <returns></returns>
+  /// <returns>Statement response</returns>
   public async Task<HttpResponseMessage> TerminatePushQueryAsync(string queryId, CancellationToken cancellationToken = default)
   {
     //https://github.com/confluentinc/ksql/issues/7559

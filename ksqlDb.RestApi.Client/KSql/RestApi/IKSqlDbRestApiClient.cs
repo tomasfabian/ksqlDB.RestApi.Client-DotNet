@@ -201,11 +201,27 @@ public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient
   Task<HttpResponseMessage> DropConnectorAsync(string connectorName, CancellationToken cancellationToken = default);
 
   /// <summary>
+  /// Pause a persistent query.
+  /// </summary>
+  /// <param name="queryId">Id of the query to pause.</param>
+  /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+  /// <returns>Statement response</returns>
+  Task<StatementResponse[]> PausePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default);
+
+  /// <summary>
   /// Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
   /// </summary>
   /// <param name="queryId">Id of the query to terminate.</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
-  /// <returns></returns>
+  /// <returns>Statement response</returns>
+  Task<StatementResponse[]> ResumePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default);
+
+  /// <summary>
+  /// Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
+  /// </summary>
+  /// <param name="queryId">Id of the query to terminate.</param>
+  /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+  /// <returns>Statement response</returns>
   Task<StatementResponse[]> TerminatePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default);
 
   /// <summary>
@@ -213,7 +229,7 @@ public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient
   /// </summary>
   /// <param name="queryId">Id of the query to terminate.</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
-  /// <returns></returns>
+  /// <returns>Statement response</returns>
   Task<HttpResponseMessage> TerminatePushQueryAsync(string queryId, CancellationToken cancellationToken = default);
 
   /// <summary>
@@ -292,7 +308,4 @@ public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Http response object.</returns>
   Task<HttpResponseMessage> DropTypeIfExistsAsync(string typeName, CancellationToken cancellationToken = default);
-
-  Task<StatementResponse[]> PausePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default);
-  Task<StatementResponse[]> ResumePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default);
 }
