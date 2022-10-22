@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
@@ -209,9 +210,9 @@ public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient
   Task<StatementResponse[]> PausePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default);
 
   /// <summary>
-  /// Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
+  /// Resume a paused persistent query.
   /// </summary>
-  /// <param name="queryId">Id of the query to terminate.</param>
+  /// <param name="queryId">Id of the query to resume.</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Statement response</returns>
   Task<StatementResponse[]> ResumePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default);
