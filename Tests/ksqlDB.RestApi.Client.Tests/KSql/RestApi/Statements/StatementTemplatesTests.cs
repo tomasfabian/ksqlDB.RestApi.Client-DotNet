@@ -220,19 +220,6 @@ public class StatementTemplatesTests
   }
 
   [Test]
-  public void TerminatePushQuery()
-  {
-    //Arrange
-    string queryId = "QUERY_ID";
-
-    //Act
-    var statement = StatementTemplates.TerminatePersistentQuery(queryId);
-
-    //Assert
-    statement.Should().Be($"TERMINATE {queryId};");
-  }
-
-  [Test]
   public void PausePushQuery()
   {
     //Arrange
@@ -243,6 +230,32 @@ public class StatementTemplatesTests
 
     //Assert
     statement.Should().Be($"PAUSE {queryId};");
+  }
+
+  [Test]
+  public void ResumePushQuery()
+  {
+    //Arrange
+    string queryId = "QUERY_ID";
+
+    //Act
+    var statement = StatementTemplates.ResumePersistentQuery(queryId);
+
+    //Assert
+    statement.Should().Be($"RESUME {queryId};");
+  }
+
+  [Test]
+  public void TerminatePushQuery()
+  {
+    //Arrange
+    string queryId = "QUERY_ID";
+
+    //Act
+    var statement = StatementTemplates.TerminatePersistentQuery(queryId);
+
+    //Assert
+    statement.Should().Be($"TERMINATE {queryId};");
   }
 
   [Test]
