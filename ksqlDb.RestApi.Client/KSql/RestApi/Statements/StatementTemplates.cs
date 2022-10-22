@@ -37,6 +37,8 @@ internal static class StatementTemplates
 
   public static string PausePersistentQuery(string queryId) => $"PAUSE {queryId};";
 
+  public static string ResumePersistentQuery(string queryId) => $"RESUME {queryId};";
+
   public static string TerminatePersistentQuery(string queryId) => $"TERMINATE {queryId};";
 
   public static string Explain(string sqlExpression) => $"EXPLAIN {sqlExpression}";

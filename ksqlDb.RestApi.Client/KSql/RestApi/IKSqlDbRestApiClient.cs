@@ -294,4 +294,5 @@ public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient
   Task<HttpResponseMessage> DropTypeIfExistsAsync(string typeName, CancellationToken cancellationToken = default);
 
   Task<StatementResponse[]> PausePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default);
+  Task<StatementResponse[]> ResumePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default);
 }

@@ -669,6 +669,19 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     return statementResponse;
   }
 
+  public async Task<StatementResponse[]> ResumePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default)
+  {
+    string resumePersistentQuery = StatementTemplates.ResumePersistentQuery(queryId);
+
+    KSqlDbStatement ksqlDbStatement = new(resumePersistentQuery);
+
+    var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
+
+    var statementResponse = await httpResponseMessage.ToStatementResponsesAsync().ConfigureAwait(false);
+
+    return statementResponse;
+  }
+
   /// <summary>
   /// Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
   /// </summary>
