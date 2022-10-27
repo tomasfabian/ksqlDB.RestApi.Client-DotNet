@@ -5,6 +5,7 @@ using ksqlDB.Api.Client.Tests.KSql.Query.Context;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
@@ -137,6 +138,24 @@ public class QbservableExtensionsWindowsTests : TestBase
 
     //Assert
     ksql.Should().BeEquivalentTo("SELECT CardNumber, COUNT(*) Count FROM Transactions WINDOW TUMBLING (SIZE 5 SECONDS) GROUP BY CardNumber EMIT CHANGES;");
+  }
+
+  [TestMethod]
+  public void FinalRefinement_BuildKSql_PrintsQueryWithEmitFinal()
+  {
+    //Arrange
+    var context = new TransactionsDbProvider(TestParameters.KsqlDBUrl);
+
+    var grouping = context.CreateQueryStream<Transaction>()
+      .GroupBy(c => c.CardNumber)
+      .WindowedBy(new TimeWindows(Duration.OfSeconds(5), OutputRefinement.Final))
+      .Select(g => new { CardNumber = g.Key, Count = g.Count() });
+
+    //Act
+    var ksql = grouping.ToQueryString();
+
+    //Assert
+    ksql.Should().BeEquivalentTo("SELECT CardNumber, COUNT(*) Count FROM Transactions WINDOW TUMBLING (SIZE 5 SECONDS) GROUP BY CardNumber EMIT FINAL;");
   }
 
   [TestMethod]
