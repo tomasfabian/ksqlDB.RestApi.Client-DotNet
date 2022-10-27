@@ -1,7 +1,6 @@
 ﻿# ksqlDB.RestApi.Client
 
 # v2.5.0
-https://www.confluent.io/blog/announcing-ksqldb-0-28-2-and-improvements-in-confluent-cloud/
 KSqlDbRestApiClient:
 - PausePushQueryAsync - pauses a persistent query by query id
 - ResumePushQueryAsync - resume a paused persistent query. Transient queries cannot be paused or resumed.
