@@ -1,5 +1,14 @@
 ﻿# ksqlDB.RestApi.Client
 
+# v2.5.0
+https://www.confluent.io/blog/announcing-ksqldb-0-28-2-and-improvements-in-confluent-cloud/
+KSqlDbRestApiClient:
+- PausePushQueryAsync - pauses a persistent query by query id
+- ResumePushQueryAsync - resume a paused persistent query. Transient queries cannot be paused or resumed.
+
+TimeWindows:
+- EMIT FINAl output refinement was added for windowed aggregations
+
 # v2.4.0
 - added System.GUID as VARCHAR ksqldb type #32
 - extract field names and values (for insert and select statements) #33
