@@ -10,7 +10,9 @@ using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
+using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using Pluralize.NET;
 
 namespace ksqlDB.RestApi.Client.KSql.Query;
@@ -104,7 +106,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
       kSqlVisitor.Visit(methodCallExpression);
     }
 
-    TryGenerateWindowAggregation();
+    var timeWindows = TryGenerateWindowAggregation();
 
     if (groupBy != null)
     {
@@ -130,8 +132,10 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
 
       if (!HasJoins || (HasJoins && whereClauses.Any()))
         separator = " ";
-        
-      kSqlVisitor.Append($"{separator}EMIT CHANGES");
+
+      string outputRefinement = timeWindows is {OutputRefinement: OutputRefinement.Final} ? "FINAL" : "CHANGES";
+
+      kSqlVisitor.Append($"{separator}EMIT {outputRefinement}");
     }
 
     if (Limit.HasValue)
@@ -144,12 +148,16 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
 
   private bool HasJoins => joins?.Any() ?? false;
 
-  private void TryGenerateWindowAggregation()
+  private TimeWindows TryGenerateWindowAggregation()
   {
     if (windowedBy == null)
-      return;
+      return null;
 
     new KSqlWindowsVisitor(kSqlVisitor.StringBuilder, queryMetadata).Visit(windowedBy);
+
+    var constantExpression = windowedBy; 
+      
+    return (TimeWindows)constantExpression.Value;
   }
 
   protected virtual string InterceptFromItemName(string value)

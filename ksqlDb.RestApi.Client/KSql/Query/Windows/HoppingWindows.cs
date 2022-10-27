@@ -1,11 +1,12 @@
-﻿using System;
+﻿using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
+using System;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Windows;
 
 public class HoppingWindows : TimeWindows
 {
-  public HoppingWindows(Duration duration) 
-    : base(duration)
+  public HoppingWindows(Duration duration, OutputRefinement outputRefinement = OutputRefinement.Emit) 
+    : base(duration, outputRefinement)
   {
     AdvanceBy = duration;
   }    
