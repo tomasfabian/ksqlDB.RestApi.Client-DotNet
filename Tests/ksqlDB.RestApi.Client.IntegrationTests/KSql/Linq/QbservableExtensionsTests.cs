@@ -10,6 +10,7 @@ using ksqlDB.Api.Client.IntegrationTests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
@@ -22,7 +23,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
 public class QbservableExtensionsTests : Infrastructure.IntegrationTests
 {
   protected static string StreamName = "tweetsTest";
-  private static string topicName = "tweetsTestTopic";
+  private static readonly string TopicName = "tweetsTestTopic";
 
   private static Tweet Tweet1 => TweetsProvider.Tweet1;
 
@@ -41,7 +42,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     RestApiProvider = KSqlDbRestApiProvider.Create();
 
     tweetsProvider = new TweetsProvider(RestApiProvider);
-    var result = await tweetsProvider.CreateTweetsStream(StreamName, topicName);
+    var result = await tweetsProvider.CreateTweetsStream(StreamName, TopicName);
     result.Should().BeTrue();
 
     result = await tweetsProvider.InsertTweetAsync(Tweet1, StreamName);
@@ -396,6 +397,31 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
 
     Assert.AreEqual(1, actualValues[1].Count);
     Assert.AreEqual(Tweet2.Id, actualValues[1].Id);
+  }
+
+  [TestMethod]
+  public async Task WindowedBy_WithFinalOutputRefinement()
+  {
+    //Arrange
+    var source = QuerySource
+        .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
+        .GroupBy(c => c.Id)
+        .WindowedBy(
+          new TimeWindows(Duration.OfSeconds(2), OutputRefinement.Final).WithGracePeriod(Duration.OfSeconds(2)))
+        .Select(g => new {Id = g.Key, Count = g.Count(c => c.Message)});
+
+    var semaphore = new SemaphoreSlim(0, 1);
+    var actualValues = new List<int>();
+
+    //Act
+    source.Subscribe(c => actualValues.Add(c.Id), e => semaphore.Release(), () => semaphore.Release());
+    await Task.Delay(TimeSpan.FromSeconds(3));
+
+    var result = await tweetsProvider.InsertTweetAsync(Tweet2, StreamName);
+
+    //Assert
+    await semaphore.WaitAsync(TimeSpan.FromSeconds(6));
+    actualValues.Count.Should().BeGreaterOrEqualTo(1);
   }
     
   [TestMethod]
