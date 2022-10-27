@@ -6,7 +6,7 @@ KSqlDbRestApiClient:
 - ResumePushQueryAsync - resume a paused persistent query. Transient queries cannot be paused or resumed.
 
 TimeWindows:
-- EMIT FINAl output refinement was added for windowed aggregations
+- EMIT FINAL output refinement was added for windowed aggregations
 
 # v2.4.0
 - added System.GUID as VARCHAR ksqldb type #32

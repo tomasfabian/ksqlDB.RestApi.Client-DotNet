@@ -4110,6 +4110,32 @@ private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient res
 }
 ```
 
+# TimeWindows - EMIT FINAL (ksqldb v0.28.2)
+- `EMIT FINAL` output refinement was added for windowed aggregations. ksqldb v0.28.2
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
+using ksqlDB.RestApi.Client.KSql.Query.Windows;
+
+var tumblingWindow =
+  new TimeWindows(Duration.OfSeconds(2), OutputRefinement.Final).WithGracePeriod(Duration.OfSeconds(2));
+
+var query = Context.CreateQueryStream<Tweet>()
+  .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
+  .GroupBy(c => c.Id)
+  .WindowedBy(tumblingWindow)
+  .Select(g => new { Id = g.Key, Count = g.Count(c => c.Message) })
+  .ToQueryString()
+```
+
+```SQL
+SELECT Id, COUNT(MESSAGE) Count
+  FROM tweets
+WINDOW TUMBLING (SIZE 2 SECONDS, GRACE PERIOD 2 SECONDS)
+ GROUP BY Id EMIT FINAL;
+```
+
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
 
