@@ -97,7 +97,7 @@ CREATE OR REPLACE STREAM Tweets (
 
 Run the following insert statements to stream some messages with your ksqldb-cli
 ```
-docker exec -it $(docker ps -q -f name=ksqldb-cli) ksql http://<YOUR_IP_ADDRESS>:8088
+docker exec -it $(docker ps -q -f name=ksqldb-cli) ksql http://ksqldb-server:8088
 ```
 ```SQL
 INSERT INTO tweets (id, message) VALUES (1, 'Hello world');
@@ -4088,6 +4088,26 @@ private record MyUpdate : IMyUpdate
 
 ```
 INSERT INTO MyUpdate (Field, Field2, ExtraField) VALUES ('Value', 'Value2', 'Test value');
+```
+
+# v2.5.0
+# Pause and resume persistent qeries
+`PausePersistentQueryAsync` - Pause a persistent query.
+`ResumePersistentQueryAsync` - Resume a paused persistent query.
+
+```C#
+private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient restApiClient)
+{
+  string topicName = "moviesByTitle";
+
+  var queries = await restApiClient.GetQueriesAsync();
+
+  var query = queries.SelectMany(c => c.Queries).FirstOrDefault(c => c.SinkKafkaTopics.Contains(topicName));
+
+  var response = await restApiClient.PausePersistentQueryAsync(query.Id);
+  response = await restApiClient.ResumePersistentQueryAsync(query.Id);
+  response = await restApiClient.TerminatePersistentQueryAsync(query.Id);
+}
 ```
 
 # LinqPad samples
