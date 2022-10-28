@@ -22,6 +22,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
@@ -209,7 +210,7 @@ public static class Program
     var saveResponse = await context.SaveChangesAsync();
   }
 
-  private static async Task SubscribeAsync(IKSqlDBContext context)
+  private static async Task SubscribeAsync(IKSqlDBContext context, IKSqlDbRestApiClient restApiProvider)
   {
     var cts = new CancellationTokenSource();
 
@@ -379,6 +380,8 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
 
   private static IDisposable Window(KSqlDBContext context)
   {
+    new TimeWindows(Duration.OfSeconds(2), OutputRefinement.Final).WithGracePeriod(Duration.OfSeconds(2));
+
     var subscription1 = context.CreateQueryStream<Tweet>()
       .GroupBy(c => c.Id)
       .WindowedBy(new TimeWindows(Duration.OfSeconds(5)).WithGracePeriod(Duration.OfHours(2)))
@@ -869,7 +872,17 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
 
     var query = queries.SelectMany(c => c.Queries).FirstOrDefault(c => c.SinkKafkaTopics.Contains(topicName));
 
-    var response = await restApiClient.TerminatePersistentQueryAsync(query.Id);
+    if (query == null)
+      return;
+    
+    await TerminatePersistentQueryAsync(restApiClient, query.Id);
+  }
+
+  private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient restApiClient, string queryId)
+  {
+    var response = await restApiClient.PausePersistentQueryAsync(queryId);
+    response = await restApiClient.ResumePersistentQueryAsync(queryId);
+    response = await restApiClient.TerminatePersistentQueryAsync(queryId);
   }
 
   private static async Task TerminatePushQueryAsync(IKSqlDBContext context, IKSqlDbRestApiClient restApiClient)
