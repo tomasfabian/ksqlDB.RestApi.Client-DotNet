@@ -31,7 +31,12 @@ using ksqlDB.RestApi.Client.Sample.Model;
 
 var ksqlDbUrl = @"http:\\localhost:8088";
 
-await using var context = new KSqlDBContext(ksqlDbUrl);
+var contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
+{
+  ShouldPluralizeFromItemName = true
+};
+
+await using var context = new KSqlDBContext(contextOptions);
 
 using var disposable = context.CreateQueryStream<Tweet>()
   .WithOffsetResetPolicy(AutoOffsetReset.Latest)
@@ -457,6 +462,7 @@ context.CreateQueryStream<Tweet>()
 Stream names are generated based on the generic record types. They are pluralized with Pluralize.NET package
 
 **By default the generated from item names such as stream and table names are pluralized**. This behaviour could be switched off with the following `ShouldPluralizeStreamName` configuration. 
+> ⚠  KSqlDBContextOptions.ShouldPluralizeStreamName was renamed to ShouldPluralizeFromItemName
 
 ```C#
 context.CreateQueryStream<Person>();
@@ -494,7 +500,7 @@ FROM custom_topic_name
 ```
 
 # ```IQbservable<T>``` extension methods
-<img src="https://sec.ch9.ms/ecn/content/images/WhatHowWhere.jpg" />
+<img src="https://www.codeproject.com/KB/cs/646361/WhatHowWhere.jpg" />
 
 ### Select (v0.1.0)
 Projects each element of a stream into a new form.
