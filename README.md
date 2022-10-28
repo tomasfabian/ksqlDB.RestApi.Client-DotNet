@@ -22,12 +22,10 @@ This adds a `<PackageReference>` to your csproj file, similar to the following:
 The following example can be tried with a [.NET interactive Notebook](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/Notebooks):
 
 ```C#
-using System;
-using ConsoleAppKsqlDB;
 using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
-using ksqlDB.RestApi.Client.Sample.Model;
 
 var ksqlDbUrl = @"http:\\localhost:8088";
 
@@ -52,14 +50,11 @@ Console.WriteLine("Press any key to stop the subscription");
 
 Console.ReadKey();
 
-namespace ConsoleAppKsqlDB
+public class Tweet : Record
 {
-  public class Tweet : Record
-  {
-    public int Id { get; set; }
+  public int Id { get; set; }
 
-    public string Message { get; set; }
-  }
+  public string Message { get; set; }
 }
 ```
 
