@@ -29,4 +29,8 @@
 		<PackageReference Include="protobuf-net" Version="3.1.17" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="ksqlDB.RestApi.Client.ProtoBuf.Tests" />
+	</ItemGroup>
+
 </Project>

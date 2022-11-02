@@ -28,8 +28,4 @@
 		<ProjectReference Include="..\..\ksqlDb.RestApi.Client.ProtoBuf\ksqlDB.RestApi.Client.ProtoBuf.csproj" />
 		<ProjectReference Include="..\UnitTests\UnitTests.csproj" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<InternalsVisibleTo Include="ksqlDB.RestApi.Client.ProtoBuf.Tests" />
-	</ItemGroup>
 </Project>
