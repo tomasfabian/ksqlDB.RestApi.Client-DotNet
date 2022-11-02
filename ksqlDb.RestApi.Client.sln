@@ -26,6 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDb.RestApi.Client.ProtoBuf", "ksqlDb.RestApi.Client.ProtoBuf\ksqlDb.RestApi.Client.ProtoBuf.csproj", "{304FA9F7-9B0F-49FD-8CB5-B3286C1F988E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDb.RestApi.Client.ProtoBuf.Tests", "Tests\ksqlDb.RestApi.Client.ProtoBuf.Tests\ksqlDb.RestApi.Client.ProtoBuf.Tests.csproj", "{7462D56C-A4AA-4347-BE2A-A6B0F84BE426}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{304FA9F7-9B0F-49FD-8CB5-B3286C1F988E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{304FA9F7-9B0F-49FD-8CB5-B3286C1F988E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{304FA9F7-9B0F-49FD-8CB5-B3286C1F988E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7462D56C-A4AA-4347-BE2A-A6B0F84BE426}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7462D56C-A4AA-4347-BE2A-A6B0F84BE426}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7462D56C-A4AA-4347-BE2A-A6B0F84BE426}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7462D56C-A4AA-4347-BE2A-A6B0F84BE426}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -65,6 +71,7 @@ Global
 		{1B81259E-59F0-48E1-ACD3-A3DCFCCC5B3E} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}
 		{EE55516C-160D-4715-ADC6-3E76DE3D89E9} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}
 		{9AD222F8-4535-4297-A4F8-9F40FFA8A133} = {AA5681E8-1682-47E9-9159-4AE95A92E694}
+		{7462D56C-A4AA-4347-BE2A-A6B0F84BE426} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {08C8585D-5006-4484-AC12-72B1F42058D7}
