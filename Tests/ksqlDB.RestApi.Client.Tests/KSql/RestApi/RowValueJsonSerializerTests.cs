@@ -65,7 +65,7 @@ public class RowValueJsonSerializerTests : TestBase
   {
     //Arrange
     var dateTime = new DateTimeOffset(new DateTime(2022, 9, 23), TimeSpan.FromHours(2));
-    var dt = "2022-09-23";
+    var dt = "2022-09-23T00:00:00+02:00";
 
     string rawJson = $"[\"{dt}\"]";
     var jsonSerializationOptions = KSqlDbJsonSerializerOptions.CreateInstance();
@@ -99,7 +99,7 @@ public class RowValueJsonSerializerTests : TestBase
   }
 
   [TestMethod]
-  [Ignore]
+  [Ignore("TODO: single property classes")]
   public void Deserialize_MyStruct()
   {
     //Arrange
