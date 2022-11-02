@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SqlServer.Connector.Tests.Data
+namespace SqlServer.Connector.Tests.Data;
+
+public record IoTSensor
 {
-  public record IoTSensor
-  {
-    [Key]
-    public string SensorId { get; set; }
-    public int Value { get; set; }
-  }
+  [Key]
+  public string SensorId { get; set; }
+  public int Value { get; set; }
 }

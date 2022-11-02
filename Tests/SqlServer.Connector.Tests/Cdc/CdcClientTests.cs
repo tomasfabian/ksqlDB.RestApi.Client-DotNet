@@ -9,139 +9,138 @@ using SqlServer.Connector.Tests.Data;
 using UnitTests;
 using ConfigurationProvider = SqlServer.Connector.Tests.Config.ConfigurationProvider;
 
-namespace SqlServer.Connector.Tests.Cdc
+namespace SqlServer.Connector.Tests.Cdc;
+
+[TestClass]
+[TestCategory("Integration")]
+public class CdcClientTests : TestBase<CdcClient>
 {
-  [TestClass]
-  [TestCategory("Integration")]
-  public class CdcClientTests : TestBase<CdcClient>
+  [ClassInitialize]
+  public static async Task ClassInitialize(TestContext context)
   {
-    [ClassInitialize]
-    public static async Task ClassInitialize(TestContext context)
-    {
-      var dbContext = new ApplicationDbContext();
+    var dbContext = new ApplicationDbContext();
 
-      await dbContext.Database.EnsureDeletedAsync();
+    await dbContext.Database.EnsureDeletedAsync();
       
-      await dbContext.Database.MigrateAsync();
-    }
+    await dbContext.Database.MigrateAsync();
+  }
 
-    private static readonly IConfiguration Configuration = ConfigurationProvider.CreateConfiguration();
+  private static readonly IConfiguration Configuration = ConfigurationProvider.CreateConfiguration();
 
-    [ClassCleanup]
-    public static async Task ClassCleanup()
-    {
-      var dbContext = new ApplicationDbContext();
+  [ClassCleanup]
+  public static async Task ClassCleanup()
+  {
+    var dbContext = new ApplicationDbContext();
 
-      await dbContext.Database.EnsureDeletedAsync();
-    }
+    await dbContext.Database.EnsureDeletedAsync();
+  }
     
-    static string ConnectionString => Configuration.GetConnectionString("DefaultConnection");
+  static string ConnectionString => Configuration.GetConnectionString("DefaultConnection");
 
-    readonly SqlConnectionStringBuilder connectionStringBuilder = new(ConnectionString);
+  readonly SqlConnectionStringBuilder connectionStringBuilder = new(ConnectionString);
 
-    [TestInitialize]
-    public override void TestInitialize()
-    {
-      base.TestInitialize();
+  [TestInitialize]
+  public override void TestInitialize()
+  {
+    base.TestInitialize();
 
-      ClassUnderTest = new CdcClient(ConnectionString);
-    }
+    ClassUnderTest = new CdcClient(ConnectionString);
+  }
 
-    [TestMethod]
-    public async Task CdcEnableDbAsync()
-    {
-      //Arrange
-      string databaseName = connectionStringBuilder.InitialCatalog;
+  [TestMethod]
+  public async Task CdcEnableDbAsync()
+  {
+    //Arrange
+    string databaseName = connectionStringBuilder.InitialCatalog;
 
-      //Act
-      await ClassUnderTest.CdcEnableDbAsync();
+    //Act
+    await ClassUnderTest.CdcEnableDbAsync();
       
-      var isEnabled = await ClassUnderTest.IsCdcDbEnabledAsync(databaseName);
+    var isEnabled = await ClassUnderTest.IsCdcDbEnabledAsync(databaseName);
 
-      //Assert
-      isEnabled.Should().Be(true);
-    }
+    //Assert
+    isEnabled.Should().Be(true);
+  }
 
-    [TestMethod]
-    public async Task CdcEnableTableAsync()
-    {
-      //Arrange
+  [TestMethod]
+  public async Task CdcEnableTableAsync()
+  {
+    //Arrange
 
-      //Act
-      await ClassUnderTest.CdcEnableTableAsync(tableName);
+    //Act
+    await ClassUnderTest.CdcEnableTableAsync(tableName);
 
-      var isEnabled = await ClassUnderTest.IsCdcTableEnabledAsync(tableName);
+    var isEnabled = await ClassUnderTest.IsCdcTableEnabledAsync(tableName);
 
-      //Assert
-      isEnabled.Should().Be(true);
-    }
+    //Assert
+    isEnabled.Should().Be(true);
+  }
     
-    string tableName = "Sensors";
+  string tableName = "Sensors";
 
-    [TestMethod]
-    public async Task CdcEnableTableAsync_CdcEnableTableInput()
+  [TestMethod]
+  public async Task CdcEnableTableAsync_CdcEnableTableInput()
+  {
+    //Arrange
+    string captureInstance = $"dbo_{tableName}_v2";
+
+    var cdcEnableTable = new CdcEnableTable(tableName)
     {
-      //Arrange
-      string captureInstance = $"dbo_{tableName}_v2";
+      CaptureInstance = captureInstance
+    };
 
-      var cdcEnableTable = new CdcEnableTable(tableName)
-      {
-        CaptureInstance = captureInstance
-      };
+    //Act
+    await ClassUnderTest.CdcEnableTableAsync(cdcEnableTable);
 
-      //Act
-      await ClassUnderTest.CdcEnableTableAsync(cdcEnableTable);
+    var isEnabled = await ClassUnderTest.IsCdcTableEnabledAsync(tableName, captureInstance: captureInstance);
 
-      var isEnabled = await ClassUnderTest.IsCdcTableEnabledAsync(tableName, captureInstance: captureInstance);
-
-      //Assert
-      isEnabled.Should().Be(true);
-    }
+    //Assert
+    isEnabled.Should().Be(true);
+  }
     
-    [TestMethod]
-    public async Task CdcDisableTableAsync_CaptureInstance()
-    {
-      //Arrange
-      string captureInstance = $"dbo_{tableName}_v2";
+  [TestMethod]
+  public async Task CdcDisableTableAsync_CaptureInstance()
+  {
+    //Arrange
+    string captureInstance = $"dbo_{tableName}_v2";
 
-      //Act
-      await ClassUnderTest.CdcDisableTableAsync(tableName, captureInstance: captureInstance);
+    //Act
+    await ClassUnderTest.CdcDisableTableAsync(tableName, captureInstance: captureInstance);
 
-      var isEnabled = await ClassUnderTest.IsCdcTableEnabledAsync(tableName, captureInstance: captureInstance);
+    var isEnabled = await ClassUnderTest.IsCdcTableEnabledAsync(tableName, captureInstance: captureInstance);
 
-      //Assert
-      isEnabled.Should().Be(false);
-    }
+    //Assert
+    isEnabled.Should().Be(false);
+  }
 
-    [TestMethod]
-    public async Task CdcDisableTableAsync()
-    {
-      //Arrange
+  [TestMethod]
+  public async Task CdcDisableTableAsync()
+  {
+    //Arrange
 
-      //Act
-      await ClassUnderTest.CdcDisableTableAsync(tableName);
+    //Act
+    await ClassUnderTest.CdcDisableTableAsync(tableName);
 
-      var isEnabled = await ClassUnderTest.IsCdcTableEnabledAsync(tableName);
+    var isEnabled = await ClassUnderTest.IsCdcTableEnabledAsync(tableName);
 
-      //Assert
-      isEnabled.Should().Be(false);
-    }
+    //Assert
+    isEnabled.Should().Be(false);
+  }
 
-    [TestMethod]
-    public async Task CdcDisableDbAsync()
-    {
-      //Arrange
-      string databaseName = connectionStringBuilder.InitialCatalog;
+  [TestMethod]
+  public async Task CdcDisableDbAsync()
+  {
+    //Arrange
+    string databaseName = connectionStringBuilder.InitialCatalog;
 
-      //Act
-      await ClassUnderTest.CdcDisableDbAsync();
+    //Act
+    await ClassUnderTest.CdcDisableDbAsync();
 
-      //Assert
+    //Assert
 
-      var isEnabled = await ClassUnderTest.IsCdcDbEnabledAsync(databaseName);
+    var isEnabled = await ClassUnderTest.IsCdcDbEnabledAsync(databaseName);
 
-      //Assert
-      isEnabled.Should().Be(false);
-    }
+    //Assert
+    isEnabled.Should().Be(false);
   }
 }

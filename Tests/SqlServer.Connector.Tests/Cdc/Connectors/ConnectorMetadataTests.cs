@@ -3,54 +3,53 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SqlServer.Connector.Cdc.Connectors;
 using UnitTests;
 
-namespace SqlServer.Connector.Tests.Cdc.Connectors
-{
-  [TestClass]
-  public class ConnectorMetadataTests : TestBase<ConnectorMetadata>
-  {    
-    [TestInitialize]
-    public override void TestInitialize()
-    {
-      base.TestInitialize();
+namespace SqlServer.Connector.Tests.Cdc.Connectors;
 
-      ClassUnderTest = new ConnectorMetadata();
-    }
+[TestClass]
+public class ConnectorMetadataTests : TestBase<ConnectorMetadata>
+{    
+  [TestInitialize]
+  public override void TestInitialize()
+  {
+    base.TestInitialize();
 
-    [TestMethod]
-    public void JsonKeyConverter()
-    {
-      //Arrange
+    ClassUnderTest = new ConnectorMetadata();
+  }
 
-      //Act
-      ClassUnderTest.SetJsonKeyConverter();
+  [TestMethod]
+  public void JsonKeyConverter()
+  {
+    //Arrange
 
-      //Assert
-      ClassUnderTest.KeyConverter.Should().Be("org.apache.kafka.connect.json.JsonConverter");
-    }
+    //Act
+    ClassUnderTest.SetJsonKeyConverter();
 
-    [TestMethod]
-    public void ValueConverter()
-    {
-      //Arrange
+    //Assert
+    ClassUnderTest.KeyConverter.Should().Be("org.apache.kafka.connect.json.JsonConverter");
+  }
 
-      //Act
-      ClassUnderTest.SetJsonValueConverter();
+  [TestMethod]
+  public void ValueConverter()
+  {
+    //Arrange
 
-      //Assert
-      ClassUnderTest.ValueConverter.Should().Be("org.apache.kafka.connect.json.JsonConverter");
-    }
+    //Act
+    ClassUnderTest.SetJsonValueConverter();
 
-    [TestMethod]
-    public void SetProperty()
-    {
-      //Arrange
-      var sqlServerConnector = "io.debezium.connector.sqlserver.SqlServerConnector";
+    //Assert
+    ClassUnderTest.ValueConverter.Should().Be("org.apache.kafka.connect.json.JsonConverter");
+  }
 
-      //Act
-      ClassUnderTest.SetProperty("connector.class", sqlServerConnector);
+  [TestMethod]
+  public void SetProperty()
+  {
+    //Arrange
+    var sqlServerConnector = "io.debezium.connector.sqlserver.SqlServerConnector";
 
-      //Assert
-      ClassUnderTest.ConnectorClass.Should().Be(sqlServerConnector);
-    }
+    //Act
+    ClassUnderTest.SetProperty("connector.class", sqlServerConnector);
+
+    //Assert
+    ClassUnderTest.ConnectorClass.Should().Be(sqlServerConnector);
   }
 }
