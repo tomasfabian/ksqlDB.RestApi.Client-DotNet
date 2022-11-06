@@ -21,7 +21,11 @@ internal class TestableKSqlDbQueryProvider : KSqlDbQueryProvider
     : base(httpClientFactory, KSqlDbContextOptionsInstance)
   {
   }
-  protected string QueryResponse = "[{\"header\":{\"queryId\":\"transient_MOVIES_7139331784417618909\",\"schema\":\"`ID` INTEGER, `TITLE` STRING, `RELEASE_YEAR` INTEGER, `ROWTIME` BIGINT\",\"protoSchema\":\"syntax = \\\"proto3\\\";\\n\\nmessage ConnectDefault1 {\\n  int32 ID = 1;\\n  string TITLE = 2;\\n  int32 RELEASE_YEAR = 3;\\n  int64 ROWTIME = 4;\\n}\\n\"}},";
+
+  protected string QueryResponse =
+    "[{\"header\":{\"queryId\":\"transient_MOVIES_8790538776625545898\",\"schema\":\"`ID` INTEGER, `TITLE` STRING, `RELEASE_YEAR` INTEGER\",\"protoSchema\":\"syntax = \\\"proto3\\\";\\n\\nmessage ConnectDefault1 {\\n  int32 ID = 1;\\n  string TITLE = 2;\\n  int32 RELEASE_YEAR = 3;\\n}\\n\"}}," +
+    "\r\n{\"row\":{\"protobufBytes\":\"CgZBbGllbnMQARjCDw==\"}},"+
+    "\r\n{\"row\":{\"protobufBytes\":\"CghEaWUgSGFyZBACGM4P\"}},";
   protected string ItemResponse = "{\"row\":{\"protobufBytes\":\"CAESBkFsaWVucxjCDyCrw6nKwzA=\"}},";
 
   protected override HttpClient OnCreateHttpClient()
