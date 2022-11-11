@@ -8,7 +8,7 @@ using UnitTests;
 namespace ksqlDb.RestApi.Client.ProtoBuf.Tests.KSql.RestApi;
 
 [TestClass]
-public class KSqlDbProviderTests : TestBase
+public class KSqlDbQueryProviderTests : TestBase
 {  
   private TestableKSqlDbQueryProvider ClassUnderTest { get; set; }
 
