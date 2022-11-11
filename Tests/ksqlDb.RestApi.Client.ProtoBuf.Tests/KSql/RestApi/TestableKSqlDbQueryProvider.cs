@@ -1,17 +1,16 @@
 ﻿using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDb.RestApi.Client.ProtoBuf.KSql.RestApi;
+using ksqlDb.RestApi.Client.ProtoBuf.Tests.Helpers;
 
 namespace ksqlDb.RestApi.Client.ProtoBuf.Tests.KSql.RestApi;
 
 internal class TestableKSqlDbQueryProvider : KSqlDbQueryProvider
 {
-  internal const string KsqlDbUrl = @"http:\\localhost:8088";
-
-  public static readonly KSqlDBContextOptions KSqlDbContextOptionsInstance = new(KsqlDbUrl)
+  public static readonly KSqlDBContextOptions KSqlDbContextOptionsInstance = new(TestParameters.KsqlDbUrl)
   {
-    JsonSerializerOptions =
-      ksqlDb.RestApi.Client.KSql.Query.Context.Options.KSqlDbJsonSerializerOptions.CreateInstance()
+    JsonSerializerOptions = KSqlDbJsonSerializerOptions.CreateInstance()
   };
 
   public TestableKSqlDbQueryProvider(IHttpV1ClientFactory httpClientFactory)

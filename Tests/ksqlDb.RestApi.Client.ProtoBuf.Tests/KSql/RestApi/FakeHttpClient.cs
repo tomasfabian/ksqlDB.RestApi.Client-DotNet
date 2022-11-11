@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using ksqlDb.RestApi.Client.ProtoBuf.Tests.Helpers;
 using Moq;
 using Moq.Protected;
 
@@ -31,7 +32,7 @@ public static class FakeHttpClient
   {
     return new HttpClient(handlerMock.Object)
     {
-      BaseAddress = new Uri(TestableKSqlDbQueryProvider.KsqlDbUrl)
+      BaseAddress = new Uri(TestParameters.KsqlDbUrl)
     };
   }
 
