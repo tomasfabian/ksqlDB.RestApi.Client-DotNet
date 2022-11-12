@@ -68,11 +68,12 @@ SELECT Message, Id
 ```
 
 In the above mentioned code snippet everything runs server side except of the ```IQbservable<TEntity>.Subscribe``` method. It subscribes to your ksqlDB stream created in the following manner:
+
 ```C#
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi;
-using System;
+using ksqlDB.Api.Client.Samples.Models;
 
 EntityCreationMetadata metadata = new()
 {
@@ -81,9 +82,14 @@ EntityCreationMetadata metadata = new()
   Replicas = 1
 };
 
-var httpClientFactory = new HttpClientFactory(new Uri(@"http:\\localhost:8088"));
+var httpClient = new HttpClient()
+{
+  BaseAddress = new Uri(@"http:\\localhost:8088")
+};
+
+var httpClientFactory = new HttpClientFactory(httpClient);
 var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
-      
+
 var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<Tweet>(metadata);
 ```
 
@@ -117,6 +123,8 @@ var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
 or with KSqlDbContext:
 
 ```C#
+await using var context = new KSqlDBContext(ksqlDbUrl);
+
 context.Add(new Tweet { Id = 1, Message = "Hello world" });
 context.Add(new Tweet { Id = 2, Message = "ksqlDB rulez!" });
 
