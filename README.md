@@ -175,16 +175,16 @@ using System.Reactive.Linq;
 using ksqlDB.Api.Client.Samples.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDb.RestApi.Client.ProtoBuf.KSql.Query;
+using ProtoBuf;
 
 var ksqlDbUrl = @"http:\\localhost:8088";
 
 await using var context = new ProtoBufKSqlDbContext(ksqlDbUrl);
 
 var query = context.CreateQueryStream<MovieProto>("movie") // query-stream endpoint
-  // var query = context.CreateQuery<MovieProto>("movie") // query endpoint
   .Where(p => p.Title != "E.T.")
   .Where(c => c.Title.ToLower().Contains("hard".ToLower()) || c.Id == 1)
-  .Select(l => new { Id = l.Id, l.Title, l.Release_Year })
+  .Select(l => new { Id = l.Id, l.Title })
   .Take(2); // LIMIT 2    
 
 var ksql = query.ToQueryString();
@@ -202,7 +202,6 @@ using var disposable = query
     Console.WriteLine();
   }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
 
-using ProtoBuf;
 
 [ProtoContract]
 record MovieProto
