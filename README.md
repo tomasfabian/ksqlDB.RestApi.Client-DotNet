@@ -235,8 +235,12 @@ using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using SqlServer.Connector.Cdc;
-using SqlServer.Connector.Cdc.Extensions;
 
 class Program
 {
@@ -256,9 +260,9 @@ class Program
 
     await CreateSensorsCdcStreamAsync();
 
-    await TryEnableCdcAsync();
+    await TryEnableCdcAsync(); //see full example https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/SqlServer.Connector/Wiki.md
 
-    await CreateConnectorAsync();
+    await CreateConnectorAsync(); //see full example
 
     await using var context = new KSqlDBContext(KsqlDbUrl);
 
@@ -313,7 +317,7 @@ class Program
     string fromName = "sqlserversensors";
     string kafkaTopic = "sqlserver2019.dbo.Sensors";
 
-    var ksqlDbUrl = Configuration[ConfigKeys.KSqlDb_Url];
+    var ksqlDbUrl = "http://localhost:8088";
 
     var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
 
@@ -359,12 +363,11 @@ using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
-
-private string KsqlDbUrl => "http://localhost:8088";
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
 private async Task CreateOrReplaceMaterializedTableAsync()
 {
-  string ksqlDbUrl = Configuration[ConfigKeys.KSqlDb_Url];
+  string ksqlDbUrl = "http://localhost:8088";
 
   await using var context = new KSqlDBContext(ksqlDbUrl);
 
@@ -372,7 +375,7 @@ private async Task CreateOrReplaceMaterializedTableAsync()
     .As<IoTSensor>("IotSensors")
     .Where(c => c.SensorId != "Sensor-5")
     .GroupBy(c => c.SensorId)
-    .Select(c => new {SensorId = c.Key, Count = c.Count(), AvgValue = c.Avg(a => a.Value) });
+    .Select(c => new { SensorId = c.Key, Count = c.Count(), AvgValue = c.Avg(a => a.Value) });
 
   var httpResponseMessage = await statement.ExecuteStatementAsync();
 
@@ -380,6 +383,13 @@ private async Task CreateOrReplaceMaterializedTableAsync()
   {
     var statementResponse = httpResponseMessage.ToStatementResponse();
   }
+}
+
+public record IoTSensor
+{
+  [Key]
+  public string SensorId { get; set; }
+  public int Value { get; set; }
 }
 ```
 
