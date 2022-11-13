@@ -10,6 +10,6 @@ insert_final_newline = true
 
 [*.cs]
 end_of_line = crlf
-indent_size = 4
+indent_size = 2
 dotnet_sort_system_directives_first = true
 dotnet_diagnostic.CS4014.severity = error
