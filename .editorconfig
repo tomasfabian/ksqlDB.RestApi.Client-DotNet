@@ -1,2 +1,15 @@
+; https://editorconfig.org/
+
+root = true
+
+[*]
+indent_style = space
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
 [*.cs]
+end_of_line = crlf
+indent_size = 4
+dotnet_sort_system_directives_first = true
 dotnet_diagnostic.CS4014.severity = error
