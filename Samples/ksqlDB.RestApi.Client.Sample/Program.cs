@@ -1016,6 +1016,21 @@ Drop table {nameof(Event)};
       .ToQueryString();
   }
 
+  private static void EmitFinal(IKSqlDBContext ksqlDbContext)
+  {
+    var tumblingWindow =
+      new TimeWindows(Duration.OfSeconds(2), OutputRefinement.Final).WithGracePeriod(Duration.OfSeconds(2));
+
+    var query = ksqlDbContext.CreateQueryStream<Tweet>()
+      .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
+      .GroupBy(c => c.Id)
+      .WindowedBy(tumblingWindow)
+      .Select(g => new {Id = g.Key, Count = g.Count(c => c.Message)})
+      .ToQueryString();
+  }
+
+  #region TimeTypes
+
   public class MyClass
   {
     public DateTime Dt { get; set; }
@@ -1023,8 +1038,6 @@ Drop table {nameof(Event)};
     public DateTimeOffset DtOffset { get; set; }
     public long UnixDt => (long)Dt.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
   }
-
-  #region TimeTypes
 
   private static async Task TimeTypes(IKSqlDbRestApiClient restApiClient, IKSqlDBContext context)
   {
