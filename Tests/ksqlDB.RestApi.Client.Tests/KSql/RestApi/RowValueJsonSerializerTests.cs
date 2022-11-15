@@ -32,7 +32,6 @@ public class RowValueJsonSerializerTests : TestBase
   }
 
   [TestMethod]
-  [Ignore]
   public void Deserialize_RecordWithSingleProperty()
   {
     //Arrange
@@ -155,7 +154,6 @@ public class RowValueJsonSerializerTests : TestBase
   }
 
   [TestMethod]
-  [Ignore("TODO: single property classes")]
   public void Deserialize_MyStruct()
   {
     //Arrange
@@ -168,7 +166,7 @@ public class RowValueJsonSerializerTests : TestBase
     ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
 
     string value = "E.T.";
-    string rawJson = $"[\"{value}\"]";
+    string rawJson = "[{\"NAME\":\"E.T.\"}]";
     var jsonSerializationOptions = KSqlDbJsonSerializerOptions.CreateInstance();
 
     //Act
@@ -184,6 +182,7 @@ public class RowValueJsonSerializerTests : TestBase
   }
 
   [TestMethod]
+  [Ignore]
   public void Deserialize_Enum()
   {
     //Arrange
@@ -203,6 +202,14 @@ public class RowValueJsonSerializerTests : TestBase
   public void Deserialize_Guid()
   {
     //Arrange
+    var queryStreamHeader = new QueryStreamHeader()
+    {
+      ColumnTypes = new[] { "STRING" },
+      ColumnNames = new[] { "KSQL_COL_0" },
+    };
+
+    ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
+
     string guid = "f03c278c-61ea-4f69-b153-5647d2eec72e";
     string rawJson = $"[\"{guid}\"]";
     var jsonSerializationOptions = KSqlDbJsonSerializerOptions.CreateInstance();
@@ -213,20 +220,28 @@ public class RowValueJsonSerializerTests : TestBase
     //Assert
     rowValue.Value.Should().Be(guid);
   }
+  class Foo : Dictionary<string, int>
+  {
+  }
 
   [TestMethod]
-  [Ignore]
-  public void Deserialize_Complex()
+  public void Deserialize_DictionaryBase()
   {
     //Arrange
-    string guid = "f03c278c-61ea-4f69-b153-5647d2eec72e";
-    //string rawJson = $"[[{{\"A\":2}}]"]";
+    var queryStreamHeader = new QueryStreamHeader()
+    {
+      ColumnTypes = new[] { "MAP<STRING, INTEGER>" },
+      ColumnNames = new[] { "DICT" },
+    };
+
+    ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
+    string rawJson = "[{\"A\":2}]";
     var jsonSerializationOptions = KSqlDbJsonSerializerOptions.CreateInstance();
 
     //Act
-    //var rowValue = ClassUnderTest.Deserialize<Guid>(rawJson, jsonSerializationOptions);
+    var rowValue = ClassUnderTest.Deserialize<Foo>(rawJson, jsonSerializationOptions);
 
     //Assert
-    //rowValue.Value.Should().Be(guid);
+    rowValue.Value["A"].Should().Be(2);
   }
 }
