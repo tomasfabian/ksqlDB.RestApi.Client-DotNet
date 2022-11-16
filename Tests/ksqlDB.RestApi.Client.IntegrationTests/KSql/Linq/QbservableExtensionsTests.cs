@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models;
@@ -38,6 +34,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
   }
 
   private static TweetsProvider tweetsProvider;
+  private static readonly string SingleLadiesStreamName = "singleLadies";
 
   protected static async Task InitializeDatabase()
   {
@@ -55,7 +52,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
 
     result.Should().BeTrue();
 
-    var entityCreationMetadata = new EntityCreationMetadata("singleLadies", 1);
+    var entityCreationMetadata = new EntityCreationMetadata(SingleLadiesStreamName, 1);
     var response = await RestApiProvider.CreateStreamAsync<SingleLady>(entityCreationMetadata, true);
     response = await RestApiProvider.InsertIntoAsync(new SingleLady { Name = "E.T."}, new InsertProperties());
   }
@@ -589,9 +586,10 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
   {
     //Arrange
     int expectedItemsCount = 1;
+    string name = "E.T.";
 
     var source = QuerySource
-      .Select(c => "E.T")
+      .Select(c => name)
       .ToAsyncEnumerable();
 
     //Act
@@ -599,7 +597,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
 
     //Assert
     Assert.AreEqual(expectedItemsCount, actualValues.Count);
-    actualValues[0].Should().Be("E.T");
+    actualValues[0].Should().Be(name);
   }
 
   private record SingleLady
@@ -613,7 +611,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     //Arrange
     int expectedItemsCount = 1;
 
-    var source = Context.CreateQueryStream<SingleLady>("singleLadies")
+    var source = Context.CreateQueryStream<SingleLady>(SingleLadiesStreamName)
       .ToAsyncEnumerable();
 
     //Act
