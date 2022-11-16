@@ -621,4 +621,23 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     Assert.AreEqual(expectedItemsCount, actualValues.Count);
     actualValues[0].Name.Should().Be("E.T.");
   }
+
+  [TestMethod]
+  public async Task SingleStructPropertySelector()
+  {
+    //Arrange
+    int expectedItemsCount = 1;
+    int year = 2022;
+
+    var source = QuerySource
+      .Select(c => new DateTimeOffset(new DateTime(year, 9, 23), TimeSpan.FromHours(2)))
+      .ToAsyncEnumerable();
+
+    //Act
+    var actualValues = await CollectActualValues(source, expectedItemsCount);
+
+    //Assert
+    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues[0].Year.Should().Be(year);
+  }
 }
