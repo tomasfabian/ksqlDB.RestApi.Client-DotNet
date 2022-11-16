@@ -1,4 +1,7 @@
-﻿# ksqlDB.RestApi.Client
+# ksqlDB.RestApi.Client
+
+# v2.5.1
+- RowValueJsonSerializer single field instance deserialization fix #34
 
 # v2.5.0
 KSqlDbRestApiClient:
