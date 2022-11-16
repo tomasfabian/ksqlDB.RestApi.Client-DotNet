@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
@@ -14,6 +14,8 @@ using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
@@ -52,6 +54,10 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     result = await tweetsProvider.InsertTweetAsync(Tweet2, StreamName);
 
     result.Should().BeTrue();
+
+    var entityCreationMetadata = new EntityCreationMetadata("singleLadies", 1);
+    var response = await RestApiProvider.CreateStreamAsync<SingleLady>(entityCreationMetadata, true);
+    response = await RestApiProvider.InsertIntoAsync(new SingleLady { Name = "E.T."}, new InsertProperties());
   }
 
   [ClassCleanup]
@@ -520,7 +526,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     var semaphoreSlim = new SemaphoreSlim(0, 1);
     var actualValues = new List<Tweet>();
 
-    var subscription = QuerySource.WithOffsetResetPolicy(AutoOffsetReset.Latest)
+    using var subscription = QuerySource.WithOffsetResetPolicy(AutoOffsetReset.Latest)
       .Take(1)
       .ToObservable()
       .Timeout(TimeSpan.FromSeconds(40))
@@ -576,5 +582,45 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
 
     //Assert
     description.Should().Contain("EXPLAIN SELECT * FROM tweetsTest EMIT CHANGES;");
+  }
+
+  [TestMethod]
+  public async Task SinglePropertySelector()
+  {
+    //Arrange
+    int expectedItemsCount = 1;
+
+    var source = QuerySource
+      .Select(c => "E.T")
+      .ToAsyncEnumerable();
+
+    //Act
+    var actualValues = await CollectActualValues(source, expectedItemsCount);
+
+    //Assert
+    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues[0].Should().Be("E.T");
+  }
+
+  private record SingleLady
+  {
+    public string Name { get; init; }
+  }
+
+  [TestMethod]
+  public async Task SinglePropertyInstanceSelector()
+  {
+    //Arrange
+    int expectedItemsCount = 1;
+
+    var source = Context.CreateQueryStream<SingleLady>("singleLadies")
+      .ToAsyncEnumerable();
+
+    //Act
+    var actualValues = await CollectActualValues(source, expectedItemsCount);
+
+    //Assert
+    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues[0].Name.Should().Be("E.T.");
   }
 }
