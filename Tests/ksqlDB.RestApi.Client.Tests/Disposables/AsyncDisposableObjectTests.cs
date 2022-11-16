@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Disposables;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+﻿using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
 namespace ksqlDB.Api.Client.Tests.Models.Movies;
 

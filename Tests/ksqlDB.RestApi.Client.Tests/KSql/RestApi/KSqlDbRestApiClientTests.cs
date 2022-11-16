@@ -1,7 +1,4 @@
-﻿using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Text;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Fakes.Logging;
 using ksqlDB.Api.Client.Tests.Models.Movies;

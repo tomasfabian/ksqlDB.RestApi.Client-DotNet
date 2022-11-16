@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using FluentAssertions;
+﻿using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Connectors;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;

@@ -1,6 +1,4 @@
-﻿using System.Net.Http;
-
-namespace ksqlDB.Api.Client.Tests.Helpers.Http;
+﻿namespace ksqlDB.Api.Client.Tests.Helpers.Http;
 
 internal class IsDisposedHttpClient : HttpClient
 {

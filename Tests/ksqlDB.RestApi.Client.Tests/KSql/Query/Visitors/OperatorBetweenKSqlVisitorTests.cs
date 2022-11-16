@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Models;

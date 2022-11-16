@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using FluentAssertions;
 using Joker.Extensions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;

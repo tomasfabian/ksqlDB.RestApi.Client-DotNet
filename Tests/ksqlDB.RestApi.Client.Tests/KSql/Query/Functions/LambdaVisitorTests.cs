@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;

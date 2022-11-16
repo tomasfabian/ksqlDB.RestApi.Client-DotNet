@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using ksqlDB.Api.Client.Tests.Fakes.Http;
+﻿using ksqlDB.Api.Client.Tests.Fakes.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UnitTests;

@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
+﻿using System.Text.Json;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context.JsonConverters;

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net.Http;
-using FluentAssertions;
+﻿using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDb.RestApi.Client.DependencyInjection;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;

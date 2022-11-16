@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using ksqlDB.Api.Client.Tests.Fakes.Http;
+﻿using ksqlDB.Api.Client.Tests.Fakes.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 
