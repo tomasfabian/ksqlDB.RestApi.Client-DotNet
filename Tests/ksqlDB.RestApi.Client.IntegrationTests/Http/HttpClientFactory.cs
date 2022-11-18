@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net.Http;
-using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
+﻿using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
 namespace ksqlDB.Api.Client.IntegrationTests.Http;
 

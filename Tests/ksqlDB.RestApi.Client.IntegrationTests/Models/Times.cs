@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ksqlDB.Api.Client.IntegrationTests.Models;
+﻿namespace ksqlDB.Api.Client.IntegrationTests.Models;
 
 public record Times : Record
 {

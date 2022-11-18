@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models.Sensors;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.Http;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.Linq;

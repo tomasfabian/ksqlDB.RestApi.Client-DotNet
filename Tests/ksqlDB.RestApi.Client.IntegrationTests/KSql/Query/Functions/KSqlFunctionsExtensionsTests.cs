@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Text;
-using System.Threading.Tasks;
 using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;

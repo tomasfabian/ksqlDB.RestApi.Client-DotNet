@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Net;
 using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models.Movies;

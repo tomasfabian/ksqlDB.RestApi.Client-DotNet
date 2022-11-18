@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;

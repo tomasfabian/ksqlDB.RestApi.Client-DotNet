@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using ksqlDB.Api.Client.IntegrationTests.Models;
+﻿using ksqlDB.Api.Client.IntegrationTests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Reactive.Concurrency;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.Http;
 using ksqlDB.Api.Client.IntegrationTests.Models.Movies;

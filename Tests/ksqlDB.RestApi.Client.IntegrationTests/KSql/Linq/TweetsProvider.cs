@@ -1,6 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;

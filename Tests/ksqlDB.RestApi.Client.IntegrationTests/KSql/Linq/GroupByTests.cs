@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.Linq;
