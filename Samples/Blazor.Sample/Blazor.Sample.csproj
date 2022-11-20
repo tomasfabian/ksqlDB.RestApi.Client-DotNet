@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
@@ -8,6 +8,7 @@
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<DockerfileContext>..\..</DockerfileContext>
 		<DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
+        <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -19,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ksqlDb.RestApi.Client" Version="2.3.1" />
+		<PackageReference Include="ksqlDb.RestApi.Client" Version="2.5.1" />
 		<PackageReference Include="SqlServer.Connector" Version="1.0.0" />
 	</ItemGroup>
 
