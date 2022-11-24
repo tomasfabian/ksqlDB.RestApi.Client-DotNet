@@ -1,5 +1,3 @@
-﻿using System;
-using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Blazor.Sample.Configuration;

@@ -1,5 +1,3 @@
-﻿using System;
-using System.Linq;
 using Blazor.Sample.Data.Sensors;
 using Confluent.Kafka;
 using InsideOut.Consumer;
