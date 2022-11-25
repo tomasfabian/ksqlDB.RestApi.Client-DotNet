@@ -1,5 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
 using Confluent.Kafka;
 
 namespace InsideOut.Consumer;

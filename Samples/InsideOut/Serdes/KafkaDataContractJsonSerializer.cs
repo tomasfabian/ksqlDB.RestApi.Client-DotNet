@@ -1,4 +1,3 @@
-﻿using System.IO;
 using System.Runtime.Serialization.Json;
 using Confluent.Kafka;
 

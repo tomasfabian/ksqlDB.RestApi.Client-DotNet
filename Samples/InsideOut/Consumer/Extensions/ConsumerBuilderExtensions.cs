@@ -1,5 +1,3 @@
-﻿using System;
-using System.Linq;
 using Confluent.Kafka;
 
 namespace InsideOut.Consumer.Extensions;
