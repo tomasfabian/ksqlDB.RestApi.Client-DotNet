@@ -1,18 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerfileContext>.</DockerfileContext>
+      <OutputType>Exe</OutputType>
+      <TargetFramework>net6.0</TargetFramework>
+      <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+      <DockerfileContext>.</DockerfileContext>
+      <LangVersion>10.0</LangVersion>
+      <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.14" />
+      <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.14" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\SqlServer.Connector\SqlServer.Connector.csproj" />
+      <ProjectReference Include="..\..\..\SqlServer.Connector\SqlServer.Connector.csproj" />
   </ItemGroup>
 
 </Project>
