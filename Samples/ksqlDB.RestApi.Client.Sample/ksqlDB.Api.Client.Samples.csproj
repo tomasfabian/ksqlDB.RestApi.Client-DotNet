@@ -11,8 +11,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-        <!-- <PackageReference Include="ksqlDB.RestApi.Client" Version="2.5.0-rc.1" /> -->
-		<ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />
+        <PackageReference Include="ksqlDB.RestApi.Client" Version="2.5.1-rc.1" />
+		<!-- <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" /> -->
 		<PackageReference Include="ksqlDb.RestApi.Client.ProtoBuf" Version="0.1.0-rc.1" />
 		<!-- <ProjectReference Include="..\..\ksqlDb.RestApi.Client.ProtoBuf\ksqlDb.RestApi.Client.ProtoBuf.csproj" /> -->
 		<PackageReference Include="Apache.Avro" Version="1.11.0" />
