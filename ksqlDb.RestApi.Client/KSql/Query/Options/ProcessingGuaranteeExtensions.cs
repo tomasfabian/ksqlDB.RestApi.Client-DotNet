@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ksqlDB.RestApi.Client.KSql.Query.Options;
+﻿namespace ksqlDB.RestApi.Client.KSql.Query.Options;
 
 public static class ProcessingGuaranteeExtensions
 {

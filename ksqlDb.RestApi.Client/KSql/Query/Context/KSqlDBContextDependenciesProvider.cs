@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using ksqlDB.RestApi.Client.Infrastructure.Extensions;
+﻿using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDb.RestApi.Client.Infrastructure.Logging;
 using ksqlDB.RestApi.Client.KSql.Disposables;
 using Microsoft.Extensions.DependencyInjection;

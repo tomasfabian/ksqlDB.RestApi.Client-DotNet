@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Text;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 

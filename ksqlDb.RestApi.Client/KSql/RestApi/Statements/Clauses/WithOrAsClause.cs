@@ -1,5 +1,4 @@
-﻿using System;
-using ksqlDB.RestApi.Client.KSql.Linq.Statements;
+﻿using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using ksqlDB.RestApi.Client.KSql.Linq;
+﻿using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.Query.Context;

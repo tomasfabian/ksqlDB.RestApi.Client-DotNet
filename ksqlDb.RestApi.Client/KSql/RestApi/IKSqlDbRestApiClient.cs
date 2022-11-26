@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+﻿using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Connectors;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Queries;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Streams;

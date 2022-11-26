@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using ksqlDB.RestApi.Client.Infrastructure.Extensions;
+﻿using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 

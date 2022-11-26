@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ksqlDB.RestApi.Client.KSql.Linq;
+﻿namespace ksqlDB.RestApi.Client.KSql.Linq;
 
 public interface IAggregations
 {     

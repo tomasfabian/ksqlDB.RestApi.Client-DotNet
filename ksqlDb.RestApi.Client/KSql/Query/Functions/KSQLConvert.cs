@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ksqlDB.RestApi.Client.KSql.Query.Functions;
+﻿namespace ksqlDB.RestApi.Client.KSql.Query.Functions;
 
 public static class KSQLConvert
 {

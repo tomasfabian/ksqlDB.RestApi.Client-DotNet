@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net.Http;
-
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Http;
+﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Http;
 
 public class HttpClientFactory : IHttpV1ClientFactory
 {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
 [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
 public sealed class DecimalAttribute : Attribute

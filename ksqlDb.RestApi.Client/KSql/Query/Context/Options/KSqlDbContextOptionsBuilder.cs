@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net.Http;
-using System.Text.Json;
+﻿using System.Text.Json;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;

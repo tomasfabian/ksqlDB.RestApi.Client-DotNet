@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ksqlDb.RestApi.Client.KSql.Entities;
+﻿namespace ksqlDb.RestApi.Client.KSql.Entities;
 
 internal record FromItem
 {

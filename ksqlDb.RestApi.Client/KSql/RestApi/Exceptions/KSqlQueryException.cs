@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
+﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 
 public class KSqlQueryException : Exception
 {        

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ksqlDB.RestApi.Client.KSql.Query.Functions;
+﻿namespace ksqlDB.RestApi.Client.KSql.Query.Functions;
 
 public static class KSqlFunctionsExtensions
 {

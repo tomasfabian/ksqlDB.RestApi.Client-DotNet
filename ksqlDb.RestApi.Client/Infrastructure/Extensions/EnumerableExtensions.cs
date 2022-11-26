@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace ksqlDB.RestApi.Client.Infrastructure.Extensions;
+﻿namespace ksqlDB.RestApi.Client.Infrastructure.Extensions;
 
 internal static class EnumerableExtensions
 {

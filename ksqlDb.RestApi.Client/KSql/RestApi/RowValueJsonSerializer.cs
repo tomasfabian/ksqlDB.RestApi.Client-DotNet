@@ -1,4 +1,3 @@
-using System;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;

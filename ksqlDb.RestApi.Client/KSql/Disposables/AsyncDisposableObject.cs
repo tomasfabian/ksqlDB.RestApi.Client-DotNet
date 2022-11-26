@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace ksqlDB.RestApi.Client.KSql.Disposables;
+﻿namespace ksqlDB.RestApi.Client.KSql.Disposables;
 
 public abstract class AsyncDisposableObject : IAsyncDisposable
 {

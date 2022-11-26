@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using ksqlDB.RestApi.Client.KSql.RestApi.Query;
+﻿using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi;
 

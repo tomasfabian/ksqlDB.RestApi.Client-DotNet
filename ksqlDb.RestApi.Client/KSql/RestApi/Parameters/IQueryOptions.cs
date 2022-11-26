@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
 public interface IQueryOptions
 {

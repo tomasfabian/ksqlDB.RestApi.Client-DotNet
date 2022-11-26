@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.Json;
 using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;

@@ -1,5 +1,4 @@
-﻿using System;
-using ksqlDB.RestApi.Client.KSql.Query.Windows;
+﻿using ksqlDB.RestApi.Client.KSql.Query.Windows;
 
 namespace ksqlDB.RestApi.Client.KSql.Linq;
 

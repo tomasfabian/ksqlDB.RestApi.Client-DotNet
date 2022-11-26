@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 public record InsertProperties : IEntityCreationProperties, IValueFormatters
 {

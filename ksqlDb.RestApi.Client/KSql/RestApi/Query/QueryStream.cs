@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ksqlDB.RestApi.Client.KSql.RestApi.Query;
+﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Query;
 
 public record QueryStream<T>
 {

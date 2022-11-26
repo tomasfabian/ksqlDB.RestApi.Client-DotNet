@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 
 namespace ksqlDB.RestApi.Client.KSql.Linq.Statements;
 

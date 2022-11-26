@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ksqlDB.RestApi.Client.KSql.Query.Windows;
+﻿namespace ksqlDB.RestApi.Client.KSql.Query.Windows;
 
 public class Duration
 {

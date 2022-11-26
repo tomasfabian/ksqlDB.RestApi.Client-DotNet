@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 

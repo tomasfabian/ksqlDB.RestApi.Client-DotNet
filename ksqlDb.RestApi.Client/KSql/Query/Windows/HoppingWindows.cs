@@ -1,5 +1,4 @@
 ﻿using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
-using System;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Windows;
 
