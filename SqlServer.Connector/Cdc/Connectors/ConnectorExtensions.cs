@@ -1,5 +1,3 @@
-﻿using System;
-using System.Linq;
 using System.Text;
 
 namespace SqlServer.Connector.Cdc.Connectors

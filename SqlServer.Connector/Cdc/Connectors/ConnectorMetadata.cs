@@ -1,5 +1,3 @@
-﻿using System.Collections.Generic;
-
 namespace SqlServer.Connector.Cdc.Connectors
 {
   public record ConnectorMetadata

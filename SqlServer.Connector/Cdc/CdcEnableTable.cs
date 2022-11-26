@@ -1,5 +1,3 @@
-﻿using System;
-
 namespace SqlServer.Connector.Cdc
 {
   /// <summary>

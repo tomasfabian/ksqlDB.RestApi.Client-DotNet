@@ -1,4 +1,3 @@
-﻿using System;
 using Microsoft.Data.SqlClient;
 
 namespace SqlServer.Connector.Cdc.Connectors

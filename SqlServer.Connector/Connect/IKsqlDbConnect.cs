@@ -1,6 +1,3 @@
-﻿using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using SqlServer.Connector.Cdc.Connectors;
 
 namespace SqlServer.Connector.Connect
