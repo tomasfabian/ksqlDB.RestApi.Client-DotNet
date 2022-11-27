@@ -975,23 +975,6 @@ KSQL
 LEN(Message)
 ```
 
-### LPad, RPad, Trim, Substring (v0.2.0)
-```C#
-using ksqlDB.RestApi.Client.KSql.Query.Functions;
-
-Expression<Func<Tweet, string>> expression1 = c => KSql.Functions.LPad(c.Message, 8, "x");
-Expression<Func<Tweet, string>> expression2 = c => KSql.Functions.RPad(c.Message, 8, "x");
-Expression<Func<Tweet, string>> expression3 = c => KSql.Functions.Trim(c.Message);
-Expression<Func<Tweet, string>> expression4 = c => K.Functions.Substring(c.Message, 2, 3);
-```
-KSQL
-```KSQL
-LPAD(Message, 8, 'x')
-RPAD(Message, 8, 'x')
-TRIM(Message)
-Substring(Message, 2, 3)
-```
-
 # v0.3.0
 
 ## Aggregation functions 
@@ -1236,69 +1219,30 @@ SELECT MAP('a' := ARRAY[1, 2], 'b' := ARRAY[3, 4]) Map
 FROM Tweets EMIT CHANGES;
 ```
 
-### Date and time functions
-#### DATETOSTRING (v0.4.0)
-```C#
-int epochDays = 18672;
-string format = "yyyy-MM-dd";
-
-Expression<Func<Tweet, string>> expression = _ => KSqlFunctions.Instance.DateToString(epochDays, format);
-```
-Generated KSQL:
-```KSQL
-DATETOSTRING(18672, 'yyyy-MM-dd')
-```
-
-#### TIMESTAMPTOSTRING (v0.4.0)
-```C#
-new KSqlDBContext(ksqlDbUrl).CreateQueryStream<Movie>()
-  .Select(c => K.Functions.TimestampToString(c.RowTime, "yyyy-MM-dd''T''HH:mm:ssX"))
-```
-
-Generated KSQL:
-```KSQL
-SELECT DATETOSTRING(1613503749145, 'yyyy-MM-dd''T''HH:mm:ssX')
-FROM tweets EMIT CHANGES;
-```
-
-#### date and time scalar functions (v0.4.0)
-[Date and time](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#date-and-time)
-
+# v0.4.0
+[Some KSql function examples can be found here](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/KSql-functions)
 
 # v0.5.0
 
 ### Structs (v0.5.0)
 [Structs](https://docs.ksqldb.io/en/latest/how-to-guides/query-structured-data/#structs)
  are an associative data type that map VARCHAR keys to values of any type. Destructure structs by using arrow syntax (->).
-
-### Entries (v0.5.0)
 ```C#
-bool sorted = true;
-      
-var subscription = new KSqlDBContext(@"http:\\localhost:8088")
-  .CreateQueryStream<Movie>()
-  .Select(c => new
-  {
-    Entries = KSqlFunctions.Instance.Entries(new Dictionary<string, string>()
-    {
-      {"a", "value"}
-    }, sorted)
-  })
-  .Subscribe(c =>
-  {
-    foreach (var entry in c.Entries)
-    {
-      var key = entry.K;
+public struct Point
+{
+  public int X { get; set; }
 
-      var value = entry.V;
-    }
-  }, error => {});
+  public int Y { get; set; }
+}
 ```
 
-Generated KSQL:
-```KSQL
-SELECT ENTRIES(MAP('a' := 'value'), True) Entries 
-FROM movies_test EMIT CHANGES;
+```C#
+query
+  .Select(c => new Point { X = 1, Y = 2 });
+```
+
+```SQL
+SELECT STRUCT(X := 1, Y := 2) FROM point EMIT CHANGES;
 ```
 
 ### Full Outer Join (v0.5.0)
@@ -2060,11 +2004,6 @@ CAST(Message AS INT)
 CAST(Message AS BIGINT)
 CAST(Message AS DECIMAL(10, 2))
 CAST(Message AS DOUBLE)
-```
-
-### Concat (v1.1.0)
-```C#
-Expression<Func<Tweet, string>> expression = c => K.Functions.Concat(c.Message, "_Value");
 ```
 
 ### WithOffsetResetPolicy - push queries extension method (v1.1.0)
