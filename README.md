@@ -19,6 +19,8 @@ This adds a `<PackageReference>` to your csproj file, similar to the following:
 <PackageReference Include="ksqlDB.RestApi.Client" Version="2.3.0" />
 ```
 
+Alternative option is to use [Protobuf content type](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/protobuf.md).
+
 The following example can be tried with a [.NET interactive Notebook](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/Notebooks):
 
 ```C#
@@ -157,62 +159,6 @@ run in command line:
 
 - set docker-compose.csproj as startup project in InsideOut.sln for an embedded Kafka connect integration and stream processing examples. 
 
-# ksqlDB.RestApi.Client.ProtoBuf
-- adds support for Protobuf content type. The package uses [protobuf-net](https://github.com/protobuf-net/protobuf-net).
-
-Install:
-```
-dotnet add package ksqlDb.RestApi.Client.ProtoBuf
-```
-
-Content-type
-```
-application/vnd.ksql.v1+protobuf
-```
-
-```C#
-using System.Reactive.Linq;
-using ksqlDB.Api.Client.Samples.Models.Movies;
-using ksqlDB.RestApi.Client.KSql.Linq;
-using ksqlDb.RestApi.Client.ProtoBuf.KSql.Query;
-using ProtoBuf;
-
-var ksqlDbUrl = @"http:\\localhost:8088";
-
-await using var context = new ProtoBufKSqlDbContext(ksqlDbUrl);
-
-var query = context.CreateQueryStream<MovieProto>("movie") // query-stream endpoint
-  .Where(p => p.Title != "E.T.")
-  .Where(c => c.Title.ToLower().Contains("hard".ToLower()) || c.Id == 1)
-  .Select(l => new { Id = l.Id, l.Title })
-  .Take(2); // LIMIT 2    
-
-var ksql = query.ToQueryString();
-
-Console.WriteLine("Generated ksql:");
-Console.WriteLine(ksql);
-Console.WriteLine();
-
-using var disposable = query
-  .ToObservable() // client side processing starts here lazily after subscription. Switches to Rx.NET
-  .Finally(() => { Console.WriteLine("Finally"); })
-  .Subscribe(onNext: movie =>
-  {
-    Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title}");
-    Console.WriteLine();
-  }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
-
-
-[ProtoContract]
-record MovieProto
-{
-  [ProtoMember(1)]
-  public string Title { get; set; } = null!;
-
-  [ProtoMember(2)]
-  public int Id { get; set; }
-}
-```
 
 # CDC - Push notifications from Sql Server tables with Kafka
 Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with SqlServer.Connector package together with the Debezium connector streaming platform.
