@@ -460,6 +460,9 @@ FROM custom_topic_name
 # ```IQbservable<T>``` extension methods
 <img src="https://www.codeproject.com/KB/cs/646361/WhatHowWhere.jpg" />
 
+List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md) extension methods:
+- Take (LIMIT)
+
 ### Select (v0.1.0)
 Projects each element of a stream into a new form.
 ```C#
@@ -568,15 +571,6 @@ Supported operators are:
 | OR       | logical OR                  | \|\| |
 | NOT      | logical NOT                 |  !   |
 
-### Take (Limit) (v0.1.0)
-Returns a specified number of contiguous elements from the start of a stream. Depends on the 'auto.topic.offset' parameter.
-```C#
-context.CreateQueryStream<Tweet>()
-  .Take(2);
-```
-```SQL
-SELECT * from tweets EMIT CHANGES LIMIT 2;
-```
 
 ### Subscribe (v0.1.0)
 Providing ```IObserver<T>```:
