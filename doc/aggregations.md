@@ -90,3 +90,28 @@ var source = Context.CreateQueryStream<Tweet>(TweetsStreamName)
   .GroupBy(c => c.Id)
   .Select(l => new { Id = l.Key, Maps = l.CollectList(c => dict) })
 ```
+
+### TopK, TopKDistinct, LongCount, Count(column) (v0.3.0)
+```C#
+Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression1 = l => new { TopK = l.TopK(c => c.Amount, 2) };
+Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression2 = l => new { TopKDistinct = l.TopKDistinct(c => c.Amount, 2) };
+Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression3 = l => new { Count = l.LongCount(c => c.Amount) };
+```
+KSQL
+```KSQL
+TOPK(Amount, 2) TopKDistinct
+TOPKDISTINCT(Amount, 2) TopKDistinct
+COUNT(Amount) Count
+```
+
+```C#
+new KSqlDBContext(@"http:\\localhost:8088").CreateQueryStream<Tweet>()
+  .GroupBy(c => c.Id)
+  .Select(g => new { Id = g.Key, TopK = g.TopKDistinct(c => c.Amount, 4) })
+  .Subscribe(onNext: tweetMessage =>
+  {
+    var tops = string.Join(',', tweetMessage.TopK);
+    Console.WriteLine($"TopKs: {tops}");
+    Console.WriteLine($"TopKs Array Length: {tops.Length}");
+  }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
+```
