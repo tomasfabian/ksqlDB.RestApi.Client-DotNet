@@ -115,3 +115,39 @@ new KSqlDBContext(@"http:\\localhost:8088").CreateQueryStream<Tweet>()
     Console.WriteLine($"TopKs Array Length: {tops.Length}");
   }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
 ```
+
+### EarliestByOffset, LatestByOffset, EarliestByOffsetAllowNulls, LatestByOffsetAllowNull (v0.3.0)
+[EarliestByOffset](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/#earliest_by_offset),
+[LatestByOffset](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/#latest_by_offset)
+```C#
+Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression1 = l => new { EarliestByOffset = l.EarliestByOffset(c => c.Amount) };
+
+Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression2 = l => new { LatestByOffsetAllowNulls = l.LatestByOffsetAllowNulls(c => c.Amount) };
+```
+KSQL
+```KSQL
+--EARLIEST_BY_OFFSET(col1, [ignoreNulls])
+EARLIEST_BY_OFFSET(Amount, True) EarliestByOffset
+LATEST_BY_OFFSET(Amount, False) LatestByOffsetAllowNulls
+```
+
+EARLIEST_BY_OFFSET(col1, earliestN, [ignoreNulls])
+
+Return the earliest N values for the specified column as an ARRAY. The earliest values
+in the partition have the lowest offsets.
+```C#
+await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+
+context.CreateQueryStream<Tweet>()
+  .GroupBy(c => c.Id)
+  .Select(g => new { Id = g.Key, EarliestByOffset = g.EarliestByOffset(c => c.Amount, 2) })
+  .Subscribe(earliest =>
+  {
+    Console.WriteLine($"{earliest.Id} array length: {earliest.EarliestByOffset.Length}");
+  }, error => { Console.WriteLine($"Exception: {error.Message}"); }, () => Console.WriteLine("Completed"));
+```
+Generated KSQL:
+```KSQL
+SELECT Id, EARLIEST_BY_OFFSET(Amount, 2, True) EarliestByOffset 
+FROM Tweets GROUP BY Id EMIT CHANGES;
+```
