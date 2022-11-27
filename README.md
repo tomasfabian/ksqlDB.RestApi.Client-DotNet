@@ -722,6 +722,19 @@ var ksql = context.CreateQueryStream<Tweet>().ToQueryString();
 Console.WriteLine(ksql);
 ```
 
+### Aggregation functions
+List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md):
+- MIN, MAX
+- AVG
+- COUNT
+- COLLECT_LIST, COLLECT_SET, EARLIEST_BY_OFFSET, LATEST_BY_OFFSET
+- SUM
+- COUNT_DISTINCT
+- HISTOGRAM
+- TOPK,TOPKDISTINCT
+
+[Rest api reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
+
 ### GroupBy (v0.1.0)
 #### Count (v0.1.0)
 Count the number of rows. When * is specified, the count returned will be the total number of rows.
@@ -754,18 +767,6 @@ context.CreateQueryStream<Tweet>()
 ```
 ```SQL
 SELECT COUNT(*) FROM Tweets GROUP BY Id EMIT CHANGES;
-```
-
-#### Sum
-```C#
-context.CreateQueryStream<Tweet>()
-        .GroupBy(c => c.Id)
-        //.Select(g => g.Sum(c => c.Amount))
-        .Select(g => new { Id = g.Key, Agg = g.Sum(c => c.Amount)})
-```
-Equivalent to KSql:
-```SQL
-SELECT Id, SUM(Amount) Agg FROM Tweets GROUP BY Id EMIT CHANGES;
 ```
 
 ### ToAsyncEnumerable (v0.1.0)

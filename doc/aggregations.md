@@ -2,6 +2,52 @@
 
 # Aggregation functions
 
+### GroupBy (v0.1.0)
+#### Count (v0.1.0)
+Count the number of rows. When * is specified, the count returned will be the total number of rows.
+```C#
+var ksqlDbUrl = @"http:\\localhost:8088";
+var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
+var context = new KSqlDBContext(contextOptions);
+
+context.CreateQueryStream<Tweet>()
+  .GroupBy(c => c.Id)
+  .Select(g => new { Id = g.Key, Count = g.Count() })
+  .Subscribe(count =>
+  {
+    Console.WriteLine($"{count.Id} Count: {count.Count}");
+    Console.WriteLine();
+  }, error => { Console.WriteLine($"Exception: {error.Message}"); }, () => Console.WriteLine("Completed"));
+```
+```SQL
+SELECT Id, COUNT(*) Count FROM Tweets GROUP BY Id EMIT CHANGES;
+```
+
+> ⚠ There is a known limitation in the early access versions (bellow version 1.10). The aggregation functions have to be named/aliased COUNT(*) Count, otherwise the deserialization won't be able to map the unknown column name KSQL_COL_0. 
+The Key should be mapped back to the respective column too Id = g.Key. See IKSqlGrouping.Source (v1.10.0).
+
+Or without the new expression:
+```C#
+context.CreateQueryStream<Tweet>()
+  .GroupBy(c => c.Id)
+  .Select(g => g.Count()); 
+```
+```SQL
+SELECT COUNT(*) FROM Tweets GROUP BY Id EMIT CHANGES;
+```
+
+#### Sum
+```C#
+context.CreateQueryStream<Tweet>()
+        .GroupBy(c => c.Id)
+        //.Select(g => g.Sum(c => c.Amount))
+        .Select(g => new { Id = g.Key, Agg = g.Sum(c => c.Amount)})
+```
+Equivalent to KSql:
+```SQL
+SELECT Id, SUM(Amount) Agg FROM Tweets GROUP BY Id EMIT CHANGES;
+```
+
 ### Avg (v0.2.0)
 ```KSQL
 AVG(col1)
