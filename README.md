@@ -917,32 +917,6 @@ EMIT CHANGES;
 > ⚠ There is a known limitation in the early access versions (bellow 1.0). 
 The Key column, in this case movie.Title, has to be aliased Title = movie.Title, otherwise the deserialization won't be able to map the unknown column name M_TITLE. 
 
-### Avg (v0.2.0)
-```KSQL
-AVG(col1)
-``` 
-Return the average value for a given column.
-```C#
-var query = CreateQbservable()
-  .GroupBy(c => c.RegionCode)
-  .Select(g => g.Avg(c => c.Citizens));
-```
-
-### Aggregation functions Min and Max (v0.2.0)
-```KSQL
-MIN(col1)
-MAX(col1)
-``` 
-Return the minimum/maximum value for a given column and window. Rows that have col1 set to null are ignored.
-```C#
-var queryMin = CreateQbservable()
-  .GroupBy(c => c.RegionCode)
-  .Select(g => g.Min(c => c.Citizens));
-
-var queryMax = CreateQbservable()
-  .GroupBy(c => c.RegionCode)
-  .Select(g => g.Max(c => c.Citizens));
-```
 
 ### Like (v0.2.0)
 ```C#
