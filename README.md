@@ -1118,29 +1118,6 @@ WHERE IP_ADDRESS IS NOT NULL OR IP_ADDRESS IS NULL
 EMIT CHANGES;
 ```
 
-### Numeric functions - Abs, Ceil, Floor, Random, Sign, Round (v0.3.0)
-```C#
-Expression<Func<Tweet, double>> expression1 = c => K.Functions.Abs(c.Amount);
-Expression<Func<Tweet, double>> expression2 = c => K.Functions.Ceil(c.Amount);
-Expression<Func<Tweet, double>> expression3 = c => K.Functions.Floor(c.Amount);
-Expression<Func<Tweet, double>> expression4 = c => K.Functions.Random();
-Expression<Func<Tweet, double>> expression5 = c => K.Functions.Sign(c.Amount);
-
-int scale = 3;
-Expression<Func<Tweet, double>> expression6 = c => K.Functions.Round(c.Amount, scale);
-```
-
-Generated KSQL:
-```KSQL
-ABS(Amount)
-CEIL(AccountBalance)
-FLOOR(AccountBalance)
-RANDOM()
-SIGN(Amount)
-
-ROUND(Amount, 3)
-```
-
 ### Dynamic - calling not supported ksqldb functions (v0.3.0)
 Some of the ksqldb functions have not been implemented yet. This can be circumvented by calling K.Functions.Dynamic with the appropriate function call and its parameters. The type of the column value is set with C# **as** operator.
 ```C#
