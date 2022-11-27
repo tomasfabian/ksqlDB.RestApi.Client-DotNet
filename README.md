@@ -736,6 +736,8 @@ List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/
 [Rest api reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
 ### GroupBy (v0.1.0)
+Extract records from an aggregation that fulfill a specified condition with the [HAVING](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#having-v020) keyword.
+
 #### Count (v0.1.0)
 Count the number of rows. When * is specified, the count returned will be the total number of rows.
 ```C#
@@ -745,6 +747,7 @@ var context = new KSqlDBContext(contextOptions);
 
 context.CreateQueryStream<Tweet>()
   .GroupBy(c => c.Id)
+  .Having(c => c.Count() > 2)
   .Select(g => new { Id = g.Key, Count = g.Count() })
   .Subscribe(count =>
   {
@@ -825,18 +828,6 @@ UCASE(Latitude) != 'HI'
 ```
 
 # v0.2.0
-
-### Having (v0.2.0)
-```C#
-var query = context.CreateQueryStream<Tweet>()
-  .GroupBy(c => c.Id)
-  .Having(c => c.Count() > 2)
-  .Select(g => new { Id = g.Key, Count = g.Count()});
-```
-KSQL:
-```KSQL
-SELECT Id, COUNT(*) Count FROM Tweets GROUP BY Id HAVING Count(*) > 2 EMIT CHANGES;
-```
 
 ### Session Window (v0.2.0)
 A [session window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#session-window) aggregates records into a session, which represents a period of activity separated by a specified gap of inactivity, or "idleness". 

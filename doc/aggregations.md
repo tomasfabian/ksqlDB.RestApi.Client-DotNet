@@ -1,6 +1,15 @@
-# v1.7.0
-
 # Aggregation functions
+List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md):
+- [MIN, MAX](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#min-and-max-v020)
+- [AVG](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#avg-v020)
+- [COUNT](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#count-v010)
+- [COLLECT_LIST, COLLECT_SET, EARLIEST_BY_OFFSET, LATEST_BY_OFFSET](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#collect_list-collect_set-earliest_by_offset-latest_by_offset)
+- [SUM](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#sum)
+- COUNT_DISTINCT
+- HISTOGRAM
+- [TOPK,TOPKDISTINCT](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#topk-topkdistinct-longcount-countcolumn-v030)
+
+[Rest api reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
 ### GroupBy (v0.1.0)
 #### Count (v0.1.0)
@@ -34,6 +43,20 @@ context.CreateQueryStream<Tweet>()
 ```
 ```SQL
 SELECT COUNT(*) FROM Tweets GROUP BY Id EMIT CHANGES;
+```
+
+### Having (v0.2.0)
+Extract records from an aggregation that fulfill a specified condition.
+
+```C#
+var query = context.CreateQueryStream<Tweet>()
+  .GroupBy(c => c.Id)
+  .Having(c => c.Count() > 2)
+  .Select(g => new { Id = g.Key, Count = g.Count()});
+```
+KSQL:
+```KSQL
+SELECT Id, COUNT(*) Count FROM Tweets GROUP BY Id HAVING Count(*) > 2 EMIT CHANGES;
 ```
 
 #### Sum
