@@ -75,7 +75,8 @@ var queryMax = CreateQbservable()
   .Select(g => g.Max(c => c.Citizens));
 ```
 
-### COLLECT_LIST, COLLECT_SET, EARLIEST_BY_OFFSET, LATEST_BY_OFFSET - with Structs, Arrays, and Maps
+### COLLECT_LIST, COLLECT_SET, EARLIEST_BY_OFFSET, LATEST_BY_OFFSET
+- with Structs, Arrays, and Maps
 
 The list of available `kslqdb` aggregate functions is available [here](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
