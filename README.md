@@ -462,6 +462,7 @@ FROM custom_topic_name
 
 List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md) extension methods:
 - Take (LIMIT)
+- Subscribe
 - ToObservable
 
 ### Select (v0.1.0)
@@ -572,46 +573,6 @@ Supported operators are:
 | OR       | logical OR                  | \|\| |
 | NOT      | logical NOT                 |  !   |
 
-
-### Subscribe (v0.1.0)
-Providing ```IObserver<T>```:
-```C#
-using var subscription = new KSqlDBContext(@"http:\\localhost:8088")
-  .CreateQueryStream<Tweet>()
-  .Subscribe(new TweetsObserver());
-
-public class TweetsObserver : System.IObserver<Tweet>
-{
-  public void OnNext(Tweet tweetMessage)
-  {
-    Console.WriteLine($"{nameof(Tweet)}: {tweetMessage.Id} - {tweetMessage.Message}");
-  }
-
-  public void OnError(Exception error)
-  {
-    Console.WriteLine($"{nameof(Tweet)}: {error.Message}");
-  }
-
-  public void OnCompleted()
-  {
-    Console.WriteLine($"{nameof(Tweet)}: completed successfully");
-  }
-}
-```
-
-Providing ```Action<T> onNext, Action<Exception> onError and Action onCompleted```:
-```C#
-using var subscription = new KSqlDBContext(@"http:\\localhost:8088")
-    .CreateQueryStream<Tweet>()
-    .Subscribe(
-      onNext: tweetMessage =>
-      {
-        Console.WriteLine($"{nameof(Tweet)}: {tweetMessage.Id} - {tweetMessage.Message}");
-      },
-      onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, 
-      onCompleted: () => Console.WriteLine("Completed")
-      );
-```
 
 ### ToQueryString (v0.1.0)
 ToQueryString is helpful for debugging purposes. It returns the generated ksql query without executing it.
