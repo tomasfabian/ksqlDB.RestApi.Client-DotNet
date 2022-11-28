@@ -594,7 +594,7 @@ List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/
 - HISTOGRAM
 - [TOPK,TOPKDISTINCT](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#topk-topkdistinct-longcount-countcolumn-v030)
 
-- [TimeWindows - EMIT FINAL]()
+- [TimeWindows - EMIT FINAL](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#timewindows---emit-final-v250)
 
 [Rest api reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
@@ -3480,7 +3480,7 @@ CREATE OR REPLACE STREAM Data (
 - Renaming of stream or table column names with the `JsonPropertyNameAttribute` was also added for selects
 
 List of supported data types:
-[System.GUID as ksqldb VARCHAR type]()
+[System.GUID as ksqldb VARCHAR type](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_types.md#systemguid-as-ksqldb-varchar-type-v240)
 
 List of supported Joins:
 - [RightJoin](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/joins.md#rightjoin)
