@@ -462,6 +462,7 @@ FROM custom_topic_name
 
 List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md) extension methods:
 - Take (LIMIT)
+- ToObservable
 
 ### Select (v0.1.0)
 Projects each element of a stream into a new form.
@@ -597,6 +598,7 @@ public class TweetsObserver : System.IObserver<Tweet>
   }
 }
 ```
+
 Providing ```Action<T> onNext, Action<Exception> onError and Action onCompleted```:
 ```C#
 using var subscription = new KSqlDBContext(@"http:\\localhost:8088")
@@ -609,48 +611,6 @@ using var subscription = new KSqlDBContext(@"http:\\localhost:8088")
       onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, 
       onCompleted: () => Console.WriteLine("Completed")
       );
-```
-
-### ToObservable moving to [Rx.NET](https://github.com/dotnet/reactive)
-The following code snippet shows how to observe messages on the desired [IScheduler](http://introtorx.com/Content/v1.0.10621.0/15_SchedulingAndThreading.html): 
-
-```C#
-using var disposable = context.CreateQueryStream<Tweet>()        
-  .Take(2)     
-  .ToObservable() //client side processing starts here lazily after subscription
-  .ObserveOn(System.Reactive.Concurrency.DispatcherScheduler.Current)
-  .Subscribe(new TweetsObserver());
-```
-Be cautious regarding to server side and client side processings:
-```C#
-KSql.Linq.IQbservable<Tweet> queryStream = context.CreateQueryStream<Tweet>().Take(2);
-
-System.IObservable<Tweet> observable = queryStream.ToObservable();
-
-//All reactive extension methods are available from this point.
-//The not obvious difference is that the processing is done client side, not server side (ksqldb) as in the case of IQbservable:
-observable.Throttle(TimeSpan.FromSeconds(3)).Subscribe();
-```
-WPF client side batching example:
-```C#
-private static IDisposable ClientSideBatching(KSqlDBContext context)
-{
-  var disposable = context.CreateQueryStream<Tweet>()
-    //Client side execution
-    .ToObservable()
-    .Buffer(TimeSpan.FromMilliseconds(250), 100)
-    .Where(c => c.Count > 0)
-    .ObserveOn(System.Reactive.Concurrency.DispatcherScheduler.Current)
-    .Subscribe(tweets =>
-    {
-      foreach (var tweet in tweets)
-      {
-        Console.WriteLine(tweet.Message);
-      }
-    });
-
-  return disposable;
-}
 ```
 
 ### ToQueryString (v0.1.0)
