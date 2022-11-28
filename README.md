@@ -3672,24 +3672,6 @@ INSERT INTO MyUpdate (Field, Field2, ExtraField) VALUES ('Value', 'Value2', 'Tes
 ```
 
 # v2.5.0
-# Pause and resume persistent qeries
-`PausePersistentQueryAsync` - Pause a persistent query.
-`ResumePersistentQueryAsync` - Resume a paused persistent query.
-
-```C#
-private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient restApiClient)
-{
-  string topicName = "moviesByTitle";
-
-  var queries = await restApiClient.GetQueriesAsync();
-
-  var query = queries.SelectMany(c => c.Queries).FirstOrDefault(c => c.SinkKafkaTopics.Contains(topicName));
-
-  var response = await restApiClient.PausePersistentQueryAsync(query.Id);
-  response = await restApiClient.ResumePersistentQueryAsync(query.Id);
-  response = await restApiClient.TerminatePersistentQueryAsync(query.Id);
-}
-```
 
 # TimeWindows - EMIT FINAL (ksqldb v0.28.2)
 - `EMIT FINAL` output refinement was added for windowed aggregations. ksqldb v0.28.2
@@ -3716,6 +3698,9 @@ SELECT Id, COUNT(MESSAGE) Count
 WINDOW TUMBLING (SIZE 2 SECONDS, GRACE PERIOD 2 SECONDS)
  GROUP BY Id EMIT FINAL;
 ```
+
+List of supported ksqlDB SQL statements:
+- Pause and resume persistent qeries
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
