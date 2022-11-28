@@ -3519,76 +3519,6 @@ CREATE OR REPLACE STREAM Data (
 
 - Renaming of stream or table column names with the `JsonPropertyNameAttribute` was also added for selects
 
-# v2.3.0
-
-### IKSqlDbRestApiClient.AssertTopicExistsAsync and IKSqlDbRestApiClient.AssertTopicNotExistsAsync
-[Assert Topic](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/assert-topic/) - asserts that a topic exists or does not exist.
-
-```C#
-using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
-using ksqlDB.RestApi.Client.KSql.Query.Windows;
-using ksqlDB.RestApi.Client.KSql.RestApi;
-
-private static async Task AssertTopicsAsync(IKSqlDbRestApiClient restApiClient)
-{
-  string topicName = "tweetsByTitle";
-
-  var topicProperties = new Dictionary<string, string>
-  {
-    { "replicas", "3" },
-    { "partitions", "1" },
-  };
-
-  var options = new AssertTopicOptions(topicName)
-  {
-    Properties = topicProperties,
-    Timeout = Duration.OfSeconds(3)
-  };
-
-  var responses = await restApiClient.AssertTopicNotExistsAsync(options);
-
-  Console.WriteLine(responses[0].Exists);
-
-  responses = await restApiClient.AssertTopicExistsAsync(options);
-}
-```
-
-```SQL
-ASSERT NOT EXISTS TOPIC tweetsByTitle WITH ( replicas=3, partitions=1 ) 3 SECONDS;
-ASSERT TOPIC tweetsByTitle WITH ( replicas=3, partitions=1 ) 3 SECONDS;
-``` 
-
-### IKSqlDbRestApiClient.AssertSchemaExistsAsync and IKSqlDbRestApiClient.AssertSchemaNotExistsAsync
-[Assert Schema](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/assert-schema/)
-
-```C#
-using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
-using ksqlDB.RestApi.Client.KSql.Query.Windows;
-using ksqlDB.RestApi.Client.KSql.RestApi;
-
-private static async Task AssertSchemaAsync(IKSqlDbRestApiClient restApiClient)
-{
-  string subject = "Kafka-key";
-  int id = 21;
-
-  var options = new AssertSchemaOptions(subject, id)
-  {
-    Timeout = Duration.OfSeconds(3)
-  };
-
-  var responses = await restApiClient.AssertSchemaNotExistsAsync(options);
-
-  Console.WriteLine(responses[0].Exists);
-
-  responses = await restApiClient.AssertSchemaExistsAsync(options);
-}
-```
-
-```SQL
-ASSERT NOT EXISTS SCHEMA SUBJECT 'Kafka-key' ID 21 TIMEOUT 3 SECONDS;
-ASSERT SCHEMA SUBJECT 'Kafka-key' ID 21 TIMEOUT 3 SECONDS;
-```
-
 # v2.4.0
 # System.GUID as ksqldb VARCHAR type
 
@@ -3651,6 +3581,13 @@ SELECT Id, COUNT(MESSAGE) Count
 WINDOW TUMBLING (SIZE 2 SECONDS, GRACE PERIOD 2 SECONDS)
  GROUP BY Id EMIT FINAL;
 ```
+
+List of supported ksqlDB SQL statements:
+- [Pause and resume persistent qeries](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#pause-and-resume-persistent-qeries-v250)
+- InsertProperties.UseInstanceType
+- [Added support for extracting field names and values (for insert and select statements)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#insertpropertiesuseinstancetype)
+- [AssertTopicExistsAsync]()
+- [AssertSchemaExistsAsync]()
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
