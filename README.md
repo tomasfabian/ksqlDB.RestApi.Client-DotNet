@@ -3479,40 +3479,8 @@ CREATE OR REPLACE STREAM Data (
 
 - Renaming of stream or table column names with the `JsonPropertyNameAttribute` was also added for selects
 
-# v2.4.0
-# System.GUID as ksqldb VARCHAR type
-
-```C#
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
-
-public record LinkCreated
-{
-  public string Name { get; set; }
-
-  [Key]
-  public Guid AggregateRootId { get; set; }
-}
-``` 
-```C#
-EntityCreationMetadata metadata = new()
-{
-  KafkaTopic = "MyGuids",
-  ValueFormat = SerializationFormats.Json,
-  Partitions = 1,
-  Replicas = 1
-};
-
-var httpResponseMessage = await restApiProvider.CreateStreamAsync<LinkCreated>(metadata, ifNotExists: true)
-  .ConfigureAwait(false);
-```
-KSQL:
-
-```SQL
-CREATE STREAM IF NOT EXISTS LINKCREATEDS (
-  NAME STRING,
-  AGGREGATEROOTID STRING KEY
-) WITH (KAFKA_TOPIC='MyGuids', KEY_FORMAT='KAFKA', PARTITIONS='1', REPLICAS='1', VALUE_FORMAT='JSON');
-```
+List of supported data types:
+[System.GUID as ksqldb VARCHAR type]()
 
 List of supported Joins:
 - [RightJoin](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/joins.md#rightjoin)
