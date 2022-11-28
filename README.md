@@ -3624,56 +3624,9 @@ CREATE STREAM IF NOT EXISTS LINKCREATEDS (
 ) WITH (KAFKA_TOPIC='MyGuids', KEY_FORMAT='KAFKA', PARTITIONS='1', REPLICAS='1', VALUE_FORMAT='JSON');
 ```
 
-# Added support for extracting field names and values (for insert and select statements)
-
-```C#
-internal record Update
-{
-  public string ExtraField = "Test value";
-}
-```
-
-# InsertProperties.UseInstanceType
-UseInstanceType set to true will include the public fields and properties from the instance type for the insert statements.
-
-```C#
-IMyUpdate value = new MyUpdate
-{
-  Field = "Value",
-  Field2 = "Value2",
-};
-
-var insertProperties = new InsertProperties
-{
-  EntityName = nameof(MyUpdate),
-  ShouldPluralizeEntityName = false,
-  UseInstanceType = true
-};
-
-string statement = new CreateInsert().Generate(value, insertProperties);
-```
-
-```C#
-private interface IMyUpdate
-{
-  public string Field { get; set; }
-}
-
-private record MyUpdate : IMyUpdate
-{
-  public string ExtraField = "Test value";
-  public string Field { get; set; }
-  public string Field2 { get; init; }
-}
-```
-
-```
-INSERT INTO MyUpdate (Field, Field2, ExtraField) VALUES ('Value', 'Value2', 'Test value');
-```
-
 # v2.5.0
 
-# TimeWindows - EMIT FINAL (ksqldb v0.28.2)
+# TimeWindows - EMIT FINAL (v2.5.0)
 - `EMIT FINAL` output refinement was added for windowed aggregations. ksqldb v0.28.2
 
 ```C#
@@ -3698,9 +3651,6 @@ SELECT Id, COUNT(MESSAGE) Count
 WINDOW TUMBLING (SIZE 2 SECONDS, GRACE PERIOD 2 SECONDS)
  GROUP BY Id EMIT FINAL;
 ```
-
-List of supported ksqlDB SQL statements:
-- Pause and resume persistent qeries
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
