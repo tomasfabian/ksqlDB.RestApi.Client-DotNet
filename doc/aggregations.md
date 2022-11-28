@@ -12,6 +12,8 @@ List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/
 [Rest api reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
 ### GroupBy (v0.1.0)
+Group records in a window. Required by the WINDOW clause. Windowing queries must group by the keys that are selected in the query.
+
 #### Count (v0.1.0)
 Count the number of rows. When * is specified, the count returned will be the total number of rows.
 ```C#
@@ -170,8 +172,36 @@ context.CreateQueryStream<Tweet>()
     Console.WriteLine($"{earliest.Id} array length: {earliest.EarliestByOffset.Length}");
   }, error => { Console.WriteLine($"Exception: {error.Message}"); }, () => Console.WriteLine("Completed"));
 ```
+
 Generated KSQL:
 ```KSQL
 SELECT Id, EARLIEST_BY_OFFSET(Amount, 2, True) EarliestByOffset 
 FROM Tweets GROUP BY Id EMIT CHANGES;
+```
+
+# TimeWindows - EMIT FINAL (v2.5.0)
+
+- `EMIT FINAL` output refinement was added for windowed aggregations. ksqldb v0.28.2
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
+using ksqlDB.RestApi.Client.KSql.Query.Windows;
+
+var tumblingWindow =
+  new TimeWindows(Duration.OfSeconds(2), OutputRefinement.Final).WithGracePeriod(Duration.OfSeconds(2));
+
+var query = Context.CreateQueryStream<Tweet>()
+  .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
+  .GroupBy(c => c.Id)
+  .WindowedBy(tumblingWindow)
+  .Select(g => new { Id = g.Key, Count = g.Count(c => c.Message) })
+  .ToQueryString()
+```
+
+```SQL
+SELECT Id, COUNT(MESSAGE) Count
+  FROM tweets
+WINDOW TUMBLING (SIZE 2 SECONDS, GRACE PERIOD 2 SECONDS)
+ GROUP BY Id EMIT FINAL;
 ```

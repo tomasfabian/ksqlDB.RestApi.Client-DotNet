@@ -594,6 +594,8 @@ List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/
 - HISTOGRAM
 - [TOPK,TOPKDISTINCT](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#topk-topkdistinct-longcount-countcolumn-v030)
 
+- [TimeWindows - EMIT FINAL]()
+
 [Rest api reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
 ### GroupBy (v0.1.0)
@@ -3512,43 +3514,15 @@ CREATE STREAM IF NOT EXISTS LINKCREATEDS (
 ) WITH (KAFKA_TOPIC='MyGuids', KEY_FORMAT='KAFKA', PARTITIONS='1', REPLICAS='1', VALUE_FORMAT='JSON');
 ```
 
-# v2.5.0
-
-# TimeWindows - EMIT FINAL (v2.5.0)
-- `EMIT FINAL` output refinement was added for windowed aggregations. ksqldb v0.28.2
-
-```C#
-using ksqlDB.RestApi.Client.KSql.Query.Options;
-using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
-using ksqlDB.RestApi.Client.KSql.Query.Windows;
-
-var tumblingWindow =
-  new TimeWindows(Duration.OfSeconds(2), OutputRefinement.Final).WithGracePeriod(Duration.OfSeconds(2));
-
-var query = Context.CreateQueryStream<Tweet>()
-  .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
-  .GroupBy(c => c.Id)
-  .WindowedBy(tumblingWindow)
-  .Select(g => new { Id = g.Key, Count = g.Count(c => c.Message) })
-  .ToQueryString()
-```
-
-```SQL
-SELECT Id, COUNT(MESSAGE) Count
-  FROM tweets
-WINDOW TUMBLING (SIZE 2 SECONDS, GRACE PERIOD 2 SECONDS)
- GROUP BY Id EMIT FINAL;
-```
-
 List of supported Joins:
-- [RightJoin]()
+- [RightJoin](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/joins.md#rightjoin)
 
 List of supported ksqlDB SQL statements:
 - [Pause and resume persistent qeries](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#pause-and-resume-persistent-qeries-v250)
 - InsertProperties.UseInstanceType
 - [Added support for extracting field names and values (for insert and select statements)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#insertpropertiesuseinstancetype)
-- [AssertTopicExistsAsync]()
-- [AssertSchemaExistsAsync]()
+- [AssertTopicExistsAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#iksqldbrestapiclientasserttopicexistsasync-and-iksqldbrestapiclientasserttopicnotexistsasync)
+- [AssertSchemaExistsAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#iksqldbrestapiclientassertschemaexistsasync-and-iksqldbrestapiclientassertschemanotexistsasync)
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
