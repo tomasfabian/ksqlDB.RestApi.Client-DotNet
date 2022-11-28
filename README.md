@@ -3440,48 +3440,6 @@ internal class DebugHandler : System.Net.Http.DelegatingHandler
 }
 ```
 
-# v2.1.0
-
-### RightJoin
-- Select all records for the right side of the join and the matching records from the left side. If the matching records on the left side are missing, the corresponding columns will contain null values.
-
-```C#
-using ksqlDB.RestApi.Client.KSql.Linq;
-
-var query = KSqlDBContext.CreateQueryStream<Lead_Actor>(ActorsTableName)
-  .RightJoin(
-    Source.Of<Movie>(MoviesTableName),
-    actor => actor.Title,
-    movie => movie.Title,
-    (actor, movie) => new
-    {
-      movie.Id,
-      Title = movie.Title,
-      movie.Release_Year,
-      Substr = K.Functions.Substring(movie.Title, 2, 4),
-      ActorTitle = actor.Title,
-    }
-  ));
-```
-
-```SQL
-SELECT movie.Id Id, movie.Title Title, movie.Release_Year Release_Year, SUBSTRING(movie.Title, 2, 4) Substr, actor.Title AS ActorTitle FROM lead_actor_test actor
- RIGHT JOIN movies_test movie
-    ON actor.Title = movie.Title
-  EMIT CHANGES;
-```
-
-### Support explicit message types for Protobuf with multiple definitions
-- the following 2 new fields were added to `CreationMetadata`: `KeySchemaFullName` and `ValueSchemaFullName`
-
-```C#
-var creationMetadata = new CreationMetadata
-{
-  KeySchemaFullName = "ProductKey"
-  ValueSchemaFullName = "ProductInfo"
-};
-```
-
 # v2.2.0
 
 ### Rename stream or table column names with the `JsonPropertyNameAttribute`
@@ -3581,6 +3539,9 @@ SELECT Id, COUNT(MESSAGE) Count
 WINDOW TUMBLING (SIZE 2 SECONDS, GRACE PERIOD 2 SECONDS)
  GROUP BY Id EMIT FINAL;
 ```
+
+List of supported Joins:
+- [RightJoin]()
 
 List of supported ksqlDB SQL statements:
 - [Pause and resume persistent qeries](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#pause-and-resume-persistent-qeries-v250)
