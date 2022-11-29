@@ -3154,39 +3154,6 @@ internal class DebugHandler : System.Net.Http.DelegatingHandler
 }
 ```
 
-# v2.2.0
-
-### Rename stream or table column names with the `JsonPropertyNameAttribute`
-In cases when you need to use a different name for the C# representation of your ksqldb stream/table column names you can use the `JsonPropertyNameAttribute`:
-
-```C#
-using System.Text.Json.Serialization;
-
-internal record Data
-{
-  [JsonPropertyName("data_id")]
-  public string DataId { get; set; }
-}
-```
-
-```C#
-var creationMetadata = new EntityCreationMetadata()
-{
-  KafkaTopic = "data_values",
-  Partitions = 1,
-  Replicas = 1,
-};
-
-string statement = StatementGenerator.CreateOrReplaceStream<Data>(creationMetadata);
-```
-
-
-```SQL
-CREATE OR REPLACE STREAM Data (
-	data_id VARCHAR
-) WITH ( KAFKA_TOPIC='data_values', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );
-```
-
 # v2.2.1
 
 - Renaming of stream or table column names with the `JsonPropertyNameAttribute` was also added for selects
@@ -3211,6 +3178,7 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [Added support for extracting field names and values (for insert and select statements)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#insertpropertiesuseinstancetype)
 - [AssertTopicExistsAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#iksqldbrestapiclientasserttopicexistsasync-and-iksqldbrestapiclientasserttopicnotexistsasync)
 - [AssertSchemaExistsAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#iksqldbrestapiclientassertschemaexistsasync-and-iksqldbrestapiclientassertschemanotexistsasync)
+- Rename stream or table column names with the `JsonPropertyNameAttribute`
 
 **Miscelenaous:**
 - [Change data capture](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/cdc.md)

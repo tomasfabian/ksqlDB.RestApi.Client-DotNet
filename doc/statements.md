@@ -23,6 +23,38 @@ Generated KSQL statement:
  WITH ( KAFKA_TOPIC='tweets', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='3', KEY_SCHEMA_ID=1, VALUE_SCHEMA_ID=2 )
 ```
 
+### Rename stream or table column names with the `JsonPropertyNameAttribute`
+**v2.2.0**
+In cases when you need to use a different name for the C# representation of your ksqldb stream/table column names you can use the `JsonPropertyNameAttribute`:
+
+```C#
+using System.Text.Json.Serialization;
+
+internal record Data
+{
+  [JsonPropertyName("data_id")]
+  public string DataId { get; set; }
+}
+```
+
+```C#
+var creationMetadata = new EntityCreationMetadata()
+{
+  KafkaTopic = "data_values",
+  Partitions = 1,
+  Replicas = 1,
+};
+
+string statement = StatementGenerator.CreateOrReplaceStream<Data>(creationMetadata);
+```
+
+
+```SQL
+CREATE OR REPLACE STREAM Data (
+	data_id VARCHAR
+) WITH ( KAFKA_TOPIC='data_values', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );
+```
+
 ### Pause and resume persistent qeries (v2.5.0)
 `PausePersistentQueryAsync` - Pause a persistent query.
 `ResumePersistentQueryAsync` - Resume a paused persistent query.
