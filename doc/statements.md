@@ -1,5 +1,28 @@
 # KSqlDbRestApiClient
 
+### Stream and table properties KEY_SCHEMA_ID and VALUE_SCHEMA_ID 
+**v1.6.0** (ksqldb v0.24.0)
+
+KEY_SCHEMA_ID - The schema ID of the key schema in Schema Registry. The schema is used for schema inference and data serialization.
+VALUE_SCHEMA_ID - The schema ID of the value schema in Schema Registry. The schema is used for schema inference and data serialization.
+
+```C#
+EntityCreationMetadata metadata2 = new()
+{
+  KafkaTopic = "tweets",
+  Partitions = 1,
+  Replicas = 3,
+  KeySchemaId = 1,
+  ValueSchemaId = 2
+};
+```
+
+Generated KSQL statement:
+
+```
+ WITH ( KAFKA_TOPIC='tweets', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='3', KEY_SCHEMA_ID=1, VALUE_SCHEMA_ID=2 )
+```
+
 ### Pause and resume persistent qeries (v2.5.0)
 `PausePersistentQueryAsync` - Pause a persistent query.
 `ResumePersistentQueryAsync` - Resume a paused persistent query.

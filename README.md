@@ -3089,29 +3089,6 @@ var query = context.CreateQueryStream<MyClass>()
   .ToQueryString();
 ```
 
-### Stream and table properties KEY_SCHEMA_ID and VALUE_SCHEMA_ID (ksqldb v0.24.0)
-**v1.6.0**
-
-KEY_SCHEMA_ID - The schema ID of the key schema in Schema Registry. The schema is used for schema inference and data serialization.
-VALUE_SCHEMA_ID - The schema ID of the value schema in Schema Registry. The schema is used for schema inference and data serialization.
-
-```C#
-EntityCreationMetadata metadata2 = new()
-{
-  KafkaTopic = "tweets",
-  Partitions = 1,
-  Replicas = 3,
-  KeySchemaId = 1,
-  ValueSchemaId = 2
-};
-```
-
-Generated KSQL statement:
-
-```
- WITH ( KAFKA_TOPIC='tweets', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='3', KEY_SCHEMA_ID=1, VALUE_SCHEMA_ID=2 )
-```
-
 # v2.0.0
 **Breaking changes:**
 
@@ -3252,6 +3229,9 @@ CREATE OR REPLACE STREAM Data (
 
 **List of supported Joins:**
 - [RightJoin](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/joins.md#rightjoin)
+
+List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md) extension methods:
+- [Take (LIMIT)]()
 
 **List of supported ksqlDB SQL statements:**
 - [Pause and resume persistent qeries](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#pause-and-resume-persistent-qeries-v250)
