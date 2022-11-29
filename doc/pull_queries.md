@@ -100,3 +100,15 @@ We can use **backticks** to control the casing of the table's name.
 ```C#
 context.CreatePullQuery<IoTSensorStats>("`IoT_sensor_stats`");
 ```
+
+### Pull query Take extension method (Limit)
+**v1.6.0**
+
+Returns a specified number of contiguous elements from the start of a stream or a table. (ksqldb v0.24.0)
+```C#
+context.CreatePullQuery<Tweet>()
+  .Take(2);
+```
+```SQL
+SELECT * from tweets LIMIT 2;
+```

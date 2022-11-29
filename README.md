@@ -3089,19 +3089,9 @@ var query = context.CreateQueryStream<MyClass>()
   .ToQueryString();
 ```
 
-# v1.6.0
-
-### Pull query Take extension method (Limit) (ksqldb v0.24.0)
-Returns a specified number of contiguous elements from the start of a stream or a table.
-```C#
-context.CreatePullQuery<Tweet>()
-  .Take(2);
-```
-```SQL
-SELECT * from tweets LIMIT 2;
-```
-
 ### Stream and table properties KEY_SCHEMA_ID and VALUE_SCHEMA_ID (ksqldb v0.24.0)
+**v1.6.0**
+
 KEY_SCHEMA_ID - The schema ID of the key schema in Schema Registry. The schema is used for schema inference and data serialization.
 VALUE_SCHEMA_ID - The schema ID of the value schema in Schema Registry. The schema is used for schema inference and data serialization.
 
@@ -3254,7 +3244,7 @@ CREATE OR REPLACE STREAM Data (
 - Renaming of stream or table column names with the `JsonPropertyNameAttribute` was also added for selects
 
 **Data definititions:**
-- [Headers]()
+- [Headers](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_definitions.md#access-record-header-data-v160)
 
 **List of supported data types:**
 
