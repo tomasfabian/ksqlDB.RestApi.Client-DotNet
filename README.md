@@ -3006,67 +3006,6 @@ record Lambda
 }
 ```
 
-## added support for Time types DATE, TIME AND TIMESTAMP (ksqldb 0.20.0)
-
-Documentation for [Time types](https://docs.ksqldb.io/en/0.22.0-ksqldb/reference/sql/data-types/#time-types)
-
-```C#
-public record MyClass
-{
-  public DateTime Dt { get; set; }
-  public TimeSpan Ts { get; set; }
-  public DateTimeOffset DtOffset { get; set; }
-}
-```
-
-```C#
-var httpResponseMessage = await restApiClient.CreateStreamAsync<MyClass>(metadata);
-```
-
-Generated statement:
-
-```SQL
-CREATE STREAM MyClasses (
-	Dt DATE,
-	Ts TIME,
-	DtOffset TIMESTAMP
-) WITH ( KAFKA_TOPIC='MyClass', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );
-```
-
-```C#
-var value = new MyClass
-{
-  Dt = new DateTime(2021, 4, 1),
-  Ts = new TimeSpan(1, 2, 3),
-  DtOffset = new DateTimeOffset(2021, 7, 4, 13, 29, 45, 447, TimeSpan.FromHours(4))
-};
-
-httpResponseMessage  = await restApiClient.InsertIntoAsync(value);
-```
-
-Generated statement:
-```SQL
-INSERT INTO MyClasses (Dt, Ts, DtOffset) VALUES ('2021-04-01', '01:02:03', '2021-07-04T13:29:45.447+04:00');
-```
-
-```C#
-using var subscription = context.CreateQueryStream<MyClass>()
-  .Subscribe(onNext: m =>
-  {
-    Console.WriteLine($"Time types: {m.Dt} : {m.Ts} : {m.DtOffset}");
-  }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
-```
-
-Output from ksqldb-cli:
-```
-print 'MyClass' from beginning;
-```
-
-_rowtime: 2021/12/11 10:36:55.678 Z, key: `<null>`, value: {"DT":18718,"TS":3723000,"DTOFFSET":1625390985447}, partition: 0_
-
-**NOTE**: 
-ksqldb 0.22.0 REST API doesn't contain the offset in the payload for the TIMESTAMP values. Needs further investigation (possible bug in ksqldb).
-
 ## operator Between for Time type values
 ```C#
 var from = new TimeSpan(11, 0, 0);
@@ -3093,24 +3032,23 @@ var query = context.CreateQueryStream<MyClass>()
 
 - Renaming of stream or table column names with the `JsonPropertyNameAttribute` was also added for selects
 
-
 **Data definititions:**
 - [Headers](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_definitions.md#access-record-header-data-v160)
 
 **List of supported data types:**
-
-[System.GUID as ksqldb VARCHAR type](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_types.md#systemguid-as-ksqldb-varchar-type-v240)
+- [Time types DATE, TIME AND TIMESTAMP]()
+- [System.GUID as ksqldb VARCHAR type](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_types.md#systemguid-as-ksqldb-varchar-type-v240)
 
 **List of supported Joins:**
 - [RightJoin](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/joins.md#rightjoin)
 
 List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md) extension methods:
-- [Take (LIMIT)]()
+- [Take (LIMIT)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md#pull-query-take-extension-method-limit)
 
 **List of supported ksqlDB SQL statements:**
 - [Pause and resume persistent qeries](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#pause-and-resume-persistent-qeries-v250)
 - [InsertProperties.UseInstanceType](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#insertpropertiesuseinstancetype)
-- [Added support for extracting field names and values (for insert and select statements)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#insertpropertiesuseinstancetype)
+- [Added support for extracting field names and values (for insert and select statements)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#added-support-for-extracting-field-names-and-values-for-insert-and-select-statements)
 - [AssertTopicExistsAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#iksqldbrestapiclientasserttopicexistsasync-and-iksqldbrestapiclientasserttopicnotexistsasync)
 - [AssertSchemaExistsAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#iksqldbrestapiclientassertschemaexistsasync-and-iksqldbrestapiclientassertschemanotexistsasync)
 - [Rename stream or table column names with the `JsonPropertyNameAttribute`](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#rename-stream-or-table-column-names-with-the-jsonpropertynameattribute)
