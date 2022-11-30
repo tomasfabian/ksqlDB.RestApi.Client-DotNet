@@ -3006,28 +3006,6 @@ record Lambda
 }
 ```
 
-## operator Between for Time type values
-```C#
-var from = new TimeSpan(11, 0, 0);
-var to = new TimeSpan(15,0 , 0);
-
-Expression<Func<MyTimeSpan, TimeSpan>> expression = t => t.Ts.Between(from, to);
-```
-
-```SQL
-Ts BETWEEN '11:00:00' AND '15:00:00'
-```
-
-```C#
-var from = new TimeSpan(11, 0, 0);
-var to = new TimeSpan(15, 0, 0);
-
-var query = context.CreateQueryStream<MyClass>()
-  .Where(c => c.Ts.Between(from, to))
-  .Select(c => new { c.Ts, to, FromTime = from, DateTime.Now, New = new TimeSpan(1, 0, 0) }
-  .ToQueryString();
-```
-
 # v2.2.1
 
 - Renaming of stream or table column names with the `JsonPropertyNameAttribute` was also added for selects
@@ -3059,6 +3037,8 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 **Miscelenaous:**
 - [Change data capture](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/cdc.md)
 - [List of breaking changes](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/breaking_changes.md)
+- [Operators](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md)
+
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
 
