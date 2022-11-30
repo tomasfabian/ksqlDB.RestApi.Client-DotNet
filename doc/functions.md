@@ -1,3 +1,5 @@
+# Functions
+
 ### LPad, RPad, Trim, Substring (v0.2.0)
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
@@ -38,8 +40,8 @@ SIGN(Amount)
 ROUND(Amount, 3)
 ```
 
-
 ### Date and time functions
+
 #### DATETOSTRING (v0.4.0)
 ```C#
 int epochDays = 18672;
@@ -100,4 +102,31 @@ FROM movies_test EMIT CHANGES;
 ### Concat (v1.1.0)
 ```C#
 Expression<Func<Tweet, string>> expression = c => K.Functions.Concat(c.Message, "_Value");
+```
+
+
+### improved invocation function extensions
+
+**v1.5.0**
+
+```C#
+var ksql = ksqlDbContext.CreateQueryStream<Lambda>()
+  .Select(c => new
+  {
+    Transformed = c.Lambda_Arr.Transform(x => x + 1),
+    Filtered = c.Lambda_Arr.Filter(x => x > 1),
+    Acc = c.Lambda_Arr.Reduce(0, (x, y) => x + y)
+  })
+  .ToQueryString();
+```
+
+```C#
+record Lambda
+{
+  public int Id { get; set; }
+  public int[] Lambda_Arr { get; set; }
+
+  public IDictionary<string, int[]> DictionaryArrayValues { get; set; }
+  public IDictionary<string, int> DictionaryInValues { get; set; }
+}
 ```

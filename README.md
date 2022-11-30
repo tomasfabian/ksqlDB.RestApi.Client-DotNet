@@ -2980,32 +2980,6 @@ internal partial class SourceGenerationContext : JsonSerializerContext
 }
 ```
 
-# v1.5.0
-
-- improved invocation function extensions
-
-```C#
-var ksql = ksqlDbContext.CreateQueryStream<Lambda>()
-  .Select(c => new
-  {
-    Transformed = c.Lambda_Arr.Transform(x => x + 1),
-    Filtered = c.Lambda_Arr.Filter(x => x > 1),
-    Acc = c.Lambda_Arr.Reduce(0, (x, y) => x + y)
-  })
-  .ToQueryString();
-```
-
-```C#
-record Lambda
-{
-  public int Id { get; set; }
-  public int[] Lambda_Arr { get; set; }
-
-  public IDictionary<string, int[]> DictionaryArrayValues { get; set; }
-  public IDictionary<string, int> DictionaryInValues { get; set; }
-}
-```
-
 # v2.2.1
 
 - Renaming of stream or table column names with the `JsonPropertyNameAttribute` was also added for selects
@@ -3038,6 +3012,7 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [Change data capture](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/cdc.md)
 - [List of breaking changes](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/breaking_changes.md)
 - [Operators](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md)
+- [Invocation functions]()
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
