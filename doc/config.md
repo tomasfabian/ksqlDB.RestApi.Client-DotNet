@@ -65,3 +65,40 @@ var kSqlDbRestApiClient = new KSqlDbRestApiClient(new HttpClientFactory(new Uri(
 };
 ```
 
+### SetJsonSerializerOptions
+**v1.4.0**
+
+- KSqlDbContextOptionsBuilder and KSqlDbContextOptions SetJsonSerializerOptions - a way to configure the JsonSerializerOptions for the materialization of the incoming values.
+
+For better performance you can use the new `System.Text.Json` source generator:
+
+```C#
+var contextOptions = new KSqlDbContextOptionsBuilder()
+        .UseKSqlDb(ksqlDbUrl)
+        .SetJsonSerializerOptions(c =>
+        {
+          c.Converters.Add(new CustomJsonConverter());
+
+          jsonOptions.AddContext<SourceGenerationContext>();
+        }).Options;
+
+//or
+contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
+  .SetJsonSerializerOptions(serializerOptions =>
+                            {
+                              serializerOptions.Converters.Add(new CustomJsonConverter());
+
+                              jsonOptions.AddContext<SourceGenerationContext>();
+                            });
+```
+
+```C#
+using System.Text.Json.Serialization;
+using ksqlDB.Api.Client.Samples.Models.Movies;
+
+[JsonSourceGenerationOptions(WriteIndented = true)]
+[JsonSerializable(typeof(Movie))]
+internal partial class SourceGenerationContext : JsonSerializerContext
+{
+}
+```

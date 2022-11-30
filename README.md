@@ -2944,42 +2944,6 @@ var metadata = new EntityCreationMetadata(entityName, 1)
 var httpResponseMessage = await restApiClient.CreateSourceTableAsync<IoTSensor>(metadata, ifNotExists: true);
 ```
 
-## KSqlDbContextOptionsBuilder and KSqlDbContextOptions
-- SetJsonSerializerOptions - a way to configure the JsonSerializerOptions for the materialization of the incoming values.
-
-For better performance you can use the new `System.Text.Json` source generator:
-
-```C#
-var contextOptions = new KSqlDbContextOptionsBuilder()
-        .UseKSqlDb(ksqlDbUrl)
-        .SetJsonSerializerOptions(c =>
-        {
-          c.Converters.Add(new CustomJsonConverter());
-
-          jsonOptions.AddContext<SourceGenerationContext>();
-        }).Options;
-
-//or
-contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
-  .SetJsonSerializerOptions(serializerOptions =>
-                            {
-                              serializerOptions.Converters.Add(new CustomJsonConverter());
-
-                              jsonOptions.AddContext<SourceGenerationContext>();
-                            });
-```
-
-```C#
-using System.Text.Json.Serialization;
-using ksqlDB.Api.Client.Samples.Models.Movies;
-
-[JsonSourceGenerationOptions(WriteIndented = true)]
-[JsonSerializable(typeof(Movie))]
-internal partial class SourceGenerationContext : JsonSerializerContext
-{
-}
-```
-
 # v2.2.1
 
 - Renaming of stream or table column names with the `JsonPropertyNameAttribute` was also added for selects
@@ -3013,6 +2977,7 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [List of breaking changes](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/breaking_changes.md)
 - [Operators](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md)
 - [Invocation functions]()
+- [SetJsonSerializerOptions]()
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
