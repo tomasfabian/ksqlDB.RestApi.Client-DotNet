@@ -47,3 +47,21 @@ internal class DebugHandler : System.Net.Http.DelegatingHandler
 }
 ```
 
+### DisposeHttpClient
+`KSqlDBContextOptions` and `KSqlDbRestApiClient` - `DisposeHttpClient` property is by default set to `false`. From v2.0.0 the used `HttpClients` will not be disposed by default.
+
+The above mentioned behavior can be overridden in the following ways:
+```C#
+var contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
+{
+  DisposeHttpClient = true
+};
+```
+
+```C#
+var kSqlDbRestApiClient = new KSqlDbRestApiClient(new HttpClientFactory(new Uri(ksqlDbUrl)))
+{
+  DisposeHttpClient = true
+};
+```
+
