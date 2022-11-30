@@ -2874,6 +2874,7 @@ var responseMessage = await context.SaveChangesAsync();
 
 # v1.4.0
 ## KSqlDbServiceCollectionExtensions - AddDbContext and AddDbContextFactory
+**v1.4.0**
 
 - AddDbContext - Registers the given ksqldb context as a service in the IServiceCollection
 - AddDbContextFactory - Registers the given ksqldb context factory as a service in the IServiceCollection
@@ -2921,27 +2922,14 @@ public interface IApplicationKSqlDbContext : IKSqlDBContext
 ```
 
 ### IKSqlDBContextFactory
+**v1.4.0**
+
 A factory for creating derived KSqlDBContext instances.
 
 ```C#
 var contextFactory = serviceCollection.BuildServiceProvider().GetRequiredService<IKSqlDBContextFactory<IKSqlDBContext>>();
 
 var context = contextFactory.Create();
-```
-
-## IKSqlDbRestApiClient CreateSourceStreamAsync and CreateSourceTableAsync
-- CreateSourceStreamAsync - creates a read-only stream
-- CreateSourceTableAsync - creates a read-only table
-
-```C#
-string entityName = nameof(IoTSensor;
-
-var metadata = new EntityCreationMetadata(entityName, 1)
-               {
-                 EntityName = entityName
-               };
-
-var httpResponseMessage = await restApiClient.CreateSourceTableAsync<IoTSensor>(metadata, ifNotExists: true);
 ```
 
 # v2.2.1
@@ -2968,6 +2956,7 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [AssertTopicExistsAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#iksqldbrestapiclientasserttopicexistsasync-and-iksqldbrestapiclientasserttopicnotexistsasync)
 - [AssertSchemaExistsAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#iksqldbrestapiclientassertschemaexistsasync-and-iksqldbrestapiclientassertschemanotexistsasync)
 - [Rename stream or table column names with the `JsonPropertyNameAttribute`](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#rename-stream-or-table-column-names-with-the-jsonpropertynameattribute)
+- [IKSqlDbRestApiClient CreateSourceStreamAsync and CreateSourceTableAsync]()
 
 **Config:**
 - [KSqlDbContextOptionsBuilder.ReplaceHttpClient](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#ksqldbcontextoptionsbuilderreplacehttpclient)
