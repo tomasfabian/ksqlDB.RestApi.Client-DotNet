@@ -2832,44 +2832,6 @@ private static async Task AddAndSaveChangesAsync(IKSqlDBContext context)
 
   var saveResponse = await context.SaveChangesAsync();
 }
-```   
-
-# ksqldb.RestApi.Client v1.3.1
-
-### InsertProperties IncludeReadOnlyProperties
-
-- Inserts - include readonly properties configuration
-
-The initial convention is that all writeable public instance properties and fields are taken into account during the Insert into statement generation.
-
-```C#
-public record Foo
-{
-  public Foo(string name)
-  {
-    Name = name;
-  }
-
-  public string Name { get; }
-  public int Count { get; set; }
-}
-```
-
-```C#
-var insertProperties = new InsertProperties
-                       {
-                         IncludeReadOnlyProperties = true
-                       };
-
-await using KSqlDBContext context = new KSqlDBContext(@"http:\\localhost:8088");
-
-var model = new Foo("Bar") {
-  Count = 3
-};
-
-context.Add(model, insertProperties);
-
-var responseMessage = await context.SaveChangesAsync();
 ```
 
 # v1.4.0
@@ -2957,6 +2919,7 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [AssertSchemaExistsAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#iksqldbrestapiclientassertschemaexistsasync-and-iksqldbrestapiclientassertschemanotexistsasync)
 - [Rename stream or table column names with the `JsonPropertyNameAttribute`](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#rename-stream-or-table-column-names-with-the-jsonpropertynameattribute)
 - [IKSqlDbRestApiClient CreateSourceStreamAsync and CreateSourceTableAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#iksqldbrestapiclient-createsourcestreamasync-and-createsourcetableasync)
+- [InsertProperties.IncludeReadOnlyProperties]()
 
 **Config:**
 - [KSqlDbContextOptionsBuilder.ReplaceHttpClient](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#ksqldbcontextoptionsbuilderreplacehttpclient)

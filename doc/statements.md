@@ -23,6 +23,44 @@ Generated KSQL statement:
  WITH ( KAFKA_TOPIC='tweets', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='3', KEY_SCHEMA_ID=1, VALUE_SCHEMA_ID=2 )
 ```
 
+# ksqldb.RestApi.Client v1.3.1
+
+### InsertProperties.IncludeReadOnlyProperties
+
+- Inserts - include readonly properties configuration
+
+The initial convention is that all writeable public instance properties and fields are taken into account during the Insert into statement generation.
+
+```C#
+public record Foo
+{
+  public Foo(string name)
+  {
+    Name = name;
+  }
+
+  public string Name { get; }
+  public int Count { get; set; }
+}
+```
+
+```C#
+var insertProperties = new InsertProperties
+                       {
+                         IncludeReadOnlyProperties = true
+                       };
+
+await using KSqlDBContext context = new KSqlDBContext(@"http:\\localhost:8088");
+
+var model = new Foo("Bar") {
+  Count = 3
+};
+
+context.Add(model, insertProperties);
+
+var responseMessage = await context.SaveChangesAsync();
+```
+
 ### IKSqlDbRestApiClient CreateSourceStreamAsync and CreateSourceTableAsync
 **v1.4.0**
 
