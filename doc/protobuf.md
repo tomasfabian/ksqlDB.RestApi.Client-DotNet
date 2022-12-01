@@ -1,9 +1,18 @@
 # ksqlDB.RestApi.Client.ProtoBuf
+
 - adds support for Protobuf content type. The package uses [protobuf-net](https://github.com/protobuf-net/protobuf-net).
 
 Install:
 ```
 dotnet add package ksqlDb.RestApi.Client.ProtoBuf
+```
+or with .NET CLI
+```
+dotnet add package ksqlDb.RestApi.Client.ProtoBuf
+```
+This adds a `<PackageReference>` to your csproj file, similar to the following:
+```XML
+<PackageReference Include="ksqlDb.RestApi.Client.ProtoBuf" Version="0.1.0" />
 ```
 
 Content-type
