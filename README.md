@@ -2773,45 +2773,6 @@ public class Worker : IHostedService, IDisposable
 }
 ```
 
-# ksqldb.RestApi.Client v1.3.0
-
-### Join within
-**v1.3.0**
-
-- specifies a time window for stream-stream joins
-
-```C#
-var query = from o in KSqlDBContext.CreateQueryStream<Order>()
-  join p in Source.Of<Payment>().Within(Duration.OfHours(1), Duration.OfDays(5)) on o.OrderId equals p.Id
-  select new
-         {
-           orderId = o.OrderId,
-           paymentId = p.Id
-         };
-```
-
-```SQL
-SELECT o.OrderId AS orderId, p.Id AS paymentId FROM Orders o
-INNER JOIN Payments p
-WITHIN (1 HOURS, 5 DAYS) ON o.OrderId = p.Id
-EMIT CHANGES;
-```
-
-## IKSqlDBContext Add and SaveChangesAsync
-**v1.3.0**
-
-With IKSqlDBContext.Add and IKSqlDBContext.SaveChangesAsync you can add multiple entities to the context and save them asynchronously in one request (as "batch inserts").
-
-```C#
-private static async Task AddAndSaveChangesAsync(IKSqlDBContext context)
-{
-  context.Add(new Movie { Id = 1 });
-  context.Add(new Movie { Id = 2 });
-
-  var saveResponse = await context.SaveChangesAsync();
-}
-```
-
 # v1.4.0
 ## KSqlDbServiceCollectionExtensions - AddDbContext and AddDbContextFactory
 **v1.4.0**
