@@ -2776,6 +2776,7 @@ public class Worker : IHostedService, IDisposable
 # ksqldb.RestApi.Client v1.3.0
 
 ### Join within
+**v1.3.0**
 
 - specifies a time window for stream-stream joins
 
@@ -2796,31 +2797,8 @@ WITHIN (1 HOURS, 5 DAYS) ON o.OrderId = p.Id
 EMIT CHANGES;
 ```
 
-### Operator LIKE - String.StartsWith, String.EndsWith, String.Contains
-
-Match a string with a specified pattern:
-
-```C#
-var query = context.CreateQueryStream<Movie>()
-  .Where(c => c.Title.ToLower().Contains("hard".ToLower());
-```
-
-```SQL
-SELECT * FROM Movies
-WHERE LCASE(Title) LIKE LCASE('%hard%') EMIT CHANGES;
-```
-
-```C#
-var query = context.CreateQueryStream<Movie>()
-  .Where(c => c.Title.StartsWith("Die");
-```
-
-```SQL
-SELECT * FROM Movies
-WHERE Title LIKE 'Die%' EMIT CHANGES;
-```
-
 ## IKSqlDBContext Add and SaveChangesAsync
+**v1.3.0**
 
 With IKSqlDBContext.Add and IKSqlDBContext.SaveChangesAsync you can add multiple entities to the context and save them asynchronously in one request (as "batch inserts").
 
