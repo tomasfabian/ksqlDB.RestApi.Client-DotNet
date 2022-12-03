@@ -2468,7 +2468,7 @@ var restApiClient = new KSqlDbRestApiClient(httpClientFactory)
 
 **List of supported Joins:**
 - [RightJoin](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/joins.md#rightjoin)
-- [Multiple joins with query comprehension syntax (GroupJoin, SelectMany, DefaultIfEmpty)]()
+- [Multiple joins with query comprehension syntax (GroupJoin, SelectMany, DefaultIfEmpty)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/joins.md#multiple-joins-with-query-comprehension-syntax-groupjoin-selectmany-defaultifempty)
 
 List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md) extension methods:
 - [Take (LIMIT)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md#pull-query-take-extension-method-limit)
@@ -2483,11 +2483,11 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [Rename stream or table column names with the `JsonPropertyNameAttribute`](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#rename-stream-or-table-column-names-with-the-jsonpropertynameattribute)
 - [IKSqlDbRestApiClient CreateSourceStreamAsync and CreateSourceTableAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#iksqldbrestapiclient-createsourcestreamasync-and-createsourcetableasync)
 - [InsertProperties.IncludeReadOnlyProperties](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#insertpropertiesincludereadonlyproperties)
-- [InsertIntoAsync]()
+- [InsertIntoAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#ksqldbrestapiclientinsertintoasync)
 
 **KSqlDbContext**
 - [AddDbContext and AddDbContextFactory](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#ksqldbservicecollectionextensions---adddbcontext-and-adddbcontextfactory)
-- [Logging info and ConfigureKSqlDb]()
+- [Logging info and ConfigureKSqlDb](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#logging-info-and-configureksqldb)
 
 **Config:**
 - [KSqlDbContextOptionsBuilder.ReplaceHttpClient](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#ksqldbcontextoptionsbuilderreplacehttpclient)
