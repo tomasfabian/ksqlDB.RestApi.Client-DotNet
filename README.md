@@ -2455,22 +2455,6 @@ var restApiClient = new KSqlDbRestApiClient(httpClientFactory)
   .SetCredentials(new BasicAuthCredentials("fred", "letmein"));
 ```
 
-## `IPullable<T>.FirstOrDefaultAsync` (v2.0.0)
-`IPullable<T>.GetAsync` was renamed to `IPullable<T>.FirstOrDefaultAsync`
-
-```C#
-using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
-
-private static async Task GetAsync(IPullable<IoTSensorStats> pullQuery)
-{
-  var result = await pullQuery
-    .FirstOrDefaultAsync();
-
-  Console.WriteLine(
-    $"Pull query GetAsync result => Id: {result?.SensorId} - Avg Value: {result?.AvgValue} - Window Start {result?.WindowStart}");
-}
-```
-
 # v2.2.1
 
 - Renaming of stream or table column names with the `JsonPropertyNameAttribute` was also added for selects
@@ -2488,6 +2472,7 @@ private static async Task GetAsync(IPullable<IoTSensorStats> pullQuery)
 
 List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md) extension methods:
 - [Take (LIMIT)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md#pull-query-take-extension-method-limit)
+- [FirstOrDefaultAsync]()
 
 **List of supported ksqlDB SQL statements:**
 - [Pause and resume persistent qeries](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#pause-and-resume-persistent-qeries-v250)

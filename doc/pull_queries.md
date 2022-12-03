@@ -1,6 +1,6 @@
 # Pull queries
 
-### `CreatePullQuery<TEntity>` (v0.10.0)
+### `CreatePullQuery<TEntity>` (v1.0.0)
 
 [A pull query](https://docs.ksqldb.io/en/latest/concepts/queries/#pull) is a form of query issued by a client that retrieves a result as of "now", like a query against a traditional RDBS.
 
@@ -43,7 +43,7 @@ async Task Main()
 	
   var result = await context.CreatePullQuery<IoTSensorStats>("avg_sensor_values")
     .Where(c => c.SensorId == "sensor-1")
-    .GetAsync();
+    .FirstOrDefaultAsync();
 
   Console.WriteLine($"{result?.SensorId} - {result?.AvgValue}");
 }
@@ -111,4 +111,20 @@ context.CreatePullQuery<Tweet>()
 ```
 ```SQL
 SELECT * from tweets LIMIT 2;
+```
+
+### `IPullable<T>.FirstOrDefaultAsync` (v1.0.0)
+`IPullable<T>.GetAsync` was renamed to `IPullable<T>.FirstOrDefaultAsync`
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
+
+private static async Task GetAsync(IPullable<IoTSensorStats> pullQuery)
+{
+  var result = await pullQuery
+    .FirstOrDefaultAsync();
+
+  Console.WriteLine(
+    $"Pull query GetAsync result => Id: {result?.SensorId} - Avg Value: {result?.AvgValue} - Window Start {result?.WindowStart}");
+}
 ```
