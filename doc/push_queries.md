@@ -12,6 +12,26 @@ context.CreateQueryStream<Tweet>()
 SELECT * from tweets EMIT CHANGES LIMIT 2;
 ```
 
+### Select
+**v1.0.0**
+
+- generation of values from captured variables
+
+```C#
+var value = new FooClass { Property = 42 };
+
+var query = context.CreateQueryStream<Location>()
+    .Select(_ => new
+    {
+      Value = value
+    });
+```
+
+Is equivalent with:
+```SQL
+SELECT STRUCT(Property := 42) AS Value FROM Locations EMIT CHANGES;
+```
+
 ### Subscribe (v0.1.0)
 Providing ```IObserver<T>```:
 ```C#

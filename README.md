@@ -322,6 +322,7 @@ FROM custom_topic_name
 <img src="https://www.codeproject.com/KB/cs/646361/WhatHowWhere.jpg" />
 
 List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md) extension methods:
+- [Select](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#select)
 - [Take (LIMIT)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#take-limit-v010)
 - [Subscribe](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribe-v010)
 - [ToObservable](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#toobservable-v010)
@@ -2470,52 +2471,6 @@ private static async Task GetAsync(IPullable<IoTSensorStats> pullQuery)
 }
 ```
 
-## KSqlDbRestApiClient.InsertIntoAsync
-- added support for deeply nested types - Maps, Structs and Arrays
-
-```C#
-var value = new ArrayOfMaps
-{
-  Arr = new[]
-        {
-          new Dictionary<string, int> { { "a", 1 }, { "b", 2 } },
-          new Dictionary<string, int> { { "c", 3 }, { "d", 4 } }
-        }
-};
-
-httpResponseMessage = await restApiClient.InsertIntoAsync(value);
-```
-
-```C#
-record ArrayOfMaps
-{
-  public Dictionary<string, int>[] Arr { get; set; }
-}
-```
-
-## Qbservable.Select
-- generation of values from captured variables
-
-```C#
-var value = new FooClass { Property = 42 };
-
-var query = context.CreateQueryStream<Location>()
-    .Select(_ => new
-    {
-      Value = value
-    });
-```
-
-Is equivalent with:
-```SQL
-SELECT STRUCT(Property := 42) AS Value FROM Locations EMIT CHANGES;
-```
-
-# ksqldb.RestApi.Client v1.0.0
-⚠ The package had to be renamed from Kafka.DotNet.ksqlDB to ksqlDB.RestApi.Client
-
-# ksqldb.RestApi.Client v1.1.0
-
 # v2.2.1
 
 - Renaming of stream or table column names with the `JsonPropertyNameAttribute` was also added for selects
@@ -2543,6 +2498,7 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [Rename stream or table column names with the `JsonPropertyNameAttribute`](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#rename-stream-or-table-column-names-with-the-jsonpropertynameattribute)
 - [IKSqlDbRestApiClient CreateSourceStreamAsync and CreateSourceTableAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#iksqldbrestapiclient-createsourcestreamasync-and-createsourcetableasync)
 - [InsertProperties.IncludeReadOnlyProperties](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#insertpropertiesincludereadonlyproperties)
+- [InsertIntoAsync]()
 
 **KSqlDbContext**
 - [AddDbContext and AddDbContextFactory](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#ksqldbservicecollectionextensions---adddbcontext-and-adddbcontextfactory)

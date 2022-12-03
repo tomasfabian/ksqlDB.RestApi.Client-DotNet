@@ -1,5 +1,28 @@
 # KSqlDbRestApiClient
 
+### KSqlDbRestApiClient.InsertIntoAsync
+- added support for deeply nested types - Maps, Structs and Arrays
+
+```C#
+var value = new ArrayOfMaps
+{
+  Arr = new[]
+        {
+          new Dictionary<string, int> { { "a", 1 }, { "b", 2 } },
+          new Dictionary<string, int> { { "c", 3 }, { "d", 4 } }
+        }
+};
+
+httpResponseMessage = await restApiClient.InsertIntoAsync(value);
+```
+
+```C#
+record ArrayOfMaps
+{
+  public Dictionary<string, int>[] Arr { get; set; }
+}
+```
+
 ### Stream and table properties KEY_SCHEMA_ID and VALUE_SCHEMA_ID 
 **v1.6.0** (ksqldb v0.24.0)
 
