@@ -23,9 +23,8 @@ Generated KSQL statement:
  WITH ( KAFKA_TOPIC='tweets', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='3', KEY_SCHEMA_ID=1, VALUE_SCHEMA_ID=2 )
 ```
 
-# ksqldb.RestApi.Client v1.3.1
-
 ### InsertProperties.IncludeReadOnlyProperties
+**v1.3.1**
 
 - Inserts - include readonly properties configuration
 
@@ -131,7 +130,6 @@ private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient res
 
 
 ### Added support for extracting field names and values (for insert and select statements)
-
 **v2.4.0**
 
 ```C#
@@ -183,7 +181,6 @@ INSERT INTO MyUpdate (Field, Field2, ExtraField) VALUES ('Value', 'Value2', 'Tes
 ```
 
 ### IKSqlDbRestApiClient.AssertTopicExistsAsync and IKSqlDbRestApiClient.AssertTopicNotExistsAsync
-
 **v2.3.0**
 
 [Assert Topic](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/assert-topic/) - asserts that a topic exists or does not exist.
@@ -223,7 +220,6 @@ ASSERT TOPIC tweetsByTitle WITH ( replicas=3, partitions=1 ) 3 SECONDS;
 ``` 
 
 ### IKSqlDbRestApiClient.AssertSchemaExistsAsync and IKSqlDbRestApiClient.AssertSchemaNotExistsAsync
-
 **v2.3.0**
 
 [Assert Schema](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/assert-schema/)
