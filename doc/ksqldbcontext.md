@@ -1,5 +1,45 @@
 # KSqlDbContext
 
+### KSqlDbContextOptionsBuilder SetProcessingGuarantee
+**v1.0.0**
+
+Enable exactly-once or at_least_once semantics
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+```
+```C#
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+var contextOptions = new KSqlDbContextOptionsBuilder()
+  .UseKSqlDb(ksqlDbUrl)
+  .SetProcessingGuarantee(ProcessingGuarantee.AtLeastOnce)
+  .Options;
+
+await using var context = new KSqlDBContext(contextOptions);
+```
+
+## Basic auth
+**v1.0.0**
+
+In ksqldb you can use the [Http-Basic authentication](https://docs.ksqldb.io/en/latest/operate-and-deploy/installation/server-config/security/#configuring-listener-for-http-basic-authenticationauthorization) mechanism:
+```C#
+string ksqlDbUrl = @"http:\\localhost:8088";
+
+string userName = "fred";
+string password = "letmein";
+
+var options = ClassUnderTest.UseKSqlDb(ksqlDbUrl)
+  .SetBasicAuthCredentials(userName, password)
+  .Options;
+
+await using var context = new KSqlDBContext(options);
+```
+
+See also how to [intercept http requests](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/Interception-of-HTTP-requests-in-ksqlDB.RestApi.Client---Authentication)
+
 ### KSqlDbServiceCollectionExtensions - AddDbContext and AddDbContextFactory
 **v1.4.0**
 

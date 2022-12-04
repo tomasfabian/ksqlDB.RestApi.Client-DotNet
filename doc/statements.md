@@ -1,5 +1,16 @@
 # KSqlDbRestApiClient
 
+## Basic auth
+**v1.0.0**
+
+In ksqldb you can use the [Http-Basic authentication](https://docs.ksqldb.io/en/latest/operate-and-deploy/installation/server-config/security/#configuring-listener-for-http-basic-authenticationauthorization) mechanism:
+```C#
+var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+      
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory)
+  .SetCredentials(new BasicAuthCredentials("fred", "letmein"));
+```
+
 ### KSqlDbRestApiClient.InsertIntoAsync
 - added support for deeply nested types - Maps, Structs and Arrays
 

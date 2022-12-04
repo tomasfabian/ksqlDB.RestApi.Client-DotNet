@@ -2412,49 +2412,6 @@ public enum ProcessingGuarantee
 }
 ```
 
-### KSqlDbContextOptionsBuilder SetProcessingGuarantee (v2.0.0)
-Enable exactly-once or at_least_once semantics
-
-```C#
-using ksqlDB.RestApi.Client.KSql.Query.Context;
-using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
-using ksqlDB.RestApi.Client.KSql.Query.Options;
-```
-```C#
-var ksqlDbUrl = @"http:\\localhost:8088";
-
-var contextOptions = new KSqlDbContextOptionsBuilder()
-  .UseKSqlDb(ksqlDbUrl)
-  .SetProcessingGuarantee(ProcessingGuarantee.AtLeastOnce)
-  .Options;
-
-await using var context = new KSqlDBContext(contextOptions);
-```
-
-## Basic auth (v2.0.0)
-In ksqldb you can use the [Http-Basic authentication](https://docs.ksqldb.io/en/latest/operate-and-deploy/installation/server-config/security/#configuring-listener-for-http-basic-authenticationauthorization) mechanism:
-```C#
-string ksqlDbUrl = @"http:\\localhost:8088";
-
-string userName = "fred";
-string password = "letmein";
-
-var options = ClassUnderTest.UseKSqlDb(ksqlDbUrl)
-  .SetBasicAuthCredentials(userName, password)
-  .Options;
-
-await using var context = new KSqlDBContext(options);
-```
-
-See also how to [intercept http requests](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/Interception-of-HTTP-requests-in-ksqlDB.RestApi.Client---Authentication)
-
-```C#
-var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
-      
-var restApiClient = new KSqlDbRestApiClient(httpClientFactory)
-  .SetCredentials(new BasicAuthCredentials("fred", "letmein"));
-```
-
 # v2.2.1
 
 - Renaming of stream or table column names with the `JsonPropertyNameAttribute` was also added for selects
@@ -2472,7 +2429,7 @@ var restApiClient = new KSqlDbRestApiClient(httpClientFactory)
 
 List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md) extension methods:
 - [Take (LIMIT)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md#pull-query-take-extension-method-limit)
-- [FirstOrDefaultAsync]()
+- [FirstOrDefaultAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md#ipullabletfirstordefaultasync-v100)
 
 **List of supported ksqlDB SQL statements:**
 - [Pause and resume persistent qeries](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#pause-and-resume-persistent-qeries-v250)
