@@ -49,3 +49,21 @@ var query = context.CreateQueryStream<MyClass>()
   .ToQueryString();
 ```
 
+### Operator (NOT) BETWEEN
+**v1.0.0**
+
+KSqlOperatorExtensions - Between - Constrain a value to a specified range in a WHERE clause.
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Operators;
+
+IQbservable<Tweet> query = context.CreateQueryStream<Tweet>()
+  .Where(c => c.Id.Between(1, 5));
+```
+
+Generated KSQL:
+
+```SQL
+SELECT * FROM Tweets
+WHERE Id BETWEEN 1 AND 5 EMIT CHANGES;
+```
