@@ -102,3 +102,19 @@ internal partial class SourceGenerationContext : JsonSerializerContext
 {
 }
 ```
+
+### ProcessingGuarantee enum
+**v1.0.0**
+
+**ExactlyOnce** - Records are processed once. To achieve a true exactly-once system, end consumers and producers must also implement exactly-once semantics.
+**AtLeastOnce** - Records are never lost but may be redelivered.
+
+For more info check [exactly once semantics](https://docs.ksqldb.io/en/latest/operate-and-deploy/exactly-once-semantics/)
+
+```C#
+public enum ProcessingGuarantee
+{
+  ExactlyOnce,
+  AtLeastOnce
+}
+```
