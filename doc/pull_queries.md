@@ -6,9 +6,6 @@
 
 See also [GetManyAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet#ipullable---getmanyasync-v170).
 
-
-> ⚠ `IPullable<T>.GetAsync` was renamed to `IPullable<T>.FirstOrDefaultAsync` in version 2.0.0.
-
 ```C#
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -113,7 +110,56 @@ context.CreatePullQuery<Tweet>()
 SELECT * from tweets LIMIT 2;
 ```
 
+### GetManyAsync
+**v1.7.0**
+
+- `IPullable.GetManyAsync<TEntity>` - Pulls all values from the materialized view asynchronously and terminates. 
+
+```C#
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
+using ksqlDB.RestApi.Client.KSql.Query;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+
+public static async Task<List<OrderData>> GetOrdersAsync()
+{
+  var ksqlDbUrl = @"http:\\localhost:8088";
+  var options = new KSqlDBContextOptions(ksqlDbUrl) { ShouldPluralizeFromItemName = false };
+  options.QueryParameters.Properties["ksql.query.pull.table.scan.enabled"] = "true";
+
+  await using var context = new KSqlDBContext(options);
+  var tableName = "queryable_order";
+  var orderTypes = new List<int> { 1,3 };
+
+  var enumerable = context.CreatePullQuery<OrderData>(tableName)    
+    .Where(o => o.EventTime >= 1630886400 && o.EventTime <= 1630887401 && orderTypes.Contains(o.OrderType))
+    .GetManyAsync();
+
+  List<OrderData> list = new List<OrderData>();
+
+  await foreach (var item in enumerable.ConfigureAwait(false))
+  {
+    Console.WriteLine(item.ToString());
+    list.Add(item);
+  } 
+
+  return list;
+}
+```
+```C#
+public class OrderData: Record
+{
+  public int Id { get; set; }
+  public long EventTime  { get; set; }
+  public int OrderType { get; set; }
+  public string Description { get; set; }
+}
+```
+
 ### `IPullable<T>.FirstOrDefaultAsync` (v1.0.0)
+
 `IPullable<T>.GetAsync` was renamed to `IPullable<T>.FirstOrDefaultAsync`
 
 ```C#
