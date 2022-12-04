@@ -104,6 +104,66 @@ FROM movies_test EMIT CHANGES;
 Expression<Func<Tweet, string>> expression = c => K.Functions.Concat(c.Message, "_Value");
 ```
 
+## Lambda functions (Invocation functions) - Maps
+**v1.0.0**
+
+Model:
+```C#
+record Lambda
+{
+  public IDictionary<string, int[]> DictionaryArrayValues { get; set; }
+  public IDictionary<string, int> DictionaryInValues { get; set; }
+}
+```
+
+### Transform maps
+**v1.0.0**
+
+Transform a collection by using a lambda function.
+If the collection is a map, two lambda functions must be provided, and both lambdas must have two arguments: a map entry key and a map entry value.
+
+```C#
+Expression<Func<Lambda, IDictionary<string, int[]>>> expression = 
+    c => K.Functions.Transform(c.Dictionary, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v, x => x * x));
+```
+
+Equivalent KSQL:
+```SQL
+TRANSFORM(DictionaryArrayValues, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v, (x) => x * x))
+```
+
+### Filter maps
+**v1.0.0**
+
+Filter a collection with a lambda function.
+If the collection is a map, the lambda function must have two input arguments.
+
+```C#
+Expression<Func<Lambda, IDictionary<string, int>>> expression = 
+    c => K.Functions.Filter(c.Dictionary2, (k, v) => k != "E.T" && v > 0);
+```
+
+Equivalent KSQL:
+```SQL
+FILTER(DictionaryInValues, (k, v) => (k != 'E.T') AND (v > 0))
+```
+
+### Reduce maps
+**v1.0.0**
+
+Reduce a collection starting from an initial state.
+If the collection is a map, the lambda function must have three input arguments.
+If the state is null, the result is null.
+
+```C#
+Expression<Func<Lambda, int>> expression = 
+    c => K.Functions.Reduce(c.Dictionary2, 2, (s, k, v) => K.Functions.Ceil(s / v));
+```
+
+Equivalent KSQL:
+```SQL
+REDUCE(DictionaryInValues, 2, (s, k, v) => CEIL(s / v))
+```
 
 ### improved invocation function extensions
 
