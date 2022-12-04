@@ -150,21 +150,6 @@ WITHIN (1 HOURS, 5 DAYS) ON o.OrderId = p.Id
 EMIT CHANGES;
 ```
 
-### IKSqlDBContext Add and SaveChangesAsync
-**v1.3.0**
-
-With IKSqlDBContext.Add and IKSqlDBContext.SaveChangesAsync you can add multiple entities to the context and save them asynchronously in one request (as "batch inserts").
-
-```C#
-private static async Task AddAndSaveChangesAsync(IKSqlDBContext context)
-{
-  context.Add(new Movie { Id = 1 });
-  context.Add(new Movie { Id = 2 });
-
-  var saveResponse = await context.SaveChangesAsync();
-}
-```
-
 ### RightJoin
 
 **v2.1.0**
@@ -195,18 +180,4 @@ SELECT movie.Id Id, movie.Title Title, movie.Release_Year Release_Year, SUBSTRIN
  RIGHT JOIN movies_test movie
     ON actor.Title = movie.Title
   EMIT CHANGES;
-```
-
-### Support explicit message types for Protobuf with multiple definitions
-
-**v2.1.0**
-
-- the following 2 new fields were added to `CreationMetadata`: `KeySchemaFullName` and `ValueSchemaFullName`
-
-```C#
-var creationMetadata = new CreationMetadata
-{
-  KeySchemaFullName = "ProductKey"
-  ValueSchemaFullName = "ProductInfo"
-};
 ```
