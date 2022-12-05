@@ -205,3 +205,47 @@ SELECT Id, COUNT(MESSAGE) Count
 WINDOW TUMBLING (SIZE 2 SECONDS, GRACE PERIOD 2 SECONDS)
  GROUP BY Id EMIT FINAL;
 ```
+
+### CollectSet, CollectList, CountDistinct
+**v1.0.0**
+
+```C#
+var subscription = context.CreateQueryStream<Tweet>()
+  .GroupBy(c => c.Id)
+  .Select(g => new { Id = g.Key, Array = g.CollectSet(c => c.Message) })
+  //.Select(g => new { Id = g.Key, Array = g.CollectList(c => c.Message) })
+  .Subscribe(c =>
+  {
+    Console.WriteLine($"{c.Id}:");
+    foreach (var value in c.Array)
+    {
+      Console.WriteLine($"  {value}");
+    }
+  }, exception => { Console.WriteLine(exception.Message); });
+```
+Generated KSQL:
+```KSQL
+SELECT Id, COLLECT_SET(Message) Array 
+FROM Tweets GROUP BY Id EMIT CHANGES;
+
+SELECT Id, COLLECT_LIST(Message) Array 
+FROM Tweets GROUP BY Id EMIT CHANGES;
+```
+
+CountDistinct, LongCountDistinct
+```C#
+var subscription = context.CreateQueryStream<Tweet>()
+  .GroupBy(c => c.Id)
+  // .Select(g => new { Id = g.Key, Count = g.CountDistinct(c => c.Message) })
+  .Select(g => new { Id = g.Key, Count = g.LongCountDistinct(c => c.Message) })
+  .Subscribe(c =>
+  {
+    Console.WriteLine($"{c.Id} - {c.Count}");
+  }, exception => { Console.WriteLine(exception.Message); });
+```
+
+Generated KSQL:
+```KSQL
+SELECT Id, COUNT_DISTINCT(Message) Count 
+FROM Tweets GROUP BY Id EMIT CHANGES;
+```
