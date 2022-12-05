@@ -69,6 +69,53 @@ Equivalent KSQL:
 INSERT INTO `my_order` (Id, ItemsList) VALUES (1, ARRAY[1.1,2]);
 ```
 
+### InsertIntoAsync for complex types
+**v1.6.0**
+
+In v1.0.0 support for inserting entities with primitive types and strings was added. This version adds support for `List<T>` and records, classes and structs. 
+Deeply nested types and dictionaries are not yet supported.
+
+```C#
+var testEvent = new EventWithList
+{
+  Id = "1",
+  Places = new List<int> { 1, 2, 3 }
+};
+
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
+var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
+  .InsertIntoAsync(testEvent);
+```
+Generated KSQL:
+```SQL
+INSERT INTO EventWithLists (Id, Places) VALUES ('1', ARRAY[1,2,3]);
+```
+
+```C#
+var eventCategory = new EventCategory
+{
+  Count = 1,
+  Name = "Planet Earth"
+};
+
+var testEvent2 = new ComplexEvent
+{
+  Id = 1,
+  Category = eventCategory
+};
+
+var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
+  .InsertIntoAsync(testEvent2, new InsertProperties { EntityName = "Events" });
+```
+
+Generated KSQL:
+```SQL
+INSERT INTO Events (Id, Category) VALUES (1, STRUCT(Count := 1, Name := 'Planet Earth'));
+```
+
 ### Inserting empty arrays
 **v1.0.0**
 
