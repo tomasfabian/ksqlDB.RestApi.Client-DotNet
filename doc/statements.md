@@ -70,7 +70,7 @@ INSERT INTO `my_order` (Id, ItemsList) VALUES (1, ARRAY[1.1,2]);
 ```
 
 ### Inserting empty arrays
-**v1..0**
+**v1.0.0**
 
 - empty arrays are generated in the following way (workaround)
 
@@ -351,4 +351,50 @@ var creationMetadata = new CreationMetadata
   KeySchemaFullName = "ProductKey"
   ValueSchemaFullName = "ProductInfo"
 };
+```
+
+### Connectors
+**v1.0.0**
+
+`GetConnectorsAsync` - List all connectors in the Connect cluster.
+
+`DropConnectorAsync` - Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement fails if the connector doesn't exist.
+    
+`DropConnectorIfExistsAsync` - Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement doesn't fail if the connector doesn't exist.
+
+```C#
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+
+public async Task CreateGetAndDropConnectorAsync()
+{
+  var ksqlDbUrl = @"http:\\localhost:8088";
+
+  var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
+  var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+  const string SinkConnectorName = "mock-connector";
+
+  var createConnector = @$"CREATE SOURCE CONNECTOR `{SinkConnectorName}` WITH(
+      'connector.class'='org.apache.kafka.connect.tools.MockSourceConnector');";
+
+  var statement = new KSqlDbStatement(createConnector);
+
+  var httpResponseMessage = await restApiClient.ExecuteStatementAsync(statement);
+
+  var connectorsResponse = await restApiClient.GetConnectorsAsync();
+
+  Console.WriteLine("Available connectors: ");
+  Console.WriteLine(string.Join(',', connectorsResponse[0].Connectors.Select(c => c.Name)));
+
+  httpResponseMessage = await restApiClient.DropConnectorAsync($"`{SinkConnectorName}`");
+
+  // Or
+  httpResponseMessage = await restApiClient.DropConnectorIfExistsAsync($"`{SinkConnectorName}`");
+}
 ```
