@@ -34,28 +34,58 @@ record ArrayOfMaps
 }
 ```
 
-### Stream and table properties KEY_SCHEMA_ID and VALUE_SCHEMA_ID 
-**v1.6.0** (ksqldb v0.24.0)
+### KSqlDbRestApiClient.InsertIntoAsync
+**v1.0.0**
 
-KEY_SCHEMA_ID - The schema ID of the key schema in Schema Registry. The schema is used for schema inference and data serialization.
-VALUE_SCHEMA_ID - The schema ID of the value schema in Schema Registry. The schema is used for schema inference and data serialization.
+- added support for ```IEnumerable<T>``` properties
 
 ```C#
-EntityCreationMetadata metadata2 = new()
+record Order
 {
-  KafkaTopic = "tweets",
-  Partitions = 1,
-  Replicas = 3,
-  KeySchemaId = 1,
-  ValueSchemaId = 2
+  public int Id { get; set; }
+  public IEnumerable<double> Items { get; set; }
+}
+```
+
+```C#
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
+var order = new Order { Id = 1, ItemsList = new List<double> { 1.1, 2 }};
+
+var config = new InsertProperties
+{
+  ShouldPluralizeEntityName = false, 
+  EntityName = "`my_order`"
 };
+
+var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
+  .InsertIntoAsync(order, config);
 ```
 
-Generated KSQL statement:
+Equivalent KSQL:
+```SQL
+INSERT INTO `my_order` (Id, ItemsList) VALUES (1, ARRAY[1.1,2]);
+```
 
+### Inserting empty arrays
+**v1..0**
+
+- empty arrays are generated in the following way (workaround)
+
+```C#
+var order = new Order { Id = 1, ItemsList = new List<double>()};
+
+var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
+  .InsertIntoAsync(order);
 ```
- WITH ( KAFKA_TOPIC='tweets', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='3', KEY_SCHEMA_ID=1, VALUE_SCHEMA_ID=2 )
+
+```SQL
+ARRAY_REMOVE(ARRAY[0], 0))
 ```
+
+```ARRAY[]``` is not yet supported in ksqldb (v0.21.0)
 
 ### InsertProperties.IncludeReadOnlyProperties
 **v1.3.1**
@@ -92,6 +122,29 @@ var model = new Foo("Bar") {
 context.Add(model, insertProperties);
 
 var responseMessage = await context.SaveChangesAsync();
+```
+
+### Stream and table properties KEY_SCHEMA_ID and VALUE_SCHEMA_ID 
+**v1.6.0** (ksqldb v0.24.0)
+
+KEY_SCHEMA_ID - The schema ID of the key schema in Schema Registry. The schema is used for schema inference and data serialization.
+VALUE_SCHEMA_ID - The schema ID of the value schema in Schema Registry. The schema is used for schema inference and data serialization.
+
+```C#
+EntityCreationMetadata metadata2 = new()
+{
+  KafkaTopic = "tweets",
+  Partitions = 1,
+  Replicas = 3,
+  KeySchemaId = 1,
+  ValueSchemaId = 2
+};
+```
+
+Generated KSQL statement:
+
+```
+ WITH ( KAFKA_TOPIC='tweets', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='3', KEY_SCHEMA_ID=1, VALUE_SCHEMA_ID=2 )
 ```
 
 ### IKSqlDbRestApiClient CreateSourceStreamAsync and CreateSourceTableAsync
@@ -284,4 +337,18 @@ private static async Task AssertSchemaAsync(IKSqlDbRestApiClient restApiClient)
 ```SQL
 ASSERT NOT EXISTS SCHEMA SUBJECT 'Kafka-key' ID 21 TIMEOUT 3 SECONDS;
 ASSERT SCHEMA SUBJECT 'Kafka-key' ID 21 TIMEOUT 3 SECONDS;
+```
+
+### Support explicit message types for Protobuf with multiple definitions
+
+**v2.1.0**
+
+- the following 2 new fields were added to `CreationMetadata`: `KeySchemaFullName` and `ValueSchemaFullName`
+
+```C#
+var creationMetadata = new CreationMetadata
+{
+  KeySchemaFullName = "ProductKey"
+  ValueSchemaFullName = "ProductInfo"
+};
 ```
