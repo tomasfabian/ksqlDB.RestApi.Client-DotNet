@@ -114,3 +114,55 @@ private static IDisposable ClientSideBatching(KSqlDBContext context)
   return disposable;
 }
 ```
+
+### Query comprehension syntax
+Note that ksqldb does not support OrderBy
+
+```C#
+var grouping = 
+  from city in context.CreateQueryStream<City>()
+  where city.RegionCode != "xy"
+  group city by city.State.Name into g
+  select new
+  {
+    g.Source.RegionCode,
+    g.Source.State.Name,
+    Num_Times = g.Count()
+  };
+```
+
+### IKSqlGrouping.Source
+**v1.0.0**
+
+- grouping by nested properies. Can be used in the following way:
+
+```C#
+var source = Context.CreateQueryStream<City>()
+  .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
+  .GroupBy(c => new { c.RegionCode, c.State.Name })
+  .Select(g => new { g.Source.RegionCode, g.Source.State.Name, Count = g.Count()})
+  .Take(1)
+  .ToAsyncEnumerable();
+```
+
+```C#
+record City
+{
+  [Key]
+  public string RegionCode { get; init; }
+  public State State { get; init; }
+}
+
+record State
+{
+  public string Name { get; init; }
+}
+```
+
+Equivalent KSQL:
+```SQL
+SELECT RegionCode, State->Name, COUNT(*) Count 
+FROM Cities 
+GROUP BY RegionCode, State->Name 
+EMIT CHANGES;
+```
