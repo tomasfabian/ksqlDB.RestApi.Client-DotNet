@@ -183,3 +183,31 @@ var asyncTweetsEnumerable = context.CreateQueryStream<Tweet>().ToAsyncEnumerable
 await foreach (var tweet in asyncTweetsEnumerable.WithCancellation(cts.Token))
   Console.WriteLine(tweet.Message);
 ```
+
+### ExplainAsync
+**v1.0.0**
+
+- `ExplainAsync` - Show the execution plan for a SQL expression, show the execution plan plus additional runtime information and metrics.
+
+```C#
+using System;
+using System.Threading.Tasks;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query.Descriptors;
+using ksqlDB.RestApi.Client.Sample.Models.Movies;
+
+public static async Task ExplainAsync(IKSqlDBContext context)
+{
+  var query = context.CreateQueryStream<Movie>()
+    .Where(c => c.Title != "E.T.");
+
+  string explain = await query
+    .ExplainAsStringAsync();
+
+  ExplainResponse[] explainResponses = await context.CreateQueryStream<Movie>().ExplainAsync();
+      
+  Console.WriteLine(explainResponses[0].QueryDescription.ExecutionPlan);
+}
+```
