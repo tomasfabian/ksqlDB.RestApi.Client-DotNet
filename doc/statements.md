@@ -338,7 +338,7 @@ private record MyUpdate : IMyUpdate
 INSERT INTO MyUpdate (Field, Field2, ExtraField) VALUES ('Value', 'Value2', 'Test value');
 ```
 
-### IKSqlDbRestApiClient.AssertTopicExistsAsync and IKSqlDbRestApiClient.AssertTopicNotExistsAsync
+### AssertTopicExistsAsync and AssertTopicNotExistsAsync
 **v2.3.0**
 
 [Assert Topic](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/assert-topic/) - asserts that a topic exists or does not exist.
@@ -377,7 +377,7 @@ ASSERT NOT EXISTS TOPIC tweetsByTitle WITH ( replicas=3, partitions=1 ) 3 SECOND
 ASSERT TOPIC tweetsByTitle WITH ( replicas=3, partitions=1 ) 3 SECONDS;
 ``` 
 
-### IKSqlDbRestApiClient.AssertSchemaExistsAsync and IKSqlDbRestApiClient.AssertSchemaNotExistsAsync
+### AssertSchemaExistsAsync and AssertSchemaNotExistsAsync
 **v2.3.0**
 
 [Assert Schema](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/assert-schema/)
@@ -411,7 +411,6 @@ ASSERT SCHEMA SUBJECT 'Kafka-key' ID 21 TIMEOUT 3 SECONDS;
 ```
 
 ### Support explicit message types for Protobuf with multiple definitions
-
 **v2.1.0**
 
 - the following 2 new fields were added to `CreationMetadata`: `KeySchemaFullName` and `ValueSchemaFullName`
@@ -468,4 +467,22 @@ public async Task CreateGetAndDropConnectorAsync()
   // Or
   httpResponseMessage = await restApiClient.DropConnectorIfExistsAsync($"`{SinkConnectorName}`");
 }
+```
+
+### Droping types
+**v1.8.0**
+
+- DropTypeAsync and DropTypeIfExistsAsync - Removes a type alias from ksqlDB. If the IF EXISTS clause is present, the statement doesn't fail if the type doesn't exist.
+
+```C#
+string typeName = nameof(EventCategory);
+var httpResponseMessage = await restApiClient.DropTypeAsync(typeName);
+//OR
+httpResponseMessage = await restApiClient.DropTypeIfExistsAsync(typeName);
+```
+
+```SQL
+DROP TYPE EventCategory;
+
+DROP TYPE IF EXISTS EventCategory;
 ```
