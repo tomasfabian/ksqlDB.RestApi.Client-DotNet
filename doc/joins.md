@@ -227,3 +227,52 @@ SELECT movie.Id Id, movie.Title Title, movie.Release_Year Release_Year, SUBSTRIN
     ON actor.Title = movie.Title
   EMIT CHANGES;
 ```
+
+### Inner Joins
+**v1.0.0**
+
+How to [join table and table](https://kafka-tutorials.confluent.io/join-a-table-to-a-table/ksql.html)
+```C#
+public class Movie : Record
+{
+  public string Title { get; set; }
+  public int Id { get; set; }
+  public int Release_Year { get; set; }
+}
+
+public class Lead_Actor : Record
+{
+  public string Title { get; set; }
+  public string Actor_Name { get; set; }
+}
+
+using ksqlDB.RestApi.Client.KSql.Linq;
+
+var query = context.CreateQueryStream<Movie>()
+  .Join(
+    Source.Of<Lead_Actor>(nameof(Lead_Actor)),
+    movie => movie.Title,
+    actor => actor.Title,
+    (movie, actor) => new
+    {
+      movie.Id,
+      Title = movie.Title,
+      movie.Release_Year,
+      ActorName = K.Functions.RPad(K.Functions.LPad(actor.Actor_Name.ToUpper(), 15, "*"), 25, "^"),
+      ActorTitle = actor.Title
+    }
+  );
+
+var joinQueryString = query.ToQueryString();
+```
+KSQL:
+```KSQL
+SELECT M.Id Id, M.Title Title, M.Release_Year Release_Year, RPAD(LPAD(UCASE(L.Actor_Name), 15, '*'), 25, '^') ActorName, L.Title ActorTitle 
+FROM Movies M
+INNER JOIN Lead_Actor L
+ON M.Title = L.Title
+EMIT CHANGES;
+```
+
+> ⚠ There is a known limitation in the early access versions (bellow 1.0). 
+The Key column, in this case movie.Title, has to be aliased Title = movie.Title, otherwise the deserialization won't be able to map the unknown column name M_TITLE. 
