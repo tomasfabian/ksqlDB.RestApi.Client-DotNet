@@ -171,6 +171,30 @@ context.Add(model, insertProperties);
 var responseMessage = await context.SaveChangesAsync();
 ```
 
+### ToInsertStatement
+**v1.8.0**
+
+- Generates raw string Insert Into, but does not execute it.
+
+```C#
+Movie movie = new()
+{
+  Id = 1,
+  Release_Year = 1986,
+  Title = "Aliens"
+};
+
+var insertStatement = restApiProvider.ToInsertStatement(movie);
+
+Console.WriteLine(insertStatement.Sql);
+```
+
+Output:
+
+```SQL
+INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Aliens', 1, 1986);
+```
+
 ### Stream and table properties KEY_SCHEMA_ID and VALUE_SCHEMA_ID 
 **v1.6.0** (ksqldb v0.24.0)
 
