@@ -150,6 +150,52 @@ WITHIN (1 HOURS, 5 DAYS) ON o.OrderId = p.Id
 EMIT CHANGES;
 ```
 
+### Full Outer Join
+**v1.0.0**
+
+FULL OUTER joins will contain leftRecord-NULL or NULL-rightRecord records in the result stream, which means that the join contains NULL values for fields coming from a stream where no match is made.
+Define nullable primitive value types in POCOs:
+```C#
+public record Movie
+{
+  public long RowTime { get; set; }
+  public string Title { get; set; }
+  public int? Id { get; set; }
+  public int? Release_Year { get; set; }
+}
+
+public class Lead_Actor
+{
+  public string Title { get; set; }
+  public string Actor_Name { get; set; }
+}
+```
+
+```C#
+var source = new KSqlDBContext(@"http:\\localhost:8088")
+  .CreateQueryStream<Movie>()
+  .FullOuterJoin(
+    Source.Of<Lead_Actor>("Actors"),
+    movie => movie.Title,
+    actor => actor.Title,
+    (movie, actor) => new
+    {
+      movie.Id,
+      Title = movie.Title,
+      movie.Release_Year,
+      ActorTitle = actor.Title
+    }
+  );
+```
+
+Generated KSQL:
+```KSQL
+SELECT m.Id Id, m.Title Title, m.Release_Year Release_Year, l.Title ActorTitle FROM movies_test m
+FULL OUTER JOIN lead_actor_test l
+ON m.Title = l.Title
+EMIT CHANGES;
+```
+
 ### RightJoin
 
 **v2.1.0**
