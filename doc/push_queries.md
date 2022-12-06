@@ -131,6 +131,11 @@ var grouping =
   };
 ```
 
+### JsonPropertyNameAttribute
+**v2.2.1**
+
+- Renaming of stream or table column names with the `JsonPropertyNameAttribute` was also added for selects
+
 ### IKSqlGrouping.Source
 **v1.0.0**
 
@@ -165,4 +170,16 @@ SELECT RegionCode, State->Name, COUNT(*) Count
 FROM Cities 
 GROUP BY RegionCode, State->Name 
 EMIT CHANGES;
+```
+
+### ToAsyncEnumerable
+**v1.0.0**
+
+Creates an [async iterator](https://docs.microsoft.com/en-us/archive/msdn-magazine/2019/november/csharp-iterating-with-async-enumerables-in-csharp-8) from the query:
+```C#
+var cts = new CancellationTokenSource();
+var asyncTweetsEnumerable = context.CreateQueryStream<Tweet>().ToAsyncEnumerable();
+
+await foreach (var tweet in asyncTweetsEnumerable.WithCancellation(cts.Token))
+  Console.WriteLine(tweet.Message);
 ```
