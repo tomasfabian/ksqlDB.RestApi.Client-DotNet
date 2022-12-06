@@ -184,6 +184,55 @@ await foreach (var tweet in asyncTweetsEnumerable.WithCancellation(cts.Token))
   Console.WriteLine(tweet.Message);
 ```
 
+### SubscribeAsync
+**v1.0.0**
+
+- Subscribes an element handler, an exception handler, and a completion handler to an qbservable stream and asynchronously returns the query id.
+
+### SubscribeOn
+**v1.0.0**
+
+- Wraps the source sequence in order to run its subscription on the specified scheduler.
+
+### ObserveOn
+**v1.0.0**
+
+- Wraps the source sequence in order to run its observer callbacks on the specified scheduler.
+
+```C#
+using System;
+using System.Reactive.Concurrency;
+using System.Threading;
+using System.Threading.Tasks;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.Sample.Models.Movies;
+
+private static async Task SubscribeAsync(IKSqlDBContext context)
+{
+  var cts = new CancellationTokenSource();
+
+  try
+  {
+    var subscription = await context.CreateQueryStream<Movie>()
+      .SubscribeOn(ThreadPoolScheduler.Instance)
+      .ObserveOn(TaskPoolScheduler.Default)
+      .SubscribeAsync(onNext: movie =>
+        {
+          Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
+          Console.WriteLine();
+        }, onError: error => { Console.WriteLine($"SubscribeAsync Exception: {error.Message}"); },
+        onCompleted: () => Console.WriteLine("SubscribeAsync Completed"), cts.Token);
+
+    Console.WriteLine($"Query id: {subscription}");
+  }
+  catch (Exception e)
+  {
+    Console.WriteLine(e);
+  }
+}
+```
+
 ### ExplainAsync
 **v1.0.0**
 
