@@ -541,7 +541,7 @@ record Event
 ```
 
 ### Droping types
-**v1.8.0**
+**v1.0.0**
 
 - DropTypeAsync and DropTypeIfExistsAsync - Removes a type alias from ksqlDB. If the IF EXISTS clause is present, the statement doesn't fail if the type doesn't exist.
 
@@ -557,3 +557,29 @@ DROP TYPE EventCategory;
 
 DROP TYPE IF EXISTS EventCategory;
 ```
+
+### Drop a stream
+**v1.0.0**
+
+Drops an existing stream.
+
+```C#
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+var ksqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+string streamName = "StreamName";
+
+// DROP STREAM StreamName;
+var httpResponseMessage = ksqlDbRestApiClient.DropStreamAsync(streamName);
+
+// OR DROP STREAM IF EXISTS StreamName DELETE TOPIC;
+httpResponseMessage = ksqlDbRestApiClient.DropStreamAsync(streamName, useIfExistsClause: true, deleteTopic: true);
+```
+
+Parameters:
+
+`useIfExistsClause` - If the IF EXISTS clause is present, the statement doesn't fail if the stream doesn't exist.
+
+`deleteTopic` - If the DELETE TOPIC clause is present, the stream's source topic is marked for deletion.
