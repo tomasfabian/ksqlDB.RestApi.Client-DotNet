@@ -469,6 +469,77 @@ public async Task CreateGetAndDropConnectorAsync()
 }
 ```
 
+### CreateTypeAsync
+**v1.6.0**
+
+- `IKSqlDbRestApiClient.CreateTypeAsync<TEntity>` - Create an alias for a complex type declaration.
+
+```C#
+using System;
+using System.Threading.Tasks;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.Sample.Models.Events;
+
+private static async Task SubscriptionToAComplexTypeAsync()
+{      
+  var ksqlDbUrl = @"http:\\localhost:8088";
+
+  var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+  var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+  var httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@$"
+Drop type {nameof(EventCategory)};
+Drop table {nameof(Event)};
+"));
+
+  httpResponseMessage = await restApiClient.CreateTypeAsync<EventCategory>();
+  httpResponseMessage = await restApiClient.CreateTableAsync<Event>(new EntityCreationMetadata { KafkaTopic = "Events", Partitions = 1 });
+      
+  await using var ksqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(ksqlDbUrl));
+
+  var subscription = ksqlDbContext.CreateQueryStream<Event>()
+    .Take(1)
+    .Subscribe(value =>
+    {
+      Console.WriteLine("Categories: ");
+
+      foreach (var category in value.Categories)
+      {
+        Console.WriteLine($"{category.Name}");
+      }
+    }, error =>
+    {
+      Console.WriteLine(error.Message);
+    });
+
+  httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@"
+INSERT INTO Events (Id, Places, Categories) VALUES (1, ARRAY['1','2','3'], ARRAY[STRUCT(Name := 'Planet Earth'), STRUCT(Name := 'Discovery')]);"));
+}
+```
+
+```C#
+using System.Collections.Generic;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+
+record EventCategory
+{
+  public string Name { get; set; }
+}
+
+record Event
+{
+  [Key]
+  public int Id { get; set; }
+
+  public string[] Places { get; set; }
+
+  public IEnumerable<EventCategory> Categories { get; set; }
+}
+```
+
 ### Droping types
 **v1.8.0**
 
