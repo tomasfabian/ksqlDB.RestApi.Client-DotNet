@@ -263,6 +263,41 @@ SELECT Id, COUNT_DISTINCT(Message) Count
 FROM Tweets GROUP BY Id EMIT CHANGES;
 ```
 
+### Session Window
+**v1.0.0**
+
+A [session window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#session-window) aggregates records into a session, which represents a period of activity separated by a specified gap of inactivity, or "idleness". 
+```C#
+var query = context.CreateQueryStream<Transaction>()
+  .GroupBy(c => c.CardNumber)
+  .WindowedBy(new SessionWindow(Duration.OfSeconds(5)))
+  .Select(g => new { CardNumber = g.Key, Count = g.Count() });
+```
+KSQL:
+```KSQL
+SELECT CardNumber, COUNT(*) Count FROM Transactions 
+  WINDOW SESSION (5 SECONDS)
+  GROUP BY CardNumber 
+  EMIT CHANGES;
+```
+Time units:
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Windows;
+
+public enum TimeUnits
+{
+  MILLISECONDS, // v2.0.0
+  SECONDS,
+  MINUTES,
+  HOURS,
+  DAYS
+}
+
+Duration duration = Duration.OfHours(2);
+
+Console.WriteLine($"{duration.Value} {duration.TimeUnit}");
+```
+
 ### WindowedBy
 **v1.0.0**
 
