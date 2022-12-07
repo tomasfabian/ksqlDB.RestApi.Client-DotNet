@@ -11,10 +11,12 @@ List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/
 
 [Rest api reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
-### GroupBy (v0.1.0)
+### GroupBy
 Group records in a window. Required by the WINDOW clause. Windowing queries must group by the keys that are selected in the query.
 
-#### Count (v0.1.0)
+### Count
+**v1.0.0**
+
 Count the number of rows. When * is specified, the count returned will be the total number of rows.
 ```C#
 var ksqlDbUrl = @"http:\\localhost:8088";
@@ -47,7 +49,9 @@ context.CreateQueryStream<Tweet>()
 SELECT COUNT(*) FROM Tweets GROUP BY Id EMIT CHANGES;
 ```
 
-### Having (v0.2.0)
+### Having
+**v1.0.0**
+
 Extract records from an aggregation that fulfill a specified condition.
 
 ```C#
@@ -61,7 +65,7 @@ KSQL:
 SELECT Id, COUNT(*) Count FROM Tweets GROUP BY Id HAVING Count(*) > 2 EMIT CHANGES;
 ```
 
-#### Sum
+### Sum
 ```C#
 context.CreateQueryStream<Tweet>()
         .GroupBy(c => c.Id)
@@ -73,7 +77,9 @@ Equivalent to KSql:
 SELECT Id, SUM(Amount) Agg FROM Tweets GROUP BY Id EMIT CHANGES;
 ```
 
-### Avg (v0.2.0)
+### Avg
+**v1.0.0**
+
 ```KSQL
 AVG(col1)
 ``` 
@@ -84,7 +90,9 @@ var query = CreateQbservable()
   .Select(g => g.Avg(c => c.Citizens));
 ```
 
-### Min and Max (v0.2.0)
+### Min and Max
+**v1.0.0**
+
 ```KSQL
 MIN(col1)
 MAX(col1)
@@ -101,6 +109,8 @@ var queryMax = CreateQbservable()
 ```
 
 ### COLLECT_LIST, COLLECT_SET, EARLIEST_BY_OFFSET, LATEST_BY_OFFSET
+**v1.0.0**
+
 - with Structs, Arrays, and Maps
 
 The list of available `kslqdb` aggregate functions is available [here](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
@@ -117,7 +127,9 @@ var source = Context.CreateQueryStream<Tweet>(TweetsStreamName)
   .Select(l => new { Id = l.Key, Maps = l.CollectList(c => dict) })
 ```
 
-### TopK, TopKDistinct, LongCount, Count(column) (v0.3.0)
+### TopK, TopKDistinct, LongCount, Count(column
+**v1.0.0**
+
 ```C#
 Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression1 = l => new { TopK = l.TopK(c => c.Amount, 2) };
 Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression2 = l => new { TopKDistinct = l.TopKDistinct(c => c.Amount, 2) };
@@ -142,7 +154,7 @@ new KSqlDBContext(@"http:\\localhost:8088").CreateQueryStream<Tweet>()
   }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
 ```
 
-### EarliestByOffset, LatestByOffset, EarliestByOffsetAllowNulls, LatestByOffsetAllowNull (v0.3.0)
+### EarliestByOffset, LatestByOffset, EarliestByOffsetAllowNulls, LatestByOffsetAllowNull
 [EarliestByOffset](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/#earliest_by_offset),
 [LatestByOffset](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/#latest_by_offset)
 ```C#
@@ -179,7 +191,8 @@ SELECT Id, EARLIEST_BY_OFFSET(Amount, 2, True) EarliestByOffset
 FROM Tweets GROUP BY Id EMIT CHANGES;
 ```
 
-# TimeWindows - EMIT FINAL (v2.5.0)
+### TimeWindows - EMIT FINAL
+**v2.5.0**
 
 - `EMIT FINAL` output refinement was added for windowed aggregations. ksqldb v0.28.2
 
@@ -249,3 +262,41 @@ Generated KSQL:
 SELECT Id, COUNT_DISTINCT(Message) Count 
 FROM Tweets GROUP BY Id EMIT CHANGES;
 ```
+
+### WindowedBy
+**v1.0.0**
+
+Creation of windowed aggregation
+
+[Tumbling window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#tumbling-window):
+```C#
+var context = new TransactionsDbProvider(ksqlDbUrl);
+
+var windowedQuery = context.CreateQueryStream<Transaction>()
+  .WindowedBy(new TimeWindows(Duration.OfSeconds(5)).WithGracePeriod(Duration.OfHours(2)))
+  .GroupBy(c => c.CardNumber)
+  .Select(g => new { CardNumber = g.Key, Count = g.Count() });
+```
+
+```KSQL
+SELECT CardNumber, COUNT(*) Count FROM Transactions 
+  WINDOW TUMBLING (SIZE 5 SECONDS, GRACE PERIOD 2 HOURS) 
+  GROUP BY CardNumber EMIT CHANGES;
+```
+
+[Hopping window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#hopping-window):
+```C#
+var subscription = context.CreateQueryStream<Tweet>()
+  .GroupBy(c => c.Id)
+  .WindowedBy(new HoppingWindows(Duration.OfSeconds(5)).WithAdvanceBy(Duration.OfSeconds(4)).WithRetention(Duration.OfDays(7)))
+  .Select(g => new { g.WindowStart, g.WindowEnd, Id = g.Key, Count = g.Count() })
+  .Subscribe(c => { Console.WriteLine($"{c.Id}: {c.Count}: {c.WindowStart}: {c.WindowEnd}"); }, exception => {});
+```
+
+```KSQL
+SELECT WindowStart, WindowEnd, Id, COUNT(*) Count FROM Tweets 
+  WINDOW HOPPING (SIZE 5 SECONDS, ADVANCE BY 10 SECONDS, RETENTION 7 DAYS) 
+  GROUP BY Id EMIT CHANGES;
+```
+Window advancement interval should be more than zero and less than window duration
+
