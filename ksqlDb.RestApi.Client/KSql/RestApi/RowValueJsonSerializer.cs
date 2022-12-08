@@ -16,6 +16,9 @@ internal class RowValueJsonSerializer
   {
     this.queryStreamHeader = queryStreamHeader ?? throw new ArgumentNullException(nameof(queryStreamHeader));
 
+    if (this.queryStreamHeader.ColumnNames.Length != queryStreamHeader.ColumnTypes.Length)
+      throw new InvalidOperationException("Length of the column names differs from column types");
+
     if (queryStreamHeader.ColumnTypes.Length == 1)
     {
       isSingleAnonymousColumn = Regex.Matches(queryStreamHeader.ColumnNames[0], anonymousColumnRegex).Count > 0;
