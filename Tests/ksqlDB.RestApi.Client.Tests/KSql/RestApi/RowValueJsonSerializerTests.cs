@@ -1,4 +1,5 @@
 using FluentAssertions;
+using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses;
@@ -176,17 +177,46 @@ public class RowValueJsonSerializerTests : TestBase
     rowValue.Value.Name.Should().Be(value);
   }
 
-  private enum MyEnum
+  public class Movie : Record
   {
-    None = 0
+    public string Title { get; set; } = null!;
+    public int Id { get; set; }
+    public int Release_Year { get; set; }
   }
 
   [TestMethod]
-  [Ignore]
+  public void Deserialize_Class()
+  {
+    //Arrange
+    var queryStreamHeader = new QueryStreamHeader()
+    {
+      ColumnTypes = new[] { "INTEGER", "STRING", "INTEGER", "BIGINT" },
+      ColumnNames = new[] { "ID", "TITLE", "RELEASE_NAME", "ROWTIME" },
+    };
+
+    ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
+
+    string rawJson = "[2,\"Die Hard\",1998,1670438716925]";
+    var jsonSerializationOptions = KSqlDbJsonSerializerOptions.CreateInstance();
+
+    //Act
+    var rowValue = ClassUnderTest.Deserialize<Movie>(rawJson, jsonSerializationOptions);
+
+    //Assert
+    rowValue.Value.Id.Should().Be(2);
+  }
+
+  private enum MyEnum
+  {
+    None = 0,
+    All = 1
+  }
+
+  [TestMethod]
   public void Deserialize_Enum()
   {
     //Arrange
-    var value = (int)MyEnum.None;
+    var value = (int)MyEnum.All;
 
     string rawJson = $"[{value}]";
     var jsonSerializationOptions = KSqlDbJsonSerializerOptions.CreateInstance();
@@ -195,7 +225,7 @@ public class RowValueJsonSerializerTests : TestBase
     var rowValue = ClassUnderTest.Deserialize<MyEnum>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value.Should().Be(MyEnum.None);
+    rowValue.Value.Should().Be(MyEnum.All);
   }
 
   [TestMethod]
@@ -220,6 +250,7 @@ public class RowValueJsonSerializerTests : TestBase
     //Assert
     rowValue.Value.Should().Be(guid);
   }
+
   class Foo : Dictionary<string, int>
   {
   }
@@ -243,5 +274,68 @@ public class RowValueJsonSerializerTests : TestBase
 
     //Assert
     rowValue.Value["A"].Should().Be(2);
+  }
+
+  [TestMethod]
+  public void Deserialize_RecordAsByteArray()
+  {
+    //Arrange
+    var queryStreamHeader = new QueryStreamHeader()
+    {
+      ColumnTypes = new[] { "BYTES" },
+      ColumnNames = new[] { "MESSAGE" },
+    };
+
+    ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
+
+    string rawJson = "[\"e30=\"]";
+    var jsonSerializationOptions = KSqlDbJsonSerializerOptions.CreateInstance();
+
+    //Act
+    var rowValue = ClassUnderTest.Deserialize<byte[]>(rawJson, jsonSerializationOptions);
+
+    //Assert
+    rowValue.Value.Should().BeOfType<byte[]>();
+    rowValue.Value[0].Should().Be(0x7b);
+    rowValue.Value[1].Should().Be(0x7d);
+  }
+
+  [TestMethod]
+  public void Deserialize_RecordAsInt()
+  {
+    //Arrange
+    var queryStreamHeader = new QueryStreamHeader()
+    {
+      ColumnTypes = new[] { "INT" },
+      ColumnNames = new[] { "MESSAGE" },
+    };
+
+    ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
+
+    string rawJson = "[1]";
+    var jsonSerializationOptions = KSqlDbJsonSerializerOptions.CreateInstance();
+
+    //Act
+    var rowValue = ClassUnderTest.Deserialize<int>(rawJson, jsonSerializationOptions);
+
+    //Assert
+    rowValue.Value.Should().Be(1);
+  }
+
+  [TestMethod]
+  [ExpectedException(typeof(InvalidOperationException))]
+  public void DifferentLengthOfColumnNamesAndTypes_ThrowsInvalidOperationException()
+  {
+    //Arrange
+    var queryStreamHeader = new QueryStreamHeader()
+    {
+      ColumnTypes = new[] { "INT", "STRING" },
+      ColumnNames = new[] { "MESSAGE" },
+    };
+
+    //ACT
+    ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
+
+    //Assert
   }
 }

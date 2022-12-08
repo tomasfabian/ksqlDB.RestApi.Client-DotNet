@@ -9,10 +9,21 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi;
 internal class RowValueJsonSerializer
 {
   private readonly QueryStreamHeader queryStreamHeader;
+  private readonly bool isSingleAnonymousColumn;
+  private readonly bool isMapColumn;
 
   internal RowValueJsonSerializer(QueryStreamHeader queryStreamHeader)
   {
     this.queryStreamHeader = queryStreamHeader ?? throw new ArgumentNullException(nameof(queryStreamHeader));
+
+    if (this.queryStreamHeader.ColumnNames.Length != queryStreamHeader.ColumnTypes.Length)
+      throw new InvalidOperationException("Length of the column names differs from column types");
+
+    if (queryStreamHeader.ColumnTypes.Length == 1)
+    {
+      isSingleAnonymousColumn = Regex.Matches(queryStreamHeader.ColumnNames[0], anonymousColumnRegex).Count > 0;
+      isMapColumn = Regex.Matches(queryStreamHeader.ColumnTypes[0], structRegex).Count > 0;
+    }
   }
 
   private readonly string anonymousColumnRegex = "^KSQL_COL_\\d+";
@@ -24,10 +35,10 @@ internal class RowValueJsonSerializer
 
     if (queryStreamHeader.ColumnTypes.Length == 1 && !typeof(T).IsAnonymousType())
     {
-      bool isSingleColumn = Regex.Matches(queryStreamHeader.ColumnNames[0], anonymousColumnRegex).Count > 0;
-      bool isMapColumn = Regex.Matches(queryStreamHeader.ColumnTypes[0], structRegex).Count > 0;
+      var type = typeof(T);
+      var isAllowedType = type.IsPrimitive || type.IsArray || type.IsEnum;
 
-      if (isSingleColumn || isMapColumn)
+      if (isSingleAnonymousColumn || isMapColumn || isAllowedType)
         return new RowValue<T>(JsonSerializer.Deserialize<T>(result, jsonSerializerOptions));
     }
 
