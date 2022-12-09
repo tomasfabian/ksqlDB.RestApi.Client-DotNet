@@ -104,6 +104,141 @@ FROM movies_test EMIT CHANGES;
 Expression<Func<Tweet, string>> expression = c => K.Functions.Concat(c.Message, "_Value");
 ```
 
+## Lambda functions (Invocation functions)
+**v1.0.0**
+
+- requirements: ksqldb 0.17.0
+- This version covers ARRAY type. MAP types are not included in this release.
+
+Lambda functions allow you to compose new expressions from existing ones. Lambda functions must be used inside the following invocation functions:
+- **Transform**
+- **Reduce**
+- **Filter**
+
+See also [Use lambda functions](https://docs.ksqldb.io/en/latest/how-to-guides/use-lambda-functions/) and [Invocation functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#invocation-functions)
+
+The following example shows you how to take advantage of invocation functions with ksqlDB.RestApi.Client:
+
+Add namespaces:
+```C#
+using System;
+using System.Threading.Tasks;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.Sample.Models.InvocationFunctions;
+```
+Prepare the model:
+```C#
+record Lambda
+{
+  public int Id { get; set; }
+  public int[] Lambda_Arr { get; set; }
+}
+```
+Create the stream and insert a value:
+```C#
+public async Task PrepareAsync(IKSqlDbRestApiClient restApiClient)
+{
+  var statement =
+    new KSqlDbStatement(
+      @"CREATE STREAM stream2 (id INT, lambda_arr ARRAY<INTEGER>) WITH (kafka_topic = 'stream2', partitions = 1, value_format = 'json');");
+
+  var createStreamResponse = await restApiClient.ExecuteStatementAsync(statement);
+
+  var insertResponse = await restApiClient.ExecuteStatementAsync(
+    new KSqlDbStatement("insert into stream2 (id, lambda_arr) values (1, ARRAY [1,2,3]);"));
+}
+```
+
+Subscribe to the unbounded stream of events:
+```C#
+public IDisposable Invoke(IKSqlDBContext ksqlDbContext)
+{
+  var subscription = ksqlDbContext.CreateQuery<Lambda>(fromItemName: "stream2")
+    .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
+    .Select(c => new
+    {
+      Transformed = KSqlFunctions.Instance.Transform(c.Lambda_Arr, x => x + 1),
+      Filtered = KSqlFunctions.Instance.Filter(c.Lambda_Arr, x => x > 1),
+      Acc = K.Functions.Reduce(c.Lambda_Arr, 0, (x, y) => x + y)
+    }).Subscribe(c =>
+    {
+      Console.WriteLine($"Transformed array: {c.Transformed}");
+      Console.WriteLine($"Filtered array: {c.Filtered}");
+      Console.WriteLine($"Reduced array: {c.Acc}");
+    }, error => { Console.WriteLine(error.Message); });
+
+  return subscription;
+}
+```
+
+The above query is equivalent to:
+```KSQL
+set 'auto.offset.reset' = 'earliest';
+
+SELECT TRANSFORM(Lambda_Arr, (x) => x + 1) Transformed, FILTER(Lambda_Arr, (x) => x > 1) Filtered, REDUCE(Lambda_Arr, 0, (x, y) => x + y) Acc 
+FROM stream2 
+EMIT CHANGES;
+```
+
+Output:
+```
++--------------------------------------+--------------------------------------+--------------------------------------+
+|TRANSFORMED                           |FILTERED                              |ACC                                   |
++--------------------------------------+--------------------------------------+--------------------------------------+
+|[2, 3, 4]                             |[2, 3]                                |6                                     |
+```
+ 
+### Transform arrays
+**v1.0.0**
+
+- Transform a collection by using a lambda function.
+- If the collection is an array, the lambda function must have one input argument.
+
+```C#
+record Tweets
+{
+  public string[] Messages { get; set; }
+  public int[] Values { get; set; }
+}
+```
+
+```C#
+Expression<Func<Tweets, string[]>> expression = c => K.Functions.Transform(c.Messages, x => x.ToUpper());
+```
+
+```SQL
+TRANSFORM(Messages, (x) => UCASE(x))
+```
+
+### Reduce arrays
+**v1.0.0**
+ 
+- Reduce a collection starting from an initial state.
+- If the collection is an array, the lambda function must have two input arguments.
+```C#
+Expression<Func<Tweets, int>> expression = c => K.Functions.Reduce(c.Values, 0, (x,y) => x + y);
+```
+
+```SQL
+REDUCE(Values, 0, (x, y) => x + y)
+```
+
+### Filter arrays (v1.9.0) 
+- Filter a collection with a lambda function.
+- If the collection is an array, the lambda function must have one input argument.
+```C#
+Expression<Func<Tweets, string[]>> expression = c => K.Functions.Filter(c.Messages, x => x == "E.T.");
+```
+
+```SQL
+FILTER(Messages, (x) => x = 'E.T.')
+```
+
 ## Lambda functions (Invocation functions) - Maps
 **v1.0.0**
 
