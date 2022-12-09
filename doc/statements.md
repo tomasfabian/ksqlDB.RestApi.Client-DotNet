@@ -195,6 +195,24 @@ Output:
 INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Aliens', 1, 1986);
 ```
 
+### ExecuteStatementAsync extension method
+**v1.0.0**
+
+Executes arbitrary [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/#streams-and-tables):
+```C#
+async Task<HttpResponseMessage> ExecuteAsync(string statement)
+{
+  KSqlDbStatement ksqlDbStatement = new(statement);
+
+  var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement)
+    .ConfigureAwait(false);
+
+  string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
+
+  return httpResponseMessage;
+}
+```
+
 ### Stream and table properties KEY_SCHEMA_ID and VALUE_SCHEMA_ID 
 **v1.6.0** (ksqldb v0.24.0)
 
@@ -583,3 +601,10 @@ Parameters:
 `useIfExistsClause` - If the IF EXISTS clause is present, the statement doesn't fail if the stream doesn't exist.
 
 `deleteTopic` - If the DELETE TOPIC clause is present, the stream's source topic is marked for deletion.
+
+### PartitionBy
+**v1.0.0**
+
+[Repartition a stream.](https://docs.ksqldb.io/en/0.15.0-ksqldb/developer-guide/joins/partition-data/)
+
+**TODO:** add example
