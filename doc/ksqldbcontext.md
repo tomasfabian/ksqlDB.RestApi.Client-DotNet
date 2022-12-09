@@ -1,5 +1,74 @@
 # KSqlDbContext
 
+### CreateQueryStream
+**v1.0.0**
+
+[Executing pull or push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/#executing-pull-or-push-queries)
+```JSON
+POST /query-stream HTTP/2.0
+Accept: application/vnd.ksqlapi.delimited.v1
+Content-Type: application/vnd.ksqlapi.delimited.v1
+
+{
+  "sql": "SELECT * FROM movies EMIT CHANGES;",
+  "properties": {
+    "auto.offset.reset": "earliest"
+  }
+}
+```
+```C#
+using System;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.Sample.Models.Movies;
+
+var ksqlDbUrl = @"http:\\localhost:8088";
+var contextOptions = CreateQueryStreamOptions(ksqlDbUrl);
+
+await using var context = new KSqlDBContext(contextOptions);
+
+using var disposable = context.CreateQueryStream<Movie>()        
+  .Subscribe(onNext: movie =>
+  {
+    Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
+    Console.WriteLine();
+  }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
+```
+
+### CreateQuery
+**v1.0.0**
+
+[Run a query](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/query-endpoint/#post-query)
+```JSON
+POST /query HTTP/1.1
+Accept: application/vnd.ksql.v1+json
+Content-Type: application/vnd.ksql.v1+json
+
+{
+  "ksql": "SELECT * FROM movies EMIT CHANGES;",
+  "streamsProperties": {
+    "ksql.streams.auto.offset.reset": "earliest"
+  }
+}
+```
+```C#
+using System;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.Sample.Models.Movies;
+
+var ksqlDbUrl = @"http:\\localhost:8088";
+var contextOptions = CreateQueryStreamOptions(ksqlDbUrl);
+
+await using var context = new KSqlDBContext(contextOptions);
+
+using var disposable = context.CreateQuery<Movie>()        
+  .Subscribe(onNext: movie =>
+  {
+    Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
+    Console.WriteLine();
+  }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
+```
 ### KSqlDbContextOptionsBuilder SetProcessingGuarantee
 **v1.0.0**
 
