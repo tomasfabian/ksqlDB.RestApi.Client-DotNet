@@ -263,6 +263,47 @@ SELECT Id, COUNT_DISTINCT(Message) Count
 FROM Tweets GROUP BY Id EMIT CHANGES;
 ```
 
+## WindowedBy
+**v1.0.0**
+
+Creation of windowed aggregation
+
+### Tumbling window
+
+[Tumbling window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#tumbling-window):
+```C#
+var context = new TransactionsDbProvider(ksqlDbUrl);
+
+var windowedQuery = context.CreateQueryStream<Transaction>()
+  .WindowedBy(new TimeWindows(Duration.OfSeconds(5)).WithGracePeriod(Duration.OfHours(2)))
+  .GroupBy(c => c.CardNumber)
+  .Select(g => new { CardNumber = g.Key, Count = g.Count() });
+```
+
+```KSQL
+SELECT CardNumber, COUNT(*) Count FROM Transactions 
+  WINDOW TUMBLING (SIZE 5 SECONDS, GRACE PERIOD 2 HOURS) 
+  GROUP BY CardNumber EMIT CHANGES;
+```
+
+### Hopping window
+
+[Hopping window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#hopping-window):
+```C#
+var subscription = context.CreateQueryStream<Tweet>()
+  .GroupBy(c => c.Id)
+  .WindowedBy(new HoppingWindows(Duration.OfSeconds(5)).WithAdvanceBy(Duration.OfSeconds(4)).WithRetention(Duration.OfDays(7)))
+  .Select(g => new { g.WindowStart, g.WindowEnd, Id = g.Key, Count = g.Count() })
+  .Subscribe(c => { Console.WriteLine($"{c.Id}: {c.Count}: {c.WindowStart}: {c.WindowEnd}"); }, exception => {});
+```
+
+```KSQL
+SELECT WindowStart, WindowEnd, Id, COUNT(*) Count FROM Tweets 
+  WINDOW HOPPING (SIZE 5 SECONDS, ADVANCE BY 10 SECONDS, RETENTION 7 DAYS) 
+  GROUP BY Id EMIT CHANGES;
+```
+Window advancement interval should be more than zero and less than window duration
+
 ### Session Window
 **v1.0.0**
 
@@ -297,41 +338,4 @@ Duration duration = Duration.OfHours(2);
 
 Console.WriteLine($"{duration.Value} {duration.TimeUnit}");
 ```
-
-### WindowedBy
-**v1.0.0**
-
-Creation of windowed aggregation
-
-[Tumbling window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#tumbling-window):
-```C#
-var context = new TransactionsDbProvider(ksqlDbUrl);
-
-var windowedQuery = context.CreateQueryStream<Transaction>()
-  .WindowedBy(new TimeWindows(Duration.OfSeconds(5)).WithGracePeriod(Duration.OfHours(2)))
-  .GroupBy(c => c.CardNumber)
-  .Select(g => new { CardNumber = g.Key, Count = g.Count() });
-```
-
-```KSQL
-SELECT CardNumber, COUNT(*) Count FROM Transactions 
-  WINDOW TUMBLING (SIZE 5 SECONDS, GRACE PERIOD 2 HOURS) 
-  GROUP BY CardNumber EMIT CHANGES;
-```
-
-[Hopping window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#hopping-window):
-```C#
-var subscription = context.CreateQueryStream<Tweet>()
-  .GroupBy(c => c.Id)
-  .WindowedBy(new HoppingWindows(Duration.OfSeconds(5)).WithAdvanceBy(Duration.OfSeconds(4)).WithRetention(Duration.OfDays(7)))
-  .Select(g => new { g.WindowStart, g.WindowEnd, Id = g.Key, Count = g.Count() })
-  .Subscribe(c => { Console.WriteLine($"{c.Id}: {c.Count}: {c.WindowStart}: {c.WindowEnd}"); }, exception => {});
-```
-
-```KSQL
-SELECT WindowStart, WindowEnd, Id, COUNT(*) Count FROM Tweets 
-  WINDOW HOPPING (SIZE 5 SECONDS, ADVANCE BY 10 SECONDS, RETENTION 7 DAYS) 
-  GROUP BY Id EMIT CHANGES;
-```
-Window advancement interval should be more than zero and less than window duration
 
