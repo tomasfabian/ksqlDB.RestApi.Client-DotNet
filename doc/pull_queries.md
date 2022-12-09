@@ -1,6 +1,16 @@
 # Pull queries
 
-### `CreatePullQuery<TEntity>` (v1.0.0)
+
+### Pull queries - `ExecutePullQuery`
+**v1.0.0**
+
+Execute [pull query](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-pull-query/) with plain string query:
+```C#
+string ksql = "SELECT * FROM avg_sensor_values WHERE SensorId = 'sensor-1';";
+var result = await context.ExecutePullQuery<IoTSensorStats>(ksql);
+```
+
+### `CreatePullQuery<TEntity>`
 
 [A pull query](https://docs.ksqldb.io/en/latest/concepts/queries/#pull) is a form of query issued by a client that retrieves a result as of "now", like a query against a traditional RDBS.
 
