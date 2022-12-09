@@ -326,6 +326,13 @@ List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [Take (LIMIT)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#take-limit-v010)
 - [Subscribe](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribe-v010)
 - [ToObservable](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#toobservable-v010)
+- [ToAsyncEnumerable](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#toasyncenumerable)
+- [ExplainAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#explainasync)
+- [SubscribeAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribeasync)
+- [SubscribeOn](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribeon)
+- [ObserveOn](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#observeon)
+
+- [IKSqlGrouping.Source](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#iksqlgroupingsource)
 
 ### Select (v0.1.0)
 Projects each element of a stream into a new form.
@@ -334,6 +341,7 @@ context.CreateQueryStream<Tweet>()
   .Select(l => new { l.RowTime, l.Message });
 ```
 Omitting select is equivalent to SELECT *
+
 ### Supported data types mapping
 
 |     ksql     |            c#            |
@@ -447,100 +455,25 @@ Console.WriteLine(ksql);
 
 ### Aggregation functions
 List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md):
-- [MIN, MAX](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#min-and-max-v020)
-- [AVG](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#avg-v020)
-- [COUNT](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#count-v010)
+- [GROUP BY](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#groupby)
+- [MIN, MAX](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#min-and-max)
+- [AVG](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#avg)
+- [COUNT](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#count)
 - [COLLECT_LIST, COLLECT_SET, EARLIEST_BY_OFFSET, LATEST_BY_OFFSET](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#collect_list-collect_set-earliest_by_offset-latest_by_offset)
 - [SUM](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#sum)
 - COUNT_DISTINCT
 - HISTOGRAM
-- [TOPK,TOPKDISTINCT](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#topk-topkdistinct-longcount-countcolumn-v030)
+- [TOPK,TOPKDISTINCT](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#topk-topkdistinct-longcount-countcolumn)
+- [COLLECTSET, COLLECTLIST, COUNT_DISTINCT](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#collectset-collectlist-countdistinct)
 
-- [TimeWindows - EMIT FINAL](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#timewindows---emit-final-v250)
+- [TimeWindows - EMIT FINAL](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#timewindows---emit-final)
+
+- [WindowedBy](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#windowedby)
+  - [Session Window](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#session-window)
+  - [Tumbling Window](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#tumbling-window)
+  - [Hopping Window](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#hopping-window)
 
 [Rest api reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
-
-### GroupBy (v0.1.0)
-Extract records from an aggregation that fulfill a specified condition with the [HAVING](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#having-v020) keyword.
-
-#### Count (v0.1.0)
-Count the number of rows. When * is specified, the count returned will be the total number of rows.
-```C#
-var ksqlDbUrl = @"http:\\localhost:8088";
-var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
-var context = new KSqlDBContext(contextOptions);
-
-context.CreateQueryStream<Tweet>()
-  .GroupBy(c => c.Id)
-  .Having(c => c.Count() > 2)
-  .Select(g => new { Id = g.Key, Count = g.Count() })
-  .Subscribe(count =>
-  {
-    Console.WriteLine($"{count.Id} Count: {count.Count}");
-    Console.WriteLine();
-  }, error => { Console.WriteLine($"Exception: {error.Message}"); }, () => Console.WriteLine("Completed"));
-```
-```SQL
-SELECT Id, COUNT(*) Count FROM Tweets GROUP BY Id EMIT CHANGES;
-```
-
-> ⚠ There is a known limitation in the early access versions (bellow version 1.10). The aggregation functions have to be named/aliased COUNT(*) Count, otherwise the deserialization won't be able to map the unknown column name KSQL_COL_0. 
-The Key should be mapped back to the respective column too Id = g.Key. See IKSqlGrouping.Source (v1.10.0).
-
-Or without the new expression:
-```C#
-context.CreateQueryStream<Tweet>()
-  .GroupBy(c => c.Id)
-  .Select(g => g.Count()); 
-```
-```SQL
-SELECT COUNT(*) FROM Tweets GROUP BY Id EMIT CHANGES;
-```
-
-### ToAsyncEnumerable (v0.1.0)
-Creates an [async iterator](https://docs.microsoft.com/en-us/archive/msdn-magazine/2019/november/csharp-iterating-with-async-enumerables-in-csharp-8) from the query:
-```C#
-var cts = new CancellationTokenSource();
-var asyncTweetsEnumerable = context.CreateQueryStream<Tweet>().ToAsyncEnumerable();
-
-await foreach (var tweet in asyncTweetsEnumerable.WithCancellation(cts.Token))
-  Console.WriteLine(tweet.Message);
-```
-
-### WindowedBy (v0.1.0)
-Creation of windowed aggregation
-
-[Tumbling window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#tumbling-window):
-```C#
-var context = new TransactionsDbProvider(ksqlDbUrl);
-
-var windowedQuery = context.CreateQueryStream<Transaction>()
-  .WindowedBy(new TimeWindows(Duration.OfSeconds(5)).WithGracePeriod(Duration.OfHours(2)))
-  .GroupBy(c => c.CardNumber)
-  .Select(g => new { CardNumber = g.Key, Count = g.Count() });
-```
-
-```KSQL
-SELECT CardNumber, COUNT(*) Count FROM Transactions 
-  WINDOW TUMBLING (SIZE 5 SECONDS, GRACE PERIOD 2 HOURS) 
-  GROUP BY CardNumber EMIT CHANGES;
-```
-
-[Hopping window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#hopping-window):
-```C#
-var subscription = context.CreateQueryStream<Tweet>()
-  .GroupBy(c => c.Id)
-  .WindowedBy(new HoppingWindows(Duration.OfSeconds(5)).WithAdvanceBy(Duration.OfSeconds(4)).WithRetention(Duration.OfDays(7)))
-  .Select(g => new { g.WindowStart, g.WindowEnd, Id = g.Key, Count = g.Count() })
-  .Subscribe(c => { Console.WriteLine($"{c.Id}: {c.Count}: {c.WindowStart}: {c.WindowEnd}"); }, exception => {});
-```
-
-```KSQL
-SELECT WindowStart, WindowEnd, Id, COUNT(*) Count FROM Tweets 
-  WINDOW HOPPING (SIZE 5 SECONDS, ADVANCE BY 10 SECONDS, RETENTION 7 DAYS) 
-  GROUP BY Id EMIT CHANGES;
-```
-Window advancement interval should be more than zero and less than window duration
 
 ### String Functions UCase, LCase (v0.1.0)
 ```C#
@@ -551,89 +484,6 @@ l => l.Message.ToUpper() != "HI";
 LCASE(Latitude) != 'hi'
 UCASE(Latitude) != 'HI'
 ```
-
-# v0.2.0
-
-### Session Window (v0.2.0)
-A [session window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#session-window) aggregates records into a session, which represents a period of activity separated by a specified gap of inactivity, or "idleness". 
-```C#
-var query = context.CreateQueryStream<Transaction>()
-  .GroupBy(c => c.CardNumber)
-  .WindowedBy(new SessionWindow(Duration.OfSeconds(5)))
-  .Select(g => new { CardNumber = g.Key, Count = g.Count() });
-```
-KSQL:
-```KSQL
-SELECT CardNumber, COUNT(*) Count FROM Transactions 
-  WINDOW SESSION (5 SECONDS)
-  GROUP BY CardNumber 
-  EMIT CHANGES;
-```
-Time units:
-```C#
-using ksqlDB.RestApi.Client.KSql.Query.Windows;
-
-public enum TimeUnits
-{
-  MILLISECONDS, // v2.0.0
-  SECONDS,
-  MINUTES,
-  HOURS,
-  DAYS
-}
-
-Duration duration = Duration.OfHours(2);
-
-Console.WriteLine($"{duration.Value} {duration.TimeUnit}");
-```
-
-### Inner Joins (v0.2.0)
-How to [join table and table](https://kafka-tutorials.confluent.io/join-a-table-to-a-table/ksql.html)
-```C#
-public class Movie : Record
-{
-  public string Title { get; set; }
-  public int Id { get; set; }
-  public int Release_Year { get; set; }
-}
-
-public class Lead_Actor : Record
-{
-  public string Title { get; set; }
-  public string Actor_Name { get; set; }
-}
-
-using ksqlDB.RestApi.Client.KSql.Linq;
-
-var query = context.CreateQueryStream<Movie>()
-  .Join(
-    Source.Of<Lead_Actor>(nameof(Lead_Actor)),
-    movie => movie.Title,
-    actor => actor.Title,
-    (movie, actor) => new
-    {
-      movie.Id,
-      Title = movie.Title,
-      movie.Release_Year,
-      ActorName = K.Functions.RPad(K.Functions.LPad(actor.Actor_Name.ToUpper(), 15, "*"), 25, "^"),
-      ActorTitle = actor.Title
-    }
-  );
-
-var joinQueryString = query.ToQueryString();
-```
-KSQL:
-```KSQL
-SELECT M.Id Id, M.Title Title, M.Release_Year Release_Year, RPAD(LPAD(UCASE(L.Actor_Name), 15, '*'), 25, '^') ActorName, L.Title ActorTitle 
-FROM Movies M
-INNER JOIN Lead_Actor L
-ON M.Title = L.Title
-EMIT CHANGES;
-```
-
-> ⚠ There is a known limitation in the early access versions (bellow 1.0). 
-The Key column, in this case movie.Title, has to be aliased Title = movie.Title, otherwise the deserialization won't be able to map the unknown column name M_TITLE. 
-
 
 ### Like (v0.2.0)
 ```C#
@@ -664,31 +514,6 @@ Expression<Func<Tweet, int>> lengthExpression = c => c.Message.Length;
 KSQL
 ```KSQL
 LEN(Message)
-```
-
-# v0.3.0
-
-### LeftJoin - LEFT OUTER (v0.3.0)
-LEFT OUTER joins will contain leftRecord-NULL records in the result stream, which means that the join contains NULL values for fields selected from the right-hand stream where no match is made.
-```C#
-var query = new KSqlDBContext(@"http:\\localhost:8088").CreateQueryStream<Movie>()
-  .LeftJoin(
-    Source.Of<Lead_Actor>(),
-    movie => movie.Title,
-    actor => actor.Title,
-    (movie, actor) => new
-    {
-      movie.Id,
-      ActorTitle = actor.Title
-    }
-  );
-```
-Generated KSQL:
-```KSQL
-SELECT M.Id Id, L.Title ActorTitle FROM Movies M
-LEFT JOIN Lead_Actors L
-ON M.Title = L.Title
-EMIT CHANGES;
 ```
 
 ### Having - aggregations with column (v0.3.0)
@@ -766,47 +591,6 @@ context.CreateQueryStream<Tweet>()
     error => Console.WriteLine($"Exception: {error.Message}"));
 ```
 
-### Aggregation functions: CollectSet, CollectList, CountDistinct (v0.3.0)
-```C#
-var subscription = context.CreateQueryStream<Tweet>()
-  .GroupBy(c => c.Id)
-  .Select(g => new { Id = g.Key, Array = g.CollectSet(c => c.Message) })
-  //.Select(g => new { Id = g.Key, Array = g.CollectList(c => c.Message) })
-  .Subscribe(c =>
-  {
-    Console.WriteLine($"{c.Id}:");
-    foreach (var value in c.Array)
-    {
-      Console.WriteLine($"  {value}");
-    }
-  }, exception => { Console.WriteLine(exception.Message); });
-```
-Generated KSQL:
-```KSQL
-SELECT Id, COLLECT_SET(Message) Array 
-FROM Tweets GROUP BY Id EMIT CHANGES;
-
-SELECT Id, COLLECT_LIST(Message) Array 
-FROM Tweets GROUP BY Id EMIT CHANGES;
-```
-
-CountDistinct, LongCountDistinct
-```C#
-var subscription = context.CreateQueryStream<Tweet>()
-  .GroupBy(c => c.Id)
-  // .Select(g => new { Id = g.Key, Count = g.CountDistinct(c => c.Message) })
-  .Select(g => new { Id = g.Key, Count = g.LongCountDistinct(c => c.Message) })
-  .Subscribe(c =>
-  {
-    Console.WriteLine($"{c.Id} - {c.Count}");
-  }, exception => { Console.WriteLine(exception.Message); });
-```
-Generated KSQL:
-```KSQL
-SELECT Id, COUNT_DISTINCT(Message) Count 
-FROM Tweets GROUP BY Id EMIT CHANGES;
-```
-
 # v0.4.0
 
 ### Maps (v0.4.0)
@@ -874,76 +658,6 @@ query
 SELECT STRUCT(X := 1, Y := 2) FROM point EMIT CHANGES;
 ```
 
-### Full Outer Join (v0.5.0)
-FULL OUTER joins will contain leftRecord-NULL or NULL-rightRecord records in the result stream, which means that the join contains NULL values for fields coming from a stream where no match is made.
-Define nullable primitive value types in POCOs:
-```C#
-public record Movie
-{
-  public long RowTime { get; set; }
-  public string Title { get; set; }
-  public int? Id { get; set; }
-  public int? Release_Year { get; set; }
-}
-
-public class Lead_Actor
-{
-  public string Title { get; set; }
-  public string Actor_Name { get; set; }
-}
-```
-
-```C#
-var source = new KSqlDBContext(@"http:\\localhost:8088")
-  .CreateQueryStream<Movie>()
-  .FullOuterJoin(
-    Source.Of<Lead_Actor>("Actors"),
-    movie => movie.Title,
-    actor => actor.Title,
-    (movie, actor) => new
-    {
-      movie.Id,
-      Title = movie.Title,
-      movie.Release_Year,
-      ActorTitle = actor.Title
-    }
-  );
-```
-
-Generated KSQL:
-```KSQL
-SELECT m.Id Id, m.Title Title, m.Release_Year Release_Year, l.Title ActorTitle FROM movies_test m
-FULL OUTER JOIN lead_actor_test l
-ON m.Title = l.Title
-EMIT CHANGES;
-```
-
-# v0.6.0:
-### CASE (v0.6.0)
-- Select a condition from one or more expressions.
-```C#
-var query = new KSqlDBContext(@"http:\\localhost:8088")
-  .CreateQueryStream<Tweet>()
-  .Select(c =>
-    new
-    {
-      case_result =
-        (c.Amount < 2.0) ? "small" :
-        (c.Amount < 4.1) ? "medium" : "large"
-    }
-  );
-```
-
-```KSQL
-SELECT 
-  CASE 
-    WHEN Amount < 2 THEN 'small' 
-    WHEN Amount < 4.1 THEN 'medium' 
-    ELSE 'large' 
-  END AS case_result 
-FROM Tweets EMIT CHANGES;
-```
-
 **NOTE:** Switch expressions and if-elseif-else statements are not supported at current versions
 
 ### KSqlDbContextOptionsBuilder (v0.6.0)
@@ -971,72 +685,6 @@ public static KSqlDBContextOptions CreateQueryStreamOptions(string ksqlDbUrl)
 # TFM netstandard 2.0 (.Net Framework, NetCoreApp 2.0 etc.) (v0.6.0)
 netstandard 2.0 does not support Http 2.0. Due to this ```IKSqlDBContext.CreateQueryStream<TEntity>``` is not exposed at the current version. 
 For these reasons ```IKSqlDBContext.CreateQuery<TEntity>``` was introduced to provide the same functionality via Http 1.1. 
-
-### CreateQueryStream (v0.1.0)
-[Executing pull or push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/#executing-pull-or-push-queries)
-```JSON
-POST /query-stream HTTP/2.0
-Accept: application/vnd.ksqlapi.delimited.v1
-Content-Type: application/vnd.ksqlapi.delimited.v1
-
-{
-  "sql": "SELECT * FROM movies EMIT CHANGES;",
-  "properties": {
-    "auto.offset.reset": "earliest"
-  }
-}
-```
-```C#
-using System;
-using ksqlDB.RestApi.Client.KSql.Linq;
-using ksqlDB.RestApi.Client.KSql.Query.Context;
-using ksqlDB.RestApi.Client.Sample.Models.Movies;
-
-var ksqlDbUrl = @"http:\\localhost:8088";
-var contextOptions = CreateQueryStreamOptions(ksqlDbUrl);
-
-await using var context = new KSqlDBContext(contextOptions);
-
-using var disposable = context.CreateQueryStream<Movie>()        
-  .Subscribe(onNext: movie =>
-  {
-    Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
-    Console.WriteLine();
-  }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
-```
-
-### CreateQuery (v0.6.0)
-[Run a query](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/query-endpoint/#post-query)
-```JSON
-POST /query HTTP/1.1
-Accept: application/vnd.ksql.v1+json
-Content-Type: application/vnd.ksql.v1+json
-
-{
-  "ksql": "SELECT * FROM movies EMIT CHANGES;",
-  "streamsProperties": {
-    "ksql.streams.auto.offset.reset": "earliest"
-  }
-}
-```
-```C#
-using System;
-using ksqlDB.RestApi.Client.KSql.Linq;
-using ksqlDB.RestApi.Client.KSql.Query.Context;
-using ksqlDB.RestApi.Client.Sample.Models.Movies;
-
-var ksqlDbUrl = @"http:\\localhost:8088";
-var contextOptions = CreateQueryStreamOptions(ksqlDbUrl);
-
-await using var context = new KSqlDBContext(contextOptions);
-
-using var disposable = context.CreateQuery<Movie>()        
-  .Subscribe(onNext: movie =>
-  {
-    Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
-    Console.WriteLine();
-  }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
-```
 
 # v0.7.0:
 - scalar collection functions: ArrayIntersect, ArrayJoin
@@ -1070,6 +718,7 @@ WHERE ((Latitude = '1') OR (Latitude != '2')) AND (Latitude = '3') EMIT CHANGES;
 Redundant brackets are not reduced in the current version
 
 ### Raw string KSQL query execution (v0.7.0)
+
 The following examples show how to execute ksql queries from strings:
 ```C#
 string ksql = @"SELECT * FROM Movies
@@ -1232,25 +881,6 @@ AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
 WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
 ```
 
-### PartitionBy extension method (v0.9.0)
-[Repartition a stream.](https://docs.ksqldb.io/en/0.15.0-ksqldb/developer-guide/joins/partition-data/)
-
-### ExecuteStatementAsync extension method (v0.9.0)
-Executes arbitrary [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/#streams-and-tables):
-```C#
-async Task<HttpResponseMessage> ExecuteAsync(string statement)
-{
-  KSqlDbStatement ksqlDbStatement = new(statement);
-
-  var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement)
-    .ConfigureAwait(false);
-
-  string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
-
-  return httpResponseMessage;
-}
-```
-
 ### ToStatementString extension method (v0.9.0)
 Generates ksql statement from Create(OrReplace)[Table|Stream]Statements
 ```C#
@@ -1291,14 +921,6 @@ Generated KSQL:
 ```KSQL
 SELECT * FROM avg_sensor_values
 WHERE SensorId = 'sensor-1' AND (WINDOWSTART > '2019-10-03T21:31:16') AND (WINDOWEND <= '2020-10-03T21:31:16');
-```
-
-### Pull queries - `ExecutePullQuery` (v.0.10.0)
-
-Execute [pull query](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-pull-query/) with plain string query:
-```C#
-string ksql = "SELECT * FROM avg_sensor_values WHERE SensorId = 'sensor-1';";
-var result = await context.ExecutePullQuery<IoTSensorStats>(ksql);
 ```
 
 # v0.11.0:
@@ -1548,50 +1170,6 @@ var subscription = context.CreateQueryStream<Movie>()
 
 # v1.2.0:
 
-### Connectors (v1.2.0)
-GetConnectorsAsync - List all connectors in the Connect cluster.
-
-DropConnectorAsync - Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement fails if the connector doesn't exist.
-    
-DropConnectorIfExistsAsync - Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement doesn't fail if the connector doesn't exist.
-
-```C#
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using ksqlDB.RestApi.Client.KSql.RestApi;
-using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-
-public async Task CreateGetAndDropConnectorAsync()
-{
-  var ksqlDbUrl = @"http:\\localhost:8088";
-
-  var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
-
-  var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
-
-  const string SinkConnectorName = "mock-connector";
-
-  var createConnector = @$"CREATE SOURCE CONNECTOR `{SinkConnectorName}` WITH(
-      'connector.class'='org.apache.kafka.connect.tools.MockSourceConnector');";
-
-  var statement = new KSqlDbStatement(createConnector);
-
-  var httpResponseMessage = await restApiClient.ExecuteStatementAsync(statement);
-
-  var connectorsResponse = await restApiClient.GetConnectorsAsync();
-
-  Console.WriteLine("Available connectors: ");
-  Console.WriteLine(string.Join(',', connectorsResponse[0].Connectors.Select(c => c.Name)));
-
-  httpResponseMessage = await restApiClient.DropConnectorAsync($"`{SinkConnectorName}`");
-
-  // Or
-  httpResponseMessage = await restApiClient.DropConnectorIfExistsAsync($"`{SinkConnectorName}`");
-}
-```
-
 ### Get streams (v1.2.0)
 - IKSqlDbRestApiClient.GetStreamsAsync - List the defined streams.
 
@@ -1733,689 +1311,6 @@ Parameters:
 
 `deleteTopic` - If the DELETE TOPIC clause is present, the table's source topic is marked for deletion.
 
-### Drop a stream (v1.4.0)
-Drops an existing stream.
-
-```C#
-var ksqlDbUrl = @"http:\\localhost:8088";
-
-var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
-var ksqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory);
-
-string streamName = "StreamName";
-
-// DROP STREAM StreamName;
-var httpResponseMessage = ksqlDbRestApiClient.DropStreamAsync(streamName);
-
-// OR DROP STREAM IF EXISTS StreamName DELETE TOPIC;
-httpResponseMessage = ksqlDbRestApiClient.DropStreamAsync(streamName, useIfExistsClause: true, deleteTopic: true);
-```
-
-Parameters:
-
-`useIfExistsClause` - If the IF EXISTS clause is present, the statement doesn't fail if the stream doesn't exist.
-
-`deleteTopic` - If the DELETE TOPIC clause is present, the stream's source topic is marked for deletion.
-
-# v1.5.0:
-
-### QbservableExtensions
-## SubscribeAsync (v1.5.0)
-- Subscribes an element handler, an exception handler, and a completion handler to an qbservable stream and asynchronously returns the query id.
-
-## SubscribeOn (v1.5.0)
-- Wraps the source sequence in order to run its subscription on the specified scheduler.
-
-## ObserveOn (v1.5.0)
-- Wraps the source sequence in order to run its observer callbacks on the specified scheduler.
-
-```C#
-using System;
-using System.Reactive.Concurrency;
-using System.Threading;
-using System.Threading.Tasks;
-using ksqlDB.RestApi.Client.KSql.Linq;
-using ksqlDB.RestApi.Client.KSql.Query.Context;
-using ksqlDB.RestApi.Client.Sample.Models.Movies;
-
-private static async Task SubscribeAsync(IKSqlDBContext context)
-{
-  var cts = new CancellationTokenSource();
-
-  try
-  {
-    var subscription = await context.CreateQueryStream<Movie>()
-      .SubscribeOn(ThreadPoolScheduler.Instance)
-      .ObserveOn(TaskPoolScheduler.Default)
-      .SubscribeAsync(onNext: movie =>
-        {
-          Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
-          Console.WriteLine();
-        }, onError: error => { Console.WriteLine($"SubscribeAsync Exception: {error.Message}"); },
-        onCompleted: () => Console.WriteLine("SubscribeAsync Completed"), cts.Token);
-
-    Console.WriteLine($"Query id: {subscription}");
-  }
-  catch (Exception e)
-  {
-    Console.WriteLine(e);
-  }
-}
-```
-
-# v1.6.0:
-
-## CreateTypeAsync (v1.6.0)
-- `IKSqlDbRestApiClient.CreateTypeAsync<TEntity>` - Create an alias for a complex type declaration.
-
-```C#
-using System;
-using System.Threading.Tasks;
-using ksqlDB.RestApi.Client.KSql.Linq;
-using ksqlDB.RestApi.Client.KSql.Query.Context;
-using ksqlDB.RestApi.Client.KSql.RestApi;
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-using ksqlDB.RestApi.Client.Sample.Models.Events;
-
-private static async Task SubscriptionToAComplexTypeAsync()
-{      
-  var ksqlDbUrl = @"http:\\localhost:8088";
-
-  var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
-  var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
-
-  var httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@$"
-Drop type {nameof(EventCategory)};
-Drop table {nameof(Event)};
-"));
-
-  httpResponseMessage = await restApiClient.CreateTypeAsync<EventCategory>();
-  httpResponseMessage = await restApiClient.CreateTableAsync<Event>(new EntityCreationMetadata { KafkaTopic = "Events", Partitions = 1 });
-      
-  await using var ksqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(ksqlDbUrl));
-
-  var subscription = ksqlDbContext.CreateQueryStream<Event>()
-    .Take(1)
-    .Subscribe(value =>
-    {
-      Console.WriteLine("Categories: ");
-
-      foreach (var category in value.Categories)
-      {
-        Console.WriteLine($"{category.Name}");
-      }
-    }, error =>
-    {
-      Console.WriteLine(error.Message);
-    });
-
-  httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@"
-INSERT INTO Events (Id, Places, Categories) VALUES (1, ARRAY['1','2','3'], ARRAY[STRUCT(Name := 'Planet Earth'), STRUCT(Name := 'Discovery')]);"));
-}
-```
-
-```C#
-using System.Collections.Generic;
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
-
-record EventCategory
-{
-  public string Name { get; set; }
-}
-
-record Event
-{
-  [Key]
-  public int Id { get; set; }
-
-  public string[] Places { get; set; }
-
-  public IEnumerable<EventCategory> Categories { get; set; }
-}
-```
-
-## InsertIntoAsync for complex types (v1.6.0)
-In v1.0.0 support for inserting entities with primitive types and strings was added. This version adds support for `List<T>` and records, classes and structs. 
-Deeply nested types and dictionaries are not yet supported.
-
-```C#
-var testEvent = new EventWithList
-{
-  Id = "1",
-  Places = new List<int> { 1, 2, 3 }
-};
-
-var ksqlDbUrl = @"http:\\localhost:8088";
-
-var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
-
-var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
-  .InsertIntoAsync(testEvent);
-```
-Generated KSQL:
-```SQL
-INSERT INTO EventWithLists (Id, Places) VALUES ('1', ARRAY[1,2,3]);
-```
-
-```C#
-var eventCategory = new EventCategory
-{
-  Count = 1,
-  Name = "Planet Earth"
-};
-
-var testEvent2 = new ComplexEvent
-{
-  Id = 1,
-  Category = eventCategory
-};
-
-var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
-  .InsertIntoAsync(testEvent2, new InsertProperties { EntityName = "Events" });
-```
-
-Generated KSQL:
-```SQL
-INSERT INTO Events (Id, Category) VALUES (1, STRUCT(Count := 1, Name := 'Planet Earth'));
-```
-
-## Operator IN - `IEnumerable<T>` and `IList<T>` Contains (v1.6.0)
-Specifies multiple OR conditions.
-`IList<T>`.Contains:
-```C#
-var orderTypes = new List<int> { 1, 2, 3 };
-
-Expression<Func<OrderData, bool>> expression = o => orderTypes.Contains(o.OrderType);
-
-```
-Enumerable extension:
-```C#
-IEnumerable<int> orderTypes = Enumerable.Range(1, 3);
-
-Expression<Func<OrderData, bool>> expression = o => orderTypes.Contains(o.OrderType);
-
-```
-For both options the following SQL is generated:
-```SQL
-OrderType IN (1, 2, 3)
-```
-
-# v1.7.0:
-
-## IPullable - GetManyAsync (v1.7.0)
-- `IPullable.GetManyAsync<TEntity>` - Pulls all values from the materialized view asynchronously and terminates. 
-
-```C#
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
-using ksqlDB.RestApi.Client.KSql.Query;
-using ksqlDB.RestApi.Client.KSql.Query.Context;
-
-public static async Task<List<OrderData>> GetOrdersAsync()
-{
-  var ksqlDbUrl = @"http:\\localhost:8088";
-  var options = new KSqlDBContextOptions(ksqlDbUrl) { ShouldPluralizeFromItemName = false };
-  options.QueryParameters.Properties["ksql.query.pull.table.scan.enabled"] = "true";
-
-  await using var context = new KSqlDBContext(options);
-  var tableName = "queryable_order";
-  var orderTypes = new List<int> { 1,3 };
-
-  var enumerable = context.CreatePullQuery<OrderData>(tableName)    
-    .Where(o => o.EventTime >= 1630886400 && o.EventTime <= 1630887401 && orderTypes.Contains(o.OrderType))
-    .GetManyAsync();
-
-  List<OrderData> list = new List<OrderData>();
-
-  await foreach (var item in enumerable.ConfigureAwait(false))
-  {
-    Console.WriteLine(item.ToString());
-    list.Add(item);
-  } 
-
-  return list;
-}
-```
-```C#
-public class OrderData: Record
-{
-  public int Id { get; set; }
-  public long EventTime  { get; set; }
-  public int OrderType { get; set; }
-  public string Description { get; set; }
-}
-```
-
-## QbservableExtensions - ExplainAsync (v1.7.0)
-- `ExplainAsync` - Show the execution plan for a SQL expression, show the execution plan plus additional runtime information and metrics.
-
-```C#
-using System;
-using System.Threading.Tasks;
-using ksqlDB.RestApi.Client.KSql.Linq;
-using ksqlDB.RestApi.Client.KSql.Query;
-using ksqlDB.RestApi.Client.KSql.Query.Context;
-using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query.Descriptors;
-using ksqlDB.RestApi.Client.Sample.Models.Movies;
-
-public static async Task ExplainAsync(IKSqlDBContext context)
-{
-  var query = context.CreateQueryStream<Movie>()
-    .Where(c => c.Title != "E.T.");
-
-  string explain = await query
-    .ExplainAsStringAsync();
-
-  ExplainResponse[] explainResponses = await context.CreateQueryStream<Movie>().ExplainAsync();
-      
-  Console.WriteLine(explainResponses[0].QueryDescription.ExecutionPlan);
-}
-```
-
-# v1.8.0:
-
-### KSqlDbRestApiClient Droping types (v1.8.0)
-- DropTypeAsync and DropTypeIfExistsAsync - Removes a type alias from ksqlDB. If the IF EXISTS clause is present, the statement doesn't fail if the type doesn't exist.
-
-```C#
-string typeName = nameof(EventCategory);
-var httpResponseMessage = await restApiClient.DropTypeAsync(typeName);
-//OR
-httpResponseMessage = await restApiClient.DropTypeIfExistsAsync(typeName);
-```
-
-# KSqlDbRestApiClient ToInsertStatement (v1.8.0)
-- Generates raw string Insert Into, but does not execute it.
-
-```C#
-Movie movie = new()
-{
-  Id = 1,
-  Release_Year = 1986,
-  Title = "Aliens"
-};
-
-var insertStatement = restApiProvider.ToInsertStatement(movie);
-
-Console.WriteLine(insertStatement.Sql);
-```
-
-Output:
-
-```SQL
-INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Aliens', 1, 1986);
-```
-
-### Operator (NOT) BETWEEN (v1.8.0)
-KSqlOperatorExtensions - Between - Constrain a value to a specified range in a WHERE clause.
-
-```C#
-using ksqlDB.RestApi.Client.KSql.Query.Operators;
-
-IQbservable<Tweet> query = context.CreateQueryStream<Tweet>()
-  .Where(c => c.Id.Between(1, 5));
-```
-
-Generated KSQL:
-
-```SQL
-SELECT * FROM Tweets
-WHERE Id BETWEEN 1 AND 5 EMIT CHANGES;
-```
-
-# v1.9.0:
-
-## Lambda functions (Invocation functions) (v1.9.0)
-- requirements: ksqldb 0.17.0
-- This version covers ARRAY type. MAP types are not included in this release.
-
-Lambda functions allow you to compose new expressions from existing ones. Lambda functions must be used inside the following invocation functions:
-- **Transform**
-- **Reduce**
-- **Filter**
-
-See also [Use lambda functions](https://docs.ksqldb.io/en/latest/how-to-guides/use-lambda-functions/) and [Invocation functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#invocation-functions)
-
-The following example shows you how to take advantage of invocation functions with ksqlDB.RestApi.Client:
-
-Add namespaces:
-```C#
-using System;
-using System.Threading.Tasks;
-using ksqlDB.RestApi.Client.KSql.Linq;
-using ksqlDB.RestApi.Client.KSql.Query.Context;
-using ksqlDB.RestApi.Client.KSql.Query.Functions;
-using ksqlDB.RestApi.Client.KSql.Query.Options;
-using ksqlDB.RestApi.Client.KSql.RestApi;
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-using ksqlDB.RestApi.Client.Sample.Models.InvocationFunctions;
-```
-Prepare the model:
-```C#
-record Lambda
-{
-  public int Id { get; set; }
-  public int[] Lambda_Arr { get; set; }
-}
-```
-Create the stream and insert a value:
-```C#
-public async Task PrepareAsync(IKSqlDbRestApiClient restApiClient)
-{
-  var statement =
-    new KSqlDbStatement(
-      @"CREATE STREAM stream2 (id INT, lambda_arr ARRAY<INTEGER>) WITH (kafka_topic = 'stream2', partitions = 1, value_format = 'json');");
-
-  var createStreamResponse = await restApiClient.ExecuteStatementAsync(statement);
-
-  var insertResponse = await restApiClient.ExecuteStatementAsync(
-    new KSqlDbStatement("insert into stream2 (id, lambda_arr) values (1, ARRAY [1,2,3]);"));
-}
-```
-
-Subscribe to the unbounded stream of events:
-```C#
-public IDisposable Invoke(IKSqlDBContext ksqlDbContext)
-{
-  var subscription = ksqlDbContext.CreateQuery<Lambda>(fromItemName: "stream2")
-    .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
-    .Select(c => new
-    {
-      Transformed = KSqlFunctions.Instance.Transform(c.Lambda_Arr, x => x + 1),
-      Filtered = KSqlFunctions.Instance.Filter(c.Lambda_Arr, x => x > 1),
-      Acc = K.Functions.Reduce(c.Lambda_Arr, 0, (x, y) => x + y)
-    }).Subscribe(c =>
-    {
-      Console.WriteLine($"Transformed array: {c.Transformed}");
-      Console.WriteLine($"Filtered array: {c.Filtered}");
-      Console.WriteLine($"Reduced array: {c.Acc}");
-    }, error => { Console.WriteLine(error.Message); });
-
-  return subscription;
-}
-```
-
-The above query is equivalent to:
-```KSQL
-set 'auto.offset.reset' = 'earliest';
-
-SELECT TRANSFORM(Lambda_Arr, (x) => x + 1) Transformed, FILTER(Lambda_Arr, (x) => x > 1) Filtered, REDUCE(Lambda_Arr, 0, (x, y) => x + y) Acc 
-FROM stream2 
-EMIT CHANGES;
-```
-
-Output:
-```
-+--------------------------------------+--------------------------------------+--------------------------------------+
-|TRANSFORMED                           |FILTERED                              |ACC                                   |
-+--------------------------------------+--------------------------------------+--------------------------------------+
-|[2, 3, 4]                             |[2, 3]                                |6                                     |
-```
- 
-### Transform arrays (v1.9.0)
-- Transform a collection by using a lambda function.
-- If the collection is an array, the lambda function must have one input argument.
-
-```C#
-record Tweets
-{
-  public string[] Messages { get; set; }
-  public int[] Values { get; set; }
-}
-```
-
-```C#
-Expression<Func<Tweets, string[]>> expression = c => K.Functions.Transform(c.Messages, x => x.ToUpper());
-```
-
-```SQL
-TRANSFORM(Messages, (x) => UCASE(x))
-```
-
-### Reduce arrays (v1.9.0) 
-- Reduce a collection starting from an initial state.
-- If the collection is an array, the lambda function must have two input arguments.
-```C#
-Expression<Func<Tweets, int>> expression = c => K.Functions.Reduce(c.Values, 0, (x,y) => x + y);
-```
-
-```SQL
-REDUCE(Values, 0, (x, y) => x + y)
-```
-
-### Filter arrays (v1.9.0) 
-- Filter a collection with a lambda function.
-- If the collection is an array, the lambda function must have one input argument.
-```C#
-Expression<Func<Tweets, string[]>> expression = c => K.Functions.Filter(c.Messages, x => x == "E.T.");
-```
-
-```SQL
-FILTER(Messages, (x) => x = 'E.T.')
-```
-
-## BYTES character type and ToBytes string function (v1.9.0)
-- [The bytes type](https://docs.ksqldb.io/en/latest/reference/sql/data-types/#character-types) - represents an array of raw bytes.
-- variable-length byte array in C# is represented as byte[]
-- requirements: ksqldb 0.21.0
-
-**ToBytes** - Converts a STRING value in the specified encoding to BYTES. The accepted encoders are 'hex', 'utf8', 'ascii' and 'base64'. Since: - ksqldb 0.21
-
-```C#
-Expression<Func<Tweet, byte[]>> expression = c => K.Functions.ToBytes(c.Message, "utf8");
-```
-
-Is equivalent to:
-```KSQL
-TO_BYTES(Message, 'utf8')
-```
-
-## FromBytes string function (v1.9.0)
-- Converts a BYTES value to STRING in the specified encoding. The accepted encoders are 'hex', 'utf8', 'ascii' and 'base64'.
-
-```C#
-struct Thumbnail
-{
-  public byte[] Image { get; init; }
-}
-```
-```C#
-Expression<Func<Thumbnail, string>> expression = c => K.Functions.FromBytes(c.Image, "utf8");
-```
-Is equivalent to:
-```KSQL
-FROM_BYTES(Message, 'utf8')
-```
-
-## KSqlDbRestApiClient.InsertIntoAsync (v1.9.0)
-- added support for ```IEnumerable<T>``` properties
-
-```C#
-record Order
-{
-  public int Id { get; set; }
-  public IEnumerable<double> Items { get; set; }
-}
-```
-
-```C#
-var ksqlDbUrl = @"http:\\localhost:8088";
-
-var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
-
-var order = new Order { Id = 1, ItemsList = new List<double> { 1.1, 2 }};
-
-var config = new InsertProperties
-{
-  ShouldPluralizeEntityName = false, 
-  EntityName = "`my_order`"
-};
-
-var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
-  .InsertIntoAsync(order, config);
-```
-
-Equivalent KSQL:
-```SQL
-INSERT INTO `my_order` (Id, ItemsList) VALUES (1, ARRAY[1.1,2]);
-```
-
-### Inserting empty arrays (v1.9.0)
-- empty arrays are generated in the following way (workaround)
-
-```C#
-var order = new Order { Id = 1, ItemsList = new List<double>()};
-
-var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
-  .InsertIntoAsync(order);
-```
-
-```SQL
-ARRAY_REMOVE(ARRAY[0], 0))
-```
-
-```ARRAY[]``` is not yet supported in ksqldb (v0.21.0)
-
-# v1.10.0:
-
-## Lambda functions (Invocation functions) - Maps (v1.10.0)
-
-Model:
-```C#
-record Lambda
-{
-  public IDictionary<string, int[]> DictionaryArrayValues { get; set; }
-  public IDictionary<string, int> DictionaryInValues { get; set; }
-}
-```
-
-### Transform maps (v1.10.0)
-Transform a collection by using a lambda function.
-If the collection is a map, two lambda functions must be provided, and both lambdas must have two arguments: a map entry key and a map entry value.
-
-```C#
-Expression<Func<Lambda, IDictionary<string, int[]>>> expression = 
-    c => K.Functions.Transform(c.Dictionary, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v, x => x * x));
-```
-
-Equivalent KSQL:
-```SQL
-TRANSFORM(DictionaryArrayValues, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v, (x) => x * x))
-```
-
-### Filter maps (v1.10.0)
-Filter a collection with a lambda function.
-If the collection is a map, the lambda function must have two input arguments.
-
-```C#
-Expression<Func<Lambda, IDictionary<string, int>>> expression = 
-    c => K.Functions.Filter(c.Dictionary2, (k, v) => k != "E.T" && v > 0);
-```
-
-Equivalent KSQL:
-```SQL
-FILTER(DictionaryInValues, (k, v) => (k != 'E.T') AND (v > 0))
-```
-
-### Reduce maps (v1.10.0)
-Reduce a collection starting from an initial state.
-If the collection is a map, the lambda function must have three input arguments.
-If the state is null, the result is null.
-
-```C#
-Expression<Func<Lambda, int>> expression = 
-    c => K.Functions.Reduce(c.Dictionary2, 2, (s, k, v) => K.Functions.Ceil(s / v));
-```
-
-Equivalent KSQL:
-```SQL
-REDUCE(DictionaryInValues, 2, (s, k, v) => CEIL(s / v))
-```
-
-### IKSqlGrouping.Source (v1.10.0)
-- grouping by nested properies. Can be used in the following way:
-
-```C#
-var source = Context.CreateQueryStream<City>()
-  .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
-  .GroupBy(c => new { c.RegionCode, c.State.Name })
-  .Select(g => new { g.Source.RegionCode, g.Source.State.Name, Count = g.Count()})
-  .Take(1)
-  .ToAsyncEnumerable();
-```
-
-```C#
-record City
-{
-  [Key]
-  public string RegionCode { get; init; }
-  public State State { get; init; }
-}
-
-record State
-{
-  public string Name { get; init; }
-}
-```
-
-Equivalent KSQL:
-```SQL
-SELECT RegionCode, State->Name, COUNT(*) Count 
-FROM Cities 
-GROUP BY RegionCode, State->Name 
-EMIT CHANGES;
-```
-
-### Query syntax
-Note that ksqldb does not support OrderBy
-```C#
-var grouping = 
-  from city in context.CreateQueryStream<City>()
-  where city.RegionCode != "xy"
-  group city by city.State.Name into g
-  select new
-  {
-    g.Source.RegionCode,
-    g.Source.State.Name,
-    Num_Times = g.Count()
-  };
-```
-
-# v2.0.0:
-
-## Breaking change KSqlDBContextOptions
-> ⚠ KSqlDBContextOptions created with a constructor or by KSqlDbContextOptionsBuilder are setting the auto.offset.reset to earliest by default. This version removes this default configuration. It will not be opinionated in this way from now.
-> This will affect your subscriptions to streams.
-
-You can set it back in the following way:
-
-```C#
-var contextOptions = new KSqlDbContextOptionsBuilder()
-  .UseKSqlDb(ksqlDbUrl)
-  .SetAutoOffsetReset(AutoOffsetReset.Earliest)
-  .Options;
-```
-
-### ProcessingGuarantee enum (v2.0.0)
-**ExactlyOnce** - Records are processed once. To achieve a true exactly-once system, end consumers and producers must also implement exactly-once semantics.
-**AtLeastOnce** - Records are never lost but may be redelivered.
-
-For more info check [exactly once semantics](https://docs.ksqldb.io/en/latest/operate-and-deploy/exactly-once-semantics/)
-
-```C#
-public enum ProcessingGuarantee
-{
-  ExactlyOnce,
-  AtLeastOnce
-}
-```
-
-# v2.2.1
-
-- Renaming of stream or table column names with the `JsonPropertyNameAttribute` was also added for selects
-
 **Data definititions:**
 - [Headers](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_definitions.md#access-record-header-data-v160)
 
@@ -2425,29 +1320,52 @@ public enum ProcessingGuarantee
 
 **List of supported Joins:**
 - [RightJoin](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/joins.md#rightjoin)
+- [Full Outer Join](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/joins.md#full-outer-join)
+- [Left Join](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/joins.md#leftjoin---left-outer)
+- [Inner Joins](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/joins.md#inner-joins)
 - [Multiple joins with query comprehension syntax (GroupJoin, SelectMany, DefaultIfEmpty)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/joins.md#multiple-joins-with-query-comprehension-syntax-groupjoin-selectmany-defaultifempty)
 
 List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md) extension methods:
 - [Take (LIMIT)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md#pull-query-take-extension-method-limit)
 - [FirstOrDefaultAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md#ipullabletfirstordefaultasync-v100)
+- [GetManyAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md#getmanyasync)
+- [CreatePullQuery](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md#createpullquerytentity-v100)
+- [ExecutePullQuery]()
 
 **List of supported ksqlDB SQL statements:**
 - [Pause and resume persistent qeries](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#pause-and-resume-persistent-qeries-v250)
 - [InsertProperties.UseInstanceType](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#insertpropertiesuseinstancetype)
 - [Added support for extracting field names and values (for insert and select statements)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#added-support-for-extracting-field-names-and-values-for-insert-and-select-statements)
-- [AssertTopicExistsAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#iksqldbrestapiclientasserttopicexistsasync-and-iksqldbrestapiclientasserttopicnotexistsasync)
-- [AssertSchemaExistsAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#iksqldbrestapiclientassertschemaexistsasync-and-iksqldbrestapiclientassertschemanotexistsasync)
+- [AssertTopicExistsAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#asserttopicexistsasync-and-asserttopicnotexistsasync)
+- [AssertSchemaExistsAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#assertschemaexistsasync-and-assertschemanotexistsasync)
 - [Rename stream or table column names with the `JsonPropertyNameAttribute`](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#rename-stream-or-table-column-names-with-the-jsonpropertynameattribute)
 - [IKSqlDbRestApiClient CreateSourceStreamAsync and CreateSourceTableAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#iksqldbrestapiclient-createsourcestreamasync-and-createsourcetableasync)
 - [InsertProperties.IncludeReadOnlyProperties](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#insertpropertiesincludereadonlyproperties)
 - [InsertIntoAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#ksqldbrestapiclientinsertintoasync)
+- [Connectors](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#connectors)
+- [Drop a stream](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#drop-a-stream)
+- [Drop type](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#droping-types)
+- [Creating types](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#createtypeasync)
+- [ExecuteStatementAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#executestatementasync-extension-method)
+- [PartitionBy](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#partitionby)
 
 **KSqlDbContext**
+- [CreateQueryStream](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#createquerystream)
+- [CreateQuery](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#createquery)
 - [AddDbContext and AddDbContextFactory](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#ksqldbservicecollectionextensions---adddbcontext-and-adddbcontextfactory)
 - [Logging info and ConfigureKSqlDb](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#logging-info-and-configureksqldb)
+- [Basic auth](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#basic-auth)
+- [Add and SaveChangesAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#iksqldbcontext-add-and-savechangesasync)
 
 **Config:**
 - [KSqlDbContextOptionsBuilder.ReplaceHttpClient](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#ksqldbcontextoptionsbuilderreplacehttpclient)
+- [ProcessingGuarantee](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#processingguarantee-enum)
+
+**Operators**
+- [Operator LIKE](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#operator-like---stringstartswith-stringendswith-stringcontains)
+- [Operator IN](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#operator-in---ienumerablet-and-ilistt-contains)
+- [Operator BETWEEN](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#operator-not-between)
+- [CASE](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#case)
 
 **Miscelenaous:**
 - [Change data capture](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/cdc.md)
@@ -2455,6 +1373,12 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [Operators](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md)
 - [Invocation functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/functions.md#improved-invocation-function-extensions)
 - [SetJsonSerializerOptions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#setjsonserializeroptions)
+
+**Functions**
+- [Lambda functions (Invocation functions) - Maps](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/functions.md#lambda-functions-invocation-functions---maps)
+  - [Transform maps](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/functions.md#transform-maps)
+  - [Filter maps](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/functions.md#filter-maps)
+  - [Reduce maps](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/functions.md#reduce-maps)
 
 # LinqPad samples
 [Push Query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqlDB.RestApi.Client.linq)
