@@ -25,6 +25,48 @@ SELECT * FROM Movies
 WHERE Title LIKE 'Die%' EMIT CHANGES;
 ```
 
+### Operator IN - `IEnumerable<T>` and `IList<T>` Contains
+**v1.0.0**
+
+Specifies multiple OR conditions.
+`IList<T>`.Contains:
+```C#
+var orderTypes = new List<int> { 1, 2, 3 };
+
+Expression<Func<OrderData, bool>> expression = o => orderTypes.Contains(o.OrderType);
+
+```
+Enumerable extension:
+```C#
+IEnumerable<int> orderTypes = Enumerable.Range(1, 3);
+
+Expression<Func<OrderData, bool>> expression = o => orderTypes.Contains(o.OrderType);
+
+```
+For both options the following SQL is generated:
+```SQL
+OrderType IN (1, 2, 3)
+```
+
+### Operator (NOT) BETWEEN
+**v1.0.0**
+
+KSqlOperatorExtensions - Between - Constrain a value to a specified range in a WHERE clause.
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Operators;
+
+IQbservable<Tweet> query = context.CreateQueryStream<Tweet>()
+  .Where(c => c.Id.Between(1, 5));
+```
+
+Generated KSQL:
+
+```SQL
+SELECT * FROM Tweets
+WHERE Id BETWEEN 1 AND 5 EMIT CHANGES;
+```
+
 ### operator Between for Time type values
 **v1.5.0**
 
@@ -49,21 +91,29 @@ var query = context.CreateQueryStream<MyClass>()
   .ToQueryString();
 ```
 
-### Operator (NOT) BETWEEN
+### CASE
 **v1.0.0**
 
-KSqlOperatorExtensions - Between - Constrain a value to a specified range in a WHERE clause.
-
+- Select a condition from one or more expressions.
 ```C#
-using ksqlDB.RestApi.Client.KSql.Query.Operators;
-
-IQbservable<Tweet> query = context.CreateQueryStream<Tweet>()
-  .Where(c => c.Id.Between(1, 5));
+var query = new KSqlDBContext(@"http:\\localhost:8088")
+  .CreateQueryStream<Tweet>()
+  .Select(c =>
+    new
+    {
+      case_result =
+        (c.Amount < 2.0) ? "small" :
+        (c.Amount < 4.1) ? "medium" : "large"
+    }
+  );
 ```
 
-Generated KSQL:
-
-```SQL
-SELECT * FROM Tweets
-WHERE Id BETWEEN 1 AND 5 EMIT CHANGES;
+```KSQL
+SELECT 
+  CASE 
+    WHEN Amount < 2 THEN 'small' 
+    WHEN Amount < 4.1 THEN 'medium' 
+    ELSE 'large' 
+  END AS case_result 
+FROM Tweets EMIT CHANGES;
 ```
