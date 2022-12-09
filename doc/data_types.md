@@ -96,3 +96,40 @@ CREATE STREAM IF NOT EXISTS LINKCREATEDS (
   AGGREGATEROOTID STRING KEY
 ) WITH (KAFKA_TOPIC='MyGuids', KEY_FORMAT='KAFKA', PARTITIONS='1', REPLICAS='1', VALUE_FORMAT='JSON');
 ```
+
+### BYTES character type and ToBytes string function
+**v1.0.0**
+
+- [The bytes type](https://docs.ksqldb.io/en/latest/reference/sql/data-types/#character-types) - represents an array of raw bytes.
+- variable-length byte array in C# is represented as byte[]
+- requirements: ksqldb 0.21.0
+
+**ToBytes** - Converts a STRING value in the specified encoding to BYTES. The accepted encoders are 'hex', 'utf8', 'ascii' and 'base64'. Since: - ksqldb 0.21
+
+```C#
+Expression<Func<Tweet, byte[]>> expression = c => K.Functions.ToBytes(c.Message, "utf8");
+```
+
+Is equivalent to:
+```KSQL
+TO_BYTES(Message, 'utf8')
+```
+
+### FromBytes string function
+**v1.0.0**
+
+- Converts a BYTES value to STRING in the specified encoding. The accepted encoders are 'hex', 'utf8', 'ascii' and 'base64'.
+
+```C#
+struct Thumbnail
+{
+  public byte[] Image { get; init; }
+}
+```
+```C#
+Expression<Func<Thumbnail, string>> expression = c => K.Functions.FromBytes(c.Image, "utf8");
+```
+Is equivalent to:
+```KSQL
+FROM_BYTES(Message, 'utf8')
+```
