@@ -196,6 +196,31 @@ ON m.Title = l.Title
 EMIT CHANGES;
 ```
 
+### LeftJoin - LEFT OUTER
+**v1.0.0**
+
+LEFT OUTER joins will contain leftRecord-NULL records in the result stream, which means that the join contains NULL values for fields selected from the right-hand stream where no match is made.
+```C#
+var query = new KSqlDBContext(@"http:\\localhost:8088").CreateQueryStream<Movie>()
+  .LeftJoin(
+    Source.Of<Lead_Actor>(),
+    movie => movie.Title,
+    actor => actor.Title,
+    (movie, actor) => new
+    {
+      movie.Id,
+      ActorTitle = actor.Title
+    }
+  );
+```
+Generated KSQL:
+```KSQL
+SELECT M.Id Id, L.Title ActorTitle FROM Movies M
+LEFT JOIN Lead_Actors L
+ON M.Title = L.Title
+EMIT CHANGES;
+```
+
 ### RightJoin
 
 **v2.1.0**
