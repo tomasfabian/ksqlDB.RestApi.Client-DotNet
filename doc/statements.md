@@ -645,3 +645,40 @@ Parameters:
 `useIfExistsClause` - If the IF EXISTS clause is present, the statement doesn't fail if the table doesn't exist.
 
 `deleteTopic` - If the DELETE TOPIC clause is present, the table's source topic is marked for deletion.
+
+### Creating connectors
+**v1.0.0**
+
+- CreateSourceConnectorAsync - Create a new source connector in the Kafka Connect cluster with the configuration passed in the config parameter.
+
+- CreateSinkConnectorAsync - Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
+
+See also how to create a SQL Server source connector with [SqlServer.Connector](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/SqlServer.Connector/Wiki.md)
+
+```C#
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+
+private static string SourceConnectorName => "mock-source-connector";
+private static string SinkConnectorName => "mock-sink-connector";
+
+private static async Task CreateConnectorsAsync(IKSqlDbRestApiClient restApiClient)
+{
+  var sourceConnectorConfig = new Dictionary<string, string>
+  {
+    {"connector.class", "org.apache.kafka.connect.tools.MockSourceConnector"}
+  };
+
+  var httpResponseMessage = await restApiClient.CreateSourceConnectorAsync(sourceConnectorConfig, SourceConnectorName);
+      
+  var sinkConnectorConfig = new Dictionary<string, string> {
+    { "connector.class", "org.apache.kafka.connect.tools.MockSinkConnector" },
+    { "topics.regex", "mock-sink*"},
+  }; 		
+
+  httpResponseMessage = await restApiClient.CreateSinkConnectorAsync(sinkConnectorConfig, SinkConnectorName);
+
+  httpResponseMessage = await restApiClient.DropConnectorAsync($"`{SinkConnectorName}`");
+}
+```
