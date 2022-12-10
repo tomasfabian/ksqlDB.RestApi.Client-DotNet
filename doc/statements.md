@@ -608,3 +608,40 @@ Parameters:
 [Repartition a stream.](https://docs.ksqldb.io/en/0.15.0-ksqldb/developer-guide/joins/partition-data/)
 
 **TODO:** add example
+
+### Terminate push queries
+**v1.0.0**
+
+- TerminatePushQueryAsync - terminates push query by query id
+
+```C#
+string queryId = "xyz123"; // <----- the ID of the query to terminate
+
+var response = await restApiClient.TerminatePushQueryAsync(queryId);
+```
+
+### Drop a table
+**v1.0.0**
+
+Drops an existing table.
+
+```C#
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+var ksqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+string tableName = "TableName";
+
+// DROP TABLE TableName;
+var httpResponseMessage = ksqlDbRestApiClient.DropTableAsync(tableName);
+
+// OR DROP TABLE IF EXISTS TableName DELETE TOPIC;
+httpResponseMessage = ksqlDbRestApiClient.DropTableAsync(tableName, useIfExistsClause: true, deleteTopic: true);
+```
+
+Parameters:
+
+`useIfExistsClause` - If the IF EXISTS clause is present, the statement doesn't fail if the table doesn't exist.
+
+`deleteTopic` - If the DELETE TOPIC clause is present, the table's source topic is marked for deletion.
