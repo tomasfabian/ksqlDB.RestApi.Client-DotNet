@@ -1,4 +1,4 @@
-﻿using ksqlDB.RestApi.Client.Infrastructure.Extensions;
+using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDb.RestApi.Client.Infrastructure.Logging;
 using ksqlDB.RestApi.Client.KSql.Disposables;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,16 +9,18 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context;
 
 public abstract class KSqlDBContextDependenciesProvider : AsyncDisposableObject, IDisposable
 {
-  private readonly KSqlDBContextOptions kSqlDbContextOptions;
   private readonly ILoggerFactory loggerFactory;
 
   protected KSqlDBContextDependenciesProvider(KSqlDBContextOptions kSqlDbContextOptions, ILoggerFactory loggerFactory = null)
   {
-    this.kSqlDbContextOptions = kSqlDbContextOptions ?? throw new ArgumentNullException(nameof(kSqlDbContextOptions));
+    if (kSqlDbContextOptions == null) throw new ArgumentNullException(nameof(kSqlDbContextOptions));
     this.loggerFactory = loggerFactory;
+
+    ServiceCollection = new ServiceCollection();
+    ServiceCollection = kSqlDbContextOptions.ServiceCollection;
   }
 
-  protected IServiceCollection ServiceCollection => kSqlDbContextOptions.ServiceCollection;
+  internal IServiceCollection ServiceCollection { get; }
 
   protected ServiceProvider ServiceProvider { get; private set; }
 
