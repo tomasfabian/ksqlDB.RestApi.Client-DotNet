@@ -649,9 +649,9 @@ Parameters:
 ### Creating connectors
 **v1.0.0**
 
-- CreateSourceConnectorAsync - Create a new source connector in the Kafka Connect cluster with the configuration passed in the config parameter.
+- `CreateSourceConnectorAsync` - Create a new source connector in the Kafka Connect cluster with the configuration passed in the config parameter.
 
-- CreateSinkConnectorAsync - Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
+- `CreateSinkConnectorAsync` - Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
 
 See also how to create a SQL Server source connector with [SqlServer.Connector](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/SqlServer.Connector/Wiki.md)
 
@@ -680,5 +680,56 @@ private static async Task CreateConnectorsAsync(IKSqlDbRestApiClient restApiClie
   httpResponseMessage = await restApiClient.CreateSinkConnectorAsync(sinkConnectorConfig, SinkConnectorName);
 
   httpResponseMessage = await restApiClient.DropConnectorAsync($"`{SinkConnectorName}`");
+}
+```
+
+### Get topics
+**v1.0.0**
+
+- `GetTopicsAsync` - lists the available topics in the Kafka cluster that ksqlDB is configured to connect to.
+- `GetAllTopicsAsync` - lists all topics, including hidden topics.
+- `GetTopicsExtendedAsync` - list of topics. Also displays consumer groups and their active consumer counts.
+- `GetAllTopicsExtendedAsync` - list of all topics. Also displays consumer groups and their active consumer counts.
+
+```C#
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Topics;
+using ksqlDB.RestApi.Client.Sample.Providers;
+
+private static async Task GetKsqlDbInformationAsync(IKSqlDbRestApiProvider restApiProvider)
+{
+  Console.WriteLine($"{Environment.NewLine}Available topics:");
+  var topicsResponses = await restApiProvider.GetTopicsAsync();
+  Console.WriteLine(string.Join(',', topicsResponses[0].Topics.Select(c => c.Name)));
+
+  TopicsResponse[] allTopicsResponses = await restApiProvider.GetAllTopicsAsync();
+  TopicsExtendedResponse[] topicsExtendedResponses = await restApiProvider.GetTopicsExtendedAsync();
+  var allTopicsExtendedResponses = await restApiProvider.GetAllTopicsExtendedAsync();
+}
+```
+
+### Getting queries and termination of persistent queries
+**v1.0.0**
+
+- `GetQueriesAsync` - Lists queries running in the cluster.
+
+- `TerminatePersistentQueryAsync` - Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
+
+```C#
+using System.Linq;
+using System.Threading.Tasks;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+
+private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient client)
+{
+  string topicName = "moviesByTitle";
+
+  var queries = await client.GetQueriesAsync();
+
+  var query = queries.SelectMany(c => c.Queries).FirstOrDefault(c => c.SinkKafkaTopics.Contains(topicName));
+
+  var response = await client.TerminatePersistentQueryAsync(query.Id);
 }
 ```
