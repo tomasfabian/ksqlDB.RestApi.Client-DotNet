@@ -640,4 +640,81 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     Assert.AreEqual(expectedItemsCount, actualValues.Count);
     actualValues[0].Year.Should().Be(year);
   }
+
+  [TestMethod]
+  public async Task SelectAsInt()
+  {
+    //Arrange
+    int expectedItemsCount = 1;
+
+    var ksql =
+      $"SELECT 42 FROM {StreamName} EMIT CHANGES LIMIT 1;";
+
+    QueryStreamParameters queryStreamParameters = new QueryStreamParameters
+    {
+      Sql = ksql,
+      [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
+    };
+
+    var source = Context.CreateQueryStream<int>(queryStreamParameters);
+
+    //Act
+    var actualValues = await CollectActualValues(source, expectedItemsCount);
+
+    //Assert
+    actualValues[0].Should().Be(42);
+  }
+
+  [TestMethod]
+  public async Task SelectAsArray()
+  {
+    //Arrange
+    int expectedItemsCount = 1;
+
+    var ksql =
+      $"SELECT ARRAY[1, 2] FROM {StreamName} EMIT CHANGES LIMIT 1;";
+
+    QueryStreamParameters queryStreamParameters = new QueryStreamParameters
+    {
+      Sql = ksql,
+      [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
+    };
+
+    var source = Context.CreateQueryStream<int[]>(queryStreamParameters);
+
+    //Act
+    var actualValues = await CollectActualValues(source, expectedItemsCount);
+
+    //Assert
+    CollectionAssert.AreEqual(new[]{1,2}, actualValues[0]);
+  }
+
+  private record MyStruct
+  {
+    public string Name { get; set; }
+  }
+
+  [TestMethod]
+  public async Task SelectAsStruct()
+  {
+    //Arrange
+    int expectedItemsCount = 1;
+
+    var ksql =
+      $"SELECT STRUCT(NAME := 'E.T.') FROM {StreamName} EMIT CHANGES LIMIT 1;";
+
+    QueryStreamParameters queryStreamParameters = new QueryStreamParameters
+    {
+      Sql = ksql,
+      [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
+    };
+
+    var source = Context.CreateQueryStream<MyStruct>(queryStreamParameters);
+
+    //Act
+    var actualValues = await CollectActualValues(source, expectedItemsCount);
+
+    //Assert
+    actualValues[0].Name.Should().Be("E.T.");
+  }
 }
