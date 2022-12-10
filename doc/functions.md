@@ -1,6 +1,13 @@
 # Functions
 
-### LPad, RPad, Trim, Substring (v0.2.0)
+## String functions
+
+### Concat
+```C#
+Expression<Func<Tweet, string>> expression = c => K.Functions.Concat(c.Message, "_Value");
+```
+
+### LPad, RPad, Trim, Substring
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 
@@ -17,7 +24,44 @@ TRIM(Message)
 Substring(Message, 2, 3)
 ```
 
-### Numeric functions - Abs, Ceil, Floor, Random, Sign, Round (v0.3.0)
+### UCase, LCase
+```C#
+l => l.Message.ToLower() != "hi";
+l => l.Message.ToUpper() != "HI";
+```
+```KSQL
+LCASE(Latitude) != 'hi'
+UCASE(Latitude) != 'HI'
+```
+
+### Length (LEN)
+```C#
+Expression<Func<Tweet, int>> lengthExpression = c => c.Message.Length;
+```
+KSQL
+```KSQL
+LEN(Message)
+```
+
+### Like
+
+See also [String.StartsWith, String.EndsWith, String.Contains](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#operator-like---stringstartswith-stringendswith-stringcontains)
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
+
+Expression<Func<Tweet, bool>> likeExpression = c => KSql.Functions.Like(c.Message, "%santa%");
+
+Expression<Func<Tweet, bool>> likeLCaseExpression = c => KSql.Functions.Like(c.Message.ToLower(), "%santa%".ToLower());
+```
+KSQL
+```KSQL
+"LCASE(Message) LIKE LCASE('%santa%')"
+```
+
+## Numeric functions
+
+### Abs, Ceil, Floor, Random, Sign, Round
 ```C#
 Expression<Func<Tweet, double>> expression1 = c => K.Functions.Abs(c.Amount);
 Expression<Func<Tweet, double>> expression2 = c => K.Functions.Ceil(c.Amount);
@@ -40,9 +84,9 @@ SIGN(Amount)
 ROUND(Amount, 3)
 ```
 
-### Date and time functions
+## Date and time functions
 
-#### DATETOSTRING (v0.4.0)
+#### DATETOSTRING
 ```C#
 int epochDays = 18672;
 string format = "yyyy-MM-dd";
@@ -54,7 +98,7 @@ Generated KSQL:
 DATETOSTRING(18672, 'yyyy-MM-dd')
 ```
 
-#### TIMESTAMPTOSTRING (v0.4.0)
+#### TIMESTAMPTOSTRING
 ```C#
 new KSqlDBContext(ksqlDbUrl).CreateQueryStream<Movie>()
   .Select(c => K.Functions.TimestampToString(c.RowTime, "yyyy-MM-dd''T''HH:mm:ssX"))
@@ -66,10 +110,10 @@ SELECT DATETOSTRING(1613503749145, 'yyyy-MM-dd''T''HH:mm:ssX')
 FROM tweets EMIT CHANGES;
 ```
 
-#### date and time scalar functions (v0.4.0)
+#### date and time scalar functions
 [Date and time](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#date-and-time)
 
-### Entries (v0.5.0)
+### Entries
 ```C#
 bool sorted = true;
       
@@ -97,11 +141,6 @@ Generated KSQL:
 ```KSQL
 SELECT ENTRIES(MAP('a' := 'value'), True) Entries 
 FROM movies_test EMIT CHANGES;
-```
-
-### Concat (v1.1.0)
-```C#
-Expression<Func<Tweet, string>> expression = c => K.Functions.Concat(c.Message, "_Value");
 ```
 
 ## Lambda functions (Invocation functions)
@@ -228,7 +267,9 @@ Expression<Func<Tweets, int>> expression = c => K.Functions.Reduce(c.Values, 0, 
 REDUCE(Values, 0, (x, y) => x + y)
 ```
 
-### Filter arrays (v1.9.0) 
+### Filter arrays
+**v1.0.0**
+
 - Filter a collection with a lambda function.
 - If the collection is an array, the lambda function must have one input argument.
 ```C#
@@ -301,7 +342,6 @@ REDUCE(DictionaryInValues, 2, (s, k, v) => CEIL(s / v))
 ```
 
 ### improved invocation function extensions
-
 **v1.5.0**
 
 ```C#
