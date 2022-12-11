@@ -143,6 +143,38 @@ SELECT ENTRIES(MAP('a' := 'value'), True) Entries
 FROM movies_test EMIT CHANGES;
 ```
 
+### CAST - ToString
+Converts any type to its string representation.
+
+```C#
+var query = context.CreateQueryStream<Movie>()
+  .GroupBy(c => c.Title)
+  .Select(c => new { Title = c.Key, Concatenated = K.Functions.Concat(c.Count().ToString(), "_Hello") });
+```
+
+```KSQL
+SELECT Title, CONCAT(CAST(COUNT(*) AS VARCHAR), '_Hello') Concatenated FROM Movies GROUP BY Title EMIT CHANGES;
+```
+
+### CAST - convert string to numeric types
+
+```C#
+using System;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
+
+Expression<Func<Tweet, int>> stringToInt = c => KSQLConvert.ToInt32(c.Message);
+Expression<Func<Tweet, long>> stringToLong = c => KSQLConvert.ToInt64(c.Message);
+Expression<Func<Tweet, decimal>> stringToDecimal = c => KSQLConvert.ToDecimal(c.Message, 10, 2);
+Expression<Func<Tweet, double>> stringToDouble = c => KSQLConvert.ToDouble(c.Message);
+```
+
+```KSQL
+CAST(Message AS INT)
+CAST(Message AS BIGINT)
+CAST(Message AS DECIMAL(10, 2))
+CAST(Message AS DOUBLE)
+```
+
 ## Lambda functions (Invocation functions)
 **v1.0.0**
 
