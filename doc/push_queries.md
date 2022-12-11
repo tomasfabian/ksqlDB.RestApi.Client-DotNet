@@ -260,3 +260,25 @@ public static async Task ExplainAsync(IKSqlDBContext context)
   Console.WriteLine(explainResponses[0].QueryDescription.ExecutionPlan);
 }
 ```
+
+### ToStatementString
+**v1.0.0**
+
+Generates ksql statement from Create(OrReplace)[Table|Stream]Statements
+```C#
+await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+
+var statement = context.CreateOrReplaceTableStatement(tableName: "MoviesByTitle")
+  .As<Movie>()
+  .Where(c => c.Id < 3)
+  .Select(c => new {c.Title, ReleaseYear = c.Release_Year})
+  .PartitionBy(c => c.Title)
+  .ToStatementString();
+```
+
+Generated KSQL:
+```KSQL
+CREATE OR REPLACE TABLE MoviesByTitle
+AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
+WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
+```
