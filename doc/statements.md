@@ -134,6 +134,64 @@ ARRAY_REMOVE(ARRAY[0], 0))
 
 ```ARRAY[]``` is not yet supported in ksqldb (v0.21.0)
 
+### Insert Into
+**v1.0.0**
+
+[Insert values](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/insert-values/) - Produce a row into an existing stream or table and its underlying topic based on explicitly specified values.
+```C#
+string url = @"http:\\localhost:8088";
+
+var http = new HttpClientFactory(new Uri(url));
+var restApiClient = new KSqlDbRestApiClient(http);
+
+var movie = new Movie() { Id = 1, Release_Year = 1988, Title = "Title" };
+
+var response = await restApiClient.InsertIntoAsync(movie);
+```
+
+Properties and fields decorated with the IgnoreByInsertsAttribute are not part of the insert statements:
+```C#
+public class Movie
+{
+  [ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations.Key]
+  public int Id { get; set; }
+  public string Title { get; set; }
+  public int Release_Year { get; set; }
+	
+  [ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations.IgnoreByInserts]
+  public int IgnoredProperty { get; set; }
+}
+```
+
+Generated KSQL:
+```KSQL
+INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);
+```
+
+### Insert values - FormatDoubleValue and FormatDecimalValue
+
+```C#
+var insertProperties = new InsertProperties()
+{
+  FormatDoubleValue = value => value.ToString("E1", CultureInfo.InvariantCulture),
+  FormatDecimalValue = value => value.ToString(CultureInfo.CreateSpecificCulture("en-GB"))
+};
+
+public static readonly Tweet Tweet1 = new()
+{
+  Id = 1,
+  Amount = 0.00042, 
+  AccountBalance = 533333333421.6332M
+};
+
+await restApiProvider.InsertIntoAsync(tweet, insertProperties);
+```
+
+Generated KSQL statement:
+```KSQL
+INSERT INTO tweetsTest (Id, Amount, AccountBalance) VALUES (1, 4.2E-004, 533333333421.6332);
+```
+
 ### InsertProperties.IncludeReadOnlyProperties
 **v1.3.1**
 
