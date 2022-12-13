@@ -791,3 +791,64 @@ private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient cli
   var response = await client.TerminatePersistentQueryAsync(query.Id);
 }
 ```
+
+### ExecuteStatementAsync
+**v1.0.0**
+
+[Execute a statement](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/ksql-endpoint/) - The /ksql resource runs a sequence of SQL statements. All statements, except those starting with SELECT, can be run on this endpoint. To run SELECT statements use the /query endpoint.
+
+```C#
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+
+public async Task ExecuteStatementAsync()
+{
+  var ksqlDbUrl = @"http:\\localhost:8088";
+
+  var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+
+  IKSqlDbRestApiClient restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+  var statement = $@"CREATE OR REPLACE TABLE {nameof(Movies)} (
+        title VARCHAR PRIMARY KEY,
+        id INT,
+        release_year INT
+      ) WITH (
+        KAFKA_TOPIC='{nameof(Movies)}',
+        PARTITIONS=1,
+        VALUE_FORMAT = 'JSON'
+      );";
+
+  KSqlDbStatement ksqlDbStatement = new(statement);
+  var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement);
+
+  string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
+}
+
+public record Movies
+{
+  public int Id { get; set; }
+
+  public string Title { get; set; }
+
+  public int Release_Year { get; set; }
+}
+```
+
+### KSqlDbStatement
+KSqlDbStatement allows you to set the statement, content encoding and [CommandSequenceNumber](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/ksql-endpoint/#coordinate-multiple-requests). 
+
+```C#
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+
+public KSqlDbStatement CreateStatement(string statement)
+{
+  KSqlDbStatement ksqlDbStatement = new(statement) {
+    ContentEncoding = Encoding.Unicode,
+    CommandSequenceNumber = 10,
+    [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
+  };
+	
+  return ksqlDbStatement;
+}
+```
