@@ -55,7 +55,7 @@ public class RowValueJsonSerializerTests : TestBase
   }
 
   [TestMethod]
-  public void Deserialize_String()
+  public void Deserialize_RecordAsString()
   {
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
@@ -77,7 +77,7 @@ public class RowValueJsonSerializerTests : TestBase
   }
 
   [TestMethod]
-  public void Deserialize_DateTimeOffsetStruct()
+  public void Deserialize_RecordAsDateTimeOffsetStruct()
   {
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
@@ -102,7 +102,7 @@ public class RowValueJsonSerializerTests : TestBase
   }
 
   [TestMethod]
-  public void Deserialize_Dictionary()
+  public void Deserialize_RecordAsDictionary()
   {
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
@@ -126,7 +126,7 @@ public class RowValueJsonSerializerTests : TestBase
   }
 
   [TestMethod]
-  public void Deserialize_PrimitiveInt()
+  public void Deserialize_RecordAsPrimitiveInt()
   {
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
@@ -155,7 +155,7 @@ public class RowValueJsonSerializerTests : TestBase
   }
 
   [TestMethod]
-  public void Deserialize_MyStruct()
+  public void Deserialize_RecordAsRecord()
   {
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
@@ -185,7 +185,7 @@ public class RowValueJsonSerializerTests : TestBase
   }
 
   [TestMethod]
-  public void Deserialize_Class()
+  public void Deserialize_RecordAsClass()
   {
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
@@ -213,7 +213,7 @@ public class RowValueJsonSerializerTests : TestBase
   }
 
   [TestMethod]
-  public void Deserialize_Enum()
+  public void Deserialize_RecordAsEnum()
   {
     //Arrange
     var value = (int)MyEnum.All;
@@ -229,7 +229,7 @@ public class RowValueJsonSerializerTests : TestBase
   }
 
   [TestMethod]
-  public void Deserialize_Guid()
+  public void Deserialize_RecordAsGuid()
   {
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
@@ -256,7 +256,7 @@ public class RowValueJsonSerializerTests : TestBase
   }
 
   [TestMethod]
-  public void Deserialize_DictionaryBase()
+  public void Deserialize_RecordAsDictionaryBase()
   {
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()

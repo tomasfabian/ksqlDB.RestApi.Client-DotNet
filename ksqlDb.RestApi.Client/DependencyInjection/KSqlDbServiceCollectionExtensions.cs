@@ -103,7 +103,7 @@ public static class KSqlDbServiceCollectionExtensions
 
     contextOptions.ServiceCollection.Add(restApiServiceDescriptor);
 
-    contextOptions.Apply(services);
+    contextOptions.ServiceCollection.ApplyTo(services);
 
     return services;
   }

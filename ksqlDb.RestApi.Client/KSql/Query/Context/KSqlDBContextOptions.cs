@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text.Json;
 using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
@@ -97,13 +97,5 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   {
     this.userName = userName;
     this.password = password;
-  }
-
-  internal void Apply(IServiceCollection externalServicesCollection)
-  {
-    foreach (var service in ServiceCollection)
-    {
-      externalServicesCollection.Add(service);
-    }
   }
 }
