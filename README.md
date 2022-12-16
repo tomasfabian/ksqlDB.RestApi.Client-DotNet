@@ -331,6 +331,7 @@ List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [SubscribeAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribeasync)
 - [SubscribeOn](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribeon)
 - [ObserveOn](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#observeon)
+- [ToStatementString](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#tostatementstring)
 
 - [IKSqlGrouping.Source](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#iksqlgroupingsource)
 
@@ -475,29 +476,6 @@ List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/
 
 [Rest api reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
-### String Functions UCase, LCase (v0.1.0)
-```C#
-l => l.Message.ToLower() != "hi";
-l => l.Message.ToUpper() != "HI";
-```
-```KSQL
-LCASE(Latitude) != 'hi'
-UCASE(Latitude) != 'HI'
-```
-
-### Like (v0.2.0)
-```C#
-using ksqlDB.RestApi.Client.KSql.Query.Functions;
-
-Expression<Func<Tweet, bool>> likeExpression = c => KSql.Functions.Like(c.Message, "%santa%");
-
-Expression<Func<Tweet, bool>> likeLCaseExpression = c => KSql.Functions.Like(c.Message.ToLower(), "%santa%".ToLower());
-```
-KSQL
-```KSQL
-"LCASE(Message) LIKE LCASE('%santa%')"
-```
-
 ### Arithmetic operations on columns (v0.2.0)
 The usual arithmetic operators (+,-,/,*,%) may be applied to numeric types, like INT, BIGINT, and DOUBLE:
 ```KSQL
@@ -505,15 +483,6 @@ SELECT USERID, LEN(FIRST_NAME) + LEN(LAST_NAME) AS NAME_LENGTH FROM USERS EMIT C
 ```
 ```C#
 Expression<Func<Person, object>> expression = c => c.FirstName.Length * c.LastName.Length;
-```
-
-### String function - Length (LEN) (v0.2.0)
-```C#
-Expression<Func<Tweet, int>> lengthExpression = c => c.Message.Length;
-```
-KSQL
-```KSQL
-LEN(Message)
 ```
 
 ### Having - aggregations with column (v0.3.0)
@@ -753,66 +722,6 @@ var source = context.CreateQueryStream<Movie>(queryStreamParameters)
   .ToObservable();
 ```
 
-# KSqlDbRestApiClient (v0.8.0)
-### ExecuteStatementAsync (v0.8.0)
-[Execute a statement](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/ksql-endpoint/) - The /ksql resource runs a sequence of SQL statements. All statements, except those starting with SELECT, can be run on this endpoint. To run SELECT statements use the /query endpoint.
-
-```C#
-using ksqlDB.RestApi.Client.KSql.RestApi;
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-
-public async Task ExecuteStatementAsync()
-{
-  var ksqlDbUrl = @"http:\\localhost:8088";
-
-  var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
-
-  IKSqlDbRestApiClient restApiClient = new KSqlDbRestApiClient(httpClientFactory);
-
-  var statement = $@"CREATE OR REPLACE TABLE {nameof(Movies)} (
-        title VARCHAR PRIMARY KEY,
-        id INT,
-        release_year INT
-      ) WITH (
-        KAFKA_TOPIC='{nameof(Movies)}',
-        PARTITIONS=1,
-        VALUE_FORMAT = 'JSON'
-      );";
-
-  KSqlDbStatement ksqlDbStatement = new(statement);
-  var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement);
-
-  string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
-}
-
-public record Movies
-{
-  public int Id { get; set; }
-
-  public string Title { get; set; }
-
-  public int Release_Year { get; set; }
-}
-```
-
-### KSqlDbStatement (v0.8.0)
-KSqlDbStatement allows you to set the statement, content encoding and [CommandSequenceNumber](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/ksql-endpoint/#coordinate-multiple-requests). 
-
-```C#
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-
-public KSqlDbStatement CreateStatement(string statement)
-{
-  KSqlDbStatement ksqlDbStatement = new(statement) {
-    ContentEncoding = Encoding.Unicode,
-    CommandSequenceNumber = 10,
-    [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
-  };
-	
-  return ksqlDbStatement;
-}
-```
-
 ### HttpResponseMessage ToStatementResponses extension (v0.8.0)
 ```C#
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
@@ -877,26 +786,6 @@ Generated KSQL statement:
 ```KSQL
 CREATE OR REPLACE TABLE MoviesByTitle
 WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
-AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
-WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
-```
-
-### ToStatementString extension method (v0.9.0)
-Generates ksql statement from Create(OrReplace)[Table|Stream]Statements
-```C#
-await using var context = new KSqlDBContext(@"http:\\localhost:8088");
-
-var statement = context.CreateOrReplaceTableStatement(tableName: "MoviesByTitle")
-  .As<Movie>()
-  .Where(c => c.Id < 3)
-  .Select(c => new {c.Title, ReleaseYear = c.Release_Year})
-  .PartitionBy(c => c.Title)
-  .ToStatementString();
-```
-
-Generated KSQL:
-```KSQL
-CREATE OR REPLACE TABLE MoviesByTitle
 AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
 WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
 ```
@@ -1009,154 +898,6 @@ Generated KSQL:
 Amount DECIMAL(3,2)
 ```
 
-# v1.0.0:
-
-### Insert Into (v1.0.0)
-[Insert values](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/insert-values/) - Produce a row into an existing stream or table and its underlying topic based on explicitly specified values.
-```C#
-string url = @"http:\\localhost:8088";
-
-var http = new HttpClientFactory(new Uri(url));
-var restApiClient = new KSqlDbRestApiClient(http);
-
-var movie = new Movie() { Id = 1, Release_Year = 1988, Title = "Title" };
-
-var response = await restApiClient.InsertIntoAsync(movie);
-```
-
-Properties and fields decorated with the IgnoreByInsertsAttribute are not part of the insert statements:
-```C#
-public class Movie
-{
-  [ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations.Key]
-  public int Id { get; set; }
-  public string Title { get; set; }
-  public int Release_Year { get; set; }
-	
-  [ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations.IgnoreByInserts]
-  public int IgnoredProperty { get; set; }
-}
-```
-
-Generated KSQL:
-```KSQL
-INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);
-```
-
-### Insert values - FormatDoubleValue and FormatDecimalValue (v1.0.0)
-```C#
-var insertProperties = new InsertProperties()
-{
-  FormatDoubleValue = value => value.ToString("E1", CultureInfo.InvariantCulture),
-  FormatDecimalValue = value => value.ToString(CultureInfo.CreateSpecificCulture("en-GB"))
-};
-
-public static readonly Tweet Tweet1 = new()
-{
-  Id = 1,
-  Amount = 0.00042, 
-  AccountBalance = 533333333421.6332M
-};
-
-await restApiProvider.InsertIntoAsync(tweet, insertProperties);
-```
-
-Generated KSQL statement:
-```KSQL
-INSERT INTO tweetsTest (Id, Amount, AccountBalance) VALUES (1, 4.2E-004, 533333333421.6332);
-```
-
-# **Breaking changes.**
-In order to improve the v1.0.0 release the following methods and properties were renamed:
-
-IKSqlDbRestApiClient interface changes:
-
-| v0.11.0                 | v1.0.0                       |
-|-------------------------|------------------------------|
-| `CreateTable`           | `CreateTableAsync`           |
-| `CreateStream`          | `CreateStreamAsync`          |
-| `CreateOrReplaceTable`  | `CreateOrReplaceTableAsync`  |
-| `CreateOrReplaceStream` | `CreateOrReplaceStreamAsync` |
-
-KSQL documentation refers to stream or table name in FROM as [from_item](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/)
-
-```
-IKSqlDBContext.CreateQuery<TEntity>(string streamName = null)
-IKSqlDBContext.CreateQueryStream<TEntity>(string streamName = null)
-```
-streamName parameters were renamed to fromItemName:
-```
-IKSqlDBContext.CreateQuery<TEntity>(string fromItemName = null)
-IKSqlDBContext.CreateQueryStream<TEntity>(string fromItemName = null)
-```
-```
-QueryContext.StreamName property was renamed to QueryContext.FromItemName
-Source.Of parameter streamName was renamed to fromItemName
-KSqlDBContextOptions.ShouldPluralizeStreamName was renamed to ShouldPluralizeFromItemName
-```
-
-Record.RowTime was decorated with IgnoreByInsertsAttribute
-
-> ⚠  From version 1.0.0 the overridden from item names are pluralized, too. 
-Join items are also affected by this breaking change. This breaking change can cause runtime exceptions for users updating from lower versions. In case that you have never used custom singular from-item names, your code won't be affected, see the example below:
-
-```
-var contextOptions = new KSqlDBContextOptions(@"http:\\localhost:8088")
-{
-  //Default value:  
-  //ShouldPluralizeFromItemName = true
-};
-
-var query = new KSqlDBContext(contextOptions)
-  .CreateQueryStream<Tweet>("Tweet")
-  .ToQueryString();
-```
-
-KSQL generated since v1.0
-
-```KSQL
-SELECT * FROM Tweets EMIT CHANGES;
-```
-
-KSQL generated before v1.0
-
-```KSQL
-SELECT * FROM Tweet EMIT CHANGES;
-```
-
-# v1.1.0:
-
-### CAST - ToString (v1.1.0)
-Converts any type to its string representation.
-
-```C#
-var query = context.CreateQueryStream<Movie>()
-  .GroupBy(c => c.Title)
-  .Select(c => new { Title = c.Key, Concatenated = K.Functions.Concat(c.Count().ToString(), "_Hello") });
-```
-
-```KSQL
-SELECT Title, CONCAT(CAST(COUNT(*) AS VARCHAR), '_Hello') Concatenated FROM Movies GROUP BY Title EMIT CHANGES;
-```
-
-### CAST - convert string to numeric types (v1.1.0)
-```C#
-using System;
-using ksqlDB.RestApi.Client.KSql.Query.Functions;
-
-Expression<Func<Tweet, int>> stringToInt = c => KSQLConvert.ToInt32(c.Message);
-Expression<Func<Tweet, long>> stringToLong = c => KSQLConvert.ToInt64(c.Message);
-Expression<Func<Tweet, decimal>> stringToDecimal = c => KSQLConvert.ToDecimal(c.Message, 10, 2);
-Expression<Func<Tweet, double>> stringToDouble = c => KSQLConvert.ToDouble(c.Message);
-```
-
-```KSQL
-CAST(Message AS INT)
-CAST(Message AS BIGINT)
-CAST(Message AS DECIMAL(10, 2))
-CAST(Message AS DOUBLE)
-```
-
 ### WithOffsetResetPolicy - push queries extension method (v1.1.0)
 Overrides the AutoOffsetReset policy for the current query:
 ```C#
@@ -1167,149 +908,6 @@ var subscription = context.CreateQueryStream<Movie>()
     Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
   }, e => { Console.WriteLine($"Exception: {e.Message}"); });   
 ```
-
-# v1.2.0:
-
-### Get streams (v1.2.0)
-- IKSqlDbRestApiClient.GetStreamsAsync - List the defined streams.
-
-```C#
-var streamResponses = await restApiClient.GetStreamsAsync();
-
-Console.WriteLine(string.Join(',', streamResponses[0].Streams.Select(c => c.Name)));
-```
-
-### Get tables (v1.2.0)
-- IKSqlDbRestApiClient.GetTablesAsync - List the defined tables.
-
-```C#
-var tableResponses = await restApiClient.GetTablesAsync();
-
-Console.WriteLine(string.Join(',', tableResponses[0].Tables.Select(c => c.Name)));
-```
-
-# v1.3.0:
-
-### KSqlDbRestApiClient:
-
-### Get topics (v1.3.0)
-- GetTopicsAsync - lists the available topics in the Kafka cluster that ksqlDB is configured to connect to.
-- GetAllTopicsAsync - lists all topics, including hidden topics.
-- GetTopicsExtendedAsync - list of topics. Also displays consumer groups and their active consumer counts.
-- GetAllTopicsExtendedAsync - list of all topics. Also displays consumer groups and their active consumer counts.
-
-```C#
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Topics;
-using ksqlDB.RestApi.Client.Sample.Providers;
-
-private static async Task GetKsqlDbInformationAsync(IKSqlDbRestApiProvider restApiProvider)
-{
-  Console.WriteLine($"{Environment.NewLine}Available topics:");
-  var topicsResponses = await restApiProvider.GetTopicsAsync();
-  Console.WriteLine(string.Join(',', topicsResponses[0].Topics.Select(c => c.Name)));
-
-  TopicsResponse[] allTopicsResponses = await restApiProvider.GetAllTopicsAsync();
-  TopicsExtendedResponse[] topicsExtendedResponses = await restApiProvider.GetTopicsExtendedAsync();
-  var allTopicsExtendedResponses = await restApiProvider.GetAllTopicsExtendedAsync();
-}
-```
-
-### Getting queries and termination of persistent queries (v1.3.0)
-- GetQueriesAsync - Lists queries running in the cluster.
-
-- TerminatePersistentQueryAsync - Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
-
-```C#
-using System.Linq;
-using System.Threading.Tasks;
-using ksqlDB.RestApi.Client.KSql.RestApi;
-
-private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient client)
-{
-  string topicName = "moviesByTitle";
-
-  var queries = await client.GetQueriesAsync();
-
-  var query = queries.SelectMany(c => c.Queries).FirstOrDefault(c => c.SinkKafkaTopics.Contains(topicName));
-
-  var response = await client.TerminatePersistentQueryAsync(query.Id);
-}
-```
-
-### Creating connectors (v1.3.0)
-- CreateSourceConnectorAsync - Create a new source connector in the Kafka Connect cluster with the configuration passed in the config parameter.
-
-- CreateSinkConnectorAsync - Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
-
-See also how to create a SQL Server source connector with [SqlServer.Connector](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/SqlServer.Connector/Wiki.md)
-
-```C#
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using ksqlDB.RestApi.Client.KSql.RestApi;
-
-private static string SourceConnectorName => "mock-source-connector";
-private static string SinkConnectorName => "mock-sink-connector";
-
-private static async Task CreateConnectorsAsync(IKSqlDbRestApiClient restApiClient)
-{
-  var sourceConnectorConfig = new Dictionary<string, string>
-  {
-    {"connector.class", "org.apache.kafka.connect.tools.MockSourceConnector"}
-  };
-
-  var httpResponseMessage = await restApiClient.CreateSourceConnectorAsync(sourceConnectorConfig, SourceConnectorName);
-      
-  var sinkConnectorConfig = new Dictionary<string, string> {
-    { "connector.class", "org.apache.kafka.connect.tools.MockSinkConnector" },
-    { "topics.regex", "mock-sink*"},
-  }; 		
-
-  httpResponseMessage = await restApiClient.CreateSinkConnectorAsync(sinkConnectorConfig, SinkConnectorName);
-
-  httpResponseMessage = await restApiClient.DropConnectorAsync($"`{SinkConnectorName}`");
-}
-```
-
-# v1.4.0:
-
-KSqlDbRestApiClient:
-
-### Terminate push queries (v1.4.0)
-- TerminatePushQueryAsync - terminates push query by query id
-
-```C#
-string queryId = "xyz123"; // <----- the ID of the query to terminate
-
-var response = await restApiClient.TerminatePushQueryAsync(queryId);
-```
-
-### Drop a table (v1.4.0)
-Drops an existing table.
-
-```C#
-var ksqlDbUrl = @"http:\\localhost:8088";
-
-var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
-var ksqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory);
-
-string tableName = "TableName";
-
-// DROP TABLE TableName;
-var httpResponseMessage = ksqlDbRestApiClient.DropTableAsync(tableName);
-
-// OR DROP TABLE IF EXISTS TableName DELETE TOPIC;
-httpResponseMessage = ksqlDbRestApiClient.DropTableAsync(tableName, useIfExistsClause: true, deleteTopic: true);
-```
-
-Parameters:
-
-`useIfExistsClause` - If the IF EXISTS clause is present, the statement doesn't fail if the table doesn't exist.
-
-`deleteTopic` - If the DELETE TOPIC clause is present, the table's source topic is marked for deletion.
 
 **Data definititions:**
 - [Headers](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_definitions.md#access-record-header-data-v160)
@@ -1330,7 +928,7 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [FirstOrDefaultAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md#ipullabletfirstordefaultasync-v100)
 - [GetManyAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md#getmanyasync)
 - [CreatePullQuery](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md#createpullquerytentity-v100)
-- [ExecutePullQuery]()
+- [ExecutePullQuery](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md#pull-queries---executepullquery)
 
 **List of supported ksqlDB SQL statements:**
 - [Pause and resume persistent qeries](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#pause-and-resume-persistent-qeries-v250)
@@ -1348,6 +946,14 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [Creating types](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#createtypeasync)
 - [ExecuteStatementAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#executestatementasync-extension-method)
 - [PartitionBy](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#partitionby)
+- [Terminate push queries](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#terminate-push-queries)
+- [Drop a table](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#drop-a-table)
+- [Creating connectors](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#creating-connectors)
+- [Get topics](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#get-topics)
+- [Getting queries and termination of persistent queries](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#getting-queries-and-termination-of-persistent-queries)
+- [ExecuteStatementAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#executestatementasync)
+- [Get streams](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#get-streams)
+- [Get tables](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#get-tables)
 
 **KSqlDbContext**
 - [CreateQueryStream](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#createquerystream)
@@ -1375,6 +981,9 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [SetJsonSerializerOptions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#setjsonserializeroptions)
 
 **Functions**
+- [String functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/functions.md#string-functions)
+- [Numeric functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/functions.md#numeric-functions)
+- [Date and time functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/functions.md#date-and-time-functions)
 - [Lambda functions (Invocation functions) - Maps](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/functions.md#lambda-functions-invocation-functions---maps)
   - [Transform maps](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/functions.md#transform-maps)
   - [Filter maps](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/functions.md#filter-maps)
