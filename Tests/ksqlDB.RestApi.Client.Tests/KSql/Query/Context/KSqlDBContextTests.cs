@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.Models;
@@ -6,9 +6,12 @@ using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UnitTests;
@@ -264,5 +267,45 @@ public class KSqlDBContextTests : TestBase
 
     //Assert
     response.Should().BeNull();
+  }
+
+  [TestMethod]
+  public void CreateQueryAndCreateQueryStreamShouldNotInfluenceEachOther()
+  {
+    //Arrange
+    var context = new KSqlDBContext(TestParameters.KsqlDBUrl);
+
+    _ = context.CreateQuery<int>();
+    _ = context.CreateQueryStream<int>();
+
+    var serviceProvider = context.KSqlDBQueryContext.ServiceCollection
+      .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+
+    //Act
+    var serviceScopeFactory = serviceProvider.GetService<IServiceScopeFactory>();
+    var queryDbProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IKSqlDbProvider>();
+
+    //Assert
+    queryDbProvider.Should().BeOfType<KSqlDbQueryProvider>();
+  }
+
+  [TestMethod]
+  public void CreateQueryStreamAndCreateQueryShouldNotInfluenceEachOther()
+  {
+    //Arrange
+    var context = new KSqlDBContext(TestParameters.KsqlDBUrl);
+
+    _ = context.CreateQueryStream<int>();
+    _ = context.CreateQuery<int>();
+
+    var serviceProvider = context.ServiceCollection
+      .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+
+    //Act
+    var serviceScopeFactory = serviceProvider.GetService<IServiceScopeFactory>();
+    var queryDbProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IKSqlDbProvider>();
+
+    //Assert
+    queryDbProvider.Should().BeOfType<KSqlDbQueryStreamProvider>();
   }
 }

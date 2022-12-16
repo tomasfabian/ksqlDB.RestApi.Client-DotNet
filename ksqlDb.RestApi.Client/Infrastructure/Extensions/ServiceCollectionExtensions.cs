@@ -1,4 +1,4 @@
-﻿using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -80,5 +80,13 @@ internal static class ServiceCollectionExtensions
     serviceCollection.TryAddSingleton(contextOptions);
     serviceCollection.TryAddScoped<IKStreamSetDependencies, KStreamSetDependencies>();
     serviceCollection.TryAddScoped<IKSqlDbRestApiClient, KSqlDbRestApiClient>();
+  }
+
+  internal static void ApplyTo(this IServiceCollection externalServicesCollection, IServiceCollection servicesCollection)
+  {
+    foreach (var service in externalServicesCollection)
+    {
+      servicesCollection.Add(service);
+    }
   }
 }
