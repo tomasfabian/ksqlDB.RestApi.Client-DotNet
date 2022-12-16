@@ -852,3 +852,25 @@ public KSqlDbStatement CreateStatement(string statement)
   return ksqlDbStatement;
 }
 ```
+
+### Get streams
+**v1.0.0**
+
+- `IKSqlDbRestApiClient.GetStreamsAsync` - List the defined streams.
+
+```C#
+var streamResponses = await restApiClient.GetStreamsAsync();
+
+Console.WriteLine(string.Join(',', streamResponses[0].Streams.Select(c => c.Name)));
+```
+
+### Get tables
+**v1.0.0**
+
+- `IKSqlDbRestApiClient.GetTablesAsync` - List the defined tables.
+
+```C#
+var tableResponses = await restApiClient.GetTablesAsync();
+
+Console.WriteLine(string.Join(',', tableResponses[0].Tables.Select(c => c.Name)));
+```
