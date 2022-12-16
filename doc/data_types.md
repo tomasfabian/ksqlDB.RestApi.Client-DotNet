@@ -1,5 +1,74 @@
 # Data types
 
+### Supported data types mapping
+
+|     ksql     |            c#            |
+|:------------:|:------------------------:|
+|    VARCHAR   |          string          |
+|    INTEGER   |            int           |
+|    BIGINT    |           long           |
+|    DOUBLE    |          double          |
+|    BOOLEAN   |           bool           |
+|     BYTES    |          byte[]          |
+|  ```ARRAY``` | C#Type[] or IEnumerable  |
+|   ```MAP```  |        IDictionary       |
+| ```STRUCT``` |          struct          |
+|     DATE     |     System.DateTime      |
+|     TIME     |     System.TimeSpan      |
+|   TIMESTAMP  |    System.DateTimeOffset |
+
+Array type mapping example:
+All of the elements in the array must be of the same type. The element type can be any valid SQL type.
+```
+ksql: ARRAY<INTEGER>
+C#  : int[]
+```
+Destructuring an array (ksqldb represents the first element of an array as 1):
+```C#
+queryStream
+  .Select(_ => new { FirstItem = new[] {1, 2, 3}[1] })
+```
+Generates the following KSQL:
+```KSQL
+ARRAY[1, 2, 3][1] AS FirstItem
+```
+Array length:
+```C#
+queryStream
+  .Select(_ => new[] {1, 2, 3}.Length)
+```
+Generates the following KSQL:
+```KSQL
+ARRAY_LENGTH(ARRAY[1, 2, 3])
+```
+
+Struct type mapping example:
+A struct represents strongly typed structured data. A struct is an ordered collection of named fields that have a specific type. The field types can be any valid SQL type.
+```C#
+struct Point
+{
+  public int X { get; set; }
+
+  public int Y { get; set; }
+}
+
+queryStream
+  .Select(c => new Point { X = c.X, Y = 2 });
+```
+Generates the following KSQL:
+```KSQL
+SELECT STRUCT(X := X, Y := 2) FROM StreamName EMIT CHANGES;
+```
+
+Destructure a struct:
+```C#
+queryStream
+  .Select(c => new Point { X = c.X, Y = 2 }.X);
+```
+```KSQL
+SELECT STRUCT(X := X, Y := 2)->X FROM StreamName EMIT CHANGES;
+```
+
 ### Time types DATE, TIME AND TIMESTAMP
 **v1.5.0** (ksqldb 0.20.0)
 
