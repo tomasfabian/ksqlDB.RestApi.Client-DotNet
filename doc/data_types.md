@@ -69,6 +69,27 @@ queryStream
 SELECT STRUCT(X := X, Y := 2)->X FROM StreamName EMIT CHANGES;
 ```
 
+### Structs
+[Structs](https://docs.ksqldb.io/en/latest/how-to-guides/query-structured-data/#structs)
+ are an associative data type that map VARCHAR keys to values of any type. Destructure structs by using arrow syntax (->).
+```C#
+public struct Point
+{
+  public int X { get; set; }
+
+  public int Y { get; set; }
+}
+```
+
+```C#
+query
+  .Select(c => new Point { X = 1, Y = 2 });
+```
+
+```SQL
+SELECT STRUCT(X := 1, Y := 2) FROM point EMIT CHANGES;
+```
+
 ### Time types DATE, TIME AND TIMESTAMP
 **v1.5.0** (ksqldb 0.20.0)
 
