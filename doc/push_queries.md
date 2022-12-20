@@ -282,3 +282,29 @@ CREATE OR REPLACE TABLE MoviesByTitle
 AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
 WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
 ```
+
+### WithOffsetResetPolicy - push queries extension method
+**v1.0.0**
+
+Overrides the AutoOffsetReset policy for the current query:
+```C#
+var subscription = context.CreateQueryStream<Movie>()
+  .WithOffsetResetPolicy(AutoOffsetReset.Latest)
+  .Subscribe(movie =>
+  {
+    Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
+  }, e => { Console.WriteLine($"Exception: {e.Message}"); });   
+```
+
+### Record (row) class
+Record class is a base class for rows returned in push queries. It has a 'RowTime' property.
+
+```C#
+public class Tweet : ksqlDB.RestApi.Client.KSql.Query.Record
+{
+  public string Message { get; set; }
+}
+
+context.CreateQueryStream<Tweet>()
+  .Select(c => new { c.RowTime, c.Message });
+```
