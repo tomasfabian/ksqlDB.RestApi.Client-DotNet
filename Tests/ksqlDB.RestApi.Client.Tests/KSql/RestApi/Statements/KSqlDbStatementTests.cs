@@ -54,10 +54,13 @@ public class KSqlDbStatementTests : TestBase
   public void SessionVariables()
   {
     //Arrange
-    var ksqlDbStatement = new KSqlDbStatement(Statement);
-
-    ksqlDbStatement.SessionVariables.Add("key1", "value1");
-    ksqlDbStatement.SessionVariables.Add("key2", "value2");
+    var ksqlDbStatement = new KSqlDbStatement(Statement)
+    {
+      SessionVariables = new Dictionary<string, object> {
+        { "key1", "value1"},
+        { "key2", "value2"}
+      }
+    };
 
     //Act
     var json = JsonSerializer.Serialize(ksqlDbStatement);

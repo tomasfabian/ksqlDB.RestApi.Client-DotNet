@@ -527,7 +527,7 @@ Drop type Address;
 
     var statement = new KSqlDbStatement("CREATE TYPE ${typeName} AS STRUCT<name VARCHAR, address ADDRESS>;")
     {
-      SessionVariables = { { "typeName", typeName } }
+      SessionVariables = new Dictionary<string, object> { { "typeName", typeName } }
     };
 
     //Act
