@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -926,6 +926,16 @@ Drop type Address;
     //Act
     httpResponseMessage = await restApiClient.CreateTypeAsync<Address>();
     httpResponseMessage = await restApiClient.CreateTypeAsync<Person>();
+  }
+
+  private static async Task CreateTypeWithSessionVariableAsync(IKSqlDbRestApiClient restApiClient)
+  {
+    var statement = new KSqlDbStatement("CREATE TYPE ${typeName} AS STRUCT<name VARCHAR, address ADDRESS>;")
+    {
+      SessionVariables = { { "typeName", "FromSessionValue" } }
+    };
+
+    var httpResponseMessage = await restApiClient.ExecuteStatementAsync(statement);
   }
 
   private static async Task SubscriptionToAComplexTypeAsync(IKSqlDbRestApiClient restApiClient, IKSqlDBContext ksqlDbContext)
