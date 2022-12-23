@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Reactive.Concurrency;
 using System.Text.Json;
 using FluentAssertions;
@@ -515,6 +515,28 @@ Drop type Address;
 
     //Assert
     httpResponseMessage.IsSuccessStatusCode.Should().BeTrue();
+    content[0].CommandStatus?.Status.Should().BeOneOf(default(string), SuccessStatus);
+  }
+
+  [TestMethod]
+  public async Task SessionVariables()
+  {
+    //Arrange
+    string typeName = "FromSessionVar";
+    var _ = await restApiClient.DropTypeAsync(typeName);
+
+    var statement = new KSqlDbStatement("CREATE TYPE ${typeName} AS STRUCT<name VARCHAR, address ADDRESS>;")
+    {
+      SessionVariables = new Dictionary<string, object> { { "typeName", typeName } }
+    };
+
+    //Act
+    var httpResponseMessage = await restApiClient.ExecuteStatementAsync(statement);
+
+    //Assert
+    httpResponseMessage.IsSuccessStatusCode.Should().BeTrue();
+
+    var content = await httpResponseMessage.ToStatementResponsesAsync();
     content[0].CommandStatus?.Status.Should().BeOneOf(default(string), SuccessStatus);
   }
 }

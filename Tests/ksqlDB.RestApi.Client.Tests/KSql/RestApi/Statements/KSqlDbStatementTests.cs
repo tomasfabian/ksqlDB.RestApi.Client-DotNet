@@ -1,4 +1,5 @@
-﻿using System.Text;
+using System.Text;
+using System.Text.Json;
 using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using NUnit.Framework;
@@ -47,5 +48,24 @@ public class KSqlDbStatementTests : TestBase
 
     //Assert
     statementText.Should().Be(Statement);
+  }
+
+  [Test]
+  public void SessionVariables()
+  {
+    //Arrange
+    var ksqlDbStatement = new KSqlDbStatement(Statement)
+    {
+      SessionVariables = new Dictionary<string, object> {
+        { "key1", "value1"},
+        { "key2", "value2"}
+      }
+    };
+
+    //Act
+    var json = JsonSerializer.Serialize(ksqlDbStatement);
+
+    //Assert
+    json.Should().Contain(@"""sessionVariables"":{""key1"":""value1"",""key2"":""value2""}");
   }
 }
