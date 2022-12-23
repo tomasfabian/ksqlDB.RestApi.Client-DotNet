@@ -65,6 +65,29 @@ KSQL:
 SELECT Id, COUNT(*) Count FROM Tweets GROUP BY Id HAVING Count(*) > 2 EMIT CHANGES;
 ```
 
+### Having - aggregations with a column
+[Example](https://kafka-tutorials.confluent.io/finding-distinct-events/ksql.html) shows how to use Having with Count(column) and Group By compound key:
+```C#
+public class Click
+{
+  public string IP_ADDRESS { get; set; }
+  public string URL { get; set; }
+  public string TIMESTAMP { get; set; }
+}
+
+var query = context.CreateQueryStream<Click>()
+  .GroupBy(c => new { c.IP_ADDRESS, c.URL, c.TIMESTAMP })
+  .WindowedBy(new TimeWindows(Duration.OfMinutes(2)))
+  .Having(c => c.Count(g => c.Key.IP_ADDRESS) == 1)
+  .Select(g => new { g.Key.IP_ADDRESS, g.Key.URL, g.Key.TIMESTAMP })
+  .Take(3);
+```
+Generated KSQL:
+```KSQL
+SELECT IP_ADDRESS, URL, TIMESTAMP FROM Clicks WINDOW TUMBLING (SIZE 2 MINUTES) GROUP BY IP_ADDRESS, URL, TIMESTAMP 
+HAVING COUNT(IP_ADDRESS) = 1 EMIT CHANGES LIMIT 3;
+```
+
 ### Sum
 ```C#
 context.CreateQueryStream<Tweet>()
