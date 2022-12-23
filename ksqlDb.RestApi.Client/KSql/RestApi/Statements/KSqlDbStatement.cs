@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
@@ -15,6 +15,9 @@ public sealed class KSqlDbStatement : QueryParameters
 
     EndpointType = EndpointType.KSql;
   }
+
+  [JsonPropertyName("sessionVariables")]
+  public Dictionary<string, object> SessionVariables { get; } = new();
 
   [JsonIgnore]
   public Encoding ContentEncoding { get; set; } = Encoding.UTF8;
