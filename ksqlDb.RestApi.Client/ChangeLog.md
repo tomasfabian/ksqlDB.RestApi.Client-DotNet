@@ -1,5 +1,10 @@
 # ksqlDB.RestApi.Client
 
+
+# v2.6.0
+- added shared values into KSqlDbStatement #39
+- KSqlDbContext's CreateStream and CreateStreamQuery influence each others services collection during consecutive usages. #37
+ 
 # v2.5.2
 - RowValueJsonSerializer single field instance deserialization fix for arrays #35
 
