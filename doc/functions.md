@@ -397,3 +397,40 @@ record Lambda
   public IDictionary<string, int> DictionaryInValues { get; set; }
 }
 ```
+
+### Dynamic - calling not supported ksqldb functions
+
+Some of the ksqldb functions have not been implemented yet. This can be circumvented by calling K.Functions.Dynamic with the appropriate function call and its parameters. The type of the column value is set with C# **as** operator.
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
+
+context.CreateQueryStream<Tweet>()
+  .Select(c => new { Col = KSql.Functions.Dynamic("IFNULL(Message, 'n/a')") as string, c.Id, c.Amount, c.Message });
+```
+The interesting part from the above query is:
+```C#
+K.Functions.Dynamic("IFNULL(Message, 'n/a')") as string
+```
+Generated KSQL:
+```KSQL
+SELECT IFNULL(Message, 'n/a') Col, Id, Amount, Message FROM Tweets EMIT CHANGES;
+```
+Result:
+```
++----------------------------+----------------------------+----------------------------+----------------------------+
+|COL                         |ID                          |AMOUNT                      |MESSAGE                     |
++----------------------------+----------------------------+----------------------------+----------------------------+
+|Hello world                 |1                           |0.0031                      |Hello world                 |
+|n/a                         |1                           |0.1                         |null                        |
+```
+
+Dynamic function call with array result example:
+```C#
+using K = ksqlDB.RestApi.Client.KSql.Query.Functions.KSql;
+
+context.CreateQueryStream<Tweet>()
+  .Select(c => K.F.Dynamic("ARRAY_DISTINCT(ARRAY[1, 1, 2, 3, 1, 2])") as int[])
+  .Subscribe(
+    message => Console.WriteLine($"{message[0]} - {message[^1]}"), 
+    error => Console.WriteLine($"Exception: {error.Message}"));
+```
