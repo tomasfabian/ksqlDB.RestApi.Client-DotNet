@@ -853,6 +853,79 @@ public KSqlDbStatement CreateStatement(string statement)
 }
 ```
 
+### Creating streams and tables
+**v1.0.0**
+
+- [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/) - fluent API
+
+```C#
+EntityCreationMetadata metadata = new()
+{
+  KafkaTopic = nameof(MyMovies),
+  Partitions = 1,
+  Replicas = 1
+};
+
+string url = @"http:\\localhost:8088";
+
+var httpClientFactory = new HttpClientFactory(new Uri(url));
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+var httpResponseMessage = await restApiClient.CreateStreamAsync<MyMovies>(metadata, ifNotExists: true);
+```
+
+```C#
+public record MyMovies
+{
+  [ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations.Key]
+  public int Id { get; set; }
+
+  public string Title { get; set; }
+
+  public int Release_Year { get; set; }
+}
+```
+
+```KSQL
+CREATE STREAM IF NOT EXISTS MyMovies (
+	Id INT KEY,
+	Title VARCHAR,
+	Release_Year INT
+) WITH ( KAFKA_TOPIC='MyMovies', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );
+```
+
+Create or replace alternative:
+
+```C#
+var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MyMovies>(metadata);
+```
+ 
+- [CREATE TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table/) - fluent API
+
+```C#
+EntityCreationMetadata metadata = new()
+{
+  KafkaTopic = nameof(MyMovies),
+  Partitions = 2,
+  Replicas = 3
+};
+
+string url = @"http:\\localhost:8088";
+
+var httpClientFactory = new HttpClientFactory(new Uri(url));
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+var httpResponseMessage = await restApiClient.CreateTableAsync<MyMovies>(metadata, ifNotExists: true);
+```
+
+```KSQL
+CREATE TABLE IF NOT EXISTS MyMovies (
+	Id INT PRIMARY KEY,
+	Title VARCHAR,
+	Release_Year INT
+) WITH ( KAFKA_TOPIC='MyMovies', VALUE_FORMAT='Json', PARTITIONS='2', REPLICAS='3' );
+```
+
 ### Get streams
 **v1.0.0**
 
