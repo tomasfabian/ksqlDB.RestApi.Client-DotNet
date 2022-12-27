@@ -312,3 +312,25 @@ private static async Task AddAndSaveChangesAsync(IKSqlDBContext context)
   var saveResponse = await context.SaveChangesAsync();
 }
 ```
+
+### KSqlDbContextOptionsBuilder
+> ⚠ KSqlDBContextOptions created with a constructor or by KSqlDbContextOptionsBuilder sets auto.offset.reset to earliest by default.
+> This was changed in version 2.0.0
+
+```C#
+public static KSqlDBContextOptions CreateQueryStreamOptions(string ksqlDbUrl)
+{
+  var contextOptions = new KSqlDbContextOptionsBuilder()
+    .UseKSqlDb(ksqlDbUrl)
+    .SetupQueryStream(options =>
+    {
+    })
+    .SetupQuery(options =>
+    {
+      options.Properties[QueryParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Latest.ToString().ToLower();
+    })
+    .Options;
+
+  return contextOptions;
+}
+```
