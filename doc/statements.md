@@ -271,6 +271,20 @@ async Task<HttpResponseMessage> ExecuteAsync(string statement)
 }
 ```
 
+### Substitute variables
+**v2.6.0**
+
+[Variable substitution](https://docs.ksqldb.io/en/latest/how-to-guides/substitute-variables/) allows you to to supply different values in specific SQL statements:
+
+```C#
+var statement = new KSqlDbStatement("CREATE TYPE ${typeName} AS STRUCT<name VARCHAR, address ADDRESS>;")
+{
+  SessionVariables = new Dictionary<string, object> { { "typeName", typeName } }
+};
+
+var httpResponseMessage = await restApiClient.ExecuteStatementAsync(statement);
+```
+
 ### Stream and table properties KEY_SCHEMA_ID and VALUE_SCHEMA_ID 
 **v1.6.0** (ksqldb v0.24.0)
 
