@@ -117,3 +117,13 @@ SELECT
   END AS case_result 
 FROM Tweets EMIT CHANGES;
 ```
+
+### Arithmetic operations on columns
+The usual arithmetic operators (+,-,/,*,%) may be applied to numeric types, like INT, BIGINT, and DOUBLE:
+```KSQL
+SELECT USERID, LEN(FIRST_NAME) + LEN(LAST_NAME) AS NAME_LENGTH FROM USERS EMIT CHANGES;
+```
+```C#
+Expression<Func<Person, object>> expression = c => c.FirstName.Length * c.LastName.Length;
+```
+
