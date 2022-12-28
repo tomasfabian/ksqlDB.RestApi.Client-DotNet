@@ -29,6 +29,24 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDb.RestApi.Client.Proto
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDb.RestApi.Client.ProtoBuf.Tests", "Tests\ksqlDb.RestApi.Client.ProtoBuf.Tests\ksqlDb.RestApi.Client.ProtoBuf.Tests.csproj", "{7462D56C-A4AA-4347-BE2A-A6B0F84BE426}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{0ABA2B0A-0F52-4B0F-8827-E5DB845BB27C}"
+	ProjectSection(SolutionItems) = preProject
+		doc\aggregations.md = doc\aggregations.md
+		doc\breaking_changes.md = doc\breaking_changes.md
+		doc\cdc.md = doc\cdc.md
+		doc\config.md = doc\config.md
+		doc\data_definitions.md = doc\data_definitions.md
+		doc\data_types.md = doc\data_types.md
+		doc\functions.md = doc\functions.md
+		doc\joins.md = doc\joins.md
+		doc\ksqldbcontext.md = doc\ksqldbcontext.md
+		doc\operators.md = doc\operators.md
+		doc\protobuf.md = doc\protobuf.md
+		doc\pull_queries.md = doc\pull_queries.md
+		doc\push_queries.md = doc\push_queries.md
+		doc\statements.md = doc\statements.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +91,7 @@ Global
 		{EE55516C-160D-4715-ADC6-3E76DE3D89E9} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}
 		{9AD222F8-4535-4297-A4F8-9F40FFA8A133} = {AA5681E8-1682-47E9-9159-4AE95A92E694}
 		{7462D56C-A4AA-4347-BE2A-A6B0F84BE426} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}
+		{0ABA2B0A-0F52-4B0F-8827-E5DB845BB27C} = {999C8EEC-CCFA-4183-805A-1804367D8F75}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {08C8585D-5006-4484-AC12-72B1F42058D7}
