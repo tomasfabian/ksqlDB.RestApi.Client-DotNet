@@ -67,7 +67,7 @@ SELECT * FROM Tweets
 WHERE Id BETWEEN 1 AND 5 EMIT CHANGES;
 ```
 
-### operator Between for Time type values
+### Operator Between for Time type values
 **v1.5.0**
 
 ```C#
@@ -125,5 +125,31 @@ SELECT USERID, LEN(FIRST_NAME) + LEN(LAST_NAME) AS NAME_LENGTH FROM USERS EMIT C
 ```
 ```C#
 Expression<Func<Person, object>> expression = c => c.FirstName.Length * c.LastName.Length;
+```
+
+### Lexical precedence
+You can use parentheses to change the order of evaluation:
+```C#
+await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+
+var query = context.CreateQueryStream<Location>()
+  .Select(c => (c.Longitude + c.Longitude) * c.Longitude);
+```
+
+```KSQL
+SELECT (Longitude + Longitude) * Longitude FROM Locations EMIT CHANGES;
+```
+
+In Where clauses:
+```C#
+await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+
+var query = context.CreateQueryStream<Location>()
+  .Where(c => (c.Latitude == "1" || c.Latitude != "2") && c.Latitude == "3");
+```
+
+```KSQL
+SELECT * FROM Locations
+WHERE ((Latitude = '1') OR (Latitude != '2')) AND (Latitude = '3') EMIT CHANGES;
 ```
 
