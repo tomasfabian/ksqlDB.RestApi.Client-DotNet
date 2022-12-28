@@ -25,6 +25,24 @@ SELECT * FROM Movies
 WHERE Title LIKE 'Die%' EMIT CHANGES;
 ```
 
+### WHERE IS NULL, IS NOT NULL
+**v1.0.0**
+
+```C#
+using var subscription = new KSqlDBContext(@"http:\\localhost:8088")
+  .CreateQueryStream<Click>()
+  .Where(c => c.IP_ADDRESS != null || c.IP_ADDRESS == null)
+  .Select(c => new { c.IP_ADDRESS, c.URL, c.TIMESTAMP });
+```
+
+Generated KSQL:
+```KSQL
+SELECT IP_ADDRESS, URL, TIMESTAMP
+FROM Clicks
+WHERE IP_ADDRESS IS NOT NULL OR IP_ADDRESS IS NULL
+EMIT CHANGES;
+```
+
 ### Operator IN - `IEnumerable<T>` and `IList<T>` Contains
 **v1.0.0**
 
