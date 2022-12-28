@@ -115,6 +115,15 @@ private static IDisposable ClientSideBatching(KSqlDBContext context)
 }
 ```
 
+### ToQueryString
+ToQueryString is helpful for debugging purposes. It returns the generated ksql query without executing it.
+```C#
+var ksql = context.CreateQueryStream<Tweet>().ToQueryString();
+
+//prints SELECT * FROM tweets EMIT CHANGES;
+Console.WriteLine(ksql);
+```
+
 ### Query comprehension syntax
 Note that ksqldb does not support OrderBy
 
