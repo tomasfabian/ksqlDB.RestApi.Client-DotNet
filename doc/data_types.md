@@ -70,6 +70,7 @@ SELECT STRUCT(X := X, Y := 2)->X FROM StreamName EMIT CHANGES;
 ```
 
 ### Structs
+
 [Structs](https://docs.ksqldb.io/en/latest/how-to-guides/query-structured-data/#structs)
  are an associative data type that map VARCHAR keys to values of any type. Destructure structs by using arrow syntax (->).
 ```C#
@@ -88,6 +89,46 @@ query
 
 ```SQL
 SELECT STRUCT(X := 1, Y := 2) FROM point EMIT CHANGES;
+```
+
+### Maps
+
+[Maps](https://docs.ksqldb.io/en/latest/how-to-guides/query-structured-data/#maps)
+are an associative data type that map keys of any type to values of any type. The types across all keys must be the same. The same rule holds for values. Destructure maps using bracket syntax ([]).
+```C#
+var dictionary = new Dictionary<string, int>()
+{
+  { "c", 2 },
+  { "d", 4 }
+};
+``` 
+```KSQL
+MAP('c' := 2, 'd' := 4)
+```
+
+Accessing map elements:
+```C#
+dictionary["c"]
+``` 
+```KSQL
+MAP('c' := 2, 'd' := 4)['d'] 
+```
+Deeply nested types:
+```C#
+context.CreateQueryStream<Tweet>()
+  .Select(c => new
+  {
+    Map = new Dictionary<string, int[]>
+    {
+      { "a", new[] { 1, 2 } },
+      { "b", new[] { 3, 4 } },
+    }
+  });
+```
+Generated KSQL:
+```KSQL
+SELECT MAP('a' := ARRAY[1, 2], 'b' := ARRAY[3, 4]) Map 
+FROM Tweets EMIT CHANGES;
 ```
 
 ### Time types DATE, TIME AND TIMESTAMP
@@ -222,4 +263,17 @@ Expression<Func<Thumbnail, string>> expression = c => K.Functions.FromBytes(c.Im
 Is equivalent to:
 ```KSQL
 FROM_BYTES(Message, 'utf8')
+```
+
+### Decimal precision
+```C#
+class Transaction
+{
+  [ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations.Decimal(3, 2)]
+  public decimal Amount { get; set; }
+}
+```
+Generated KSQL:
+```KSQL
+Amount DECIMAL(3,2)
 ```
