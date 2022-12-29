@@ -159,101 +159,6 @@ run in command line:
 
 - set docker-compose.csproj as startup project in InsideOut.sln for an embedded Kafka connect integration and stream processing examples.
 
-# Kafka stream processing example
-Example of how to consume a table with a kafka consumer. The following code is based on sample named [InsideOut](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/InsideOut)
-```
-Install-Package ksqlDB.RestApi.Client
-```
-
-```C#
-using System.Threading.Tasks;
-using ksqlDB.RestApi.Client.KSql.Linq.Statements;
-using ksqlDB.RestApi.Client.KSql.Query.Context;
-using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
-
-private async Task CreateOrReplaceMaterializedTableAsync()
-{
-  string ksqlDbUrl = "http://localhost:8088";
-
-  await using var context = new KSqlDBContext(ksqlDbUrl);
-
-  var statement = context.CreateOrReplaceTableStatement(tableName: "SENSORSTABLE")
-    .As<IoTSensor>("IotSensors")
-    .Where(c => c.SensorId != "Sensor-5")
-    .GroupBy(c => c.SensorId)
-    .Select(c => new { SensorId = c.Key, Count = c.Count(), AvgValue = c.Avg(a => a.Value) });
-
-  var httpResponseMessage = await statement.ExecuteStatementAsync();
-
-  if (!httpResponseMessage.IsSuccessStatusCode)
-  {
-    var statementResponse = httpResponseMessage.ToStatementResponse();
-  }
-}
-
-public record IoTSensor
-{
-  [Key]
-  public string SensorId { get; set; }
-  public int Value { get; set; }
-}
-```
-
-```C#
-public class SensorsTableConsumer : KafkaConsumer<string, IoTSensorStats>
-{
-  public SensorsTableConsumer(ConsumerConfig consumerConfig)
-    : base("SENSORSTABLE", consumerConfig)
-  {
-  }
-}
-
-public record IoTSensorStats
-{
-  public string SensorId { get; set; }
-  public double AvgValue { get; set; }
-  public int Count { get; set; }
-}
-```
-
-```
-Install-Package System.Interactive.Async -Version 5.0.0
-```
-
-```C#
-using System;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
-using Confluent.Kafka;
-using InsideOut.Consumer;
-
-const string bootstrapServers = "localhost:29092";
-
-static async Task Main(string[] args)
-{
-  var consumerConfig = new ConsumerConfig
-                       {
-                         BootstrapServers = bootstrapServers,
-                         GroupId = "Client-01",
-                         AutoOffsetReset = AutoOffsetReset.Latest
-                       };
-
-  var kafkaConsumer = new KafkaConsumer<string, IoTSensorStats>("IoTSensors", consumerConfig);
-
-  await foreach (var consumeResult in kafkaConsumer.ConnectToTopic().ToAsyncEnumerable().Take(10))
-  {
-    Console.WriteLine(consumeResult.Message);
-  }
-
-  using (kafkaConsumer)
-  { }
-}
-```
-
-[Blazor server side example](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet) - InsideOut.sln
-
 # Setting query parameters
 Default settings:
 'auto.offset.reset' is set to 'earliest' by default. 
@@ -310,16 +215,19 @@ FROM custom_topic_name
 
 List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md) extension methods:
 - [Select](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#select)
-- [Take (LIMIT)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#take-limit-v010)
-- [Subscribe](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribe-v010)
-- [ToObservable](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#toobservable-v010)
+- [Take (LIMIT)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#take-limit)
+- [Subscribe](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribe)
+- [ToObservable](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#toobservable)
 - [ToAsyncEnumerable](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#toasyncenumerable)
+- [ToQueryString](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#toquerystring)
 - [ExplainAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#explainasync)
 - [SubscribeAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribeasync)
 - [SubscribeOn](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribeon)
 - [ObserveOn](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#observeon)
 - [ToStatementString](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#tostatementstring)
 - [WithOffsetResetPolicy](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#withoffsetresetpolicy---push-queries-extension-method)
+- [Window bounds](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#window-bounds)
+- [Raw string KSQL query execution](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#raw-string-ksql-query-execution)
 
 - [IKSqlGrouping.Source](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#iksqlgroupingsource)
 
@@ -359,16 +267,6 @@ Supported operators are:
 | OR       | logical OR                  | \|\| |
 | NOT      | logical NOT                 |  !   |
 
-
-### ToQueryString (v0.1.0)
-ToQueryString is helpful for debugging purposes. It returns the generated ksql query without executing it.
-```C#
-var ksql = context.CreateQueryStream<Tweet>().ToQueryString();
-
-//prints SELECT * FROM tweets EMIT CHANGES;
-Console.WriteLine(ksql);
-```
-
 ### Aggregation functions
 List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md):
 - [GROUP BY](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#groupby)
@@ -391,256 +289,21 @@ List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/
 
 [Rest api reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
-### Arithmetic operations on columns (v0.2.0)
-The usual arithmetic operators (+,-,/,*,%) may be applied to numeric types, like INT, BIGINT, and DOUBLE:
-```KSQL
-SELECT USERID, LEN(FIRST_NAME) + LEN(LAST_NAME) AS NAME_LENGTH FROM USERS EMIT CHANGES;
-```
-```C#
-Expression<Func<Person, object>> expression = c => c.FirstName.Length * c.LastName.Length;
-```
-
-### Where IS NULL, IS NOT NULL (v0.3.0)
-```C#
-using var subscription = new KSqlDBContext(@"http:\\localhost:8088")
-  .CreateQueryStream<Click>()
-  .Where(c => c.IP_ADDRESS != null || c.IP_ADDRESS == null)
-  .Select(c => new { c.IP_ADDRESS, c.URL, c.TIMESTAMP });
-```
-
-Generated KSQL:
-```KSQL
-SELECT IP_ADDRESS, URL, TIMESTAMP
-FROM Clicks
-WHERE IP_ADDRESS IS NOT NULL OR IP_ADDRESS IS NULL
-EMIT CHANGES;
-```
-
-# v0.4.0
-
-### Maps (v0.4.0)
-[Maps](https://docs.ksqldb.io/en/latest/how-to-guides/query-structured-data/#maps)
-are an associative data type that map keys of any type to values of any type. The types across all keys must be the same. The same rule holds for values. Destructure maps using bracket syntax ([]).
-```C#
-var dictionary = new Dictionary<string, int>()
-{
-  { "c", 2 },
-  { "d", 4 }
-};
-``` 
-```KSQL
-MAP('c' := 2, 'd' := 4)
-```
-
-Accessing map elements:
-```C#
-dictionary["c"]
-``` 
-```KSQL
-MAP('c' := 2, 'd' := 4)['d'] 
-```
-Deeply nested types:
-```C#
-context.CreateQueryStream<Tweet>()
-  .Select(c => new
-  {
-    Map = new Dictionary<string, int[]>
-    {
-      { "a", new[] { 1, 2 } },
-      { "b", new[] { 3, 4 } },
-    }
-  });
-```
-Generated KSQL:
-```KSQL
-SELECT MAP('a' := ARRAY[1, 2], 'b' := ARRAY[3, 4]) Map 
-FROM Tweets EMIT CHANGES;
-```
-
-# v0.4.0
 [Some KSql function examples can be found here](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/KSql-functions)
 
 # TFM netstandard 2.0 (.Net Framework, NetCoreApp 2.0 etc.)
 netstandard 2.0 does not support Http 2.0. Due to this ```IKSqlDBContext.CreateQueryStream<TEntity>``` is not exposed at the current version. 
 For these reasons ```IKSqlDBContext.CreateQuery<TEntity>``` was introduced to provide the same functionality via Http 1.1. 
 
-# v0.7.0:
-- scalar collection functions: ArrayIntersect, ArrayJoin
-
-### Lexical precedence
-You can use parentheses to change the order of evaluation:
-```C#
-await using var context = new KSqlDBContext(@"http:\\localhost:8088");
-
-var query = context.CreateQueryStream<Location>()
-  .Select(c => (c.Longitude + c.Longitude) * c.Longitude);
-```
-
-```KSQL
-SELECT (Longitude + Longitude) * Longitude FROM Locations EMIT CHANGES;
-```
-
-In Where clauses:
-```C#
-await using var context = new KSqlDBContext(@"http:\\localhost:8088");
-
-var query = context.CreateQueryStream<Location>()
-  .Where(c => (c.Latitude == "1" || c.Latitude != "2") && c.Latitude == "3");
-```
-
-```KSQL
-SELECT * FROM Locations
-WHERE ((Latitude = '1') OR (Latitude != '2')) AND (Latitude = '3') EMIT CHANGES;
-```
-
 Redundant brackets are not reduced in the current version
-
-### Raw string KSQL query execution
-
-The following examples show how to execute ksql queries from strings:
-```C#
-string ksql = @"SELECT * FROM Movies
-WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
-
-QueryParameters queryParameters = new QueryParameters
-{
-  Sql = ksql,
-  [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
-};
-
-await using var context = new KSqlDBContext(@"http:\\localhost:8088");
-
-var moviesSource = context.CreateQuery<Movie>(queryParameters)
-  .ToObservable();
-```
-
-Query stream:
-```C#
-string ksql = @"SELECT * FROM Movies
-WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
-
-QueryStreamParameters queryStreamParameters = new QueryStreamParameters
-{
-  Sql = ksql,
-  [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
-};
-
-await using var context = new KSqlDBContext(@"http:\\localhost:8088");
-
-var source = context.CreateQueryStream<Movie>(queryStreamParameters)
-  .ToObservable();
-```
-
-### HttpResponseMessage ToStatementResponses extension
-```C#
-using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
-
-var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement);
-
-var responses = httpResponseMessage.ToStatementResponses();
-
-foreach (var response in responses)
-{
-	Console.WriteLine(response.CommandStatus);
-	Console.WriteLine(response.CommandId);
-}
-```
-
-# v0.9.0:
-
-# CreateOrReplaceTableStatement
-
-| Statement                                                                                                             | Description                                                                                                                                                                                     |
-|-----------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [EXECUTE STATEMENTS](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)                              | CreateStatementAsync - execution of general-purpose string statements                                                                                                                           |
-| [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/)                     | CreateStreamAsync - Create a new stream with the specified columns and properties.                                                                                                              |
-| [CREATE TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table/)                       | CreateTableAsync - Create a new table with the specified columns and properties.                                                                                                                |
-| [CREATE STREAM AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream-as-select/) | CreateOrReplaceStreamStatement - Create or replace a new materialized stream view, along with the corresponding Kafka topic, and stream the result of the query into the topic.                 |
-| [CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/)   | CreateOrReplaceTableStatement - Create or replace a ksqlDB materialized table view, along with the corresponding Kafka topic, and stream the result of the query as a changelog into the topic. |
-
-```C#
-using ksqlDB.RestApi.Client.KSql.Linq.Statements;
-using ksqlDB.RestApi.Client.KSql.Query.Context;
-
-public static async Task Main(string[] args)
-{
-  await using var context = new KSqlDBContext(@"http:\\localhost:8088");
-  await CreateOrReplaceTableStatement(context);
-}
-
-private static async Task CreateOrReplaceTableStatement(IKSqlDBStatementsContext context)
-{
-  var creationMetadata = new CreationMetadata
-  {
-    KafkaTopic = "moviesByTitle",		
-    KeyFormat = SerializationFormats.Json,
-    ValueFormat = SerializationFormats.Json,
-    Replicas = 1,
-    Partitions = 1
-  };
-
-  var httpResponseMessage = await context.CreateOrReplaceTableStatement(tableName: "MoviesByTitle")
-    .With(creationMetadata)
-    .As<Movie>()
-    .Where(c => c.Id < 3)
-    .Select(c => new {c.Title, ReleaseYear = c.Release_Year})
-    .PartitionBy(c => c.Title)
-    .ExecuteStatementAsync();
-
-  var statementResponse = httpResponseMessage.ToStatementResponses();
-}
-```
-
-Generated KSQL statement:
-```KSQL
-CREATE OR REPLACE TABLE MoviesByTitle
-WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
-AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
-WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
-```
-
-# v0.10.0:
-
-### Window Bounds
-The WHERE clause must contain a value for each primary-key column to retrieve and may optionally include bounds on WINDOWSTART and WINDOWEND if the materialized table is windowed.
-```C#
-using ksqlDB.RestApi.Client.KSql.Query.Functions;
-
-string windowStart = "2019-10-03T21:31:16";
-string windowEnd = "2025-10-03T21:31:16";
-
-var result = await context.CreatePullQuery<IoTSensorStats>(MaterializedViewName)
-  .Where(c => c.SensorId == "sensor-1")
-  .Where(c => Bounds.WindowStart > windowStart && Bounds.WindowEnd <= windowEnd)
-  .GetAsync();
-```
-
-Generated KSQL:
-```KSQL
-SELECT * FROM avg_sensor_values
-WHERE SensorId = 'sensor-1' AND (WINDOWSTART > '2019-10-03T21:31:16') AND (WINDOWEND <= '2020-10-03T21:31:16');
-```
-
-# v0.11.0:
-
-### Decimal precision
-```C#
-class Transaction
-{
-  [ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations.Decimal(3, 2)]
-  public decimal Amount { get; set; }
-}
-```
-Generated KSQL:
-```KSQL
-Amount DECIMAL(3,2)
-```
 
 **Data definititions:**
 - [Headers](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_definitions.md#access-record-header-data-v160)
 
 **List of supported data types:**
 - [Supported data types mapping](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_types.md#supported-data-types-mapping)
+- [Structs](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_types.md#structs)
+- [Maps](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_types.md#maps)
 - [Time types DATE, TIME AND TIMESTAMP](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_types.md#time-types-date-time-and-timestamp)
 - [System.GUID as ksqldb VARCHAR type](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_types.md#systemguid-as-ksqldb-varchar-type-v240)
 
@@ -680,6 +343,7 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [Get topics](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#get-topics)
 - [Getting queries and termination of persistent queries](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#getting-queries-and-termination-of-persistent-queries)
 - [ExecuteStatementAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#executestatementasync)
+- [Create or replace table statements](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#create-or-replace-table-statements)
 - [Creating streams and tables](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#creating-streams-and-tables)
 - [Get streams](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#get-streams)
 - [Get tables](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#get-tables)
@@ -702,6 +366,9 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [Operator IN](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#operator-in---ienumerablet-and-ilistt-contains)
 - [Operator BETWEEN](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#operator-not-between)
 - [CASE](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#case)
+- [Arithmetic operations on columns](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#arithmetic-operations-on-columns)
+- [Lexical precedence](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#lexical-precedence)
+- [WHERE IS NULL, IS NOT NULL](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#where-is-null-is-not-null)
 
 **Miscelenaous:**
 - [Change data capture](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/cdc.md)
@@ -709,6 +376,7 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [Operators](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md)
 - [Invocation functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/functions.md#improved-invocation-function-extensions)
 - [SetJsonSerializerOptions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#setjsonserializeroptions)
+- [Kafka stream processing example](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/stream_processing_.md)
 
 **Functions**
 - [String functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/functions.md#string-functions)

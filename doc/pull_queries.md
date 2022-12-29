@@ -1,6 +1,5 @@
 # Pull queries
 
-
 ### Pull queries - `ExecutePullQuery`
 **v1.0.0**
 

@@ -434,3 +434,7 @@ context.CreateQueryStream<Tweet>()
     message => Console.WriteLine($"{message[0]} - {message[^1]}"), 
     error => Console.WriteLine($"Exception: {error.Message}"));
 ```
+
+### Scalar collection functions
+- `ArrayIntersect`
+- `ArrayJoin`
