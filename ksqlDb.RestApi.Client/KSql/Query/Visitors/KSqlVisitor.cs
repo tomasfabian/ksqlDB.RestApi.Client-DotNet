@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -18,7 +18,6 @@ internal class KSqlVisitor : ExpressionVisitor
 {
   private readonly StringBuilder stringBuilder;
   private readonly KSqlQueryMetadata queryMetadata;
-  private readonly bool useTableAlias;
 
   internal StringBuilder StringBuilder => stringBuilder;
 
@@ -26,9 +25,7 @@ internal class KSqlVisitor : ExpressionVisitor
   {
     this.queryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
 
-    useTableAlias = queryMetadata.Joins?.Any() ?? false;
-
-    stringBuilder = new();
+    stringBuilder = new StringBuilder();
   }
      
   internal KSqlVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
@@ -253,11 +250,21 @@ internal class KSqlVisitor : ExpressionVisitor
 
     TryCast(methodCallExpression);
 
-    if (methodCallExpression.Object == null && methodInfo.DeclaringType is { Name: nameof(KSqlInvocationFunctionsExtensions) })
+    if (methodCallExpression.Object == null && methodInfo.DeclaringType is {Name: nameof(KSqlInvocationFunctionsExtensions)})
+    {
       new KSqlInvocationFunctionVisitor(stringBuilder, queryMetadata).Visit(methodCallExpression);
 
-    if (methodCallExpression.Object == null && methodInfo.DeclaringType is { Name: nameof(KSqlFunctionsExtensions) })
+      return methodCallExpression;
+    }
+
+    if (methodCallExpression.Object == null && methodInfo.DeclaringType is {Name: nameof(KSqlFunctionsExtensions)})
+    {
       CreateKSqlFunctionVisitor().Visit(methodCallExpression);
+
+      return methodCallExpression;
+    }
+
+    new KSqlCustomFunctionVisitor(stringBuilder, queryMetadata).Visit(methodCallExpression);
 
     if (methodCallExpression.Object != null && (methodInfo.DeclaringType != null && methodInfo.DeclaringType.Name == typeof(IAggregations<>).Name || methodInfo.DeclaringType is
         {
