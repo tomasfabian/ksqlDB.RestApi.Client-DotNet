@@ -1,6 +1,7 @@
 # Push queries
 
-### Take (LIMIT) (v0.1.0)
+### Take (LIMIT)
+**v1.0.0**
 Returns a specified number of contiguous elements from the start of a stream. Depends on the 'auto.topic.offset' parameter.
 
 ```C#
@@ -52,7 +53,9 @@ SELECT * FROM avg_sensor_values
 WHERE SensorId = 'sensor-1' AND (WINDOWSTART > '2019-10-03T21:31:16') AND (WINDOWEND <= '2020-10-03T21:31:16');
 ```
 
-### Subscribe (v0.1.0)
+### Subscribe
+**v1.0.0**
+
 Providing ```IObserver<T>```:
 ```C#
 using var subscription = new KSqlDBContext(@"http:\\localhost:8088")
@@ -92,7 +95,9 @@ using var subscription = new KSqlDBContext(@"http:\\localhost:8088")
       );
 ```
 
-### ToObservable (v0.1.0)
+### ToObservable
+**v1.0.0**
+
 Moving to [Rx.NET](https://github.com/dotnet/reactive)
 The following code snippet shows how to observe messages on the desired [IScheduler](http://introtorx.com/Content/v1.0.10621.0/15_SchedulingAndThreading.html): 
 
@@ -310,6 +315,42 @@ Generated KSQL:
 CREATE OR REPLACE TABLE MoviesByTitle
 AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
 WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
+```
+
+### Raw string KSQL query execution
+
+The following examples show how to execute ksql queries from strings:
+```C#
+string ksql = @"SELECT * FROM Movies
+WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
+
+QueryParameters queryParameters = new QueryParameters
+{
+  Sql = ksql,
+  [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
+};
+
+await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+
+var moviesSource = context.CreateQuery<Movie>(queryParameters)
+  .ToObservable();
+```
+
+Query stream:
+```C#
+string ksql = @"SELECT * FROM Movies
+WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
+
+QueryStreamParameters queryStreamParameters = new QueryStreamParameters
+{
+  Sql = ksql,
+  [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
+};
+
+await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+
+var source = context.CreateQueryStream<Movie>(queryStreamParameters)
+  .ToObservable();
 ```
 
 ### WithOffsetResetPolicy - push queries extension method
