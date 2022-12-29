@@ -867,6 +867,74 @@ public KSqlDbStatement CreateStatement(string statement)
 }
 ```
 
+### HttpResponseMessage ToStatementResponses extension
+
+```C#
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+
+var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement);
+
+var responses = httpResponseMessage.ToStatementResponses();
+
+foreach (var response in responses)
+{
+	Console.WriteLine(response.CommandStatus);
+	Console.WriteLine(response.CommandId);
+}
+```
+
+### Create or replace table statements
+**v1.0.0**
+
+| Statement                                                                                                             | Description                                                                                                                                                                                     |
+|-----------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [EXECUTE STATEMENTS](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)                              | CreateStatementAsync - execution of general-purpose string statements                                                                                                                           |
+| [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/)                     | CreateStreamAsync - Create a new stream with the specified columns and properties.                                                                                                              |
+| [CREATE TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table/)                       | CreateTableAsync - Create a new table with the specified columns and properties.                                                                                                                |
+| [CREATE STREAM AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream-as-select/) | CreateOrReplaceStreamStatement - Create or replace a new materialized stream view, along with the corresponding Kafka topic, and stream the result of the query into the topic.                 |
+| [CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/)   | CreateOrReplaceTableStatement - Create or replace a ksqlDB materialized table view, along with the corresponding Kafka topic, and stream the result of the query as a changelog into the topic. |
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Linq.Statements;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+
+public static async Task Main(string[] args)
+{
+  await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+  await CreateOrReplaceTableStatement(context);
+}
+
+private static async Task CreateOrReplaceTableStatement(IKSqlDBStatementsContext context)
+{
+  var creationMetadata = new CreationMetadata
+  {
+    KafkaTopic = "moviesByTitle",		
+    KeyFormat = SerializationFormats.Json,
+    ValueFormat = SerializationFormats.Json,
+    Replicas = 1,
+    Partitions = 1
+  };
+
+  var httpResponseMessage = await context.CreateOrReplaceTableStatement(tableName: "MoviesByTitle")
+    .With(creationMetadata)
+    .As<Movie>()
+    .Where(c => c.Id < 3)
+    .Select(c => new {c.Title, ReleaseYear = c.Release_Year})
+    .PartitionBy(c => c.Title)
+    .ExecuteStatementAsync();
+
+  var statementResponse = httpResponseMessage.ToStatementResponses();
+}
+```
+
+Generated KSQL statement:
+```KSQL
+CREATE OR REPLACE TABLE MoviesByTitle
+WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
+AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
+WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
+```
+
 ### Creating streams and tables
 **v1.0.0**
 
