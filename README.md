@@ -223,6 +223,36 @@ List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 
 - [IKSqlGrouping.Source](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#iksqlgroupingsource)
 
+# Register the KsqlDbContext
+`IKSqlDBContext` and `IKSqlDbRestApiClient` can be provided with dependency injection. These services can be registered during app startup and components that require these services, are provided with these services via constructor parameters.
+
+To register KsqlDbContext as a service, open Program.cs, and add the lines to the ConfigureServices method shown bellow:
+
+```
+using ksqlDB.RestApi.Client.Sensors;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDb.RestApi.Client.DependencyInjection;
+using ksqlDB.RestApi.Client.Sensors.KSqlDb;
+
+IHost host = Host.CreateDefaultBuilder(args)
+    .ConfigureServices(services =>
+    {
+      var ksqlDbUrl = @"http:\\localhost:8088";
+
+      services.AddDbContext<ISensorsKSqlDbContext, SensorsKSqlDbContext>(
+        options =>
+        {
+          var setupParameters = options.UseKSqlDb(ksqlDbUrl);
+
+          setupParameters.SetAutoOffsetReset(AutoOffsetReset.Earliest);
+
+        }, ServiceLifetime.Transient, restApiLifetime: ServiceLifetime.Transient);
+    })
+    .Build();
+
+await host.RunAsync();
+```
+
 ### Aggregation functions
 List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md):
 - [GROUP BY](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#groupby)
