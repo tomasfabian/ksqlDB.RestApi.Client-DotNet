@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Fakes.Logging;
 using ksqlDB.Api.Client.Tests.Models.Movies;
@@ -12,6 +12,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Moq.Protected;
+using System.Linq.Expressions;
+using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
 
@@ -34,8 +38,8 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
     ClassUnderTest = new KSqlDbRestApiClient(HttpClientFactory, LoggerFactoryMock.Object);
   }
-    
-  string createOrReplaceTableStatement = "CREATE OR REPLACE TABLE movies";
+
+  readonly string createOrReplaceTableStatement = "CREATE OR REPLACE TABLE movies";
 
   private string StatementResponse => @"[{""@type"":""currentStatus"",""statementText"":""CREATE OR REPLACE TABLE MOVIES (TITLE STRING PRIMARY KEY, ID INTEGER, RELEASE_YEAR INTEGER) WITH (KAFKA_TOPIC='Movies', KEY_FORMAT='KAFKA', PARTITIONS=1, VALUE_FORMAT='JSON');"",""commandId"":""table/`MOVIES`/create"",""commandStatus"":{""status"":""SUCCESS"",""message"":""Table created"",""queryId"":null},""commandSequenceNumber"":328,""warnings"":[]}]
 ";
@@ -302,9 +306,9 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
       
     VerifySendAsync(expectedContent);
   }
-    
-  string queryId = "CTAS_MOVIESBYTITLE_35";
-  string type = "@type";
+
+  readonly string queryId = "CTAS_MOVIESBYTITLE_35";
+  readonly string type = "@type";
 
   private string TerminatePersistentQueryResponse => $@"[{{""{type}"":""currentStatus"",""statementText"":""TERMINATE {queryId};"",""commandId"":""terminate/{queryId}/execute"",""commandStatus"":{{""status"":""SUCCESS"",""message"":""Query terminated."",""queryId"":null}},""commandSequenceNumber"":40,""warnings"":[]}}]";
 
@@ -495,7 +499,41 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     //Assert
     insertStatement.Sql.Should().Be("INSERT INTO Movies (Title, Id, Release_Year) VALUES (NULL, 1, 0);");
   }
-  
+
+  [KSqlFunction]
+  public static string FormatTimestamp(long input, string format) => throw new NotSupportedException();
+
+  [KSqlFunction]
+  public static long FROM_UNIXTIME(long milliseconds) => throw new NotSupportedException();
+
+  [KSqlFunction]
+  public static long UnixTimestamp() => throw new NotSupportedException();
+
+  private struct Article
+  {
+    [IgnoreByInserts]
+    public long RowTime { get; set; }
+    public string Title { get; set; }
+    [Key]
+    public int Id { get; set; }
+    public string Release_Date { get; set; }
+  }
+
+  [TestMethod]
+  public void ToInsertStatement_WithFunction()
+  {
+    //Arrange
+    Expression<Func<string>> valueExpression = () => FormatTimestamp(FROM_UNIXTIME(UnixTimestamp()), "yyyy");
+    var insertValues = new InsertValues<Article>(new Article()).WithValue(c => c.Release_Date, valueExpression);
+
+    //Act
+    var insertStatement = ClassUnderTest.ToInsertStatement(insertValues);
+
+    //Assert
+    string expectedFunction = "FORMAT_TIMESTAMP(FROM_UNIXTIME(UNIX_TIMESTAMP()), 'yyyy')";
+    insertStatement.Sql.Should().Be($"INSERT INTO Articles ({nameof(Article.Title)}, Id, {nameof(Article.Release_Date)}) VALUES (NULL, 0, {expectedFunction});");
+  }
+
   [TestMethod]
   public async Task AssertTopicExistsAsync_ReturnsTrue()
   {
