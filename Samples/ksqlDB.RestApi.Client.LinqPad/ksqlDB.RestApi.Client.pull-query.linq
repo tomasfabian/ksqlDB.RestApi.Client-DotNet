@@ -16,11 +16,17 @@ IKSqlDbRestApiClient restApiClient;
 
 async Task Main()
 {
-	string url = @"http:\\localhost:8088";
-	await using var context = new KSqlDBContext(url);
+	string ksqlDbUrl = @"http:\\localhost:8088";
+	await using var context = new KSqlDBContext(ksqlDbUrl);
 
-	var http = new HttpClientFactory(new Uri(url));
-	restApiClient = new KSqlDbRestApiClient(http);
+	var httpClient = new HttpClient
+	{
+		BaseAddress = new Uri(ksqlDbUrl)
+	};
+
+	var httpClientFactory = new HttpClientFactory(httpClient);
+	
+	restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 	
 	await CreateOrReplaceStreamAsync();
 	

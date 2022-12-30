@@ -21,11 +21,17 @@
 
 async Task Main()
 {
-	string url = @"http:\\localhost:8088";
-	await using var context = new KSqlDBContext(url);
+	string ksqlDbUrl = @"http:\\localhost:8088";
+	await using var context = new KSqlDBContext(ksqlDbUrl);
 
-	var http = new HttpClientFactory(new Uri(url));
-	restApiClient = new KSqlDbRestApiClient(http);
+	var httpClient = new HttpClient
+	{
+		BaseAddress = new Uri(ksqlDbUrl)
+	};
+
+	var httpClientFactory = new HttpClientFactory(httpClient);
+
+	restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
 	await CreateMoviesStreamAsync();
 	
@@ -88,10 +94,15 @@ async Task CreateOrReplaceStreamAsync()
 		EntityName = MoviesStreamName
 	};
 
-	string url = @"http:\\localhost:8088";
-
-	var http = new HttpClientFactory(new Uri(url));
-	var restApiClient = new KSqlDbRestApiClient(http);
+	string ksqlDbUrl = @"http:\\localhost:8088";
+	
+	var httpClient = new HttpClient
+	{
+		BaseAddress = new Uri(ksqlDbUrl)
+	};
+	
+	var httpClientFactory = new HttpClientFactory(httpClient);
+	var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
 	var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<Movie>(metadata);
 }

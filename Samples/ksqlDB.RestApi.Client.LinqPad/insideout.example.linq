@@ -91,9 +91,13 @@ private async Task<HttpResponseMessage> TryCreateStreamAsync()
 		Replicas = 1
 	};
 
-	var http = new HttpClientFactory(new Uri(KsqlDbUrl));
-	var restApiClient = new KSqlDbRestApiClient(http);
+	var httpClient = new HttpClient
+	{
+		BaseAddress = new Uri(KsqlDbUrl)
+	};
 
+	var httpClientFactory = new HttpClientFactory(httpClient);
+	var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 	var httpResponseMessage = await restApiClient.CreateStreamAsync<IoTSensor>(metadata, ifNotExists: true);
 
 	return httpResponseMessage;

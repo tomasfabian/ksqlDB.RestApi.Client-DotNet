@@ -137,8 +137,7 @@ private async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationTok
 	string fromName = "sqlserversensorsv2";
 	string kafkaTopic = "sqlserver2019.dbo.Sensors";
 
-	var httpClientFactory = new HttpClientFactory(new Uri(KsqlDbUrl));
-
+	var httpClientFactory = CreateHttpClientFactory();
 	var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
 	EntityCreationMetadata metadata = new()
@@ -158,7 +157,7 @@ private async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationTok
 
 private async Task CreateConnectorAsync()
 {
-	var ksqlDbConnect = new KsqlDbConnect(new Uri(KsqlDbUrl));
+	var ksqlDbConnect = new KsqlDbConnect(CreateHttpClientFactory());
 
 	SqlServerConnectorMetadata connectorMetadata = CreateConnectorMetadata();
 
@@ -183,9 +182,21 @@ private SqlServerConnectorMetadata CreateConnectorMetadata()
 	return createConnector as SqlServerConnectorMetadata;
 }
 
+private ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory CreateHttpClientFactory()
+{
+	var httpClient = new HttpClient
+	{
+		BaseAddress = new Uri(KsqlDbUrl)
+	};
+
+	var httpClientFactory = new HttpClientFactory(httpClient);
+	
+	return httpClientFactory;
+}
+
 public Task<HttpResponseMessage> ExecuteStatementAsync(KSqlDbStatement ksqlDbStatement, CancellationToken cancellationToken = default)
 {
-	var httpClientFactory = new HttpClientFactory(new Uri(KsqlDbUrl));
+	var httpClientFactory = CreateHttpClientFactory();
 
 	var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
