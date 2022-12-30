@@ -1,10 +1,11 @@
-﻿using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Connectors;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Queries;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Streams;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Tables;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Topics;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi;
@@ -95,14 +96,23 @@ public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient
   /// <param name="cancellationToken"></param>
   /// <returns>Http response object.</returns>
   Task<HttpResponseMessage> InsertIntoAsync<T>(T entity, InsertProperties insertProperties = null, CancellationToken cancellationToken = default);
+  
+  /// <summary>
+  /// Generates raw 'Insert Into' string, but does not execute it.
+  /// </summary>
+  /// <typeparam name="T">Type of entity</typeparam>
+  /// <param name="insertValues">Insert values</param>
+  /// <param name="insertProperties">Insert configuration</param>
+  /// <returns>A <see cref="KSqlDbStatement"/></returns>
+  KSqlDbStatement ToInsertStatement<T>(InsertValues<T> insertValues, InsertProperties insertProperties = null);
 
   /// <summary>
-  /// Generates raw string Insert Into, but does not execute it.
+  /// Generates raw 'Insert Into' string, but does not execute it.
   /// </summary>
-  /// <typeparam name="T"></typeparam>
+  /// <typeparam name="T">Type of entity</typeparam>
   /// <param name="entity">Entity for insertion.</param>
   /// <param name="insertProperties">Overrides conventions.</param>
-  /// <returns></returns>
+  /// <returns>A <see cref="KSqlDbStatement"/></returns>
   KSqlDbStatement ToInsertStatement<T>(T entity, InsertProperties insertProperties = null);
 
   /// <summary>
