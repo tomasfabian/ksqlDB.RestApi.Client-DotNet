@@ -539,6 +539,15 @@ public async Task CreateGetAndDropConnectorAsync()
 }
 ```
 
+```SQL
+SHOW CONNECTORS;
+
+CREATE SOURCE CONNECTOR `mock-connector` WITH(
+      'connector.class'='org.apache.kafka.connect.tools.MockSourceConnector');
+
+DROP CONNECTOR `mock-connector`;
+```
+
 ### CreateTypeAsync
 **v1.6.0**
 
@@ -669,7 +678,22 @@ Parameters:
 
 [Repartition a stream.](https://docs.ksqldb.io/en/0.15.0-ksqldb/developer-guide/joins/partition-data/)
 
-**TODO:** add example
+```C#
+var httpResponseMessage = await context.CreateOrReplaceTableStatement(tableName: "TweetsByTitle")
+  .With(creationMetadata)
+  .As<Movie>()
+  .Where(c => c.Id < 3)
+  .Select(c => new { c.Title, ReleaseYear = c.Release_Year })
+  .PartitionBy(c => c.Title)
+  .ExecuteStatementAsync();
+```
+
+```SQL
+CREATE OR REPLACE TABLE TweetsByTitle
+ WITH ( KAFKA_TOPIC='tweetsByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
+AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
+WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
+```
 
 ### Pause and resume persistent queries
 **v2.5.0**
