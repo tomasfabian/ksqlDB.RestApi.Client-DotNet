@@ -2,6 +2,7 @@
 
 ### Take (LIMIT)
 **v1.0.0**
+
 Returns a specified number of contiguous elements from the start of a stream. Depends on the 'auto.topic.offset' parameter.
 
 ```C#
@@ -16,7 +17,14 @@ SELECT * from tweets EMIT CHANGES LIMIT 2;
 ### Select
 **v1.0.0**
 
-- generation of values from captured variables
+Projects each element of a stream into a new form.
+```C#
+context.CreateQueryStream<Tweet>()
+  .Select(l => new { l.RowTime, l.Message });
+```
+Omitting select is equivalent to SELECT *
+
+- selecting of values from captured variables
 
 ```C#
 var value = new FooClass { Property = 42 };
@@ -33,10 +41,31 @@ Is equivalent with:
 SELECT STRUCT(Property := 42) AS Value FROM Locations EMIT CHANGES;
 ```
 
+### Where
+**v1.0.0**
+
+Filters a stream of values based on a predicate.
+```C#
+context.CreateQueryStream<Tweet>()
+  .Where(p => p.Message != "Hello world" || p.Id == 1)
+  .Where(p => p.RowTime >= 1510923225000);
+```
+Multiple Where statements are joined with AND operator. 
+```KSQL
+SELECT * FROM Tweets
+WHERE Message != 'Hello world' OR Id = 1 AND RowTime >= 1510923225000
+EMIT CHANGES;
+```
+
+List of supported operators is [documented here](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md).
+
 ### Window Bounds
+
 The WHERE clause must contain a value for each primary-key column to retrieve and may optionally include bounds on WINDOWSTART and WINDOWEND if the materialized table is windowed.
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
+
+const string MaterializedViewName = "avg_sensor_values";
 
 string windowStart = "2019-10-03T21:31:16";
 string windowEnd = "2025-10-03T21:31:16";
@@ -141,6 +170,7 @@ private static IDisposable ClientSideBatching(KSqlDBContext context)
 ```
 
 ### ToQueryString
+
 ToQueryString is helpful for debugging purposes. It returns the generated ksql query without executing it.
 ```C#
 var ksql = context.CreateQueryStream<Tweet>().ToQueryString();
