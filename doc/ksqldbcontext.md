@@ -69,6 +69,11 @@ using var disposable = context.CreateQuery<Movie>()
     Console.WriteLine();
   }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
 ```
+
+# TFM netstandard 2.0 (.Net Framework, NetCoreApp 2.0 etc.)
+netstandard 2.0 does not support Http 2.0. Due to this ```IKSqlDBContext.CreateQueryStream<TEntity>``` is not exposed at the current version. 
+For these reasons ```IKSqlDBContext.CreateQuery<TEntity>``` was introduced to provide the same functionality via Http 1.1. 
+
 ### KSqlDbContextOptionsBuilder SetProcessingGuarantee
 **v1.0.0**
 

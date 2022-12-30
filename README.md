@@ -173,7 +173,6 @@ contextOptions.QueryStreamParameters["auto.offset.reset"] = "latest";
 Stream names are generated based on the generic record types. They are pluralized with Pluralize.NET package
 
 **By default the generated from item names such as stream and table names are pluralized**. This behaviour could be switched off with the following `ShouldPluralizeStreamName` configuration. 
-> ⚠  KSqlDBContextOptions.ShouldPluralizeStreamName was renamed to ShouldPluralizeFromItemName
 
 ```C#
 context.CreateQueryStream<Person>();
@@ -185,21 +184,13 @@ This can be disabled:
 ```C#
 var contextOptions = new KSqlDBContextOptions(@"http:\\localhost:8088")
 {
-  ShouldPluralizeStreamName = false
+  ShouldPluralizeFromItemName = false
 };
 
 new KSqlDBContext(contextOptions).CreateQueryStream<Person>();
 ```
 ```SQL
 FROM Person
-```
-
-In v1.0 was ShouldPluralizeStreamName renamed to **ShouldPluralizeFromItemName**
-```C#
-var contextOptions = new KSqlDBContextOptions(@"http:\\localhost:8088")
-{
-  ShouldPluralizeFromItemName = false
-};
 ```
 
 Setting an arbitrary stream name (from_item name):
@@ -215,6 +206,7 @@ FROM custom_topic_name
 
 List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md) extension methods:
 - [Select](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#select)
+- [Where](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#where)
 - [Take (LIMIT)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#take-limit)
 - [Subscribe](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribe)
 - [ToObservable](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#toobservable)
@@ -230,42 +222,6 @@ List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [Raw string KSQL query execution](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#raw-string-ksql-query-execution)
 
 - [IKSqlGrouping.Source](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#iksqlgroupingsource)
-
-### Select (v0.1.0)
-Projects each element of a stream into a new form.
-```C#
-context.CreateQueryStream<Tweet>()
-  .Select(l => new { l.RowTime, l.Message });
-```
-Omitting select is equivalent to SELECT *
-
-### Where (v0.1.0)
-Filters a stream of values based on a predicate.
-```C#
-context.CreateQueryStream<Tweet>()
-  .Where(p => p.Message != "Hello world" || p.Id == 1)
-  .Where(p => p.RowTime >= 1510923225000);
-```
-Multiple Where statements are joined with AND operator. 
-```KSQL
-SELECT * FROM Tweets
-WHERE Message != 'Hello world' OR Id = 1 AND RowTime >= 1510923225000
-EMIT CHANGES;
-```
-
-Supported operators are:
-
-|   ksql   |           meaning           |  c#  |
-|:--------:|:---------------------------:|:----:|
-| =        | is equal to                 | ==   |
-| != or <> | is not equal to             | !=   |
-| <        | is less than                | <    |
-| <=       | is less than or equal to    | <=   |
-| >        | is greater than             | >    |
-| >=       | is greater than or equal to | >=   |
-| AND      | logical AND                 | &&   |
-| OR       | logical OR                  | \|\| |
-| NOT      | logical NOT                 |  !   |
 
 ### Aggregation functions
 List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md):
@@ -290,12 +246,6 @@ List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/
 [Rest api reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
 [Some KSql function examples can be found here](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/KSql-functions)
-
-# TFM netstandard 2.0 (.Net Framework, NetCoreApp 2.0 etc.)
-netstandard 2.0 does not support Http 2.0. Due to this ```IKSqlDBContext.CreateQueryStream<TEntity>``` is not exposed at the current version. 
-For these reasons ```IKSqlDBContext.CreateQuery<TEntity>``` was introduced to provide the same functionality via Http 1.1. 
-
-Redundant brackets are not reduced in the current version
 
 **Data definititions:**
 - [Headers](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_definitions.md#access-record-header-data-v160)
@@ -322,15 +272,15 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [ExecutePullQuery](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/pull_queries.md#pull-queries---executepullquery)
 
 **List of supported ksqlDB SQL statements:**
-- [Pause and resume persistent qeries](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#pause-and-resume-persistent-qeries-v250)
+- [Pause and resume persistent qeries](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#pause-and-resume-persistent-queries)
 - [InsertProperties.UseInstanceType](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#insertpropertiesuseinstancetype)
 - [Added support for extracting field names and values (for insert and select statements)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#added-support-for-extracting-field-names-and-values-for-insert-and-select-statements)
 - [AssertTopicExistsAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#asserttopicexistsasync-and-asserttopicnotexistsasync)
 - [AssertSchemaExistsAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#assertschemaexistsasync-and-assertschemanotexistsasync)
 - [Rename stream or table column names with the `JsonPropertyNameAttribute`](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#rename-stream-or-table-column-names-with-the-jsonpropertynameattribute)
-- [IKSqlDbRestApiClient CreateSourceStreamAsync and CreateSourceTableAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#iksqldbrestapiclient-createsourcestreamasync-and-createsourcetableasync)
+- [CreateSourceStreamAsync and CreateSourceTableAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#createsourcestreamasync-and-createsourcetableasync)
 - [InsertProperties.IncludeReadOnlyProperties](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#insertpropertiesincludereadonlyproperties)
-- [InsertIntoAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#ksqldbrestapiclientinsertintoasync)
+- [InsertIntoAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#insertintoasync)
 - [Connectors](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#connectors)
 - [Drop a stream](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#drop-a-stream)
 - [Drop type](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#droping-types)
@@ -349,6 +299,7 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [Get tables](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#get-tables)
 
 **KSqlDbContext**
+- [Dependency injection with ServicesCollection](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/4e6487dbf201f4318da88707d62e1a75c6cef402/doc/ksqldbcontext.md#logging-info-and-configureksqldb)
 - [CreateQueryStream](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#createquerystream)
 - [CreateQuery](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#createquery)
 - [AddDbContext and AddDbContextFactory](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#ksqldbservicecollectionextensions---adddbcontext-and-adddbcontextfactory)
@@ -358,6 +309,7 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [KSqlDbContextOptionsBuilder](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#ksqldbcontextoptionsbuilder)
 
 **Config:**
+- [Bearer token authentication](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#bearer-token-authentication)
 - [KSqlDbContextOptionsBuilder.ReplaceHttpClient](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#ksqldbcontextoptionsbuilderreplacehttpclient)
 - [ProcessingGuarantee](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#processingguarantee-enum)
 
@@ -376,7 +328,7 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [Operators](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md)
 - [Invocation functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/functions.md#improved-invocation-function-extensions)
 - [SetJsonSerializerOptions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#setjsonserializeroptions)
-- [Kafka stream processing example](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/stream_processing_.md)
+- [Kafka stream processing example](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/stream_processing.md)
 
 **Functions**
 - [String functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/functions.md#string-functions)

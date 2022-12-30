@@ -11,7 +11,7 @@ var restApiClient = new KSqlDbRestApiClient(httpClientFactory)
   .SetCredentials(new BasicAuthCredentials("fred", "letmein"));
 ```
 
-### KSqlDbRestApiClient.InsertIntoAsync
+### InsertIntoAsync
 - added support for deeply nested types - Maps, Structs and Arrays
 
 ```C#
@@ -34,7 +34,7 @@ record ArrayOfMaps
 }
 ```
 
-### KSqlDbRestApiClient.InsertIntoAsync
+### InsertIntoAsync
 **v1.0.0**
 
 - added support for ```IEnumerable<T>``` properties
@@ -308,11 +308,11 @@ Generated KSQL statement:
  WITH ( KAFKA_TOPIC='tweets', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='3', KEY_SCHEMA_ID=1, VALUE_SCHEMA_ID=2 )
 ```
 
-### IKSqlDbRestApiClient CreateSourceStreamAsync and CreateSourceTableAsync
+### CreateSourceStreamAsync and CreateSourceTableAsync
 **v1.4.0**
 
-- CreateSourceStreamAsync - creates a read-only stream
-- CreateSourceTableAsync - creates a read-only table
+- `CreateSourceStreamAsync` - creates a read-only stream
+- `CreateSourceTableAsync` - creates a read-only table
 
 ```C#
 string entityName = nameof(IoTSensor;
@@ -356,26 +356,6 @@ CREATE OR REPLACE STREAM Data (
 	data_id VARCHAR
 ) WITH ( KAFKA_TOPIC='data_values', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );
 ```
-
-### Pause and resume persistent qeries (v2.5.0)
-`PausePersistentQueryAsync` - Pause a persistent query.
-`ResumePersistentQueryAsync` - Resume a paused persistent query.
-
-```C#
-private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient restApiClient)
-{
-  string topicName = "moviesByTitle";
-
-  var queries = await restApiClient.GetQueriesAsync();
-
-  var query = queries.SelectMany(c => c.Queries).FirstOrDefault(c => c.SinkKafkaTopics.Contains(topicName));
-
-  var response = await restApiClient.PausePersistentQueryAsync(query.Id);
-  response = await restApiClient.ResumePersistentQueryAsync(query.Id);
-  response = await restApiClient.TerminatePersistentQueryAsync(query.Id);
-}
-```
-
 
 ### Added support for extracting field names and values (for insert and select statements)
 **v2.4.0**
@@ -630,6 +610,10 @@ record Event
 }
 ```
 
+```SQL
+CREATE TYPE EVENTCATEGORY AS STRUCT<Name VARCHAR>;
+```
+
 ### Droping types
 **v1.0.0**
 
@@ -668,6 +652,12 @@ var httpResponseMessage = ksqlDbRestApiClient.DropStreamAsync(streamName);
 httpResponseMessage = ksqlDbRestApiClient.DropStreamAsync(streamName, useIfExistsClause: true, deleteTopic: true);
 ```
 
+```SQL
+DROP STREAM StreamName;
+
+DROP STREAM IF EXISTS StreamName DELETE TOPIC;
+```
+
 Parameters:
 
 `useIfExistsClause` - If the IF EXISTS clause is present, the statement doesn't fail if the stream doesn't exist.
@@ -681,6 +671,32 @@ Parameters:
 
 **TODO:** add example
 
+### Pause and resume persistent queries
+**v2.5.0**
+
+`PausePersistentQueryAsync` - Pause a persistent query.
+`ResumePersistentQueryAsync` - Resume a paused persistent query.
+
+```C#
+private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient restApiClient)
+{
+  string topicName = "moviesByTitle";
+
+  var queries = await restApiClient.GetQueriesAsync();
+
+  var query = queries.SelectMany(c => c.Queries).FirstOrDefault(c => c.SinkKafkaTopics.Contains(topicName));
+
+  var response = await restApiClient.PausePersistentQueryAsync(query.Id);
+  response = await restApiClient.ResumePersistentQueryAsync(query.Id);
+  response = await restApiClient.TerminatePersistentQueryAsync(query.Id);
+}
+```
+
+```SQL
+PAUSE xyz123;
+RESUME xyz123;
+```
+
 ### Terminate push queries
 **v1.0.0**
 
@@ -690,6 +706,10 @@ Parameters:
 string queryId = "xyz123"; // <----- the ID of the query to terminate
 
 var response = await restApiClient.TerminatePushQueryAsync(queryId);
+```
+
+```SQL
+TERMINATE xyz123;
 ```
 
 ### Drop a table
@@ -782,6 +802,13 @@ private static async Task GetKsqlDbInformationAsync(IKSqlDbRestApiProvider restA
 }
 ```
 
+```SQL
+SHOW TOPICS;
+SHOW ALL TOPICS;
+SHOW TOPICS EXTENDED;
+SHOW ALL TOPICS EXTENDED;
+```
+
 ### Getting queries and termination of persistent queries
 **v1.0.0**
 
@@ -804,6 +831,10 @@ private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient cli
 
   var response = await client.TerminatePersistentQueryAsync(query.Id);
 }
+```
+
+```SQL
+SHOW QUERIES;
 ```
 
 ### ExecuteStatementAsync
@@ -1013,6 +1044,10 @@ CREATE TABLE IF NOT EXISTS MyMovies (
 
 - `IKSqlDbRestApiClient.GetStreamsAsync` - List the defined streams.
 
+```SQL
+SHOW STREAMS;
+```
+
 ```C#
 var streamResponses = await restApiClient.GetStreamsAsync();
 
@@ -1023,6 +1058,10 @@ Console.WriteLine(string.Join(',', streamResponses[0].Streams.Select(c => c.Name
 **v1.0.0**
 
 - `IKSqlDbRestApiClient.GetTablesAsync` - List the defined tables.
+
+```SQL
+SHOW TABLES;
+```
 
 ```C#
 var tableResponses = await restApiClient.GetTablesAsync();
