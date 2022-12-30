@@ -10,6 +10,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -213,14 +214,14 @@ public class KSqlDBContextTests : TestBase
     var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
       
     var entity = new Tweet();
-    context.KSqlDbRestApiClientMock.Setup(c => c.ToInsertStatement(entity, null)).Returns(new KSqlDbStatement("Insert Into"));
+    context.KSqlDbRestApiClientMock.Setup(c => c.ToInsertStatement(It.IsAny<InsertValues<Tweet>>(), null)).Returns(new KSqlDbStatement("Insert Into"));
       
     //Act
     context.Add(entity);
     await context.SaveChangesAsync();
 
     //Assert
-    context.KSqlDbRestApiClientMock.Verify(c => c.ToInsertStatement(entity, null), Times.Once);
+    context.KSqlDbRestApiClientMock.Verify(c => c.ToInsertStatement(It.Is<InsertValues<Tweet>>(c => c.Entity == entity), null), Times.Once);
     context.KSqlDbRestApiClientMock.Verify(c => c.ExecuteStatementAsync(It.IsAny<KSqlDbStatement>(), It.IsAny<CancellationToken>()), Times.Once);
   }
 
@@ -230,15 +231,34 @@ public class KSqlDBContextTests : TestBase
     //Arrange
     var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
     var entity = new Tweet();
-    context.KSqlDbRestApiClientMock.Setup(c => c.ToInsertStatement(entity, null)).Returns(new KSqlDbStatement("Insert Into"));
+    context.KSqlDbRestApiClientMock.Setup(c => c.ToInsertStatement(It.IsAny<InsertValues<Tweet>>(), null)).Returns(new KSqlDbStatement("Insert Into"));
       
     //Act
     context.Add(entity);
     context.Add(entity);
 
     //Assert
-    context.KSqlDbRestApiClientMock.Verify(c => c.ToInsertStatement(entity, null), Times.Exactly(2));
+    context.ChangesCache.Count.Should().Be(2);
+
+    context.KSqlDbRestApiClientMock.Verify(c => c.ToInsertStatement(It.Is<InsertValues<Tweet>>(c => c.Entity == entity), null), Times.Exactly(2));
     context.KSqlDbRestApiClientMock.Verify(c => c.ExecuteStatementAsync(It.IsAny<KSqlDbStatement>(), It.IsAny<CancellationToken>()), Times.Never);
+  }
+
+  [TestMethod]
+  public void Add_InsertValues_WereCached()
+  {
+    //Arrange
+    var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
+
+    var entity = new Tweet();
+    var insertValues = new InsertValues<Tweet>(entity);
+    context.KSqlDbRestApiClientMock.Setup(c => c.ToInsertStatement(insertValues, null)).Returns(new KSqlDbStatement("Insert Into"));
+
+    //Act
+    context.Add(insertValues);
+
+    //Assert
+    context.ChangesCache.Count.Should().Be(1);
   }
 
   [TestMethod]
@@ -253,7 +273,7 @@ public class KSqlDBContextTests : TestBase
     context.Add(entity, insertProperties);
 
     //Assert
-    context.KSqlDbRestApiClientMock.Verify(c => c.ToInsertStatement(entity, insertProperties), Times.Once);
+    context.KSqlDbRestApiClientMock.Verify(c => c.ToInsertStatement(It.IsAny<InsertValues<Tweet>>(), insertProperties), Times.Once);
   }
 
   [TestMethod]
