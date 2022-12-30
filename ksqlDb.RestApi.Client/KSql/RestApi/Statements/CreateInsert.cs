@@ -28,7 +28,7 @@ internal sealed class CreateInsert : CreateEntityStatement
     var useEntityType = insertProperties is {UseInstanceType: true};
     var entityType = useEntityType ? insertValues.Entity.GetType() : typeof(T);
 
-    foreach (var memberInfo in Members(entityType, insertProperties?.IncludeReadOnlyProperties))
+    foreach (var memberInfo in Members(entityType, insertProperties.IncludeReadOnlyProperties))
     {
       if (isFirst)
       {

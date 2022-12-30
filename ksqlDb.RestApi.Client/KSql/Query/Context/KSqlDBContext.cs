@@ -1,10 +1,11 @@
-﻿using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.PullQueries;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Clauses;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -205,15 +206,26 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 
   #region SaveChanges
 
-  private readonly ChangesCache changesCache = new();
+  internal readonly ChangesCache ChangesCache = new();
 
   /// <summary>
   /// Add entity for insertion. In order to save them call SaveChangesAsync.
   /// </summary>
-  /// <typeparam name="T"></typeparam>
-  /// <param name="entity">Entity to add</param>
+  /// <typeparam name="T">Type of entity to add.</typeparam>
+  /// <param name="entity">Entity to add.</param>
   /// <param name="insertProperties">Optional insert properties.</param>
   public void Add<T>(T entity, InsertProperties insertProperties = null)
+  {
+    Add(new InsertValues<T>(entity), insertProperties);
+  }
+
+  /// <summary>
+  /// Add entity for insertion. In order to save them call SaveChangesAsync.
+  /// </summary>
+  /// <typeparam name="T">Type of entity to add.</typeparam>
+  /// <param name="insertValues">Configurable insert values.</param>
+  /// <param name="insertProperties">Optional insert properties.</param>
+  public void Add<T>(InsertValues<T> insertValues, InsertProperties insertProperties = null)
   {
     var serviceScopeFactory = Initialize(contextOptions);
 
@@ -221,9 +233,9 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 
     var restApiClient = scope.ServiceProvider.GetRequiredService<IKSqlDbRestApiClient>();
 
-    var statement = restApiClient.ToInsertStatement(entity, insertProperties);
+    var statement = restApiClient.ToInsertStatement(insertValues, insertProperties);
 
-    changesCache.Enqueue(statement);
+    ChangesCache.Enqueue(statement);
   }
 
   private readonly CancellationTokenSource cts = new();
@@ -234,7 +246,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
   /// <returns>Save response.</returns>
   public async Task<HttpResponseMessage> SaveChangesAsync(CancellationToken cancellationToken = default)
   {
-    if (changesCache.IsEmpty)
+    if (ChangesCache.IsEmpty)
       return null;
 
     var serviceScopeFactory = Initialize(contextOptions);
@@ -243,7 +255,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 
     var restApiClient = scope.ServiceProvider.GetRequiredService<IKSqlDbRestApiClient>();
 
-    return await changesCache.SaveChangesAsync(restApiClient, cancellationToken).ConfigureAwait(false);
+    return await ChangesCache.SaveChangesAsync(restApiClient, cancellationToken).ConfigureAwait(false);
   }
 
   #endregion
