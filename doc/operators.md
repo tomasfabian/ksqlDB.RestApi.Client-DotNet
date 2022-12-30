@@ -1,5 +1,19 @@
 # Operators
 
+Supported operators are:
+
+|   ksql   |           meaning           |  c#  |
+|:--------:|:---------------------------:|:----:|
+| =        | is equal to                 | ==   |
+| != or <> | is not equal to             | !=   |
+| <        | is less than                | <    |
+| <=       | is less than or equal to    | <=   |
+| >        | is greater than             | >    |
+| >=       | is greater than or equal to | >=   |
+| AND      | logical AND                 | &&   |
+| OR       | logical OR                  | \|\| |
+| NOT      | logical NOT                 |  !   |
+
 ### Operator LIKE - String.StartsWith, String.EndsWith, String.Contains
 **v1.3.0**
 
@@ -171,3 +185,4 @@ SELECT * FROM Locations
 WHERE ((Latitude = '1') OR (Latitude != '2')) AND (Latitude = '3') EMIT CHANGES;
 ```
 
+Redundant brackets are not reduced in the current version.
