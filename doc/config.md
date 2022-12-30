@@ -47,6 +47,52 @@ internal class DebugHandler : System.Net.Http.DelegatingHandler
 }
 ```
 
+### Bearer token authentication
+
+```C#
+using System.Net.Http.Headers;
+using ksqlDb.RestApi.Client.DependencyInjection;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using Microsoft.Extensions.DependencyInjection;
+using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
+
+namespace ksqlDB.Api.Client.Samples;
+
+public static class KSqlDDbServiceCollectionExtensions
+{
+  public static void Configure(this IServiceCollection services, string ksqlDbUrl)
+  {
+    services.AddDbContext<IKSqlDBContext, KSqlDBContext>(c =>
+    {
+      c.UseKSqlDb(ksqlDbUrl);
+
+      c.ReplaceHttpClient<IHttpClientFactory, HttpClientFactory>(_ => { })
+        .AddHttpMessageHandler(_ => new BearerAuthHandler());
+    });
+  }
+}
+
+internal class BearerAuthHandler : DelegatingHandler
+{
+  public BearerAuthHandler()
+  {
+    InnerHandler = new HttpClientHandler();
+  }
+
+  protected override Task<HttpResponseMessage> SendAsync(
+    HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
+  {
+    var token = "xoidiag"; //CreateToken();
+
+    request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+
+    return base.SendAsync(request, cancellationToken);
+  }
+}
+
+```
+
 ### DisposeHttpClient
 `KSqlDBContextOptions` and `KSqlDbRestApiClient` - `DisposeHttpClient` property is by default set to `false`. From v2.0.0 the used `HttpClients` will not be disposed by default.
 
