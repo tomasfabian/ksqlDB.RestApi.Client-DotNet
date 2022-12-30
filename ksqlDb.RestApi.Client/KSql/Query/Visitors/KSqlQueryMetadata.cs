@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using ksqlDb.RestApi.Client.KSql.Entities;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
@@ -9,6 +9,8 @@ internal sealed record KSqlQueryMetadata
   public FromItem[] Joins { get; set; }
 
   internal LambdaExpression Select { get; set; }
+
+  internal bool IsInsideNestedInvocationFunction { get; set; }
 
   internal FromItem TrySetAlias(MemberExpression memberExpression, Func<FromItem, string, bool> predicate)
   {
