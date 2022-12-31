@@ -1,9 +1,9 @@
 ﻿using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
-using ksqlDb.RestApi.Client.ProtoBuf.KSql.Query;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using ksqlDb.RestApi.Client.ProtoBuf.KSql.Query.Context;
 
 namespace ksqlDb.RestApi.Client.ProtoBuf.Tests.KSql.Query;
 

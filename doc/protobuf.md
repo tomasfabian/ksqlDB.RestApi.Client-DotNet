@@ -21,17 +21,15 @@ application/vnd.ksql.v1+protobuf
 ```
 
 ```C#
-using System.Reactive.Linq;
-using ksqlDB.Api.Client.Samples.Models.Movies;
-using ksqlDB.RestApi.Client.KSql.Linq;
-using ksqlDb.RestApi.Client.ProtoBuf.KSql.Query;
 using ProtoBuf;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDb.RestApi.Client.ProtoBuf.KSql.Query.Context;
 
 var ksqlDbUrl = @"http:\\localhost:8088";
 
 await using var context = new ProtoBufKSqlDbContext(ksqlDbUrl);
 
-var query = context.CreateQueryStream<MovieProto>("movie") // query-stream endpoint
+var query = context.CreateQueryStream<MovieProto>("movie")
   .Where(p => p.Title != "E.T.")
   .Where(c => c.Title.ToLower().Contains("hard".ToLower()) || c.Id == 1)
   .Select(l => new { Id = l.Id, l.Title })
@@ -51,7 +49,6 @@ using var disposable = query
     Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title}");
     Console.WriteLine();
   }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
-
 
 [ProtoContract]
 record MovieProto

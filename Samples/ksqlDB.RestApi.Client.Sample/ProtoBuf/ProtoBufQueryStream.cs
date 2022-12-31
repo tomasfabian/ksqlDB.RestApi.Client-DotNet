@@ -1,7 +1,7 @@
-﻿using System.Reactive.Linq;
+using System.Reactive.Linq;
 using ksqlDB.Api.Client.Samples.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
-using ksqlDb.RestApi.Client.ProtoBuf.KSql.Query;
+using ksqlDb.RestApi.Client.ProtoBuf.KSql.Query.Context;
 
 namespace ksqlDB.Api.Client.Samples.ProtoBuf;
 
