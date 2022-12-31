@@ -1,10 +1,10 @@
-﻿using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDb.RestApi.Client.ProtoBuf.KSql.RestApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace ksqlDb.RestApi.Client.ProtoBuf.KSql.Query;
+namespace ksqlDb.RestApi.Client.ProtoBuf.KSql.Query.Context;
 
 internal class KSqlDBContextQueryDependenciesProvider : ksqlDB.RestApi.Client.KSql.Query.Context.KSqlDBContextQueryDependenciesProvider
 {
