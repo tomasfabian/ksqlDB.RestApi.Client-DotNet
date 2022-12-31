@@ -169,9 +169,9 @@ private static IDisposable ClientSideBatching(KSqlDBContext context)
 }
 ```
 
-### ToQueryString
+### Getting the generated KSQL
 
-ToQueryString is helpful for debugging purposes. It returns the generated ksql query without executing it.
+`ToQueryString` is mainly helpful for debugging purposes. It returns the generated ksql query without executing it.
 ```C#
 var ksql = context.CreateQueryStream<Tweet>().ToQueryString();
 

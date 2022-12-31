@@ -1,6 +1,6 @@
-This package generates ksql queries from your .NET C# linq queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
+This package generates **KSQL** push and pull queries from your .NET C# LINQ queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
 You can continually process computations over unbounded (theoretically never-ending) streams of data.
-It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the Rest API such as inserting records into streams and creating tables, types, etc. or executing admin operations such as listing streams.
+It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the REST API such as inserting records into streams and creating tables, types, etc. or executing admin operations such as listing streams.
 
 [ksqlDB.RestApi.Client](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet) is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
 
@@ -59,6 +59,8 @@ public class Tweet : Record
   public string Message { get; set; }
 }
 ```
+
+An entity class in **ksqlDB.RestApi.Client** represents the structure of a table or stream. An instance of the class represents a record in that stream while properties are mapped to columns respectively.
 
 LINQ code written in C# from the sample is equivalent to this ksql query:
 ```SQL
@@ -202,6 +204,9 @@ FROM custom_topic_name
 ```
 
 # ```IQbservable<T>``` extension methods
+As depicted bellow `IObservable<T>` is the dual of `IEnumerable<T>` and `IQbservable<T>` is the dual of `IQueryable<T>`. In all four cases LINQ providers are using deferred execution.
+While the prior ones are executed locally the former are exucuted server side. The server side execution is possible thanks to traversing ASTs (Abstract Syntax Trees) with visitors. The provider will create the KSQL syntax for you from expression trees and pass it along to ksqlDB.
+
 <img src="https://www.codeproject.com/KB/cs/646361/WhatHowWhere.jpg" />
 
 List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md) extension methods:
@@ -211,7 +216,7 @@ List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [Subscribe](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribe)
 - [ToObservable](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#toobservable)
 - [ToAsyncEnumerable](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#toasyncenumerable)
-- [ToQueryString](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#toquerystring)
+- [ToQueryString](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#getting-the-generated-ksql)
 - [ExplainAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#explainasync)
 - [SubscribeAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribeasync)
 - [SubscribeOn](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribeon)
@@ -223,10 +228,10 @@ List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 
 - [IKSqlGrouping.Source](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#iksqlgroupingsource)
 
-# Register the KsqlDbContext
+# Register the KSqlDbContext
 `IKSqlDBContext` and `IKSqlDbRestApiClient` can be provided with dependency injection. These services can be registered during app startup and components that require these services, are provided with these services via constructor parameters.
 
-To register KsqlDbContext as a service, open Program.cs, and add the lines to the ConfigureServices method shown bellow:
+To register `KsqlDbContext` as a service, open Program.cs, and add the lines to the `ConfigureServices` method shown bellow or see some more details in [the workshop](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/ksqlDB.RestApi.Client-workshop):
 
 ```
 using ksqlDB.RestApi.Client.Sensors;
