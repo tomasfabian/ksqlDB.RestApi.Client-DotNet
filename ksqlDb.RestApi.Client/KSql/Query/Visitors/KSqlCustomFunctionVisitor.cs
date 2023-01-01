@@ -24,7 +24,12 @@ internal class KSqlCustomFunctionVisitor : KSqlVisitor
         ? methodInfo.Name.ToKSqlFunctionName()
         : functionAttribute.FunctionName;
 
-      Append($"{functionName}");
+      if (string.IsNullOrEmpty(functionName))
+      {
+        functionName = methodInfo.Name;
+      }
+
+      Append($"{functionName.ToUpper()}");
 
       PrintFunctionArguments(methodCallExpression.Arguments);
     }

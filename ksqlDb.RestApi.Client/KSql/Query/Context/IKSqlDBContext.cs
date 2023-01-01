@@ -1,6 +1,7 @@
-﻿using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -17,6 +18,14 @@ public interface IKSqlDBContext : IKSqlDBStatementsContext, IAsyncDisposable, ID
 
   IPullable<TEntity> CreatePullQuery<TEntity>(string tableName = null);
   ValueTask<TEntity> ExecutePullQuery<TEntity>(string ksql, CancellationToken cancellationToken = default);
+
+  /// <summary>
+  /// Add entity for insertion. In order to save them call SaveChangesAsync.
+  /// </summary>
+  /// <typeparam name="T">Type of entity to add.</typeparam>
+  /// <param name="insertValues">Configurable insert values.</param>
+  /// <param name="insertProperties">Optional insert properties.</param>
+  void Add<T>(InsertValues<T> insertValues, InsertProperties insertProperties = null);
 
   /// <summary>
   /// Add entity for insertion. In order to save them call SaveChangesAsync.

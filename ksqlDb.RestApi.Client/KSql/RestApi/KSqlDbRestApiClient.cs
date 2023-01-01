@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using ksqlDb.RestApi.Client.Infrastructure.Logging;
@@ -16,6 +16,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Tables;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Topics;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Connectors;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.Extensions.Logging;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
@@ -344,17 +345,31 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   }
 
   /// <summary>
-  /// Generates raw string Insert Into, but does not execute it.
+  /// Generates raw 'Insert Into' string, but does not execute it.
   /// </summary>
-  /// <typeparam name="T"></typeparam>
+  /// <typeparam name="T">Type of entity</typeparam>
+  /// <param name="insertValues">Insert values</param>
+  /// <param name="insertProperties">Insert configuration</param>
+  /// <returns>A <see cref="KSqlDbStatement"/></returns>
+  public KSqlDbStatement ToInsertStatement<T>(InsertValues<T> insertValues, InsertProperties insertProperties = null)
+  {
+    var insertStatement = new CreateInsert().Generate(insertValues, insertProperties);
+
+    return new KSqlDbStatement(insertStatement);
+  }
+
+  /// <summary>
+  /// Generates raw 'Insert Into' string, but does not execute it.
+  /// </summary>
+  /// <typeparam name="T">Type of entity</typeparam>
   /// <param name="entity">Entity for insertion.</param>
   /// <param name="insertProperties">Overrides conventions.</param>
-  /// <returns></returns>
+  /// <returns>A <see cref="KSqlDbStatement"/></returns>
   public KSqlDbStatement ToInsertStatement<T>(T entity, InsertProperties insertProperties = null)
   {
-    var insert = new CreateInsert().Generate(entity, insertProperties);
+    var insertStatement = new CreateInsert().Generate(entity, insertProperties);
 
-    return new KSqlDbStatement(insert);
+    return new KSqlDbStatement(insertStatement);
   }
 
   #region Get

@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 
 namespace ksqlDB.RestApi.Client.Infrastructure.Extensions;
 
@@ -15,6 +15,7 @@ internal static class StringExtensions
 
     return ksqlFunctionName.ToUpper();
   }
+
   public static bool IsNotNullOrEmpty(this string text)
   {
     return !string.IsNullOrEmpty(text);

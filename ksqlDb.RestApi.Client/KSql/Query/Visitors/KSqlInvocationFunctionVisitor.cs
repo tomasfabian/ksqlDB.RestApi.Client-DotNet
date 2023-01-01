@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
@@ -16,9 +16,7 @@ internal class KSqlInvocationFunctionVisitor : KSqlVisitor
     this.stringBuilder = stringBuilder ?? throw new ArgumentNullException(nameof(stringBuilder));
     this.queryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
   }
-
-  private static bool isNestedInvocationFunction;
-
+  
   protected override Expression VisitMethodCall(MethodCallExpression methodCallExpression)
   {
     var methodInfo = methodCallExpression.Method;
@@ -39,12 +37,12 @@ internal class KSqlInvocationFunctionVisitor : KSqlVisitor
           if (arguments[0].Type == typeof(KSqlFunctions))
             arguments = arguments.Skip(1).ToList();
 
-          if (isNestedInvocationFunction)
+          if (queryMetadata.IsInsideNestedInvocationFunction)
             VisitArgument(arguments[0]);
           else
             base.Visit(arguments[0]);
 
-          isNestedInvocationFunction = true;
+          queryMetadata.IsInsideNestedInvocationFunction = true;
 
           Append(", ");
             
@@ -64,8 +62,8 @@ internal class KSqlInvocationFunctionVisitor : KSqlVisitor
       }
     }
     else base.VisitMethodCall(methodCallExpression);
-      
-    isNestedInvocationFunction = false;
+
+    queryMetadata.IsInsideNestedInvocationFunction = false;
 
     return methodCallExpression;
   }
