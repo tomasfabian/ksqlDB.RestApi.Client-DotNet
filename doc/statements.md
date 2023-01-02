@@ -1092,3 +1092,30 @@ var tableResponses = await restApiClient.GetTablesAsync();
 
 Console.WriteLine(string.Join(',', tableResponses[0].Tables.Select(c => c.Name)));
 ```
+
+### Insert values with KSQL functions
+**v2.7.0**
+
+```C#
+using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Annotations;
+
+[KSqlFunction]
+public static string INITCAP(string value) => throw new NotSupportedException();
+```
+
+```C#
+Expression<Func<string>> valueExpression = () => INITCAP("One little mouse");
+
+var insertValues = new InsertValues<Movie>(new Movie { Id = 5 });
+
+//Act
+insertValues.WithValue(c => c.Title, valueExpression);
+
+Context.Add(insertValues);
+
+var response = await Context.SaveChangesAsync();
+```
+
+```SQL
+INSERT INTO Movies (Title, Id, Release_Year) VALUES (INITCAP('One little mouse'), 5, 0);
+```
