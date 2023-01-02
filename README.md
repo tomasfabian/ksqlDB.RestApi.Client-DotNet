@@ -62,7 +62,7 @@ public class Tweet : Record
 
 An entity class in **ksqlDB.RestApi.Client** represents the structure of a table or stream. An instance of the class represents a record in that stream while properties are mapped to columns respectively.
 
-LINQ code written in C# from the sample is equivalent to this ksql query:
+LINQ code written in C# from the sample is equivalent to this KSQL query:
 ```SQL
 SELECT Message, Id
   FROM Tweets
@@ -174,7 +174,7 @@ contextOptions.QueryStreamParameters["auto.offset.reset"] = "latest";
 ### Overriding stream names
 Stream names are generated based on the generic record types. They are pluralized with Pluralize.NET package
 
-**By default the generated from item names such as stream and table names are pluralized**. This behaviour could be switched off with the following `ShouldPluralizeStreamName` configuration. 
+**By default the generated from item names such as stream and table names are pluralized**. This behavior could be switched off with the following `ShouldPluralizeStreamName` configuration. 
 
 ```C#
 context.CreateQueryStream<Person>();
@@ -278,11 +278,11 @@ List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/
   - [Tumbling Window](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#tumbling-window)
   - [Hopping Window](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/aggregations.md#hopping-window)
 
-[Rest api reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
+[Rest API reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
 [Some KSql function examples can be found here](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/KSql-functions)
 
-**Data definititions:**
+**Data definitions:**
 - [Headers](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_definitions.md#access-record-header-data-v160)
 
 **List of supported data types:**
