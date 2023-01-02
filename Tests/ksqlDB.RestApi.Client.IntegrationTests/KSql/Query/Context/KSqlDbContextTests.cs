@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
@@ -12,6 +12,9 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq.Expressions;
+using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Context;
 
@@ -41,7 +44,7 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     Context.Add(entity2, config);
 
     var response = await Context.SaveChangesAsync();
-    var c = await response.Content.ReadAsStringAsync();
+    var _ = await response.Content.ReadAsStringAsync();
 
     //Assert
     response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -69,7 +72,28 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     context.Add(entity2, config);
 
     var response = await context.SaveChangesAsync();
-    var c = await response.Content.ReadAsStringAsync();
+
+    //Assert
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
+  }
+
+  [KSqlFunction]
+  public static string INITCAP(string value) => throw new NotSupportedException();
+
+  [TestMethod]
+  public async Task WithValue_RendersFromProvidedValue()
+  {
+    //Arrange
+    Expression<Func<string>> valueExpression = () => INITCAP("One little mouse");
+
+    var insertValues = new InsertValues<Movie>(new Movie { Id = 5 });
+
+    //Act
+    insertValues.WithValue(c => c.Title, valueExpression);
+
+    Context.Add(insertValues);
+
+    var response = await Context.SaveChangesAsync();
 
     //Assert
     response.StatusCode.Should().Be(HttpStatusCode.OK);
