@@ -1,5 +1,7 @@
 # ksqlDB.RestApi.Client
 
+# v2.7.0-rc.1
+- insert values with KSQL functions
 
 # v2.6.0
 - added shared values into KSqlDbStatement #39
