@@ -205,7 +205,7 @@ FROM custom_topic_name
 
 # ```IQbservable<T>``` extension methods
 As depicted bellow `IObservable<T>` is the dual of `IEnumerable<T>` and `IQbservable<T>` is the dual of `IQueryable<T>`. In all four cases LINQ providers are using deferred execution.
-While the prior ones are executed locally the former are exucuted server side. The server side execution is possible thanks to traversing ASTs (Abstract Syntax Trees) with visitors. The provider will create the KSQL syntax for you from expression trees and pass it along to ksqlDB.
+While the first two are executed locally the latter two are executed server side. The server side execution is possible thanks to traversing ASTs (Abstract Syntax Trees) with visitors. The provider will create the KSQL syntax for you from expression trees and pass it along to ksqlDB.
 
 <img src="https://www.codeproject.com/KB/cs/646361/WhatHowWhere.jpg" />
 
