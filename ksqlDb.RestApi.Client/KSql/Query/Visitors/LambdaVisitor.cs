@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;

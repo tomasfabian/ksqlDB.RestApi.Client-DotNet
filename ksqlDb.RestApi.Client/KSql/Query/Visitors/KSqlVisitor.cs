@@ -234,62 +234,13 @@ internal class KSqlVisitor : ExpressionVisitor
   }
 
   protected override Expression VisitMethodCall(MethodCallExpression methodCallExpression)
-  {      
-    var methodInfo = methodCallExpression.Method;
-
-    if (methodCallExpression.Object != null && methodCallExpression.Object.Type.IsDictionary())
-    {
-      if (methodCallExpression.Method.Name == "get_Item")
-      {
-        Visit(methodCallExpression.Object);
-        Append("[");
-        Visit(methodCallExpression.Arguments[0]);
-        Append("]");
-      }
-    }
-
-    TryCast(methodCallExpression);
-
-    if (methodCallExpression.Object == null && methodInfo.DeclaringType is {Name: nameof(KSqlInvocationFunctionsExtensions)})
-    {
-      new KSqlInvocationFunctionVisitor(stringBuilder, queryMetadata).Visit(methodCallExpression);
-
-      return methodCallExpression;
-    }
-
-    if (methodCallExpression.Object == null && methodInfo.DeclaringType is {Name: nameof(KSqlFunctionsExtensions)})
-    {
-      CreateKSqlFunctionVisitor().Visit(methodCallExpression);
-
-      return methodCallExpression;
-    }
-
-    new KSqlCustomFunctionVisitor(stringBuilder, queryMetadata).Visit(methodCallExpression);
-
-    if (methodCallExpression.Object != null && (methodInfo.DeclaringType != null && methodInfo.DeclaringType.Name == typeof(IAggregations<>).Name || methodInfo.DeclaringType is
-        {
-          Name: nameof(IAggregations)
-        }))
-    {
-      new AggregationFunctionVisitor(stringBuilder, queryMetadata).Visit(methodCallExpression);
-    }
-
-    if (methodCallExpression.Object == null && methodInfo.DeclaringType is { Name: nameof(KSqlOperatorExtensions) })
-    {
-      new OperatorBetweenKSqlVisitor(stringBuilder, queryMetadata).Visit(methodCallExpression);
-    }
-
-    if (methodCallExpression.Object?.Type == typeof(string))
-    {
-      new StringVisitor(stringBuilder, queryMetadata).Visit(methodCallExpression);
-    }
-        
-    TryPrintContains(methodCallExpression, methodInfo);
+  {
+    new MethodCallVisitor(StringBuilder, queryMetadata).Visit(methodCallExpression);
 
     return methodCallExpression;
   }
 
-  private void TryPrintContains(MethodCallExpression methodCallExpression, MethodInfo methodInfo)
+  private protected void TryPrintContains(MethodCallExpression methodCallExpression, MethodInfo methodInfo)
   {
     if (methodCallExpression.Object != null && methodCallExpression.Object.Type.IsList())
     {
@@ -331,7 +282,7 @@ internal class KSqlVisitor : ExpressionVisitor
     isInContainsScope = false;
   }
 
-  private void TryCast(MethodCallExpression methodCallExpression)
+  private protected void TryCast(MethodCallExpression methodCallExpression)
   {
     var methodName = methodCallExpression.Method.Name;
 
@@ -756,24 +707,6 @@ internal class KSqlVisitor : ExpressionVisitor
 
     return fromItem;
   }
-
-  private string SetAlias(MemberExpression memberExpression)
-  {
-    string alias = ((ParameterExpression)memberExpression.Expression).Name;
-
-    var joinsOfType = queryMetadata.Joins.Where(c => c.Type == memberExpression.Expression.Type).ToArray();
-
-    var fromItem2 = joinsOfType.FirstOrDefault();
-
-    if (joinsOfType.Length > 1)
-      fromItem2 = joinsOfType.FirstOrDefault(c => string.IsNullOrEmpty(c.Alias));
-
-    if (fromItem2 != null)
-      fromItem2.Alias = alias;
-
-    return alias;
-  }
-
 
   protected void Destructure(MemberExpression memberExpression)
   {
