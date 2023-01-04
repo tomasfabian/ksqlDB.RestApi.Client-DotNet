@@ -932,8 +932,7 @@ Drop type Address;
   {
     var statement = new KSqlDbStatement("CREATE TYPE ${typeName} AS STRUCT<name VARCHAR, address ADDRESS>;")
     {
-      //TODO: release package
-      //SessionVariables = { { "typeName", "FromSessionValue" } }
+      SessionVariables = { { "typeName", "FromSessionValue" } }
     };
 
     var httpResponseMessage = await restApiClient.ExecuteStatementAsync(statement);
