@@ -21,7 +21,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 [TestClass]
 public class KSqlDbRestApiClientTests
 {
-  private IKSqlDbRestApiClient restApiClient;
+  private IKSqlDbRestApiClient restApiClient = null!;
 
   [TestInitialize]
   public void Initialize()
@@ -155,13 +155,13 @@ Drop type Address;
   public record Address
   {
     public int Number { get; set; }
-    public string Street { get; set; }
+    public string Street { get; set; } = null!;
   }
 
   public class Person
   {
-    public string Name { get; set; }
-    public Address Address { get; set; }
+    public string Name { get; set; } = null!;
+    public Address Address { get; set; } = null!;
   }
 
   #region Connectors
@@ -290,7 +290,7 @@ Drop type Address;
 
     var queries = await restApiClient.GetQueriesAsync();
 
-    var query = queries.SelectMany(c => c.Queries).FirstOrDefault(c => c.SinkKafkaTopics.Contains(topicName));
+    var query = queries.SelectMany(c => c.Queries).First(c => c.SinkKafkaTopics.Contains(topicName));
 
     //Act
     statementResponse = await restApiClient.TerminatePersistentQueryAsync(query.Id);
@@ -376,8 +376,8 @@ Drop type Address;
   {
     [Key]
     public int Id { get; set; }
-    public string Title { get; init; }
-    public Lead_Actor Actor { get; set; }
+    public string Title { get; init; } = null!;
+    public Lead_Actor? Actor { get; set; } 
   }
 
   [TestMethod]
@@ -453,16 +453,16 @@ Drop type Address;
     [Key]
     public int Id { get; set; }
 
-    public string Title { get; set; }
+    public string Title { get; set; } = null!;
 
-    public string Timestamp { get; set; }
+    public string Timestamp { get; set; } = null!;
 
     public int Release_Year { get; set; }
 
-    public int[] NumberOfDays { get; set; }
+    public int[] NumberOfDays { get; set; } = null!;
 
-    public IDictionary<string, int> Dictionary { get; set; }
-    public Dictionary<string, int> Dictionary2 { get; set; }
+    public IDictionary<string, int> Dictionary { get; set; } = null!;
+    public Dictionary<string, int> Dictionary2 { get; set; } = null!;
 
     //#pragma warning disable CS0649
     public int DontFindMe;
@@ -494,7 +494,7 @@ Drop type Address;
   record IoTSensor
   {
     [Key]
-    public string SensorId { get; set; }
+    public string SensorId { get; set; } = null!;
     public int Value { get; set; }
   }
 

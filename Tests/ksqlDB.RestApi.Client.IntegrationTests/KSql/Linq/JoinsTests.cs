@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models;
 using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
@@ -16,7 +16,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
 [TestClass]
 public class JoinsTests : Infrastructure.IntegrationTests
 {
-  private static MoviesProvider moviesProvider;
+  private static MoviesProvider moviesProvider = null!;
 
 
   static readonly EntityCreationMetadata OrderEntityCreationMetadata = new()
@@ -48,8 +48,6 @@ public class JoinsTests : Infrastructure.IntegrationTests
   public static async Task ClassCleanup()
   {
     await moviesProvider.DropTablesAsync();
-
-    moviesProvider = null;
   }
 
   private string MoviesTableName => MoviesProvider.MoviesTableName;
@@ -127,7 +125,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
 
   public record Movie2 : Record
   {
-    public string Title { get; set; }
+    public string Title { get; set; } = null!;
     public int? Id { get; set; }
     public int? Release_Year { get; set; }
   }
@@ -335,14 +333,14 @@ public class JoinsTests : Infrastructure.IntegrationTests
 
   private class Nested
   {
-    public string Prop { get; set; }
+    public string Prop { get; set; } = null!;
   }
 
   class PaymentExt
   {
     [Key]
     public int Id { get; set; }
-    public Nested Nested { get; set; }
+    public Nested Nested { get; set; } = null!;
   }
 
   [TestMethod]

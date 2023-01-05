@@ -33,7 +33,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     await InitializeDatabase();
   }
 
-  private static TweetsProvider tweetsProvider;
+  private static TweetsProvider tweetsProvider = null!;
   private static readonly string SingleLadiesStreamName = "singleLadies";
 
   protected static async Task InitializeDatabase()
@@ -206,7 +206,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     //Arrange
     var source = Context.CreateQueryStream<Tweet>(StreamName+"xyz");
 
-    Subscription subscription = null;
+    Subscription? subscription = null;
 
     //Act
     try
@@ -282,7 +282,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
 
     //Assert
     observeOnThread.Should().NotBeNull();
-    Assert.AreNotEqual(currentThread, observeOnThread.Value);
+    Assert.AreNotEqual(currentThread, observeOnThread!.Value);
   }
 
   [TestMethod]
@@ -292,7 +292,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     var semaphore = new SemaphoreSlim(initialCount: 0, 1);
     var source = QuerySource;
 
-    Thread observeOnThread = null;
+    Thread observeOnThread = null!;
 
     //Act
     var subscription = source.Take(1)
@@ -602,7 +602,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
 
   private record SingleLady
   {
-    public string Name { get; init; }
+    public string Name { get; init; } = null!;
   }
 
   [TestMethod]
@@ -691,7 +691,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
 
   private record MyStruct
   {
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
   }
 
   [TestMethod]

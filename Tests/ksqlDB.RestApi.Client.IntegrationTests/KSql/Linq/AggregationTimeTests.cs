@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -79,7 +79,7 @@ public class AggregationTimeTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    var result = actualValues.FirstOrDefault(c => c.Id == Times2.Id);
+    var result = actualValues.First(c => c.Id == Times2.Id);
     result.MinDateTime.Year.Should().Be(1986);
   }
 
@@ -103,7 +103,7 @@ public class AggregationTimeTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    var result = actualValues.FirstOrDefault(c => c.Id == Times2.Id);
+    var result = actualValues.First(c => c.Id == Times2.Id);
     result.MaxTime.Hours.Should().Be(11);
   }
 
@@ -127,7 +127,7 @@ public class AggregationTimeTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    var result = actualValues.FirstOrDefault(c => c.Id == Times2.Id);
+    var result = actualValues.First(c => c.Id == Times2.Id);
     result.MinDateTimeOffset.Offset.Should().Be(TimeSpan.FromHours(1));
   }
 }

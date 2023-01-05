@@ -1,4 +1,4 @@
-﻿using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using HttpClientFactory = ksqlDB.Api.Client.IntegrationTests.Http.HttpClientFactory;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
@@ -9,7 +9,7 @@ public class KSqlDbRestApiProvider : KSqlDbRestApiClient
 {
   internal static string KsqlDbUrl { get; } = @"http:\\localhost:8088";
 
-  public static KSqlDbRestApiProvider Create(string ksqlDbUrl = null)
+  public static KSqlDbRestApiProvider Create(string? ksqlDbUrl = null)
   {
     var uri = new Uri(ksqlDbUrl ?? KsqlDbUrl);
 

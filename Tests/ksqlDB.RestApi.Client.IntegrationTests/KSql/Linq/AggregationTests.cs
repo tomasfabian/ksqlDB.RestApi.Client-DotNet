@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models;
 using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
@@ -10,10 +10,10 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
 [TestClass]
 public class AggregationTests : Infrastructure.IntegrationTests
 {
-  private static MoviesProvider moviesProvider;
-  private static TweetsProvider tweetsProvider;
+  private static MoviesProvider? moviesProvider;
+  private static TweetsProvider? tweetsProvider;
 
-  private static readonly string tweetsTopicName = "tweetsTestTopic";
+  private static readonly string TweetsTopicName = "tweetsTestTopic";
 
   [ClassInitialize]
   public static async Task ClassInitialize(TestContext context)
@@ -29,7 +29,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
 
     tweetsProvider = new TweetsProvider(RestApiProvider);
 
-    await tweetsProvider.CreateTweetsStream(TweetsStreamName, tweetsTopicName);
+    await tweetsProvider.CreateTweetsStream(TweetsStreamName, TweetsTopicName);
 
     await tweetsProvider.InsertTweetAsync(TweetsProvider.Tweet1, TweetsStreamName);
     await tweetsProvider.InsertTweetAsync(TweetsProvider.Tweet2, TweetsStreamName);
@@ -38,7 +38,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
   [ClassCleanup]
   public static async Task ClassCleanup()
   {
-    await moviesProvider.DropTablesAsync();
+    await moviesProvider?.DropTablesAsync()!;
 
     moviesProvider = null;
     tweetsProvider = null;
@@ -64,7 +64,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    var id1 = actualValues.FirstOrDefault(c => c.Id == MoviesProvider.Movie1.Id);
+    var id1 = actualValues.First(c => c.Id == MoviesProvider.Movie1.Id);
     id1.Histogram[MoviesProvider.Movie1.Title].Should().BeOneOf(0, 1);
   }
 
@@ -83,7 +83,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
   //Struct(Name :='Karen', Age := 55)
   private class Person
   {
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     public int Age { get; set; }
   }
 
@@ -101,7 +101,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    var id1 = actualValues.FirstOrDefault(c => c.Id == MoviesProvider.Movie1.Id);
+    var id1 = actualValues.First(c => c.Id == MoviesProvider.Movie1.Id);
     id1.Structs[0].Name.Should().Be("Karen");
   }
 
@@ -130,7 +130,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    var id1 = actualValues.FirstOrDefault(c => c.Id == MoviesProvider.Movie1.Id);
+    var id1 = actualValues.First(c => c.Id == MoviesProvider.Movie1.Id);
     id1.Maps[0]["Karen"].Should().Be(42);
   }
 
@@ -154,7 +154,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    var id1 = actualValues.FirstOrDefault(c => c.Id == MoviesProvider.Movie1.Id);
+    var id1 = actualValues.First(c => c.Id == MoviesProvider.Movie1.Id);
     id1.Array[0][1].Should().Be(2);
   }
 
@@ -183,7 +183,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    var id1 = actualValues.FirstOrDefault(c => c.Id == MoviesProvider.Movie1.Id);
+    var id1 = actualValues.First(c => c.Id == MoviesProvider.Movie1.Id);
     id1.Maps[0]["Karen"].Should().Be(42);
   }
 
@@ -215,7 +215,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    var id1 = actualValues.FirstOrDefault(c => c.Id == TweetsProvider.Tweet1.Id);
+    var id1 = actualValues.First(c => c.Id == TweetsProvider.Tweet1.Id);
     id1.Maps["Karen"].Should().Be(42);
   }
 
@@ -244,7 +244,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    var id1 = actualValues.FirstOrDefault(c => c.Id == TweetsProvider.Tweet1.Id);
+    var id1 = actualValues.First(c => c.Id == TweetsProvider.Tweet1.Id);
     id1.Maps["Karen"].Should().Be(42);
   }
 
@@ -270,7 +270,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    var id1 = actualValues.FirstOrDefault(c => c.Id == TweetsProvider.Tweet1.Id);
+    var id1 = actualValues.First(c => c.Id == TweetsProvider.Tweet1.Id);
     id1.Struct.Name.Should().Be("Karen");
   }
 }

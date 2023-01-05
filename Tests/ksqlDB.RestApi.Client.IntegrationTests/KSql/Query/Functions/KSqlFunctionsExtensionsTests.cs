@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
@@ -14,10 +14,10 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Functions;
 [TestClass]
 public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
 {
-  private static MoviesProvider moviesProvider;
+  private static MoviesProvider moviesProvider = null!;
 
   [ClassInitialize]
-  public static async Task ClassInitialize(TestContext context)
+  public static async Task ClassInitialize(TestContext _)
   {
     RestApiProvider = KSqlDbRestApiProvider.Create();
       
@@ -31,8 +31,6 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
   public static async Task ClassCleanup()
   {
     await moviesProvider.DropTablesAsync();
-
-    moviesProvider = null;
   }
 
   private string MoviesTableName => MoviesProvider.MoviesTableName;
@@ -190,7 +188,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
       
     //Act
     var source = Context.CreateQuery<Movie>(MoviesTableName)
-      .Select(c => new { Col = KSqlFunctions.Instance.ArrayMin(new string [] { null })})
+      .Select(c => new { Col = KSqlFunctions.Instance.ArrayMin(new string? [] { null })})
       .ToAsyncEnumerable();
 
     var actualValues = await CollectActualValues(source, expectedItemsCount);

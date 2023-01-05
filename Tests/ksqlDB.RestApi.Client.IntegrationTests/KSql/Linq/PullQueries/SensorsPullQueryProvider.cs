@@ -1,4 +1,4 @@
-﻿using ksqlDB.Api.Client.IntegrationTests.Http;
+using ksqlDB.Api.Client.IntegrationTests.Http;
 using ksqlDB.Api.Client.IntegrationTests.Models.Sensors;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -11,7 +11,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq.PullQueries;
 
 internal class SensorsPullQueryProvider
 {
-  IKSqlDbRestApiClient restApiClient;
+  IKSqlDbRestApiClient restApiClient = null!;
 
   public async Task ExecuteAsync()
   {

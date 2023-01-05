@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
@@ -38,7 +38,7 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
   record Lambda
   {
     public int Id { get; set; }
-    public int[] Lambda_Arr { get; set; }
+    public int[] Lambda_Arr { get; set; } = null!;
     // public IEnumerable<int> Lambda_Arr { get; set; }
   }
 
@@ -65,8 +65,8 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
   class LambdaMap
   {
     public int Id { get; set; }
-    public IDictionary<string, int[]> Lambda_Map { get; set; }
-    public IDictionary<string, int> Dictionary2 { get; set; }
+    public IDictionary<string, int[]> Lambda_Map { get; set; } = null!;
+    public IDictionary<string, int> Dictionary2 { get; set; } = null!;
   }
     
   private readonly string streamNameWithMap = "stream4";

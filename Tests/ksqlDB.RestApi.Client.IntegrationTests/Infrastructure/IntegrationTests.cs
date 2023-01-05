@@ -1,4 +1,4 @@
-﻿using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
+using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
@@ -8,9 +8,9 @@ namespace ksqlDB.Api.Client.IntegrationTests.Infrastructure;
 [TestClass]
 public abstract class IntegrationTests : TestBase
 {
-  protected static KSqlDbRestApiProvider RestApiProvider;  
-  protected KSqlDBContextOptions ContextOptions;
-  protected KSqlDBContext Context;
+  protected static KSqlDbRestApiProvider RestApiProvider = null!;
+  protected KSqlDBContextOptions ContextOptions = null!;
+  protected KSqlDBContext Context = null!;
 
   [TestInitialize]
   public override void TestInitialize()

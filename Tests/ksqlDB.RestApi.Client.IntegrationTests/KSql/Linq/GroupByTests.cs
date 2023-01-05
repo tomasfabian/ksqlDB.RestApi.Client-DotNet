@@ -36,13 +36,13 @@ public class GroupByTests : Infrastructure.IntegrationTests
   record TestCity
   {
     [Key]
-    public string RegionCode { get; init; }
-    public TestState State { get; init; }
+    public string RegionCode { get; init; } = null!;
+    public TestState State { get; init; } = null!;
   }
 
   record TestState
   {
-    public string Name { get; init; }
+    public string Name { get; init; } = null!;
   }
 
   [TestMethod]

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.Http;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -15,8 +15,8 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
 [TestClass]
 public class ComplexTypesTests
 {
-  private IKSqlDbRestApiClient restApiClient;
-  protected KSqlDBContext Context;
+  private IKSqlDbRestApiClient restApiClient = null!;
+  protected KSqlDBContext Context = null!;
 
   [TestInitialize]
   public void Initialize()
@@ -120,7 +120,7 @@ Drop table Events;
     var source = Context.CreateQueryStream<Foo>(queryStreamParameters)
       .Take(1)
       .ToEnumerable()
-      .FirstOrDefault();
+      .First();
 
     //Assert
     source["A"].Should().Be(2);
@@ -157,7 +157,7 @@ Drop table Events;
     var source = Context.CreateQueryStream<Foo>(queryStreamParameters)
       .Take(1)
       .ToEnumerable()
-      .FirstOrDefault();
+      .First();
 
     //Assert
     source["A"].Should().Be(2);
@@ -168,13 +168,12 @@ Drop table Events;
     [Key]
     public int Id { get; set; }
 
-    public string[] Places { get; init; }
-    //public EventCategory[] Categories { get; init; }
-    public IEnumerable<EventCategory> Categories { get; init; }
+    public string[] Places { get; init; } = null!;
+    public IEnumerable<EventCategory> Categories { get; init; } = null!;
   }
 
   record EventCategory
   {
-    public string Name { get; init; }
+    public string Name { get; init; } = null!;
   }
 }

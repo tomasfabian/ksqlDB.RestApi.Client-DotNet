@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
@@ -10,7 +10,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query;
 [TestClass]
 public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
 {
-  protected static MoviesProvider MoviesProvider;
+  protected static MoviesProvider MoviesProvider = null!;
 
   [ClassInitialize]
   public static async Task ClassInitialize(TestContext context)
@@ -32,8 +32,6 @@ public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
   public static async Task ClassCleanup()
   {
     await MoviesProvider.DropTablesAsync();
-
-    MoviesProvider = null;
   }
 
   protected string MoviesTableName => MoviesProvider.MoviesTableName;

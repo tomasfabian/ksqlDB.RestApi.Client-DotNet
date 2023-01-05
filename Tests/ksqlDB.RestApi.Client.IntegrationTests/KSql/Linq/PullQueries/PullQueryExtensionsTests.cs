@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models.Sensors;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
@@ -11,10 +11,10 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq.PullQueries;
 [TestClass]
 public class PullQueryExtensionsTests
 {
-  private static SensorsPullQueryProvider pullQueryProvider;
+  private static SensorsPullQueryProvider pullQueryProvider = null!;
 
-  private static KSqlDBContextOptions contextOptions;
-  private static KSqlDBContext context;
+  private static KSqlDBContextOptions contextOptions = null!;
+  private static KSqlDBContext context = null!;
 
   [ClassInitialize]
   public static async Task ClassInitialize(TestContext testContext)
