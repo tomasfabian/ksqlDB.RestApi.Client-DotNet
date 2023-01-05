@@ -50,6 +50,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{0ABA2B0A-0
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Avro.Samples", "Samples\Avro\Avro.Samples.csproj", "{511E9B8A-7706-4D43-8DCC-32A54F66AF8E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aggregations", "Samples\Aggregations\Aggregations.csproj", "{6BCBECD0-848D-4718-8E94-221A84EE97E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +90,10 @@ Global
 		{511E9B8A-7706-4D43-8DCC-32A54F66AF8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{511E9B8A-7706-4D43-8DCC-32A54F66AF8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{511E9B8A-7706-4D43-8DCC-32A54F66AF8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BCBECD0-848D-4718-8E94-221A84EE97E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BCBECD0-848D-4718-8E94-221A84EE97E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BCBECD0-848D-4718-8E94-221A84EE97E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BCBECD0-848D-4718-8E94-221A84EE97E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,6 +106,7 @@ Global
 		{7462D56C-A4AA-4347-BE2A-A6B0F84BE426} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}
 		{0ABA2B0A-0F52-4B0F-8827-E5DB845BB27C} = {999C8EEC-CCFA-4183-805A-1804367D8F75}
 		{511E9B8A-7706-4D43-8DCC-32A54F66AF8E} = {AA5681E8-1682-47E9-9159-4AE95A92E694}
+		{6BCBECD0-848D-4718-8E94-221A84EE97E4} = {AA5681E8-1682-47E9-9159-4AE95A92E694}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {08C8585D-5006-4484-AC12-72B1F42058D7}
