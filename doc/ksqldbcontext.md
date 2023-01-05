@@ -1,6 +1,6 @@
 # KSqlDbContext
 
-### CreateQueryStream
+### Creating query streams
 **v1.0.0**
 
 [Executing pull or push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/#executing-pull-or-push-queries)
@@ -35,7 +35,7 @@ using var disposable = context.CreateQueryStream<Movie>()
   }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
 ```
 
-### CreateQuery
+### Creating queries
 **v1.0.0**
 
 [Run a query](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/query-endpoint/#post-query)
@@ -73,27 +73,6 @@ using var disposable = context.CreateQuery<Movie>()
 # TFM netstandard 2.0 (.Net Framework, NetCoreApp 2.0 etc.)
 netstandard 2.0 does not support Http 2.0. Due to this ```IKSqlDBContext.CreateQueryStream<TEntity>``` is not exposed at the current version. 
 For these reasons ```IKSqlDBContext.CreateQuery<TEntity>``` was introduced to provide the same functionality via Http 1.1. 
-
-### KSqlDbContextOptionsBuilder SetProcessingGuarantee
-**v1.0.0**
-
-Enable exactly-once or at_least_once semantics
-
-```C#
-using ksqlDB.RestApi.Client.KSql.Query.Context;
-using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
-using ksqlDB.RestApi.Client.KSql.Query.Options;
-```
-```C#
-var ksqlDbUrl = @"http:\\localhost:8088";
-
-var contextOptions = new KSqlDbContextOptionsBuilder()
-  .UseKSqlDb(ksqlDbUrl)
-  .SetProcessingGuarantee(ProcessingGuarantee.AtLeastOnce)
-  .Options;
-
-await using var context = new KSqlDBContext(contextOptions);
-```
 
 ## Basic auth
 **v1.0.0**
@@ -303,10 +282,11 @@ public class Worker : IHostedService, IDisposable
 }
 ```
 
-### IKSqlDBContext Add and SaveChangesAsync
+### Add and SaveChangesAsync
 **v1.3.0**
 
 With IKSqlDBContext.Add and IKSqlDBContext.SaveChangesAsync you can add multiple entities to the context and save them asynchronously in one request (as "batch inserts").
+Internally it doesn't provide an entity change tracker, but merely caches insert statement snapshots which will be executed during `SaveChanges`;
 
 ```C#
 private static async Task AddAndSaveChangesAsync(IKSqlDBContext context)
@@ -316,6 +296,43 @@ private static async Task AddAndSaveChangesAsync(IKSqlDBContext context)
 
   var saveResponse = await context.SaveChangesAsync();
 }
+```
+
+### Include read-only properties for inserts
+**v1.3.1**
+
+- Inserts - include read-only properties configuration
+
+The initial convention is that all writeable public instance properties and fields are taken into account during the Insert into statement generation.
+
+```C#
+public record Foo
+{
+  public Foo(string name)
+  {
+    Name = name;
+  }
+
+  public string Name { get; }
+  public int Count { get; set; }
+}
+```
+
+```C#
+var insertProperties = new InsertProperties
+                       {
+                         IncludeReadOnlyProperties = true
+                       };
+
+await using KSqlDBContext context = new KSqlDBContext(@"http:\\localhost:8088");
+
+var model = new Foo("Bar") {
+  Count = 3
+};
+
+context.Add(model, insertProperties);
+
+var responseMessage = await context.SaveChangesAsync();
 ```
 
 ### KSqlDbContextOptionsBuilder
@@ -338,4 +355,25 @@ public static KSqlDBContextOptions CreateQueryStreamOptions(string ksqlDbUrl)
 
   return contextOptions;
 }
+```
+
+### Setting processing guarantee with KSqlDbContextOptionsBuilder
+**v1.0.0**
+
+Enable exactly-once or at_least_once semantics
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+```
+```C#
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+var contextOptions = new KSqlDbContextOptionsBuilder()
+  .UseKSqlDb(ksqlDbUrl)
+  .SetProcessingGuarantee(ProcessingGuarantee.AtLeastOnce)
+  .Options;
+
+await using var context = new KSqlDBContext(contextOptions);
 ```

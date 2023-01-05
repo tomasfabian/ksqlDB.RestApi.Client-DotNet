@@ -192,43 +192,6 @@ Generated KSQL statement:
 INSERT INTO tweetsTest (Id, Amount, AccountBalance) VALUES (1, 4.2E-004, 533333333421.6332);
 ```
 
-### InsertProperties.IncludeReadOnlyProperties
-**v1.3.1**
-
-- Inserts - include readonly properties configuration
-
-The initial convention is that all writeable public instance properties and fields are taken into account during the Insert into statement generation.
-
-```C#
-public record Foo
-{
-  public Foo(string name)
-  {
-    Name = name;
-  }
-
-  public string Name { get; }
-  public int Count { get; set; }
-}
-```
-
-```C#
-var insertProperties = new InsertProperties
-                       {
-                         IncludeReadOnlyProperties = true
-                       };
-
-await using KSqlDBContext context = new KSqlDBContext(@"http:\\localhost:8088");
-
-var model = new Foo("Bar") {
-  Count = 3
-};
-
-context.Add(model, insertProperties);
-
-var responseMessage = await context.SaveChangesAsync();
-```
-
 ### ToInsertStatement
 **v1.8.0**
 
@@ -408,7 +371,7 @@ private record MyUpdate : IMyUpdate
 INSERT INTO MyUpdate (Field, Field2, ExtraField) VALUES ('Value', 'Value2', 'Test value');
 ```
 
-### AssertTopicExistsAsync and AssertTopicNotExistsAsync
+### Assert topics
 **v2.3.0**
 
 [Assert Topic](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/assert-topic/) - asserts that a topic exists or does not exist.
@@ -447,7 +410,7 @@ ASSERT NOT EXISTS TOPIC tweetsByTitle WITH ( replicas=3, partitions=1 ) 3 SECOND
 ASSERT TOPIC tweetsByTitle WITH ( replicas=3, partitions=1 ) 3 SECONDS;
 ``` 
 
-### AssertSchemaExistsAsync and AssertSchemaNotExistsAsync
+### Assert schemas
 **v2.3.0**
 
 [Assert Schema](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/assert-schema/)
@@ -548,7 +511,7 @@ CREATE SOURCE CONNECTOR `mock-connector` WITH(
 DROP CONNECTOR `mock-connector`;
 ```
 
-### CreateTypeAsync
+### Create types
 **v1.6.0**
 
 - `IKSqlDbRestApiClient.CreateTypeAsync<TEntity>` - Create an alias for a complex type declaration.
