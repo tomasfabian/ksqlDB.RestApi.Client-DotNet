@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace ksqlDB.Api.Client.Tests.Fakes.Logging;
@@ -12,6 +12,6 @@ internal static class LoggerMockExtensions
       It.IsAny<EventId>(),
       It.Is<It.IsAnyType>((v, t) => true),
       It.IsAny<Exception>(),
-      It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), times);
+      It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), times);
   }
 }

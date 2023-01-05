@@ -119,7 +119,9 @@ public class AggregationFunctionExpressionTests : TestBase
   public void CollectList_BuildKSql_PrintsCollectListWithColumn()
   {
     //Arrange
+#pragma warning disable CS0612 // Type or member is obsolete
     Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression = l => new { Key = l.Key, CollectList = l.CollectList(c => c.Amount) };
+#pragma warning restore CS0612 // Type or member is obsolete
 
     //Act
     var query = ClassUnderTest.BuildKSql(expression);

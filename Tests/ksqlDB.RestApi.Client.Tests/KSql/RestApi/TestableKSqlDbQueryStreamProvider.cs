@@ -26,7 +26,7 @@ internal class TestableKSqlDbQueryStreamProvider : KSqlDbQueryStreamProvider
   protected string ErrorResponse =
     @"{""@type"":""generic_error"",""error_code"":40001,""message"":""Line: 1, Col: 21: SELECT column 'Foo' cannot be resolved.\nStatement: SELECT Message, Id, Foo FROM Tweets\r\nWHERE Message = 'Hello world' EMIT CHANGES LIMIT 2;""}";
 
-  internal IsDisposedHttpClient LastUsedHttpClient { get; private set; }
+  internal IsDisposedHttpClient LastUsedHttpClient { get; private set; } = null!;
 
   protected override HttpClient OnCreateHttpClient()
   {
@@ -52,7 +52,7 @@ internal class TestableKSqlDbQueryStreamProvider : KSqlDbQueryStreamProvider
     };
   }
 
-  public Exception Exception { get; set; }
+  public Exception Exception { get; set; } = null!;
 
   protected override HttpRequestMessage CreateQueryHttpRequestMessage(HttpClient httpClient, object parameters)
   {

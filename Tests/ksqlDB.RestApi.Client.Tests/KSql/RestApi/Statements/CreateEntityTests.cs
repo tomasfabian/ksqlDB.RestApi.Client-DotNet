@@ -547,11 +547,9 @@ public class CreateEntityTests
 
     public IDictionary<string, int> Dictionary { get; set; } = null!;
     public Dictionary<string, int> Dictionary2 { get; set; } = null!;
-
-    //#pragma warning disable CS0649
+//#pragma warning disable CS0649
     public double Field;
-    //#pragma warning restore CS0649
-
+//#pragma warning restore CS0649
     public int DontFindMe { get; }
 
   }

@@ -55,8 +55,6 @@ public class InsertValuesTests
       .WithValue(c => c.Release_Year, () => "2023");
 
     //Assert
-    string expectedFunction = "FORMAT_TIMESTAMP(FROM_UNIXTIME(UNIX_TIMESTAMP()), 'yyyy')";
-
     insertValues.PropertyValues[nameof(Movie.Release_Year)].Should().Be("'2023'");
   }
 

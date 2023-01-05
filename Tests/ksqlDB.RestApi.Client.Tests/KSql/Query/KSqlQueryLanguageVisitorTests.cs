@@ -130,7 +130,6 @@ EMIT CHANGES;";
     contextOptions.ShouldPluralizeFromItemName = false;
     string stream1TableName = "stream1";
     string stream2TableName = "stream2";
-    string stream3TableName = "stream3";
 
     var query = (from a in new TestableDbProvider(contextOptions).CreateQueryStream<MySensor>(stream1TableName)
       join b in Source.Of<MySensor>(stream2TableName) on a.DataId equals b.DataId
