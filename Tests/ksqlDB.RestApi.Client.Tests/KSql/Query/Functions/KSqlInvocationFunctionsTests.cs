@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.KSql.Linq;
@@ -12,9 +12,9 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Functions;
 [TestClass]
 public class KSqlInvocationFunctionsTests : TestBase
 {
-  private KSqlInvocationFunctionVisitor ClassUnderTest { get; set; }
+  private KSqlInvocationFunctionVisitor ClassUnderTest { get; set; } = null!;
 
-  private StringBuilder StringBuilder { get; set; }
+  private StringBuilder StringBuilder { get; set; } = null!;
 
   [TestInitialize]
   public override void TestInitialize()
@@ -28,11 +28,11 @@ public class KSqlInvocationFunctionsTests : TestBase
   class Tweets
   {
     public int Id { get; set; }
-    public string[] Messages { get; set; }
-    public int[] Values { get; set; }
-    public IDictionary<string, int[]> Dictionary { get; set; }
-    public IDictionary<string, int> Dictionary2 { get; set; }
-    public IDictionary<string, QbservableGroupByExtensionsTests.City> Dictionary3 { get; set; }
+    public string[] Messages { get; set; } = null!;
+    public int[] Values { get; set; } = null!;
+    public IDictionary<string, int[]> Dictionary { get; set; } = null!;
+    public IDictionary<string, int> Dictionary2 { get; set; } = null!;
+    public IDictionary<string, QbservableGroupByExtensionsTests.City> Dictionary3 { get; set; } = null!;
   }
 
   #region Array

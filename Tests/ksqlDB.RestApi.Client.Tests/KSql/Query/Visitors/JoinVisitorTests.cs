@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -13,7 +13,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
 [TestClass]
 public class JoinVisitorTests : TestBase
 {
-  private KSqlDBContext KSqlDBContext { get; set; }
+  private KSqlDBContext KSqlDBContext { get; set; } = null!;
 
   [TestInitialize]
   public override void TestInitialize()
@@ -282,17 +282,17 @@ EMIT CHANGES;";
   class LambdaMap
   {
     public int Id { get; set; }
-    public IDictionary<string, City> Dictionary { get; set; }
-    public Nested Nested { get; set; }
+    public IDictionary<string, City> Dictionary { get; set; } = null!;
+    public Nested Nested { get; set; } = null!;
   }
   private class City
   {
-    public int[] Values { get; set; }
+    public int[] Values { get; set; } = null!;
   }
 
   private class Nested
   {
-    public string Prop { get; set; }
+    public string Prop { get; set; } = null!;
   }
 
   [TestMethod]
@@ -644,7 +644,7 @@ EMIT CHANGES;";
   private sealed class Item
   {
     public int ItemId { get; set; }
-    public string ItemName { get; set; }
+    public string ItemName { get; set; } = null!;
   }
 
   [TestMethod]

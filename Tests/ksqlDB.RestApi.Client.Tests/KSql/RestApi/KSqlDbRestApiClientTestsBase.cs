@@ -1,4 +1,4 @@
-﻿using ksqlDB.Api.Client.Tests.Fakes.Http;
+using ksqlDB.Api.Client.Tests.Fakes.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UnitTests;
@@ -8,9 +8,9 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
 
 public abstract class KSqlDbRestApiClientTestsBase : TestBase
 {
-  protected IHttpClientFactory HttpClientFactory;
-  protected HttpClient HttpClient;
-  protected Mock<HttpMessageHandler> httpMessageHandlerMock;
+  protected IHttpClientFactory HttpClientFactory = null!;
+  protected HttpClient HttpClient = null!;
+  protected Mock<HttpMessageHandler> HttpMessageHandlerMock = null!;
 
   [TestInitialize]
   public override void TestInitialize()
@@ -22,9 +22,9 @@ public abstract class KSqlDbRestApiClientTestsBase : TestBase
 
   protected void CreateHttpMocks(string responseContents)
   {
-    httpMessageHandlerMock = FakeHttpClient.CreateHttpMessageHandler(responseContents);
+    HttpMessageHandlerMock = FakeHttpClient.CreateHttpMessageHandler(responseContents);
 
-    HttpClient = httpMessageHandlerMock.ToHttpClient();
+    HttpClient = HttpMessageHandlerMock.ToHttpClient();
 
     Mock.Get(HttpClientFactory).Setup(c => c.CreateClient()).Returns(HttpClient);
   }

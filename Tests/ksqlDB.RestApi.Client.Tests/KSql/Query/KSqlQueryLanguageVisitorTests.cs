@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.KSql.Linq;
@@ -20,12 +20,12 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query;
 [TestClass]
 public class KSqlQueryLanguageVisitorTests : TestBase
 {
-  private KSqlQueryGenerator ClassUnderTest { get; set; }
+  private KSqlQueryGenerator ClassUnderTest { get; set; } = null!;
 
-  string streamName = nameof(Location) + "s";
+  readonly string streamName = nameof(Location) + "s";
 
-  private KSqlDBContextOptions contextOptions;
-  private QueryContext queryContext;
+  private KSqlDBContextOptions contextOptions = null!;
+  private QueryContext queryContext = null!;
 
   [TestInitialize]
   public override void TestInitialize()
@@ -58,12 +58,12 @@ public class KSqlQueryLanguageVisitorTests : TestBase
   public class MySensor
   {
     [JsonPropertyName("SensorId")]
-    public string SensorId2 { get; set; }
-    
-    public string Data { get; set; }
+    public string SensorId2 { get; set; } = null!;
+
+    public string Data { get; set; } = null!;
 
     [JsonPropertyName("data_id")]
-    public string DataId { get; set; }
+    public string DataId { get; set; } = null!;
   }
 
   [TestMethod]
@@ -625,7 +625,7 @@ WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;";
   class OrderData
   {
     public int OrderType { get; set; }
-    public string Category { get; set; }
+    public string Category { get; set; } = null!;
   }
 
   [TestMethod]
@@ -1318,18 +1318,18 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
   record DatabaseChangeObject<TEntity>
   {
-    public TEntity After { get; set; }
+    public TEntity After { get; init; } = default!;
   }
 
-  record Entity
+  private record Entity
   {
-    public string SensorId { get; set; }
-    public Model Model { get; set; }
+    public string SensorId { get; init; } = null!;
+    public Model Model { get; init; } = null!;
   }
 
-  record Model
+  private record Model
   {
-    public string Version { get; set; }
+    public string Version { get; init; } = null!;
   }
 
   private IQbservable<DatabaseChangeObject<Entity>> CreateDatabaseChangeObjectStreamSource()

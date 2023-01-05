@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Models;
@@ -12,8 +12,8 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
 [TestClass]
 public class AggregationFunctionExpressionTests : TestBase
 {
-  private AggregationFunctionVisitor ClassUnderTest { get; set; }
-  private StringBuilder StringBuilder { get; set; }
+  private AggregationFunctionVisitor ClassUnderTest { get; set; } = null!;
+  private StringBuilder StringBuilder { get; set; } = null!;
 
   [TestInitialize]
   public override void TestInitialize()

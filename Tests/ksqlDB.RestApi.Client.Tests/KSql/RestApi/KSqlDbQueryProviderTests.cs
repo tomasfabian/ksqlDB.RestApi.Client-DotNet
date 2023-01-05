@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ninject;
@@ -9,7 +9,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
 [TestClass]
 public class KSqlDbQueryProviderTests : TestBase
 {
-  private TestableKSqlDbQueryProvider ClassUnderTest { get; set; }
+  private TestableKSqlDbQueryProvider ClassUnderTest { get; set; } = null!;
 
   [TestInitialize]
   public override void TestInitialize()
@@ -49,9 +49,9 @@ public class KSqlDbQueryProviderTests : TestBase
   internal class Nested
   {
     public int Id { get; set; }
-    public MovieStruct[] Arr { get; set; }
-    public Dictionary<string, Dictionary<string, int>> MapValue { get; set; }
-    public Dictionary<int, string[]> MapArr { get; set; }
+    public MovieStruct[] Arr { get; set; } = null!;
+    public Dictionary<string, Dictionary<string, int>> MapValue { get; set; } = null!;
+    public Dictionary<int, string[]> MapArr { get; set; } = null!;
     public MovieStruct Movie { get; set; }
     public int Release_Year { get; set; }
   }

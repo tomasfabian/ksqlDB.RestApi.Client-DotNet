@@ -10,8 +10,8 @@ public class InsertValuesTests
 {
   private record Movie
   {
-    internal string Id { get; init; }
-    internal string Release_Year { get; set; }
+    internal string Id { get; init; } = null!;
+    internal string Release_Year { get; set; } = null!;
   }
 
   [KSqlFunction]

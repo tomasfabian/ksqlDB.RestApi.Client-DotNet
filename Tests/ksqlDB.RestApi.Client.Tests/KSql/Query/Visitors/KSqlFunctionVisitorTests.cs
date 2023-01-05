@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Models;
@@ -12,9 +12,9 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
 [TestClass]
 public class KSqlFunctionVisitorTests : TestBase
 {
-  private KSqlFunctionVisitor ClassUnderTest { get; set; }
+  private KSqlFunctionVisitor ClassUnderTest { get; set; } = null!;
 
-  private StringBuilder StringBuilder { get; set; }
+  private StringBuilder StringBuilder { get; set; } = null!;
 
   [TestInitialize]
   public override void TestInitialize()
@@ -73,7 +73,7 @@ public class KSqlFunctionVisitorTests : TestBase
   {
     //Arrange
     string functionCall = "IFNULL(Message, 'n/a')";
-    Expression<Func<Tweet, object>> expression = c => K.Functions.Dynamic(functionCall) as string;
+    Expression<Func<Tweet, object>> expression = c => K.Functions.Dynamic(functionCall);
 
     //Act
     var query = ClassUnderTest.BuildKSql(expression);

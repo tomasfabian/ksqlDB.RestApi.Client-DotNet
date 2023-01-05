@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Fakes.Http;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.KSql.Query.Context;
@@ -16,7 +16,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Linq;
 [TestClass]
 public class QbservableExtensionsExplainTests : TestBase
 {
-  private TestableDbProviderForExplain dbProvider;
+  private TestableDbProviderForExplain dbProvider = null!;
 
   [TestInitialize]
   public void Initialize()

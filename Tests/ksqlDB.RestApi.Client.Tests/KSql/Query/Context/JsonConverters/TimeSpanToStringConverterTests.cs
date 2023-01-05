@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context.JsonConverters;
@@ -33,7 +33,7 @@ public class TimeSpanToStringConverterTests
     var timeSpan = JsonSerializer.Deserialize<CreateEntityTests.TimeTypes>(json, jsonSerializerOptions);
 
     //Assert
-    timeSpan.Ts.Should().Be(value.Ts);
+    timeSpan!.Ts.Should().Be(value.Ts);
     timeSpan.Dt.Should().Be(value.Dt);
   }
 

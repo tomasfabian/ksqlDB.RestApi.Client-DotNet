@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
@@ -99,7 +99,7 @@ public class CreateInsertTests
   record EventCategory
   {
     public int Count { get; set; }
-    public string Name { get; init; }
+    public string Name { get; init; } = null!;
   }
 
   record Event
@@ -107,7 +107,7 @@ public class CreateInsertTests
     [Key]
     public int Id { get; set; }
 
-    public string[] Places { get; set; }
+    public string[] Places { get; set; } = null!;
   }
 
   [Test]
@@ -130,9 +130,9 @@ public class CreateInsertTests
   record EventWithPrimitiveEnumerable
   {
     [Key]
-    public string Id { get; set; }
+    public string Id { get; init; } = null!;
 
-    public int[] Places { get; set; }
+    public int[] Places { get; init; } = null!;
   }
 
   [Test]
@@ -155,9 +155,9 @@ public class CreateInsertTests
   record EventWithList
   {
     [Key]
-    public string Id { get; set; }
+    public string Id { get; set; } = null!;
 
-    public List<int> Places { get; set; }
+    public List<int> Places { get; set; } = null!;
   }
 
   [Test]
@@ -221,7 +221,7 @@ public class CreateInsertTests
     var testEvent = new ComplexEvent
     {
       Id = 1,
-      Category = null
+      Category = null!
     };
 
     //Act
@@ -234,7 +234,7 @@ public class CreateInsertTests
   public class Kafka_table_order
   {
     public int Id { get; set; }
-    public IEnumerable<double> Items { get; set; }
+    public IEnumerable<double> Items { get; set; } = null!;
   }
 
   [Test]
@@ -287,11 +287,10 @@ public class CreateInsertTests
     statement.Should().Be($"INSERT INTO Kafka_table_orders ({nameof(Kafka_table_order.Id)}, {nameof(Kafka_table_order.Items)}) VALUES (1, ARRAY[1.1, 2]);");
   }
 
-
   record Kafka_table_order2
   {
     public int Id { get; set; }
-    public List<double> ItemsList { get; set; }
+    public List<double>? ItemsList { get; set; }
   }
 
   [Test]
@@ -343,7 +342,7 @@ public class CreateInsertTests
   record Kafka_table_order3
   {
     public int Id { get; set; }
-    public IList<int> ItemsList { get; set; }
+    public IList<int> ItemsList { get; set; } = null!;
   }
 
   [Test]
@@ -361,7 +360,7 @@ public class CreateInsertTests
 
   record FooNestedArrayInMap
   {
-    public Dictionary<string, int[]> Map { get; set; }
+    public Dictionary<string, int[]> Map { get; set; } = null!;
   }
 
   [Test]
@@ -387,7 +386,7 @@ public class CreateInsertTests
 
   record FooNestedMapInMap
   {
-    public Dictionary<string, Dictionary<string, int>> Map { get; set; }
+    public Dictionary<string, Dictionary<string, int>> Map { get; set; } = null!;
   }
 
   [Test]
@@ -421,8 +420,8 @@ public class CreateInsertTests
 
   record FooStruct
   {
-    public string Property { get; set; }
-    public FooNestedStruct Str { get; set; }
+    public string Property { get; init; } = null!;
+    public FooNestedStruct Str { get; init; } = null!;
   }
 
   record FooNestedStruct
@@ -458,7 +457,7 @@ public class CreateInsertTests
 
   record FooNestedStructInMap
   {
-    public Dictionary<string, LocationStruct> Str { get; set; }
+    public Dictionary<string, LocationStruct> Str { get; set; } = null!;
   }
 
   [Test]
@@ -492,7 +491,7 @@ public class CreateInsertTests
 
   record FooNestedMapInArray
   {
-    public Dictionary<string, int>[] Arr { get; set; }
+    public Dictionary<string, int>[] Arr { get; init; } = null!;
   }
 
   [Test]
@@ -517,7 +516,7 @@ public class CreateInsertTests
 
   record FooNestedArrayInArray
   {
-    public int[][] Arr { get; set; }
+    public int[][] Arr { get; init; } = null!;
   }
 
   [Test]
@@ -542,7 +541,7 @@ public class CreateInsertTests
 
   record FooNestedStructInArray
   {
-    public LocationStruct[] Arr { get; set; }
+    public LocationStruct[] Arr { get; set; } = null!;
   }
 
   [Test]
@@ -657,8 +656,8 @@ public class CreateInsertTests
   private record MyUpdate : IMyUpdate
   {
     public string ExtraField = "Test value";
-    public string Field { get; set; }
-    public string Field2 { get; init; }
+    public string Field { get; set; } = null!;
+    public string Field2 { get; init; } = null!;
   }
 
   [Test]

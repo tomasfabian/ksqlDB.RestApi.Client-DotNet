@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using FluentAssertions;
 using Joker.Extensions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -12,7 +12,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements;
 
 public class CreateEntityTests
 {
-  private EntityCreationMetadata creationMetadata;
+  private EntityCreationMetadata creationMetadata = null!;
 
   [SetUp]
   public void Init()
@@ -27,7 +27,7 @@ public class CreateEntityTests
     
   private static readonly IPluralize EnglishPluralizationService = new Pluralizer();
 
-  private string CreateExpectedStatement(string creationClause, bool hasPrimaryKey, string entityName = null)
+  private string CreateExpectedStatement(string creationClause, bool hasPrimaryKey, string? entityName = null)
   {
     string key = hasPrimaryKey ? "PRIMARY KEY" : "KEY";
 
@@ -454,12 +454,12 @@ public class CreateEntityTests
   public abstract record AbstractProducerClass
   {
     [Key]
-    public string Key { get; set; }
+    public string Key { get; set; } = null!;
   }
 
   record Enrichedevent1 : AbstractProducerClass
   {
-    public EventCategory[] EventCategories { get; set; }
+    public EventCategory[] EventCategories { get; set; } = null!;
   }
     
   [Test]
@@ -470,7 +470,7 @@ public class CreateEntityTests
 
   record Enrichedevent2 : AbstractProducerClass
   {
-    public List<EventCategory> EventCategories { get; set; }
+    public List<EventCategory> EventCategories { get; set; } = null!;
   }
     
   [Test]
@@ -481,7 +481,7 @@ public class CreateEntityTests
     
   record Enrichedevent3 : AbstractProducerClass
   {
-    public IEnumerable<EventCategory> EventCategories { get; set; }
+    public IEnumerable<EventCategory> EventCategories { get; set; } = null!;
   }
 
   [Test]
@@ -492,7 +492,7 @@ public class CreateEntityTests
     
   record Enrichedevent4 : AbstractProducerClass
   {
-    public int[] EventCategories { get; set; }
+    public int[] EventCategories { get; set; } = null!;
   }
 
   [Test]
@@ -505,7 +505,7 @@ public class CreateEntityTests
   record EventCategory
   {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
   }
 
   private static void TestCreateEntityWithEnumerable<TEntity>(string arrayElementType = "EVENTCATEGORY")
@@ -539,14 +539,14 @@ public class CreateEntityTests
     [Key]
     public int Id { get; set; }
 
-    public string Title { get; set; }
+    public string Title { get; set; } = null!;
 
     public int Release_Year { get; set; }
 
-    public int[] NumberOfDays { get; set; }
+    public int[] NumberOfDays { get; init; } = null!;
 
-    public IDictionary<string, int> Dictionary { get; set; }
-    public Dictionary<string, int> Dictionary2 { get; set; }
+    public IDictionary<string, int> Dictionary { get; set; } = null!;
+    public Dictionary<string, int> Dictionary2 { get; set; } = null!;
 
     //#pragma warning disable CS0649
     public double Field;
@@ -602,7 +602,7 @@ public class CreateEntityTests
   internal record Renamed
   {
     [JsonPropertyName("data_id")]
-    public string DataId { get; set; }
+    public string DataId { get; set; } = null!;
   }
 
   [Test]

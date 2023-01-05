@@ -13,9 +13,9 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
 [TestClass]
 public class KSqlCustomFunctionVisitorTests : TestBase
 {
-  private KSqlCustomFunctionVisitor ClassUnderTest { get; set; }
+  private KSqlCustomFunctionVisitor ClassUnderTest { get; set; } = null!;
 
-  private StringBuilder StringBuilder { get; set; }
+  private StringBuilder StringBuilder { get; set; } = null!;
 
   [TestInitialize]
   public override void TestInitialize()
@@ -51,7 +51,7 @@ public class KSqlCustomFunctionVisitorTests : TestBase
   public void MissingAttribute_NothingIsRendered()
   {
     //Arrange
-    Expression<Func<Tweet, string>> expression = c => c.ToString();
+    Expression<Func<Tweet, string?>> expression = c => c.ToString();
 
     //Act
     var query = ClassUnderTest.BuildKSql(expression);

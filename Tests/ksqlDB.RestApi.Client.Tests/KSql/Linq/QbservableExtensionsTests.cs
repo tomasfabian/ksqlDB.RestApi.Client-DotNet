@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.KSql.Query.Context;
 using ksqlDB.Api.Client.Tests.Models;
@@ -181,7 +181,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
       RegisterKSqlQueryGenerator = false;
     }
 
-    public IQbservable<Tweet> CreateTweetsStreamSet(string streamName = null)
+    public IQbservable<Tweet> CreateTweetsStreamSet(string? streamName = null)
     {
       var serviceScopeFactory = Initialize(new KSqlDBContextOptions(ksqlDbUrl));
 
@@ -343,8 +343,8 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     //Act
 
     //Assert
-    (source as KStreamSet).SubscribeOnScheduler.Should().BeNull();
-    (source as KStreamSet).ObserveOnScheduler.Should().BeNull();
+    ((KStreamSet)source).SubscribeOnScheduler.Should().BeNull();
+    ((KStreamSet)source).ObserveOnScheduler.Should().BeNull();
   }
 
   [TestMethod]
@@ -359,7 +359,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     var source = query.SubscribeOn(testScheduler);
 
     //Assert
-    (source as KStreamSet).SubscribeOnScheduler.Should().Be(testScheduler);
+    ((KStreamSet)source).SubscribeOnScheduler.Should().Be(testScheduler);
   }
 
   [TestMethod]
@@ -374,7 +374,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     var source = query.ObserveOn(testScheduler);
 
     //Assert
-    (source as KStreamSet).ObserveOnScheduler.Should().Be(testScheduler);
+    ((KStreamSet)source).ObserveOnScheduler.Should().Be(testScheduler);
   }
 
   private IQbservable<Location> CreateStreamSource()

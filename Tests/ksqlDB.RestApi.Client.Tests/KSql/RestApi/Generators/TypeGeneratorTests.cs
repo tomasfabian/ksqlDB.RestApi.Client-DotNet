@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using NUnit.Framework;
@@ -71,14 +71,14 @@ public class TypeGeneratorTests
   public record Address
   {
     public int Number { get; set; }
-    public string Street { get; set; }
-    public string City { get; set; }
+    public string Street { get; set; } = null!;
+    public string City { get; set; } = null!;
   }
 
   public class Person
   {
-    public string Name { get; set; }
-    public Address Address { get; set; }
+    public string Name { get; set; } = null!;
+    public Address Address { get; set; } = null!;
   }
 
   public struct Thumbnail
@@ -88,23 +88,23 @@ public class TypeGeneratorTests
 
   record Container
   {
-    public IDictionary<string, int> Values2 { get; set; }
+    public IDictionary<string, int> Values2 { get; set; } = null!;
   }
 
   #region GenericType
 
   record DatabaseChangeObject<TEntity> : DatabaseChangeObject
   {
-    public TEntity Before { get; set; }
-    public TEntity After { get; set; }
+    public TEntity Before { get; set; } = default!;
+    public TEntity After { get; set; } = default!;
   }
 
   record DatabaseChangeObject
   {
-    public Source Source { get; set; }
-    public string Op { get; set; }
+    public Source Source { get; set; } = null!;
+    public string Op { get; set; } = null!;
+
     public long TsMs { get; set; }
-    //public object Transaction { get; set; }
 
     public ChangeDataCaptureType OperationType => ChangeDataCaptureType.Created;
   }
@@ -121,14 +121,14 @@ public class TypeGeneratorTests
   record IoTSensor
   {
     [Key]
-    public string SensorId { get; set; }
+    public string SensorId { get; set; } = null!;
     public int Value { get; set; }
   }
 
   public record Source
   {
-    public string Version { get; set; }
-    public string Connector { get; set; }
+    public string Version { get; set; } = null!;
+    public string Connector { get; set; } = null!;
   }
 
   [Test]

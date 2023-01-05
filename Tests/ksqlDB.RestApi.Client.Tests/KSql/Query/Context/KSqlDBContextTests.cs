@@ -302,7 +302,7 @@ public class KSqlDBContextTests : TestBase
       .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
 
     //Act
-    var serviceScopeFactory = serviceProvider.GetService<IServiceScopeFactory>();
+    var serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
     var queryDbProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IKSqlDbProvider>();
 
     //Assert
@@ -322,7 +322,7 @@ public class KSqlDBContextTests : TestBase
       .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
 
     //Act
-    var serviceScopeFactory = serviceProvider.GetService<IServiceScopeFactory>();
+    var serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
     var queryDbProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IKSqlDbProvider>();
 
     //Assert

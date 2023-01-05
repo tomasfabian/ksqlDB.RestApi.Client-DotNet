@@ -11,7 +11,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
 [TestClass]
 public class RowValueJsonSerializerTests : TestBase
 {
-  private RowValueJsonSerializer ClassUnderTest { get; set; }
+  private RowValueJsonSerializer ClassUnderTest { get; set; } = null!;
 
   [TestInitialize]
   public override void TestInitialize()
@@ -29,7 +29,7 @@ public class RowValueJsonSerializerTests : TestBase
 
   private record SingleLady
   {
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
   }
 
   [TestMethod]
@@ -151,7 +151,7 @@ public class RowValueJsonSerializerTests : TestBase
 
   private record MyStruct
   {
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
   }
 
   [TestMethod]

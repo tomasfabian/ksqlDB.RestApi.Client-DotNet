@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
@@ -27,7 +27,7 @@ public class BasicAuthHandlerTests : TestBase
     var result = await invoker.SendAsync(httpRequestMessage, new CancellationToken());
 
     //Assert
-    httpRequestMessage.Headers.Authorization.Scheme.Should().Be("basic");
+    httpRequestMessage.Headers!.Authorization!.Scheme.Should().Be("basic");
     httpRequestMessage.Headers.Authorization.Parameter.Should().Be("ZnJlZDpsZXRtZWlu");
   }
 }

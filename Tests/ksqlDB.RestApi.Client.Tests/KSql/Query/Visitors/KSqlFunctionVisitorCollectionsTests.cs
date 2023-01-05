@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
@@ -13,9 +13,9 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
 [TestClass]
 public class KSqlFunctionVisitorCollectionsTests : TestBase
 {
-  private KSqlFunctionVisitor ClassUnderTest { get; set; }
+  private KSqlFunctionVisitor ClassUnderTest { get; set; } = null!;
 
-  private StringBuilder StringBuilder { get; set; }
+  private StringBuilder StringBuilder { get; set; } = null!;
 
   [TestInitialize]
   public override void TestInitialize()
@@ -30,8 +30,8 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
     
   private class Collection
   {
-    public int[] Items1 { get; set; }
-    public int[] Items2 { get; set; }
+    public int[] Items1 { get; set; } = null!;
+    public int[] Items2 { get; set; } = null!;
   }
 
   #region ArrayContains

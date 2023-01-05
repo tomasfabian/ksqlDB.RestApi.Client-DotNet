@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
@@ -11,7 +11,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query.Functions;
 [TestClass]
 public class LambdaVisitorTests : TestBase
 {
-  private LambdaVisitor ClassUnderTest { get; set; }
+  private LambdaVisitor ClassUnderTest { get; set; } = null!;
 
   [TestInitialize]
   public override void TestInitialize()

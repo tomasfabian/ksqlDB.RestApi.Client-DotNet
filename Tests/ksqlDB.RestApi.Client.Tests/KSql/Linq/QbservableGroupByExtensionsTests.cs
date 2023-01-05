@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Fakes.Http;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.KSql.Query.Context;
@@ -28,8 +28,8 @@ public class QbservableGroupByExtensionsTests : TestBase
 
     return context.CreateQueryStream<City>();
   }
-          
-  TestScheduler testScheduler;
+
+  private TestScheduler testScheduler = null!;
 
   [TestInitialize]
   public override void TestInitialize()
@@ -478,21 +478,21 @@ WHERE RegionCode != 'xx' GROUP BY RegionCode EMIT CHANGES;");
 
   public class City
   {
-    public string RegionCode { get; set; }
+    public string RegionCode { get; set; } = null!;
     public long Citizens { get; set; }
-    public State State { get; set; }
-    public int[] Values { get; set; }
+    public State State { get; set; } = null!;
+    public int[] Values { get; set; } = null!;
   }
 
   public record State
   {
-    public string Name { get; set; }
-    public Nested Nested { get; set; }
+    public string Name { get; set; } = null!;
+    public Nested Nested { get; set; } = null!;
   }
 
   public record Nested
   {
-    public string Version { get; set; }
+    public string Version { get; set; } = null!;
   }
 }
 

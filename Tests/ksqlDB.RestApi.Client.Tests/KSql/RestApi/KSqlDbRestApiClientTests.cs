@@ -22,9 +22,9 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
 [TestClass]
 public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 {
-  private KSqlDbRestApiClient ClassUnderTest { get; set; }
-  private Mock<ILogger> LoggerMock { get; set; }
-  private Mock<ILoggerFactory> LoggerFactoryMock { get; set; }
+  private KSqlDbRestApiClient ClassUnderTest { get; set; } = null!;
+  private Mock<ILogger> LoggerMock { get; set; } = null!;
+  private Mock<ILoggerFactory> LoggerFactoryMock { get; set; } = null!;
 
   [TestInitialize]
   public override void TestInitialize()
@@ -91,7 +91,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     //Assert
     httpRequestMessage.Method.Should().Be(HttpMethod.Post);
     httpRequestMessage.RequestUri.Should().Be("/ksql");
-    httpRequestMessage.Content.Headers.ContentType.MediaType.Should().Be(KSqlDbRestApiClient.MediaType);
+    httpRequestMessage.Content!.Headers!.ContentType!.MediaType.Should().Be(KSqlDbRestApiClient.MediaType);
   }
     
   [TestMethod]
@@ -104,7 +104,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     var httpRequestMessage = ClassUnderTest.CreateHttpRequestMessage(ksqlDbStatement);
 
     //Assert
-    var content = await httpRequestMessage.Content.ReadAsStringAsync();
+    var content = await httpRequestMessage.Content!.ReadAsStringAsync();
     content.Should().Be(@$"{{""ksql"":""{createOrReplaceTableStatement}"",""streamsProperties"":{{}}}}");
   }
 
@@ -118,7 +118,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     var stringContent = ClassUnderTest.CreateContent(ksqlDbStatement);
 
     //Assert
-    stringContent.Headers.ContentType.MediaType.Should().Be(KSqlDbRestApiClient.MediaType);
+    stringContent.Headers!.ContentType!.MediaType.Should().Be(KSqlDbRestApiClient.MediaType);
     stringContent.Headers.ContentType.CharSet.Should().Be(Encoding.UTF8.WebName);
   }
 
@@ -137,7 +137,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     var stringContent = ClassUnderTest.CreateContent(ksqlDbStatement);
 
     //Assert
-    stringContent.Headers.ContentType.CharSet.Should().Be(encoding.WebName);
+    stringContent.Headers!.ContentType!.CharSet.Should().Be(encoding.WebName);
   }
 
   [TestMethod]
@@ -366,9 +366,9 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
   private void VerifySendAsync(string content, string requestUri = @"/ksql")
   {
-    var request = ItExpr.Is<HttpRequestMessage>(c => c.Method == HttpMethod.Post && c.RequestUri.PathAndQuery == requestUri && c.Content.ReadAsStringAsync().Result == content);
+    var request = ItExpr.Is<HttpRequestMessage>(c => c.Method == HttpMethod.Post && c.RequestUri!.PathAndQuery == requestUri && c.Content!.ReadAsStringAsync().Result == content);
       
-    httpMessageHandlerMock.Protected()
+    HttpMessageHandlerMock.Protected()
       .Verify(nameof(HttpClient.SendAsync), Times.Once(), exactParameterMatch: true, request, ItExpr.IsAny<CancellationToken>());
   }
 

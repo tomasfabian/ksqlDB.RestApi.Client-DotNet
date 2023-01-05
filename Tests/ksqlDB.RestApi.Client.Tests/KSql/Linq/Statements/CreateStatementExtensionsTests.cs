@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.Api.Client.Tests.Models.Movies;
@@ -15,7 +15,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Linq.Statements;
 [TestClass]
 public class CreateStatementExtensionsTests : TestBase
 {
-  private TestableDbProvider DbProvider { get; set; }
+  private TestableDbProvider DbProvider { get; set; } = null!;
 
   protected virtual string StatementResponse { get; set; } = @"[{""@type"":""currentStatus"", ""commandSequenceNumber"":2174,""warnings"":[]}]";
 

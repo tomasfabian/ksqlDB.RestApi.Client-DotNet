@@ -18,7 +18,7 @@ namespace ksqlDB.Api.Client.Tests.DependencyInjection;
 [TestClass]
 public class KSqlDbServiceCollectionExtensionsTests : TestBase
 {
-  private ServiceCollection ClassUnderTest { get; set; }
+  private ServiceCollection ClassUnderTest { get; set; } = null!;
 
   [TestInitialize]
   public override void TestInitialize()

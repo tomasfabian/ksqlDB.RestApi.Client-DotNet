@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -26,6 +26,6 @@ public class HttpClientFactoryWithBasicAuthTests : TestBase
 
     //Assert
     httpClient.Should().BeOfType<HttpClient>();
-    httpClient.BaseAddress.OriginalString.Should().BeEquivalentTo(TestParameters.KsqlDBUrl);
+    httpClient.BaseAddress!.OriginalString.Should().BeEquivalentTo(TestParameters.KsqlDBUrl);
   }
 }

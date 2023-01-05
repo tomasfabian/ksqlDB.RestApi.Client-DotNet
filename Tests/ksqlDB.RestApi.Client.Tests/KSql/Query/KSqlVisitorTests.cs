@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -14,7 +14,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Query;
 [TestClass]
 public class KSqlVisitorTests : TestBase
 {
-  private KSqlVisitor ClassUnderTest { get; set; }
+  private KSqlVisitor ClassUnderTest { get; set; } = null!;
 
   [TestInitialize]
   public override void TestInitialize()
@@ -342,7 +342,7 @@ public class KSqlVisitorTests : TestBase
 
   private record Update
   {
-    public string ExtraField;
+    public string ExtraField = null!;
   }
 
   [TestMethod]
@@ -393,20 +393,20 @@ public class KSqlVisitorTests : TestBase
 
   record DatabaseChangeObject<TEntity>
   {
-    public TEntity Before { get; set; }
-    public TEntity After { get; set; }
+    public TEntity Before { get; set; } = default!;
+    public TEntity After { get; set; } = default!;
   }
 
   record IoTSensor
   {
-    public string SensorId { get; set; }
-    public Model Model { get; set; }
+    public string SensorId { get; set; } = null!;
+    public Model Model { get; set; } = null!;
   }
 
   record Model
   {
-    public string Version { get; set; }
-    public string[] Capabilities { get; set; }
+    public string Version { get; set; } = null!;
+    public string[] Capabilities { get; set; } = null!;
   }
 
   [TestMethod]
@@ -820,7 +820,7 @@ public class KSqlVisitorTests : TestBase
   class OrderData
   {
     public int OrderType { get; set; }
-    public string Category { get; set; }
+    public string Category { get; set; } = null!;
   }
 
   [TestMethod]

@@ -1,7 +1,7 @@
-﻿namespace ksqlDB.Api.Client.Tests.Models.Sensors;
+namespace ksqlDB.Api.Client.Tests.Models.Sensors;
 
 public class IoTSensorStats
 {
-  public string SensorId { get; set; }
+  public string SensorId { get; set; } = null!;
   public double AvgValue { get; set; }
 }

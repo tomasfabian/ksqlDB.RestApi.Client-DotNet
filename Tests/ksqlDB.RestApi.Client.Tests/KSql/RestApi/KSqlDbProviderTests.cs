@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Fakes.Logging;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
@@ -14,10 +14,10 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
 [TestClass]
 public class KSqlDbProviderTests : TestBase
 {  
-  private TestableKSqlDbQueryStreamProvider ClassUnderTest { get; set; }
+  private TestableKSqlDbQueryStreamProvider ClassUnderTest { get; set; } = null!;
 
-  private Mock<ILogger> LoggerMock { get; set; }
-    
+  private Mock<ILogger> LoggerMock { get; set; } = null!;
+
   [TestInitialize]
   public override void TestInitialize()
   {

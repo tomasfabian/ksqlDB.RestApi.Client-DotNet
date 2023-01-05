@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.Models.Sensors;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
@@ -11,7 +11,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.Linq.PullQueries;
 [TestClass]
 public class PullQueryExtensionsTests : TestBase
 {
-  private TestableDbProvider DbProvider { get; set; }
+  private TestableDbProvider DbProvider { get; set; } = null!;
 
   protected virtual string PullQueryResponse { get; set; } = @"[{""header"":{""queryId"":""query_1619945627639"",""schema"":""`SENSORID` STRING KEY, `WINDOWSTART` BIGINT KEY, `WINDOWEND` BIGINT KEY, `AVGVALUE` DOUBLE""}},
 {""row"":{""columns"":[""sensor-1"",1619859745000,1619859750000,11.0]}},";

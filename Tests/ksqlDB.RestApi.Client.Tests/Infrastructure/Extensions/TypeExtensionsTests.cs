@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Text;
 using System.Text.Json.Serialization;
 using FluentAssertions;
@@ -360,9 +360,9 @@ public class TypeExtensionsTests
   private record MySensor
   {
     [JsonPropertyName("SensorId")]
-    public string SensorId2 { get; set; }
+    public string SensorId2 { get; set; } = null!;
 
-    public string Title { get; set; }
+    public string Title { get; set; } = null!;
   }
 
   [TestMethod]

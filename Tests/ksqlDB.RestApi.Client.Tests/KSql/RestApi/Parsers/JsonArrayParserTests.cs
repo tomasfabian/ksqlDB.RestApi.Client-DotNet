@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parsers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
@@ -9,7 +9,7 @@ namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Parsers;
 [TestClass]
 public class JsonArrayParserTests : TestBase
 {
-  private JsonArrayParser ClassUnderTest { get; set; }
+  private JsonArrayParser ClassUnderTest { get; set; } = null!;
 
   [TestInitialize]
   public override void TestInitialize()
@@ -34,10 +34,10 @@ public class JsonArrayParserTests : TestBase
 
     var jObject = JObject.Parse(json);
       
-    JProperty property = (JProperty)jObject.First;
+    JProperty property = (JProperty)jObject.First!;
     property.Name.Should().BeEquivalentTo(headerColumns[0]);
       
-    property = (JProperty)jObject.Last;
+    property = (JProperty)jObject.Last!;
     property.Name.Should().BeEquivalentTo(headerColumns[1]);
   }
 
@@ -56,10 +56,10 @@ public class JsonArrayParserTests : TestBase
     var jObject = JObject.Parse(json);
 
     var expectedJson = JObject.Parse(mapValue);
-    JProperty property = (JProperty)jObject.First;
+    JProperty property = (JProperty)jObject.First!;
     property.Value.ToString().Should().BeEquivalentTo(expectedJson.ToString());
 
-    property = (JProperty)jObject.Last;
+    property = (JProperty)jObject.Last!;
     property.Value.ToString().Should().BeEquivalentTo("True");
   }
 
@@ -80,10 +80,10 @@ public class JsonArrayParserTests : TestBase
     var jObject = JObject.Parse(json);
 
     var expectedJson = JObject.Parse(arrayValue);
-    JProperty property = (JProperty)jObject.First;
+    JProperty property = (JProperty)jObject.First!;
     property.Value.ToString().Should().BeEquivalentTo(expectedJson.ToString());
 
-    property = (JProperty)jObject.Last;
+    property = (JProperty)jObject.Last!;
     property.Value.ToString().Should().BeEquivalentTo("1");
   }
 
@@ -153,8 +153,8 @@ public class JsonArrayParserTests : TestBase
 ,""NAME"": ""Test1.8,8""
 ,""CREATED_AT"": 18833
 }");
-    JProperty property = jObject.Property("NAME");
-    property.Value.ToString().Should().BeEquivalentTo("Test1.8,8");
+    JProperty property = jObject.Property("NAME")!;
+    property!.Value.ToString().Should().BeEquivalentTo("Test1.8,8");
 
     JObject.Parse(json).ToString().Should().BeEquivalentTo(expectedJson.ToString());
   }
