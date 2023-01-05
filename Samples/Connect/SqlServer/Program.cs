@@ -48,7 +48,7 @@ namespace Connect.SqlServer
         .SetProperty("value.converter.schemas.enable", "false")
         .SetProperty("include.schema.changes", "false");
 
-      return createConnector as SqlServerConnectorMetadata;
+      return (SqlServerConnectorMetadata)createConnector;
     }
   }
 }

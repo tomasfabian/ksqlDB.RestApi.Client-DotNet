@@ -1,9 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Net.Http;
 using System.Reactive.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Blazor.Sample.Configuration;
 using Blazor.Sample.Data;
 using Blazor.Sample.Data.Sensors;
@@ -76,9 +71,9 @@ public partial class SqlServerComponent : IDisposable
 
     try
     {
-      var dbContext = DbContextFactory.CreateDbContext();
+      var dbContext = await DbContextFactory.CreateDbContextAsync();
 
-      sensors = await EntityFrameworkQueryableExtensions.ToListAsync(dbContext.Sensors);
+      sensors = await dbContext.Sensors.ToListAsync();
     }
     catch (Exception e)
     {
@@ -210,7 +205,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
 
   private IDisposable cdcSubscription;
 
-  private async Task SubscribeToQuery(SynchronizationContext? synchronizationContext)
+  private async Task SubscribeToQuery(SynchronizationContext synchronizationContext)
   {
     var options = new KSqlDBContextOptions(KsqlDbUrl)
     {
@@ -234,7 +229,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
       }, error => { Console.WriteLine(error.Message); });
   }
 
-  private async Task SubscribeToRawQuery(SynchronizationContext? synchronizationContext)
+  private async Task SubscribeToRawQuery(SynchronizationContext synchronizationContext)
   {
     var options = new KSqlDBContextOptions(KsqlDbUrl)
     {
@@ -313,7 +308,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
 
   private async Task SaveAsync()
   {
-    var dbContext = DbContextFactory.CreateDbContext();
+    var dbContext = await DbContextFactory.CreateDbContextAsync();
 
     dbContext.Sensors.Add(Model);
 
@@ -327,7 +322,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
     if (sensor == null)
       return;
 
-    var dbContext = DbContextFactory.CreateDbContext();
+    var dbContext = await DbContextFactory.CreateDbContextAsync();
 
     var updatedSensor = sensor with { Value = new Random().Next(1, 100) };
 
@@ -338,7 +333,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
 
   private async Task DeleteAsync(IoTSensor sensor)
   {
-    var dbContext = DbContextFactory.CreateDbContext();
+    var dbContext = await DbContextFactory.CreateDbContextAsync();
 
     dbContext.Sensors.Remove(sensor);
 

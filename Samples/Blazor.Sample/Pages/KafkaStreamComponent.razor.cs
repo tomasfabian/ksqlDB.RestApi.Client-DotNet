@@ -23,7 +23,7 @@ partial class KafkaStreamComponent : IDisposable
 
   private IDisposable topicSubscription;
     
-  private CancellationTokenSource cancellationTokenSource = new();
+  private readonly CancellationTokenSource cancellationTokenSource = new();
 
   protected override async Task OnInitializedAsync()
   {
@@ -54,7 +54,7 @@ partial class KafkaStreamComponent : IDisposable
     //!!! disclaimer
   }
 
-  private async Task SubscribeToQuery(SynchronizationContext? synchronizationContext)
+  private async Task SubscribeToQuery(SynchronizationContext synchronizationContext)
   {
     var options = new KSqlDBContextOptions(KsqlDbUrl)
     {
