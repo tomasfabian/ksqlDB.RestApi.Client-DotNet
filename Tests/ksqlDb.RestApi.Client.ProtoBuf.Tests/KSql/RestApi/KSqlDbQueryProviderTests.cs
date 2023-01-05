@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDb.RestApi.Client.ProtoBuf.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -10,7 +10,7 @@ namespace ksqlDb.RestApi.Client.ProtoBuf.Tests.KSql.RestApi;
 [TestClass]
 public class KSqlDbQueryProviderTests : TestBase
 {  
-  private TestableKSqlDbQueryProvider ClassUnderTest { get; set; }
+  private TestableKSqlDbQueryProvider ClassUnderTest { get; set; } = null!;
 
   [TestInitialize]
   public override void TestInitialize()

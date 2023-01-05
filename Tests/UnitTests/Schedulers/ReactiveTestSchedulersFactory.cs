@@ -1,4 +1,4 @@
-﻿using System.Reactive.Concurrency;
+using System.Reactive.Concurrency;
 using Joker.Factories.Schedulers;
 using Microsoft.Reactive.Testing;
 
@@ -6,23 +6,23 @@ namespace UnitTests.Schedulers;
 
 public class ReactiveTestSchedulersFactory : ISchedulersFactory
 {
-  private TestScheduler currentThread;
+  private TestScheduler currentThread = null!;
 
   public TestScheduler CurrentThread => currentThread ??= new TestScheduler();
 
-  private TestScheduler immediate;
+  private TestScheduler immediate = null!;
 
   public TestScheduler Immediate => immediate ??= new TestScheduler();
 
-  private TestScheduler newThread;
+  private TestScheduler newThread = null!;
 
   public TestScheduler NewThread => newThread ??= new TestScheduler();
 
-  private TestScheduler taskPool;
+  private TestScheduler taskPool = null!;
 
   public TestScheduler TaskPool => taskPool ??= new TestScheduler();
 
-  private TestScheduler threadPool;
+  private TestScheduler threadPool = null!;
 
   public TestScheduler ThreadPool => threadPool ??= new TestScheduler();
 
@@ -30,7 +30,7 @@ public class ReactiveTestSchedulersFactory : ISchedulersFactory
 
   public IScheduler NewEventLoopScheduler => threadPool ??= new TestScheduler();
 
-  private TestScheduler dispatcher;
+  private TestScheduler dispatcher = null!;
 
   public TestScheduler Dispatcher => dispatcher ??= new TestScheduler();
 

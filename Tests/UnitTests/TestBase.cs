@@ -9,7 +9,7 @@ namespace UnitTests;
 
 public abstract class TestBase<TClassUnderTest> : TestBase
 {
-  protected TClassUnderTest ClassUnderTest { get; set; }
+  protected TClassUnderTest ClassUnderTest { get; set; } = default!;
 }
 
 public abstract class TestBase
@@ -17,7 +17,7 @@ public abstract class TestBase
   protected readonly MoqMockingKernel MockingKernel = new MoqMockingKernel();
   protected TestScheduler TestScheduler = new TestScheduler();
 
-  protected ReactiveTestSchedulersFactory SchedulersFactory;
+  protected ReactiveTestSchedulersFactory SchedulersFactory = null!;
 
   [TestInitialize]
   public virtual void TestInitialize()

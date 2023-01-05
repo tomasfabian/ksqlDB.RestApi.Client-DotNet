@@ -22,7 +22,7 @@ namespace SqlServer.Connector.Tests.Connect;
 [TestCategory("Integration")]
 public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
 {
-  private static ApplicationDbContext ApplicationDbContext { get; set; }
+  private static ApplicationDbContext ApplicationDbContext { get; set; } = null!;
 
   [ClassInitialize]
   public static async Task ClassInitialize(TestContext context)
@@ -41,14 +41,12 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
   }
 
   private static readonly IConfiguration Configuration = ConfigurationProvider.CreateConfiguration();
-  private static readonly string connectorName = "test_connector";
+  private static readonly string ConnectorName = "test_connector";
     
   [ClassCleanup]
   public static async Task ClassCleanup()
   {
     await DropDependenciesAsync(ApplicationDbContext.Database);
-
-    ApplicationDbContext = null;
   }
 
   private static async Task DropConnectorAsync()
@@ -64,10 +62,10 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
 
     var ksqlDbConnect = new KsqlDbConnect(httpClientFactory);
       
-    await ksqlDbConnect.DropConnectorIfExistsAsync(connectorName);
+    await ksqlDbConnect.DropConnectorIfExistsAsync(ConnectorName);
   }
 
-  private static string exposedBootstrapServers = "localhost:29092";
+  private static readonly string ExposedBootstrapServers = "localhost:29092";
 
   private static async Task DropDependenciesAsync(DatabaseFacade databaseFacade)
   {
@@ -94,8 +92,7 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
     ClassUnderTest = new KsqlDbConnect(httpClientFactory);
   }
 
-  private static string tableName = "Sensors";
-  private static string cdcTopicName = "sqlserver2019Tests.dbo.Sensors";
+  private static readonly string TableName = "Sensors";
     
   [TestMethod]
   public async Task CreateConnectorAsync_AndReceivesDatabaseChangeObjects()
@@ -114,11 +111,11 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
     string databaseServerName = "sqlserver2019Tests";
 
     var connectorMetadata = new SqlServerConnectorMetadata(connectionString)
-      .SetTableIncludeListPropertyName($"dbo.{tableName}")
+      .SetTableIncludeListPropertyName($"dbo.{TableName}")
       .SetJsonKeyConverter()
       .SetJsonValueConverter()
       .SetProperty("database.history.kafka.bootstrap.servers", bootstrapServers)
-      .SetProperty("database.history.kafka.topic", $"dbhistory.test.{tableName}")
+      .SetProperty("database.history.kafka.topic", $"dbhistory.test.{TableName}")
       .SetProperty("database.server.name", databaseServerName)
       //.SetProperty("topic.creation.enable", "true")
       .SetProperty("key.converter.schemas.enable", "false")
@@ -126,7 +123,7 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
       .SetProperty("include.schema.changes", "false") as SqlServerConnectorMetadata;
 
     //Act
-    var httpResponseMessage = await ClassUnderTest.CreateConnectorAsync(connectorName, connectorMetadata);
+    var httpResponseMessage = await ClassUnderTest.CreateConnectorAsync(ConnectorName, connectorMetadata);
 
     //Assert
     //var statementResponse = httpResponseMessage.ToStatementResponse();
@@ -143,7 +140,7 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
 
     var consumerConfig = new ConsumerConfig
     {
-      BootstrapServers = exposedBootstrapServers,
+      BootstrapServers = ExposedBootstrapServers,
       GroupId = $"Client-01-{uniqueGroup}",
       AutoOffsetReset = AutoOffsetReset.Earliest
     };
@@ -165,7 +162,7 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
     saveResult = await ApplicationDbContext.SaveChangesAsync();
 
     //Act
-    string topicName = $"{databaseServerName}.dbo.{tableName}";
+    string topicName = $"{databaseServerName}.dbo.{TableName}";
       
     var kafkaConsumer =
       new KafkaConsumer<string, DatabaseChangeObject<IoTSensor>>(topicName, consumerConfig);
@@ -233,8 +230,9 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
     var connectors = await response.Content.ReadAsStringAsync();
     var connectorsResponse = JsonSerializer.Deserialize<ConnectorsResponse[]>(connectors);
 
-    connectorsResponse[0].Connectors.Select(c => c.Name.ToLower()).Contains(connectorName).Should().BeTrue();
-    var testConnector = connectorsResponse[0].Connectors.FirstOrDefault(c => c.Name.ToLower() == connectorName);
+    connectorsResponse.Should().NotBeNull();
+    connectorsResponse![0].Connectors.Select(c => c.Name.ToLower()).Contains(ConnectorName).Should().BeTrue();
+    var testConnector = connectorsResponse[0].Connectors.First(c => c.Name.ToLower() == ConnectorName);
 
     testConnector.State.Should().Contain("RUNNING");
   }
@@ -245,7 +243,7 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
     {
       var config = new AdminClientConfig
       {
-        BootstrapServers = exposedBootstrapServers
+        BootstrapServers = ExposedBootstrapServers
       };
 
       var adminClientBuilder = new AdminClientBuilder(config);
