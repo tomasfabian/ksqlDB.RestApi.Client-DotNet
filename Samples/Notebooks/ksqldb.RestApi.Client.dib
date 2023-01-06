@@ -56,7 +56,7 @@ dotnet add package ksqlDB.RestApi.Client
 This adds a `<PackageReference>` to your csproj file, similar to the following:
 
 ```XML
-<PackageReference Include="ksqlDB.RestApi.Client" Version="1.0.0" />
+<PackageReference Include="ksqlDB.RestApi.Client" Version="2.6.0" />
 ```
 
 #!markdown
@@ -65,7 +65,7 @@ In this interactive notebook run the bellow command:
 
 #!csharp
 
-#r "nuget:ksqlDb.RestApi.Client, 1.3.0-rc.1"
+#r "nuget:ksqlDb.RestApi.Client, 2.6.0"
 
 #!markdown
 
@@ -170,6 +170,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using System;
+using System.Net.Http;
 
 EntityCreationMetadata metadata = new()
 {
@@ -181,7 +182,10 @@ EntityCreationMetadata metadata = new()
 var ksqlDbUrl = @"http:\\localhost:8088";
 
 var ksqlDbUri = new Uri(ksqlDbUrl);
-var httpClientFactory = new HttpClientFactory(ksqlDbUri);
+var httpClient = new HttpClient{
+  BaseAddress = ksqlDbUri
+};
+var httpClientFactory = new HttpClientFactory(httpClient);
 var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
       
 var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<Tweet>(metadata);
@@ -362,6 +366,10 @@ To further extend our knowledge base, the in memory representations of the previ
 Let's discuss the observer pattern this time. The not immediately obvious difference between IObservable and strangely named IQbservable is that the latter uses Expressions as arguments in its extension methods instead of `Func`s. 
 
 The `Where` extension method expects a predicate that is used to filter the messages:
+
+#!csharp
+
+#r "nuget:System.Reactive, 5.0.0"
 
 #!csharp
 
