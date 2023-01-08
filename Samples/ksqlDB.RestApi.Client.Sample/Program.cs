@@ -1,13 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ksqlDB.Api.Client.Samples.HostedServices;
 using ksqlDB.Api.Client.Samples.Json;
 using ksqlDB.Api.Client.Samples.Models;
-using ksqlDB.Api.Client.Samples.Models.Events;
 using ksqlDB.Api.Client.Samples.Models.InvocationFunctions;
 using ksqlDB.Api.Client.Samples.Models.Movies;
 using ksqlDB.Api.Client.Samples.Observers;
@@ -22,15 +17,11 @@ using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
-using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
-using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
-using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query.Descriptors;
-using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Topics;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using Microsoft.Extensions.DependencyInjection;
@@ -150,6 +141,37 @@ public static class Program
     Console.WriteLine("Finished.");
   }
 
+  static async Task CreateOrReplaceTableStatement(IKSqlDBStatementsContext context)
+  {
+    var creationMetadata = new CreationMetadata
+    {
+      KafkaTopic = "moviesByTitle",
+      KeyFormat = SerializationFormats.Json,
+      ValueFormat = SerializationFormats.Json,
+      Replicas = 1,
+      Partitions = 1
+    };
+
+    var httpResponseMessage = await context.CreateOrReplaceTableStatement(tableName: "MoviesByTitle")
+      .With(creationMetadata)
+      .As<Movie>()
+      .Where(c => c.Id < 3)
+      .Select(c => new { c.Title, ReleaseYear = c.Release_Year })
+      .PartitionBy(c => c.Title)
+      .ExecuteStatementAsync();
+
+    /*
+  CREATE OR REPLACE TABLE MoviesByTitle
+  WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS = '1', REPLICAS='1' )
+  AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
+  WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
+     */
+
+    string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
+
+    var statementResponse = await httpResponseMessage.ToStatementResponsesAsync();
+  }
+
   internal class DebugHandler : DelegatingHandler
   {
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -238,60 +260,6 @@ public static class Program
     cts.Cancel();
   }
 
-  private static async Task GetKsqlDbInformationAsync(KSqlDbRestApiProvider restApiProvider)
-  {
-    Console.WriteLine($"{Environment.NewLine}Available topics:");
-    var topicsResponses = await restApiProvider.GetTopicsAsync();
-    Console.WriteLine(string.Join(',', topicsResponses[0].Topics.Select(c => c.Name)));
-
-    TopicsResponse[] allTopicsResponses = await restApiProvider.GetAllTopicsAsync();
-    TopicsExtendedResponse[] topicsExtendedResponses = await restApiProvider.GetTopicsExtendedAsync();
-    var allTopicsExtendedResponses = await restApiProvider.GetAllTopicsExtendedAsync();
-
-    Console.WriteLine($"{Environment.NewLine}Available tables:");
-    var tablesResponse = await restApiProvider.GetTablesAsync();
-    Console.WriteLine(string.Join(',', tablesResponse[0].Tables.Select(c => c.Name)));
-
-    Console.WriteLine($"{Environment.NewLine}Available streams:");
-    var streamsResponse = await restApiProvider.GetStreamsAsync();
-    Console.WriteLine(string.Join(',', streamsResponse[0].Streams.Select(c => c.Name)));
-
-    Console.WriteLine($"{Environment.NewLine}Available connectors:");
-    var connectorsResponse = await restApiProvider.GetConnectorsAsync();
-    Console.WriteLine(string.Join(',', connectorsResponse[0].Connectors.Select(c => c.Name)));
-  }
-
-  private static async Task CreateOrReplaceTableStatement(IKSqlDBStatementsContext context)
-  {
-    var creationMetadata = new CreationMetadata
-    {
-      KafkaTopic = "tweetsByTitle",
-      KeyFormat = SerializationFormats.Json,
-      ValueFormat = SerializationFormats.Json,
-      Replicas = 1,
-      Partitions = 1
-    };
-
-    var httpResponseMessage = await context.CreateOrReplaceTableStatement(tableName: "TweetsByTitle")
-      .With(creationMetadata)
-      .As<Movie>()
-      .Where(c => c.Id < 3)
-      .Select(c => new { c.Title, ReleaseYear = c.Release_Year })
-      .PartitionBy(c => c.Title)
-      .ExecuteStatementAsync();
-
-    /*
-CREATE OR REPLACE TABLE TweetsByTitle
-WITH ( KAFKA_TOPIC='tweetsByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS = '1', REPLICAS='1' )
-AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
-WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
-     */
-
-    string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
-
-    var statementResponse = await httpResponseMessage.ToStatementResponsesAsync();
-  }
-
   private static IDisposable ClientSideBatching(KSqlDBContext context)
   {
     var disposable = context.CreateQueryStream<Tweet>()
@@ -308,98 +276,6 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
       });
 
     return disposable;
-  }
-
-  private static IDisposable JoinTables(KSqlDBContext context)
-  {
-    var queryWithin = Source.Of<Lead_Actor>().Within(Duration.OfHours(1), Duration.OfDays(5));
-
-    var rightJoinQueryString = context.CreateQueryStream<Movie>()
-      .RightJoin(
-        Source.Of<Lead_Actor>(nameof(Lead_Actor)),
-        movie => movie.Title,
-        actor => actor.Title,
-        (movie, actor) => new
-        {
-          movie.Id,
-          actor.Title,
-        }
-      ).ToQueryString();
-
-    var query = context.CreateQueryStream<Movie>()
-      .Join(
-        //.LeftJoin(
-        Source.Of<Lead_Actor>(nameof(Lead_Actor)),
-        movie => movie.Title,
-        actor => actor.Title,
-        (movie, actor) => new
-        {
-          movie.Id,
-          Title = movie.Title,
-          movie.Release_Year,
-          ActorName = K.Functions.RPad(K.Functions.LPad(actor.Actor_Name.ToUpper(), 15, "*"), 25, "^"),
-          ActorTitle = actor.Title,
-          Substr = K.Functions.Substring(actor.Title, 2, 4)
-        }
-      );
-
-    var joinQueryString = query.ToQueryString();
-
-    return query
-      .Subscribe(c => { Console.WriteLine($"{c.Id}: {c.ActorName} - {c.Title} - {c.ActorTitle}"); }, exception => { Console.WriteLine(exception.Message); });
-  }
-
-  private static IDisposable FullOuterJoinTables(KSqlDBContext context)
-  {
-    var query = context.CreateQueryStream<MovieNullableFields>("Movies")
-      .FullOuterJoin(
-        Source.Of<Lead_Actor>(nameof(Lead_Actor)),
-        movie => movie.Title,
-        actor => actor.Title,
-        (movie, actor) => new
-        {
-          movie.Id,
-          Title = movie.Title,
-          movie.Release_Year,
-          ActorTitle = actor.Title,
-          ActorName = actor.Actor_Name
-        }
-      );
-
-    var joinQueryString = query.ToQueryString();
-
-    return query
-      .Subscribe(c =>
-      {
-        if (c.Id.HasValue)
-          Console.WriteLine($"{c.Id}: {c.ActorName} - {c.Title} - {c.ActorTitle}");
-        else
-          Console.WriteLine($"No movie id: {c.ActorName} - {c.Title} - {c.ActorTitle}");
-      }, exception => { Console.WriteLine(exception.Message); });
-  }
-
-  private static IDisposable Window(KSqlDBContext context)
-  {
-    new TimeWindows(Duration.OfSeconds(2), OutputRefinement.Final).WithGracePeriod(Duration.OfSeconds(2));
-
-    var subscription1 = context.CreateQueryStream<Tweet>()
-      .GroupBy(c => c.Id)
-      .WindowedBy(new TimeWindows(Duration.OfSeconds(5)).WithGracePeriod(Duration.OfHours(2)))
-      .Select(g => new { g.WindowStart, g.WindowEnd, Id = g.Key, Count = g.Count() })
-      .Subscribe(c => { Console.WriteLine($"{c.Id}: {c.Count}: {c.WindowStart}: {c.WindowEnd}"); }, exception => { Console.WriteLine(exception.Message); });
-
-    var query = context.CreateQueryStream<Tweet>()
-      .GroupBy(c => c.Id)
-      .WindowedBy(new HoppingWindows(Duration.OfSeconds(5)).WithAdvanceBy(Duration.OfSeconds(4))
-        .WithRetention(Duration.OfDays(7)))
-      .Select(g => new { Id = g.Key, Count = g.Count() });
-
-    var hoppingWindowQueryString = query.ToQueryString();
-
-    var subscription2 = query
-      .Subscribe(c => { Console.WriteLine($"{c.Id}: {c.Count}"); }, exception => { Console.WriteLine(exception.Message); });
-
-    return new CompositeDisposable { subscription1, subscription2 };
   }
 
   private static async Task AsyncEnumerable(KSqlDBContext context)
@@ -458,71 +334,12 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
     Console.WriteLine(ksql);
   }
 
-  private static async Task GroupBy()
-  {
-    var ksqlDbUrl = @"http:\\localhost:8088";
-    var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
-
-    contextOptions.QueryStreamParameters["auto.offset.reset"] = "latest";
-    await using var context = new KSqlDBContext(contextOptions);
-
-    context.CreateQueryStream<Tweet>()
-      .GroupBy(c => c.Id)
-      .Select(g => new { Id = g.Key, Count = g.Count() })
-      .Subscribe(count =>
-      {
-        Console.WriteLine($"{count.Id} Count: {count.Count}");
-        Console.WriteLine();
-      }, error => { Console.WriteLine($"Exception: {error.Message}"); }, () => Console.WriteLine("Completed"));
-
-
-    context.CreateQueryStream<Tweet>()
-      .GroupBy(c => c.Id)
-      .Select(g => g.Count())
-      .Subscribe(count =>
-      {
-        Console.WriteLine($"Count: {count}");
-        Console.WriteLine();
-      }, error => { Console.WriteLine($"Exception: {error.Message}"); }, () => Console.WriteLine("Completed"));
-
-    context.CreateQueryStream<Tweet>()
-      .GroupBy(c => c.Id)
-      .Select(g => new { Count = g.Count() })
-      .Subscribe(count =>
-      {
-        Console.WriteLine($"Count: {count}");
-        Console.WriteLine();
-      }, error => { Console.WriteLine($"Exception: {error.Message}"); }, () => Console.WriteLine("Completed"));
-
-    //Sum
-    var subscription = context.CreateQueryStream<Tweet>()
-      .GroupBy(c => c.Id)
-      //.Select(g => g.Sum(c => c.Id))
-      .Select(g => new { Id = g.Key, MySum = g.Sum(c => c.Id) })
-      .Subscribe(sum =>
-      {
-        Console.WriteLine($"{sum}");
-        Console.WriteLine();
-      }, error => { Console.WriteLine($"Exception: {error.Message}"); }, () => Console.WriteLine("Completed"));
-
-    var groupBySubscription = context.CreateQueryStream<IoTSensorChange>("sqlserversensors")
-      .GroupBy(c => new { c.Op, c.After!.Value })
-      .Select(g => new { g.Source.Op, g.Source.After!.Value, num_times = g.Count() })
-      .Subscribe(c =>
-      {
-        Console.WriteLine($"{c}");
-      }, error =>
-      {
-
-      }, () => { });
-  }
-
   private static IDisposable NotNull(KSqlDBContext context)
   {
     return context.CreateQueryStream<Click>()
       .Where(c => c.IP_ADDRESS != null)
       .Select(c => new { c.IP_ADDRESS, c.URL, c.TIMESTAMP })
-      .Subscribe(message => Console.WriteLine(message), error => { Console.WriteLine($"Exception: {error.Message}"); });
+      .Subscribe(Console.WriteLine, error => { Console.WriteLine($"Exception: {error.Message}"); });
   }
 
   private static IDisposable DynamicFunctionCall(KSqlDBContext context)
@@ -538,41 +355,6 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
         error => Console.WriteLine($"Exception: {error.Message}"));
   }
 
-  private static IDisposable Having(KSqlDBContext context)
-  {
-    return
-      //https://kafka-tutorials.confluent.io/finding-distinct-events/ksql.html
-      context.CreateQueryStream<Click>()
-      .GroupBy(c => new { c.IP_ADDRESS, c.URL, c.TIMESTAMP })
-      .WindowedBy(new TimeWindows(Duration.OfMinutes(2)))
-      .Having(c => c.Count(g => c.Key.IP_ADDRESS) == 1)
-      .Select(g => new { g.Key.IP_ADDRESS, g.Key.URL, g.Key.TIMESTAMP })
-      .Take(3)
-      .Subscribe(onNext: message =>
-      {
-        Console.WriteLine($"{nameof(Click)}: {message}");
-        Console.WriteLine($"{nameof(Click)}: {message.URL} - {message.TIMESTAMP}");
-      }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
-  }
-
-  private static IDisposable TopKDistinct(KSqlDBContext context)
-  {
-    return context.CreateQueryStream<Tweet>()
-      .GroupBy(c => c.Id)
-      .Select(g => new { Id = g.Key, TopK = g.TopKDistinct(c => c.Amount, 2) })
-      // .Select(g => new { Id = g.Key, TopK = g.TopK(c => c.Amount, 2) })
-      .Subscribe(onNext: tweetMessage =>
-      {
-        var tops = string.Join(',', tweetMessage.TopK);
-        Console.WriteLine($"{nameof(Tweet)} Tops: {tops}");
-        Console.WriteLine($"{nameof(Tweet)}: {tweetMessage}");
-        Console.WriteLine($"{nameof(Tweet)}: {tweetMessage.TopK[0]} - {tweetMessage.TopK[^1]}");
-
-        Console.WriteLine($"TopKs Array Length: {tops.Length}");
-        Console.WriteLine();
-      }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
-  }
-
   private static void ScalarFunctions(KSqlDBContext context)
   {
     context.CreateQueryStream<Tweet>()
@@ -585,163 +367,6 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
         Sign = K.Functions.Sign(c.Amount)
       })
       .ToQueryString();
-  }
-
-  private static IDisposable LatestByOffset(KSqlDBContext context)
-  {
-    var query = context.CreateQueryStream<Tweet>()
-      .GroupBy(c => c.Id)
-      .Select(g => new { Id = g.Key, EarliestByOffset = g.EarliestByOffset(c => c.Amount, 2) })
-      .ToQueryString();
-
-    return context.CreateQueryStream<Tweet>()
-      .GroupBy(c => c.Id)
-      //.Select(g => new { Id = g.Key, Earliest = g.EarliestByOffset(c => c.Message) })
-      //.Select(g => new { Id = g.Key, Earliest = g.EarliestByOffsetAllowNulls(c => c.Message) })
-      //.Select(g => new { Id = g.Key, Earliest = g.LatestByOffset(c => c.Message) })
-      .Select(g => new { Id = g.Key, Earliest = g.LatestByOffsetAllowNulls(c => c.Message) })
-      .Take(2) // LIMIT 2    
-      .Subscribe(onNext: tweetMessage =>
-      {
-        Console.WriteLine($"{nameof(Tweet)}: {tweetMessage}");
-        Console.WriteLine();
-      }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
-  }
-
-  private static IDisposable CollectSet(KSqlDBContext context)
-  {
-    var subscription = context.CreateQueryStream<Tweet>()
-      .GroupBy(c => c.Id)
-      .Select(g => new { Id = g.Key, Array = g.CollectSet(c => c.Message) })
-      //.Select(g => new { Id = g.Key, Array = g.CollectList(c => c.Message) })
-      .Subscribe(c =>
-      {
-        Console.WriteLine($"{c.Id}:");
-        foreach (var value in c.Array)
-        {
-          Console.WriteLine($"  {value}");
-        }
-      }, exception => { Console.WriteLine(exception.Message); });
-
-    return subscription;
-  }
-
-  private static IDisposable Arrays(KSqlDBContext context)
-  {
-    var subscription =
-      context.CreateQueryStream<Tweet>()
-        .Select(_ => new { FirstItem = new[] { 1, 2, 3 }[1] })
-        .Subscribe(onNext: c => { Console.WriteLine($"Array first value: {c}"); },
-          onError: error => { Console.WriteLine($"Exception: {error.Message}"); });
-
-    var arrayLengthQuery = context.CreateQueryStream<Tweet>()
-      .Select(_ => new[] { 1, 2, 3 }.Length)
-      .ToQueryString();
-
-    return subscription;
-  }
-
-  private static IDisposable CountDistinct(KSqlDBContext context)
-  {
-    var subscription = context.CreateQueryStream<Tweet>()
-      .GroupBy(c => c.Id)
-      // .Select(g => new { Id = g.Key, Count = g.CountDistinct(c => c.Message) })
-      .Select(g => new { Id = g.Key, Count = g.LongCountDistinct(c => c.Message) })
-      .Subscribe(c =>
-      {
-        Console.WriteLine($"{c.Id} - {c.Count}");
-      }, exception => { Console.WriteLine(exception.Message); });
-
-    return subscription;
-  }
-
-  private static IDisposable NestedTypes(KSqlDBContext context)
-  {
-    var disposable =
-      context.CreateQueryStream<Tweet>()
-        .Select(c => new
-        {
-          MapValue = new Dictionary<string, Dictionary<string, int>>
-          {
-              { "a", new Dictionary<string, int> { { "a", 1 }, { "b", 2 } } },
-              { "b", new Dictionary<string, int> { { "c", 3 }, { "d", 4 } } },
-          }["a"]
-        })
-        .Subscribe(
-          message =>
-          {
-            Console.WriteLine($"Dictionary with {message.MapValue.Count} values");
-            foreach (var value in message.MapValue)
-            {
-              Console.WriteLine($"    {value.Key} - {value.Value}");
-            }
-          },
-          error => Console.WriteLine($"Exception: {error.Message}"));
-
-    return disposable;
-  }
-
-  private struct MovieStruct
-  {
-    public string Title { get; set; }
-
-    public int Id { get; set; }
-  }
-
-  private static async Task DeeplyNestedTypes(KSqlDBContext context)
-  {
-    var moviesStream = context.CreateQueryStream<Movie>();
-
-    var source = moviesStream.Select(c => new
-    {
-      c.Id,
-      Arr = new[]
-      {
-          new MovieStruct
-          {
-            Title = c.Title,
-            Id = c.Id,
-          },
-          new MovieStruct
-          {
-            Title = "test",
-            Id = 2,
-          }
-        },
-      MapValue = new Dictionary<string, Dictionary<string, int>>
-        {
-          { "a", new Dictionary<string, int> { { "a", 1 }, { "b", 2 } } },
-          { "b", new Dictionary<string, int> { { "c", 3 }, { "d", 4 } } },
-        },
-      MapArr = new Dictionary<int, string[]>
-        {
-          { 1, new[] { "a", "b"} },
-          { 2, new[] { "c", "d"} }
-        },
-      Str = new MovieStruct { Title = c.Title, Id = c.Id },
-      c.Release_Year
-    }).ToAsyncEnumerable();
-
-    await foreach (var movie in source)
-    {
-      Console.WriteLine($"{movie.Str.Title} - {movie.Release_Year}");
-    }
-  }
-
-  private static async Task StructType(KSqlDBContext context)
-  {
-    var moviesStream = context.CreateQueryStream<Movie>();
-
-    var source = moviesStream.Select(c => new
-    {
-      Str = new MovieStruct { Title = c.Title, Id = c.Id },
-      c.Release_Year
-    }).ToAsyncEnumerable();
-
-    await foreach (var movie in source)
-    {
-      Console.WriteLine($"{movie.Str.Title} - {movie.Release_Year}");
-    }
   }
 
   private static IDisposable Entries(KSqlDBContext context)
@@ -840,162 +465,6 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
       }, e => { Console.WriteLine($"Exception: {e.Message}"); });
   }
 
-  private static async Task CreateStreamAsync()
-  {
-    EntityCreationMetadata metadata = new()
-    {
-      KafkaTopic = nameof(Movie),
-      Partitions = 1,
-      Replicas = 1
-    };
-
-    string url = @"http:\\localhost:8088";
-
-    var http = new HttpClientFactory(new Uri(url));
-    var restApiClient = new KSqlDbRestApiClient(http);
-
-    var httpResponseMessage = await restApiClient.CreateStreamAsync<MovieNullableFields>(metadata, ifNotExists: true);
-
-    //OR
-    //httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MovieNullableFields>(metadata);
-
-    httpResponseMessage = await restApiClient.CreateSourceStreamAsync<MovieNullableFields>(metadata, ifNotExists: true);
-
-    string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
-  }
-
-  private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient restApiClient)
-  {
-    string topicName = "moviesByTitle";
-
-    var queries = await restApiClient.GetQueriesAsync();
-
-    var query = queries.SelectMany(c => c.Queries).FirstOrDefault(c => c.SinkKafkaTopics.Contains(topicName));
-
-    if (query == null)
-      return;
-    
-    await TerminatePersistentQueryAsync(restApiClient, query.Id);
-  }
-
-  private static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient restApiClient, string queryId)
-  {
-    var response = await restApiClient.PausePersistentQueryAsync(queryId);
-    response = await restApiClient.ResumePersistentQueryAsync(queryId);
-    response = await restApiClient.TerminatePersistentQueryAsync(queryId);
-  }
-
-  private static async Task TerminatePushQueryAsync(IKSqlDBContext context, IKSqlDbRestApiClient restApiClient)
-  {
-    var subscription = await context.CreateQueryStream<Movie>()
-      .SubscribeOn(ThreadPoolScheduler.Instance)
-      .SubscribeAsync(onNext: _ => { }, onError: e => { }, onCompleted: () => { });
-
-    var response = await restApiClient.TerminatePushQueryAsync(subscription.QueryId);
-  }
-
-  private static string SourceConnectorName => "mock-source-connector";
-  private static string SinkConnectorName => "mock-sink-connector";
-
-  private static async Task CreateConnectorsAsync(IKSqlDbRestApiClient restApiClient)
-  {
-    var sourceConnectorConfig = new Dictionary<string, string>
-      {
-        {"connector.class", "org.apache.kafka.connect.tools.MockSourceConnector"}
-      };
-
-    var httpResponseMessage = await restApiClient.CreateSourceConnectorAsync(sourceConnectorConfig, SourceConnectorName);
-
-    var sinkConnectorConfig = new Dictionary<string, string> {
-        { "connector.class", "org.apache.kafka.connect.tools.MockSinkConnector" },
-        { "topics.regex", "mock-sink*"},
-      };
-
-    httpResponseMessage = await restApiClient.CreateSinkConnectorAsync(sinkConnectorConfig, SinkConnectorName);
-
-    httpResponseMessage = await restApiClient.DropConnectorAsync($"`{SinkConnectorName}`");
-  }
-
-  private static async Task CreateTypesAsync(IKSqlDbRestApiClient restApiClient)
-  {
-    var httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@"
-Drop type Person;
-Drop type Address;
-"));
-
-    //Act
-    httpResponseMessage = await restApiClient.CreateTypeAsync<Address>();
-    httpResponseMessage = await restApiClient.CreateTypeAsync<Person>();
-  }
-
-  private static async Task CreateTypeWithSessionVariableAsync(IKSqlDbRestApiClient restApiClient)
-  {
-    var statement = new KSqlDbStatement("CREATE TYPE ${typeName} AS STRUCT<name VARCHAR, address ADDRESS>;")
-    {
-      SessionVariables = { { "typeName", "FromSessionValue" } }
-    };
-
-    var httpResponseMessage = await restApiClient.ExecuteStatementAsync(statement);
-  }
-
-  private static async Task SubscriptionToAComplexTypeAsync(IKSqlDbRestApiClient restApiClient, IKSqlDBContext ksqlDbContext)
-  {
-    string typeName = nameof(EventCategory);
-    var httpResponseMessage = await restApiClient.DropTypeIfExistsAsync(typeName);
-
-    httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@$"
-Drop table {nameof(Event)};
-"));
-
-    httpResponseMessage = await restApiClient.CreateTypeAsync<EventCategory>();
-    httpResponseMessage = await restApiClient.CreateTableAsync<Event>(new EntityCreationMetadata { KafkaTopic = "Events", Partitions = 1 });
-
-    var subscription = ksqlDbContext.CreateQueryStream<Event>()
-      .Subscribe(value =>
-        {
-          Console.WriteLine("Categories: ");
-
-          foreach (var category in value.Categories ?? Enumerable.Empty<EventCategory>())
-          {
-            Console.WriteLine($"{category.Name}");
-          }
-        }, error =>
-        {
-          Console.WriteLine(error.Message);
-        });
-
-    httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@"
-INSERT INTO Events (Id, Places, Categories) VALUES (1, ARRAY['Place1','Place2','Place3'], ARRAY[STRUCT(Name := 'Planet Earth'), STRUCT(Name := 'Discovery')]);"));
-  }
-
-  // await SubscriptionToAComplexTypeAsync(restApiProvider, context);
-  // await InsertAComplexTypeAsync(restApiProvider, context);
-
-  private static async Task InsertAComplexTypeAsync(IKSqlDbRestApiClient restApiClient, IKSqlDBContext ksqlDbContext)
-  {
-    var httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@$"
-Drop type {nameof(EventCategory)};
-Drop table {nameof(Event)};
-"));
-
-    httpResponseMessage = await restApiClient.CreateTypeAsync<EventCategory>();
-    httpResponseMessage = await restApiClient.CreateTableAsync<Event>(new EntityCreationMetadata { KafkaTopic = "Events", Partitions = 1 });
-
-    var eventCategory = new EventCategory
-    {
-      Name = "Planet Earth"
-    };
-
-    var testEvent = new Event
-    {
-      Id = 42,
-      Places = new[] { "Place1", "Place2", "Place3" },
-      //Categories = new[] { eventCategory, new EventCategory { Name = "Discovery" } } // TODO
-    };
-
-    httpResponseMessage = await restApiClient.InsertIntoAsync(testEvent);
-  }
-
   private static void InvocationFunctions(IKSqlDBContext ksqlDbContext)
   {
     var ksql = ksqlDbContext.CreateQueryStream<Lambda>()
@@ -1017,108 +486,6 @@ Drop table {nameof(Event)};
         Acc = K.Functions.Reduce(c.DictionaryInValues, 2, (s, k, v) => K.Functions.Ceil(s / v))
       })
       .ToQueryString();
-  }
-
-  private static void Bytes(IKSqlDBContext ksqlDbContext)
-  {
-    var ksql = ksqlDbContext.CreateQuery<Thumbnail>()
-      .Select(c => new { Col = K.Functions.FromBytes(c.Image, "hex") })
-      .ToQueryString();
-  }
-
-  private static void EmitFinal(IKSqlDBContext ksqlDbContext)
-  {
-    var tumblingWindow =
-      new TimeWindows(Duration.OfSeconds(2), OutputRefinement.Final).WithGracePeriod(Duration.OfSeconds(2));
-
-    var query = ksqlDbContext.CreateQueryStream<Tweet>()
-      .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
-      .GroupBy(c => c.Id)
-      .WindowedBy(tumblingWindow)
-      .Select(g => new {Id = g.Key, Count = g.Count(c => c.Message)})
-      .ToQueryString();
-  }
-
-  #region TimeTypes
-
-  public class MyClass
-  {
-    public DateTime Dt { get; set; }
-    public TimeSpan Ts { get; set; }
-    public DateTimeOffset DtOffset { get; set; }
-    public long UnixDt => (long)Dt.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
-  }
-
-  private static async Task TimeTypes(IKSqlDbRestApiClient restApiClient, IKSqlDBContext context)
-  {
-    EntityCreationMetadata metadata = new EntityCreationMetadata
-    {
-      KafkaTopic = nameof(MyClass),
-      Partitions = 1,
-      Replicas = 1,
-      ValueFormat = SerializationFormats.Json
-    };
-
-    var httpResponseMessage = await restApiClient.CreateStreamAsync<MyClass>(metadata);
-
-    var from = new TimeSpan(1, 0, 0);
-    var to = new TimeSpan(22, 0, 0);
-
-    var query = context.CreateQueryStream<MyClass>()
-      .Select(c => new { c.Ts, to, FromTime = from, DateTime.Now, New = new TimeSpan(1, 0, 0) })
-      .ToQueryString();
-
-    //.Select(c => new { c.Ts, to, FromTime = from, DateTime.Now, New = new TimeSpan(1, 0, 0) })
-    using var subscription = context.CreateQueryStream<MyClass>()
-      .Where(c => c.Ts.Between(from, to))
-      .Subscribe(onNext: m =>
-      {
-        Console.WriteLine($"{nameof(MyClass)}: {m.Dt} : {m.Ts} : {m.DtOffset}");
-
-        Console.WriteLine();
-      }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
-
-    var value = new MyClass
-    {
-      Dt = new DateTime(2021, 4, 1),
-      Ts = new TimeSpan(1, 2, 3),
-      DtOffset = new DateTimeOffset(2021, 7, 4, 13, 29, 45, 447, TimeSpan.FromHours(4))
-    };
-
-    httpResponseMessage = await restApiClient.InsertIntoAsync(value);
-    var statementResponses = await httpResponseMessage.ToStatementResponsesAsync().ConfigureAwait(false);
-  }
-
-  #endregion
-
-  private static async Task AssertsAsync(IKSqlDbRestApiClient restApiClient)
-  {
-    var assertSchemaOptions = new AssertSchemaOptions("Kafka-key3", 1)
-    {
-      Timeout = Duration.OfSeconds(3)
-    };
-
-    var assertSchemaResponse = await restApiClient.AssertSchemaNotExistsAsync(assertSchemaOptions);
-    assertSchemaResponse = await restApiClient.AssertSchemaExistsAsync(assertSchemaOptions);
-
-    Console.WriteLine(assertSchemaResponse[0].Subject);
-
-    var topicProperties = new Dictionary<string, string>
-    {
-      { "replicas", "1" },
-      { "partitions", "1" },
-    };
-
-    var options = new AssertTopicOptions("tweetsByTitle")
-    {
-      Properties = topicProperties,
-      Timeout = Duration.OfSeconds(3)
-    };
-
-    var assertTopicResponse = await restApiClient.AssertTopicNotExistsAsync(options);
-    assertTopicResponse = await restApiClient.AssertTopicExistsAsync(options);
-
-    Console.WriteLine(assertTopicResponse[0].TopicName);
   }
 
   public static ILoggerFactory CreateLoggerFactory()

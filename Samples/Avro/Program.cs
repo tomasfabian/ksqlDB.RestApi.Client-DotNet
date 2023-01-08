@@ -1,4 +1,6 @@
 using Confluent.SchemaRegistry;
+using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
@@ -46,3 +48,18 @@ var httpResponseMessage = await restApiClient.CreateStreamAsync<IoTSensor>(metad
 var httpResponse = await httpResponseMessage.Content.ReadAsStringAsync();
 
 Console.WriteLine(httpResponse);
+
+await using var context = new KSqlDBContext(ksqlDbUrl);
+
+using var disposable = context.CreateQueryStream<IoTSensor>()
+  .ToObservable()
+  .Subscribe(onNext: sensor =>
+    {
+      Console.WriteLine($"{nameof(IoTSensor)}: {sensor.SensorId} - {sensor.Value}");
+      Console.WriteLine();
+    }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); },
+    onCompleted: () => Console.WriteLine("Completed"));
+
+Console.WriteLine("Press any key to stop the subscription");
+
+Console.ReadKey();
