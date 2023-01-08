@@ -1,6 +1,6 @@
 This package generates **KSQL** push and pull queries from your .NET C# LINQ queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
 You can continually process computations over unbounded (theoretically never-ending) streams of data.
-It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the REST API such as inserting records into streams and creating tables, types, etc. or executing admin operations such as listing streams.
+It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the REST API such as inserting records into streams and creating tables, types, etc. or execute admin operations such as listing streams.
 
 [ksqlDB.RestApi.Client](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet) is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
 
@@ -116,10 +116,6 @@ INSERT INTO tweets (id, message) VALUES (2, 'ksqlDB rulez!');
 
 or insert a record from C#:
 ```C#
-var ksqlDbUrl = @"http:\\localhost:8088";
-
-var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
-
 var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
   .InsertIntoAsync(new Tweet { Id = 2, Message = "ksqlDB rulez!" });
 ```
@@ -282,7 +278,7 @@ List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/
 
 [Some KSql function examples can be found here](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/KSql-functions)
 
-**Data definitions:**
+**Data definitions**
 - [Headers](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_definitions.md#access-record-header-data-v160)
 
 **List of supported data types:**
@@ -312,14 +308,13 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [Assert topics](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#assert-topics)
 - [Assert schemas](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#assert-schemas)
 - [Rename stream or table column names with the `JsonPropertyNameAttribute`](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#rename-stream-or-table-column-names-with-the-jsonpropertynameattribute)
-- [CreateSourceStreamAsync and CreateSourceTableAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#createsourcestreamasync-and-createsourcetableasync)
-- [InsertProperties.IncludeReadOnlyProperties](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#insertpropertiesincludereadonlyproperties)
+- [Create source streams and tables](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#createsourcestreamasync-and-createsourcetableasync)
 - [InsertIntoAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#insertintoasync)
 - [Connectors](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#connectors)
 - [Drop a stream](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#drop-a-stream)
 - [Drop type](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#droping-types)
 - [Creating types](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#create-types)
-- [ExecuteStatementAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#executestatementasync-extension-method)
+- [Execute statement async](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#executestatementasync-extension-method)
 - [PartitionBy](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#partitionby)
 - [Terminate push queries](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#terminate-push-queries)
 - [Drop a table](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/statements.md#drop-a-table)
@@ -334,17 +329,17 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 
 **KSqlDbContext**
 - [Dependency injection with ServicesCollection](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/4e6487dbf201f4318da88707d62e1a75c6cef402/doc/ksqldbcontext.md#logging-info-and-configureksqldb)
-- [CreateQueryStream](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#creating-query-streams)
-- [CreateQuery](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#creating-queries)
+- [Creating query streams](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#creating-query-streams)
+- [Creating queries](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#creating-queries)
 - [AddDbContext and AddDbContextFactory](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#ksqldbservicecollectionextensions---adddbcontext-and-adddbcontextfactory)
 - [Logging info and ConfigureKSqlDb](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#logging-info-and-configureksqldb)
 - [Basic auth](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#basic-auth)
 - [Add and SaveChangesAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#add-and-savechangesasync)
 - [KSqlDbContextOptionsBuilder](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#ksqldbcontextoptionsbuilder)
 
-**Config:**
+**Config**
 - [Bearer token authentication](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#bearer-token-authentication)
-- [KSqlDbContextOptionsBuilder.ReplaceHttpClient](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#ksqldbcontextoptionsbuilderreplacehttpclient)
+- [Replacing HttpClient](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#ksqldbcontextoptionsbuilderreplacehttpclient)
 - [ProcessingGuarantee](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#processingguarantee-enum)
 
 **Operators**
@@ -356,12 +351,12 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [Lexical precedence](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#lexical-precedence)
 - [WHERE IS NULL, IS NOT NULL](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#where-is-null-is-not-null)
 
-**Miscelenaous:**
+**Miscelenaous**
 - [Change data capture](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/cdc.md)
 - [List of breaking changes](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/breaking_changes.md)
 - [Operators](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md)
 - [Invocation functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/functions.md#improved-invocation-function-extensions)
-- [SetJsonSerializerOptions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#setjsonserializeroptions)
+- [Setting JsonSerializerOptions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#setjsonserializeroptions)
 - [Kafka stream processing example](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/stream_processing.md)
 
 **Functions**
@@ -380,10 +375,6 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 
 # Nuget
 https://www.nuget.org/packages/ksqlDB.RestApi.Client/
-
-**TODO:**
-- [CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/) - EMIT output_refinement
-- rest of the [ksql query syntax](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/) (supported operators etc.)
 
 # ksqldb links
 [Scalar functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#as_value)
