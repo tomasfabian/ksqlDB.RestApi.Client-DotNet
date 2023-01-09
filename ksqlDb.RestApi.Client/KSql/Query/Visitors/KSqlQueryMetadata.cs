@@ -10,7 +10,7 @@ internal sealed record KSqlQueryMetadata
 
   internal LambdaExpression Select { get; set; }
 
-  internal bool IsInsideNestedInvocationFunction { get; set; }
+  internal bool IsInNestedFunctionScope { get; set; }
 
   internal FromItem TrySetAlias(MemberExpression memberExpression, Func<FromItem, string, bool> predicate)
   {

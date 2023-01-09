@@ -114,11 +114,11 @@ internal class LambdaVisitor : KSqlVisitor
       
     Append(") => ");
 
-    queryMetadata.IsInsideNestedInvocationFunction = true;
+    queryMetadata.IsInNestedFunctionScope = true;
 
     Visit(node.Body);
 
-    queryMetadata.IsInsideNestedInvocationFunction = false;
+    queryMetadata.IsInNestedFunctionScope = false;
 
     return node;
   }

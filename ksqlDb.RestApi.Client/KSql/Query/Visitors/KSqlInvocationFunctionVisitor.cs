@@ -37,12 +37,12 @@ internal class KSqlInvocationFunctionVisitor : KSqlVisitor
           if (arguments[0].Type == typeof(KSqlFunctions))
             arguments = arguments.Skip(1).ToList();
 
-          if (queryMetadata.IsInsideNestedInvocationFunction)
+          if (queryMetadata.IsInNestedFunctionScope)
             VisitArgument(arguments[0]);
           else
             base.Visit(arguments[0]);
 
-          queryMetadata.IsInsideNestedInvocationFunction = true;
+          queryMetadata.IsInNestedFunctionScope = true;
 
           Append(", ");
             
@@ -63,7 +63,7 @@ internal class KSqlInvocationFunctionVisitor : KSqlVisitor
     }
     else base.VisitMethodCall(methodCallExpression);
 
-    queryMetadata.IsInsideNestedInvocationFunction = false;
+    queryMetadata.IsInNestedFunctionScope = false;
 
     return methodCallExpression;
   }

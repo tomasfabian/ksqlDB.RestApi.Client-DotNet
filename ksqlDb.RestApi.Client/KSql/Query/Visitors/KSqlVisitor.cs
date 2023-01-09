@@ -5,10 +5,7 @@ using System.Reflection;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDb.RestApi.Client.KSql.Entities;
-using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
-using ksqlDB.RestApi.Client.KSql.Query.Functions;
-using ksqlDB.RestApi.Client.KSql.Query.Operators;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using DateTime = System.DateTime;
 
@@ -282,32 +279,6 @@ internal class KSqlVisitor : ExpressionVisitor
     isInContainsScope = false;
   }
 
-  private protected void TryCast(MethodCallExpression methodCallExpression)
-  {
-    var methodName = methodCallExpression.Method.Name;
-
-    if (methodName.IsOneOfFollowing(nameof(string.ToString), nameof(Convert.ToInt32), nameof(Convert.ToInt64), nameof(Convert.ToDecimal), nameof(Convert.ToDouble)))
-    {
-      Append("CAST(");
-
-      Visit(methodCallExpression.Arguments.Count >= 1
-        ? methodCallExpression.Arguments[0]
-        : methodCallExpression.Object);
-
-      string ksqlType = methodName switch
-      {
-        nameof(string.ToString) => "VARCHAR",
-        nameof(Convert.ToInt32) => "INT",
-        nameof(Convert.ToInt64) => "BIGINT",
-        nameof(KSQLConvert.ToDecimal) => $"DECIMAL({methodCallExpression.Arguments[1]},{methodCallExpression.Arguments[2]})",
-        nameof(Convert.ToDouble) => "DOUBLE",
-        _ => throw new ArgumentOutOfRangeException(nameof(methodName))
-      };
-
-      Append($" AS {ksqlType})");
-    }
-  }
-
   protected void PrintFunctionArguments(IEnumerable<Expression> expressions)
   {
     Append("(");
@@ -381,88 +352,11 @@ internal class KSqlVisitor : ExpressionVisitor
     return constantExpression;
   }
 
-  private const string OperatorAnd = "AND";
-
-  private static readonly ISet<ExpressionType> SupportedBinaryOperators = new HashSet<ExpressionType>
-  {
-    ExpressionType.Add,
-    ExpressionType.Subtract, 
-    ExpressionType.Divide, 
-    ExpressionType.Multiply, 
-    ExpressionType.Modulo, 
-    ExpressionType.AndAlso,
-    ExpressionType.OrElse,
-    ExpressionType.NotEqual,
-    ExpressionType.Equal,
-    ExpressionType.GreaterThan,
-    ExpressionType.GreaterThanOrEqual,
-    ExpressionType.LessThan,
-    ExpressionType.LessThanOrEqual,
-  };
-
   protected override Expression VisitBinary(BinaryExpression binaryExpression)
   {
     if (binaryExpression == null) throw new ArgumentNullException(nameof(binaryExpression));
 
-    bool IsBinaryOperation(ExpressionType expressionType) => SupportedBinaryOperators.Contains(expressionType);
-
-    bool shouldAddParentheses = IsBinaryOperation(binaryExpression.Left.NodeType);
-
-    if(shouldAddParentheses)
-      Append("(");
-
-    Visit(binaryExpression.Left);
-
-    if(shouldAddParentheses)
-      Append(")");
-
-    if (binaryExpression.NodeType == ExpressionType.ArrayIndex)
-    {
-      Append("[");
-      Visit(binaryExpression.Right);
-      Append("]");
-
-      return binaryExpression;
-    }
-
-    //https://docs.ksqldb.io/en/latest/reference/sql/appendix/
-    string @operator = binaryExpression.NodeType switch
-    {
-      //arithmetic
-      ExpressionType.Add => "+",
-      ExpressionType.Subtract => "-",
-      ExpressionType.Divide => "/",
-      ExpressionType.Multiply => "*",
-      ExpressionType.Modulo => "%",
-      //conditionals
-      ExpressionType.AndAlso => OperatorAnd,
-      ExpressionType.OrElse => "OR",
-      ExpressionType.Equal when binaryExpression.Right is ConstantExpression ce && ce.Value == null => "IS",
-      ExpressionType.Equal => "=",
-      ExpressionType.NotEqual when binaryExpression.Right is ConstantExpression ce && ce.Value == null => "IS NOT",
-      ExpressionType.NotEqual => "!=",
-      ExpressionType.LessThan => "<",
-      ExpressionType.LessThanOrEqual => "<=",
-      ExpressionType.GreaterThan => ">",
-      ExpressionType.GreaterThanOrEqual => ">=",
-      _ => throw new ArgumentOutOfRangeException(nameof(binaryExpression.NodeType))
-    };
-
-    @operator = $" {@operator} ";
-
-    Append(@operator);
-      
-    shouldAddParentheses = IsBinaryOperation(binaryExpression.Right.NodeType);
-
-    if(shouldAddParentheses)
-      Append("(");
-
-    Visit(binaryExpression.Right);
-
-    if(shouldAddParentheses)
-      Append(")");
-
-    return binaryExpression;
+    return new BinaryVisitor(StringBuilder, queryMetadata).Visit(binaryExpression) ?? binaryExpression;
   }
 
   protected override Expression VisitNew(NewExpression newExpression)
@@ -587,7 +481,7 @@ internal class KSqlVisitor : ExpressionVisitor
       return false;
 
     return expression.NodeType == ExpressionType.MemberAccess && expression is MemberExpression me &&
-           me.Member.Name != memberInfo.Name ;
+           me.Member.Name != memberInfo.Name;
   }
 
   private void PrintColumnWithAlias(MemberInfo memberInfo, Expression expression)
