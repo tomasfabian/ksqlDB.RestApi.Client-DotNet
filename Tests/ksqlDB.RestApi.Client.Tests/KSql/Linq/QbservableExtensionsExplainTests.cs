@@ -70,7 +70,7 @@ public class QbservableExtensionsExplainTests : TestBase
 
     //Assert
     explainStatement.Should().Be(@"EXPLAIN SELECT * FROM Strings
-WHERE  = 'ET' EMIT CHANGES;");
+WHERE c = 'ET' EMIT CHANGES;");
   }
 
   class TestableDbProviderForExplain : TestableDbProvider<QbservableGroupByExtensionsTests.City>

@@ -5,6 +5,7 @@ using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using Microsoft.Extensions.DependencyInjection;
@@ -144,6 +145,32 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM Locations EMIT CHANGES LIMIT {limit};");
+  }
+
+  record MyType
+  {
+    public int A { get; set; }
+    public int B { get; set; }
+  }
+
+  [TestMethod]
+  public void ToQueryString_TransformWithNestedStruct()
+  {
+    //Arrange
+    var value = new Dictionary<string, MyType>
+      { { "a", new MyType { A = 1, B = 2 } } };
+
+    var query = CreateStreamSource()
+      .Select(_ => new
+      {
+        Dict = K.Functions.Transform(value, (k, v) => k.ToUpper(), (k, v) => v.A + 1)
+      });
+
+    //Act
+    var ksql = query.ToQueryString();
+
+    //Assert
+    ksql.Should().Be("SELECT TRANSFORM(MAP('a' := STRUCT(A := 1, B := 2)), (k, v) => UCASE(k), (k, v) => v->A + 1) Dict FROM Locations EMIT CHANGES;");
   }
 
   [TestMethod]

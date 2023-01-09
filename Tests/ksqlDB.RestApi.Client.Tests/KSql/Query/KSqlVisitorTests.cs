@@ -952,4 +952,17 @@ public class KSqlVisitorTests : TestBase
     //Assert
     query.Should().BeEquivalentTo($"ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)})");
   }
+
+  [TestMethod]
+  public void Conditional()
+  {
+    //Arrange
+    Expression<Func<Location, string>> expression = c => c.Longitude < 4.1 ? "left" : "right";
+
+    //Act
+    var query = ClassUnderTest.BuildKSql(expression);
+
+    //Assert
+    query.Should().BeEquivalentTo($" WHEN {nameof(Location.Longitude)} < 4.1 THEN 'left' ELSE 'right'");
+  }
 }

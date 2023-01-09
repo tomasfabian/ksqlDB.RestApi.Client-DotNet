@@ -125,4 +125,84 @@ public class MethodCallVisitorTests
     var ksql = stringBuilder.ToString();
     ksql.Should().Be("REDUCE(Array, 0, (x, y) => x + y)");
   }
+
+  [Test]
+  public void CastAsVarchar()
+  {
+    //Arrange
+    Expression<Func<string>> expression = () => 1.ToString();
+    StringBuilder stringBuilder = new();
+    MethodCallVisitor visitor = new(stringBuilder, new KSqlQueryMetadata());
+
+    //Act
+    visitor.Visit(expression);
+
+    //Assert
+    var ksql = stringBuilder.ToString();
+    ksql.Should().Be("CAST(1 AS VARCHAR)");
+  }
+
+  [Test]
+  public void CastAsInt()
+  {
+    //Arrange
+    Expression<Func<int>> expression = () => Convert.ToInt32("22");
+    StringBuilder stringBuilder = new();
+    MethodCallVisitor visitor = new(stringBuilder, new KSqlQueryMetadata());
+
+    //Act
+    visitor.Visit(expression);
+
+    //Assert
+    var ksql = stringBuilder.ToString();
+    ksql.Should().Be("CAST('22' AS INT)");
+  }
+
+  [Test]
+  public void CastAsBigInt()
+  {
+    //Arrange
+    Expression<Func<long>> expression = () => Convert.ToInt64("22");
+    StringBuilder stringBuilder = new();
+    MethodCallVisitor visitor = new(stringBuilder, new KSqlQueryMetadata());
+
+    //Act
+    visitor.Visit(expression);
+
+    //Assert
+    var ksql = stringBuilder.ToString();
+    ksql.Should().Be("CAST('22' AS BIGINT)");
+  }
+
+  [Test]
+  public void CastAsDouble()
+  {
+    //Arrange
+    Expression<Func<double>> expression = () => Convert.ToDouble("22");
+    StringBuilder stringBuilder = new();
+    MethodCallVisitor visitor = new(stringBuilder, new KSqlQueryMetadata());
+
+    //Act
+    visitor.Visit(expression);
+
+    //Assert
+    var ksql = stringBuilder.ToString();
+    ksql.Should().Be("CAST('22' AS DOUBLE)");
+  }
+
+  [Test]
+  public void CastAsDecimal()
+  {
+    //Arrange
+    Expression<Func<decimal>> expression = () => KSQLConvert.ToDecimal("22", 10, 2);
+    StringBuilder stringBuilder = new();
+    MethodCallVisitor visitor = new(stringBuilder, new KSqlQueryMetadata());
+
+    //Act
+    visitor.Visit(expression);
+
+    //Assert
+    var ksql = stringBuilder.ToString();
+    ksql.Should().Be("CAST('22' AS DECIMAL(10,2))");
+  }
 }

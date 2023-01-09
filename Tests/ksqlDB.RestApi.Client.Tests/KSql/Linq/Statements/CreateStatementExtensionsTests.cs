@@ -53,7 +53,7 @@ AS SELECT * FROM {nameof(Location)}s EMIT CHANGES;");
     //Arrange
     var creationMetadata = new CreationMetadata
     {
-      KafkaTopic = "tweetsByTitle",		
+      KafkaTopic = "moviesByTitle",		
       KeyFormat = SerializationFormats.Json,
       ValueFormat = SerializationFormats.Json,
       Replicas = 1,
@@ -72,7 +72,7 @@ AS SELECT * FROM {nameof(Location)}s EMIT CHANGES;");
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
- WITH ( KAFKA_TOPIC='tweetsByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
+ WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
 AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
 WHERE Id < 3 PARTITION BY Title EMIT CHANGES;");
   }
