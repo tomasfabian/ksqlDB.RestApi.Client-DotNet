@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -45,7 +45,8 @@ internal class MethodCallVisitor : KSqlVisitor
 
   protected override Expression VisitParameter(ParameterExpression node)
   {
-    Append(node.Name);
+    if(queryMetadata.IsInsideNestedInvocationFunction)
+      Append(node.Name);
 
     return node;
   }

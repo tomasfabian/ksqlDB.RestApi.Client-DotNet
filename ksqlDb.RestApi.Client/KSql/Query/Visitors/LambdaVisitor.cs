@@ -59,7 +59,7 @@ internal class LambdaVisitor : KSqlVisitor
     if (memberExpression == null) throw new ArgumentNullException(nameof(memberExpression));
 
     var memberName = memberExpression.Member.Name;
-
+    
     if (memberExpression.Expression.NodeType == ExpressionType.MemberInit)
     {
       Destructure(memberExpression);
@@ -92,7 +92,7 @@ internal class LambdaVisitor : KSqlVisitor
 
       Visit(Expression.Constant(outerObj));
     }
-
+    
     return memberExpression;
   }
 
@@ -114,7 +114,11 @@ internal class LambdaVisitor : KSqlVisitor
       
     Append(") => ");
 
+    queryMetadata.IsInsideNestedInvocationFunction = true;
+
     Visit(node.Body);
+
+    queryMetadata.IsInsideNestedInvocationFunction = false;
 
     return node;
   }
