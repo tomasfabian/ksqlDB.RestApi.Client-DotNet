@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Parsers;
 
@@ -45,10 +45,10 @@ internal class JsonArrayParser
 
     foreach(var currentChar in row)
     {
-      if(structuredTypeStarted.Contains(currentChar))
+      if(structuredTypeStarted.Contains(currentChar) && !isInsideString)
         isStructuredType++;
 		 
-      if(structuredTypeEnded.Contains(currentChar))
+      if(structuredTypeEnded.Contains(currentChar) && !isInsideString)
         isStructuredType--;
 
       if (currentChar == '"' && (previousChar == null || previousChar != '\\'))
