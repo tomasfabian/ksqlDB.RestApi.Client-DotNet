@@ -42,8 +42,6 @@ internal class KSqlInvocationFunctionVisitor : KSqlVisitor
           else
             base.Visit(arguments[0]);
 
-          queryMetadata.IsInNestedFunctionScope = true;
-
           Append(", ");
             
           if (arguments.Count >= 2)
@@ -62,8 +60,6 @@ internal class KSqlInvocationFunctionVisitor : KSqlVisitor
       }
     }
     else base.VisitMethodCall(methodCallExpression);
-
-    queryMetadata.IsInNestedFunctionScope = false;
 
     return methodCallExpression;
   }
