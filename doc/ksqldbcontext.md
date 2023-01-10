@@ -23,7 +23,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.Sample.Models.Movies;
 
 var ksqlDbUrl = @"http:\\localhost:8088";
-var contextOptions = CreateQueryStreamOptions(ksqlDbUrl);
+var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
 
 await using var context = new KSqlDBContext(contextOptions);
 
@@ -58,7 +58,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.Sample.Models.Movies;
 
 var ksqlDbUrl = @"http:\\localhost:8088";
-var contextOptions = CreateQueryStreamOptions(ksqlDbUrl);
+var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
 
 await using var context = new KSqlDBContext(contextOptions);
 
@@ -79,12 +79,15 @@ For these reasons ```IKSqlDBContext.CreateQuery<TEntity>``` was introduced to pr
 
 In ksqldb you can use the [Http-Basic authentication](https://docs.ksqldb.io/en/latest/operate-and-deploy/installation/server-config/security/#configuring-listener-for-http-basic-authenticationauthorization) mechanism:
 ```C#
+using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
+
 string ksqlDbUrl = @"http:\\localhost:8088";
 
 string userName = "fred";
 string password = "letmein";
 
-var options = ClassUnderTest.UseKSqlDb(ksqlDbUrl)
+var options = new KSqlDbContextOptionsBuilder()
+  .UseKSqlDb(ksqlDbUrl)
   .SetBasicAuthCredentials(userName, password)
   .Options;
 
