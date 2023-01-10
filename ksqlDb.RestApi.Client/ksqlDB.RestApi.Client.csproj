@@ -23,6 +23,7 @@
         <Nullable>disable</Nullable>
 		<PackageReleaseNotes>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/ksqlDb.RestApi.Client/ChangeLog.md</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 	
 	<ItemGroup>
@@ -40,6 +41,13 @@
 		<InternalsVisibleTo Include="ksqlDB.Api.Client.IntegrationTests" />
 		<InternalsVisibleTo Include="ksqlDB.RestApi.Client.ProtoBuf" />
 		<InternalsVisibleTo Include="ksqlDB.RestApi.Client.ProtoBuf.Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
 
 </Project>
