@@ -1,7 +1,8 @@
 # ksqlDB.RestApi.Client
 
-# v2.7.0-rc.1
+# v2.7.0-rc.2
 - insert values with KSQL functions
+- JsonArrayParser fixed deserialization of values with brackets #43 fix
 
 # v2.6.0
 - added shared values into KSqlDbStatement #39
