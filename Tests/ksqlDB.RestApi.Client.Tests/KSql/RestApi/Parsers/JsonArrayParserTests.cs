@@ -1,4 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+using System.Net.Mime;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using FluentAssertions;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Context.JsonConverters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parsers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
@@ -205,5 +211,53 @@ public class JsonArrayParserTests : TestBase
     //Assert
     string expectedJson = JObject.Parse("{\r\n\"INTERNALID\": \"7775dee282f011724d3108f25302b999\"\r\n,\"FILENAME\": \"test.json\"\r\n,\"TYPE\": \"Monitor\"\r\n,\"NAME\": \"27\\\" XZ272UVBMIIPHX Black\"\r\n}").ToString();
     JObject.Parse(json).ToString().Should().BeEquivalentTo(expectedJson);
+  }
+
+  private record IoTSensor
+  {
+    [Key]
+    public string SensorId { get; set; } = null!;
+
+    public int Value { get; set; }
+  }
+
+  private record IoTSensorChange : DatabaseChangeObject<IoTSensor>
+  {
+  }
+
+  private record DatabaseChangeObject<TEntity> : DatabaseChangeObject
+  {
+    public TEntity? Before { get; set; }
+    public TEntity? After { get; set; }
+    public TEntity? EntityBefore => Before;
+    public TEntity? EntityAfter => After;
+  }
+
+  private record DatabaseChangeObject
+  {
+    public string Op { get; set; }
+    public long? TsMs { get; set; }
+  }
+
+  [TestMethod]
+  public void ValueWithSquareBrackets()
+  {
+    //Arrange
+    string[] headerColumns = { "BEFORE", "AFTER", "OP", "TSMS" };
+    string row = "{\"SENSORID\":\"f575a8a9-e]\",\"VALUE\":88},{\"SENSORID\":\"f575a8a9-e\",\"VALUE\":58},\"u\",null";
+
+    var jsonRecord = ClassUnderTest.CreateJson(headerColumns, row);
+
+    JsonSerializerOptions jsonSerializerOptions = new()
+    {
+      PropertyNameCaseInsensitive = true,
+    };
+
+    //Act
+    var record = JsonSerializer.Deserialize<IoTSensorChange>(jsonRecord, jsonSerializerOptions);
+
+    //Assert
+    record.Should().NotBeNull();
+    record!.Before!.SensorId.Should().Be("f575a8a9-e]");
   }
 }
