@@ -47,6 +47,36 @@ internal class DebugHandler : System.Net.Http.DelegatingHandler
 }
 ```
 
+### Register KSqlDB dependencies
+
+```C#
+using ksqlDb.RestApi.Client.DependencyInjection;
+
+serviceCollection.ConfigureKSqlDb(ksqlDbUrl);
+```
+
+The above used extension method `ConfigureKSqlDb` registers services behalf of you as illustrated bellow:
+
+```C#
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using Microsoft.Extensions.DependencyInjection;
+
+var ksqlDbUrl = @"http:\\localhost:8088";
+
+var serviceCollection = new ServiceCollection();
+
+serviceCollection.AddHttpClient<ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory, ksqlDB.RestApi.Client.KSql.RestApi.Http.HttpClientFactory>(httpClient =>
+{
+  httpClient.BaseAddress = new Uri(ksqlDbUrl);
+});
+
+serviceCollection.AddScoped<IKSqlDbRestApiClient, KSqlDbRestApiClient>();
+
+var provider = serviceCollection.BuildServiceProvider();
+
+var restApiClient = provider.GetRequiredService<IKSqlDbRestApiClient>();
+```
+
 ### Bearer token authentication
 
 ```C#
