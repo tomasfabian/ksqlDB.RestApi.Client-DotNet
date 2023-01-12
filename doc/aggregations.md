@@ -56,7 +56,7 @@ SELECT Id, COUNT(*) Count FROM Tweets GROUP BY Id HAVING Count(*) > 2 EMIT CHANG
 ```
 
 ### Having - aggregations with a column
-[Example](https://kafka-tutorials.confluent.io/finding-distinct-events/ksql.html) shows how to use Having with Count(column) and Group By compound key:
+[Example](https://kafka-tutorials.confluent.io/finding-distinct-events/ksql.html) shows how to use Having with Count(column) and GroupBy compound key:
 ```C#
 public class Click
 {
@@ -72,10 +72,14 @@ var query = context.CreateQueryStream<Click>()
   .Select(g => new { g.Key.IP_ADDRESS, g.Key.URL, g.Key.TIMESTAMP })
   .Take(3);
 ```
+
 Generated KSQL:
-```KSQL
-SELECT IP_ADDRESS, URL, TIMESTAMP FROM Clicks WINDOW TUMBLING (SIZE 2 MINUTES) GROUP BY IP_ADDRESS, URL, TIMESTAMP 
-HAVING COUNT(IP_ADDRESS) = 1 EMIT CHANGES LIMIT 3;
+```SQL
+SELECT IP_ADDRESS, URL, TIMESTAMP FROM Clicks WINDOW TUMBLING (SIZE 2 MINUTES)
+ GROUP BY IP_ADDRESS, URL, TIMESTAMP 
+HAVING COUNT(IP_ADDRESS) = 1
+  EMIT CHANGES
+ LIMIT 3;
 ```
 
 ### Sum
@@ -87,15 +91,15 @@ context.CreateQueryStream<Tweet>()
 ```
 Equivalent to KSql:
 ```SQL
-SELECT Id, SUM(Amount) Agg FROM Tweets GROUP BY Id EMIT CHANGES;
+SELECT Id, SUM(Amount) Agg
+  FROM Tweets
+ GROUP BY Id
+  EMIT CHANGES;
 ```
 
 ### Avg
 **v1.0.0**
 
-```KSQL
-AVG(col1)
-``` 
 Return the average value for a given column.
 ```C#
 var query = CreateQbservable()
@@ -103,13 +107,13 @@ var query = CreateQbservable()
   .Select(g => g.Avg(c => c.Citizens));
 ```
 
+```KSQL
+AVG(col1)
+``` 
+
 ### Min and Max
 **v1.0.0**
 
-```KSQL
-MIN(col1)
-MAX(col1)
-``` 
 Return the minimum/maximum value for a given column and window. Rows that have col1 set to null are ignored.
 ```C#
 var queryMin = CreateQbservable()
@@ -120,6 +124,11 @@ var queryMax = CreateQbservable()
   .GroupBy(c => c.RegionCode)
   .Select(g => g.Max(c => c.Citizens));
 ```
+
+```KSQL
+MIN(col1)
+MAX(col1)
+``` 
 
 ### COLLECT_LIST, COLLECT_SET, EARLIEST_BY_OFFSET, LATEST_BY_OFFSET
 **v1.0.0**
@@ -148,6 +157,7 @@ Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression1 = l => new
 Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression2 = l => new { TopKDistinct = l.TopKDistinct(c => c.Amount, 2) };
 Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression3 = l => new { Count = l.LongCount(c => c.Amount) };
 ```
+
 KSQL
 ```KSQL
 TOPK(Amount, 2) TopKDistinct
@@ -177,12 +187,16 @@ Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression2 = l => new
 ```
 KSQL
 ```KSQL
---EARLIEST_BY_OFFSET(col1, [ignoreNulls])
+EARLIEST_BY_OFFSET(col1, [ignoreNulls])
+```
+```KSQL
 EARLIEST_BY_OFFSET(Amount, True) EarliestByOffset
 LATEST_BY_OFFSET(Amount, False) LatestByOffsetAllowNulls
 ```
 
+```KSQL
 EARLIEST_BY_OFFSET(col1, earliestN, [ignoreNulls])
+```
 
 Return the earliest N values for the specified column as an ARRAY. The earliest values
 in the partition have the lowest offsets.
@@ -199,9 +213,11 @@ context.CreateQueryStream<Tweet>()
 ```
 
 Generated KSQL:
-```KSQL
+```SQL
 SELECT Id, EARLIEST_BY_OFFSET(Amount, 2, True) EarliestByOffset 
-FROM Tweets GROUP BY Id EMIT CHANGES;
+  FROM Tweets
+ GROUP BY Id
+  EMIT CHANGES;
 ```
 
 ### TimeWindows - EMIT FINAL
@@ -250,12 +266,16 @@ var subscription = context.CreateQueryStream<Tweet>()
   }, exception => { Console.WriteLine(exception.Message); });
 ```
 Generated KSQL:
-```KSQL
+```SQL
 SELECT Id, COLLECT_SET(Message) Array 
-FROM Tweets GROUP BY Id EMIT CHANGES;
+  FROM Tweets
+ GROUP BY Id
+  EMIT CHANGES;
 
 SELECT Id, COLLECT_LIST(Message) Array 
-FROM Tweets GROUP BY Id EMIT CHANGES;
+  FROM Tweets
+ GROUP BY Id
+  EMIT CHANGES;
 ```
 
 CountDistinct, LongCountDistinct
@@ -271,9 +291,11 @@ var subscription = context.CreateQueryStream<Tweet>()
 ```
 
 Generated KSQL:
-```KSQL
+```SQL
 SELECT Id, COUNT_DISTINCT(Message) Count 
-FROM Tweets GROUP BY Id EMIT CHANGES;
+  FROM Tweets
+ GROUP BY Id
+  EMIT CHANGES;
 ```
 
 ## WindowedBy
@@ -293,10 +315,12 @@ var windowedQuery = context.CreateQueryStream<Transaction>()
   .Select(g => new { CardNumber = g.Key, Count = g.Count() });
 ```
 
-```KSQL
-SELECT CardNumber, COUNT(*) Count FROM Transactions 
-  WINDOW TUMBLING (SIZE 5 SECONDS, GRACE PERIOD 2 HOURS) 
-  GROUP BY CardNumber EMIT CHANGES;
+```SQL
+SELECT CardNumber, COUNT(*) Count
+  FROM Transactions 
+WINDOW TUMBLING (SIZE 5 SECONDS, GRACE PERIOD 2 HOURS) 
+ GROUP BY CardNumber
+  EMIT CHANGES;
 ```
 
 ### Hopping window
@@ -310,10 +334,12 @@ var subscription = context.CreateQueryStream<Tweet>()
   .Subscribe(c => { Console.WriteLine($"{c.Id}: {c.Count}: {c.WindowStart}: {c.WindowEnd}"); }, exception => {});
 ```
 
-```KSQL
-SELECT WindowStart, WindowEnd, Id, COUNT(*) Count FROM Tweets 
-  WINDOW HOPPING (SIZE 5 SECONDS, ADVANCE BY 10 SECONDS, RETENTION 7 DAYS) 
-  GROUP BY Id EMIT CHANGES;
+```SQL
+SELECT WindowStart, WindowEnd, Id, COUNT(*) Count
+  FROM Tweets 
+WINDOW HOPPING (SIZE 5 SECONDS, ADVANCE BY 10 SECONDS, RETENTION 7 DAYS) 
+ GROUP BY Id
+  EMIT CHANGES;
 ```
 Window advancement interval should be more than zero and less than window duration
 
@@ -327,13 +353,16 @@ var query = context.CreateQueryStream<Transaction>()
   .WindowedBy(new SessionWindow(Duration.OfSeconds(5)))
   .Select(g => new { CardNumber = g.Key, Count = g.Count() });
 ```
+
 KSQL:
-```KSQL
-SELECT CardNumber, COUNT(*) Count FROM Transactions 
-  WINDOW SESSION (5 SECONDS)
-  GROUP BY CardNumber 
+```SQL
+SELECT CardNumber, COUNT(*) Count
+  FROM Transactions 
+WINDOW SESSION (5 SECONDS)
+ GROUP BY CardNumber 
   EMIT CHANGES;
 ```
+
 Time units:
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
