@@ -21,7 +21,7 @@ This adds a `<PackageReference>` to your csproj file, similar to the following:
 
 Alternative option is to use [Protobuf content type](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/protobuf.md).
 
-The following example can be tried with a [.NET interactive Notebook](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/Notebooks):
+The following example can be tried oud with a [.NET interactive Notebook](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/Notebooks):
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -157,6 +157,31 @@ run in command line:
 
 - set docker-compose.csproj as startup project in InsideOut.sln for an embedded Kafka connect integration and stream processing examples.
 
+# ```IQbservable<T>``` extension methods
+As depicted bellow `IObservable<T>` is the dual of `IEnumerable<T>` and `IQbservable<T>` is the dual of `IQueryable<T>`. In all four cases LINQ providers are using deferred execution.
+While the first two are executed locally the latter two are executed server side. The server side execution is possible thanks to traversing ASTs (Abstract Syntax Trees) with visitors. The `KSqlDbProvider` will create the KSQL syntax for you from expression trees and pass it along to ksqlDB.
+
+<img src="https://www.codeproject.com/KB/cs/646361/WhatHowWhere.jpg" />
+
+List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md) extension methods:
+- [Select](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#select)
+- [Where](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#where)
+- [Take (LIMIT)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#take-limit)
+- [Subscribe](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribe)
+- [ToObservable](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#toobservable)
+- [ToAsyncEnumerable](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#toasyncenumerable)
+- [ToQueryString](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#getting-the-generated-ksql)
+- [ExplainAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#explainasync)
+- [SubscribeAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribeasync)
+- [SubscribeOn](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribeon)
+- [ObserveOn](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#observeon)
+- [ToStatementString](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#tostatementstring)
+- [WithOffsetResetPolicy](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#withoffsetresetpolicy---push-queries-extension-method)
+- [Window bounds](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#window-bounds)
+- [Raw string KSQL query execution](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#raw-string-ksql-query-execution)
+
+- [IKSqlGrouping.Source](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#iksqlgroupingsource)
+
 # Setting query parameters
 Default settings:
 'auto.offset.reset' is set to 'earliest' by default. 
@@ -168,7 +193,7 @@ contextOptions.QueryStreamParameters["auto.offset.reset"] = "latest";
 ```
 
 ### Overriding stream names
-Stream names are generated based on the generic record types. They are pluralized with Pluralize.NET package
+Stream names are generated based on the generic record types. They are pluralized with Pluralize.NET package.
 
 **By default the generated from item names such as stream and table names are pluralized**. This behavior could be switched off with the following `ShouldPluralizeStreamName` configuration. 
 
@@ -198,31 +223,6 @@ context.CreateQueryStream<Tweet>("custom_topic_name");
 ```SQL
 FROM custom_topic_name
 ```
-
-# ```IQbservable<T>``` extension methods
-As depicted bellow `IObservable<T>` is the dual of `IEnumerable<T>` and `IQbservable<T>` is the dual of `IQueryable<T>`. In all four cases LINQ providers are using deferred execution.
-While the first two are executed locally the latter two are executed server side. The server side execution is possible thanks to traversing ASTs (Abstract Syntax Trees) with visitors. The `KSqlDbProvider` will create the KSQL syntax for you from expression trees and pass it along to ksqlDB.
-
-<img src="https://www.codeproject.com/KB/cs/646361/WhatHowWhere.jpg" />
-
-List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md) extension methods:
-- [Select](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#select)
-- [Where](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#where)
-- [Take (LIMIT)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#take-limit)
-- [Subscribe](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribe)
-- [ToObservable](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#toobservable)
-- [ToAsyncEnumerable](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#toasyncenumerable)
-- [ToQueryString](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#getting-the-generated-ksql)
-- [ExplainAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#explainasync)
-- [SubscribeAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribeasync)
-- [SubscribeOn](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#subscribeon)
-- [ObserveOn](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#observeon)
-- [ToStatementString](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#tostatementstring)
-- [WithOffsetResetPolicy](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#withoffsetresetpolicy---push-queries-extension-method)
-- [Window bounds](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#window-bounds)
-- [Raw string KSQL query execution](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#raw-string-ksql-query-execution)
-
-- [IKSqlGrouping.Source](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#iksqlgroupingsource)
 
 # Register the KSqlDbContext
 `IKSqlDBContext` and `IKSqlDbRestApiClient` can be provided with dependency injection. These services can be registered during app startup and components that require these services, are provided with these services via constructor parameters.
