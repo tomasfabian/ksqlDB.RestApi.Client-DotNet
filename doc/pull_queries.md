@@ -169,8 +169,6 @@ public class OrderData: Record
 
 ### `IPullable<T>.FirstOrDefaultAsync` (v1.0.0)
 
-`IPullable<T>.GetAsync` was renamed to `IPullable<T>.FirstOrDefaultAsync`
-
 ```C#
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 
@@ -182,4 +180,28 @@ private static async Task GetAsync(IPullable<IoTSensorStats> pullQuery)
   Console.WriteLine(
     $"Pull query GetAsync result => Id: {result?.SensorId} - Avg Value: {result?.AvgValue} - Window Start {result?.WindowStart}");
 }
+```
+
+### Window Bounds
+
+The WHERE clause must contain a value for each primary-key column to retrieve and may optionally include bounds on WINDOWSTART and WINDOWEND if the materialized table is windowed.
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
+
+const string MaterializedViewName = "avg_sensor_values";
+
+string windowStart = "2019-10-03T21:31:16";
+string windowEnd = "2025-10-03T21:31:16";
+
+var result = await context.CreatePullQuery<IoTSensorStats>(MaterializedViewName)
+  .Where(c => c.SensorId == "sensor-1")
+  .Where(c => Bounds.WindowStart > windowStart && Bounds.WindowEnd <= windowEnd)
+  .GetAsync();
+```
+
+Generated KSQL:
+```SQL
+SELECT *
+  FROM avg_sensor_values
+ WHERE SensorId = 'sensor-1' AND (WINDOWSTART > '2019-10-03T21:31:16') AND (WINDOWEND <= '2020-10-03T21:31:16');
 ```

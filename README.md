@@ -278,9 +278,6 @@ List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/
 
 [Some KSql function examples can be found here](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/KSql-functions)
 
-**Data definitions**
-- [Headers](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_definitions.md#access-record-header-data-v160)
-
 **List of supported data types:**
 - [Supported data types mapping](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_types.md#supported-data-types-mapping)
 - [Structs](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_types.md#structs)
@@ -340,16 +337,19 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 **Config**
 - [Bearer token authentication](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#bearer-token-authentication)
 - [Replacing HttpClient](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#ksqldbcontextoptionsbuilderreplacehttpclient)
-- [ProcessingGuarantee](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#processingguarantee-enum)
+- [Processing guarantees](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/config.md#processingguarantee-enum)
 
 **Operators**
 - [Operator LIKE](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#operator-like---stringstartswith-stringendswith-stringcontains)
 - [Operator IN](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#operator-in---ienumerablet-and-ilistt-contains)
 - [Operator BETWEEN](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#operator-not-between)
-- [CASE](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#case)
+- [Operator CASE](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#case)
 - [Arithmetic operations on columns](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#arithmetic-operations-on-columns)
 - [Lexical precedence](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#lexical-precedence)
 - [WHERE IS NULL, IS NOT NULL](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#where-is-null-is-not-null)
+
+**Data definitions**
+- [Headers](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/data_definitions.md#access-record-header-data-v160)
 
 **Miscelenaous**
 - [Change data capture](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/cdc.md)

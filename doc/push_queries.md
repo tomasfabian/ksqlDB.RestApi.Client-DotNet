@@ -11,7 +11,10 @@ context.CreateQueryStream<Tweet>()
 ```
 
 ```SQL
-SELECT * from tweets EMIT CHANGES LIMIT 2;
+SELECT *
+  FROM tweets
+  EMIT CHANGES
+ LIMIT 2;
 ```
 
 ### Select
@@ -38,7 +41,9 @@ var query = context.CreateQueryStream<Location>()
 
 Is equivalent with:
 ```SQL
-SELECT STRUCT(Property := 42) AS Value FROM Locations EMIT CHANGES;
+SELECT STRUCT(Property := 42) AS Value
+  FROM Locations
+  EMIT CHANGES;
 ```
 
 ### Where
@@ -51,36 +56,14 @@ context.CreateQueryStream<Tweet>()
   .Where(p => p.RowTime >= 1510923225000);
 ```
 Multiple Where statements are joined with AND operator. 
-```KSQL
-SELECT * FROM Tweets
-WHERE Message != 'Hello world' OR Id = 1 AND RowTime >= 1510923225000
-EMIT CHANGES;
+```SQL
+SELECT *
+  FROM Tweets
+ WHERE Message != 'Hello world' OR Id = 1 AND RowTime >= 1510923225000
+  EMIT CHANGES;
 ```
 
 List of supported operators is [documented here](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md).
-
-### Window Bounds
-
-The WHERE clause must contain a value for each primary-key column to retrieve and may optionally include bounds on WINDOWSTART and WINDOWEND if the materialized table is windowed.
-```C#
-using ksqlDB.RestApi.Client.KSql.Query.Functions;
-
-const string MaterializedViewName = "avg_sensor_values";
-
-string windowStart = "2019-10-03T21:31:16";
-string windowEnd = "2025-10-03T21:31:16";
-
-var result = await context.CreatePullQuery<IoTSensorStats>(MaterializedViewName)
-  .Where(c => c.SensorId == "sensor-1")
-  .Where(c => Bounds.WindowStart > windowStart && Bounds.WindowEnd <= windowEnd)
-  .GetAsync();
-```
-
-Generated KSQL:
-```KSQL
-SELECT * FROM avg_sensor_values
-WHERE SensorId = 'sensor-1' AND (WINDOWSTART > '2019-10-03T21:31:16') AND (WINDOWEND <= '2020-10-03T21:31:16');
-```
 
 ### Subscribe
 **v1.0.0**
@@ -231,9 +214,9 @@ record State
 Equivalent KSQL:
 ```SQL
 SELECT RegionCode, State->Name, COUNT(*) Count 
-FROM Cities 
-GROUP BY RegionCode, State->Name 
-EMIT CHANGES;
+  FROM Cities 
+ GROUP BY RegionCode, State->Name 
+  EMIT CHANGES;
 ```
 
 ### ToAsyncEnumerable
