@@ -29,9 +29,7 @@ record Shipment
 ```C#
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
-```
 
-```C#
 var ksqlDbUrl = @"http:\\localhost:8088";
 
 var context = new KSqlDBContext(ksqlDbUrl);
@@ -52,12 +50,13 @@ var query = (from o in context.CreateQueryStream<Order>()
 Equivalent KSQL:
 
 ```SQL
-SELECT o.OrderId AS orderId, sa.Id AS shipmentId, p1.Id AS paymentId FROM Orders o
-INNER JOIN Payments p1
-ON O.PaymentId = p1.Id
-LEFT JOIN Shipments sa
-ON o.ShipmentId = sa.Id
-EMIT CHANGES LIMIT 5;
+SELECT o.OrderId AS orderId, sa.Id AS shipmentId, p1.Id AS paymentId
+  FROM Orders o
+ INNER JOIN Payments p1
+    ON O.PaymentId = p1.Id
+  LEFT JOIN Shipments sa
+    ON o.ShipmentId = sa.Id
+  EMIT CHANGES LIMIT 5;
 ```
 
 Creation of entities for the above mentioned query:
@@ -121,11 +120,12 @@ var query2 = KSqlDBContext.CreateQueryStream<Order>()
 
 Equivalent KSQL:
 
-```KSQL
-SELECT order.OrderId OrderId, s1.Id AS shipmentId FROM Orders order
-LEFT JOIN Payments s1
-ON order.OrderId = s1.Id
-EMIT CHANGES;
+```SQL
+SELECT order.OrderId OrderId, s1.Id AS shipmentId
+  FROM Orders order
+  LEFT JOIN Payments s1
+    ON order.OrderId = s1.Id
+  EMIT CHANGES;
 ```
 
 ### Join within
@@ -144,10 +144,11 @@ var query = from o in KSqlDBContext.CreateQueryStream<Order>()
 ```
 
 ```SQL
-SELECT o.OrderId AS orderId, p.Id AS paymentId FROM Orders o
-INNER JOIN Payments p
+SELECT o.OrderId AS orderId, p.Id AS paymentId
+  FROM Orders o
+ INNER JOIN Payments p
 WITHIN (1 HOURS, 5 DAYS) ON o.OrderId = p.Id
-EMIT CHANGES;
+  EMIT CHANGES;
 ```
 
 ### Full Outer Join
@@ -189,11 +190,12 @@ var source = new KSqlDBContext(@"http:\\localhost:8088")
 ```
 
 Generated KSQL:
-```KSQL
-SELECT m.Id Id, m.Title Title, m.Release_Year Release_Year, l.Title ActorTitle FROM movies_test m
-FULL OUTER JOIN lead_actor_test l
-ON m.Title = l.Title
-EMIT CHANGES;
+```SQL
+SELECT m.Id Id, m.Title Title, m.Release_Year Release_Year, l.Title ActorTitle
+  FROM movies_test m
+  FULL OUTER JOIN lead_actor_test l
+    ON m.Title = l.Title
+  EMIT CHANGES;
 ```
 
 ### LeftJoin - LEFT OUTER
@@ -213,12 +215,14 @@ var query = new KSqlDBContext(@"http:\\localhost:8088").CreateQueryStream<Movie>
     }
   );
 ```
+
 Generated KSQL:
-```KSQL
-SELECT M.Id Id, L.Title ActorTitle FROM Movies M
-LEFT JOIN Lead_Actors L
-ON M.Title = L.Title
-EMIT CHANGES;
+```SQL
+SELECT M.Id Id, L.Title ActorTitle
+  FROM Movies M
+  LEFT JOIN Lead_Actors L
+    ON M.Title = L.Title
+  EMIT CHANGES;
 ```
 
 ### RightJoin
@@ -291,12 +295,12 @@ var query = context.CreateQueryStream<Movie>()
 var joinQueryString = query.ToQueryString();
 ```
 KSQL:
-```KSQL
+```SQL
 SELECT M.Id Id, M.Title Title, M.Release_Year Release_Year, RPAD(LPAD(UCASE(L.Actor_Name), 15, '*'), 25, '^') ActorName, L.Title ActorTitle 
-FROM Movies M
-INNER JOIN Lead_Actor L
-ON M.Title = L.Title
-EMIT CHANGES;
+  FROM Movies M
+ INNER JOIN Lead_Actor L
+    ON M.Title = L.Title
+  EMIT CHANGES;
 ```
 
 > ⚠ There is a known limitation in the early access versions (bellow 1.0). 

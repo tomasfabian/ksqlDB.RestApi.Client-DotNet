@@ -25,8 +25,10 @@ var query = context.CreateQueryStream<Movie>()
 ```
 
 ```SQL
-SELECT * FROM Movies
-WHERE LCASE(Title) LIKE LCASE('%hard%') EMIT CHANGES;
+SELECT *
+  FROM Movies
+ WHERE LCASE(Title) LIKE LCASE('%hard%')
+  EMIT CHANGES;
 ```
 
 ```C#
@@ -35,8 +37,10 @@ var query = context.CreateQueryStream<Movie>()
 ```
 
 ```SQL
-SELECT * FROM Movies
-WHERE Title LIKE 'Die%' EMIT CHANGES;
+SELECT *
+  FROM Movies
+ WHERE Title LIKE 'Die%'
+  EMIT CHANGES;
 ```
 
 ### WHERE IS NULL, IS NOT NULL
@@ -50,11 +54,11 @@ using var subscription = new KSqlDBContext(@"http:\\localhost:8088")
 ```
 
 Generated KSQL:
-```KSQL
+```SQL
 SELECT IP_ADDRESS, URL, TIMESTAMP
-FROM Clicks
-WHERE IP_ADDRESS IS NOT NULL OR IP_ADDRESS IS NULL
-EMIT CHANGES;
+  FROM Clicks
+ WHERE IP_ADDRESS IS NOT NULL OR IP_ADDRESS IS NULL
+  EMIT CHANGES;
 ```
 
 ### Operator IN - `IEnumerable<T>` and `IList<T>` Contains
@@ -95,8 +99,9 @@ IQbservable<Tweet> query = context.CreateQueryStream<Tweet>()
 Generated KSQL:
 
 ```SQL
-SELECT * FROM Tweets
-WHERE Id BETWEEN 1 AND 5 EMIT CHANGES;
+SELECT *
+  FROM Tweets
+ WHERE Id BETWEEN 1 AND 5 EMIT CHANGES;
 ```
 
 ### Operator Between for Time type values
@@ -140,21 +145,24 @@ var query = new KSqlDBContext(@"http:\\localhost:8088")
   );
 ```
 
-```KSQL
+```SQL
 SELECT 
   CASE 
     WHEN Amount < 2 THEN 'small' 
     WHEN Amount < 4.1 THEN 'medium' 
     ELSE 'large' 
   END AS case_result 
-FROM Tweets EMIT CHANGES;
+ FROM Tweets EMIT CHANGES;
 ```
 
 ### Arithmetic operations on columns
 The usual arithmetic operators (+,-,/,*,%) may be applied to numeric types, like INT, BIGINT, and DOUBLE:
-```KSQL
-SELECT USERID, LEN(FIRST_NAME) + LEN(LAST_NAME) AS NAME_LENGTH FROM USERS EMIT CHANGES;
+```SQL
+SELECT USERID, LEN(FIRST_NAME) + LEN(LAST_NAME) AS NAME_LENGTH
+  FROM USERS
+  EMIT CHANGES;
 ```
+
 ```C#
 Expression<Func<Person, object>> expression = c => c.FirstName.Length * c.LastName.Length;
 ```
@@ -168,8 +176,10 @@ var query = context.CreateQueryStream<Location>()
   .Select(c => (c.Longitude + c.Longitude) * c.Longitude);
 ```
 
-```KSQL
-SELECT (Longitude + Longitude) * Longitude FROM Locations EMIT CHANGES;
+```SQL
+SELECT (Longitude + Longitude) * Longitude
+  FROM Locations
+  EMIT CHANGES;
 ```
 
 In Where clauses:
@@ -180,9 +190,11 @@ var query = context.CreateQueryStream<Location>()
   .Where(c => (c.Latitude == "1" || c.Latitude != "2") && c.Latitude == "3");
 ```
 
-```KSQL
-SELECT * FROM Locations
-WHERE ((Latitude = '1') OR (Latitude != '2')) AND (Latitude = '3') EMIT CHANGES;
+```SQL
+SELECT *
+  FROM Locations
+ WHERE ((Latitude = '1') OR (Latitude != '2')) AND (Latitude = '3')
+  EMIT CHANGES;
 ```
 
 Redundant brackets are not reduced in the current version.
