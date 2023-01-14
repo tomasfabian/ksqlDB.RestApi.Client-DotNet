@@ -5,39 +5,47 @@ using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDb.RestApi.Client.DependencyInjection;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using System.Reactive.Disposables;
+using Aggregations.KSqlDbContext;
 using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
 
 const string ksqlDbUrl = @"http:\\localhost:8088";
 
-IHost host = Host.CreateDefaultBuilder(args)
-  .ConfigureServices(services =>
+var host = Host.CreateDefaultBuilder(args)
+  .ConfigureLogging((hostingContext, logging) =>
   {
-    services.ConfigureKSqlDb(
-      ksqlDbUrl,
+    logging.AddConsole();
+    logging.AddDebug();
+  })
+  .ConfigureServices((_, serviceCollection) =>
+  {
+    serviceCollection.AddDbContext<IApplicationKSqlDbContext, ApplicationKSqlDbContext>(
       options =>
       {
-        options.SetAutoOffsetReset(AutoOffsetReset.Earliest);
-      }, ServiceLifetime.Transient, restApiLifetime: ServiceLifetime.Transient);
-  })
-  .Build();
+        var setupParameters = options.UseKSqlDb(ksqlDbUrl);
 
-await using var context = host.Services.GetRequiredService<IKSqlDBContext>();
+        setupParameters.SetAutoOffsetReset(AutoOffsetReset.Earliest);
+
+      }, contextLifetime: ServiceLifetime.Transient, restApiLifetime: ServiceLifetime.Transient);
+
+    serviceCollection.AddDbContextFactory<IApplicationKSqlDbContext>(factoryLifetime: ServiceLifetime.Scoped);
+  }).Build();
+
+await using var context = host.Services.GetRequiredService<IApplicationKSqlDbContext>();
 
 using var disposable = LatestByOffset(context);
 
 await host.RunAsync();
 
-
-static IDisposable LatestByOffset(IKSqlDBContext context)
+static IDisposable LatestByOffset(IApplicationKSqlDbContext context)
 {
-  var query = context.CreateQueryStream<Tweet>()
+  var query = context.Tweets
     .GroupBy(c => c.Id)
     .Select(g => new { Id = g.Key, EarliestByOffset = g.EarliestByOffset(c => c.Amount, 2) })
     .ToQueryString();
 
   Console.WriteLine(query);
 
-  return context.CreateQueryStream<Tweet>()
+  return context.Tweets
     .GroupBy(c => c.Id)
     //.Select(g => new { Id = g.Key, Earliest = g.EarliestByOffset(c => c.Message) })
     //.Select(g => new { Id = g.Key, Earliest = g.EarliestByOffsetAllowNulls(c => c.Message) })
