@@ -1,6 +1,5 @@
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using ksqlDB.Api.Client.Samples.HostedServices;
 using ksqlDB.Api.Client.Samples.Json;
 using ksqlDB.Api.Client.Samples.Models;
 using ksqlDB.Api.Client.Samples.Models.InvocationFunctions;
@@ -25,7 +24,6 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query.Descriptors;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
@@ -50,12 +48,12 @@ public static class Program
       .SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce) // global setting
       .SetupQueryStream(options =>
       {
-          //SetupQueryStream affects only IKSqlDBContext.CreateQueryStream<T>
+        //SetupQueryStream affects only IKSqlDBContext.CreateQueryStream<T>
         options.AutoOffsetReset = AutoOffsetReset.Earliest;
       })
       .SetupQuery(options =>
       {
-          //SetupQuery affects only IKSqlDBContext.CreateQuery<T>
+        //SetupQuery affects only IKSqlDBContext.CreateQuery<T>
         options.Properties[KSqlDbConfigs.ProcessingGuarantee] = ProcessingGuarantee.ExactlyOnce.ToKSqlValue();
       })
       .Options;
@@ -501,54 +499,4 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
 
     return loggerFactory;
   }
-
-  public static async Task Main2(string[] args)
-  {
-    await CreateHostBuilder(args).RunConsoleAsync();
-  }
-
-  internal class ApplicationKSqlDbContext : KSqlDBContext, IApplicationKSqlDbContext
-  {
-    public ApplicationKSqlDbContext(string ksqlDbUrl, ILoggerFactory? loggerFactory = null)
-      : base(ksqlDbUrl, loggerFactory)
-    {
-    }
-
-    public ApplicationKSqlDbContext(KSqlDBContextOptions contextOptions, ILoggerFactory? loggerFactory = null)
-      : base(contextOptions, loggerFactory)
-    {
-    }
-
-    public RestApi.Client.KSql.Linq.IQbservable<Movie> Movies => CreateQueryStream<Movie>();
-  }
-
-  public interface IApplicationKSqlDbContext : IKSqlDBContext
-  {
-    RestApi.Client.KSql.Linq.IQbservable<Movie> Movies { get; }
-  }
-
-  public static IHostBuilder CreateHostBuilder(string[] args) =>
-    Host.CreateDefaultBuilder(args)
-      .ConfigureLogging((hostingContext, logging) =>
-                        {
-                          logging.AddConsole();
-                          logging.AddDebug();
-                        })
-      .ConfigureServices((hostContext, serviceCollection) =>
-                         {
-                           var ksqlDbUrl = @"http:\\localhost:8088";
-
-                           serviceCollection.AddDbContext<IApplicationKSqlDbContext, ApplicationKSqlDbContext>(
-                             options =>
-                             {
-                               var setupParameters = options.UseKSqlDb(ksqlDbUrl);
-
-                               setupParameters.SetAutoOffsetReset(AutoOffsetReset.Earliest);
-
-                             }, contextLifetime: ServiceLifetime.Transient, restApiLifetime: ServiceLifetime.Transient);
-
-                           serviceCollection.AddDbContextFactory<IApplicationKSqlDbContext>(factoryLifetime: ServiceLifetime.Scoped);
-
-                           serviceCollection.AddHostedService<Worker>();
-                         });
 }
