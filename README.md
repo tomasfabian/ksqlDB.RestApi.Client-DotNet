@@ -131,7 +131,7 @@ context.Add(new Tweet { Id = 2, Message = "ksqlDB rulez!" });
 var saveChangesResponse = await context.SaveChangesAsync();
 ```
 
-Sample project can be found under [Samples](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.Sample) solution folder in ksqlDB.RestApi.Client.sln 
+Sample projects can be found under [Samples](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.Sample) solution folder in ksqlDB.RestApi.Client.sln 
 
 
 **External dependencies:**
