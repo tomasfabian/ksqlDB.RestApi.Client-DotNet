@@ -82,8 +82,8 @@ using ksqlDB.Api.Client.Samples.Models;
 EntityCreationMetadata metadata = new()
 {
   KafkaTopic = nameof(Tweet),
-  Partitions = 1,
-  Replicas = 1
+  Partitions = 3,
+  Replicas = 3
 };
 
 var httpClient = new HttpClient()
@@ -97,15 +97,15 @@ var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<Tweet>(metadata);
 ```
 
-CreateOrReplaceStreamAsync executes the following statement:
+`CreateOrReplaceStreamAsync` executes the following statement:
 ```SQL
 CREATE OR REPLACE STREAM Tweets (
 	Id INT,
 	Message VARCHAR
-) WITH ( KAFKA_TOPIC='Tweet', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );
+) WITH ( KAFKA_TOPIC='Tweet', VALUE_FORMAT='Json', PARTITIONS='3', REPLICAS='3' );
 ```
 
-Run the following insert statements to stream some messages with your ksqldb-cli
+Run the following insert statements to publish some messages with your ksqldb-cli
 ```
 docker exec -it $(docker ps -q -f name=ksqldb-cli) ksql http://ksqldb-server:8088
 ```
