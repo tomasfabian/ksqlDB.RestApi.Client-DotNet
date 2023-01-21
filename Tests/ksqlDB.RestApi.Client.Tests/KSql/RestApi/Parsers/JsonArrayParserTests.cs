@@ -235,7 +235,7 @@ public class JsonArrayParserTests : TestBase
 
   private record DatabaseChangeObject
   {
-    public string Op { get; set; }
+    public string Op { get; set; } = null!;
     public long? TsMs { get; set; }
   }
 
