@@ -4,7 +4,6 @@ using Blazor.Sample.Configuration;
 using Blazor.Sample.Data.Sensors;
 using Blazor.Sample.Extensions.Http;
 using Blazor.Sample.Kafka;
-using Confluent.Kafka;
 using InsideOut.Consumer;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
@@ -24,6 +23,8 @@ partial class KafkaStreamComponent : IDisposable
   private IDisposable topicSubscription;
     
   private readonly CancellationTokenSource cancellationTokenSource = new();
+  
+  private string KsqlDbUrl => Configuration[ConfigKeys.KSqlDb_Url];
 
   protected override async Task OnInitializedAsync()
   {
@@ -54,6 +55,23 @@ partial class KafkaStreamComponent : IDisposable
     //!!! disclaimer
   }
 
+  private void SubscribeToSensors(SynchronizationContext synchronizationContext)
+  {
+    topicSubscription = ItemsConsumer.ConnectToTopic()
+      .ToObservable()
+      .Select(c => c.Message)
+      .SubscribeOn(NewThreadScheduler.Default)
+      .ObserveOn(synchronizationContext)
+      .Subscribe(c =>
+      {
+        c.Value.Id = c.Key;
+
+        items.Enqueue(c.Value);
+
+        StateHasChanged();
+      }, error => { Console.WriteLine(error.Message); });
+  }
+
   private async Task SubscribeToQuery(SynchronizationContext synchronizationContext)
   {
     var options = new KSqlDBContextOptions(KsqlDbUrl)
@@ -73,39 +91,6 @@ partial class KafkaStreamComponent : IDisposable
         items.Enqueue(c);
         StateHasChanged();
       }, error => { });
-  }
-
-  private void SubscribeToSensors(SynchronizationContext synchronizationContext)
-  {
-    topicSubscription = ItemsConsumer.ConnectToTopic()
-      .ToObservable()
-      .Select(c => c.Message)
-      .SubscribeOn(NewThreadScheduler.Default)
-      .ObserveOn(synchronizationContext)
-      .Subscribe(c =>
-      {
-        c.Value.Id = c.Key;
-
-        items.Enqueue(c.Value);
-
-        StateHasChanged();
-      }, error => { Console.WriteLine(error.Message); });
-  }
-
-  private string KsqlDbUrl => Configuration[ConfigKeys.KSqlDb_Url];
-    
-  public IAdminClient GetAdminClient()
-  {
-    var config = new AdminClientConfig
-    {
-      BootstrapServers = Configuration["Kafka:BootstrapServers"]
-    };
-
-    var adminClientBuilder = new AdminClientBuilder(config);
-
-    var adminClient = adminClientBuilder.Build();
-
-    return adminClient;
   }
 
   public void Dispose()

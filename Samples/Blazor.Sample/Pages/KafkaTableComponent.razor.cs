@@ -47,6 +47,7 @@ public partial class KafkaTableComponent : IDisposable
         StateHasChanged();
       }, error =>
       {
+        Console.WriteLine(error.Message);
       });
 
     await base.OnInitializedAsync();
