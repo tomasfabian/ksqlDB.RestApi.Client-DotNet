@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
@@ -6,9 +6,15 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
 public class QueryParameters : IKSqlDbParameters
 {
+  /// <summary>
+  /// A semicolon-delimited sequence of SQL statements to run.
+  /// </summary>
   [JsonPropertyName("ksql")]
   public string Sql { get; set; }
 
+  /// <summary>
+  /// Property overrides to run the statements with.
+  /// </summary>
   [JsonPropertyName("streamsProperties")]
   public Dictionary<string, string> Properties { get; } = new();
 
