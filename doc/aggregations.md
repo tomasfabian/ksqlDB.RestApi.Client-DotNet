@@ -23,7 +23,10 @@ context.CreateQueryStream<Tweet>()
   }, error => { Console.WriteLine($"Exception: {error.Message}"); }, () => Console.WriteLine("Completed"));
 ```
 ```SQL
-SELECT Id, COUNT(*) Count FROM Tweets GROUP BY Id EMIT CHANGES;
+SELECT Id, COUNT(*) Count
+  FROM Tweets
+ GROUP BY Id
+  EMIT CHANGES;
 ```
 
 > ⚠ There is a known limitation in the early access versions (bellow version 1.10). The aggregation functions have to be named/aliased COUNT(*) Count, otherwise the deserialization won't be able to map the unknown column name KSQL_COL_0. 
@@ -36,7 +39,10 @@ context.CreateQueryStream<Tweet>()
   .Select(g => g.Count()); 
 ```
 ```SQL
-SELECT COUNT(*) FROM Tweets GROUP BY Id EMIT CHANGES;
+SELECT COUNT(*)
+  FROM Tweets
+ GROUP BY Id
+  EMIT CHANGES;
 ```
 
 ### Having
@@ -52,7 +58,11 @@ var query = context.CreateQueryStream<Tweet>()
 ```
 KSQL:
 ```KSQL
-SELECT Id, COUNT(*) Count FROM Tweets GROUP BY Id HAVING Count(*) > 2 EMIT CHANGES;
+SELECT Id, COUNT(*) Count
+  FROM Tweets
+ GROUP BY Id
+HAVING Count(*) > 2
+  EMIT CHANGES;
 ```
 
 ### Having - aggregations with a column
