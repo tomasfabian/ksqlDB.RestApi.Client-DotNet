@@ -11,7 +11,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-        <PackageReference Include="ksqlDB.RestApi.Client" Version="2.7.0-rc.1" />
+        <PackageReference Include="ksqlDB.RestApi.Client" Version="3.0.0-rc.1" />
 		<!-- <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" /> -->
 		<PackageReference Include="ksqlDb.RestApi.Client.ProtoBuf" Version="1.0.0-rc.1" />
 		<!-- <ProjectReference Include="..\..\ksqlDb.RestApi.Client.ProtoBuf\ksqlDb.RestApi.Client.ProtoBuf.csproj" /> -->

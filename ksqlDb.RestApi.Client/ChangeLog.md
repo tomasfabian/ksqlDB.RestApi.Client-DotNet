@@ -1,5 +1,8 @@
 # ksqlDB.RestApi.Client
 
+# v3.0.0-rc.1
+- upgraded .NET package dependencies
+
 # v2.7.0
 - insert values with KSQL functions
 - JsonArrayParser fixed deserialization of values with brackets #43 fix
