@@ -1,4 +1,4 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Linq;
+namespace ksqlDB.RestApi.Client.KSql.Linq;
 
 public interface IAggregations
 {     
@@ -170,9 +170,6 @@ public interface IAggregations<out TSource> : IAggregations
   TValue[][] CollectList<TValue>(Func<TSource, TValue[]> selector);
 
   TValue[] CollectList<TKey, TValue>(Func<TSource, IDictionary<TKey, TValue>> selector);
-
-  [Obsolete]
-  decimal[] CollectList(Func<TSource, decimal> selector);
 
   #endregion
 

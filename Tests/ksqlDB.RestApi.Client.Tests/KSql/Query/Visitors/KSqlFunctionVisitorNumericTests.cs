@@ -338,20 +338,5 @@ public class KSqlFunctionVisitorNumericTests : TestBase
     query.Should().BeEquivalentTo($"SIGN({nameof(Tweet.Amount)})");
   }
 
-  [TestMethod]
-  public void DecimalSign_BuildKSql_PrintsSignFunction()
-  {
-    //Arrange
-#pragma warning disable CS0612 // Type or member is obsolete
-    Expression<Func<Tweet, decimal>> expression = c => K.Functions.Sign(c.AccountBalance);
-#pragma warning restore CS0612 // Type or member is obsolete
-
-    //Act
-    var query = ClassUnderTest.BuildKSql(expression);
-
-    //Assert
-    query.Should().BeEquivalentTo($"SIGN({nameof(Tweet.AccountBalance)})");
-  }
-
   #endregion
 }

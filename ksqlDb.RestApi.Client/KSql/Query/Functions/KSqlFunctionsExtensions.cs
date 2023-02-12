@@ -1,4 +1,4 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Query.Functions;
+namespace ksqlDB.RestApi.Client.KSql.Query.Functions;
 
 public static class KSqlFunctionsExtensions
 {
@@ -612,15 +612,6 @@ public static class KSqlFunctionsExtensions
     throw new InvalidOperationException(ServerSideOperationErrorMessage);
   }
 
-  /// <summary>
-  /// The sign of a value.
-  /// </summary>
-  [Obsolete]
-  public static int Sign(this KSqlFunctions kSqlFunctions, decimal input)
-  {
-    throw new InvalidOperationException(ServerSideOperationErrorMessage);
-  }
-
   #endregion
 
   #region Sqrt
@@ -1071,7 +1062,7 @@ public static class KSqlFunctionsExtensions
   /// <param name="kSqlFunctions"></param>
   /// <param name="array">The array</param>
   /// <returns>Returns the maximum value from within a given array of primitive elements (not arrays of other arrays, or maps, or structs, or combinations thereof).</returns>
-  public static string? ArrayMax(this KSqlFunctions kSqlFunctions, string[] array)
+  public static string ArrayMax(this KSqlFunctions kSqlFunctions, string[] array)
   {
     throw new InvalidOperationException(ServerSideOperationErrorMessage);
   }
@@ -1130,7 +1121,7 @@ public static class KSqlFunctionsExtensions
   /// <param name="kSqlFunctions"></param>
   /// <param name="array">The array</param>
   /// <returns>Returns the minimum value from within a given array of primitive elements (not arrays of other arrays, or maps, or structs, or combinations thereof).</returns>
-  public static string? ArrayMin(this KSqlFunctions kSqlFunctions, string[] array)
+  public static string ArrayMin(this KSqlFunctions kSqlFunctions, string[] array)
   {
     throw new InvalidOperationException(ServerSideOperationErrorMessage);
   }

@@ -1,7 +1,12 @@
 # ksqlDB.RestApi.Client
 
 # v3.0.0-rc.1
+- property `AsyncDisposableObject.IsDisposed` was changed from public to an internal access modifier
 - upgraded .NET package dependencies
+
+Removed obsolete methods:
+- `KSqlFunctionsExtensions.Sign`
+- `IAggregations<TSource>.CollectList`
 
 # v2.7.0
 - insert values with KSQL functions

@@ -1,10 +1,10 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Disposables;
+namespace ksqlDB.RestApi.Client.KSql.Disposables;
 
 public abstract class AsyncDisposableObject : IAsyncDisposable
 {
   private readonly AsyncLock gate = new();
 
-  public bool IsDisposed => isDisposed;
+  internal bool IsDisposed => isDisposed;
 
   public bool HasBeenInitialized { get; private set; }
 
