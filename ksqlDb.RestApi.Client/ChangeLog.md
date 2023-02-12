@@ -4,6 +4,9 @@
 - property `AsyncDisposableObject.IsDisposed` was changed from public to an internal access modifier
 - upgraded .NET package dependencies
 
+Removed not supported **TFM**s:
+- netcoreapp3.1;net5.0
+ 
 Removed obsolete methods:
 - `KSqlFunctionsExtensions.Sign`
 - `IAggregations<TSource>.CollectList`

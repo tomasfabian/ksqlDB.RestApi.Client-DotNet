@@ -1,53 +1,53 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-        <TargetFrameworks>netstandard2.0;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
         <Authors>Tomas Fabian</Authors>
-		<Company />
-		<PackageLicenseFile></PackageLicenseFile>
-		<PackageProjectUrl>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/ksqlDb.RestApi.Client</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet</RepositoryUrl>
-		<Copyright>@tomasfabian</Copyright>
-		<Description>
+        <Company />
+        <PackageLicenseFile></PackageLicenseFile>
+        <PackageProjectUrl>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/ksqlDb.RestApi.Client</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet</RepositoryUrl>
+        <Copyright>@tomasfabian</Copyright>
+        <Description>
             ksqlDB.RestApi.Client is a C# LINQ-enabled client API for issuing and consuming ksqlDB push queries.
             You can continually process computations over unbounded streams of data.
             It also enables the execution of SQL statements via the Rest API such as inserting records into streams and creating tables, types, etc. or executing admin operations such as listing streams.
-            Targets .NET 5, .NET Core 3.1 and .NET Standard 2.0.
+            Targets .NET 6 and .NET Standard 2.0.
             Documentation for the library can be found at https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/README.md.
         </Description>
-		<PackageTags>ksql ksqlDB LINQ .NET csharp push query</PackageTags>
-		<Version>3.0.0-rc.1</Version>
-		<AssemblyVersion>3.0.0.0</AssemblyVersion>
-		<LangVersion>10.0</LangVersion>
-		<ImplicitUsings>enable</ImplicitUsings>
+        <PackageTags>ksql ksqlDB LINQ .NET csharp push query</PackageTags>
+        <Version>3.0.0-rc.2</Version>
+        <AssemblyVersion>3.0.0.0</AssemblyVersion>
+        <LangVersion>10.0</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
-		<PackageReleaseNotes>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/ksqlDb.RestApi.Client/ChangeLog.md</PackageReleaseNotes>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-	</PropertyGroup>
-	
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
-		<PackageReference Include="System.Interactive.Async" Version="6.0.1" />
-		<PackageReference Include="System.Reactive" Version="5.0.0" />
-		<PackageReference Include="System.Text.Json" Version="7.0.0" />
-		<PackageReference Include="Pluralize.NET" Version="1.0.2" />
-	</ItemGroup>
+        <PackageReleaseNotes>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/ksqlDb.RestApi.Client/ChangeLog.md</PackageReleaseNotes>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<InternalsVisibleTo Include="ksqlDB.Api.Client.Tests" />
-		<InternalsVisibleTo Include="ksqlDB.Api.Client.IntegrationTests" />
-		<InternalsVisibleTo Include="ksqlDB.RestApi.Client.ProtoBuf" />
-		<InternalsVisibleTo Include="ksqlDB.RestApi.Client.ProtoBuf.Tests" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+        <PackageReference Include="System.Interactive.Async" Version="6.0.1" />
+        <PackageReference Include="System.Reactive" Version="5.0.0" />
+        <PackageReference Include="System.Text.Json" Version="7.0.0" />
+        <PackageReference Include="Pluralize.NET" Version="1.0.2" />
+    </ItemGroup>
 
-	<ItemGroup>
-	  <None Include="..\README.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	</ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="ksqlDB.Api.Client.Tests" />
+        <InternalsVisibleTo Include="ksqlDB.Api.Client.IntegrationTests" />
+        <InternalsVisibleTo Include="ksqlDB.RestApi.Client.ProtoBuf" />
+        <InternalsVisibleTo Include="ksqlDB.RestApi.Client.ProtoBuf.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\README.md">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+    </ItemGroup>
 
 </Project>
