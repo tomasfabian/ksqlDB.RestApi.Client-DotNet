@@ -1,4 +1,3 @@
-using System.Reactive.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.WorkerService.ksqlDB;
 using ksqlDB.RestApi.Client.WorkerService.Models;

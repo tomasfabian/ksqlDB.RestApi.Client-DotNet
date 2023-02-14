@@ -7,7 +7,6 @@ IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
       var ksqlDbUrl = @"http:\\localhost:8088"; // for local dev. provide your IP address
-      ksqlDbUrl = @"http:\\172.30.48.1:8088";
 
       services.AddDbContext<IMoviesKSqlDbContext, MoviesKSqlDbContext>(
         options =>
