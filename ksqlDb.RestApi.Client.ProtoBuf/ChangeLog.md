@@ -2,7 +2,8 @@
 
 # v2.0.0-rc.1
 Removed not supported **TFM**s:
-- netcoreapp3.1;net5.0
+- netcoreapp3.1
+- upgraded ksqlDB.RestApi.Client. package dependency
 
 Upgraded ksqlDb.RestApi.Client package to v3.0.0-rc.2
 

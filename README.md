@@ -19,7 +19,10 @@ This adds a `<PackageReference>` to your csproj file, similar to the following:
 <PackageReference Include="ksqlDB.RestApi.Client" Version="2.3.0" />
 ```
 
-Alternative option is to use [Protobuf content type](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/protobuf.md).
+Alternative option is to use [Protobuf content type](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/protobuf.md):
+```
+dotnet add package ksqlDB.RestApi.Client.ProtoBuf
+```
 
 The following example can be tried out with a [.NET interactive Notebook](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/Notebooks):
 

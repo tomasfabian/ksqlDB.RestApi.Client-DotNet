@@ -21,6 +21,7 @@
 		<Nullable>enable</Nullable>
 		<PackageReleaseNotes>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/ksqlDb.RestApi.Client.ProtoBuf/ChangeLog.md</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 	
 	<ItemGroup>
@@ -31,6 +32,13 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="ksqlDB.RestApi.Client.ProtoBuf.Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
 
 </Project>
