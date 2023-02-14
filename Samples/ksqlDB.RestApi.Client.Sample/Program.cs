@@ -91,7 +91,6 @@ public static class Program
       .Where(p => p.Title != "E.T.")
       .Where(c => c.Title.ToLower().Contains("hard".ToLower()) || c.Id == 1)
       .Where(p => p.RowTime >= 1510923225000)
-      .Select(l => new { Id = l.Id, l.Title, l.Release_Year, l.RowTime })
       .Take(2); // LIMIT 2    
 
     var ksql = query.ToQueryString();
