@@ -1,6 +1,6 @@
 # ksqlDB.RestApi.Client
 
-# v3.0.0-rc.2
+# v3.0.0
 - property `AsyncDisposableObject.IsDisposed` was changed from public to an internal access modifier
 - upgraded .NET package dependencies
 
