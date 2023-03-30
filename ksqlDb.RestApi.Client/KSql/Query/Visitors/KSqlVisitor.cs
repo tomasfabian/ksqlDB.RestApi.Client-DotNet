@@ -313,15 +313,15 @@ internal class KSqlVisitor : ExpressionVisitor
     if (value is byte[])
       throw new NotSupportedException();
 
-    if (value != null && !isInContainsScope && (type.IsClass || type.IsStruct() || type.IsDictionary()))
+    if (value is not string && isInContainsScope && value is IEnumerable enumerable)
+    {
+      Append(enumerable);
+    }
+    else if (value != null && (type.IsClass || type.IsStruct() || type.IsDictionary()))
     {
       var ksqlValue = new CreateKSqlValue().ExtractValue(value, null, null, type);
 
       stringBuilder.Append(ksqlValue);
-    }
-    else if(value is not string && value is IEnumerable enumerable)
-    {
-      Append(enumerable);
     }
     else if (KSqlDBContextOptions.NumberFormatInfo != null && value is double doubleValue)
     {
