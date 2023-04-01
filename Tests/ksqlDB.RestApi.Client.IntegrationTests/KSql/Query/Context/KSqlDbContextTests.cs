@@ -86,12 +86,13 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     //Arrange
     Expression<Func<string>> valueExpression = () => INITCAP("One little mouse");
 
+    var config = new InsertProperties { EntityName = EntityName, ShouldPluralizeEntityName = false };
     var insertValues = new InsertValues<Movie>(new Movie { Id = 5 });
 
     //Act
     insertValues.WithValue(c => c.Title, valueExpression);
 
-    Context.Add(insertValues);
+    Context.Add(insertValues, config);
 
     var response = await Context.SaveChangesAsync();
 
