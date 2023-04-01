@@ -711,6 +711,38 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{nameof(Tweet.Message)} LIKE '%{text}%'");
   }
 
+  [TestMethod]
+  public void ContainsGuid_BuildKSql_PrintsLike()
+  {
+    //Arrange
+    var guid1 = Guid.NewGuid();
+    var guid2 = Guid.NewGuid();
+    var guids = new List<Guid> { guid1, guid2 };
+
+    Expression<Func<Tweet, bool>> expression = c => guids.Contains(guid1);
+
+    //Act
+    var query = ClassUnderTest.BuildKSql(expression);
+
+    //Assert
+    query.Should().BeEquivalentTo($"'{guid1}' IN ('{guid1}', '{guid2}')");
+  }
+
+  [TestMethod]
+  public void ContainsString_BuildKSql_PrintsLike()
+  {
+    //Arrange
+    var guids = new List<string> { "one", "two"};
+
+    Expression<Func<Tweet, bool>> expression = c => guids.Contains("one");
+
+    //Act
+    var query = ClassUnderTest.BuildKSql(expression);
+
+    //Assert
+    query.Should().BeEquivalentTo("'one' IN ('one', 'two')");
+  }
+
   #endregion
 
   #endregion
