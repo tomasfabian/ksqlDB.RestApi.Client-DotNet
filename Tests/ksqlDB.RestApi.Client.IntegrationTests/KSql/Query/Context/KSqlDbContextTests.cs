@@ -27,7 +27,7 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
   public static async Task ClassInitialize(TestContext context)
   {
     var restApiClient = KSqlDbRestApiProvider.Create();
-      
+
     await restApiClient.CreateStreamAsync<Movie>(new EntityCreationMetadata(EntityName, 1) { EntityName = EntityName, ShouldPluralizeEntityName = false });
   }
 
@@ -86,12 +86,13 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     //Arrange
     Expression<Func<string>> valueExpression = () => INITCAP("One little mouse");
 
+    var config = new InsertProperties { EntityName = EntityName, ShouldPluralizeEntityName = false };
     var insertValues = new InsertValues<Movie>(new Movie { Id = 5 });
 
     //Act
     insertValues.WithValue(c => c.Title, valueExpression);
 
-    Context.Add(insertValues);
+    Context.Add(insertValues, config);
 
     var response = await Context.SaveChangesAsync();
 
@@ -138,12 +139,12 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     using var subscription = context.CreateQueryStream<TimeTypes>()
       .Take(1)
       .Subscribe(value =>
-        {
-          receivedValues.Add(value);
-        }, error =>
-        {
-          semaphoreSlim.Release();
-        },
+      {
+        receivedValues.Add(value);
+      }, error =>
+      {
+        semaphoreSlim.Release();
+      },
         () =>
         {
           semaphoreSlim.Release();
@@ -152,7 +153,7 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     var value = new TimeTypes
     {
       Dt = new DateTime(2021, 4, 1),
-      Ts = new TimeSpan(1,2,3),
+      Ts = new TimeSpan(1, 2, 3),
       DtOffset = new DateTimeOffset(2021, 7, 4, 13, 29, 45, 447, TimeSpan.Zero)
       //DtOffset = new DateTimeOffset(2021, 7, 4, 13, 29, 45, 447, TimeSpan.FromHours(4))
     };
@@ -167,17 +168,17 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     response.StatusCode.Should().Be(HttpStatusCode.OK);
     receivedValues[0].Dt.Should().Be(value.Dt);
     receivedValues[0].Ts.Should().Be(value.Ts);
-      
+
     //TODO: rest api bug? missing offset
     //["2021-04-01","01:02:03","2021-07-04T09:29:45.447"]
     //receivedValues[0].DtOffset.Should().Be(value.DtOffset);
 
-//       string json = @"{
-// ""DT"": ""2021-04-01""
-// ,""TS"": ""01:02:03""
-// ,""DTOFFSET"": ""2021-07-04T09:29:45.447""
-// }
-// ";
+    //       string json = @"{
+    // ""DT"": ""2021-04-01""
+    // ,""TS"": ""01:02:03""
+    // ,""DTOFFSET"": ""2021-07-04T09:29:45.447""
+    // }
+    // ";
   }
 
   #endregion
