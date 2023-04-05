@@ -26,7 +26,7 @@ public class KSqlDbRestApiClientTests
   [TestInitialize]
   public void Initialize()
   {
-    var ksqlDbUrl = @"http:\\localhost:8088";
+    var ksqlDbUrl = @"http://localhost:8088";
 
     var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
 
@@ -267,7 +267,7 @@ Drop type Address;
     //Arrange
     string topicName = "testTableAsSelect";
 
-    var contextOptions = new KSqlDBContextOptions(@"http:\\localhost:8088")
+    var contextOptions = new KSqlDBContextOptions(@"http://localhost:8088")
     {
       ShouldPluralizeFromItemName = false
     };
@@ -309,7 +309,7 @@ Drop type Address;
   public async Task TerminatePushQueryAsync()
   {
     //Arrange
-    var contextOptions = new KSqlDBContextOptions(@"http:\\localhost:8088");
+    var contextOptions = new KSqlDBContextOptions(@"http://localhost:8088");
     await using var context = new KSqlDBContext(contextOptions);
       
     var subscription = await context

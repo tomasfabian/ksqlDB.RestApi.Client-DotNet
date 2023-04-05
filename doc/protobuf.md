@@ -25,7 +25,7 @@ using ProtoBuf;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDb.RestApi.Client.ProtoBuf.KSql.Query.Context;
 
-var ksqlDbUrl = @"http:\\localhost:8088";
+var ksqlDbUrl = @"http://localhost:8088";
 
 await using var context = new ProtoBufKSqlDbContext(ksqlDbUrl);
 

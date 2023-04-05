@@ -61,7 +61,7 @@ The above used extension method `ConfigureKSqlDb` registers services behalf of y
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using Microsoft.Extensions.DependencyInjection;
 
-var ksqlDbUrl = @"http:\\localhost:8088";
+var ksqlDbUrl = @"http://localhost:8088";
 
 var serviceCollection = new ServiceCollection();
 

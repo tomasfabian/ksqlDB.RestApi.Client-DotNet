@@ -70,7 +70,7 @@ List of supported operators is [documented here](https://github.com/tomasfabian/
 
 Providing ```IObserver<T>```:
 ```C#
-using var subscription = new KSqlDBContext(@"http:\\localhost:8088")
+using var subscription = new KSqlDBContext(@"http://localhost:8088")
   .CreateQueryStream<Tweet>()
   .Subscribe(new TweetsObserver());
 
@@ -95,7 +95,7 @@ public class TweetsObserver : System.IObserver<Tweet>
 
 Providing ```Action<T> onNext, Action<Exception> onError and Action onCompleted```:
 ```C#
-using var subscription = new KSqlDBContext(@"http:\\localhost:8088")
+using var subscription = new KSqlDBContext(@"http://localhost:8088")
     .CreateQueryStream<Tweet>()
     .Subscribe(
       onNext: tweetMessage =>
@@ -313,7 +313,7 @@ public static async Task ExplainAsync(IKSqlDBContext context)
 
 Generates ksql statement from Create(OrReplace)[Table|Stream]Statements
 ```C#
-await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+await using var context = new KSqlDBContext(@"http://localhost:8088");
 
 var statement = context.CreateOrReplaceTableStatement(tableName: "MoviesByTitle")
   .As<Movie>()
@@ -343,7 +343,7 @@ QueryParameters queryParameters = new QueryParameters
   [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
 };
 
-await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+await using var context = new KSqlDBContext(@"http://localhost:8088");
 
 var moviesSource = context.CreateQuery<Movie>(queryParameters)
   .ToObservable();
@@ -360,7 +360,7 @@ QueryStreamParameters queryStreamParameters = new QueryStreamParameters
   [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
 };
 
-await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+await using var context = new KSqlDBContext(@"http://localhost:8088");
 
 var source = context.CreateQueryStream<Movie>(queryStreamParameters)
   .ToObservable();

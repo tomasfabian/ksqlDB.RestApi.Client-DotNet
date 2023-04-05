@@ -22,7 +22,7 @@ using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.Sample.Models.Movies;
 
-var ksqlDbUrl = @"http:\\localhost:8088";
+var ksqlDbUrl = @"http://localhost:8088";
 var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
 
 await using var context = new KSqlDBContext(contextOptions);
@@ -57,7 +57,7 @@ using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.Sample.Models.Movies;
 
-var ksqlDbUrl = @"http:\\localhost:8088";
+var ksqlDbUrl = @"http://localhost:8088";
 var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
 
 await using var context = new KSqlDBContext(contextOptions);
@@ -81,7 +81,7 @@ In ksqldb you can use the [Http-Basic authentication](https://docs.ksqldb.io/en/
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
 
-string ksqlDbUrl = @"http:\\localhost:8088";
+string ksqlDbUrl = @"http://localhost:8088";
 
 string userName = "fred";
 string password = "letmein";
@@ -114,7 +114,7 @@ using Microsoft.Extensions.Logging;
 ```C#
 var serviceCollection = new ServiceCollection();
 
-var ksqlDbUrl = @"http:\\localhost:8088";
+var ksqlDbUrl = @"http://localhost:8088";
 
 serviceCollection.AddDbContext<ApplicationKSqlDbContext, IApplicationKSqlDbContext>(options =>
   options.UseKSqlDb(ksqlDbUrl), contextLifetime: ServiceLifetime.Transient);
@@ -202,7 +202,7 @@ namespace ksqlDB.Api.Client.Samples
                           })
         .ConfigureServices((hostContext, serviceCollection) =>
                            {
-                             var ksqlDbUrl = @"http:\\localhost:8088";
+                             var ksqlDbUrl = @"http://localhost:8088";
 
                              var setupAction = setupParameters =>
                                                {
@@ -327,7 +327,7 @@ var insertProperties = new InsertProperties
                          IncludeReadOnlyProperties = true
                        };
 
-await using KSqlDBContext context = new KSqlDBContext(@"http:\\localhost:8088");
+await using KSqlDBContext context = new KSqlDBContext(@"http://localhost:8088");
 
 var model = new Foo("Bar") {
   Count = 3
@@ -371,7 +371,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 ```
 ```C#
-var ksqlDbUrl = @"http:\\localhost:8088";
+var ksqlDbUrl = @"http://localhost:8088";
 
 var contextOptions = new KSqlDbContextOptionsBuilder()
   .UseKSqlDb(ksqlDbUrl)

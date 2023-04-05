@@ -9,7 +9,7 @@ Group records in a window. Required by the WINDOW clause. Windowing queries must
 
 Count the number of rows. When * is specified, the count returned will be the total number of rows.
 ```C#
-var ksqlDbUrl = @"http:\\localhost:8088";
+var ksqlDbUrl = @"http://localhost:8088";
 var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
 var context = new KSqlDBContext(contextOptions);
 
@@ -176,7 +176,7 @@ COUNT(Amount) Count
 ```
 
 ```C#
-new KSqlDBContext(@"http:\\localhost:8088").CreateQueryStream<Tweet>()
+new KSqlDBContext(@"http://localhost:8088").CreateQueryStream<Tweet>()
   .GroupBy(c => c.Id)
   .Select(g => new { Id = g.Key, TopK = g.TopKDistinct(c => c.Amount, 4) })
   .Subscribe(onNext: tweetMessage =>
@@ -211,7 +211,7 @@ EARLIEST_BY_OFFSET(col1, earliestN, [ignoreNulls])
 Return the earliest N values for the specified column as an ARRAY. The earliest values
 in the partition have the lowest offsets.
 ```C#
-await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+await using var context = new KSqlDBContext(@"http://localhost:8088");
 
 context.CreateQueryStream<Tweet>()
   .GroupBy(c => c.Id)

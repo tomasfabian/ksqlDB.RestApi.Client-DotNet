@@ -179,7 +179,7 @@ EntityCreationMetadata metadata = new()
   Replicas = 1
 };
 
-var ksqlDbUrl = @"http:\\localhost:8088";
+var ksqlDbUrl = @"http://localhost:8088";
 
 var ksqlDbUri = new Uri(ksqlDbUrl);
 var httpClient = new HttpClient{

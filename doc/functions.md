@@ -117,7 +117,7 @@ FROM tweets EMIT CHANGES;
 ```C#
 bool sorted = true;
       
-var subscription = new KSqlDBContext(@"http:\\localhost:8088")
+var subscription = new KSqlDBContext(@"http://localhost:8088")
   .CreateQueryStream<Movie>()
   .Select(c => new
   {

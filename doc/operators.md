@@ -47,7 +47,7 @@ SELECT *
 **v1.0.0**
 
 ```C#
-using var subscription = new KSqlDBContext(@"http:\\localhost:8088")
+using var subscription = new KSqlDBContext(@"http://localhost:8088")
   .CreateQueryStream<Click>()
   .Where(c => c.IP_ADDRESS != null || c.IP_ADDRESS == null)
   .Select(c => new { c.IP_ADDRESS, c.URL, c.TIMESTAMP });
@@ -133,7 +133,7 @@ var query = context.CreateQueryStream<MyClass>()
 
 - Select a condition from one or more expressions.
 ```C#
-var query = new KSqlDBContext(@"http:\\localhost:8088")
+var query = new KSqlDBContext(@"http://localhost:8088")
   .CreateQueryStream<Tweet>()
   .Select(c =>
     new
@@ -170,7 +170,7 @@ Expression<Func<Person, object>> expression = c => c.FirstName.Length * c.LastNa
 ### Lexical precedence
 You can use parentheses to change the order of evaluation:
 ```C#
-await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+await using var context = new KSqlDBContext(@"http://localhost:8088");
 
 var query = context.CreateQueryStream<Location>()
   .Select(c => (c.Longitude + c.Longitude) * c.Longitude);
@@ -184,7 +184,7 @@ SELECT (Longitude + Longitude) * Longitude
 
 In Where clauses:
 ```C#
-await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+await using var context = new KSqlDBContext(@"http://localhost:8088");
 
 var query = context.CreateQueryStream<Location>()
   .Where(c => (c.Latitude == "1" || c.Latitude != "2") && c.Latitude == "3");

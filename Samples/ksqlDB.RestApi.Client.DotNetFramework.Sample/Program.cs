@@ -36,7 +36,7 @@ namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
 
     public static async Task Main(string[] args)
     {
-      var ksqlDbUrl = @"http:\\localhost:8088";
+      var ksqlDbUrl = @"http://localhost:8088";
 
       var httpClient = new HttpClient()
       {

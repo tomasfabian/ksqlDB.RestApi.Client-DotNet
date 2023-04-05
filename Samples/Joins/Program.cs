@@ -9,7 +9,7 @@ using ksqlDb.RestApi.Client.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Joins.Model.Orders;
 
-const string ksqlDbUrl = @"http:\\localhost:8088";
+const string ksqlDbUrl = @"http://localhost:8088";
 
 await using var context = new KSqlDBContext(ksqlDbUrl);
 
@@ -131,7 +131,7 @@ static IDisposable JoinTables(KSqlDBContext context)
 
 static IQbservable<dynamic> LeftJoin()
 {
-  var query = new KSqlDBContext(@"http:\\localhost:8088").CreateQueryStream<Movie>()
+  var query = new KSqlDBContext(@"http://localhost:8088").CreateQueryStream<Movie>()
     .LeftJoin(
       Source.Of<Lead_Actor>(),
       movie => movie.Title,

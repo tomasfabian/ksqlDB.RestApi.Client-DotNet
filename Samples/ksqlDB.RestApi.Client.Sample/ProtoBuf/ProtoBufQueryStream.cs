@@ -9,7 +9,7 @@ public class ProtoBufQueryStream
 {
   public static async Task StartAsync()
   {
-    var ksqlDbUrl = @"http:\\localhost:8088";
+    var ksqlDbUrl = @"http://localhost:8088";
 
     await using var context = new ProtoBufKSqlDbContext(ksqlDbUrl);
 

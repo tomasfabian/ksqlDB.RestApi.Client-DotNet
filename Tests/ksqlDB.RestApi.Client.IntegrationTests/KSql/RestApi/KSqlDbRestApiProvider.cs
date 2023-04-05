@@ -7,7 +7,7 @@ namespace ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 
 public class KSqlDbRestApiProvider : KSqlDbRestApiClient
 {
-  internal static string KsqlDbUrl { get; } = @"http:\\localhost:8088";
+  internal static string KsqlDbUrl { get; } = @"http://localhost:8088";
 
   public static KSqlDbRestApiProvider Create(string? ksqlDbUrl = null)
   {

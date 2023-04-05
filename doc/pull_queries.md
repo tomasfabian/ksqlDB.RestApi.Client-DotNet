@@ -29,7 +29,7 @@ IKSqlDbRestApiClient restApiClient;
 
 async Task Main()
 {
-  string url = @"http:\\localhost:8088";
+  string url = @"http://localhost:8088";
   await using var context = new KSqlDBContext(url);
 
   var http = new HttpClientFactory(new Uri(url));
@@ -134,7 +134,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Context;
 
 public static async Task<List<OrderData>> GetOrdersAsync()
 {
-  var ksqlDbUrl = @"http:\\localhost:8088";
+  var ksqlDbUrl = @"http://localhost:8088";
   var options = new KSqlDBContextOptions(ksqlDbUrl) { ShouldPluralizeFromItemName = false };
   options.QueryParameters.Properties["ksql.query.pull.table.scan.enabled"] = "true";
 

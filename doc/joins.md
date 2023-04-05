@@ -30,7 +30,7 @@ record Shipment
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 
-var ksqlDbUrl = @"http:\\localhost:8088";
+var ksqlDbUrl = @"http://localhost:8088";
 
 var context = new KSqlDBContext(ksqlDbUrl);
 
@@ -173,7 +173,7 @@ public class Lead_Actor
 ```
 
 ```C#
-var source = new KSqlDBContext(@"http:\\localhost:8088")
+var source = new KSqlDBContext(@"http://localhost:8088")
   .CreateQueryStream<Movie>()
   .FullOuterJoin(
     Source.Of<Lead_Actor>("Actors"),
@@ -203,7 +203,7 @@ SELECT m.Id Id, m.Title Title, m.Release_Year Release_Year, l.Title ActorTitle
 
 LEFT OUTER joins will contain leftRecord-NULL records in the result stream, which means that the join contains NULL values for fields selected from the right-hand stream where no match is made.
 ```C#
-var query = new KSqlDBContext(@"http:\\localhost:8088").CreateQueryStream<Movie>()
+var query = new KSqlDBContext(@"http://localhost:8088").CreateQueryStream<Movie>()
   .LeftJoin(
     Source.Of<Lead_Actor>(),
     movie => movie.Title,

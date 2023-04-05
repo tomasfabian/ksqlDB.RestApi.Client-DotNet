@@ -12,7 +12,7 @@ public class KSqlDbRestApiProvider : KSqlDbRestApiClient, IKSqlDbRestApiProvider
   {
   }
 
-  public static string KsqlDbUrl { get; } = @"http:\\localhost:8088";
+  public static string KsqlDbUrl { get; } = @"http://localhost:8088";
 
   public Task<HttpResponseMessage> DropStreamAndTopic(string streamName)
   {

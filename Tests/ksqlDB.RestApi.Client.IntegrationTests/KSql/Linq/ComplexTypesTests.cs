@@ -21,7 +21,7 @@ public class ComplexTypesTests
   [TestInitialize]
   public void Initialize()
   {
-    var ksqlDbUrl = @"http:\\localhost:8088";
+    var ksqlDbUrl = @"http://localhost:8088";
 
     var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
 

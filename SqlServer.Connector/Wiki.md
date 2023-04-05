@@ -55,7 +55,7 @@ class Program
   static string connectionString = @"Server=127.0.0.1,1433;User Id = SA;Password=<YourNewStrong@Passw0rd>;Initial Catalog = Sensors;MultipleActiveResultSets=true";
 
   static string bootstrapServers = "localhost:29092";
-  static string KsqlDbUrl => @"http:\\localhost:8088";
+  static string KsqlDbUrl => @"http://localhost:8088";
 
   static string tableName = "Sensors";
   static string schemaName = "dbo";
@@ -391,7 +391,7 @@ using System.Reactive;
 using ksqlDb.RestApi.Client.KSql.Query.Context;
 using SqlServer.Connector.Cdc;
 
-await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+await using var context = new KSqlDBContext(@"http://localhost:8088");
 
 context.CreateQuery<RawDatabaseChangeObject<IoTSensor>>("sqlserversensors")
   .Subscribe(new AnonymousObserver<RawDatabaseChangeObject<IoTSensor>>(dco =>
@@ -471,7 +471,7 @@ class Program
   static string connectionString = @"Server=127.0.0.1,1433;User Id = SA;Password=<YourNewStrong@Passw0rd>;Initial Catalog = Sensors;MultipleActiveResultSets=true";
 
   static string bootstrapServers = "localhost:29092";
-  static string KsqlDbUrl => @"http:\\localhost:8088";
+  static string KsqlDbUrl => @"http://localhost:8088";
 
   static string tableName = "Sensors";
   static string schemaName = "dbo";

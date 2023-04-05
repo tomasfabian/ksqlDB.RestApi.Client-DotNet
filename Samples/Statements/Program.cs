@@ -10,12 +10,8 @@ using System.Reactive.Concurrency;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Topics;
 using Statements.Model;
 using Statements.Model.Events;
-using ksqlDB.RestApi.Client.KSql.Linq.Statements;
-using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
-using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
-using Statements.Model.Movies;
 
-const string ksqlDbUrl = @"http:\\localhost:8088";
+const string ksqlDbUrl = @"http://localhost:8088";
 
 var servicesCollection = new ServiceCollection();
 servicesCollection.ConfigureKSqlDb(ksqlDbUrl);

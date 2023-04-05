@@ -23,7 +23,7 @@ var latestSchema = await schemaRegistry.GetLatestSchemaAsync(subject);
 
 Console.WriteLine($"Latest schema: {latestSchema}");
 
-var ksqlDbUrl = @"http:\\localhost:8088";
+var ksqlDbUrl = @"http://localhost:8088";
 
 var httpClient = new HttpClient()
 {

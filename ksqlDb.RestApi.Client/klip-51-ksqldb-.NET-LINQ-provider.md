@@ -54,7 +54,7 @@ namespace Example
   public class Program
   {
     private static async Task Main() {
-      var ksqlDbUrl = @"http:\\localhost:8088";
+      var ksqlDbUrl = @"http://localhost:8088";
 
       var contextOptions = new KSqlDbContextOptionsBuilder()
         .UseKSqlDb(ksqlDbUrl)

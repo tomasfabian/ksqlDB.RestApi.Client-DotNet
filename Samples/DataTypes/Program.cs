@@ -12,7 +12,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
 
-const string ksqlDbUrl = @"http:\\localhost:8088";
+const string ksqlDbUrl = @"http://localhost:8088";
 
 var servicesCollection = new ServiceCollection();
 servicesCollection.ConfigureKSqlDb(ksqlDbUrl);

@@ -32,7 +32,7 @@ using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 
-var ksqlDbUrl = @"http:\\localhost:8088";
+var ksqlDbUrl = @"http://localhost:8088";
 
 var contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
 {
@@ -91,7 +91,7 @@ EntityCreationMetadata metadata = new()
 
 var httpClient = new HttpClient()
 {
-  BaseAddress = new Uri(@"http:\\localhost:8088")
+  BaseAddress = new Uri(@"http://localhost:8088")
 };
 
 var httpClientFactory = new HttpClientFactory(httpClient);
@@ -190,7 +190,7 @@ Default settings:
 'auto.offset.reset' is set to 'earliest' by default. 
 New parameters could be added or existing ones changed in the following manner:
 ```C#
-var contextOptions = new KSqlDBContextOptions(@"http:\\localhost:8088");
+var contextOptions = new KSqlDBContextOptions(@"http://localhost:8088");
 
 contextOptions.QueryStreamParameters["auto.offset.reset"] = "latest";
 ```
@@ -208,7 +208,7 @@ FROM People
 ```
 This can be disabled:
 ```C#
-var contextOptions = new KSqlDBContextOptions(@"http:\\localhost:8088")
+var contextOptions = new KSqlDBContextOptions(@"http://localhost:8088")
 {
   ShouldPluralizeFromItemName = false
 };
@@ -241,7 +241,7 @@ using ksqlDB.RestApi.Client.Sensors.KSqlDb;
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
-      var ksqlDbUrl = @"http:\\localhost:8088";
+      var ksqlDbUrl = @"http://localhost:8088";
 
       services.AddDbContext<ISensorsKSqlDbContext, SensorsKSqlDbContext>(
         options =>

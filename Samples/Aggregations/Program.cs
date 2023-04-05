@@ -8,7 +8,7 @@ using System.Reactive.Disposables;
 using Aggregations.KSqlDbContext;
 using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
 
-const string ksqlDbUrl = @"http:\\localhost:8088";
+const string ksqlDbUrl = @"http://localhost:8088";
 
 var host = Host.CreateDefaultBuilder(args)
   .ConfigureLogging((hostingContext, logging) =>
@@ -80,7 +80,7 @@ static IDisposable Having(IKSqlDBContext context)
 
 static async Task GroupBy()
 {
-  var ksqlDbUrl = @"http:\\localhost:8088";
+  var ksqlDbUrl = @"http://localhost:8088";
   var contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
   {
     QueryStreamParameters =

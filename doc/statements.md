@@ -48,7 +48,7 @@ record Order
 ```
 
 ```C#
-var ksqlDbUrl = @"http:\\localhost:8088";
+var ksqlDbUrl = @"http://localhost:8088";
 
 var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
 
@@ -82,7 +82,7 @@ var testEvent = new EventWithList
   Places = new List<int> { 1, 2, 3 }
 };
 
-var ksqlDbUrl = @"http:\\localhost:8088";
+var ksqlDbUrl = @"http://localhost:8088";
 
 var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
 
@@ -139,7 +139,7 @@ ARRAY_REMOVE(ARRAY[0], 0))
 
 [Insert values](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/insert-values/) - Produce a row into an existing stream or table and its underlying topic based on explicitly specified values.
 ```C#
-string url = @"http:\\localhost:8088";
+string url = @"http://localhost:8088";
 
 var http = new HttpClientFactory(new Uri(url));
 var restApiClient = new KSqlDbRestApiClient(http);
@@ -475,7 +475,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 public async Task CreateGetAndDropConnectorAsync()
 {
-  var ksqlDbUrl = @"http:\\localhost:8088";
+  var ksqlDbUrl = @"http://localhost:8088";
 
   var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
 
@@ -527,7 +527,7 @@ using ksqlDB.RestApi.Client.Sample.Models.Events;
 
 private static async Task SubscriptionToAComplexTypeAsync()
 {      
-  var ksqlDbUrl = @"http:\\localhost:8088";
+  var ksqlDbUrl = @"http://localhost:8088";
 
   var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
   var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
@@ -610,7 +610,7 @@ DROP TYPE IF EXISTS EventCategory;
 Drops an existing stream.
 
 ```C#
-var ksqlDbUrl = @"http:\\localhost:8088";
+var ksqlDbUrl = @"http://localhost:8088";
 
 var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
 var ksqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory);
@@ -705,7 +705,7 @@ TERMINATE xyz123;
 Drops an existing table.
 
 ```C#
-var ksqlDbUrl = @"http:\\localhost:8088";
+var ksqlDbUrl = @"http://localhost:8088";
 
 var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
 var ksqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory);
@@ -835,7 +835,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 public async Task ExecuteStatementAsync()
 {
-  var ksqlDbUrl = @"http:\\localhost:8088";
+  var ksqlDbUrl = @"http://localhost:8088";
 
   var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
 
@@ -918,7 +918,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Context;
 
 public static async Task Main(string[] args)
 {
-  await using var context = new KSqlDBContext(@"http:\\localhost:8088");
+  await using var context = new KSqlDBContext(@"http://localhost:8088");
   await CreateOrReplaceTableStatement(context);
 }
 
@@ -966,7 +966,7 @@ EntityCreationMetadata metadata = new()
   Replicas = 1
 };
 
-string url = @"http:\\localhost:8088";
+string url = @"http://localhost:8088";
 
 var httpClientFactory = new HttpClientFactory(new Uri(url));
 var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
@@ -1010,7 +1010,7 @@ EntityCreationMetadata metadata = new()
   Replicas = 3
 };
 
-string url = @"http:\\localhost:8088";
+string url = @"http://localhost:8088";
 
 var httpClientFactory = new HttpClientFactory(new Uri(url));
 var restApiClient = new KSqlDbRestApiClient(httpClientFactory);

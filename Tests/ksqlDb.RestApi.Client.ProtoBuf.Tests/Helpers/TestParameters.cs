@@ -2,5 +2,5 @@
 
 public static class TestParameters
 {
-  public const string KsqlDbUrl = @"http:\\localhost:8088";
+  public const string KsqlDbUrl = @"http://localhost:8088";
 }

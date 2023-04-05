@@ -10,7 +10,7 @@ namespace ksqlDB.RestApi.Client.DotNetFramework.Sample.Providers;
 
 public class KSqlDbRestApiProvider : KSqlDbRestApiClient, IKSqlDbRestApiProvider
 {
-  public static string KsqlDbUrl { get; } = @"http:\\localhost:8088";
+  public static string KsqlDbUrl { get; } = @"http://localhost:8088";
 
   public static KSqlDbRestApiProvider Create(string? ksqlDbUrl = null)
   {

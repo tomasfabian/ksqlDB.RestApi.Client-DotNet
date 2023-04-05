@@ -15,7 +15,7 @@ internal class SensorsPullQueryProvider
 
   public async Task ExecuteAsync()
   {
-    string url = @"http:\\localhost:8088";
+    string url = @"http://localhost:8088";
     await using var context = new KSqlDBContext(url);
 
     var http = new HttpClientFactory(new Uri(url));

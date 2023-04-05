@@ -249,7 +249,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
     response = await RestApiProvider.CreateTableAsync<Payment>(OrderEntityCreationMetadata with { KafkaTopic = nameof(Payment) + "-TestJoin" }, ifNotExists: true);
     response = await RestApiProvider.CreateTableAsync<Shipment>(OrderEntityCreationMetadata with { KafkaTopic = nameof(Shipment) + "-TestJoin" }, ifNotExists: true);
 
-    var ksqlDbUrl = @"http:\\localhost:8088";
+    var ksqlDbUrl = @"http://localhost:8088";
 
     var context = new KSqlDBContext(ksqlDbUrl);
 
@@ -304,7 +304,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
 
     var response = await RestApiProvider.CreateStreamAsync<Payment>(entityCreationMetadata, ifNotExists: true);
 
-    var ksqlDbUrl = @"http:\\localhost:8088";
+    var ksqlDbUrl = @"http://localhost:8088";
 
     var context = new KSqlDBContext(ksqlDbUrl);
 
@@ -353,7 +353,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
     var entityCreationMetadata = new EntityCreationMetadata(nameof(PaymentExt) + "-TestJoin", partitions: 1);
     response = await RestApiProvider.CreateTableAsync<PaymentExt>(entityCreationMetadata, ifNotExists: true);
 
-    var ksqlDbUrl = @"http:\\localhost:8088";
+    var ksqlDbUrl = @"http://localhost:8088";
 
     var context = new KSqlDBContext(ksqlDbUrl);
       

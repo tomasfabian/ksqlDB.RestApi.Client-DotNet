@@ -21,7 +21,7 @@ public class PullQueryExample
 
   public async Task ExecuteAsync()
   {
-    string ksqlDbUrl = @"http:\\localhost:8088";
+    string ksqlDbUrl = @"http://localhost:8088";
 
     var contextOptions = new KSqlDbContextOptionsBuilder()
       .UseKSqlDb(ksqlDbUrl)
