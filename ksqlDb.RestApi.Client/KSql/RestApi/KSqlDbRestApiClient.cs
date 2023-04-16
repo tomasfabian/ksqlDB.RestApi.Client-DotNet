@@ -399,9 +399,9 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 
     var httpResponseMessage = await ExecuteStatementAsync(ksqlDbStatement, cancellationToken).ConfigureAwait(false);
 
-    var streamsResponses = await httpResponseMessage.ToTablesResponseAsync().ConfigureAwait(false);
+    var responses = await httpResponseMessage.ToTablesResponseAsync().ConfigureAwait(false);
 
-    return streamsResponses;
+    return responses;
   }
 
   #region Topics
