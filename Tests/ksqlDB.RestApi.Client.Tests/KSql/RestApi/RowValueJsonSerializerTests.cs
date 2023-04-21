@@ -196,7 +196,7 @@ public class RowValueJsonSerializerTests : TestBase
 
     ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
 
-    string rawJson = "[2,\"Die Hard\",1998,1670438716925]";
+    string rawJson = "[2,\"Die Hard\",1988,1670438716925]";
     var jsonSerializationOptions = KSqlDbJsonSerializerOptions.CreateInstance();
 
     //Act
