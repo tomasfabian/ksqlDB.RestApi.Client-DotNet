@@ -381,16 +381,16 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     CreateHttpMocks(GetAllStreamsResponse);
 
     //Act
-    var queriesResponses = await ClassUnderTest.GetStreamsAsync();
+    var streamsResponses = await ClassUnderTest.GetStreamsAsync();
 
     //Assert
     var expectedContent = GetExpectedContent(StatementTemplates.ShowStreams);
       
     VerifySendAsync(expectedContent);
 
-    queriesResponses[0].StatementText.Should().Be(StatementTemplates.ShowStreams);
+    streamsResponses[0].StatementText.Should().Be(StatementTemplates.ShowStreams);
 
-    queriesResponses[0].Streams.Length.Should().Be(2);
+    streamsResponses[0].Streams.Length.Should().Be(2);
   }
 
   private string GetAllTablesResponse => @"[{""@type"":""tables"",""statementText"":""SHOW TABLES;"",""tables"":[{""type"":""TABLE"",""name"":""AVG_SENSOR_VALUES"",""topic"":""AVG_SENSOR_VALUES"",""keyFormat"":""KAFKA"",""valueFormat"":""JSON"",""isWindowed"":true},{""type"":""TABLE"",""name"":""MYMOVIESTABLES"",""topic"":""MyMoviesTable"",""keyFormat"":""JSON"",""valueFormat"":""JSON"",""isWindowed"":true}],""warnings"":[]}]";
@@ -402,16 +402,16 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     CreateHttpMocks(GetAllTablesResponse);
 
     //Act
-    var queriesResponses = await ClassUnderTest.GetTablesAsync();
+    var tablesResponses = await ClassUnderTest.GetTablesAsync();
 
     //Assert
     var expectedContent = GetExpectedContent(StatementTemplates.ShowTables);
       
     VerifySendAsync(expectedContent);
 
-    queriesResponses[0].StatementText.Should().Be(StatementTemplates.ShowTables);
+    tablesResponses[0].StatementText.Should().Be(StatementTemplates.ShowTables);
 
-    queriesResponses[0].Tables.Length.Should().Be(2);
+    tablesResponses[0].Tables.Length.Should().Be(2);
   }
 
   [TestMethod]
