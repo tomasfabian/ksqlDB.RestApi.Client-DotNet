@@ -1,5 +1,4 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDb.RestApi.Client.DependencyInjection;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Config;
@@ -8,27 +7,24 @@ using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using UnitTests;
+using NUnit.Framework;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
+using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDB.Api.Client.Tests.DependencyInjection;
 
-[TestClass]
-public class KSqlDbServiceCollectionExtensionsTests : TestBase
+public class KSqlDbServiceCollectionExtensionsTests
 {
   private ServiceCollection ClassUnderTest { get; set; } = null!;
 
-  [TestInitialize]
-  public override void TestInitialize()
+  [SetUp]
+  public void Setup()
   {
-    base.TestInitialize();
-
     ClassUnderTest = new ServiceCollection();
   }
 
-  [TestMethod]
+  [Test]
   public void ConfigureKSqlDb_IKSqlDBContext()
   {
     //Arrange
@@ -43,7 +39,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
     descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
   }
 
-  [TestMethod]
+  [Test]
   public void ConfigureKSqlDb_SetupParametersAction()
   {
     //Arrange
@@ -61,7 +57,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
     descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
   }
 
-  [TestMethod]
+  [Test]
   public void ConfigureKSqlDb_BuildServiceProviderAndResolve()
   {
     //Arrange
@@ -78,7 +74,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
     context?.ContextOptions.QueryStreamParameters[KSqlDbConfigs.ProcessingGuarantee].ToProcessingGuarantee().Should().Be(ProcessingGuarantee.AtLeastOnce);
   }
 
-  [TestMethod]
+  [Test]
   public void ConfigureKSqlDb_IKSqlDbRestApiClient()
   {
     //Arrange
@@ -93,7 +89,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
     descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
   }
 
-  [TestMethod]
+  [Test]
   public void ConfigureKSqlDb_BuildServiceProviderAndResolve_IKSqlDbRestApiClient()
   {
     //Arrange
@@ -106,7 +102,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
     kSqlDbRestApiClient.Should().NotBeNull();
   }
 
-  [TestMethod]
+  [Test]
   public void ConfigureKSqlDb_IHttpClientFactory()
   {
     //Arrange
@@ -121,7 +117,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
     descriptor.Lifetime.Should().Be(ServiceLifetime.Transient);
   }
 
-  [TestMethod]
+  [Test]
   public void ConfigureKSqlDb_KSqlDBContextOptions()
   {
     //Arrange
@@ -136,7 +132,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
     descriptor.Lifetime.Should().Be(ServiceLifetime.Singleton);
   }
 
-  [TestMethod]
+  [Test]
   public void ConfigureKSqlDb_BuildServiceProviderAndResolve_IHttpClientFactory()
   {
     //Arrange
@@ -149,7 +145,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
     httpClientFactory.Should().NotBeNull();
   }
 
-  [TestMethod]
+  [Test]
   public void ConfigureKSqlDb_BuildServiceProviderAndResolve_KSqlDBContextOptions()
   {
     //Arrange
@@ -165,7 +161,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
 
   #region AddDbContext
 
-  [TestMethod]
+  [Test]
   public void AddDbContext_RegisterAsInterface()
   {
     //Arrange
@@ -178,7 +174,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
     context.Should().NotBeNull();
   }
     
-  [TestMethod]
+  [Test]
   public void AddDbContext_KSqlDBContext_DefaultLifetimeIsScoped()
   {
     //Arrange
@@ -192,7 +188,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
     descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
   }
     
-  [TestMethod]
+  [Test]
   public void AddDbContext_KSqlDBContext_ContextLifetimeChangedToTransientScope()
   {
     //Arrange
@@ -211,7 +207,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
   }
 
 
-  [TestMethod]
+  [Test]
   public void AddDbContext_IKSqlDbRestApiClient_DefaultLifetimeIsScoped()
   {
     //Arrange
@@ -225,7 +221,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
     descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
   }
 
-  [TestMethod]
+  [Test]
   public void AddDbContext_RestApiLifetimeChangedToTransientScope()
   {
     //Arrange
@@ -247,20 +243,21 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
     
   #region ContextFactory
 
-  [TestMethod]
-  [ExpectedException(typeof(InvalidOperationException))]
+  [Test]
   public void AddDbContextFactory_DbContextWasNotRegistered_Throws()
   {
     //Arrange
     ClassUnderTest.AddDbContextFactory<IKSqlDBContext>(factoryLifetime: ServiceLifetime.Scoped);
 
-    //Act
-    var context = ClassUnderTest.BuildServiceProvider().GetRequiredService<IKSqlDBContext>();
-
     //Assert
+    Assert.Throws<InvalidOperationException>(() =>
+    {
+      //Act
+      var context = ClassUnderTest.BuildServiceProvider().GetRequiredService<IKSqlDBContext>();
+    });
   }
 
-  [TestMethod]
+  [Test]
   public void ConfigureKSqlDb_AddDbContextFactory_DbContextWasRegistered()
   {
     //Arrange
@@ -274,7 +271,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
     context.Should().NotBeNull();
   }
 
-  [TestMethod]
+  [Test]
   public void AddDbContextFactory_BuildServiceProviderAndResolve()
   {
     //Arrange
@@ -288,7 +285,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
     contextFactory.Should().NotBeNull();
   }
 
-  [TestMethod]
+  [Test]
   public void ContextFactory_Create()
   {
     //Arrange
@@ -306,7 +303,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
     context1.Should().NotBeSameAs(context2);
   }
 
-  [TestMethod]
+  [Test]
   public void AddDbContextFactory_Scope()
   {
     //Arrange
@@ -323,7 +320,7 @@ public class KSqlDbServiceCollectionExtensionsTests : TestBase
 
   #endregion
 
-  [TestMethod]
+  [Test]
   public void ReplaceHttpClient_HttpClientUriAndTimeoutWereSet()
   {
     //Arrange

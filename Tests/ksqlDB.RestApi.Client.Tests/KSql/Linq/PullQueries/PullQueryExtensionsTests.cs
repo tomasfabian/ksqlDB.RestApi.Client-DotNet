@@ -1,14 +1,13 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.Models.Sensors;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
+using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Linq.PullQueries;
 
-[TestClass]
 public class PullQueryExtensionsTests : TestBase
 {
   private TestableDbProvider DbProvider { get; set; } = null!;
@@ -16,15 +15,13 @@ public class PullQueryExtensionsTests : TestBase
   protected virtual string PullQueryResponse { get; set; } = @"[{""header"":{""queryId"":""query_1619945627639"",""schema"":""`SENSORID` STRING KEY, `WINDOWSTART` BIGINT KEY, `WINDOWEND` BIGINT KEY, `AVGVALUE` DOUBLE""}},
 {""row"":{""columns"":[""sensor-1"",1619859745000,1619859750000,11.0]}},";
 
-  [TestInitialize]
-  public override void TestInitialize()
+  [SetUp]
+  public void SetUp()
   {
-    base.TestInitialize();
-      
     DbProvider = new TestableDbProvider(TestParameters.KsqlDBUrl, PullQueryResponse);
   }
 
-  [TestMethod]
+  [Test]
   public async Task CreatePullQuery()
   {
     //Arrange
@@ -40,7 +37,7 @@ public class PullQueryExtensionsTests : TestBase
     result.SensorId.Should().Be(sensorId);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectColumns()
   {
     //Arrange
@@ -57,7 +54,7 @@ public class PullQueryExtensionsTests : TestBase
 WHERE SensorId = '{sensorId}';");
   }
 
-  [TestMethod]
+  [Test]
   public void CreatePullQuery_ToQueryString()
   {
     //Arrange
@@ -78,7 +75,7 @@ WHERE SensorId = '{sensorId}';");
 
   private const string MaterializedViewName = "TestViews";
 
-  [TestMethod]
+  [Test]
   public void CreatePullQuery_TableNameWasOverriden()
   {
     //Arrange
@@ -94,7 +91,7 @@ WHERE SensorId = '{sensorId}';");
 WHERE SensorId = '{sensorId}';");
   }
 
-  [TestMethod]
+  [Test]
   public void CreatePullQuery_WindowBounds_LongTypeDateFormat()
   {
     //Arrange
@@ -113,7 +110,7 @@ WHERE SensorId = '{sensorId}';");
 WHERE SensorId = '{sensorId}' AND (WINDOWSTART > {windowStart}) AND (WINDOWEND <= {windowEnd});");
   }
 
-  [TestMethod]
+  [Test]
   public void CreatePullQuery_WindowBounds_StringTypeDateFormat()
   {
     //Arrange
@@ -132,7 +129,7 @@ WHERE SensorId = '{sensorId}' AND (WINDOWSTART > {windowStart}) AND (WINDOWEND <
 WHERE SensorId = '{sensorId}' AND (WINDOWSTART > '{windowStart}') AND (WINDOWEND <= '{windowEnd}');");
   }
 
-  [TestMethod]
+  [Test]
   public void Take()
   {
     //Arrange

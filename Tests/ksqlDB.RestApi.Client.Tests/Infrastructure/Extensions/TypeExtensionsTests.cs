@@ -6,14 +6,13 @@ using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.Tests.Infrastructure.Extensions;
 
-[TestClass]
 public class TypeExtensionsTests
 {
-  [TestMethod]
+  [Test]
   public void IsAnonymousType()
   {
     //Arrange
@@ -26,7 +25,7 @@ public class TypeExtensionsTests
     isAnonymousType.Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public void IsAnonymousType_Class_ReturnsFalse()
   {
     //Arrange
@@ -39,7 +38,7 @@ public class TypeExtensionsTests
     isAnonymousType.Should().BeFalse();
   }
 
-  [TestMethod]
+  [Test]
   public void TryFindProviderAncestor()
   {
     //Arrange
@@ -52,7 +51,7 @@ public class TypeExtensionsTests
     providerAncestorType.Should().Be(typeof(KSet));
   }
 
-  [TestMethod]
+  [Test]
   public void IsStruct()
   {
     //Arrange
@@ -65,7 +64,7 @@ public class TypeExtensionsTests
     typeDefinition.Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public void IsStruct_PrimitiveType_ReturnsFalse()
   {
     //Arrange
@@ -80,7 +79,7 @@ public class TypeExtensionsTests
 
   enum TestTypes{}
 
-  [TestMethod]
+  [Test]
   public void IsStruct_EnumType_ReturnsFalse()
   {
     //Arrange
@@ -93,7 +92,7 @@ public class TypeExtensionsTests
     typeDefinition.Should().BeFalse();
   }
 
-  [TestMethod]
+  [Test]
   public void IsDictionary()
   {
     //Arrange
@@ -106,7 +105,7 @@ public class TypeExtensionsTests
     typeDefinition.Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public void IsList()
   {
     //Arrange
@@ -119,7 +118,7 @@ public class TypeExtensionsTests
     typeDefinition.Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public void IsList_Interface()
   {
     //Arrange
@@ -132,7 +131,7 @@ public class TypeExtensionsTests
     typeDefinition.Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public void IsList_PrimitiveType_ReturnsFalse()
   {
     //Arrange
@@ -145,7 +144,7 @@ public class TypeExtensionsTests
     typeDefinition.Should().BeFalse();
   }
 
-  [TestMethod]
+  [Test]
   public void HasKey_PropertyIsNotAnnotatedWithAKeyAttribute_ReturnsFalse()
   {
     //Arrange
@@ -166,7 +165,7 @@ public class TypeExtensionsTests
     public int Value { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public void HasKey()
   {
     //Arrange
@@ -181,7 +180,7 @@ public class TypeExtensionsTests
 
   #region GetEnumerableTypeDefinition
     
-  [TestMethod]
+  [Test]
   public void GetEnumerableTypeDefinition_FindsEnumerableType()
   {
     //Arrange
@@ -207,7 +206,7 @@ public class TypeExtensionsTests
     }
   }
 
-  [TestMethod]
+  [Test]
   public void GetEnumerableTypeDefinition_EnumerableOfStringBaseType_FindsEnumerableType()
   {
     //Arrange
@@ -224,7 +223,7 @@ public class TypeExtensionsTests
   {
   }
 
-  [TestMethod]
+  [Test]
   public void GetEnumerableTypeDefinition_ListBaseType_FindsEnumerableType()
   {
     //Arrange
@@ -237,7 +236,7 @@ public class TypeExtensionsTests
     typeDefinition.Should().Contain(typeof(IEnumerable<string>));
   }
 
-  [TestMethod]
+  [Test]
   public void GetEnumerableTypeDefinition_ReturnsNullForNonEnumerableTypes()
   {
     //Arrange
@@ -250,7 +249,7 @@ public class TypeExtensionsTests
     typeDefinition.Should().BeEmpty();
   }
 
-  [TestMethod]
+  [Test]
   public void GetEnumerableOfStringTypeDefinition_FindsEnumerableType()
   {
     //Arrange
@@ -263,7 +262,7 @@ public class TypeExtensionsTests
     typeDefinitions.Should().Contain(typeof(IEnumerable<string>));
   }
 
-  [TestMethod]
+  [Test]
   public void GetEnumerableOfStringTypeDefinition_IList_FindsEnumerableType()
   {
     //Arrange
@@ -276,7 +275,7 @@ public class TypeExtensionsTests
     typeDefinitions.Should().Contain(typeof(IEnumerable<string>));
   }
 
-  [TestMethod]
+  [Test]
   public void GetEnumerableOfStringTypeDefinition_List_FindsEnumerableType()
   {
     //Arrange
@@ -291,7 +290,7 @@ public class TypeExtensionsTests
 
   #endregion
 
-  [TestMethod]
+  [Test]
   public void IsKsqlGrouping_List_FindsEnumerableType()
   {
     //Arrange
@@ -304,7 +303,7 @@ public class TypeExtensionsTests
     isKsqlGrouping.Should().BeFalse();
   }
 
-  [TestMethod]
+  [Test]
   public void IsKsqlGrouping_KsqlGrouping_ReturnsTrue()
   {
     //Arrange
@@ -317,7 +316,7 @@ public class TypeExtensionsTests
     isKsqlGrouping.Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public void ExtractName_Type()
   {
     //Arrange
@@ -330,7 +329,7 @@ public class TypeExtensionsTests
     name.Should().Be(nameof(TestList));
   }
 
-  [TestMethod]
+  [Test]
   public void ExtractName_GenericType()
   {
     //Arrange
@@ -343,7 +342,7 @@ public class TypeExtensionsTests
     name.Should().Be("List");
   }
 
-  [TestMethod]
+  [Test]
   public void TryGetAttribute()
   {
     //Arrange
@@ -365,7 +364,7 @@ public class TypeExtensionsTests
     public string Title { get; set; } = null!;
   }
 
-  [TestMethod]
+  [Test]
   public void GetMemberName()
   {
     //Arrange
@@ -379,7 +378,7 @@ public class TypeExtensionsTests
     memberName.Should().Be(nameof(MySensor.Title));
   }
 
-  [TestMethod]
+  [Test]
   public void GetMemberName_JsonPropertyNameOverride()
   {
     //Arrange
