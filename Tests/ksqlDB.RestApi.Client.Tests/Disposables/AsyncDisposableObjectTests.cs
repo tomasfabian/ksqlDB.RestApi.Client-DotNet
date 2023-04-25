@@ -1,14 +1,14 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Disposables;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace ksqlDB.Api.Client.Tests.Disposables;
 
-[TestClass]
 public class AsyncDisposableObjectTests : TestBase<AsyncDisposableObjectTests.TestableAsyncDisposableObject>
 {
-  [TestInitialize]
+  // [TestInitialize]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -16,7 +16,7 @@ public class AsyncDisposableObjectTests : TestBase<AsyncDisposableObjectTests.Te
     ClassUnderTest = new TestableAsyncDisposableObject();
   }
 
-  [TestMethod]
+  [Test]
   public async Task InitializeAsync_HasBeenInitialized()
   {
     //Arrange
@@ -28,20 +28,18 @@ public class AsyncDisposableObjectTests : TestBase<AsyncDisposableObjectTests.Te
     ClassUnderTest.HasBeenInitialized.Should().BeTrue();
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(ObjectDisposedException))]
+  [Test]
   public async Task InitializeAsyncDisposed_Throws()
   {
     //Arrange
     await ClassUnderTest.DisposeAsync().ConfigureAwait(false);
 
-    //Act
-    await ClassUnderTest.InitializeAsync();
 
     //Assert
+    await Assert.ThrowsExceptionAsync<ObjectDisposedException>(() => ClassUnderTest.InitializeAsync());
   }
     
-  [TestMethod]
+  [Test]
   public async Task InitializeAsyncDisposed_IsCancellationRequested()
   {
     //Arrange
@@ -54,7 +52,7 @@ public class AsyncDisposableObjectTests : TestBase<AsyncDisposableObjectTests.Te
     ClassUnderTest.CancellationToken.IsCancellationRequested.Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public async Task MultipleInitializeAsync_InitializedOnce()
   {
     //Arrange
@@ -67,7 +65,7 @@ public class AsyncDisposableObjectTests : TestBase<AsyncDisposableObjectTests.Te
     ClassUnderTest.InitializationCounter.Should().Be(1);
   }
 
-  [TestMethod]
+  [Test]
   public async Task DisposeAsync_IsDisposed()
   {
     //Arrange

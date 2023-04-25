@@ -1,5 +1,4 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.KSql.Query.Context;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -10,16 +9,17 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Reactive.Testing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using NUnit.Framework;
 using UnitTests;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
+using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Linq;
 
-[TestClass]
 public class QbservableExtensionsTests : TestBase
 {
-  [TestMethod]
+  [Test]
   public void SelectConstant_BuildKSql_PrintsConstant()
   {
     //Arrange
@@ -35,7 +35,7 @@ public class QbservableExtensionsTests : TestBase
 
   #region OperatorPrecedence
 
-  [TestMethod]
+  [Test]
   public void PlusOperatorPrecedence_BuildKSql_PrintsParentheses()
   {
     //Arrange
@@ -49,7 +49,7 @@ public class QbservableExtensionsTests : TestBase
     ksql.Should().BeEquivalentTo(@$"SELECT ({nameof(Location.Longitude)} + {nameof(Location.Longitude)}) * {nameof(Location.Longitude)} FROM Locations EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void OperatorPrecedence_BuildKSql_PrintsParentheses()
   {
     //Arrange
@@ -63,7 +63,7 @@ public class QbservableExtensionsTests : TestBase
     ksql.Should().BeEquivalentTo(@$"SELECT {nameof(Location.Longitude)} + ({nameof(Location.Longitude)} * {nameof(Location.Longitude)}) FROM Locations EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void OperatorPrecedenceTwoAliases_BuildKSql_PrintsParentheses()
   {
     //Arrange
@@ -79,7 +79,7 @@ public class QbservableExtensionsTests : TestBase
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
     
-  [TestMethod]
+  [Test]
   public void OperatorPrecedenceInWhereClause_NoOrder_BuildKSql_PrintsParentheses()
   {
     //Arrange
@@ -98,7 +98,7 @@ WHERE ({columnName} = '1') OR (({columnName} != '2') AND ({columnName} = '3')) E
     ksql.Should().BeEquivalentTo(expected);
   }    
 
-  [TestMethod]
+  [Test]
   public void OperatorPrecedenceInWhereClause_BuildKSql_PrintsParentheses()
   {
     //Arrange
@@ -117,7 +117,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
 
   #endregion
 
-  [TestMethod]
+  [Test]
   public void SelectConstants_BuildKSql_PrintsConstants()
   {
     //Arrange
@@ -131,7 +131,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     ksql.Should().Be("SELECT 'Hello world' Message, 23 Age FROM Locations EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void ToQueryString_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -153,7 +153,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     public int B { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public void ToQueryString_TransformWithNestedStruct()
   {
     //Arrange
@@ -173,7 +173,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     ksql.Should().Be("SELECT TRANSFORM(MAP('a' := STRUCT(A := 1, B := 2)), (k, v) => UCASE(k), (k, v) => v->A + 1) Dict FROM Locations EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void ToQueryString_CalledTwice_PrintsSameQuery()
   {
     //Arrange
@@ -221,7 +221,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     }    
   }
 
-  [TestMethod]
+  [Test]
   public void ToQueryString_BuildKSqlOnDerivedClass_PrintsQuery()
   {
     //Arrange
@@ -235,7 +235,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM Tweets EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public async Task ToAsyncEnumerable_Query_KSqldbProviderRunWasCalled()
   {
     //Arrange
@@ -253,7 +253,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     await asyncEnumerable.GetAsyncEnumerator().DisposeAsync();
   }
 
-  [TestMethod]
+  [Test]
   public async Task ToAsyncEnumerable_Enumerate_ValuesWereReceived()
   {
     //Arrange
@@ -270,7 +270,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     wasValueReceived.Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public void ToObservable_QueryShouldBeDeferred_KSqlDbProviderRunWasNotCalled()
   {
     //Arrange
@@ -287,7 +287,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()), Times.Never);
   }
 
-  [TestMethod]
+  [Test]
   public void ToObservable_DisposeSubscription()
   {
     //Arrange
@@ -316,7 +316,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     await Task.CompletedTask;
   }
 
-  [TestMethod]
+  [Test]
   public void Subscribe_BuildKSql_ObservesItems()
   {
     //Arrange
@@ -338,7 +338,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     Assert.AreEqual(2, results.Count);
   }
 
-  [TestMethod]
+  [Test]
   public async Task SubscribeAsync_ObservesItems()
   {
     //Arrange
@@ -361,7 +361,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     subscription.QueryId.Should().Be("xyz");
   }
 
-  [TestMethod]
+  [Test]
   public void Source_SchedulersAreNotSet()
   {
     //Arrange
@@ -374,7 +374,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     ((KStreamSet)source).ObserveOnScheduler.Should().BeNull();
   }
 
-  [TestMethod]
+  [Test]
   public void SubscribeOn_SetsSubscribeOnScheduler()
   {
     //Arrange
@@ -389,7 +389,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     ((KStreamSet)source).SubscribeOnScheduler.Should().Be(testScheduler);
   }
 
-  [TestMethod]
+  [Test]
   public void ObserveOn_SetsObserveOnScheduler()
   {
     //Arrange
@@ -426,7 +426,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     return context.CreateQueryStream<string>();
   }
     
-  [TestMethod]
+  [Test]
   public void SelectPredicate_BuildKSql_PrintsPredicate()
   {
     //Arrange
@@ -440,7 +440,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     ksql.Should().BeEquivalentTo(@$"SELECT LCASE({nameof(Location.Latitude)}) != LCASE('HI') FROM Locations EMIT CHANGES;");
   }
     
-  [TestMethod]
+  [Test]
   public void WhereIsNotNull_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -460,7 +460,7 @@ WHERE IP_ADDRESS IS NOT NULL EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKSql);
   }
 
-  [TestMethod]
+  [Test]
   public void WhereIsNull_BuildKSql_PrintsQuery()
   {
     //Arrange

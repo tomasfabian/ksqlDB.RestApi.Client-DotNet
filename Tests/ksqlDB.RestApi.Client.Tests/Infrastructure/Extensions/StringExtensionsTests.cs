@@ -1,13 +1,12 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.Tests.Infrastructure.Extensions;
 
-[TestClass]
 public class StringExtensionsTests
 {
-  [TestMethod]
+  [Test]
   public void ToKSqlFunctionName()
   {
     //Arrange
@@ -20,7 +19,7 @@ public class StringExtensionsTests
     ksqlFunctionName.Should().Be("EXTRACT_JSON_FIELD");
   }
 
-  [TestMethod]
+  [Test]
   public void IsNotNullOrEmpty()
   {
     //Arrange
@@ -32,7 +31,7 @@ public class StringExtensionsTests
     isNotNullOrEmpty.Should().BeFalse();
   }
 
-  [TestMethod]
+  [Test]
   public void IsNotNullOrEmpty_TextString_ReturnsTrue()
   {
     //Arrange

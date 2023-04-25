@@ -1,15 +1,14 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ninject;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
 
-[TestClass]
 public class ArrayValuesKSqlDbProviderTests : TestBase
 {
-  [TestMethod]
+  [Test]
   public async Task Count_ParseSingleFields_IntegersAreConsumed()
   {
     //Arrange

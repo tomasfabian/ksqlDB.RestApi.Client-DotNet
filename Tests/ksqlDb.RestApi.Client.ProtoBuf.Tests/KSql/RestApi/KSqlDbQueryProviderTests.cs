@@ -3,11 +3,11 @@ using ksqlDb.RestApi.Client.ProtoBuf.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ninject;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDb.RestApi.Client.ProtoBuf.Tests.KSql.RestApi;
 
-[TestClass]
 public class KSqlDbQueryProviderTests : TestBase
 {  
   private TestableKSqlDbQueryProvider ClassUnderTest { get; set; } = null!;
@@ -20,7 +20,7 @@ public class KSqlDbQueryProviderTests : TestBase
     ClassUnderTest = MockingKernel.Get<TestableKSqlDbQueryProvider>();
   }
 
-  [TestMethod]
+  [Test]
   public async Task Run_RetrievesDeserializedValues()
   {
     //Arrange

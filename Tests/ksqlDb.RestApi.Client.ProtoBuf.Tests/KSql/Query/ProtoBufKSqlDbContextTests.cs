@@ -1,16 +1,15 @@
-﻿using FluentAssertions;
-using ksqlDb.RestApi.Client.ProtoBuf.Tests.Helpers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
 using Moq;
 using UnitTests;
 using ksqlDB.RestApi.Client.KSql.Linq;
+using NUnit.Framework;
+using TestParameters = ksqlDb.RestApi.Client.ProtoBuf.Tests.Helpers.TestParameters;
 
 namespace ksqlDb.RestApi.Client.ProtoBuf.Tests.KSql.Query;
 
-[TestClass]
 public class ProtoBufKSqlDbContextTests : TestBase
 {
-  [TestMethod]
+  [Test]
   public void CreateQueryStream_Subscribe_KSqlDbProvidersRunWasCalled()
   {
     //Arrange
