@@ -1,8 +1,8 @@
-using System;
 using System.Reactive.Concurrency;
 using Microsoft.Reactive.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ninject.MockingKernel.Moq;
+using NUnit.Framework;
 using UnitTests.Schedulers;
 
 namespace UnitTests;
@@ -19,6 +19,7 @@ public abstract class TestBase
 
   protected ReactiveTestSchedulersFactory SchedulersFactory = null!;
 
+  [SetUp]
   [TestInitialize]
   public virtual void TestInitialize()
   {
@@ -28,6 +29,7 @@ public abstract class TestBase
     MockingKernel.Bind<ReactiveTestSchedulersFactory>().ToConstant(SchedulersFactory);
   }
 
+  [TearDown]
   [TestCleanup]
   public virtual void TestCleanup()
   {
