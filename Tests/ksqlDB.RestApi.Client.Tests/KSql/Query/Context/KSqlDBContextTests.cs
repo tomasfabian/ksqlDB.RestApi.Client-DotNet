@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -13,16 +12,16 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using NUnit.Framework;
 using UnitTests;
+using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Context;
 
-[TestClass]
 public class KSqlDBContextTests : TestBase
 {
-  [TestMethod]
+  [Test]
   public void CreateQueryStream_Subscribe_KSqlDbProvidersRunWasCalled()
   {
     //Arrange
@@ -36,7 +35,7 @@ public class KSqlDBContextTests : TestBase
     context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()), Times.Once);
   }
 
-  [TestMethod]
+  [Test]
   public void CreateStreamSet_Subscribe_QueryOptionsWereTakenFromContext()
   {
     //Arrange
@@ -57,7 +56,7 @@ public class KSqlDBContextTests : TestBase
     context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.Is<QueryStreamParameters>(c => c[QueryParameters.AutoOffsetResetPropertyName] == "Latest"), It.IsAny<CancellationToken>()), Times.Once);
   }
 
-  [TestMethod]
+  [Test]
   public void WithOffsetResetPolicy_Subscribe_QueryOptionsWereTakenFromContext()
   {
     //Arrange
@@ -77,7 +76,7 @@ public class KSqlDBContextTests : TestBase
     subscription.Dispose();
   }
 
-  [TestMethod]
+  [Test]
   public void SetAutoOffsetReset_Subscribe_ProcessingGuarantee()
   {
     //Arrange
@@ -93,7 +92,7 @@ public class KSqlDBContextTests : TestBase
     context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.Is<QueryStreamParameters>(c => c["auto.offset.reset"] == "latest"), It.IsAny<CancellationToken>()), Times.Once);
   }
 
-  [TestMethod]
+  [Test]
   public void CreateStreamSet_Subscribe_ProcessingGuarantee()
   {
     //Arrange
@@ -109,7 +108,7 @@ public class KSqlDBContextTests : TestBase
     context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.Is<QueryStreamParameters>(c => c[KSqlDbConfigs.ProcessingGuarantee] == "exactly_once"), It.IsAny<CancellationToken>()), Times.Once);
   }
 
-  [TestMethod]
+  [Test]
   public void CreateStreamSet_CalledMultipleTimes_KSqlQueryGeneratorBuildKSqlWasNotCalled()
   {
     //Arrange
@@ -122,7 +121,7 @@ public class KSqlDBContextTests : TestBase
     context.KSqlQueryGenerator.Verify(c => c.BuildKSql(It.IsAny<Expression>(), It.IsAny<QueryContext>()), Times.Once);
   }
 
-  [TestMethod]
+  [Test]
   public void CreateStreamSet_Subscribe_KSqlQueryGenerator()
   {
     //Arrange
@@ -138,7 +137,7 @@ public class KSqlDBContextTests : TestBase
     context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.Is<QueryStreamParameters>(parameters => parameters["auto.offset.reset"] == "latest"), It.IsAny<CancellationToken>()), Times.Once);
   }
 
-  [TestMethod]
+  [Test]
   public async Task DisposeAsync_ServiceProviderIsNull_ContextWasDisposed()
   {
     //Arrange
@@ -151,7 +150,7 @@ public class KSqlDBContextTests : TestBase
     context.IsDisposed.Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public async Task DisposeAsync_ServiceProviderWasBuilt_ContextWasDisposed()
   {
     //Arrange
@@ -165,7 +164,7 @@ public class KSqlDBContextTests : TestBase
     context.IsDisposed.Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public void CreateQueryStream_RawKSQL_ReturnAsyncEnumerable()
   {
     //Arrange
@@ -186,7 +185,7 @@ public class KSqlDBContextTests : TestBase
     source.Should().NotBeNull();
   }
 
-  [TestMethod]
+  [Test]
   public void CreateQuery_RawKSQL_ReturnAsyncEnumerable()
   {
     //Arrange
@@ -207,7 +206,7 @@ public class KSqlDBContextTests : TestBase
     source.Should().NotBeNull();
   }
 
-  [TestMethod]
+  [Test]
   public async Task AddAndSaveChangesAsync()
   {
     //Arrange
@@ -225,7 +224,7 @@ public class KSqlDBContextTests : TestBase
     context.KSqlDbRestApiClientMock.Verify(c => c.ExecuteStatementAsync(It.IsAny<KSqlDbStatement>(), It.IsAny<CancellationToken>()), Times.Once);
   }
 
-  [TestMethod]
+  [Test]
   public void AddTwice_SaveChangesAsyncWasNotCalled()
   {
     //Arrange
@@ -244,7 +243,7 @@ public class KSqlDBContextTests : TestBase
     context.KSqlDbRestApiClientMock.Verify(c => c.ExecuteStatementAsync(It.IsAny<KSqlDbStatement>(), It.IsAny<CancellationToken>()), Times.Never);
   }
 
-  [TestMethod]
+  [Test]
   public void Add_InsertValues_WereCached()
   {
     //Arrange
@@ -261,7 +260,7 @@ public class KSqlDBContextTests : TestBase
     context.ChangesCache.Count.Should().Be(1);
   }
 
-  [TestMethod]
+  [Test]
   public void AddWithInsertProperties()
   {
     //Arrange
@@ -276,7 +275,7 @@ public class KSqlDBContextTests : TestBase
     context.KSqlDbRestApiClientMock.Verify(c => c.ToInsertStatement(It.IsAny<InsertValues<Tweet>>(), insertProperties), Times.Once);
   }
 
-  [TestMethod]
+  [Test]
   public async Task NothingWasAdded_SaveChangesAsync_WasNotCalled()
   {
     //Arrange
@@ -289,7 +288,7 @@ public class KSqlDBContextTests : TestBase
     response.Should().BeNull();
   }
 
-  [TestMethod]
+  [Test]
   public void CreateQueryAndCreateQueryStreamShouldNotInfluenceEachOther()
   {
     //Arrange
@@ -309,7 +308,7 @@ public class KSqlDBContextTests : TestBase
     queryDbProvider.Should().BeOfType<KSqlDbQueryProvider>();
   }
 
-  [TestMethod]
+  [Test]
   public void CreateQueryStreamAndCreateQueryShouldNotInfluenceEachOther()
   {
     //Arrange

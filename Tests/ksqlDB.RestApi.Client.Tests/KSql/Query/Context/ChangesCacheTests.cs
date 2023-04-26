@@ -1,19 +1,18 @@
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Context;
 
-[TestClass]
 public class ChangesCacheTests
 {
   private ChangesCache ClassUnderTest { get; set; } = null!;
 
   private Mock<IKSqlDbRestApiClient> KSqlDbRestApiClientMock = null!;
 
-  [TestInitialize]
+  [SetUp]
   public void TestInitialize()
   {
     KSqlDbRestApiClientMock = new Mock<IKSqlDbRestApiClient>();
@@ -21,7 +20,7 @@ public class ChangesCacheTests
     ClassUnderTest = new ChangesCache();
   }
 
-  [TestMethod]
+  [Test]
   public async Task AddTwice_SaveChangesAsyncWasNotCalled()
   {
     //Arrange

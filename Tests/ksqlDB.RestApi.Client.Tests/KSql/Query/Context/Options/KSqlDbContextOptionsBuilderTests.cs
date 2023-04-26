@@ -1,16 +1,17 @@
-﻿using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Helpers;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 using static System.String;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
+using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Context.Options;
 
-[TestClass]
 public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBuilder>
 {
   [TestInitialize]
@@ -21,31 +22,33 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     ClassUnderTest = new KSqlDbContextOptionsBuilder();
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(ArgumentNullException))]
+  [Test]
   public void UseKSqlDb_NullUrl_ThrowsArgumentNullException()
   {
     //Arrange
 
-    //Act
-    var options = ClassUnderTest.UseKSqlDb(null).Options;
-
     //Assert
+    Assert.ThrowsException<ArgumentNullException>(() =>
+    {
+      //Act
+      var options = ClassUnderTest.UseKSqlDb(null).Options;
+    });
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(ArgumentNullException))]
+  [Test]
   public void UseKSqlDb_EmptyStringUrl_ThrowsArgumentNullException()
   {
     //Arrange
 
-    //Act
-    var options = ClassUnderTest.UseKSqlDb(Empty).Options;
-
     //Assert
+    Assert.ThrowsException<ArgumentNullException>(() =>
+    {
+      //Act
+      var options = ClassUnderTest.UseKSqlDb(Empty).Options;
+    });
   }
 
-  [TestMethod]
+  [Test]
   public void UseKSqlDb_OptionsContainsFilledUrl()
   {
     //Arrange
@@ -57,7 +60,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     options.Url.Should().BeEquivalentTo(TestParameters.KsqlDBUrl);
   }
 
-  [TestMethod]
+  [Test]
   public void SetBasicAuthCredentials()
   {
     //Arrange
@@ -74,7 +77,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     options.BasicAuthPassword.Should().Be(password);
   }
 
-  [TestMethod]
+  [Test]
   public void NotSetBasicAuthCredentials()
   {
     //Arrange
@@ -88,7 +91,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     options.BasicAuthPassword.Should().BeEmpty();
   }
     
-  [TestMethod]
+  [Test]
   public void SetProcessingGuarantee()
   {
     //Arrange
@@ -102,7 +105,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     options.QueryStreamParameters[KSqlDbConfigs.ProcessingGuarantee].Should().Be("at_least_once");
   }
     
-  [TestMethod]
+  [Test]
   public void SetProcessingGuarantee_ThenSetupQueryStream()
   {
     //Arrange
@@ -120,7 +123,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     options.QueryStreamParameters[KSqlDbConfigs.ProcessingGuarantee].Should().Be("at_least_once");
   }
     
-  [TestMethod]
+  [Test]
   public void SetAutoOffsetReset()
   {
     //Arrange
@@ -138,7 +141,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     options.QueryStreamParameters[QueryStreamParameters.AutoOffsetResetPropertyName].Should().Be(expectedValue);
   }
     
-  [TestMethod]
+  [Test]
   public void SetJsonSerializerOptions_DefaultPropertyNameCaseInsensitiveIsTrue()
   {
     //Arrange
@@ -151,7 +154,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     options.JsonSerializerOptions.PropertyNameCaseInsensitive.Should().BeTrue();
   }
     
-  [TestMethod]
+  [Test]
   public void SetJsonSerializerOptions()
   {
     //Arrange
@@ -167,7 +170,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
 
   #region QueryStream
 
-  [TestMethod]
+  [Test]
   public void SetupQueryStream_OptionsQueryStreamParameters_AutoOffsetResetIsSetToDefault()
   {
     //Arrange
@@ -183,7 +186,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     options.QueryStreamParameters.Properties[QueryStreamParameters.AutoOffsetResetPropertyName].Should().BeEquivalentTo("earliest");
   }
 
-  [TestMethod]
+  [Test]
   public void SetupQueryStreamNotCalled_OptionsQueryStreamParameters_AutoOffsetResetIsSetToDefault()
   {
     //Arrange
@@ -197,7 +200,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     options.QueryStreamParameters.Properties[QueryStreamParameters.AutoOffsetResetPropertyName].Should().BeEquivalentTo(earliestAtoOffsetReset);
   }
 
-  [TestMethod]
+  [Test]
   public void SetupQueryStream_AmendOptionsQueryStreamParametersProperty_AutoOffsetResetWasChanged()
   {
     //Arrange
@@ -218,7 +221,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
 
   #region Query
 
-  [TestMethod]
+  [Test]
   public void SetupQuery_OptionsQueryParameters_AutoOffsetResetIsSetToDefault()
   {
     //Arrange
@@ -234,7 +237,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     options.QueryParameters.Properties[QueryParameters.AutoOffsetResetPropertyName].Should().BeEquivalentTo("earliest");
   }
 
-  [TestMethod]
+  [Test]
   public void SetupQueryNotCalled_OptionsQueryParameters_AutoOffsetResetIsSetToDefault()
   {
     //Arrange
@@ -248,7 +251,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     options.QueryParameters.Properties[QueryParameters.AutoOffsetResetPropertyName].Should().BeEquivalentTo(earliestAtoOffsetReset);
   }
 
-  [TestMethod]
+  [Test]
   public void SetupQuery_AmendOptionsQueryParametersProperty_AutoOffsetResetWasChanged()
   {
     //Arrange

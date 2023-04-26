@@ -3,14 +3,13 @@ using FluentAssertions;
 using ksqlDB.Api.Client.Tests.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context.JsonConverters;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Context.JsonConverters;
 
-[TestClass]
 public class TimeSpanToStringConverterTests
 {
-  [TestMethod]
+  [Test]
   public void Read()
   {
     //Arrange
@@ -37,7 +36,7 @@ public class TimeSpanToStringConverterTests
     timeSpan.Dt.Should().Be(value.Dt);
   }
 
-  [TestMethod]
+  [Test]
   public void Write()
   {
     //Arrange

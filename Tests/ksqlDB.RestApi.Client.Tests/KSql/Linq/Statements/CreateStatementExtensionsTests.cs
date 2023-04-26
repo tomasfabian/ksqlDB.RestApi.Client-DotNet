@@ -1,5 +1,4 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.Api.Client.Tests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -7,19 +6,19 @@ using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
+using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Linq.Statements;
 
-[TestClass]
 public class CreateStatementExtensionsTests : TestBase
 {
   private TestableDbProvider DbProvider { get; set; } = null!;
 
   protected virtual string StatementResponse { get; set; } = @"[{""@type"":""currentStatus"", ""commandSequenceNumber"":2174,""warnings"":[]}]";
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -29,7 +28,7 @@ public class CreateStatementExtensionsTests : TestBase
 
   private const string StreamName = "TestStream";
 
-  [TestMethod]
+  [Test]
   public void CreateOrReplaceStreamStatement_ToStatementString_CalledTwiceWithSameResult()
   {
     //Arrange
@@ -47,7 +46,7 @@ AS SELECT * FROM {nameof(Location)}s EMIT CHANGES;");
     ksql1.Should().BeEquivalentTo(ksql2);
   }
 
-  [TestMethod]
+  [Test]
   public void CreateOrReplaceStreamStatement_ToStatementString_ComplexQueryWasGenerated()
   {
     //Arrange
@@ -79,7 +78,7 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;");
 
   private const string TableName = "TestTable";
 
-  [TestMethod]
+  [Test]
   public async Task CreateOrReplaceTableStatement_ExecuteStatementAsync_ResponseWasReceived()
   {
     //Arrange
@@ -94,7 +93,7 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;");
     responseContent.Should().BeEquivalentTo(StatementResponse);
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByHaving()
   {
     //Arrange
@@ -111,7 +110,7 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;");
 AS SELECT * FROM Movies GROUP BY Title HAVING Count(*) > 2 EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void Take()
   {
     //Arrange
@@ -129,7 +128,7 @@ AS SELECT * FROM Movies GROUP BY Title HAVING Count(*) > 2 EMIT CHANGES;");
 AS SELECT * FROM Movies EMIT CHANGES LIMIT {limit};");
   }
 
-  [TestMethod]
+  [Test]
   public void WindowedBy()
   {
     //Arrange
@@ -146,7 +145,7 @@ AS SELECT * FROM Movies EMIT CHANGES LIMIT {limit};");
 AS SELECT * FROM Movies WINDOW TUMBLING (SIZE 2 MINUTES) GROUP BY Title EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void Join()
   {
     //Arrange
@@ -173,7 +172,7 @@ ON movie.Title = actor.Title
 EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void FullOuterJoin()
   {
     //Arrange
@@ -200,7 +199,7 @@ ON movie.Title = actor.Title
 EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void LeftJoin()
   {
     //Arrange

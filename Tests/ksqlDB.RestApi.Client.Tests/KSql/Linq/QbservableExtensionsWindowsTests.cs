@@ -1,20 +1,20 @@
-﻿using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Helpers;
+using FluentAssertions;
 using ksqlDB.Api.Client.Tests.KSql.Query.Context;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
+using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Linq;
 
-[TestClass]
 public class QbservableExtensionsWindowsTests : TestBase
 {
-  [TestMethod]
+  [Test]
   public void GroupByAndCount_BuildKSql_PrintsQueryWithWindowSession()
   {
     //Arrange
@@ -32,7 +32,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT CardNumber, COUNT(*) Count FROM Transactions WINDOW SESSION (5 SECONDS) GROUP BY CardNumber EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByAndCount_BuildKSql_PrintsQueryWithHoppingWindow()
   {
     //Arrange
@@ -50,7 +50,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT CardNumber, COUNT(*) Count FROM Transactions WINDOW HOPPING (SIZE 5 SECONDS, ADVANCE BY 5 SECONDS) GROUP BY CardNumber EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void WindowStartAndEnd_BuildKSql_PrintsQueryWithHoppingWindow()
   {
     //Arrange
@@ -68,7 +68,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT WindowStart, WindowEnd, CardNumber, COUNT(*) Count FROM Transactions WINDOW HOPPING (SIZE 5 SECONDS, ADVANCE BY 5 SECONDS) GROUP BY CardNumber EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByAndCount_BuildKSql_PrintsQueryWithHoppingWindowAdvanceBy()
   {
     //Arrange
@@ -86,7 +86,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT CardNumber, COUNT(*) Count FROM Transactions WINDOW HOPPING (SIZE 5 MINUTES, ADVANCE BY 4 MINUTES) GROUP BY CardNumber EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByAndCount_BuildKSql_PrintsQueryWithHoppingWindowRetention()
   {
     //Arrange
@@ -104,24 +104,24 @@ public class QbservableExtensionsWindowsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT CardNumber, COUNT(*) Count FROM Transactions WINDOW HOPPING (SIZE 5 SECONDS, ADVANCE BY 5 SECONDS, RETENTION 7 DAYS) GROUP BY CardNumber EMIT CHANGES;");
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(InvalidOperationException))]
+  [Test]
   public void AdvanceByIsBiggerThenWindowSize_BuildKSql_Throws()
   {
     //Arrange
     var context = new TransactionsDbProvider(TestParameters.KsqlDBUrl);
 
-    var grouping = context.CreateQueryStream<Transaction>()
-      .GroupBy(c => c.CardNumber)
-      .WindowedBy(new HoppingWindows(Duration.OfSeconds(5)).WithAdvanceBy(Duration.OfSeconds(7)))
-      .Select(g => new { CardNumber = g.Key, Count = g.Count() });
-
-    //Act
-
     //Assert
+    Assert.ThrowsException<InvalidOperationException>(() =>
+    {
+      //Act
+      var grouping = context.CreateQueryStream<Transaction>()
+        .GroupBy(c => c.CardNumber)
+        .WindowedBy(new HoppingWindows(Duration.OfSeconds(5)).WithAdvanceBy(Duration.OfSeconds(7)))
+        .Select(g => new { CardNumber = g.Key, Count = g.Count() });
+    });
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByAndCount_BuildKSql_PrintsQueryWithTumblingWindow()
   {
     //Arrange
@@ -139,7 +139,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT CardNumber, COUNT(*) Count FROM Transactions WINDOW TUMBLING (SIZE 5 SECONDS) GROUP BY CardNumber EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void FinalRefinement_BuildKSql_PrintsQueryWithEmitFinal()
   {
     //Arrange
@@ -157,7 +157,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT CardNumber, COUNT(*) Count FROM Transactions WINDOW TUMBLING (SIZE 5 SECONDS) GROUP BY CardNumber EMIT FINAL;");
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByAndCount_BuildKSql_PrintsQueryWithTumblingWindowAndGracePeriod()
   {
     //Arrange
@@ -175,7 +175,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT CardNumber, COUNT(*) Count FROM Transactions WINDOW TUMBLING (SIZE 5 SECONDS, GRACE PERIOD 2 HOURS) GROUP BY CardNumber EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void QueriesFromSameCreateStreamSetShouldNotAffectEachOther()
   {
     //Arrange
