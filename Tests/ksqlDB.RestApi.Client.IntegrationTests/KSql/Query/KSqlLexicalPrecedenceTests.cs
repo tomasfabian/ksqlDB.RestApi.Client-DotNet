@@ -68,14 +68,14 @@ public class KSqlLexicalPrecedenceTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
 
     //Act
-    var source = MoviesStream.Where(c => (c.Title == "Aliens" || c.Title == "Die Hard") && c.Release_Year >= 1990).ToAsyncEnumerable();
+    var source = MoviesStream.Where(c => (c.Title == "Aliens" || c.Title == "Die Hard") && c.Release_Year < 1988).ToAsyncEnumerable();
 
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
     var movie = actualValues.First();
-      
-    movie.Id.Should().Be(MoviesProvider.Movie2.Id);
+
+    movie.Id.Should().Be(MoviesProvider.Movie1.Id);
   }
 
   [TestMethod]
@@ -85,7 +85,7 @@ public class KSqlLexicalPrecedenceTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
 
     //Act
-    var source = MoviesStream.Where(c => c.Title == "Aliens" || c.Title == "Die Hard" && c.Release_Year >= 1990).ToAsyncEnumerable();
+    var source = MoviesStream.Where(c => c.Title == "Aliens" || c.Title == "Die Hard" && c.Release_Year < 1988).ToAsyncEnumerable();
 
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
