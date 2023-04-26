@@ -1,23 +1,18 @@
 using System.ComponentModel.DataAnnotations;
-using System.Net.Mime;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using FluentAssertions;
-using ksqlDB.RestApi.Client.KSql.Query.Context;
-using ksqlDB.RestApi.Client.KSql.Query.Context.JsonConverters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parsers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Parsers;
 
-[TestClass]
 public class JsonArrayParserTests : TestBase
 {
   private JsonArrayParser ClassUnderTest { get; set; } = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -25,7 +20,7 @@ public class JsonArrayParserTests : TestBase
     ClassUnderTest = new JsonArrayParser();
   }
 
-  [TestMethod]
+  [Test]
   public void CreateJson_PropertyNamesAreEqualToColumnHeaders()
   {
     //Arrange
@@ -47,7 +42,7 @@ public class JsonArrayParserTests : TestBase
     property.Name.Should().BeEquivalentTo(headerColumns[1]);
   }
 
-  [TestMethod]
+  [Test]
   public void CreateJson_PropertyValuesAreEqualToRowValues()
   {
     //Arrange
@@ -69,7 +64,7 @@ public class JsonArrayParserTests : TestBase
     property.Value.ToString().Should().BeEquivalentTo("True");
   }
 
-  [TestMethod]
+  [Test]
   public void NestedArrayInMap()
   {
     //Arrange
@@ -93,7 +88,7 @@ public class JsonArrayParserTests : TestBase
     property.Value.ToString().Should().BeEquivalentTo("1");
   }
 
-  [TestMethod]
+  [Test]
   public void NestedArrayInArray()
   {
     //Arrange
@@ -108,7 +103,7 @@ public class JsonArrayParserTests : TestBase
     json.Should().BeEquivalentTo("{\r\n\"Value\": 1\r\n,\"Arr\": [[1,2],[3,4]]\r\n}\r\n");
   }
 
-  [TestMethod]
+  [Test]
   public void NestedMapInArray()
   {
     //Arrange
@@ -123,7 +118,7 @@ public class JsonArrayParserTests : TestBase
     json.Should().BeEquivalentTo("{\r\n\"Value\": 1\r\n,\"Arr\": [{\"a\":1,\"b\":2},{\"d\":4,\"c\":3}]\r\n}\r\n");
   }
 
-  [TestMethod]
+  [Test]
   public void NestedMapInMap()
   {
     //Arrange
@@ -138,7 +133,7 @@ public class JsonArrayParserTests : TestBase
     json.Should().BeEquivalentTo("{\r\n\"Value\": 1\r\n,\"Map\": {\"a\":{\"a\":1,\"b\":2},\"b\":{\"d\":4,\"c\":3}}\r\n}\r\n");
   }
 
-  [TestMethod]
+  [Test]
   public void JsonWithCommaSeparatedValues()
   {
     //Arrange
@@ -165,7 +160,7 @@ public class JsonArrayParserTests : TestBase
     JObject.Parse(json).ToString().Should().BeEquivalentTo(expectedJson.ToString());
   }
 
-  [TestMethod]
+  [Test]
   public void Array_JsonWithCommaSeparatedValues()
   {
     //Arrange
@@ -182,7 +177,7 @@ public class JsonArrayParserTests : TestBase
   }
 
 
-  [TestMethod]
+  [Test]
   public void CreateJson_Map_JsonWithCommaSeparatedValues()
   {
     //Arrange
@@ -198,7 +193,7 @@ public class JsonArrayParserTests : TestBase
     JObject.Parse(json).ToString().Should().BeEquivalentTo(expectedJson);
   }
 
-  [TestMethod]
+  [Test]
   public void CreateJson_QuoteInValue()
   {
     //Arrange
@@ -239,7 +234,7 @@ public class JsonArrayParserTests : TestBase
     public long? TsMs { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public void ValueWithSquareBrackets()
   {
     //Arrange

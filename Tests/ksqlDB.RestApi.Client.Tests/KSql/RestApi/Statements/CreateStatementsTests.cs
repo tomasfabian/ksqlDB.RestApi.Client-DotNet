@@ -1,15 +1,14 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements;
 
-[TestClass]
 public class CreateStatementsTests
 {
-  [TestMethod]
+  [Test]
   public void GenerateWithClause_KafkaTopic()
   {
     //Arrange
@@ -25,7 +24,7 @@ public class CreateStatementsTests
     withClause.Should().BeEquivalentTo(@$" WITH ( KAFKA_TOPIC='{metadata.KafkaTopic}' )");
   }
 
-  [TestMethod]
+  [Test]
   public void GenerateWithClause_KeyFormat()
   {
     //Arrange
@@ -41,7 +40,7 @@ public class CreateStatementsTests
     withClause.Should().BeEquivalentTo(@$" WITH ( KEY_FORMAT='{metadata.KeyFormat}' )");
   }
 
-  [TestMethod]
+  [Test]
   public void GenerateWithClause_ValueFormat()
   {
     //Arrange
@@ -57,7 +56,7 @@ public class CreateStatementsTests
     withClause.Should().BeEquivalentTo(@$" WITH ( VALUE_FORMAT='{metadata.ValueFormat}' )");
   }
 
-  [TestMethod]
+  [Test]
   public void GenerateWithClause_Partitions()
   {
     //Arrange
@@ -73,7 +72,7 @@ public class CreateStatementsTests
     withClause.Should().BeEquivalentTo(@$" WITH ( PARTITIONS='{metadata.Partitions}' )");
   }
 
-  [TestMethod]
+  [Test]
   public void GenerateWithClause_Replicas()
   {
     //Arrange
@@ -89,7 +88,7 @@ public class CreateStatementsTests
     withClause.Should().BeEquivalentTo(@$" WITH ( REPLICAS='{metadata.Replicas}' )");
   }
 
-  [TestMethod]
+  [Test]
   public void GenerateWithClause_ValueDelimiter()
   {
     //Arrange
@@ -105,7 +104,7 @@ public class CreateStatementsTests
     withClause.Should().BeEquivalentTo(@$" WITH ( VALUE_DELIMITER='{metadata.ValueDelimiter}' )");
   }
 
-  [TestMethod]
+  [Test]
   public void GenerateWithClause_Timestamp()
   {
     //Arrange
@@ -121,7 +120,7 @@ public class CreateStatementsTests
     withClause.Should().BeEquivalentTo(@$" WITH ( TIMESTAMP='{metadata.Timestamp}' )");
   }
 
-  [TestMethod]
+  [Test]
   public void GenerateWithClause_TimestampFormat()
   {
     //Arrange
@@ -137,7 +136,7 @@ public class CreateStatementsTests
     withClause.Should().BeEquivalentTo(@$" WITH ( TIMESTAMP_FORMAT='{metadata.TimestampFormat}' )");
   }
 
-  [TestMethod]
+  [Test]
   public void GenerateWithClause_WrapSingleValue()
   {
     //Arrange
@@ -153,7 +152,7 @@ public class CreateStatementsTests
     withClause.Should().BeEquivalentTo(@$" WITH ( WRAP_SINGLE_VALUE='{metadata.WrapSingleValue}' )");
   }
 
-  [TestMethod]
+  [Test]
   public void GenerateWithClause_WindowType()
   {
     //Arrange
@@ -169,7 +168,7 @@ public class CreateStatementsTests
     withClause.Should().BeEquivalentTo(@$" WITH ( WINDOW_TYPE='{metadata.WindowType}', VALUE_FORMAT='Json' )");
   }
 
-  [TestMethod]
+  [Test]
   public void GenerateWithClause_WindowSize()
   {
     //Arrange
@@ -185,7 +184,7 @@ public class CreateStatementsTests
     withClause.Should().BeEquivalentTo(@$" WITH ( WINDOW_SIZE='{metadata.WindowSize}', VALUE_FORMAT='Json' )");
   }
 
-  [TestMethod]
+  [Test]
   public void GenerateWithClause_MultipleValues_AreSeparated()
   {
     //Arrange
@@ -202,7 +201,7 @@ public class CreateStatementsTests
     withClause.Should().BeEquivalentTo(@$" WITH ( TIMESTAMP_FORMAT='{metadata.TimestampFormat}', WRAP_SINGLE_VALUE='{metadata.WrapSingleValue}' )");
   }
 
-  [TestMethod]
+  [Test]
   public void GenerateWithClause_KeySchemaId()
   {
     //Arrange
@@ -218,7 +217,7 @@ public class CreateStatementsTests
     withClause.Should().BeEquivalentTo(@$" WITH ( KEY_SCHEMA_ID={metadata.KeySchemaId} )");
   }
 
-  [TestMethod]
+  [Test]
   public void GenerateWithClause_ValueSchemaId()
   {
     //Arrange
@@ -234,7 +233,7 @@ public class CreateStatementsTests
     withClause.Should().BeEquivalentTo(@$" WITH ( VALUE_SCHEMA_ID={metadata.ValueSchemaId} )");
   }
 
-  [TestMethod]
+  [Test]
   public void GenerateWithClause_KeySchemaFullName()
   {
     //Arrange
@@ -250,7 +249,7 @@ public class CreateStatementsTests
     withClause.Should().BeEquivalentTo(@$" WITH ( KEY_SCHEMA_FULL_NAME={metadata.KeySchemaFullName} )");
   }
 
-  [TestMethod]
+  [Test]
   public void GenerateWithClause_ValueSchemaFullName()
   {
     //Arrange

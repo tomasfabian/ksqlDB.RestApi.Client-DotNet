@@ -4,16 +4,17 @@ using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
 
-[TestClass]
 public class RowValueJsonSerializerTests : TestBase
 {
   private RowValueJsonSerializer ClassUnderTest { get; set; } = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -32,7 +33,7 @@ public class RowValueJsonSerializerTests : TestBase
     public string Name { get; set; } = null!;
   }
 
-  [TestMethod]
+  [Test]
   public void Deserialize_RecordWithSingleProperty()
   {
     //Arrange
@@ -54,7 +55,7 @@ public class RowValueJsonSerializerTests : TestBase
     rowValue.Value.Name.Should().Be("f03c278c-61ea-4f69-b153-5647d2eec72e");
   }
 
-  [TestMethod]
+  [Test]
   public void Deserialize_RecordAsString()
   {
     //Arrange
@@ -76,7 +77,7 @@ public class RowValueJsonSerializerTests : TestBase
     rowValue.Value.Should().Be("f03c278c-61ea-4f69-b153-5647d2eec72e");
   }
 
-  [TestMethod]
+  [Test]
   public void Deserialize_RecordAsDateTimeOffsetStruct()
   {
     //Arrange
@@ -101,7 +102,7 @@ public class RowValueJsonSerializerTests : TestBase
     rowValue.Value.Should().Be(dateTime);
   }
 
-  [TestMethod]
+  [Test]
   public void Deserialize_RecordAsDictionary()
   {
     //Arrange
@@ -125,7 +126,7 @@ public class RowValueJsonSerializerTests : TestBase
     rowValue.Value["a"].Should().Be(1);
   }
 
-  [TestMethod]
+  [Test]
   public void Deserialize_RecordAsPrimitiveInt()
   {
     //Arrange
@@ -154,7 +155,7 @@ public class RowValueJsonSerializerTests : TestBase
     public string Name { get; set; } = null!;
   }
 
-  [TestMethod]
+  [Test]
   public void Deserialize_RecordAsRecord()
   {
     //Arrange
@@ -184,7 +185,7 @@ public class RowValueJsonSerializerTests : TestBase
     public int Release_Year { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public void Deserialize_RecordAsClass()
   {
     //Arrange
@@ -212,7 +213,7 @@ public class RowValueJsonSerializerTests : TestBase
     All = 1
   }
 
-  [TestMethod]
+  [Test]
   public void Deserialize_RecordAsEnum()
   {
     //Arrange
@@ -228,7 +229,7 @@ public class RowValueJsonSerializerTests : TestBase
     rowValue.Value.Should().Be(MyEnum.All);
   }
 
-  [TestMethod]
+  [Test]
   public void Deserialize_RecordAsGuid()
   {
     //Arrange
@@ -255,7 +256,7 @@ public class RowValueJsonSerializerTests : TestBase
   {
   }
 
-  [TestMethod]
+  [Test]
   public void Deserialize_RecordAsDictionaryBase()
   {
     //Arrange
@@ -276,7 +277,7 @@ public class RowValueJsonSerializerTests : TestBase
     rowValue.Value["A"].Should().Be(2);
   }
 
-  [TestMethod]
+  [Test]
   public void Deserialize_RecordAsByteArray()
   {
     //Arrange
@@ -300,7 +301,7 @@ public class RowValueJsonSerializerTests : TestBase
     rowValue.Value[1].Should().Be(0x7d);
   }
 
-  [TestMethod]
+  [Test]
   public void Deserialize_RecordAsInt()
   {
     //Arrange
@@ -322,8 +323,7 @@ public class RowValueJsonSerializerTests : TestBase
     rowValue.Value.Should().Be(1);
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(InvalidOperationException))]
+  [Test]
   public void DifferentLengthOfColumnNamesAndTypes_ThrowsInvalidOperationException()
   {
     //Arrange
@@ -333,9 +333,11 @@ public class RowValueJsonSerializerTests : TestBase
       ColumnNames = new[] { "MESSAGE" },
     };
 
-    //ACT
-    ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
-
     //Assert
+    Assert.ThrowsException<InvalidOperationException>(() =>
+    {
+      //Act
+      ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
+    });
   }
 }

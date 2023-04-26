@@ -1,14 +1,13 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Context.JsonConverters;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Context.Options;
 
-[TestClass]
 public class KSqlDbJsonSerializerOptionsTests
 {
-  [TestMethod]
+  [Test]
   public void CreateInstance_PropertyNameCaseInsensitive()
   {
     //Arrange
@@ -21,7 +20,7 @@ public class KSqlDbJsonSerializerOptionsTests
     propertyNameCaseInsensitive.Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public void CreateInstance_Converters_ContainsTimeSpanToStringConverter()
   {
     //Arrange
@@ -34,7 +33,7 @@ public class KSqlDbJsonSerializerOptionsTests
     converters.OfType<TimeSpanToStringConverter>().Any().Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public void CreateInstance_Converters_ContainsJsonConverterGuid()
   {
     //Arrange

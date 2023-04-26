@@ -9,24 +9,23 @@ using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Moq.Protected;
 using System.Linq.Expressions;
 using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
 
-[TestClass]
 public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 {
   private KSqlDbRestApiClient ClassUnderTest { get; set; } = null!;
   private Mock<ILogger> LoggerMock { get; set; } = null!;
   private Mock<ILoggerFactory> LoggerFactoryMock { get; set; } = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -44,7 +43,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
   private string StatementResponse => @"[{""@type"":""currentStatus"",""statementText"":""CREATE OR REPLACE TABLE MOVIES (TITLE STRING PRIMARY KEY, ID INTEGER, RELEASE_YEAR INTEGER) WITH (KAFKA_TOPIC='Movies', KEY_FORMAT='KAFKA', PARTITIONS=1, VALUE_FORMAT='JSON');"",""commandId"":""table/`MOVIES`/create"",""commandStatus"":{""status"":""SUCCESS"",""message"":""Table created"",""queryId"":null},""commandSequenceNumber"":328,""warnings"":[]}]
 ";
 
-  [TestMethod]
+  [Test]
   public async Task ExecuteStatementAsync_HttpClientWasCalled_OkResult()
   {
     //Arrange
@@ -61,7 +60,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     Mock.Get(HttpClientFactory).Verify(c => c.CreateClient(), Times.Once);
   }
 
-  [TestMethod]
+  [Test]
   public async Task ExecuteStatementAsync_LogInformation()
   {
     //Arrange
@@ -79,7 +78,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     LoggerMock.VerifyLog(LogLevel.Information, Times.Once);
   }
 
-  [TestMethod]
+  [Test]
   public void CreateHttpRequestMessage_HttpRequestMessage_WasConfigured()
   {
     //Arrange
@@ -94,7 +93,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     httpRequestMessage.Content!.Headers!.ContentType!.MediaType.Should().Be(KSqlDbRestApiClient.MediaType);
   }
     
-  [TestMethod]
+  [Test]
   public async Task CreateHttpRequestMessage_HttpRequestMessage_ContentWasSet()
   {
     //Arrange
@@ -108,7 +107,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     content.Should().Be(@$"{{""ksql"":""{createOrReplaceTableStatement}"",""streamsProperties"":{{}}}}");
   }
 
-  [TestMethod]
+  [Test]
   public void CreateContent_MediaTypeAndCharsetWereApplied()
   {
     //Arrange
@@ -122,7 +121,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     stringContent.Headers.ContentType.CharSet.Should().Be(Encoding.UTF8.WebName);
   }
 
-  [TestMethod]
+  [Test]
   public void CreateContent_Encoding_OverridenCharsetWasApplied()
   {
     //Arrange
@@ -140,7 +139,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     stringContent.Headers!.ContentType!.CharSet.Should().Be(encoding.WebName);
   }
 
-  [TestMethod]
+  [Test]
   public async Task CreateContent_KSqlContentWasSet()
   {
     //Arrange
@@ -155,7 +154,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     content.Should().Be(@$"{{""ksql"":""{createOrReplaceTableStatement}"",""streamsProperties"":{{}}}}");
   }
 
-  [TestMethod]
+  [Test]
   public async Task CreateContent_CommandSequenceNumber()
   {
     //Arrange
@@ -183,7 +182,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     return content;
   }
 
-  [TestMethod]
+  [Test]
   public void GetEndpoint_DefaultIs_KSql()
   {
     //Arrange
@@ -196,7 +195,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     endpoint.Should().Be("/ksql");
   }
 
-  [TestMethod]
+  [Test]
   public void GetEndpoint_OverridenToQueryEndpoint()
   {
     //Arrange
@@ -214,7 +213,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
   private string GetQueriesResponse => @"[{""@type"":""queries"",""statementText"":""SHOW QUERIES;"",""queries"":[{""queryString"":""select * from mymovies emit changes;"",""sinks"":[],""sinkKafkaTopics"":[],""id"":""_confluent-ksql-ksql-connect-clustertransient_6719152142362566835_1627490551142"",""statusCount"":{""RUNNING"":1},""queryType"":""PUSH"",""state"":""RUNNING""}],""warnings"":[]}]";
 
-  [TestMethod]
+  [Test]
   public async Task GetQueriesAsync()
   {
     //Arrange
@@ -238,7 +237,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
   private string GetTopicsResponse => @"[{""@type"":""kafka_topics"",""statementText"":""SHOW TOPICS;"",""topics"":[{""name"":""AVG_SENSOR_VALUES"",""replicaInfo"":[1,1]},{""name"":""sensor_values"",""replicaInfo"":[1,1]}],""warnings"":[]}]";
   private string GetAllTopicsResponse => @"[{""@type"":""kafka_topics"",""statementText"":""SHOW ALL TOPICS;"",""topics"":[{""name"":""AVG_SENSOR_VALUES"",""replicaInfo"":[1,1]},{""name"":""sensor_values"",""replicaInfo"":[1,1]}],""warnings"":[]}]";
 
-  [TestMethod]
+  [Test]
   public async Task GetTopicsAsync()
   {
     //Arrange
@@ -258,7 +257,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     topicsResponses[0].Topics.Length.Should().Be(2);
   }
 
-  [TestMethod]
+  [Test]
   public async Task GetAllTopicsAsync()
   {
     //Arrange
@@ -277,7 +276,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     topicsResponses[0].Topics.Length.Should().Be(2);
   }
 
-  [TestMethod]
+  [Test]
   public async Task GetTopicsExtendedAsync()
   {
     //Arrange
@@ -292,7 +291,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     VerifySendAsync(expectedContent);
   }
 
-  [TestMethod]
+  [Test]
   public async Task GetAllTopicsExtendedAsync()
   {
     //Arrange
@@ -312,7 +311,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
   private string TerminatePersistentQueryResponse => $@"[{{""{type}"":""currentStatus"",""statementText"":""TERMINATE {queryId};"",""commandId"":""terminate/{queryId}/execute"",""commandStatus"":{{""status"":""SUCCESS"",""message"":""Query terminated."",""queryId"":null}},""commandSequenceNumber"":40,""warnings"":[]}}]";
 
-  [TestMethod]
+  [Test]
   public async Task TerminatePersistentQueryAsync()
   {
     //Arrange
@@ -336,7 +335,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
   //https://github.com/confluentinc/ksql/issues/7559
   private string TerminatePushQueryResponse => @"""{""@type"":""generic_error"",""error_code"":50000,""message"":""On wrong context or worker""}""";
 
-  [TestMethod]
+  [Test]
   public async Task TerminatePushQueryAsync()
   {
     //Arrange
@@ -374,7 +373,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
   private string GetAllStreamsResponse => @"[{""@type"":""streams"",""statementText"":""SHOW STREAMS;"",""streams"":[{""type"":""STREAM"",""name"":""SENSORSSTREAM"",""topic"":""SENSORSSTREAM"",""keyFormat"":""KAFKA"",""valueFormat"":""JSON"",""isWindowed"":false},{""type"":""STREAM"",""name"":""MYMOVIESSTREAMTESTS"",""topic"":""MyMoviesStreamTest"",""keyFormat"":""JSON"",""valueFormat"":""JSON"",""isWindowed"":true}],""warnings"":[]}]";
 
-  [TestMethod]
+  [Test]
   public async Task GetStreamsAsync()
   {
     //Arrange
@@ -395,7 +394,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
   private string GetAllTablesResponse => @"[{""@type"":""tables"",""statementText"":""SHOW TABLES;"",""tables"":[{""type"":""TABLE"",""name"":""AVG_SENSOR_VALUES"",""topic"":""AVG_SENSOR_VALUES"",""keyFormat"":""KAFKA"",""valueFormat"":""JSON"",""isWindowed"":true},{""type"":""TABLE"",""name"":""MYMOVIESTABLES"",""topic"":""MyMoviesTable"",""keyFormat"":""JSON"",""valueFormat"":""JSON"",""isWindowed"":true}],""warnings"":[]}]";
 
-  [TestMethod]
+  [Test]
   public async Task GetTablesAsync()
   {
     //Arrange
@@ -414,7 +413,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     tablesResponses[0].Tables.Length.Should().Be(2);
   }
 
-  [TestMethod]
+  [Test]
   public async Task DropStreamAsync()
   {
     //Arrange
@@ -431,7 +430,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     VerifySendAsync(expectedContent);
   }
 
-  [TestMethod]
+  [Test]
   public async Task DropStreamAsync_IfExistsAndDeleteTopic()
   {
     //Arrange
@@ -451,7 +450,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     VerifySendAsync(expectedContent);
   }
 
-  [TestMethod]
+  [Test]
   public async Task DropTableAsync()
   {
     //Arrange
@@ -468,7 +467,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     VerifySendAsync(expectedContent);
   }
 
-  [TestMethod]
+  [Test]
   public async Task DropTableAsync_IfExistsAndDeleteTopic()
   {
     //Arrange
@@ -488,7 +487,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     VerifySendAsync(expectedContent);
   }
 
-  [TestMethod]
+  [Test]
   public void ToInsertStatement()
   {
     //Arrange
@@ -519,7 +518,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     public string Release_Date { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public void ToInsertStatement_WithFunction()
   {
     //Arrange
@@ -534,7 +533,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     insertStatement.Sql.Should().Be($"INSERT INTO Articles ({nameof(Article.Title)}, Id, {nameof(Article.Release_Date)}) VALUES (NULL, 0, {expectedFunction});");
   }
 
-  [TestMethod]
+  [Test]
   public async Task AssertTopicExistsAsync_ReturnsTrue()
   {
     //Arrange
@@ -556,7 +555,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     response[0].Exists.Should().BeTrue();
   }
   
-  [TestMethod]
+  [Test]
   public async Task AssertTopicExistsAsync_ReturnsFalse()
   {
     //Arrange
@@ -577,7 +576,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     response[0].Exists.Should().BeFalse();
   }
 
-  [TestMethod]
+  [Test]
   public async Task AssertSchemaExistsAsync_ReturnsTrue()
   {
     //Arrange
@@ -599,7 +598,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     response[0].Exists.Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public async Task AssertSchemaExistsAsync_ReturnsFalse()
   {
     //Arrange
