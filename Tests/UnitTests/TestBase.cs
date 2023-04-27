@@ -1,6 +1,5 @@
 using System.Reactive.Concurrency;
 using Microsoft.Reactive.Testing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ninject.MockingKernel.Moq;
 using NUnit.Framework;
 using UnitTests.Schedulers;
@@ -14,23 +13,23 @@ public abstract class TestBase<TClassUnderTest> : TestBase
 
 public abstract class TestBase
 {
-  protected readonly MoqMockingKernel MockingKernel = new MoqMockingKernel();
-  protected TestScheduler TestScheduler = new TestScheduler();
+  protected MoqMockingKernel MockingKernel = null!;
+  protected TestScheduler TestScheduler = new();
 
   protected ReactiveTestSchedulersFactory SchedulersFactory = null!;
 
   [SetUp]
-  [TestInitialize]
   public virtual void TestInitialize()
   {
     SchedulersFactory = new ReactiveTestSchedulersFactory();
+
+    MockingKernel = new MoqMockingKernel();
 
     MockingKernel.Bind<IScheduler>().ToConstant(TestScheduler);
     MockingKernel.Bind<ReactiveTestSchedulersFactory>().ToConstant(SchedulersFactory);
   }
 
   [TearDown]
-  [TestCleanup]
   public virtual void TestCleanup()
   {
   }
