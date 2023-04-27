@@ -5,19 +5,18 @@ using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
 using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Annotations;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
 
-[TestClass]
 public class KSqlCustomFunctionVisitorTests : TestBase
 {
   private KSqlCustomFunctionVisitor ClassUnderTest { get; set; } = null!;
 
   private StringBuilder StringBuilder { get; set; } = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -34,7 +33,7 @@ public class KSqlCustomFunctionVisitorTests : TestBase
   [KSqlFunction]
   string Substring(string input, int position, int length) => throw new NotSupportedException();
 
-  [TestMethod]
+  [Test]
   public void InstanceFunction()
   {
     //Arrange
@@ -47,7 +46,7 @@ public class KSqlCustomFunctionVisitorTests : TestBase
     query.Should().BeEquivalentTo($"Substring({nameof(Tweet.Message)}, 2, 3)");
   }
 
-  [TestMethod]
+  [Test]
   public void MissingAttribute_NothingIsRendered()
   {
     //Arrange
@@ -69,7 +68,7 @@ public class KSqlCustomFunctionVisitorTests : TestBase
     public static double MyAbs(double input) => throw new NotSupportedException();
   }
 
-  [TestMethod]
+  [Test]
   public void StaticFunction()
   {
     Expression<Func<Tweet, double>> expression = c => F.Abs(c.Amount);
@@ -81,7 +80,7 @@ public class KSqlCustomFunctionVisitorTests : TestBase
     query.Should().BeEquivalentTo($"ABS({nameof(Tweet.Amount)})");
   }
 
-  [TestMethod]
+  [Test]
   public void StaticFunction_OverridenFunctionName()
   {
     Expression<Func<Tweet, double>> expression = c => F.Abs(c.Amount);

@@ -1,11 +1,10 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Connectors;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements.Connectors;
 
-[TestClass]
 public class ConnectorGeneratorTests : TestBase
 {
   private IDictionary<string, string> CreateConfig()
@@ -16,10 +15,10 @@ public class ConnectorGeneratorTests : TestBase
       { "key2", "value2"}
     };
   }
-    
-  string connectorName = "myConnector";
 
-  [TestMethod]
+  readonly string connectorName = "myConnector";
+
+  [Test]
   public void ToCreateSourceConnectorStatement()
   {
     //Arrange
@@ -32,7 +31,7 @@ public class ConnectorGeneratorTests : TestBase
     statement.Should().Be(ExpectedStatement("CREATE SOURCE CONNECTOR"));
   }
 
-  [TestMethod]
+  [Test]
   public void ToCreateSourceConnectorStatement_IfNotExists()
   {
     //Arrange
@@ -45,7 +44,7 @@ public class ConnectorGeneratorTests : TestBase
     statement.Should().Be(ExpectedStatement("CREATE SOURCE CONNECTOR IF NOT EXISTS"));
   }
 
-  [TestMethod]
+  [Test]
   public void ToCreateSinkConnectorStatement()
   {
     //Arrange
@@ -58,7 +57,7 @@ public class ConnectorGeneratorTests : TestBase
     statement.Should().Be(ExpectedStatement("CREATE SINK CONNECTOR"));
   }
 
-  [TestMethod]
+  [Test]
   public void ToCreateSinkConnectorStatement_IfNotExists()
   {
     //Arrange

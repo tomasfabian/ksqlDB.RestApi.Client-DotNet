@@ -4,18 +4,17 @@ using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
 
-[TestClass]
 public class AggregationFunctionExpressionTests : TestBase
 {
   private AggregationFunctionVisitor ClassUnderTest { get; set; } = null!;
   private StringBuilder StringBuilder { get; set; } = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -24,7 +23,7 @@ public class AggregationFunctionExpressionTests : TestBase
     ClassUnderTest = new AggregationFunctionVisitor(StringBuilder, new KSqlQueryMetadata());
   }
 
-  [TestMethod]
+  [Test]
   public void LongCount_BuildKSql_PrintsCountWithAsterix()
   {
     //Arrange
@@ -37,7 +36,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, COUNT(*) Count");
   }
 
-  [TestMethod]
+  [Test]
   public void LongCount_BuildKSql_PrintsCountWithColumn()
   {
     //Arrange
@@ -50,7 +49,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, COUNT({nameof(Transaction.Amount)}) Count");
   }
 
-  [TestMethod]
+  [Test]
   public void Count_BuildKSql_PrintsCountWithColumn()
   {
     //Arrange
@@ -63,7 +62,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, COUNT({nameof(Transaction.Amount)}) Count");
   }
 
-  [TestMethod]
+  [Test]
   public void LongCountDistinct_BuildKSql_PrintsCountDistinctWithColumn()
   {
     //Arrange
@@ -76,7 +75,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, COUNT_DISTINCT({nameof(Transaction.Amount)}) CountDistinct");
   }
 
-  [TestMethod]
+  [Test]
   public void CountDistinct_BuildKSql_PrintsCountDistinctWithColumn()
   {
     //Arrange
@@ -89,7 +88,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, COUNT_DISTINCT({nameof(Transaction.Amount)}) CountDistinct");
   }
     
-  [TestMethod]
+  [Test]
   public void CollectSet_BuildKSql_PrintsCollectSetWithColumn()
   {
     //Arrange
@@ -102,7 +101,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, COLLECT_SET({nameof(Transaction.Amount)}) CollectSet");
   }
     
-  [TestMethod]
+  [Test]
   public void CollectSet_BuildKSql_Map()
   {
     //Arrange
@@ -115,7 +114,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, COLLECT_SET({nameof(Transaction.Dictionary)}) CollectSet");
   }
     
-  [TestMethod]
+  [Test]
   public void CollectList_BuildKSql_PrintsCollectListWithColumn()
   {
     //Arrange
@@ -128,7 +127,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, COLLECT_LIST({nameof(Transaction.Amount)}) CollectList");
   }
     
-  [TestMethod]
+  [Test]
   public void CollectList_BuildKSql_Array()
   {
     //Arrange
@@ -141,7 +140,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, COLLECT_LIST({nameof(Transaction.Array)}) CollectList");
   }
     
-  [TestMethod]
+  [Test]
   public void CollectList_BuildKSql_Map()
   {
     //Arrange
@@ -154,7 +153,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, COLLECT_LIST({nameof(Transaction.Dictionary)}) CollectList");
   }
 
-  [TestMethod]
+  [Test]
   public void Max_BuildKSql_PrintsMaxWithColumn()
   {
     //Arrange
@@ -167,7 +166,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, MAX({nameof(System.Drawing.Rectangle.Height)}) Max");
   }
 
-  [TestMethod]
+  [Test]
   public void Min_BuildKSql_PrintsMinWithColumn()
   {
     //Arrange
@@ -180,7 +179,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, MIN({nameof(Transaction.Amount)}) Min");
   }
 
-  [TestMethod]
+  [Test]
   public void EarliestByOffset_BuildKSql_PrintsEarliestByOffsetWithColumn()
   {
     //Arrange
@@ -193,7 +192,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, EARLIEST_BY_OFFSET({nameof(Transaction.Amount)}, true) EarliestByOffset");
   }
 
-  [TestMethod]
+  [Test]
   public void EarliestByOffset_BuildKSql_Map()
   {
     //Arrange
@@ -206,7 +205,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, EARLIEST_BY_OFFSET({nameof(Transaction.Dictionary)}, true) EarliestByOffset");
   }
 
-  [TestMethod]
+  [Test]
   public void EarliestByOffsetN_BuildKSql_PrintsEarliestByOffsetWithColumn()
   {
     //Arrange
@@ -219,7 +218,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, EARLIEST_BY_OFFSET({nameof(Transaction.Amount)}, 2, true) EarliestByOffset");
   }
 
-  [TestMethod]
+  [Test]
   public void EarliestByOffsetAllowNulls_BuildKSql_PrintsEarliestByOffsetAllowNullsWithColumn()
   {
     //Arrange
@@ -232,7 +231,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, EARLIEST_BY_OFFSET({nameof(Transaction.Amount)}, false) EarliestByOffsetAllowNulls");
   }
 
-  [TestMethod]
+  [Test]
   public void EarliestByOffsetAllowNullsN_BuildKSql_PrintsEarliestByOffsetAllowNullsWithColumn()
   {
     //Arrange
@@ -246,7 +245,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, EARLIEST_BY_OFFSET({nameof(Transaction.Amount)}, {earliestN}, false) EarliestByOffsetAllowNulls");
   }
 
-  [TestMethod]
+  [Test]
   public void LatestByOffset_BuildKSql_PrintsLatestByOffsetWithColumn()
   {
     //Arrange
@@ -259,7 +258,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, LATEST_BY_OFFSET({nameof(Transaction.Amount)}, true) LatestByOffset");
   }
 
-  [TestMethod]
+  [Test]
   public void LatestByOffset_BuildKSql_Map()
   {
     //Arrange
@@ -272,7 +271,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, LATEST_BY_OFFSET({nameof(Transaction.Dictionary)}, true) LatestByOffset");
   }
 
-  [TestMethod]
+  [Test]
   public void LatestByOffsetN_BuildKSql_PrintsLatestByOffsetWithColumn()
   {
     //Arrange
@@ -286,7 +285,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, LATEST_BY_OFFSET({nameof(Transaction.Amount)}, {latestN}, true) LatestByOffset");
   }
 
-  [TestMethod]
+  [Test]
   public void LatestByOffsetAllowNulls_BuildKSql_PrintsLatestByOffsetAllowNullsWithColumn()
   {
     //Arrange
@@ -299,7 +298,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, LATEST_BY_OFFSET({nameof(Transaction.Amount)}, false) LatestByOffsetAllowNulls");
   }
 
-  [TestMethod]
+  [Test]
   public void LatestByOffsetAllowNullsN_BuildKSql_PrintsLatestByOffsetAllowNullsWithColumn()
   {
     //Arrange
@@ -312,7 +311,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, LATEST_BY_OFFSET({nameof(Transaction.Amount)}, 2, false) LatestByOffsetAllowNulls");
   }
 
-  [TestMethod]
+  [Test]
   public void TopK_BuildKSql_PrintsTopK()
   {
     //Arrange
@@ -325,7 +324,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, TOPK({nameof(Transaction.Amount)}, 2) TopK");
   }
 
-  [TestMethod]
+  [Test]
   public void TopKDistinct_BuildKSql_PrintsTopKDistinct()
   {
     //Arrange
@@ -338,7 +337,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, TOPKDISTINCT({nameof(Transaction.Amount)}, 2) TopKDistinct");
   }
 
-  [TestMethod]
+  [Test]
   public void TopKDistinctWithVariableInput_BuildKSql_PrintsTopKDistinct()
   {
     //Arrange
@@ -352,7 +351,7 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, TOPKDISTINCT({nameof(Transaction.Amount)}, {k}) TopKDistinct");
   }
 
-  [TestMethod]
+  [Test]
   public void Histogram_BuildKSql_PrintsAggregation()
   {
     //Arrange

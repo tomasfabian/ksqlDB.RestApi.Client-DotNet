@@ -1,15 +1,14 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Parameters;
 
-[TestClass]
 public class QueryParametersExtensionsTests
 {
-  [TestMethod]
+  [Test]
   public void ToLogInfo_QueryStreamParameters_NoParameters()
   {
     //Arrange
@@ -24,7 +23,7 @@ Parameters:
 ");
   }
 
-  [TestMethod]
+  [Test]
   public void ToLogInfo_QueryStreamParameters()
   {
     //Arrange
@@ -45,7 +44,7 @@ processing.guarantee = at_least_once
 ");
   }
 
-  [TestMethod]
+  [Test]
   public void ToLogInfo_QueryStreamParameters_Sql()
   {
     //Arrange
@@ -65,7 +64,7 @@ Parameters:
 ");
   }
 
-  [TestMethod]
+  [Test]
   public void ToLogInfo_QueryParameters()
   {
     //Arrange

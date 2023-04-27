@@ -1,6 +1,5 @@
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Fakes.Http;
-using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.KSql.Query.Context;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -10,13 +9,13 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Reactive.Testing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using NUnit.Framework;
 using UnitTests;
+using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Linq;
 
-[TestClass]
 public class QbservableGroupByExtensionsTests : TestBase
 {
   private IQbservable<City> CreateQbservable()
@@ -31,7 +30,7 @@ public class QbservableGroupByExtensionsTests : TestBase
 
   private TestScheduler testScheduler = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -41,7 +40,7 @@ public class QbservableGroupByExtensionsTests : TestBase
 
   #region Count
 
-  [TestMethod]
+  [Test]
   public void GroupByAndCount_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -56,7 +55,7 @@ public class QbservableGroupByExtensionsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT COUNT(*) FROM Cities GROUP BY RegionCode EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByAndCount_Named_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -71,7 +70,7 @@ public class QbservableGroupByExtensionsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT COUNT(*) Count FROM Cities GROUP BY RegionCode EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByAndCountByKey_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -86,7 +85,7 @@ public class QbservableGroupByExtensionsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT RegionCode, COUNT(*) Count FROM Cities GROUP BY RegionCode EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByAndCountHaving_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -102,7 +101,7 @@ public class QbservableGroupByExtensionsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT RegionCode, COUNT(*) Count FROM Cities GROUP BY RegionCode HAVING Count(*) > 2 EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByAndCount_Subscribe_ReceivesValues()
   {
     //Arrange
@@ -129,7 +128,7 @@ public class QbservableGroupByExtensionsTests : TestBase
 
   #region Sum
 
-  [TestMethod]
+  [Test]
   public void GroupByAndSum_Subscribe_ReceivesValues()
   {
     //Arrange
@@ -149,7 +148,7 @@ public class QbservableGroupByExtensionsTests : TestBase
     subscription.Dispose();
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByAndSum_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -164,7 +163,7 @@ public class QbservableGroupByExtensionsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT SUM(Citizens) FROM Cities GROUP BY RegionCode EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByAndSumWithColumn_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -183,7 +182,7 @@ public class QbservableGroupByExtensionsTests : TestBase
 
   #region Avg
 
-  [TestMethod]
+  [Test]
   public void GroupByAndAvg_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -202,7 +201,7 @@ public class QbservableGroupByExtensionsTests : TestBase
 
   #region GroupBy
 
-  [TestMethod]
+  [Test]
   public void GroupByCompoundKey_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -225,7 +224,7 @@ public class QbservableGroupByExtensionsTests : TestBase
     ksql.Should().BeEquivalentTo(expectedKSql);
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByNestedProperty_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -240,7 +239,7 @@ public class QbservableGroupByExtensionsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT State->Name, COUNT(*) num_times FROM Cities GROUP BY State->Name EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByDeeplyNestedProperty_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -255,7 +254,7 @@ public class QbservableGroupByExtensionsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT State->Nested->Version, COUNT(*) num_times FROM Cities GROUP BY State->Nested->Version EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByNestedPropertyWithSameAlias_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -270,7 +269,7 @@ public class QbservableGroupByExtensionsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT State->Name, COUNT(*) num_times FROM Cities GROUP BY State->Name EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByNestedPropertyWithDifferentAlias_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -285,7 +284,7 @@ public class QbservableGroupByExtensionsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT State->Name AS MyAlias, COUNT(*) num_times FROM Cities GROUP BY State->Name EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByAnonymousType_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -300,7 +299,7 @@ public class QbservableGroupByExtensionsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT RegionCode, State->Name, COUNT(*) num_times FROM Cities GROUP BY RegionCode, State->Name EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByQuerySyntax_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -323,7 +322,7 @@ public class QbservableGroupByExtensionsTests : TestBase
 WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void GroupByQuerySyntaxWithLimit_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -347,7 +346,7 @@ WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES;");
 WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES LIMIT 2;");
   }
 
-  [TestMethod]
+  [Test]
   public void GroupNewByQuerySyntax_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -373,7 +372,7 @@ WHERE RegionCode != 'xx' GROUP BY RegionCode EMIT CHANGES;");
 
   #region Min
 
-  [TestMethod]
+  [Test]
   public void GroupByAndMin_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -392,7 +391,7 @@ WHERE RegionCode != 'xx' GROUP BY RegionCode EMIT CHANGES;");
 
   #region Max
 
-  [TestMethod]
+  [Test]
   public void GroupByAndMax_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -411,7 +410,7 @@ WHERE RegionCode != 'xx' GROUP BY RegionCode EMIT CHANGES;");
 
   #region Cast
     
-  [TestMethod]
+  [Test]
   public void ConvertToString_Cast()
   {
     //Arrange
@@ -426,7 +425,7 @@ WHERE RegionCode != 'xx' GROUP BY RegionCode EMIT CHANGES;");
     ksql.Should().BeEquivalentTo(@"SELECT RegionCode, CAST(COUNT(*) AS VARCHAR) Count FROM Cities GROUP BY RegionCode EMIT CHANGES;");
   }
     
-  [TestMethod]
+  [Test]
   public void ToString_Cast()
   {
     //Arrange

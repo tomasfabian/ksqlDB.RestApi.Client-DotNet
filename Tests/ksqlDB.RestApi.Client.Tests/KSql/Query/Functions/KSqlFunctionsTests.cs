@@ -1,14 +1,13 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Functions;
 
-[TestClass]
 public class KSqlFunctionsTests : TestBase
 {
-  [TestMethod]
+  [Test]
   public void Instance_ReturnsSelf()
   {
     //Arrange
@@ -21,7 +20,7 @@ public class KSqlFunctionsTests : TestBase
     kSqlFunctions.Should().BeOfType<KSqlFunctions>();
   }
 
-  [TestMethod]
+  [Test]
   public void K_ReturnsInstanceOfFunctions()
   {
     //Arrange
@@ -35,7 +34,7 @@ public class KSqlFunctionsTests : TestBase
     kSqlFunctions.Should().BeSameAs(KSqlFunctions.Instance);
   }
 
-  [TestMethod]
+  [Test]
   public void KSqlFunctions_ReturnsInstanceOfFunctions()
   {
     //Arrange
@@ -48,7 +47,7 @@ public class KSqlFunctionsTests : TestBase
     kSqlFunctions.Should().BeSameAs(KSqlFunctions.Instance);
   }
 
-  [TestMethod]
+  [Test]
   public void KSqlF_ReturnsInstanceOfFunctions()
   {
     //Arrange

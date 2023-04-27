@@ -1,17 +1,16 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Extensions;
 
-[TestClass]
 public class HttpResponseMessageExtensionsTests : KSqlDbRestApiClientTestsBase
 {
-  string statement = "CREATE OR REPLACE TABLE movies";
+  readonly string statement = "CREATE OR REPLACE TABLE movies";
 
-  [TestMethod]
+  [Test]
   public async Task ExecuteStatementAsync_HttpClientWasCalled_OkResult()
   {
     //Arrange

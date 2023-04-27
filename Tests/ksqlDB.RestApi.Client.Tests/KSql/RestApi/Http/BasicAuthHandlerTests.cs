@@ -1,14 +1,13 @@
 using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Http;
 
-[TestClass]
 public class BasicAuthHandlerTests : TestBase
 {
-  [TestMethod]
+  [Test]
   public async Task SendAsync()
   {
     //Arrange

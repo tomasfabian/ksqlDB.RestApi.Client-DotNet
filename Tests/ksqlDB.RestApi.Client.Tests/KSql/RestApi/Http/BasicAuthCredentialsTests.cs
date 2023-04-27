@@ -1,14 +1,13 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Http;
 
-[TestClass]
 public class BasicAuthCredentialsTests : TestBase
 {
-  [TestMethod]
+  [Test]
   public void CreateToken_Ctor()
   {
     //Arrange
@@ -23,7 +22,7 @@ public class BasicAuthCredentialsTests : TestBase
 
   private readonly string expectedToken = "ZnJlZDpsZXRtZWlu";
 
-  [TestMethod]
+  [Test]
   public void CreateToken_FromProperties()
   {
     //Arrange
@@ -40,7 +39,7 @@ public class BasicAuthCredentialsTests : TestBase
     token.Should().Be(expectedToken);
   }
 
-  [TestMethod]
+  [Test]
   public void Schema_Basic()
   {
     //Arrange

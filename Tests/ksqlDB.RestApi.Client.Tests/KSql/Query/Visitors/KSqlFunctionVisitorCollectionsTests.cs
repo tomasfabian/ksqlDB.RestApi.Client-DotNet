@@ -5,19 +5,18 @@ using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
 
-[TestClass]
 public class KSqlFunctionVisitorCollectionsTests : TestBase
 {
   private KSqlFunctionVisitor ClassUnderTest { get; set; } = null!;
 
   private StringBuilder StringBuilder { get; set; } = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -36,7 +35,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
   #region ArrayContains
 
-  [TestMethod]
+  [Test]
   public void ArrayContains_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -49,7 +48,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
     query.Should().BeEquivalentTo($"ARRAY_CONTAINS({nameof(Collection.Items1)}, 2)");
   }
 
-  [TestMethod]
+  [Test]
   public void Array_BuildKSql_PrintsArrayFromProperties()
   {
     //Arrange
@@ -66,7 +65,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
   #region ArrayDistinct
     
-  [TestMethod]
+  [Test]
   public void ArrayDistinct_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -84,7 +83,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
   #region ArrayExcept
     
-  [TestMethod]
+  [Test]
   public void ArrayExcept_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -101,7 +100,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
   #region ArrayIntersect
 
-  [TestMethod]
+  [Test]
   public void ArrayIntersect_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -118,7 +117,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
   #region ArrayJoin
 
-  [TestMethod]
+  [Test]
   public void ArrayJoin_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -135,7 +134,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
   #region ArrayRemove
 
-  [TestMethod]
+  [Test]
   public void ArrayRemove_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -152,7 +151,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
   #region ArrayLength
 
-  [TestMethod]
+  [Test]
   public void ArrayLength_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -169,7 +168,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
   #region ArrayMin
 
-  [TestMethod]
+  [Test]
   public void ArrayMin_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -186,7 +185,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
     
   #region ArrayMax
 
-  [TestMethod]
+  [Test]
   public void ArrayMax_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -203,7 +202,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
   #region ArraySort
     
-  [TestMethod]
+  [Test]
   public void ArraySortNewArray_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -216,7 +215,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
     query.Should().BeEquivalentTo("ARRAY_SORT(ARRAY[3, NULL, 1], 'ASC')");
   } 
 
-  [TestMethod]
+  [Test]
   public void ArraySort_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -233,7 +232,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
   #region ArrayUnion
     
-  [TestMethod]
+  [Test]
   public void ArrayUnionNewArray_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -246,7 +245,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
     query.Should().BeEquivalentTo("ARRAY_UNION(ARRAY[3, NULL, 1], ARRAY[3, NULL])");
   } 
 
-  [TestMethod]
+  [Test]
   public void ArrayUnion_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -263,7 +262,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
   #region AsMap
     
-  [TestMethod]
+  [Test]
   public void AsMap_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -280,7 +279,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
   #region JsonArrayContains
     
-  [TestMethod]
+  [Test]
   public void JsonArrayContains_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -297,7 +296,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
   #region MapKeys
     
-  [TestMethod]
+  [Test]
   public void MapKeys_BuildKSql_PrintsFunction()
   {
     //Arrange

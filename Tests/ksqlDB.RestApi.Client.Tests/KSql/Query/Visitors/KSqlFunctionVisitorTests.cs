@@ -4,19 +4,18 @@ using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
 
-[TestClass]
 public class KSqlFunctionVisitorTests : TestBase
 {
   private KSqlFunctionVisitor ClassUnderTest { get; set; } = null!;
 
   private StringBuilder StringBuilder { get; set; } = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -27,7 +26,7 @@ public class KSqlFunctionVisitorTests : TestBase
 
   #region Nulls
     
-  [TestMethod]
+  [Test]
   public void IfNull_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -50,7 +49,7 @@ public class KSqlFunctionVisitorTests : TestBase
     public string Description { get; init; }
   }
 
-  [TestMethod]
+  [Test]
   public void IfNullStruct_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -68,7 +67,7 @@ public class KSqlFunctionVisitorTests : TestBase
 
   #region Dynamic
 
-  [TestMethod]
+  [Test]
   public void Dynamic_BuildKSql_PrintsStringifiedFunction()
   {
     //Arrange
@@ -82,7 +81,7 @@ public class KSqlFunctionVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{functionCall}");
   }
 
-  [TestMethod]
+  [Test]
   public void DynamicNewExpression_BuildKSql_PrintsStringifiedFunction()
   {
     //Arrange
@@ -96,7 +95,7 @@ public class KSqlFunctionVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{functionCall} Col");
   }
 
-  [TestMethod]
+  [Test]
   public void DynamicNewExpressionMultipleFields_BuildKSql_PrintsStringifiedFunction()
   {
     //Arrange
@@ -114,7 +113,7 @@ public class KSqlFunctionVisitorTests : TestBase
 
   #region Arrays
     
-  [TestMethod]
+  [Test]
   public void Array_BuildKSql_PrintsArray()
   {
     //Arrange
@@ -127,7 +126,7 @@ public class KSqlFunctionVisitorTests : TestBase
     query.Should().BeEquivalentTo("ARRAY[1, 2, 3]");
   }
     
-  [TestMethod]
+  [Test]
   public void ArrayDestructure_BuildKSql_PrintsIndexer()
   {
     //Arrange
@@ -140,7 +139,7 @@ public class KSqlFunctionVisitorTests : TestBase
     query.Should().BeEquivalentTo("ARRAY[1, 2, 3][1]");
   }
     
-  [TestMethod]
+  [Test]
   public void ArrayLength_BuildKSql_PrintsArrayLength()
   {
     //Arrange

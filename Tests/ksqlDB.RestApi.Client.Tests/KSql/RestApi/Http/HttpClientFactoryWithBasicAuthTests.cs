@@ -1,15 +1,14 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
+using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Http;
 
-[TestClass]
 public class HttpClientFactoryWithBasicAuthTests : TestBase
 {
-  [TestMethod]
+  [Test]
   public void CreateClient_BaseAddressWasSet()
   {
     //Arrange

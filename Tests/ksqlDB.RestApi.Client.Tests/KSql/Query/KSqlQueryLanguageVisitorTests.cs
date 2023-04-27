@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.KSql.Linq;
 using ksqlDB.Api.Client.Tests.KSql.RestApi.Statements;
 using ksqlDB.Api.Client.Tests.Models;
@@ -11,13 +10,13 @@ using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Formats;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 using Location = ksqlDB.Api.Client.Tests.Models.Location;
+using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query;
 
-[TestClass]
 public class KSqlQueryLanguageVisitorTests : TestBase
 {
   private KSqlQueryGenerator ClassUnderTest { get; set; } = null!;
@@ -27,7 +26,7 @@ public class KSqlQueryLanguageVisitorTests : TestBase
   private KSqlDBContextOptions contextOptions = null!;
   private QueryContext queryContext = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -66,7 +65,7 @@ public class KSqlQueryLanguageVisitorTests : TestBase
     public string DataId { get; set; } = null!;
   }
 
-  [TestMethod]
+  [Test]
   public void BuildKSql_SelectPropertyWithJsonPropertyNameAttribute()
   {
     //Arrange
@@ -86,7 +85,7 @@ WHERE SensorId = '1' EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void BuildKSql_SelectFromJoinPropertyWithJsonPropertyNameAttribute()
   {
     //Arrange
@@ -123,7 +122,7 @@ EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void BuildKSql_SelectFromMultiJoinPropertyWithJsonPropertyNameAttribute()
   {
     //Arrange
@@ -153,8 +152,8 @@ EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
-  [Ignore]
+  [Test]
+  [Ignore("TODO")]
   public void BuildKSql_SelectFrom3MultiJoinSameTypePropertyWithJsonPropertyNameAttribute()
   {
     //Arrange
@@ -191,7 +190,7 @@ EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectAlias_BuildKSql_PrintsProjection()
   {
     //Arrange
@@ -208,7 +207,7 @@ EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectTwoAliasesWithBinaryOperations_BuildKSql_PrintsProjection()
   {
     //Arrange
@@ -225,7 +224,7 @@ EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectWhere_BuildKSql_PrintsSelectFromWhere()
   {
     //Arrange
@@ -244,7 +243,7 @@ WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectMultipleWhere_BuildKSql_PrintsSelectFromWheres()
   {
     //Arrange
@@ -269,7 +268,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectDynamicFunction_BuildKSql_PrintsFunctionCall()
   {
     //Arrange
@@ -286,7 +285,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectListMember_BuildKSql_PrintsArray()
   {
     //Arrange
@@ -303,7 +302,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectList_BuildKSql_PrintsArray()
   {
     //Arrange
@@ -322,7 +321,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectListContains_BuildKSql_PrintsIn()
   {
     //Arrange
@@ -339,7 +338,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     ksql.Should().BeEquivalentTo(@$"SELECT {nameof(OrderData.OrderType)} IN (1, 3) FROM {nameof(OrderData)} EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void SelectNewListContains_BuildKSql_PrintsIn()
   {
     //Arrange
@@ -358,7 +357,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
 
   #region CapturedVariables
 
-  [TestMethod]
+  [Test]
   public void Transform_CapturedNestedPropertyAccessor()
   {
     //Arrange
@@ -385,7 +384,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     public int Prop { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public void Select_CapturedStructWithAlias()
   {
     //Arrange
@@ -408,7 +407,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     public int Prop { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public void Select_CapturedClassWithAlias()
   {
     //Arrange
@@ -426,7 +425,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     ksql.Should().Be($"SELECT STRUCT(Prop := 42) AS C FROM {streamName} EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void Select_CapturedStruct()
   {
     //Arrange
@@ -448,7 +447,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
 
   #region Time types
 
-  [TestMethod]
+  [Test]
   public void Select_TimeField_PrintsBetween()
   {
     //Arrange
@@ -466,7 +465,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void Select_CapturedTimeVariable_PrintsBetween()
   {
     //Arrange
@@ -486,7 +485,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void Select_NewTimeVariable_PrintsBetween()
   {
     //Arrange
@@ -504,7 +503,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void Select_MinValue_PrintsBetween()
   {
     //Arrange
@@ -523,7 +522,7 @@ WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void Select_DateTimeNow_PrintsBetween()
   {
     //Arrange
@@ -541,7 +540,7 @@ WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;";
     ksql.Should().Be(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void Select_CapturedDateTime_PrintsBetween()
   {
     //Arrange
@@ -561,7 +560,7 @@ WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void Select_CapturedDateTimeNew_PrintsBetween()
   {
     //Arrange
@@ -587,7 +586,7 @@ WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;";
 
   #region Where
 
-  [TestMethod]
+  [Test]
   public void Where_BuildKSql_PrintsWhere()
   {
     //Arrange
@@ -602,7 +601,7 @@ WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;";
 WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void WhereSelect_BuildKSql_PrintsSelectFromWhere()
   {
     //Arrange
@@ -627,7 +626,7 @@ WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;";
     public string Category { get; set; } = null!;
   }
 
-  [TestMethod]
+  [Test]
   public void WhereContains_BuildKSql_PrintsArrayContains()
   {
     //Arrange
@@ -643,7 +642,7 @@ WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;";
 WHERE ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)}) EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void WhereContainsArrayMember_BuildKSql_PrintsArrayContains()
   {
     //Arrange
@@ -661,7 +660,7 @@ WHERE ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)}) EMIT CHANGES;")
 WHERE ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)}) EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void WhereContainsListMember_BuildKSql_PrintsWhere()
   {
     //Arrange
@@ -679,7 +678,7 @@ WHERE ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)}) EMIT CHANGES;")
 WHERE {nameof(OrderData.OrderType)} IN (1, 3) EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void WhereContainsListOfStringsMember_BuildKSql_PrintsWhere()
   {
     //Arrange
@@ -697,7 +696,7 @@ WHERE {nameof(OrderData.OrderType)} IN (1, 3) EMIT CHANGES;");
 WHERE {nameof(OrderData.Category)} IN ('1', '3') EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public void WhereContainsArrayMember_BuildKSql_PrintsWhere()
   {
     //Arrange
@@ -719,7 +718,7 @@ WHERE {nameof(OrderData.OrderType)} IN (1, 3) EMIT CHANGES;");
 
   #region Between
 
-  [TestMethod]
+  [Test]
   public void WhereBetween_StringField_PrintsBetween()
   {
     //Arrange
@@ -737,7 +736,7 @@ WHERE {nameof(Tweet.Message)} BETWEEN '1' AND '3' EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void WhereBetween_IntegerField_PrintsBetween()
   {
     //Arrange
@@ -755,7 +754,7 @@ WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectBetween_IntegerField_PrintsBetween()
   {
     //Arrange
@@ -772,7 +771,7 @@ WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectBetweenAsAlias_IntegerField_PrintsBetween()
   {
     //Arrange
@@ -789,7 +788,7 @@ WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectBetweenFromVariables_IntegerField_PrintsBetween()
   {
     //Arrange
@@ -809,7 +808,7 @@ WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectBetweenFromConstants_IntegerField_PrintsBetween()
   {
     //Arrange
@@ -829,7 +828,7 @@ WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void WhereNotBetween_StringField_PrintsBetween()
   {
     //Arrange
@@ -854,7 +853,7 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
     public DateTimeOffset DtOffset { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public void WhereBetween_TimeClosure_PrintsBetween()
   {
     //Arrange
@@ -876,7 +875,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void WhereBetween_TimeField_PrintsBetween()
   {
     //Arrange
@@ -899,7 +898,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
   #region Take
 
-  [TestMethod]
+  [Test]
   public void Take_BuildKSql_PrintsLimit()
   {
     //Arrange
@@ -919,7 +918,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
   #region ToQueryString
 
-  [TestMethod]
+  [Test]
   public void ToQueryString_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -939,7 +938,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
   #region StreamName
 
-  [TestMethod]
+  [Test]
   public void DontPluralize_BuildKSql_PrintsSingularStreamName()
   {
     //Arrange
@@ -955,7 +954,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void InjectStreamName_BuildKSql_PrintsInjectedStreamName()
   {
     //Arrange
@@ -972,7 +971,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void InjectStreamName_ShouldNotPluralizeStreamName_BuildKSql_PrintsInjectedStreamName()
   {
     //Arrange
@@ -993,7 +992,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
   #region Arrays
 
-  [TestMethod]
+  [Test]
   public void SelectArrayLength_BuildKSql_PrintsArrayLength()
   {
     //Arrange
@@ -1010,7 +1009,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectNamedArrayLength_BuildKSql_PrintsArrayLength()
   {
     //Arrange
@@ -1027,7 +1026,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectArrayIndex_BuildKSql_PrintsArrayIndex()
   {
     //Arrange
@@ -1044,7 +1043,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void ArrayProjected()
   {
     //Arrange
@@ -1065,7 +1064,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
   #region Maps
 
-  [TestMethod]
+  [Test]
   public void SelectDictionary_BuildKSql_PrintsMap()
   {
     //Arrange
@@ -1086,7 +1085,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectDictionaryProjected_BuildKSql_PrintsMap()
   {
     //Arrange
@@ -1110,7 +1109,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectDictionaryElement_BuildKSql_PrintsMapElementAccess()
   {
     //Arrange
@@ -1131,7 +1130,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectDictionaryElementProjected_BuildKSql_PrintsMapElementAccess()
   {
     //Arrange
@@ -1166,7 +1165,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     public int Y { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public void SelectStruct_BuildKSql_PrintsStruct()
   {
     //Arrange
@@ -1183,7 +1182,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectStructProjected_BuildKSql_PrintsStruct()
   {
     //Arrange
@@ -1200,7 +1199,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectStructElement_BuildKSql_PrintsElementAccessor()
   {
     //Arrange
@@ -1217,7 +1216,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectStructElementProjected_BuildKSql_PrintsElementAccessor()
   {
     //Arrange
@@ -1242,7 +1241,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     public Dictionary<string, double> Map { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public void SelectStructElementsFromColumns_BuildKSql_PrintsStruct()
   {
     //Arrange
@@ -1259,7 +1258,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectStructWithNestedArray_BuildKSql_PrintsStruct()
   {
     //Arrange
@@ -1285,7 +1284,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectStructWithNestedMap_BuildKSql_PrintsStruct()
   {
     //Arrange
@@ -1338,7 +1337,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     return context.CreateQueryStream<DatabaseChangeObject<Entity>>();
   }
 
-  [TestMethod]
+  [Test]
   public void SelectNestedProperty_BuildKSql_PrintsElementAccessor()
   {
     //Arrange
@@ -1355,7 +1354,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectDeeplyNestedProperty_BuildKSql_PrintsElementAccessor()
   {
     //Arrange
@@ -1372,7 +1371,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectNewNestedProperty_BuildKSql_PrintsElementAccessor()
   {
     //Arrange
@@ -1389,7 +1388,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void SelectNewNestedPropertyWithAlias_BuildKSql_PrintsElementAccessor()
   {
     //Arrange
@@ -1412,7 +1411,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
   #region Deeply nested types
 
-  [TestMethod]
+  [Test]
   public void NestedArrayInMap()
   {
     //Arrange
@@ -1436,7 +1435,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void NestedMapInMap()
   {
     //Arrange
@@ -1460,7 +1459,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void NestedStructInMap()
   {
     //Arrange
@@ -1492,7 +1491,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void NestedMapInArray()
   {
     //Arrange
@@ -1516,7 +1515,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void NestedArrayInArray()
   {
     //Arrange
@@ -1540,7 +1539,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void NestedStructInArray()
   {
     //Arrange
@@ -1571,7 +1570,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void NestedArrayInArray_OuterMemberAccess()
   {
     //Arrange
@@ -1601,7 +1600,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
   #region Deeply nested types element destructure
 
-  [TestMethod]
+  [Test]
   public void NestedArrayInMap_ElementAccess()
   {
     //Arrange
@@ -1625,7 +1624,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void NestedMapInMap_ElementAccess()
   {
     //Arrange
@@ -1649,7 +1648,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void NestedMapInArray_ElementAccess()
   {
     //Arrange
@@ -1673,7 +1672,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void NestedArrayInArray_ElementAccess()
   {
     //Arrange
@@ -1701,7 +1700,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
   #region Operators
 
-  [TestMethod]
+  [Test]
   public void LogicalOperatorNot_BuildKSql_PrintsNot()
   {
     //Arrange
@@ -1718,7 +1717,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void LogicalOperatorNotProjected_BuildKSql_PrintsNot()
   {
     //Arrange
@@ -1735,7 +1734,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void Contains_BuildKSql_PrintsLike()
   {
     //Arrange
@@ -1753,7 +1752,7 @@ WHERE LCASE(Message) LIKE LCASE('%hard%') EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  [TestMethod]
+  [Test]
   public void EndsWith_BuildKSql_PrintsLike()
   {
     //Arrange
@@ -1777,7 +1776,7 @@ WHERE Message LIKE UCASE('%hard') EMIT CHANGES;";
 
   #region Functions
 
-  [TestMethod]
+  [Test]
   public void EntriesFromDictionary_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -1805,7 +1804,7 @@ WHERE Message LIKE UCASE('%hard') EMIT CHANGES;";
 
   #region Case
 
-  [TestMethod]
+  [Test]
   public void Switch_BuildKSql_PrintsCaseWhen()
   {
     //Arrange

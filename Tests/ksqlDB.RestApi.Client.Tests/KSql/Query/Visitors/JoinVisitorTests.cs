@@ -1,21 +1,20 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Helpers;
 using ksqlDB.Api.Client.Tests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
+using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
 
-[TestClass]
 public class JoinVisitorTests : TestBase
 {
   private KSqlDBContext KSqlDBContext { get; set; } = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -29,7 +28,7 @@ public class JoinVisitorTests : TestBase
 
   #region Join
 
-  [TestMethod]
+  [Test]
   public void Join_BuildKSql_PrintsInnerJoin()
   {
     //Arrange
@@ -63,7 +62,7 @@ EMIT CHANGES;";
     ksql.Should().Be(expectedQuery);
   }
 
-  [TestMethod]
+  [Test]
   public void Join_BuildKSql_PrintsInnerJoin_PluralizedJoinItem()
   {
     //Arrange
@@ -95,7 +94,7 @@ EMIT CHANGES;";
     ksql.Should().Be(expectedQuery);
   }
 
-  [TestMethod]
+  [Test]
   public void JoinAndSelectWithAliases_BuildKSql_PrintsInnerJoin()
   {
     //Arrange
@@ -129,7 +128,7 @@ EMIT CHANGES;";
   {
   }
 
-  [TestMethod]
+  [Test]
   public void SameStreamName_BuildKSql_PrintsDifferentAliases()
   {
     //Arrange
@@ -156,7 +155,7 @@ EMIT CHANGES;";
     ksql.Should().Be(expectedQuery);
   }
 
-  [TestMethod]
+  [Test]
   public void InnerJoinOverrideStreamName_NoProjectionFromJoinTable_BuildKSql_Prints()
   {
     //Arrange
@@ -183,7 +182,7 @@ EMIT CHANGES;";
     ksql.Should().Be(expectedQuery);
   }
 
-  [TestMethod]
+  [Test]
   public void InnerJoinOverrideStreamName_BuildKSql_Prints()
   {
     //Arrange
@@ -211,7 +210,7 @@ EMIT CHANGES;";
     ksql.Should().Be(expectedQuery);
   }
     
-  [TestMethod]
+  [Test]
   public void InnerJoinQuerySyntax_BuildKSql_Prints()
   {
     //Arrange
@@ -248,7 +247,7 @@ EMIT CHANGES;";
     public int Prop { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public void MultipleInnerJoinsQuerySyntax_BuildKSql_Prints()
   {
     //Arrange
@@ -295,7 +294,7 @@ EMIT CHANGES;";
     public string Prop { get; set; } = null!;
   }
 
-  [TestMethod]
+  [Test]
   public void JoinWithInvocationFunction_BuildKSql_Prints()
   {
     //Arrange
@@ -326,8 +325,8 @@ EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
 
-  [TestMethod]
-  [Ignore("TODO:")]
+  [Test]
+  [Microsoft.VisualStudio.TestTools.UnitTesting.Ignore("TODO:")]
   public void JoinWithSeveralOnConditions_BuildKSql_Prints()
   {
     //Arrange
@@ -346,7 +345,7 @@ EMIT CHANGES;";
     //TODO:
   }
 
-  [TestMethod]
+  [Test]
   public void JoinWithNestedType_BuildKSql_Prints()
   {
     //Arrange
@@ -373,7 +372,7 @@ WHERE {lambdaAlias}.Nested->Prop = 'Nested' EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
 
-  [TestMethod]
+  [Test]
   public void JoinWithFunctionAndNestedType_BuildKSql_Prints()
   {
     //Arrange
@@ -400,7 +399,7 @@ EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
 
-  [TestMethod]
+  [Test]
   public void MultipleInnerJoinsQuerySyntax_WithTake_BuildKSql_Prints()
   {
     //Arrange
@@ -430,7 +429,7 @@ EMIT CHANGES LIMIT 2;";
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
 
-  [TestMethod]
+  [Test]
   public void JoinAndLeftJoin_WithTake_BuildKSql_Prints()
   {
     //Arrange
@@ -461,7 +460,7 @@ EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
 
-  [TestMethod]
+  [Test]
   public void JoinWithinTimeUnit_BuildKSql_Prints()
   {
     //Arrange
@@ -491,7 +490,7 @@ EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
 
-  [TestMethod]
+  [Test]
   public void JoinWithinTimeUnit_BeforeAfter_BuildKSql_Prints()
   {
     //Arrange
@@ -517,7 +516,7 @@ EMIT CHANGES;";
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
 
-  [TestMethod]
+  [Test]
   public void Join_KSqlFunctionKeySelector_ShouldBeWithoutAlias()
   {
     //Arrange
@@ -543,7 +542,7 @@ EMIT CHANGES;";
 
   #region LeftJoin
 
-  [TestMethod]
+  [Test]
   public void LeftJoin_BuildKSql_PrintsLeftJoin()
   {
     //Arrange
@@ -575,7 +574,7 @@ EMIT CHANGES;";
     ksql.Should().Be(expectedQuery);
   }
 
-  [TestMethod]
+  [Test]
   public void LeftJoinQuerySyntax_BuildKSql_Prints()
   {
     //Arrange
@@ -603,7 +602,7 @@ EMIT CHANGES;";
     ksql.Should().Be(expectedQuery);
   }
 
-  [TestMethod]
+  [Test]
   public void GroupJoinSelectMany_BuildKSql_Prints()
   {
     //Arrange
@@ -647,7 +646,7 @@ EMIT CHANGES;";
     public string ItemName { get; set; } = null!;
   }
 
-  [TestMethod]
+  [Test]
   public void MultipleLeftJoinsQuerySyntax_BuildKSql_Prints()
   {
     //Arrange
@@ -681,7 +680,7 @@ EMIT CHANGES;";
     ksql.Should().Be(expectedQuery);
   }
 
-  [TestMethod]
+  [Test]
   public void LeftJoinOverrideStreamName_BuildKSql_Prints()
   {
     //Arrange
@@ -713,7 +712,7 @@ EMIT CHANGES;";
 
   #region FullOuterJoin
 
-  [TestMethod]
+  [Test]
   public void FullOuterJoinOverrideStreamName_BuildKSql_Prints()
   {
     //Arrange
@@ -745,7 +744,7 @@ EMIT CHANGES;";
 
   #region RightJoin
 
-  [TestMethod]
+  [Test]
   public void RightJoinOverrideStreamName_BuildKSql_Prints()
   {
     //Arrange

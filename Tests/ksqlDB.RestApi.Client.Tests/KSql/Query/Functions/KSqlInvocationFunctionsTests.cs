@@ -4,19 +4,18 @@ using FluentAssertions;
 using ksqlDB.Api.Client.Tests.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Functions;
 
-[TestClass]
 public class KSqlInvocationFunctionsTests : TestBase
 {
   private KSqlInvocationFunctionVisitor ClassUnderTest { get; set; } = null!;
 
   private StringBuilder StringBuilder { get; set; } = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -37,7 +36,7 @@ public class KSqlInvocationFunctionsTests : TestBase
 
   #region Array
 
-  [TestMethod]
+  [Test]
   public void Transform()
   {
     //Arrange
@@ -50,7 +49,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"TRANSFORM({nameof(Tweets.Messages)}, (x) => UCASE(x))");
   }
 
-  [TestMethod]
+  [Test]
   public void TransformExtensionMethod()
   {
     //Arrange
@@ -63,7 +62,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"TRANSFORM({nameof(Tweets.Messages)}, (x) => UCASE(x))");
   }
 
-  [TestMethod]
+  [Test]
   public void TransformExtensionMethod_Dictionary()
   {
     //Arrange
@@ -76,7 +75,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => k, (k, v) => v->RegionCode)");
   }
 
-  [TestMethod]
+  [Test]
   [Ignore("TODO:")]
   public void TransformExtensionMethod_Dictionary_ToUpper()
   {
@@ -90,7 +89,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => k, (k, v) => UCASE(v->RegionCode))");
   }
 
-  [TestMethod]
+  [Test]
   public void Transform_Constant()
   {
     //Arrange
@@ -103,7 +102,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"TRANSFORM({nameof(Tweets.Values)}, (x) => x + 1)");
   }
 
-  [TestMethod]
+  [Test]
   public void Transform_Function()
   {
     //Arrange
@@ -116,7 +115,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"TRANSFORM({nameof(Tweets.Messages)}, (y) => CONCAT(y, '_new'))");
   }
 
-  [TestMethod]
+  [Test]
   public void Transform_Function_NestedPropertyAccessor()
   {
     //Arrange
@@ -129,7 +128,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => k, (k, v) => v->State->Name)");
   }
 
-  [TestMethod]
+  [Test]
   public void Transform_Function_NestedPropertyAccessorAndLength()
   {
     //Arrange
@@ -142,7 +141,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => k, (k, v) => LEN(v->State->Name))");
   }
 
-  [TestMethod]
+  [Test]
   public void Transform_AnonymousType()
   {
     //Arrange
@@ -155,7 +154,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"TRANSFORM({nameof(Tweets.Values)}, (x) => x + 1) Col");
   }
     
-  [TestMethod]
+  [Test]
   public void Transform_CapturedVariable_AnonymousType()
   {
     //Arrange
@@ -169,7 +168,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"TRANSFORM({nameof(Tweets.Values)}, (x) => x + 1) Col");
   }
 
-  [TestMethod]
+  [Test]
   public void Filter()
   {
     //Arrange
@@ -182,7 +181,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"FILTER({nameof(Tweets.Messages)}, (x) => x = 'E.T.')");
   }
 
-  [TestMethod]
+  [Test]
   public void FilterExtensionMethod()
   {
     //Arrange
@@ -195,7 +194,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"FILTER({nameof(Tweets.Messages)}, (x) => x = 'E.T.')");
   }
 
-  [TestMethod]
+  [Test]
   public void Reduce()
   {
     //Arrange
@@ -208,7 +207,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"REDUCE({nameof(Tweets.Values)}, 0, (x, y) => x + y)");
   }
 
-  [TestMethod]
+  [Test]
   public void ReduceExtensionMethod()
   {
     //Arrange
@@ -225,7 +224,7 @@ public class KSqlInvocationFunctionsTests : TestBase
 
   #region Map
 
-  [TestMethod]
+  [Test]
   public void TransformMap()
   {
     //Arrange
@@ -238,7 +237,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"TRANSFORM({nameof(Tweets.Dictionary)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v, (x) => x * x))");
   }
 
-  [TestMethod]
+  [Test]
   public void TransformMap_NestedTransformWithPropertyAccessor()
   {
     //Arrange
@@ -251,7 +250,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->Values, (x) => x * x))");
   }
 
-  [TestMethod]
+  [Test]
   public void TransformMapTwice()
   {
     //Arrange
@@ -268,7 +267,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"{expected} A, {expected} B");
   }
 
-  [TestMethod]
+  [Test]
   public void FilterMap()
   {
     //Arrange
@@ -281,7 +280,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"FILTER({nameof(Tweets.Dictionary2)}, (k, v) => ((INSTR(k, 'name') > 0) AND (k != 'E.T')) AND (v > 0))");
   }
 
-  [TestMethod]
+  [Test]
   public void ReduceMap()
   {
     //Arrange

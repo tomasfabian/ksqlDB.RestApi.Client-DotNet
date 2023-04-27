@@ -5,18 +5,17 @@ using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 using Location = ksqlDB.Api.Client.Tests.Models.Location;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query;
 
-[TestClass]
 public class KSqlVisitorTests : TestBase
 {
   private KSqlVisitor ClassUnderTest { get; set; } = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -26,7 +25,7 @@ public class KSqlVisitorTests : TestBase
 
   #region Constants
 
-  [TestMethod]
+  [Test]
   public void NullConstant_BuildKSql_PrintsStringifiedNull()
   {
     //Arrange
@@ -39,7 +38,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("NULL");
   }
 
-  [TestMethod]
+  [Test]
   public void TextConstant_BuildKSql_PrintsTextSurroundedWithTicks()
   {
     //Arrange
@@ -53,7 +52,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"'{constant}'");
   }
 
-  [TestMethod]
+  [Test]
   public void ValueTypeConstant_BuildKSql_PrintsPlainText()
   {
     //Arrange
@@ -67,7 +66,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo(constant.ToString());
   }
 
-  [TestMethod]
+  [Test]
   public void EnumerableStringConstant_BuildKSql_PrintsArray()
   {
     //Arrange
@@ -81,7 +80,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("ARRAY['Field1', 'Field2']");
   }
 
-  [TestMethod]
+  [Test]
   public void EnumerableIntConstant_BuildKSql_PrintsArray()
   {
     //Arrange
@@ -95,7 +94,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("ARRAY[1, 2]");
   }
 
-  [TestMethod]
+  [Test]
   public void ReferenceTypeConstant_BuildKSql_PrintsCommaSeparatedTextFields()
   {
     //Arrange
@@ -113,7 +112,7 @@ public class KSqlVisitorTests : TestBase
 
   #region Binary
 
-  [TestMethod]
+  [Test]
   public void BinaryAnd_BuildKSql_PrintsOperatorAnd()
   {
     //Arrange
@@ -126,7 +125,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("True AND True");
   }
 
-  [TestMethod]
+  [Test]
   public void BinaryOr_BuildKSql_PrintsOperatorOr()
   {
     //Arrange
@@ -139,7 +138,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("True OR False");
   }
 
-  [TestMethod]
+  [Test]
   public void BinaryEqual_BuildKSql_PrintsEqual()
   {
     //Arrange
@@ -153,7 +152,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("1 = 1");
   }
 
-  [TestMethod]
+  [Test]
   public void BinaryNotEqual_BuildKSql_PrintsNotEqual()
   {
     //Arrange
@@ -168,7 +167,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("1 != 2");
   }
 
-  [TestMethod]
+  [Test]
   public void BinaryLessThan_BuildKSql_PrintsLessThan()
   {
     //Arrange
@@ -183,7 +182,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("1 < 2");
   }
 
-  [TestMethod]
+  [Test]
   public void BinaryLessThanOrEqual_BuildKSql_PrintsLessThanOrEqual()
   {
     //Arrange
@@ -198,7 +197,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("1 <= 2");
   }
 
-  [TestMethod]
+  [Test]
   public void BinaryGreaterThan_BuildKSql_PrintsGreaterThan()
   {
     //Arrange
@@ -213,7 +212,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("2 > 1");
   }
 
-  [TestMethod]
+  [Test]
   public void BinaryGreaterThanOrEqual_BuildKSql_PrintsGreaterThanOrEqual()
   {
     //Arrange
@@ -232,7 +231,7 @@ public class KSqlVisitorTests : TestBase
 
   #region New
 
-  [TestMethod]
+  [Test]
   public void NewAnonymousType_BuildKSql_PrintsMemberName()
   {
     //Arrange
@@ -245,7 +244,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo(nameof(Location.Longitude));
   }
 
-  [TestMethod]
+  [Test]
   public void NewAnonymousTypeMultipleMembers_BuildKSql_PrintsAllCommaSeparatedMemberNames()
   {
     //Arrange
@@ -258,7 +257,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{nameof(Location.Longitude)}, {nameof(Location.Latitude)}");
   }
 
-  [TestMethod]
+  [Test]
   public void NewAnonymousTypeMultipleMembersOneHasAlias_BuildKSql_PrintsAllCommaSeparatedMemberNames()
   {
     //Arrange
@@ -271,7 +270,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{nameof(Location.Longitude)}, {nameof(Location.Latitude)} AS La");
   }
 
-  [TestMethod]
+  [Test]
   public void NewReferenceType_BuildKSql_PrintsStruct()
   {
     //Arrange
@@ -284,7 +283,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEmpty();
   }
 
-  [TestMethod]
+  [Test]
   public void NewMemberInit_BuildKSql_PrintsStruct()
   {
     //Arrange
@@ -297,7 +296,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().Be("STRUCT(Latitude := 't')");
   }
 
-  [TestMethod]
+  [Test]
   public void NewMemberInitMemberAccess_BuildKSql_PrintsStructMemberAccess()
   {
     //Arrange
@@ -314,7 +313,7 @@ public class KSqlVisitorTests : TestBase
 
   #region MemberAccess
 
-  [TestMethod]
+  [Test]
   public void MemberAccess_BuildKSql_PrintsNameOfTheProperty()
   {
     //Arrange
@@ -327,7 +326,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo(nameof(Location.Longitude));
   }
 
-  [TestMethod]
+  [Test]
   public void Predicate_BuildKSql_PrintsOperatorAndOperands()
   {
     //Arrange
@@ -345,7 +344,7 @@ public class KSqlVisitorTests : TestBase
     public string ExtraField = null!;
   }
 
-  [TestMethod]
+  [Test]
   public void Field_BuildKSql_PrintsFieldName()
   {
     //Arrange
@@ -358,7 +357,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{nameof(Update.ExtraField)}");
   }
 
-  [TestMethod]
+  [Test]
   public void PredicateCompareWithVariable_BuildKSql_PrintsOperatorAndOperands()
   {
     //Arrange
@@ -373,7 +372,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{nameof(Location.Latitude)} != '{value}'");
   }
 
-  [TestMethod]
+  [Test]
   public void PredicateCompareWithDouble_BuildKSql_PrintsOperatorAndOperands()
   {
     //Arrange
@@ -409,7 +408,7 @@ public class KSqlVisitorTests : TestBase
     public string[] Capabilities { get; set; } = null!;
   }
 
-  [TestMethod]
+  [Test]
   public void PredicateNestedProperty_BuildKSql_PrintsDestructuredField()
   {
     //Arrange
@@ -422,7 +421,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("After->SensorId = 'sensor-42'");
   }
 
-  [TestMethod]
+  [Test]
   public void PredicateDeeplyNestedProperty_BuildKSql_PrintsDestructuredField()
   {
     //Arrange
@@ -435,7 +434,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("After->Model->Version = 'v-42'");
   }
 
-  [TestMethod]
+  [Test]
   public void PredicateDeeplyNestedArrayProperty_BuildKSql_PrintsAllFields()
   {
     //Arrange
@@ -452,7 +451,7 @@ public class KSqlVisitorTests : TestBase
 
   #region Parameter
 
-  [TestMethod]
+  [Test]
   public void Parameter_BuildKSql_PrintsParameterName()
   {
     //Arrange
@@ -469,7 +468,7 @@ public class KSqlVisitorTests : TestBase
 
   #region Convert
 
-  [TestMethod]
+  [Test]
   public void Convert_BuildKSql_PrintsParameterName()
   {
     //Arrange
@@ -486,7 +485,7 @@ public class KSqlVisitorTests : TestBase
 
   #region Lambda
 
-  [TestMethod]
+  [Test]
   public void LambdaWithNewCount_BuildKSql_PrintsKeyAndCountAsterix()
   {
     //Arrange
@@ -499,7 +498,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("Key, Count(*) Agg");
   }
 
-  [TestMethod]
+  [Test]
   public void LambdaWithNewLongCount_BuildKSql_PrintsKeyAndCountAsterix()
   {
     //Arrange
@@ -512,7 +511,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("Key, Count(*) Agg");
   }
 
-  [TestMethod]
+  [Test]
   public void LambdaWithNewCount_BuildKSql_PrintsKeyAndCountColumnName()
   {
     //Arrange
@@ -525,7 +524,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"Key, Count({nameof(Location.Longitude)}) Agg");
   }
 
-  [TestMethod]
+  [Test]
   public void LambdaWithNewSum_BuildKSql_PrintsKeyAndSumColumnName()
   {
     //Arrange
@@ -544,7 +543,7 @@ public class KSqlVisitorTests : TestBase
 
   #region Case
 
-  [TestMethod]
+  [Test]
   public void ToUpper_BuildKSql_PrintsUCase()
   {
     //Arrange
@@ -557,7 +556,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("UCASE(Message)");
   }
 
-  [TestMethod]
+  [Test]
   public void ToUpperInCondition_BuildKSql_PrintsUCase()
   {
     //Arrange
@@ -570,7 +569,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("UCASE(Message) != 'hi'");
   }
 
-  [TestMethod]
+  [Test]
   public void ToLower_BuildKSql_PrintsLCase()
   {
     //Arrange
@@ -583,7 +582,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("LCASE(Message)");
   }
 
-  [TestMethod]
+  [Test]
   public void ToLowerInCondition_BuildKSql_PrintsLCase()
   {
     //Arrange
@@ -596,7 +595,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("LCASE(Message) != 'hi'");
   }
 
-  [TestMethod]
+  [Test]
   public void ConstantToLowerInCondition_BuildKSql_PrintsLCase()
   {
     //Arrange
@@ -613,7 +612,7 @@ public class KSqlVisitorTests : TestBase
 
   #region Length
 
-  [TestMethod]
+  [Test]
   public void Length_BuildKSql_PrintsLenFunction()
   {
     //Arrange
@@ -626,7 +625,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"LEN({nameof(Tweet.Message)})");
   }
 
-  [TestMethod]
+  [Test]
   public void LengthWithPMinusOperator_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -639,7 +638,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"LEN({nameof(Person.FirstName)}) - LEN({nameof(Person.LastName)})");
   }
 
-  [TestMethod]
+  [Test]
   public void LengthWithPlusOperator_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -652,7 +651,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"LEN({nameof(Person.FirstName)}) + LEN({nameof(Person.LastName)})");
   }
 
-  [TestMethod]
+  [Test]
   public void LengthWithPlusNew_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -669,7 +668,7 @@ public class KSqlVisitorTests : TestBase
 
   #region Like
 
-  [TestMethod]
+  [Test]
   public void StartsWith_BuildKSql_PrintsLike()
   {
     //Arrange
@@ -683,7 +682,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{nameof(Tweet.Message)} LIKE '{text}%'");
   }
 
-  [TestMethod]
+  [Test]
   public void EndsWith_BuildKSql_PrintsLike()
   {
     //Arrange
@@ -697,7 +696,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{nameof(Tweet.Message)} LIKE '%{text}'");
   }
 
-  [TestMethod]
+  [Test]
   public void Contains_BuildKSql_PrintsLike()
   {
     //Arrange
@@ -711,7 +710,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{nameof(Tweet.Message)} LIKE '%{text}%'");
   }
 
-  [TestMethod]
+  [Test]
   public void ContainsGuid_BuildKSql_PrintsLike()
   {
     //Arrange
@@ -728,7 +727,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"'{guid1}' IN ('{guid1}', '{guid2}')");
   }
 
-  [TestMethod]
+  [Test]
   public void ContainsString_BuildKSql_PrintsLike()
   {
     //Arrange
@@ -749,7 +748,7 @@ public class KSqlVisitorTests : TestBase
 
   #region Arithmetic
 
-  [TestMethod]
+  [Test]
   public void Divide_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -762,7 +761,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"LEN({nameof(Person.FirstName)}) / LEN({nameof(Person.LastName)})");
   }
     
-  [TestMethod]
+  [Test]
   public void Multiply_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -775,7 +774,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"LEN({nameof(Person.FirstName)}) * LEN({nameof(Person.LastName)})");
   }
     
-  [TestMethod]
+  [Test]
   public void Modulo_BuildKSql_PrintsQuery()
   {
     //Arrange
@@ -792,7 +791,7 @@ public class KSqlVisitorTests : TestBase
 
   #region Constants
 
-  [TestMethod]
+  [Test]
   public void BooleanConstant_BuildKSql_PrintsTrue()
   {
     //Arrange
@@ -805,7 +804,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("true Const");
   }
 
-  [TestMethod]
+  [Test]
   public void BooleanConstant_BuildKSql_PrintsFalse()
   {
     //Arrange
@@ -818,7 +817,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("false");
   }
 
-  [TestMethod]
+  [Test]
   [Ignore("TODO")]
   public void NegateBooleanConstant_BuildKSql_PrintsFalse()
   {
@@ -832,7 +831,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo("NOT true");
   }
 
-  [TestMethod]
+  [Test]
   public void NegateBooleanColumn_BuildKSql_PrintsFalse()
   {
     //Arrange
@@ -855,7 +854,7 @@ public class KSqlVisitorTests : TestBase
     public string Category { get; set; } = null!;
   }
 
-  [TestMethod]
+  [Test]
   public void ListContains()
   {
     //Arrange
@@ -868,7 +867,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 3)");
   } 
 
-  [TestMethod]
+  [Test]
   public void ListMemberContains()
   {
     //Arrange
@@ -883,7 +882,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 3)");
   } 
 
-  [TestMethod]
+  [Test]
   public void VisitNewArrayContains()
   {
     //Arrange
@@ -896,7 +895,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 3)");
   } 
 
-  [TestMethod]
+  [Test]
   public void EnumerableContains()
   {
     //Arrange
@@ -911,7 +910,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 2, 3)");
   } 
 
-  [TestMethod]
+  [Test]
   public void EnumerableOfStringContains()
   {
     //Arrange
@@ -926,7 +925,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{nameof(OrderData.Category)} IN ('1', '2')");
   } 
 
-  [TestMethod]
+  [Test]
   public void IListMemberContains()
   {
     //Arrange
@@ -941,7 +940,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 3)");
   } 
 
-  [TestMethod]
+  [Test]
   public void IEnumerableMemberContains()
   {
     //Arrange
@@ -958,7 +957,7 @@ public class KSqlVisitorTests : TestBase
 
   #endregion
 
-  [TestMethod]
+  [Test]
   public void ArrayContains_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -971,7 +970,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)})");
   }
 
-  [TestMethod]
+  [Test]
   public void ArrayMemberContains_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -985,7 +984,7 @@ public class KSqlVisitorTests : TestBase
     query.Should().BeEquivalentTo($"ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)})");
   }
 
-  [TestMethod]
+  [Test]
   public void Conditional()
   {
     //Arrange

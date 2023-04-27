@@ -1,25 +1,26 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Options;
 
-[TestClass]
 public class ProcessingGuaranteeExtensionsTests
 {
-  [TestMethod]
-  [ExpectedException(typeof(ArgumentOutOfRangeException))]
+  [Test]
   public void ToProcessingGuarantee_UnknownValue()
   {
     //Arrange
 
-    //Act
-    "xyz".ToProcessingGuarantee();
 
     //Assert
+    Assert.Throws<ArgumentOutOfRangeException>(() =>
+    {
+      //Act
+      "xyz".ToProcessingGuarantee();
+    });
   }
 
-  [TestMethod]
+  [Test]
   public void ToProcessingGuarantee_ExactlyOnce()
   {
     //Arrange
@@ -31,7 +32,7 @@ public class ProcessingGuaranteeExtensionsTests
     value.Should().Be(ProcessingGuarantee.ExactlyOnce);
   }
     
-  [TestMethod]
+  [Test]
   public void ToProcessingGuarantee_AtLeastOnce()
   {
     //Arrange
@@ -43,7 +44,7 @@ public class ProcessingGuaranteeExtensionsTests
     value.Should().Be(ProcessingGuarantee.AtLeastOnce);
   }
     
-  [TestMethod]
+  [Test]
   public void ToKSqlValue_AtLeastOnce()
   {
     //Arrange
@@ -55,7 +56,7 @@ public class ProcessingGuaranteeExtensionsTests
     value.Should().BeEquivalentTo("at_least_once");
   }
     
-  [TestMethod]
+  [Test]
   public void ToKSqlValue_ExactlyOnce()
   {
     //Arrange

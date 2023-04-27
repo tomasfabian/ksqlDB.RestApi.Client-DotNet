@@ -4,21 +4,20 @@ using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Ninject;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
 
-[TestClass]
 public class KSqlDbProviderTests : TestBase
 {  
   private TestableKSqlDbQueryStreamProvider ClassUnderTest { get; set; } = null!;
 
   private Mock<ILogger> LoggerMock { get; set; } = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -28,7 +27,7 @@ public class KSqlDbProviderTests : TestBase
     ClassUnderTest = MockingKernel.Get<TestableKSqlDbQueryStreamProvider>();
   }
 
-  [TestMethod]
+  [Test]
   public async Task Run_LogInformation()
   {
     //Arrange
@@ -42,7 +41,7 @@ public class KSqlDbProviderTests : TestBase
     LoggerMock.VerifyLog(LogLevel.Debug, () => Times.Exactly(3));
   }
 
-  [TestMethod]
+  [Test]
   public async Task Run_HttpStatusCodeOK_ReturnsTweets()
   {
     //Arrange
@@ -62,7 +61,7 @@ public class KSqlDbProviderTests : TestBase
     receivedTweets.Count.Should().Be(2);
   }
 
-  [TestMethod]
+  [Test]
   public async Task Run_HttpStatusCodeOK_StringFieldWasParsed()
   {
     //Arrange
@@ -77,7 +76,7 @@ public class KSqlDbProviderTests : TestBase
     tweet.Message.Should().Be("Hello world");
   }
 
-  [TestMethod]
+  [Test]
   public async Task Run_HttpStatusCodeOK_BooleanFieldWasParsed()
   {
     //Arrange
@@ -92,7 +91,7 @@ public class KSqlDbProviderTests : TestBase
     tweet.IsRobot.Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public async Task Run_HttpStatusCodeOK_DoubleFieldWasParsed()
   {
     //Arrange
@@ -107,7 +106,7 @@ public class KSqlDbProviderTests : TestBase
     tweet.Amount.Should().Be(0.00042);
   }
 
-  [TestMethod]
+  [Test]
   public async Task Run_HttpStatusCodeOK_DecimalFieldWasParsed()
   {
     //Arrange
@@ -122,7 +121,7 @@ public class KSqlDbProviderTests : TestBase
     tweet.AccountBalance.Should().Be(9999999999999999.1234M);
   }
 
-  [TestMethod]
+  [Test]
   public async Task Run_HttpStatusCodeOK_BigintRowTimeFieldWasParsed()
   {
     //Arrange
@@ -137,7 +136,7 @@ public class KSqlDbProviderTests : TestBase
     tweet.RowTime.Should().Be(1611327570881);
   }
 
-  [TestMethod]
+  [Test]
   public async Task Run_HttpStatusCodeOK_IntegerFieldWasParsed()
   {
     //Arrange
@@ -152,9 +151,8 @@ public class KSqlDbProviderTests : TestBase
     tweet.Id.Should().Be(1);
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(KSqlQueryException))]
-  public async Task Run_HttpStatusCodeBadRequest_ThrowsException()
+  [Test]
+  public void Run_HttpStatusCodeBadRequest_ThrowsException()
   {
     //Arrange
     ClassUnderTest.ShouldThrowException = true;
@@ -165,13 +163,10 @@ public class KSqlDbProviderTests : TestBase
     var tweets = ClassUnderTest.Run<Tweet>(queryParameters);
 
     //Assert
-    await foreach (var tweet in tweets)
-    {
-      tweet.Should().NotBeNull();
-    }
+    Assert.ThrowsAsync<KSqlQueryException>(() => tweets.ToListAsync().AsTask());
   }
 
-  [TestMethod]
+  [Test]
   public async Task LogError()
   {
     //Arrange
@@ -192,7 +187,7 @@ public class KSqlDbProviderTests : TestBase
     }
   }
 
-  [TestMethod]
+  [Test]
   public async Task Run_Disposed_NothingWasReceived()
   {
     //Arrange
@@ -215,11 +210,12 @@ public class KSqlDbProviderTests : TestBase
     cts.Dispose();
   }
 
-  [TestMethod]
+  [Test]
   public async Task Run_HttpClientWasNotDisposed()
   {
     //Arrange
     var queryParameters = new QueryStreamParameters();
+    ClassUnderTest.Options.DisposeHttpClient = false;
 
     //Act
     _ = await ClassUnderTest.Run<Tweet>(queryParameters).ToListAsync();
@@ -228,7 +224,7 @@ public class KSqlDbProviderTests : TestBase
     ClassUnderTest.LastUsedHttpClient.IsDisposed.Should().BeFalse();
   }
 
-  [TestMethod]
+  [Test]
   public async Task Run_DonNotDisposeHttpClient()
   {
     //Arrange

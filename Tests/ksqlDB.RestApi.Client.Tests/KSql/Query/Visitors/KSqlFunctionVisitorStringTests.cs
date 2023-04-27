@@ -4,19 +4,18 @@ using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
 
-[TestClass]
 public class KSqlFunctionVisitorStringTests : TestBase
 {
   private KSqlFunctionVisitor ClassUnderTest { get; set; } = null!;
 
   private StringBuilder StringBuilder { get; set; } = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -29,7 +28,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
 
   #region Trim
 
-  [TestMethod]
+  [Test]
   public void Trim_BuildKSql_PrintsTrimFunction()
   {
     //Arrange
@@ -46,7 +45,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
 
   #region LPad
     
-  [TestMethod]
+  [Test]
   public void LPad_BuildKSql_PrintsLPadFunction()
   {
     //Arrange
@@ -63,7 +62,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
 
   #region Instr
     
-  [TestMethod]
+  [Test]
   public void InstrOccurrence_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -76,7 +75,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo($"INSTR({nameof(Tweet.Message)}, 'sub', 1, 1)");
   }
     
-  [TestMethod]
+  [Test]
   public void InstrPosition_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -89,7 +88,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo($"INSTR({nameof(Tweet.Message)}, 'sub', 1)");
   }
     
-  [TestMethod]
+  [Test]
   public void Instr_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -106,7 +105,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
 
   #region RPad
     
-  [TestMethod]
+  [Test]
   public void RPad_BuildKSql_PrintsRPadFunction()
   {
     //Arrange
@@ -123,7 +122,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
 
   #region Substring
     
-  [TestMethod]
+  [Test]
   public void Substring_BuildKSql_PrintsSubstringFunction()
   {
     //Arrange
@@ -140,7 +139,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
 
   #region Like
 
-  [TestMethod]
+  [Test]
   public void Like_BuildKSql_PrintsLikeCondition()
   {
     //Arrange
@@ -153,7 +152,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo($"{nameof(Tweet.Message)} LIKE 'santa%'");
   }
 
-  [TestMethod]
+  [Test]
   public void LikeToLower_BuildKSql_PrintsLikeCondition()
   {
     //Arrange
@@ -170,7 +169,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
 
   #region Concat
 
-  [TestMethod]
+  [Test]
   public void Concat_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -187,7 +186,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
 
   #region ToBytes
 
-  [TestMethod]
+  [Test]
   public void ToBytes_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -209,7 +208,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     public byte[] Image { get; init; }
   }
 
-  [TestMethod]
+  [Test]
   public void FromBytes_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -222,28 +221,27 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo($"FROM_BYTES({nameof(Thumbnail.Image)}, 'utf8')");
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(NotSupportedException))]
+  [Test]
   public void FromBytes_CapturedVariable()
   {
     //Arrange
-    byte[] bytes = Encoding.UTF8.GetBytes("Alien");
-    //QWxpZW4=
+    byte[] bytes = Encoding.UTF8.GetBytes("Alien"); //QWxpZW4=
 
     Expression<Func<Thumbnail, string>> expression = c => K.Functions.FromBytes(bytes, "utf8");
 
-    //Act
-    var query = ClassUnderTest.BuildKSql(expression);
-
     //Assert
-    query.Should().BeEquivalentTo($"FROM_BYTES({nameof(Thumbnail.Image)}, 'utf8')");
+    Assert.Throws<NotSupportedException>(() =>
+    {
+      //Act
+      var _ = ClassUnderTest.BuildKSql(expression);
+    });
   }
 
   #endregion
 
   #region ConcatWS
 
-  [TestMethod]
+  [Test]
   public void ConcatWS_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -261,7 +259,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
 
   #region Encode
 
-  [TestMethod]
+  [Test]
   public void Encode_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -280,7 +278,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
 
   #region InitCap
 
-  [TestMethod]
+  [Test]
   public void InitCap_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -297,7 +295,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
 
   #region Cast
 
-  [TestMethod]
+  [Test]
   public void ToInt_CastAsInt()
   {
     //Arrange
@@ -310,7 +308,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo(@$"CAST({nameof(Tweet.Message)} AS INT)");
   }
 
-  [TestMethod]
+  [Test]
   public void KSQLConvertToInt_CastAsInt()
   {
     //Arrange
@@ -323,7 +321,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo(@$"CAST({nameof(Tweet.Message)} AS INT)");
   }
 
-  [TestMethod]
+  [Test]
   public void ToLong_CastAsInt()
   {
     //Arrange
@@ -336,7 +334,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo(@$"CAST({nameof(Tweet.Message)} AS BIGINT)");
   }
 
-  [TestMethod]
+  [Test]
   public void KSQLConvertToLong_CastAsInt()
   {
     //Arrange
@@ -349,7 +347,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo(@$"CAST({nameof(Tweet.Message)} AS BIGINT)");
   }
 
-  [TestMethod]
+  [Test]
   public void ToDecimal_CastAsDecimal()
   {
     //Arrange
@@ -362,7 +360,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo(@$"CAST({nameof(Tweet.Message)} AS DECIMAL(10,2))");
   }
 
-  [TestMethod]
+  [Test]
   public void ToDecimal_CastAsDouble()
   {
     //Arrange
@@ -375,7 +373,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo(@$"CAST({nameof(Tweet.Message)} AS DOUBLE)");
   }
 
-  [TestMethod]
+  [Test]
   public void KSQLConvertToDecimal_CastAsDouble()
   {
     //Arrange
@@ -394,7 +392,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
 
   #region ExtractJsonField
 
-  [TestMethod]
+  [Test]
   public void ExtractJsonField_BuildKSql_PrintsTheFunction()
   {
     //Arrange
@@ -412,7 +410,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
 
   #region IsJsonString
 
-  [TestMethod]
+  [Test]
   public void IsJsonString_BuildKSql_PrintsTheFunction()
   {
     //Arrange
@@ -430,7 +428,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
 
   #region JsonArrayLength
 
-  [TestMethod]
+  [Test]
   public void JsonArrayLength_BuildKSql_PrintsTheFunction()
   {
     //Arrange
@@ -444,7 +442,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo($"JSON_ARRAY_LENGTH('{jsonInput}')");
   }
 
-  [TestMethod]
+  [Test]
   public void JsonArrayLength_Null_BuildKSql_PrintsTheFunction()
   {
     //Arrange
@@ -458,7 +456,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo("JSON_ARRAY_LENGTH(NULL)");
   }
 
-  [TestMethod]
+  [Test]
   public void JsonConcat_BuildKSql_PrintsTheFunction()
   {
     //Arrange
@@ -471,7 +469,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo("JSON_CONCAT('[1, 2]', '[3, 4]')");
   }
 
-  [TestMethod]
+  [Test]
   public void JsonKeys_BuildKSql_PrintsTheFunction()
   {
     //Arrange
@@ -485,7 +483,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo($"JSON_KEYS('{jsonInput}')");
   }
 
-  [TestMethod]
+  [Test]
   public void JsonRecords_BuildKSql_PrintsTheFunction()
   {
     //Arrange
@@ -499,7 +497,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo($"JSON_RECORDS('{jsonInput}')");
   }
 
-  [TestMethod]
+  [Test]
   public void ToJsonString_Bool_BuildKSql_PrintsTheFunction()
   {
     //Arrange
@@ -513,7 +511,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo($"TO_JSON_STRING({input})");
   }
 
-  [TestMethod]
+  [Test]
   public void ToJsonString_String_BuildKSql_PrintsTheFunction()
   {
     //Arrange
@@ -527,7 +525,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo($"TO_JSON_STRING('{input}')");
   }
 
-  [TestMethod]
+  [Test]
   public void ToJsonString_Array_BuildKSql_PrintsTheFunction()
   {
     //Arrange
@@ -541,7 +539,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     query.Should().BeEquivalentTo("TO_JSON_STRING(Array[1, 2, 3])");
   }
 
-  [TestMethod]
+  [Test]
   public void ToJsonString_Dictionary_BuildKSql_PrintsTheFunction()
   {
     //Arrange
@@ -566,7 +564,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     public string name { get; set; } = null!;
   }
 
-  [TestMethod]
+  [Test]
   public void ToJsonString_Struct_BuildKSql_PrintsTheFunction()
   {
     //Arrange

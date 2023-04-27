@@ -4,19 +4,18 @@ using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
 
-[TestClass]
 public class KSqlFunctionVisitorDateAndTimeTests : TestBase
 {
   private KSqlFunctionVisitor ClassUnderTest { get; set; } = null!;
 
   private StringBuilder StringBuilder { get; set; } = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -27,7 +26,7 @@ public class KSqlFunctionVisitorDateAndTimeTests : TestBase
 
   #region Date and time functions
 
-  [TestMethod]
+  [Test]
   public void UnixDate_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -40,7 +39,7 @@ public class KSqlFunctionVisitorDateAndTimeTests : TestBase
     kSqlFunction.Should().BeEquivalentTo("UNIX_DATE()");
   }
 
-  [TestMethod]
+  [Test]
   public void UnixTimestamp_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -53,7 +52,7 @@ public class KSqlFunctionVisitorDateAndTimeTests : TestBase
     kSqlFunction.Should().BeEquivalentTo("UNIX_TIMESTAMP()");
   }
 
-  [TestMethod]
+  [Test]
   public void DateToString_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -68,7 +67,7 @@ public class KSqlFunctionVisitorDateAndTimeTests : TestBase
     kSqlFunction.Should().BeEquivalentTo($"DATETOSTRING({epochDays}, '{format}')");
   }
 
-  [TestMethod]
+  [Test]
   public void StringToDate_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -83,7 +82,7 @@ public class KSqlFunctionVisitorDateAndTimeTests : TestBase
     kSqlFunction.Should().BeEquivalentTo($"STRINGTODATE('{formattedDate}', '{format}')");
   }
 
-  [TestMethod]
+  [Test]
   public void StringToTimestamp_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -98,7 +97,7 @@ public class KSqlFunctionVisitorDateAndTimeTests : TestBase
     kSqlFunction.Should().BeEquivalentTo($"STRINGTOTIMESTAMP('{formattedTimestamp}', '{format}')");
   }
 
-  [TestMethod]
+  [Test]
   public void StringToTimestamp_TimeZone_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -114,7 +113,7 @@ public class KSqlFunctionVisitorDateAndTimeTests : TestBase
     kSqlFunction.Should().BeEquivalentTo($"STRINGTOTIMESTAMP('{formattedTimestamp}', '{format}', '{timeZone}')");
   }
 
-  [TestMethod]
+  [Test]
   public void TimeStampToString_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -129,7 +128,7 @@ public class KSqlFunctionVisitorDateAndTimeTests : TestBase
     kSqlFunction.Should().BeEquivalentTo($"TIMESTAMPTOSTRING({epochMilli}, '{format}')");
   }
 
-  [TestMethod]
+  [Test]
   public void TimeStampToStringFormatWithBackTicks_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -144,7 +143,7 @@ public class KSqlFunctionVisitorDateAndTimeTests : TestBase
     kSqlFunction.Should().BeEquivalentTo($"TIMESTAMPTOSTRING({epochMilli}, '{format}')");
   }
 
-  [TestMethod]
+  [Test]
   public void TimeStampToStringWithTimeZone_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -160,7 +159,7 @@ public class KSqlFunctionVisitorDateAndTimeTests : TestBase
     kSqlFunction.Should().BeEquivalentTo($"TIMESTAMPTOSTRING({epochMilli}, '{format}', '{timeZone}')");
   }
 
-  [TestMethod]
+  [Test]
   public void FormatDate_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -175,7 +174,7 @@ public class KSqlFunctionVisitorDateAndTimeTests : TestBase
     kSqlFunction.Should().BeEquivalentTo($"FORMAT_DATE('2022-04-11', '{format}')");
   }
 
-  [TestMethod]
+  [Test]
   public void FormatTime_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -190,7 +189,7 @@ public class KSqlFunctionVisitorDateAndTimeTests : TestBase
     kSqlFunction.Should().BeEquivalentTo($"FORMAT_TIME('10:01:22', '{format}')");
   }
 
-  [TestMethod]
+  [Test]
   public void ParseDate_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -205,7 +204,7 @@ public class KSqlFunctionVisitorDateAndTimeTests : TestBase
     kSqlFunction.Should().BeEquivalentTo($"PARSE_DATE('{formattedDate}', '{format}')");
   }
 
-  [TestMethod]
+  [Test]
   public void ParseTime_BuildKSql_PrintsFunction()
   {
     //Arrange

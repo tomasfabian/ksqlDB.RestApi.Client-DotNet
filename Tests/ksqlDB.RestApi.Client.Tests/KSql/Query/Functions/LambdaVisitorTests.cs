@@ -3,17 +3,16 @@ using System.Text;
 using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Functions;
 
-[TestClass]
 public class LambdaVisitorTests : TestBase
 {
   private LambdaVisitor ClassUnderTest { get; set; } = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -21,7 +20,7 @@ public class LambdaVisitorTests : TestBase
     ClassUnderTest = new LambdaVisitor(new StringBuilder(), new KSqlQueryMetadata());
   }
     
-  [TestMethod]
+  [Test]
   public void SingleLambdaParam()
   {
     //Arrange
@@ -34,7 +33,7 @@ public class LambdaVisitorTests : TestBase
     ksql.Should().Be("(x) => UCASE(x)");
   }
     
-  [TestMethod]
+  [Test]
   public void AnonymousTypeProjection()
   {
     //Arrange
@@ -47,7 +46,7 @@ public class LambdaVisitorTests : TestBase
     ksql.Should().Be("(x) => UCASE(x) Col");
   }
     
-  [TestMethod]
+  [Test]
   public void K_Function()
   {
     //Arrange
@@ -60,7 +59,7 @@ public class LambdaVisitorTests : TestBase
     ksql.Should().Be("(c) => CONCAT(c, '_new')");
   }
 
-  [TestMethod]
+  [Test]
   public void K_Function_MapPropertyAccessor()
   {
     //Arrange
@@ -73,7 +72,7 @@ public class LambdaVisitorTests : TestBase
     ksql.Should().Be("(c) => c['a'] + 1");
   }
 
-  [TestMethod]
+  [Test]
   public void MultipleLambdaParams()
   {
     //Arrange
@@ -86,7 +85,7 @@ public class LambdaVisitorTests : TestBase
     ksql.Should().Be("(x, y) => x + y");
   }
     
-  [TestMethod]
+  [Test]
   public void CapturedVariable()
   {
     //Arrange
@@ -101,7 +100,7 @@ public class LambdaVisitorTests : TestBase
     ksql.Should().Be("(x, y) => x + 1");
   }
     
-  [TestMethod]
+  [Test]
   public void MultipleLambdaParams_Condition()
   {
     //Arrange
@@ -114,7 +113,7 @@ public class LambdaVisitorTests : TestBase
     ksql.Should().Be("(k, v) => v > 0");
   }
     
-  [TestMethod]
+  [Test]
   public void MultipleLambdaParams_Conditions()
   {
     //Arrange
@@ -127,7 +126,7 @@ public class LambdaVisitorTests : TestBase
     ksql.Should().Be("(k, v) => (k != 'E.T') AND (v > 0)");
   }
 
-  [TestMethod]
+  [Test]
   public void DateType()
   {
     //Arrange

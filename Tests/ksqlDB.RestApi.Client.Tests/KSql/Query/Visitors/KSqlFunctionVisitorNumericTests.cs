@@ -5,19 +5,18 @@ using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
 
-[TestClass]
 public class KSqlFunctionVisitorNumericTests : TestBase
 {
   private KSqlFunctionVisitor ClassUnderTest { get; set; } = null!;
 
   private StringBuilder StringBuilder { get; set; } = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -33,7 +32,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
 
   #region Abs
 
-  [TestMethod]
+  [Test]
   public void DoubleAbs_BuildKSql_PrintsAbsFunction()
   {
     //Arrange
@@ -46,7 +45,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
     query.Should().BeEquivalentTo($"ABS({nameof(Tweet.Amount)})");
   }
 
-  [TestMethod]
+  [Test]
   public void DecimalAbs_BuildKSql_PrintsAbsFunction()
   {
     //Arrange
@@ -63,7 +62,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
 
   #region Ceil
 
-  [TestMethod]
+  [Test]
   public void DoubleCeil_BuildKSql_PrintsCeilFunction()
   {
     //Arrange
@@ -76,7 +75,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
     query.Should().BeEquivalentTo($"CEIL({nameof(Tweet.Amount)})");
   }
 
-  [TestMethod]
+  [Test]
   public void DecimalCeil_BuildKSql_PrintsCeilFunction()
   {
     //Arrange
@@ -98,7 +97,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
     public IDictionary<string, string> Dictionary { get; set; } = null!;
   }
 
-  [TestMethod]
+  [Test]
   public void Entries_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -112,7 +111,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
     kSqlFunction.Should().BeEquivalentTo($"ENTRIES({nameof(Test.Dictionary)}, true)");
   }
 
-  [TestMethod]
+  [Test]
   public void EntriesFromDictionary_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -129,7 +128,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
     kSqlFunction.Should().BeEquivalentTo("ENTRIES(MAP('a' := 'value'), true)");
   }
 
-  [TestMethod]
+  [Test]
   public void EntriesOuterMemberAccess_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -153,7 +152,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
 
   #region Exp
 
-  [TestMethod]
+  [Test]
   public void Exp_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -170,7 +169,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
 
   #region Floor
 
-  [TestMethod]
+  [Test]
   public void DoubleFloor_BuildKSql_PrintsFloorFunction()
   {
     //Arrange
@@ -183,7 +182,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
     query.Should().BeEquivalentTo($"FLOOR({nameof(Tweet.Amount)})");
   }
 
-  [TestMethod]
+  [Test]
   public void DecimalFloor_BuildKSql_PrintsFloorFunction()
   {
     //Arrange
@@ -200,7 +199,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
 
   #region GenerateSeries
 
-  [TestMethod]
+  [Test]
   public void GenerateSeries_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -217,7 +216,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
 
   #region GeoDistance
 
-  [TestMethod]
+  [Test]
   public void GeoDistance_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -230,7 +229,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
     query.Should().BeEquivalentTo($"GEO_DISTANCE({nameof(Location.Longitude)}, 1.1, 2, 3)");
   }
 
-  [TestMethod]
+  [Test]
   public void GeoDistanceWithUnit_BuildKSql_PrintsFunction()
   {
     //Arrange
@@ -247,7 +246,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
 
   #region Ln
 
-  [TestMethod]
+  [Test]
   public void Ln_BuildKSql_PrintsFloorFunction()
   {
     //Arrange
@@ -264,7 +263,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
 
   #region Round
 
-  [TestMethod]
+  [Test]
   public void DoubleRound_BuildKSql_PrintsRoundFunction()
   {
     //Arrange
@@ -277,7 +276,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
     query.Should().BeEquivalentTo($"ROUND({nameof(Tweet.Amount)})");
   }
 
-  [TestMethod]
+  [Test]
   public void DoubleRoundWithScale_BuildKSql_PrintsRoundFunction()
   {
     //Arrange
@@ -291,7 +290,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
     query.Should().BeEquivalentTo($"ROUND({nameof(Tweet.Amount)}, {scale})");
   }
 
-  [TestMethod]
+  [Test]
   public void DecimalRound_BuildKSql_PrintsRoundFunction()
   {
     //Arrange
@@ -308,7 +307,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
 
   #region Random
     
-  [TestMethod]
+  [Test]
   public void Random_BuildKSql_PrintsRandomFunction()
   {
     //Arrange
@@ -325,7 +324,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
 
   #region Sign
 
-  [TestMethod]
+  [Test]
   public void DoubleSign_BuildKSql_PrintsSignFunction()
   {
     //Arrange

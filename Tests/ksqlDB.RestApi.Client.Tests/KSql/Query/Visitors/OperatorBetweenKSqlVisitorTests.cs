@@ -1,18 +1,17 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
 using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
 
-[TestClass]
 public class OperatorBetweenKSqlVisitorTests : TestBase
 {
-  [TestMethod]
+  [Test]
   public void Visit_Between()
   {
     //Arrange
@@ -27,7 +26,7 @@ public class OperatorBetweenKSqlVisitorTests : TestBase
     ksql.Should().Be("Id BETWEEN 1 AND 100");
   }
 
-  [TestMethod]
+  [Test]
   public void Visit_NotBetween()
   {
     //Arrange
@@ -49,7 +48,7 @@ public class OperatorBetweenKSqlVisitorTests : TestBase
     public DateTimeOffset DtOffset { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public void BetweenTime()
   {
     //Arrange
@@ -67,7 +66,7 @@ public class OperatorBetweenKSqlVisitorTests : TestBase
     ksql.Should().Be("Ts BETWEEN '11:00:00' AND '15:00:00'");
   }
 
-  [TestMethod]
+  [Test]
   public void NotBetweenTime()
   {
     //Arrange
@@ -85,7 +84,7 @@ public class OperatorBetweenKSqlVisitorTests : TestBase
     ksql.Should().Be("Ts NOT BETWEEN '11:00:00' AND '15:00:00'");
   }
 
-  [TestMethod]
+  [Test]
   public void BetweenNewTime()
   {
     //Arrange
@@ -100,7 +99,7 @@ public class OperatorBetweenKSqlVisitorTests : TestBase
     ksql.Should().Be("Ts BETWEEN '11:00:00' AND '15:00:00'");
   }
 
-  [TestMethod]
+  [Test]
   public void BetweenDate()
   {
     //Arrange
@@ -118,7 +117,7 @@ public class OperatorBetweenKSqlVisitorTests : TestBase
     ksql.Should().Be($"{nameof(MyTimeSpan.Dt)} BETWEEN '2021-10-01' AND '2021-10-12'");
   }
 
-  [TestMethod]
+  [Test]
   public void BetweenDateTimeOffset()
   {
     //Arrange

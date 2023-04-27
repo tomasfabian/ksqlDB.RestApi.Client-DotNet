@@ -1,25 +1,25 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.Tests.KSql.Query.Options;
 
-[TestClass]
 public class AutoOffsetResetExtensionsTests
 {
-  [TestMethod]
-  [ExpectedException(typeof(ArgumentOutOfRangeException))]
+  [Test]
   public void ToAutoOffsetReset_UnknownValue()
   {
     //Arrange
 
-    //Act
-    "xyz".ToAutoOffsetReset();
-
     //Assert
+    Assert.Throws<ArgumentOutOfRangeException>(() =>
+    {
+      //Act
+      "xyz".ToAutoOffsetReset();
+    });
   }
 
-  [TestMethod]
+  [Test]
   public void ToAutoOffsetReset_Earliest()
   {
     //Arrange
@@ -31,7 +31,7 @@ public class AutoOffsetResetExtensionsTests
     value.Should().Be(AutoOffsetReset.Earliest);
   }
     
-  [TestMethod]
+  [Test]
   public void ToAutoOffsetReset_Latest()
   {
     //Arrange
@@ -43,7 +43,7 @@ public class AutoOffsetResetExtensionsTests
     value.Should().Be(AutoOffsetReset.Latest);
   }
     
-  [TestMethod]
+  [Test]
   public void ToKSqlValue_Earliest()
   {
     //Arrange
@@ -55,7 +55,7 @@ public class AutoOffsetResetExtensionsTests
     value.Should().BeEquivalentTo("earliest");
   }
     
-  [TestMethod]
+  [Test]
   public void ToKSqlValue_Latest()
   {
     //Arrange

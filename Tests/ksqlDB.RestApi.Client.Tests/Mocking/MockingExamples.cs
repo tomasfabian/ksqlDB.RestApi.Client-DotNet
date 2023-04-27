@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using ksqlDB.Api.Client.Tests.Helpers;
+using System.Linq.Expressions;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -7,8 +6,9 @@ using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using NUnit.Framework;
+using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDB.Api.Client.Tests.Mocking;
 
@@ -32,10 +32,9 @@ public class TestableKSqlDBContext : KSqlDBContext
   }
 }
 
-[TestClass]
 public class KSqlDbTests
 {
-  [TestMethod]
+  [Test]
   public async Task GetById()
   {
     //Arrange
@@ -76,7 +75,7 @@ public class KSqlDbTests
     await Task.CompletedTask;
   }
 
-  [TestMethod]
+  [Test]
   public async Task Subscribe()
   {
     //Arrange

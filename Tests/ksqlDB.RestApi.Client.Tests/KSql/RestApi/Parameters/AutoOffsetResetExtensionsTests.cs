@@ -1,13 +1,12 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Parameters;
 
-[TestClass]
 public class AutoOffsetResetExtensionsTests
 {
-  [TestMethod]
+  [Test]
   public void ToKSqlValue()
   {
     //Arrange
@@ -19,7 +18,7 @@ public class AutoOffsetResetExtensionsTests
     result.Should().Be("latest");
   }
 
-  [TestMethod]
+  [Test]
   public void ToAutoOffsetReset()
   {
     //Arrange
