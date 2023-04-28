@@ -5,10 +5,10 @@ using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
 
-[TestClass]
 public class AggregationTimeTests : Infrastructure.IntegrationTests
 {
   public static readonly Times Times1 = new()
@@ -25,8 +25,8 @@ public class AggregationTimeTests : Infrastructure.IntegrationTests
     CreatedTime = new TimeSpan(11, 11, 42),
   };
 
-  [ClassInitialize]
-  public static async Task ClassInitialize(TestContext context)
+  [OneTimeSetUp]
+  public static async Task ClassInitialize()
   {
     RestApiProvider = KSqlDbRestApiProvider.Create();
 
@@ -59,7 +59,7 @@ public class AggregationTimeTests : Infrastructure.IntegrationTests
 
   private static string TimesStreamName = "times_test";
 
-  [TestMethod]
+  [Test]
   public async Task MinDateTime()
   {
     await MinDateTime(Context.CreateQueryStream<Times>(TimesStreamName));
@@ -83,7 +83,7 @@ public class AggregationTimeTests : Infrastructure.IntegrationTests
     result.MinDateTime.Year.Should().Be(1986);
   }
 
-  [TestMethod]
+  [Test]
   public async Task MaxTime()
   {
     await MaxTime(Context.CreateQueryStream<Times>(TimesStreamName));
@@ -107,7 +107,7 @@ public class AggregationTimeTests : Infrastructure.IntegrationTests
     result.MaxTime.Hours.Should().Be(11);
   }
 
-  [TestMethod]
+  [Test]
   public async Task MinDateTimeOffset()
   {
     await MinDateTimeOffset(Context.CreateQueryStream<Times>(TimesStreamName));

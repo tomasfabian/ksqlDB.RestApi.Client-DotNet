@@ -11,27 +11,26 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq.Expressions;
 using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Context;
 
-[TestClass]
 public class KSqlDbContextTests : Infrastructure.IntegrationTests
 {
   private const string EntityName = "movies_test112";
 
-  [ClassInitialize]
-  public static async Task ClassInitialize(TestContext context)
+  [OneTimeSetUp]
+  public static async Task ClassInitialize()
   {
     var restApiClient = KSqlDbRestApiProvider.Create();
 
     await restApiClient.CreateStreamAsync<Movie>(new EntityCreationMetadata(EntityName, 1) { EntityName = EntityName, ShouldPluralizeEntityName = false });
   }
 
-  [TestMethod]
+  [Test]
   public async Task AddAndSaveChangesAsync()
   {
     //Arrange
@@ -50,7 +49,7 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     response.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
-  [TestMethod]
+  [Test]
   public async Task AddDbContextFactory_ContextFactoryCreate_SaveChangesAsync()
   {
     //Arrange
@@ -80,7 +79,7 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
   [KSqlFunction]
   public static string INITCAP(string value) => throw new NotSupportedException();
 
-  [TestMethod]
+  [Test]
   public async Task WithValue_RendersFromProvidedValue()
   {
     //Arrange
@@ -117,7 +116,7 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     ValueFormat = SerializationFormats.Json
   };
 
-  [TestMethod]
+  [Test]
   public async Task TimeTypes_InsertValues_ValuesReceived()
   {
     //Arrange

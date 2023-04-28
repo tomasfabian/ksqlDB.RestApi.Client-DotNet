@@ -14,16 +14,15 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 
-[TestClass]
 public class KSqlDbRestApiClientTests
 {
   private IKSqlDbRestApiClient restApiClient = null!;
 
-  [TestInitialize]
+  [SetUp]
   public void Initialize()
   {
     var ksqlDbUrl = @"http://localhost:8088";
@@ -35,7 +34,7 @@ public class KSqlDbRestApiClientTests
 
   private string SuccessStatus => "SUCCESS";
 
-  [TestMethod]
+  [Test]
   public async Task ExecuteStatementAsync()
   {
     //Arrange
@@ -54,19 +53,21 @@ public class KSqlDbRestApiClientTests
     responseObject?[0].CommandStatus.Message.Should().Be("Table created");
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(TaskCanceledException))]
-  public async Task ExecuteStatementAsync_Cancelled_ThrowsTaskCanceledException()
+  [Test]
+  public void ExecuteStatementAsync_Cancelled_ThrowsTaskCanceledException()
   {
     //Arrange
     KSqlDbStatement ksqlDbStatement = new(CreateTableStatement());
     var cts = new CancellationTokenSource();
 
-    //Act
-    var httpResponseMessageTask = restApiClient.ExecuteStatementAsync(ksqlDbStatement, cts.Token);
-    cts.Cancel();
+    Assert.ThrowsAsync<TaskCanceledException>(() =>
+    {
+      //Act
+      var httpResponseMessageTask = restApiClient.ExecuteStatementAsync(ksqlDbStatement, cts.Token);
+      cts.Cancel();
 
-    HttpResponseMessage httpResponseMessage = await httpResponseMessageTask;
+      return httpResponseMessageTask;
+    });
   }
 
   private string CreateTableStatement(string tableName = "TestTable")
@@ -82,7 +83,7 @@ public class KSqlDbRestApiClientTests
       );";
   }
 
-  [TestMethod]
+  [Test]
   public async Task CreateTable()
   {
     //Arrange
@@ -115,7 +116,7 @@ public class KSqlDbRestApiClientTests
     return metadata;
   }
 
-  [TestMethod]
+  [Test]
   public async Task CreateOrReplaceStream()
   {
     //Arrange
@@ -135,7 +136,7 @@ public class KSqlDbRestApiClientTests
     responseObject?[0].CommandStatus.Message.Should().Be("Stream created");
   }
 
-  [TestMethod]
+  [Test]
   public async Task CreateTypeAsync()
   {
     //Arrange
@@ -168,7 +169,7 @@ Drop type Address;
 
   private string SinkConnectorName => "mock-sink-connector";
 
-  [TestMethod]
+  [Test]
   public async Task CreateSinkConnectorAsync()
   {
     //Arrange
@@ -189,7 +190,7 @@ Drop type Address;
 
   private string SourceConnectorName => "mock-source-connector";
 
-  [TestMethod]
+  [Test]
   public async Task CreateSourceConnectorAsync_And_GetConnectorAsync_And_DropConnectorIfExistsAsync()
   {
     //Arrange
@@ -221,7 +222,7 @@ Drop type Address;
 
   #endregion
 
-  [TestMethod]
+  [Test]
   public async Task GetStreamsAsync()
   {
     //Arrange
@@ -234,7 +235,7 @@ Drop type Address;
     streamResponses[0].Streams.Select(c => c.Name).Contains(nameof(MyMoviesStreamTest).ToUpper() + "S").Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public async Task GetTablesAsync()
   {
     //Arrange
@@ -248,7 +249,7 @@ Drop type Address;
     tablesResponses[0].Tables.Select(c => c.Name).Contains(nameof(MyMoviesTable).ToUpper() + "S").Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public async Task GetAllTopicsAsync()
   {
     //Arrange
@@ -261,7 +262,7 @@ Drop type Address;
     topicsResponses[0].Topics.Select(c => c.Name).Contains(nameof(MyMoviesTable)).Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public async Task TerminatePersistentQueryAsync()
   {
     //Arrange
@@ -305,7 +306,7 @@ Drop type Address;
     statementResponse[0].CommandStatus.Message.Should().Be("Query terminated.");
   }
 
-  [TestMethod]
+  [Test]
   public async Task TerminatePushQueryAsync()
   {
     //Arrange
@@ -333,7 +334,7 @@ Drop type Address;
     queriesResponses.SelectMany(c => c.Queries).Count().Should().Be(queriesCount - 1);
   }
 
-  [TestMethod]
+  [Test]
   public async Task GetQueriesAsync()
   {
     //Arrange
@@ -346,7 +347,7 @@ Drop type Address;
     queriesResponses[0].StatementText.Should().Be(StatementTemplates.ShowQueries);
   }
 
-  [TestMethod]
+  [Test]
   public async Task DropConnectorIfExistsAsync_DoesNotExist_WarningResponse()
   {
     //Arrange
@@ -359,7 +360,7 @@ Drop type Address;
     content[0].Type.Should().Be("warning_entity");
   }
 
-  [TestMethod]
+  [Test]
   public async Task DropConnectorAsync_DoesNotExist_ErrorResponse()
   {
     //Arrange
@@ -380,7 +381,7 @@ Drop type Address;
     public Lead_Actor? Actor { get; set; } 
   }
 
-  [TestMethod]
+  [Test]
   public async Task InsertIntoAsync_NullValue()
   {
     //Arrange
@@ -413,7 +414,7 @@ Drop type Address;
       );";
   }
 
-  [TestMethod]
+  [Test]
   public async Task DropStreamAsync()
   {
     //Arrange
@@ -428,7 +429,7 @@ Drop type Address;
     httpResponseMessage.IsSuccessStatusCode.Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public async Task DropTableAsync()
   {
     //Arrange
@@ -471,7 +472,7 @@ Drop type Address;
     public int DontFindMe2 { get; }
   }
     
-  [TestMethod]
+  [Test]
   public async Task CreateSourceStream()
   {
     //Arrange
@@ -498,7 +499,7 @@ Drop type Address;
     public int Value { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public async Task CreateSourceTable()
   {
     //Arrange
@@ -518,7 +519,7 @@ Drop type Address;
     content[0].CommandStatus?.Status.Should().BeOneOf(default(string), SuccessStatus);
   }
 
-  [TestMethod]
+  [Test]
   public async Task SessionVariables()
   {
     //Arrange

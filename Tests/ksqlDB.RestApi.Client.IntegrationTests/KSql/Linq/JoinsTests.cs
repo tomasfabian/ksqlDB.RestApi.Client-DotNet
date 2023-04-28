@@ -9,11 +9,10 @@ using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
 
-[TestClass]
 public class JoinsTests : Infrastructure.IntegrationTests
 {
   private static MoviesProvider moviesProvider = null!;
@@ -25,8 +24,8 @@ public class JoinsTests : Infrastructure.IntegrationTests
     Partitions = 1
   };
 
-  [ClassInitialize]
-  public static async Task ClassInitialize(TestContext context)
+  [OneTimeSetUp]
+  public static async Task ClassInitialize()
   {
     RestApiProvider = KSqlDbRestApiProvider.Create();
       
@@ -44,7 +43,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
     await moviesProvider.InsertLeadAsync(MoviesProvider.LeadActor1);
   }
 
-  [ClassCleanup]
+  [OneTimeTearDown]
   public static async Task ClassCleanup()
   {
     await moviesProvider.DropTablesAsync();
@@ -53,7 +52,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
   private string MoviesTableName => MoviesProvider.MoviesTableName;
   private string ActorsTableName => MoviesProvider.ActorsTableName;
 
-  [TestMethod]
+  [Test]
   public async Task Join()
   {
     //Arrange
@@ -87,7 +86,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
     Assert.AreEqual(MoviesProvider.Movie1.Release_Year, actualValues[0].Release_Year);
   }
 
-  [TestMethod]
+  [Test]
   public async Task LeftJoin()
   {
     //Arrange
@@ -130,13 +129,13 @@ public class JoinsTests : Infrastructure.IntegrationTests
     public int? Release_Year { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public async Task FullOuterJoin()
   {
     await FullOuterJoinTest(Context.CreateQueryStream<Movie2>(MoviesTableName));
   }
 
-  [TestMethod]
+  [Test]
   public async Task FullOuterJoin_QueryEndPoint()
   {
     await FullOuterJoinTest(Context.CreateQuery<Movie2>(MoviesTableName));
@@ -182,7 +181,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
 
   #region RightJoin
 
-  [TestMethod]
+  [Test]
   public async Task RightJoin()
   {
     //Arrange
@@ -239,7 +238,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
     public int Prop { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public async Task MultipleJoins_QuerySyntax()
   {
     //Arrange
@@ -289,7 +288,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
       shipmentId.Should().Be(1);
   }
 
-  [TestMethod]
+  [Test]
   public async Task JoinWithin_QuerySyntax()
   {
     //Arrange
@@ -343,7 +342,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
     public Nested Nested { get; set; } = null!;
   }
 
-  [TestMethod]
+  [Test]
   public async Task JoinWithNestedPropertyAccessor_QuerySyntax()
   {
     //Arrange

@@ -3,17 +3,16 @@ using ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query;
 
-[TestClass]
 public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
 {
   protected static MoviesProvider MoviesProvider = null!;
 
-  [ClassInitialize]
-  public static async Task ClassInitialize(TestContext context)
+  [OneTimeSetUp]
+  public static async Task ClassInitialize()
   {
     await InitializeDatabase();
   }
@@ -28,7 +27,7 @@ public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
     await MoviesProvider.InsertMovieAsync(MoviesProvider.Movie1);
   }
 
-  [ClassCleanup]
+  [OneTimeTearDown]
   public static async Task ClassCleanup()
   {
     await MoviesProvider.DropTablesAsync();
@@ -38,7 +37,7 @@ public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
 
   protected virtual IQbservable<Movie> MoviesStream => Context.CreateQueryStream<Movie>(MoviesTableName);
 
-  [TestMethod]
+  [Test]
   public async Task ArrayInArray()
   {
     //Arrange
@@ -70,7 +69,7 @@ public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
     actualArr[1][1].Should().Be(expected[1][1]);
   }
 
-  [TestMethod]
+  [Test]
   public async Task ArrayInMap()
   {
     //Arrange
@@ -105,7 +104,7 @@ public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
     actual["b"][1].Should().Be(expected["b"][1]);
   }
 
-  [TestMethod]
+  [Test]
   public async Task MapInArray()
   {
     //Arrange
@@ -140,7 +139,7 @@ public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
     actual[1]["d"].Should().Be(expected[1]["d"]);
   }
 
-  [TestMethod]
+  [Test]
   public async Task MapInMap()
   {
     //Arrange
@@ -180,7 +179,7 @@ public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
     public int Id { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public async Task Struct()
   {
     //Arrange
@@ -203,7 +202,7 @@ public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
     actualValues.First().Release_Year.Should().Be(MoviesProvider.Movie1.Release_Year);
   }
 
-  [TestMethod]
+  [Test]
   public async Task Struct_FromColumns()
   {
     //Arrange
@@ -226,7 +225,7 @@ public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
     actualValues.First().Release_Year.Should().Be(expectedMovie.Release_Year);
   }
 
-  [TestMethod]
+  [Test]
   public async Task ArrayWithNestedStruct()
   {
     //Arrange
@@ -262,7 +261,7 @@ public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
     actualValues.First().Release_Year.Should().Be(expectedMovie.Release_Year);
   }
 
-  [TestMethod]
+  [Test]
   public async Task Array_FromColumn()
   {
     //Arrange

@@ -3,15 +3,14 @@ using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Functions;
 
-[TestClass]
 public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
 {
-  [ClassInitialize]
-  public static async Task ClassInitialize(TestContext context)
+  [OneTimeSetUp]
+  public static async Task ClassInitialize()
   {
     RestApiProvider = KSqlDbRestApiProvider.Create();
       
@@ -44,7 +43,7 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
 
   private readonly string streamName = "stream2";
 
-  [TestMethod]
+  [Test]
   public async Task TransformArray()
   {
     //Arrange
@@ -71,7 +70,7 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     
   private readonly string streamNameWithMap = "stream4";
 
-  [TestMethod]
+  [Test]
   public async Task TransformMap()
   {
     //Arrange
@@ -91,7 +90,7 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col.Values.First().Should().BeEquivalentTo(new [] {1,4,9});
   }
 
-  [TestMethod]
+  [Test]
   public async Task FilterArray()
   {
     //Arrange
@@ -109,7 +108,7 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col.Should().BeEquivalentTo(new[] { 2, 3 });
   }
     
-  [TestMethod]
+  [Test]
   public async Task FilterMap()
   {
     //Arrange
@@ -128,7 +127,7 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col.Values.First().Should().BeEquivalentTo(new [] {1,2,3});
   }
 
-  [TestMethod]
+  [Test]
   public async Task ReduceArray()
   {
     //Arrange
@@ -146,7 +145,7 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     actualValues[0].Acc.Should().Be(6);
   }
     
-  [TestMethod]
+  [Test]
   public async Task ReduceMap()
   {
     //Arrange

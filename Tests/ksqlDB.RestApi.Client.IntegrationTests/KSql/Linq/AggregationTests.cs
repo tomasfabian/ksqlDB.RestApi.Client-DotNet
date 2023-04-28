@@ -3,20 +3,19 @@ using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models;
 using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
 
-[TestClass]
 public class AggregationTests : Infrastructure.IntegrationTests
 {
-  private static MoviesProvider? moviesProvider;
+  private static MoviesProvider moviesProvider = null!;
   private static TweetsProvider? tweetsProvider;
 
   private static readonly string TweetsTopicName = "tweetsTestTopic";
 
-  [ClassInitialize]
-  public static async Task ClassInitialize(TestContext context)
+  [OneTimeSetUp]
+  public static async Task ClassInitialize()
   {
     RestApiProvider = KSqlDbRestApiProvider.Create();
 
@@ -35,16 +34,16 @@ public class AggregationTests : Infrastructure.IntegrationTests
     await tweetsProvider.InsertTweetAsync(TweetsProvider.Tweet2, TweetsStreamName);
   }
 
-  [ClassCleanup]
+  [OneTimeTearDown]
   public static async Task ClassCleanup()
   {
-    await moviesProvider?.DropTablesAsync()!;
+    await moviesProvider.DropTablesAsync();
 
-    moviesProvider = null;
+    moviesProvider = null!;
     tweetsProvider = null;
   }
 
-  [TestMethod]
+  [Test]
   public async Task Histogram()
   {
     await TestHistogram(Context.CreateQueryStream<Movie>(MoviesProvider.MoviesTableName));
@@ -68,13 +67,13 @@ public class AggregationTests : Infrastructure.IntegrationTests
     id1.Histogram[MoviesProvider.Movie1.Title].Should().BeOneOf(0, 1);
   }
 
-  [TestMethod]
+  [Test]
   public async Task Histogram_QueryEndPoint()
   {
     await TestHistogram(Context.CreateQuery<Movie>(MoviesProvider.MoviesTableName));
   }
     
-  [TestMethod]
+  [Test]
   public async Task CollectListStructs()
   {
     await CollectListStructs(Context.CreateQueryStream<Movie>(MoviesProvider.MoviesTableName));
@@ -105,7 +104,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     id1.Structs[0].Name.Should().Be("Karen");
   }
 
-  [TestMethod]
+  [Test]
   public async Task CollectListMaps()
   {
     await CollectListMaps(Context.CreateQueryStream<Movie>(MoviesProvider.MoviesTableName));
@@ -134,7 +133,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     id1.Maps[0]["Karen"].Should().Be(42);
   }
 
-  [TestMethod]
+  [Test]
   public async Task CollectListArray()
   {
     await CollectListArray(Context.CreateQueryStream<Movie>(MoviesProvider.MoviesTableName));
@@ -158,7 +157,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     id1.Array[0][1].Should().Be(2);
   }
 
-  [TestMethod]
+  [Test]
   public async Task CollectSetMaps()
   {
     await CollectSetMaps(Context.CreateQueryStream<Tweet>(TweetsStreamName));
@@ -189,7 +188,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
 
   protected static string TweetsStreamName = "tweetsTest";
 
-  [TestMethod]
+  [Test]
   public async Task EarliestByOffsetMaps()
   {
     await EarliestByOffsetMaps(Context.CreateQueryStream<Tweet>(TweetsStreamName));
@@ -219,7 +218,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     id1.Maps["Karen"].Should().Be(42);
   }
 
-  [TestMethod]
+  [Test]
   public async Task LatestByOffsetMaps()
   {
     await LatestByOffsetMaps(Context.CreateQueryStream<Tweet>(TweetsStreamName));
@@ -248,7 +247,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     id1.Maps["Karen"].Should().Be(42);
   }
 
-  [TestMethod]
+  [Test]
   public async Task LatestByOffsetStructs()
   {
     await LatestByOffsetStructs(Context.CreateQueryStream<Tweet>(TweetsStreamName));

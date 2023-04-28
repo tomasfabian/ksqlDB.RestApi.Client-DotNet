@@ -8,17 +8,16 @@ using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
 
-[TestClass]
 public class ComplexTypesTests
 {
   private IKSqlDbRestApiClient restApiClient = null!;
   protected KSqlDBContext Context = null!;
 
-  [TestInitialize]
+  [SetUp]
   public void Initialize()
   {
     var ksqlDbUrl = @"http://localhost:8088";
@@ -35,7 +34,7 @@ public class ComplexTypesTests
     Context = new KSqlDBContext(contextOptions);
   }
 
-  [TestMethod]
+  [Test]
   public async Task ReceiveArrayWithComplexElements()
   {
     //Arrange
@@ -95,7 +94,7 @@ Drop table Events;
   {
   }
 
-  [TestMethod]
+  [Test]
   public void TransformMap_WithNestedMap()
   {
     //Arrange
@@ -132,7 +131,7 @@ Drop table Events;
     public int b { get; set; }
   }
 
-  [TestMethod]
+  [Test]
   public void TransformMap_WithNestedStruct()
   {
     //Arrange

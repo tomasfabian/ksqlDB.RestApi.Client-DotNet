@@ -12,12 +12,12 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+using Assert = NUnit.Framework.Assert;
+using CollectionAssert = NUnit.Framework.CollectionAssert;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
 
-[TestClass]
-[TestCategory("Integration")]
 public class QbservableExtensionsTests : Infrastructure.IntegrationTests
 {
   protected static string StreamName = "tweetsTest";
@@ -27,8 +27,8 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
 
   private static Tweet Tweet2 => TweetsProvider.Tweet2;
 
-  [ClassInitialize]
-  public static async Task ClassInitialize(TestContext context)
+  [OneTimeSetUp]
+  public static async Task ClassInitialize()
   {
     await InitializeDatabase();
   }
@@ -57,7 +57,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     response = await RestApiProvider.InsertIntoAsync(new SingleLady { Name = "E.T."}, new InsertProperties());
   }
 
-  [ClassCleanup]
+  [OneTimeTearDown]
   public static async Task ClassCleanup()
   {
     var result = await RestApiProvider.DropStreamAndTopic(StreamName);
@@ -66,7 +66,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
   protected virtual ksqlDB.RestApi.Client.KSql.Linq.IQbservable<Tweet> QuerySource =>
     Context.CreateQueryStream<Tweet>(StreamName);
 
-  [TestMethod]
+  [Test]
   public async Task Select()
   {
     //Arrange
@@ -88,7 +88,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     CollectionAssert.AreEqual(expectedValues, actualValues);
   }
 
-  [TestMethod]
+  [Test]
   public async Task Take()
   {
     //Arrange
@@ -111,7 +111,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     CollectionAssert.AreEqual(expectedValues, actualValues);
   }
 
-  [TestMethod]
+  [Test]
   public async Task Where_MessageWasFiltered()
   {
     //Arrange
@@ -129,7 +129,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     Assert.AreEqual(actualValues[0].Message, Tweet2.Message);
   }
 
-  [TestMethod]
+  [Test]
   public async Task Between_MessageWasNotFiltered()
   {
     //Arrange
@@ -147,7 +147,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     Assert.AreEqual(actualValues[0].Amount, Tweet2.Amount);
   }
 
-  [TestMethod]
+  [Test]
   public async Task Subscribe()
   {
     //Arrange
@@ -166,7 +166,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     Assert.AreEqual(expectedItemsCount, actualValues.Count);
   }
 
-  [TestMethod]
+  [Test]
   public async Task SubscribeAsync_ReturnQueryId()
   {
     //Arrange
@@ -186,21 +186,22 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     subscription.QueryId.Should().NotBeNullOrEmpty();
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(KSqlQueryException))]
-  public async Task SubscribeAsync_UnknownTopic()
+  [Test]
+  public void SubscribeAsync_UnknownTopic()
   {
     //Arrange
     var source = Context.CreateQueryStream<Tweet>(StreamName+"xyz");
 
-    //Act
-    var subscription = await source.SubscribeAsync(c => { }, e => { }, () => {});
+    Assert.ThrowsAsync<KSqlQueryException>(() =>
+    {
+      //Act
+      var subscription = source.SubscribeAsync(c => { }, e => { }, () => { });
 
-    //Assert
-    subscription.QueryId.Should().BeNull();
+      return subscription;
+    });
   }
 
-  [TestMethod]
+  [Test]
   public async Task SubscribeAsync_UnknownTopic_NullQueryId()
   {
     //Arrange
@@ -220,7 +221,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     }
   }
 
-  [TestMethod]
+  [Test]
   public async Task SubscribeAsync_Canceled()
   {
     //Arrange
@@ -243,8 +244,8 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     subscription.QueryId.Should().NotBeNullOrEmpty();
   }
 
-  [Ignore]
-  [TestMethod]
+  [Test]
+  [Ignore("TODO")]
   public async Task SubscribeOn_Blocks()
   {
     //Arrange
@@ -263,7 +264,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     Assert.AreEqual(expectedItemsCount, actualValues.Count);
   }
 
-  [TestMethod]
+  [Test]
   public async Task ObserveOn_TaskPoolScheduler_ReceivesValuesOnNewThread()
   {
     //Arrange
@@ -285,7 +286,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     Assert.AreNotEqual(currentThread, observeOnThread!.Value);
   }
 
-  [TestMethod]
+  [Test]
   public async Task ObserveOn_TaskPoolScheduler_ReceivesValuesOnNonThreadPoolThread()
   {
     //Arrange
@@ -308,7 +309,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     using(subscription){}
   }
 
-  [TestMethod]
+  [Test]
   public async Task ToObservable()
   {
     //Arrange
@@ -328,7 +329,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     Assert.AreEqual(expectedItemsCount, actualValues.Count);
   }
 
-  [TestMethod]
+  [Test]
   public async Task GroupBy()
   {
     //Arrange
@@ -352,7 +353,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     Assert.AreEqual(Tweet2.Id, actualValues[1].Id);
   }
 
-  [TestMethod]
+  [Test]
   public async Task Having()
   {
     //Arrange
@@ -377,7 +378,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     Assert.AreEqual(Tweet2.Id, actualValues[1].Id);
   }
 
-  [TestMethod]
+  [Test]
   public async Task WindowedBy()
   {
     //Arrange
@@ -402,7 +403,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     Assert.AreEqual(Tweet2.Id, actualValues[1].Id);
   }
 
-  [TestMethod]
+  [Test]
   public async Task WindowedBy_WithFinalOutputRefinement()
   {
     //Arrange
@@ -427,7 +428,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     actualValues.Count.Should().BeGreaterOrEqualTo(1);
   }
     
-  [TestMethod]
+  [Test]
   public async Task QueryRawKSql()
   {
     //Arrange
@@ -450,7 +451,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     Assert.AreEqual(expectedItemsCount, actualValues.Count);
   }
     
-  [TestMethod]
+  [Test]
   public async Task QueryStreamRawKSql()
   {
     //Arrange
@@ -473,7 +474,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     Assert.AreEqual(expectedItemsCount, actualValues.Count);
   }
 
-  [TestMethod]
+  [Test]
   public async Task InClauseFilter()
   {
     //Arrange
@@ -493,7 +494,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     Assert.AreEqual(actualValues[0].Id, 1);
   }
 
-  [TestMethod]
+  [Test]
   public async Task ListContainsProjection()
   {
     //Arrange
@@ -516,7 +517,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].Should().BeTrue();
   }
 
-  [TestMethod]
+  [Test]
   public async Task WithOffsetResetPolicy()
   {
     //Arrange
@@ -553,7 +554,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     CollectionAssert.AreEqual(expectedValues, actualValues);
   }
     
-  [TestMethod]
+  [Test]
   public async Task ExplainAsync()
   {
     //Arrange
@@ -569,7 +570,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     description[0].QueryDescription.ExecutionPlan.Should().NotBeNullOrEmpty();
   }
 
-  [TestMethod]
+  [Test]
   public async Task ExplainAsStringAsync()
   {
     //Arrange
@@ -581,7 +582,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     description.Should().Contain("EXPLAIN SELECT * FROM tweetsTest EMIT CHANGES;");
   }
 
-  [TestMethod]
+  [Test]
   public async Task SinglePropertySelector()
   {
     //Arrange
@@ -605,7 +606,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     public string Name { get; init; } = null!;
   }
 
-  [TestMethod]
+  [Test]
   public async Task SinglePropertyInstanceSelector()
   {
     //Arrange
@@ -622,7 +623,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     actualValues[0].Name.Should().Be("E.T.");
   }
 
-  [TestMethod]
+  [Test]
   public async Task SingleStructPropertySelector()
   {
     //Arrange
@@ -641,7 +642,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     actualValues[0].Year.Should().Be(year);
   }
 
-  [TestMethod]
+  [Test]
   public async Task SelectAsInt()
   {
     //Arrange
@@ -665,7 +666,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     actualValues[0].Should().Be(42);
   }
 
-  [TestMethod]
+  [Test]
   public async Task SelectAsArray()
   {
     //Arrange
@@ -694,7 +695,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     public string Name { get; set; } = null!;
   }
 
-  [TestMethod]
+  [Test]
   public async Task SelectAsStruct()
   {
     //Arrange

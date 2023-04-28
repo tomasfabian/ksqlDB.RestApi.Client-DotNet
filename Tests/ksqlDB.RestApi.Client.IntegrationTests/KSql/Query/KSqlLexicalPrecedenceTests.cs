@@ -3,17 +3,16 @@ using ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query;
 
-[TestClass]
 public class KSqlLexicalPrecedenceTests : Infrastructure.IntegrationTests
 {
   protected static MoviesProvider MoviesProvider = null!;
 
-  [ClassInitialize]
-  public static async Task ClassInitialize(TestContext context)
+  [OneTimeSetUp]
+  public static async Task ClassInitialize()
   {
     await InitializeDatabase();
   }
@@ -29,7 +28,7 @@ public class KSqlLexicalPrecedenceTests : Infrastructure.IntegrationTests
     await MoviesProvider.InsertMovieAsync(MoviesProvider.Movie2);
   }
 
-  [ClassCleanup]
+  [OneTimeTearDown]
   public static async Task ClassCleanup()
   {
     await MoviesProvider.DropTablesAsync();
@@ -39,7 +38,7 @@ public class KSqlLexicalPrecedenceTests : Infrastructure.IntegrationTests
 
   protected virtual IQbservable<Movie> MoviesStream => Context.CreateQueryStream<Movie>(MoviesTableName);
 
-  [TestMethod]
+  [Test]
   public async Task Select()
   {
     //Arrange
@@ -61,7 +60,7 @@ public class KSqlLexicalPrecedenceTests : Infrastructure.IntegrationTests
     actualArr.ChangedOrder.Should().Be(9);
   }
 
-  [TestMethod]
+  [Test]
   public async Task Where()
   {
     //Arrange
@@ -78,7 +77,7 @@ public class KSqlLexicalPrecedenceTests : Infrastructure.IntegrationTests
     movie.Id.Should().Be(MoviesProvider.Movie1.Id);
   }
 
-  [TestMethod]
+  [Test]
   public async Task Where_NoBrackets()
   {
     //Arrange

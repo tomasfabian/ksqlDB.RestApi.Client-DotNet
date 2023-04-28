@@ -1,26 +1,19 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq.Statements;
 
-[TestClass]
 public class CreateStatementExtensionsTests : Infrastructure.IntegrationTests
 {
-  [TestInitialize]
-  public override void TestInitialize()
-  {
-    base.TestInitialize();
-  }
-
   private const string StreamName = "TestStreamStatement";
 
-  [TestMethod]
+  [Test]
   public void CreateOrReplaceStreamStatement_ToStatementString_CalledTwiceWithSameResult()
   {
     //Arrange
@@ -40,7 +33,7 @@ AS SELECT * FROM {nameof(Movie)} EMIT CHANGES;");
 
   private const string StreamEntityName = "MYMOVIESSTREAMTESTS";
 
-  [TestMethod]
+  [Test]
   public async Task CreateOrReplaceStreamStatement_ToStatementString_ComplexQueryWasGenerated()
   {
     //Arrange
@@ -57,8 +50,7 @@ AS SELECT * FROM {nameof(Movie)} EMIT CHANGES;");
       Replicas = 1
     };
 
-    var httpResponseMessage =
-      await restApiClient.CreateStreamAsync<Movie>(metadata, ifNotExists: false);
+    var httpResponseMessage = await restApiClient.CreateStreamAsync<Movie>(metadata, ifNotExists: false);
 
     var creationMetadata = new CreationMetadata
     {
@@ -93,7 +85,7 @@ WHERE Id < 3 PARTITION BY Id EMIT CHANGES;");
   private const string TableName = "IntegrationTestTable";
   private const string EntityName = "movies_test112";
 
-  [TestMethod]
+  [Test]
   public async Task CreateOrReplaceTableStatement_ExecuteStatementAsync_ResponseWasReceived()
   {
     //Arrange

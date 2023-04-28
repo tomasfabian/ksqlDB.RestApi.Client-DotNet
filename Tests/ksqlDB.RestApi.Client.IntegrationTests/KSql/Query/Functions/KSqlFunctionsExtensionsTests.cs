@@ -7,17 +7,16 @@ using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Functions;
 
-[TestClass]
 public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
 {
   private static MoviesProvider moviesProvider = null!;
 
-  [ClassInitialize]
-  public static async Task ClassInitialize(TestContext _)
+  [OneTimeSetUp]
+  public static async Task ClassInitialize()
   {
     RestApiProvider = KSqlDbRestApiProvider.Create();
       
@@ -27,7 +26,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     await moviesProvider.InsertMovieAsync(MoviesProvider.Movie1);
   }
 
-  [ClassCleanup]
+  [OneTimeTearDown]
   public static async Task ClassCleanup()
   {
     await moviesProvider.DropTablesAsync();
@@ -35,13 +34,13 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
 
   private string MoviesTableName => MoviesProvider.MoviesTableName;
 
-  [TestMethod]
+  [Test]
   public async Task DateToString()
   {
     await DateToStringTest(Context.CreateQueryStream<Movie>(MoviesTableName));
   }
 
-  [TestMethod]
+  [Test]
   public async Task DateToString_QueryEndPoint()
   {
     await DateToStringTest(Context.CreateQuery<Movie>(MoviesTableName));
@@ -68,13 +67,13 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].Should().BeEquivalentTo("2021-02-14");
   }
 
-  [TestMethod]
+  [Test]
   public async Task Entries()
   {
     await EntriesTest(Context.CreateQueryStream<Movie>(MoviesTableName));
   }
 
-  [TestMethod]
+  [Test]
   public async Task Entries_QueryEndPoint()
   {
     await EntriesTest(Context.CreateQuery<Movie>(MoviesTableName));
@@ -103,7 +102,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col[0].V.Should().BeEquivalentTo("value");
   }
 
-  [TestMethod]
+  [Test]
   public async Task ArrayIntersect()
   {
     //Arrange
@@ -122,7 +121,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col[0].Should().Be(1);
   }
 
-  [TestMethod]
+  [Test]
   public async Task ArrayJoin()
   {
     //Arrange
@@ -141,7 +140,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col.Should().Be(@"1;2");
   }
 
-  [TestMethod]
+  [Test]
   public async Task ArrayLength()
   {
     //Arrange
@@ -160,7 +159,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col.Should().Be(2);
   }
     
-  [TestMethod]
+  [Test]
   public async Task ArrayMin()
   {
     //Arrange
@@ -179,7 +178,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col.Should().Be(1);
   }
 
-  [TestMethod]
+  [Test]
   [Ignore("Cannot construct an array with all NULL elements")]
   public async Task ArrayMin_Null()
   {
@@ -199,7 +198,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col.Should().BeNull();
   }
 
-  [TestMethod]
+  [Test]
   public async Task ArrayLength_NullValue()
   {
     //Arrange
@@ -218,7 +217,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col.Should().BeNull();
   }
     
-  [TestMethod]
+  [Test]
   public async Task ArrayRemove()
   {
     //Arrange
@@ -237,7 +236,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col.Length.Should().Be(1);
   }
     
-  [TestMethod]
+  [Test]
   public async Task ArraySort()
   {
     //Arrange
@@ -254,7 +253,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     CollectionAssert.AreEquivalent(new int?[] { 1, 3, null}, actualValues[0].Col);
   }
     
-  [TestMethod]
+  [Test]
   public async Task ArrayUnion()
   {
     //Arrange
@@ -271,7 +270,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     CollectionAssert.AreEquivalent(new int?[] { 3, null, 1, 4}, actualValues[0].Col);
   }
     
-  [TestMethod]
+  [Test]
   public async Task Concat()
   {
     //Arrange
@@ -291,7 +290,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].ColWS.Should().Be($"{MoviesProvider.Movie1.Title} - {message}");
   }
     
-  [TestMethod]
+  [Test]
   public async Task ToBytes()
   {
     //Arrange
@@ -311,7 +310,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     result.Should().Be(MoviesProvider.Movie1.Title);
   }
     
-  [TestMethod]
+  [Test]
   public async Task FromBytes()
   {
     //Arrange
@@ -330,7 +329,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col.Should().BeEquivalentTo(MoviesProvider.Movie1.Title);
   }
     
-  [TestMethod]
+  [Test]
   [Ignore("TODO")]
   public async Task FromBytes_CapturedVariable()
   {
@@ -355,7 +354,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col.Should().BeEquivalentTo(MoviesProvider.Movie1.Title);
   }
 
-  [TestMethod]
+  [Test]
   public async Task AsMap()
   {
     //Arrange
@@ -373,7 +372,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col["1"].Should().Be(11);
   }
     
-  [TestMethod]
+  [Test]
   public async Task JsonArrayContains()
   {
     //Arrange
@@ -391,7 +390,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col.Should().BeTrue();
   }
     
-  [TestMethod]
+  [Test]
   public async Task MapKeys()
   {
     //Arrange
@@ -419,7 +418,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col[1].Should().Be("apple");
   }
 
-  [TestMethod]
+  [Test]
   public async Task Encode()
   {
     //Arrange
@@ -441,7 +440,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     actualValues[0].Should().Be(MoviesProvider.Movie1.Title);
   }
 
-  [TestMethod]
+  [Test]
   public async Task ExtractJsonField()
   {
     //Arrange

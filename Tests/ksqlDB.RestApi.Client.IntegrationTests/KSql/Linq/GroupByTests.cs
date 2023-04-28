@@ -5,15 +5,14 @@ using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
 
-[TestClass]
 public class GroupByTests : Infrastructure.IntegrationTests
 {
-  [ClassInitialize]
-  public static async Task ClassInitialize(TestContext context)
+  [OneTimeSetUp]
+  public static async Task ClassInitialize()
   {
     RestApiProvider = KSqlDbRestApiProvider.Create();
       
@@ -45,7 +44,7 @@ public class GroupByTests : Infrastructure.IntegrationTests
     public string Name { get; init; } = null!;
   }
 
-  [TestMethod]
+  [Test]
   public async Task GroupByNested()
   {
     //Arrange
@@ -68,7 +67,7 @@ public class GroupByTests : Infrastructure.IntegrationTests
     actualValues[0].Name.Should().Be(State1.Name);
   }
 
-  [TestMethod]
+  [Test]
   public async Task GroupByAnonymousNested()
   {
     //Arrange

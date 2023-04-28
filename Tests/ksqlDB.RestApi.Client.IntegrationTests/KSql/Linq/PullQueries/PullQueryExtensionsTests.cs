@@ -4,11 +4,10 @@ using ksqlDB.Api.Client.IntegrationTests.Models.Sensors;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq.PullQueries;
 
-[TestClass]
 public class PullQueryExtensionsTests
 {
   private static SensorsPullQueryProvider pullQueryProvider = null!;
@@ -16,8 +15,8 @@ public class PullQueryExtensionsTests
   private static KSqlDBContextOptions contextOptions = null!;
   private static KSqlDBContext context = null!;
 
-  [ClassInitialize]
-  public static async Task ClassInitialize(TestContext testContext)
+  [OneTimeSetUp]
+  public static async Task ClassInitialize()
   {
     contextOptions = new KSqlDBContextOptions(KSqlDbRestApiProvider.KsqlDbUrl);
       
@@ -30,7 +29,7 @@ public class PullQueryExtensionsTests
     await Task.Delay(TimeSpan.FromSeconds(6));
   }
 
-  [TestMethod]
+  [Test]
   public async Task CreatePullQuery()
   {
     //Arrange
@@ -48,7 +47,7 @@ public class PullQueryExtensionsTests
     result.WindowEnd.Should().NotBe(null);
   }
 
-  [TestMethod]
+  [Test]
   public async Task GetManyAsync()
   {
     //Arrange
@@ -68,7 +67,7 @@ public class PullQueryExtensionsTests
     results.Should().NotBeEmpty();
   }
 
-  [TestMethod]
+  [Test]
   public async Task SelectSingleColumn()
   {
     //Arrange
@@ -85,7 +84,7 @@ public class PullQueryExtensionsTests
     result.Should().Be(sensorId);
   }
 
-  [TestMethod]
+  [Test]
   public async Task SelectColumns()
   {
     //Arrange
@@ -102,7 +101,7 @@ public class PullQueryExtensionsTests
     result.SensorId.Should().Be(sensorId);
   }
 
-  [TestMethod]
+  [Test]
   public async Task CreatePullQuery_WithBounds()
   {
     //Arrange
@@ -124,7 +123,7 @@ public class PullQueryExtensionsTests
     result.WindowEnd.Should().NotBe(null);
   }
 
-  [TestMethod]
+  [Test]
   public async Task CreatePullQuery_FromPlainStringQuery()
   {
     //Arrange
