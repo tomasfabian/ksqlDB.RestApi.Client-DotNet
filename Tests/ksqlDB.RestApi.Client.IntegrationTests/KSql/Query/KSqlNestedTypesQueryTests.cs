@@ -1,19 +1,18 @@
-﻿using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
+using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query;
 
-[TestClass]
 public class KSqlNestedTypesQueryTests : KSqlNestedTypesTests
 {
-  [ClassInitialize]
-  public new static async Task ClassInitialize(TestContext context)
+  [OneTimeSetUp]
+  public new static async Task ClassInitialize()
   {
     await InitializeDatabase();
   }
 
-  [ClassCleanup]
+  [OneTimeTearDown]
   public new static async Task ClassCleanup()
   {
     await MoviesProvider.DropTablesAsync();
