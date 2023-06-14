@@ -10,3 +10,31 @@ Streams are backed by Kafka topics and inherit their properties.
 ## Tables
 A table in `ksqlDB` represents a **mutable** view of a stream. It is a continuously updated result set derived from one or more streams.
 Tables have to define a required **key** that allows efficient retrieval of specific records based on the key value.
+`ksqlDB` tables are usually stored in compacted Kafka topics that are a special type of topic in Kafka that retains only the most recent value for each key within the topic after compaction.
+
+Example:
+```bash
+kafka-topics --create --topic my_topic --bootstrap-server localhost:9092 --partitions 3 --replication-factor 3 --config cleanup.policy=delete
+```
+
+```SQL
+CREATE TABLE my_table (
+  key INT,
+  value STRING
+) WITH (
+  KAFKA_TOPIC = 'my_topic',
+  VALUE_FORMAT = 'JSON'
+);
+```
+
+In the following example the underlying Kafka topic will be automatically configured as compacted:
+```SQL
+CREATE TABLE my_table (
+  key INT,
+  value STRING
+) WITH (
+  PARTITIONS = 3,
+  VALUE_FORMAT = 'JSON'
+);
+```
+When creating a `ksqlDB` table without specifying the KAFKA_TOPIC configuration, you should provide the PARTITIONS configuration in the WITH clause to indicate the desired number of partitions for the underlying Kafka topic.
