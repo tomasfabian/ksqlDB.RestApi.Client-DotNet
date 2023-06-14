@@ -45,6 +45,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{0ABA2B0A-0
 		doc\pull_queries.md = doc\pull_queries.md
 		doc\push_queries.md = doc\push_queries.md
 		doc\statements.md = doc\statements.md
+		doc\streams_and_tables.md = doc\streams_and_tables.md
 		doc\stream_processing.md = doc\stream_processing.md
 	EndProjectSection
 EndProject
