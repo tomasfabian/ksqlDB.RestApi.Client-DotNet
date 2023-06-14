@@ -7,6 +7,24 @@ The data in streams and tables can be transformed, filtered, joined and aggregat
 A stream in `ksqlDB` represents an unbounded sequence of records in `ksqlDB`, where each record is an **immutable** unit of data (fact).
 Streams are backed by Kafka topics and inherit their properties.
 
+```KSQL
+CREATE STREAM my_stream (
+  id INT,
+  name STRING,
+) WITH (
+  KAFKA_TOPIC = 'my_topic',
+  VALUE_FORMAT = 'JSON'
+);
+```
+
+In the above example, we are creating a stream named `'my_stream'` with three columns: `'id'`, `'name'`, and `'age'`. The id column is of type **INT**, and name column is of type **STRING**.
+
+The **KAFKA_TOPIC** configuration specifies the Kafka topic associated with the stream, in this case, `'my_topic'`. The stream will consume events from this Kafka topic.
+
+The **VALUE_FORMAT** configuration indicates the format of the values stored in the Kafka topic. In this example, the values are in JSON format. KSQLDB supports various value formats, including JSON, Avro, delimited text, and more.
+
+When you create a stream in `ksqlDB`, it sets up the necessary infrastructure to consume and process events from the specified Kafka topic. The stream continuously reads events from the topic and makes them available for querying and processing in real-time.
+
 ## Tables
 A table in `ksqlDB` represents a **mutable** view of a stream. It is a continuously updated result set derived from one or more streams.
 Tables have to define a required **key** that allows efficient retrieval of specific records based on the key value.
@@ -26,6 +44,10 @@ CREATE TABLE my_table (
   VALUE_FORMAT = 'JSON'
 );
 ```
+
+The **KEY** configuration specifies the column that will be used as the primary key for the table. In this example, the `'key'` column is designated as the key.
+
+When you create a table in `ksqlDB`, it sets up the necessary infrastructure to consume and process events from the specified Kafka topic, similar to a stream. However, unlike a stream, a table maintains the latest state of the data based on the key column(s). The table continuously updates its state as new events arrive, allowing random access and lookup operations based on the key(s).
 
 In the following example the underlying Kafka topic will be automatically configured as compacted:
 ```SQL
