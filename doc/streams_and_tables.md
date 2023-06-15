@@ -17,11 +17,11 @@ CREATE STREAM my_stream (
 );
 ```
 
-In the above example, we are creating a stream named `'my_stream'` with three columns: `'id'`, `'name'`, and `'age'`. The id column is of type **INT**, and name column is of type **STRING**.
+In the above example, we are creating a stream named `'my_stream'` with two columns: `'id'` and `'name'`. The `'id'` column is of type **INT**, and `'name'` column is of type **STRING**.
 
 The **KAFKA_TOPIC** configuration specifies the Kafka topic associated with the stream, in this case, `'my_topic'`. The stream will consume events from this Kafka topic.
 
-The **VALUE_FORMAT** configuration indicates the format of the values stored in the Kafka topic. In this example, the values are in JSON format. KSQLDB supports various value formats, including JSON, Avro, delimited text, and more.
+The **VALUE_FORMAT** configuration indicates the format of the values stored in the Kafka topic. In this example, the values are in JSON format. `ksqlDB` supports various value formats, including JSON, Avro, delimited text, and more.
 
 When you create a stream in `ksqlDB`, it sets up the necessary infrastructure to consume and process events from the specified Kafka topic. The stream continuously reads events from the topic and makes them available for querying and processing in real-time.
 
@@ -59,4 +59,4 @@ CREATE TABLE my_table (
   VALUE_FORMAT = 'JSON'
 );
 ```
-When creating a `ksqlDB` table without specifying the KAFKA_TOPIC configuration, you should provide the PARTITIONS configuration in the WITH clause to indicate the desired number of partitions for the underlying Kafka topic.
+When creating a `ksqlDB` table without specifying the **KAFKA_TOPIC** configuration, you should provide the **PARTITIONS** configuration in the **WITH** clause to indicate the desired number of partitions for the underlying Kafka topic.
