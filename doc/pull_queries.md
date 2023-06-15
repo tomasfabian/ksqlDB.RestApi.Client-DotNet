@@ -30,8 +30,8 @@ IKSqlDbRestApiClient restApiClient;
 
 async Task Main()
 {
-  string url = @"http://localhost:8088";
-  await using var context = new KSqlDBContext(url);
+  string ksqlDbUrl = @"http://localhost:8088";
+  await using var context = new KSqlDBContext(ksqlDbUrl);
 
   var httpClient = new HttpClient
   {

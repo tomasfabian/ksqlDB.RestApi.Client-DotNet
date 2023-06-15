@@ -135,7 +135,13 @@ var contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
 ```
 
 ```C#
-var kSqlDbRestApiClient = new KSqlDbRestApiClient(new HttpClientFactory(new Uri(ksqlDbUrl)))
+var httpClient = new HttpClient
+{
+  BaseAddress = new Uri(ksqlDbUrl)
+};
+
+var httpClientFactory = new HttpClientFactory(httpClient);
+var kSqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory)
 {
   DisposeHttpClient = true
 };
