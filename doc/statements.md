@@ -5,7 +5,12 @@
 
 In ksqldb you can use the [Http-Basic authentication](https://docs.ksqldb.io/en/latest/operate-and-deploy/installation/server-config/security/#configuring-listener-for-http-basic-authenticationauthorization) mechanism:
 ```C#
-var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+var httpClient = new HttpClient
+{
+  BaseAddress = new Uri(ksqlDbUrl)
+};
+
+var httpClientFactory = new HttpClientFactory(httpClient);
       
 var restApiClient = new KSqlDbRestApiClient(httpClientFactory)
   .SetCredentials(new BasicAuthCredentials("fred", "letmein"));
@@ -50,7 +55,12 @@ record Order
 ```C#
 var ksqlDbUrl = @"http://localhost:8088";
 
-var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+var httpClient = new HttpClient
+{
+  BaseAddress = new Uri(ksqlDbUrl)
+};
+
+var httpClientFactory = new HttpClientFactory(httpClient);
 
 var order = new Order { Id = 1, ItemsList = new List<double> { 1.1, 2 }};
 
@@ -84,7 +94,12 @@ var testEvent = new EventWithList
 
 var ksqlDbUrl = @"http://localhost:8088";
 
-var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+var httpClient = new HttpClient
+{
+  BaseAddress = new Uri(ksqlDbUrl)
+};
+
+var httpClientFactory = new HttpClientFactory(httpClient);
 
 var responseMessage = await new KSqlDbRestApiClient(httpClientFactory)
   .InsertIntoAsync(testEvent);
@@ -139,10 +154,15 @@ ARRAY_REMOVE(ARRAY[0], 0))
 
 [Insert values](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/insert-values/) - Produce a row into an existing stream or table and its underlying topic based on explicitly specified values.
 ```C#
-string url = @"http://localhost:8088";
+string ksqlDbUrl = @"http://localhost:8088";
 
-var http = new HttpClientFactory(new Uri(url));
-var restApiClient = new KSqlDbRestApiClient(http);
+var httpClient = new HttpClient
+{
+  BaseAddress = new Uri(ksqlDbUrl)
+};
+
+var httpClientFactory = new HttpClientFactory(httpClient);
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
 var movie = new Movie() { Id = 1, Release_Year = 1988, Title = "Title" };
 
@@ -471,13 +491,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 public async Task CreateGetAndDropConnectorAsync()
 {
   var ksqlDbUrl = @"http://localhost:8088";
 
-  var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+  var httpClient = new HttpClient
+  {
+    BaseAddress = new Uri(ksqlDbUrl)
+  };
+
+  var httpClientFactory = new HttpClientFactory(httpClient);
 
   var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
@@ -521,6 +547,7 @@ using System;
 using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.Sample.Models.Events;
@@ -529,7 +556,12 @@ private static async Task SubscriptionToAComplexTypeAsync()
 {      
   var ksqlDbUrl = @"http://localhost:8088";
 
-  var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+  var httpClient = new HttpClient
+  {
+    BaseAddress = new Uri(ksqlDbUrl)
+  };
+
+  var httpClientFactory = new HttpClientFactory(httpClient);
   var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
   var httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@$"
@@ -613,7 +645,12 @@ Drops an existing stream.
 ```C#
 var ksqlDbUrl = @"http://localhost:8088";
 
-var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+var httpClient = new HttpClient
+{
+  BaseAddress = new Uri(ksqlDbUrl)
+};
+
+var httpClientFactory = new HttpClientFactory(httpClient);
 var ksqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
 string streamName = "StreamName";
@@ -708,7 +745,13 @@ Drops an existing table.
 ```C#
 var ksqlDbUrl = @"http://localhost:8088";
 
-var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+var httpClient = new HttpClient
+{
+  BaseAddress = new Uri(ksqlDbUrl)
+};
+
+var httpClientFactory = new HttpClientFactory(httpClient);
+
 var ksqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
 string tableName = "TableName";
@@ -838,7 +881,12 @@ public async Task ExecuteStatementAsync()
 {
   var ksqlDbUrl = @"http://localhost:8088";
 
-  var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+  var httpClient = new HttpClient
+  {
+    BaseAddress = new Uri(ksqlDbUrl)
+  };
+
+  var httpClientFactory = new HttpClientFactory(httpClient);
 
   IKSqlDbRestApiClient restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
@@ -967,9 +1015,14 @@ EntityCreationMetadata metadata = new()
   Replicas = 1
 };
 
-string url = @"http://localhost:8088";
+string ksqlDbUrl = @"http://localhost:8088";
 
-var httpClientFactory = new HttpClientFactory(new Uri(url));
+var httpClient = new HttpClient
+{
+  BaseAddress = new Uri(ksqlDbUrl)
+};
+
+var httpClientFactory = new HttpClientFactory(httpClient);
 var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
 var httpResponseMessage = await restApiClient.CreateStreamAsync<MyMovies>(metadata, ifNotExists: true);
@@ -1011,9 +1064,14 @@ EntityCreationMetadata metadata = new()
   Replicas = 3
 };
 
-string url = @"http://localhost:8088";
+string ksqlDbUrl = @"http://localhost:8088";
 
-var httpClientFactory = new HttpClientFactory(new Uri(url));
+var httpClient = new HttpClient
+{
+  BaseAddress = new Uri(ksqlDbUrl)
+};
+
+var httpClientFactory = new HttpClientFactory(httpClient);
 var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
 var httpResponseMessage = await restApiClient.CreateTableAsync<MyMovies>(metadata, ifNotExists: true);
