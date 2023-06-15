@@ -18,6 +18,7 @@ See also [GetManyAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-Dot
 ```C#
 using System.Net.Http;
 using System.Threading.Tasks;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -32,8 +33,13 @@ async Task Main()
   string url = @"http://localhost:8088";
   await using var context = new KSqlDBContext(url);
 
-  var http = new HttpClientFactory(new Uri(url));
-  restApiClient = new KSqlDbRestApiClient(http);
+  var httpClient = new HttpClient
+  {
+    BaseAddress = new Uri(ksqlDbUrl)
+  };
+
+  var httpClientFactory = new HttpClientFactory(httpClient);
+  restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 	
   await CreateOrReplaceStreamAsync();
 	

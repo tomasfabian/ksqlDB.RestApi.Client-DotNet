@@ -538,7 +538,8 @@ Drop table {nameof(Event)};
 "));
 
   httpResponseMessage = await restApiClient.CreateTypeAsync<EventCategory>();
-  httpResponseMessage = await restApiClient.CreateTableAsync<Event>(new EntityCreationMetadata { KafkaTopic = "Events", Partitions = 1 });
+  var metadata = new EntityCreationMetadata { KafkaTopic = "Events", Partitions = 1 };
+  httpResponseMessage = await restApiClient.CreateTableAsync<Event>(metadata);
       
   await using var ksqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(ksqlDbUrl));
 
