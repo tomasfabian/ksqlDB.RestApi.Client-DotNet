@@ -1,5 +1,8 @@
 # Pull queries
 
+**Pull queries** allow you to retrieve specific records from a stream or table based on certain criteria.
+Unlike continuous queries, which continuously process and emit results in real-time, pull queries are used for ad-hoc retrieval of data from the stored state of a stream or table.
+
 ### Pull queries - `ExecutePullQuery`
 **v1.0.0**
 
