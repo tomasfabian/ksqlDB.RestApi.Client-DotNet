@@ -1,5 +1,7 @@
 # Push queries
 
+**Push queries** in `ksqlDB` provide a way to obtain continuous updates as new data arrives and matches the specified criteria.
+
 ### Take (LIMIT)
 **v1.0.0**
 
@@ -67,6 +69,10 @@ List of supported operators is [documented here](https://github.com/tomasfabian/
 
 ### Subscribe
 **v1.0.0**
+
+**Subscribe** refers to the action of a client or consumer connecting to a query result stream and **receiving** continuous updates as new data arrives or the state of the underlying stream or table changes.
+
+When you subscribe to a push query in `ksqlDB`, you establish a connection between the client application and the `ksqlDB` server, enabling the client to receive and process the continuously pushed query results.
 
 Providing ```IObserver<T>```:
 ```C#
