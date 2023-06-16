@@ -6,7 +6,7 @@ It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/
 
 [![main](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/actions/workflows/dotnetcore.yml/badge.svg?branch=main&event=push)](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/actions/workflows/dotnetcore.yml/)
 
-Install with NuGet package manager:
+Install with **NuGet** package manager:
 ```
 Install-Package ksqlDB.RestApi.Client
 ```
@@ -41,7 +41,7 @@ var contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
 
 await using var context = new KSqlDBContext(contextOptions);
 
-using var disposable = context.CreateQueryStream<Tweet>()
+using var subscription = context.CreateQueryStream<Tweet>()
   .WithOffsetResetPolicy(AutoOffsetReset.Latest)
   .Where(p => p.Message != "Hello world" || p.Id == 1)
   .Select(l => new { l.Message, l.Id })
@@ -74,7 +74,7 @@ SELECT Message, Id
  LIMIT 2;
 ```
 
-In the above mentioned code snippet everything runs server side except of the ```IQbservable<TEntity>.Subscribe``` method. It subscribes to your ksqlDB stream created in the following manner:
+In the above mentioned C# code snippet everything runs server side except of the ```IQbservable<TEntity>.Subscribe``` extension method. It subscribes to your ksqlDB stream created in the following manner:
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
@@ -103,8 +103,8 @@ var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<Tweet>(
 `CreateOrReplaceStreamAsync` executes the following statement:
 ```SQL
 CREATE OR REPLACE STREAM Tweets (
-	Id INT,
-	Message VARCHAR
+  Id INT,
+  Message VARCHAR
 ) WITH ( KAFKA_TOPIC='Tweet', VALUE_FORMAT='Json', PARTITIONS='3', REPLICAS='3' );
 ```
 
@@ -158,11 +158,13 @@ run in command line:
 
 **AspNet Blazor server side sample:**
 
-- set docker-compose.csproj as startup project in InsideOut.sln for an embedded Kafka connect integration and stream processing examples.
+- set `docker-compose.csproj` as startup project in `InsideOut.sln` for an embedded Kafka connect integration and stream processing examples.
 
 # ```IQbservable<T>``` extension methods
 As depicted bellow `IObservable<T>` is the dual of `IEnumerable<T>` and `IQbservable<T>` is the dual of `IQueryable<T>`. In all four cases LINQ providers are using deferred execution.
-While the first two are executed locally the latter two are executed server side. The server side execution is possible thanks to traversing ASTs (Abstract Syntax Trees) with visitors. The `KSqlDbProvider` will create the KSQL syntax for you from expression trees and pass it along to ksqlDB.
+While the first two are executed locally the latter two are executed server side. The server side execution is possible thanks to traversing **AST**s (Abstract Syntax Trees) with visitors. The `KSqlDbProvider` will create the **KSQL syntax** for you from **expression trees** and pass it along to ksqlDB.
+
+Both `IObservable<T>` and `IQbservable<T>` represent **push-based** sequences of asynchronous and potentially infinite events, while `IEnumerable<T>` and `IQueryable<T>` represent collections or **pull-based** sequences of items that can be iterated or queried, respectively.
 
 <img src="https://www.codeproject.com/KB/cs/646361/WhatHowWhere.jpg" />
 
@@ -230,7 +232,7 @@ FROM custom_topic_name
 # Register the KSqlDbContext
 `IKSqlDBContext` and `IKSqlDbRestApiClient` can be provided with dependency injection. These services can be registered during app startup and components that require these services, are provided with these services via constructor parameters.
 
-To register `KsqlDbContext` as a service, open Program.cs, and add the lines to the `ConfigureServices` method shown bellow or see some more details in [the workshop](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/ksqlDB.RestApi.Client-workshop):
+To register `KsqlDbContext` as a service, open `Program.cs`, and add the lines to the `ConfigureServices` method shown bellow or see some more details in [the workshop](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/ksqlDB.RestApi.Client-workshop):
 
 ```
 using ksqlDB.RestApi.Client.Sensors;
