@@ -1,5 +1,9 @@
 # KSqlDbContext
 
+**KSqlDbContext** provides **querying** capabilities, allowing developers to express complex queries against the ksql database using a higher-level query language.
+This enables retrieval of specific data based on filtering conditions, limiting, and other criteria in a more compile type safe way.
+It also exposes a method to perform operations to **create** records.
+
 ### Creating query streams
 **v1.0.0**
 
@@ -16,6 +20,7 @@ Content-Type: application/vnd.ksqlapi.delimited.v1
   }
 }
 ```
+
 ```C#
 using System;
 using ksqlDB.RestApi.Client.KSql.Linq;
