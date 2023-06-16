@@ -7,8 +7,8 @@ The data in streams and tables can be transformed, filtered, joined and aggregat
 A stream in `ksqlDB` represents an unbounded sequence of records in `ksqlDB`, where each record is an **immutable** unit of data (fact).
 Streams are backed by Kafka topics and inherit their properties.
 
-```KSQL
-CREATE STREAM my_stream (
+```SQL
+CREATE STREAM users (
   id INT,
   name STRING,
 ) WITH (
@@ -17,7 +17,7 @@ CREATE STREAM my_stream (
 );
 ```
 
-In the above example, we are creating a stream named `'my_stream'` with two columns: `'id'` and `'name'`. The `'id'` column is of type **INT**, and `'name'` column is of type **STRING**.
+In the above example, we are creating a stream named `'users'` with two columns: `'id'` and `'name'`. The `'id'` column is of type **INT**, and `'name'` column is of type **STRING**.
 
 The **KAFKA_TOPIC** configuration specifies the Kafka topic associated with the stream, in this case, `'my_topic'`. The stream will consume events from this Kafka topic.
 
@@ -36,7 +36,7 @@ kafka-topics --create --topic my_topic --bootstrap-server localhost:9092 --parti
 ```
 
 ```SQL
-CREATE TABLE my_table (
+CREATE TABLE messages (
   key INT,
   value STRING
 ) WITH (
@@ -45,13 +45,55 @@ CREATE TABLE my_table (
 );
 ```
 
+The above `ksqlDB` statement can be executed from C# in a more type safe manner:
+```C#
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+
+private static async Task CreateMessagesTableAsync()
+{      
+  var ksqlDbUrl = @"http://localhost:8088";
+
+  var httpClient = new HttpClient
+  {
+    BaseAddress = new Uri(ksqlDbUrl)
+  };
+
+  var httpClientFactory = new HttpClientFactory(httpClient);
+
+  var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+  var metadata = new EntityCreationMetadata
+  {
+    KafkaTopic = "my_topic",
+    ValueFormat = SerializationFormats.Json
+  };
+
+  var httpResponseMessage = await restApiClient.CreateTableAsync<Message>(metadata);
+}
+```
+
+```C#
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+
+public record Message
+{
+  [Key]
+  public int Key { get; set; }
+
+  public string Value { get; set; }
+}
+```
+
 The **KEY** configuration specifies the column that will be used as the primary key for the table. In this example, the `'key'` column is designated as the key.
 
 When you create a table in `ksqlDB`, it sets up the necessary infrastructure to consume and process events from the specified Kafka topic, similar to a stream. However, unlike a stream, a table maintains the latest state of the data based on the key column(s). The table continuously updates its state as new events arrive, allowing random access and lookup operations based on the key(s).
 
 In the following example the underlying Kafka topic will be automatically configured as compacted:
 ```SQL
-CREATE TABLE my_table (
+CREATE TABLE messages (
   key INT,
   value STRING
 ) WITH (
@@ -59,4 +101,5 @@ CREATE TABLE my_table (
   VALUE_FORMAT = 'JSON'
 );
 ```
+
 When creating a `ksqlDB` table without specifying the **KAFKA_TOPIC** configuration, you should provide the **PARTITIONS** configuration in the **WITH** clause to indicate the desired number of partitions for the underlying Kafka topic.
