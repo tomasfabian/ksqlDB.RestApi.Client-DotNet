@@ -1,6 +1,14 @@
 # Functions
+In `ksqlDB`, there are various **built-in functions** available for processing and transforming data within streams and tables.
+These functions can be used in queries to perform calculations, aggregations, string operations, date and time manipulations, and more. Here are some commonly used function categories in `ksqlDB`:
+- **string** functions
+- **mathematical** functions
+- **date and time** functions
+- **aggregate** functions
 
 ## String functions
+
+There are several **string** functions available in `ksqlDB` that allow you to **manipulate** and **transform** string data within streams and tables. These functions can be used in KSQL queries to perform operations such as concatenation, substring extraction, case conversion, and more.
 
 ### Concat
 ```C#
@@ -61,6 +69,9 @@ KSQL
 
 ## Numeric functions
 
+There are several **numeric** functions available in `ksqlDB` that allow you to perform **calculations** and **manipulations** on numeric data within streams and tables.
+These functions can be used in KSQL queries to perform operations such as absolute value calculation, rounding, and more.
+
 ### Abs, Ceil, Floor, Random, Sign, Round
 ```C#
 Expression<Func<Tweet, double>> expression1 = c => K.Functions.Abs(c.Amount);
@@ -86,6 +97,9 @@ ROUND(Amount, 3)
 
 ## Date and time functions
 
+There are several **date and time** functions available in `ksqlDB` that allow you to perform **operations** and **manipulations** on date and time values within streams and tables.
+These functions can be used in KSQL queries to extract specific components, format timestamps, and more.
+
 #### DATETOSTRING
 ```C#
 int epochDays = 18672;
@@ -110,7 +124,7 @@ SELECT DATETOSTRING(1613503749145, 'yyyy-MM-dd''T''HH:mm:ssX')
 FROM tweets EMIT CHANGES;
 ```
 
-#### date and time scalar functions
+#### Date and time scalar functions
 [Date and time](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#date-and-time)
 
 ### Entries
