@@ -1,6 +1,6 @@
 # Operators
 
-Supported operators are:
+Supported **comparison** and **logical** operators that can be used in value expressions:
 
 |   ksql   |           meaning           |  c#  |
 |:--------:|:---------------------------:|:----:|
@@ -16,6 +16,10 @@ Supported operators are:
 
 ### Operator LIKE - String.StartsWith, String.EndsWith, String.Contains
 **v1.3.0**
+
+The **LIKE** operator is used in value expressions to perform pattern matching on strings.
+It allows you to match strings against a specified pattern using wildcard characters.
+The **LIKE** operator is used in combination with the % (percent sign) wildcard characters for prefix or suffix matching.
 
 Match a string with a specified pattern:
 
@@ -46,10 +50,12 @@ SELECT *
 ### WHERE IS NULL, IS NOT NULL
 **v1.0.0**
 
+The **IS NULL** and **IS NOT NULL** operators are used in the **WHERE** clause to check for the presence or absence of a `NULL` value in a column.
+
 ```C#
 using var subscription = new KSqlDBContext(@"http://localhost:8088")
   .CreateQueryStream<Click>()
-  .Where(c => c.IP_ADDRESS != null || c.IP_ADDRESS == null)
+  .Where(c => c.IP_ADDRESS != null || c.URL == null)
   .Select(c => new { c.IP_ADDRESS, c.URL, c.TIMESTAMP });
 ```
 
@@ -57,12 +63,17 @@ Generated KSQL:
 ```SQL
 SELECT IP_ADDRESS, URL, TIMESTAMP
   FROM Clicks
- WHERE IP_ADDRESS IS NOT NULL OR IP_ADDRESS IS NULL
+ WHERE IP_ADDRESS IS NOT NULL OR URL IS NULL
   EMIT CHANGES;
 ```
 
+This query selects all rows from the stream 'Clicks' where the value in the column 'IP_ADDRESS' is not NULL or 'URL' is NULL.
+
 ### Operator IN - `IEnumerable<T>` and `IList<T>` Contains
 **v1.0.0**
+
+The **IN** operator is used in the **WHERE** clause to check if a value matches any value in a list.
+It allows you to specify multiple values and compare them to a single column or expression.
 
 Specifies multiple OR conditions.
 `IList<T>`.Contains:
@@ -87,7 +98,9 @@ OrderType IN (1, 2, 3)
 ### Operator (NOT) BETWEEN
 **v1.0.0**
 
-KSqlOperatorExtensions - Between - Constrain a value to a specified range in a WHERE clause.
+The **BETWEEN** operator provides a concise way to specify range conditions in KSQL queries, making it useful for filtering data based on a range of values.
+
+`KSqlOperatorExtensions.Between` - constrain a value to a specified range in a WHERE clause.
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
@@ -103,6 +116,8 @@ SELECT *
   FROM Tweets
  WHERE Id BETWEEN 1 AND 5 EMIT CHANGES;
 ```
+
+This query selects all rows from 'Tweets' where the value in column 'Id' is between 1 and 5.
 
 ### Operator Between for Time type values
 **v1.5.0**
@@ -156,7 +171,7 @@ SELECT
 ```
 
 ### Arithmetic operations on columns
-The usual arithmetic operators (+,-,/,*,%) may be applied to numeric types, like INT, BIGINT, and DOUBLE:
+The usual **arithmetic** operators (+,-,/,*,%) may be applied to numeric types, like INT, BIGINT, and DOUBLE:
 ```SQL
 SELECT USERID, LEN(FIRST_NAME) + LEN(LAST_NAME) AS NAME_LENGTH
   FROM USERS
