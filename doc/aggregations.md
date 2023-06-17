@@ -1,6 +1,13 @@
 # Aggregation functions
 [Rest api reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
+SQL **aggregation functions** are built-in functions that operate on a set of values from a column of a database table and return a single, aggregated value.
+These functions are commonly used in SQL queries to perform calculations on groups of data or to summarize data.
+
+In a **streaming database** such as `ksqlDB` the concept of SQL aggregation functions is similar, but there are some differences due to the nature of streaming data and the capabilities of the streaming database.
+In `ksqlDB`, you can use aggregation functions to perform calculations and transformations on streaming data.
+`ksqlDB` also provides additional features for working with streaming data, such as **windowing** and **time-based** operations, which allow you to aggregate data over specified time intervals.
+
 ### GroupBy
 Group records in a window. Required by the WINDOW clause. Windowing queries must group by the keys that are selected in the query.
 
@@ -93,6 +100,9 @@ HAVING COUNT(IP_ADDRESS) = 1
 ```
 
 ### Sum
+
+Sums the column values.
+
 ```C#
 context.CreateQueryStream<Tweet>()
         .GroupBy(c => c.Id)
@@ -140,8 +150,10 @@ MIN(col1)
 MAX(col1)
 ``` 
 
-### COLLECT_LIST, COLLECT_SET, EARLIEST_BY_OFFSET, LATEST_BY_OFFSET
+### COLLECT_LIST, COLLECT_SET
 **v1.0.0**
+- **COLLECT_LIST** - returns an array containing all the values of col1 from each input row (for the specified grouping and time window, if any).
+- **COLLECT_SET** - returns an array containing the distinct values of col1 from each input row (for the specified grouping and time window, if any).
 
 - with Structs, Arrays, and Maps
 
@@ -188,8 +200,10 @@ new KSqlDBContext(@"http://localhost:8088").CreateQueryStream<Tweet>()
 ```
 
 ### EarliestByOffset, LatestByOffset, EarliestByOffsetAllowNulls, LatestByOffsetAllowNull
-[EarliestByOffset](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/#earliest_by_offset),
-[LatestByOffset](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/#latest_by_offset)
+
+- [EarliestByOffset](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/#earliest_by_offset) - return the earliest value for the specified column.
+- [LatestByOffset](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/#latest_by_offset) - returns the latest value for the specified column.
+
 ```C#
 Expression<Func<IKSqlGrouping<int, Transaction>, object>> expression1 = l => new { EarliestByOffset = l.EarliestByOffset(c => c.Amount) };
 
@@ -314,8 +328,8 @@ SELECT Id, COUNT_DISTINCT(Message) Count
 Creation of windowed aggregation
 
 ### Tumbling window
+[Tumbling window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#tumbling-window) is a time-based windowing mechanism used for aggregating and processing streaming data within **fixed**, non-overlapping time intervals.
 
-[Tumbling window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#tumbling-window):
 ```C#
 var context = new TransactionsDbProvider(ksqlDbUrl);
 
@@ -335,7 +349,7 @@ WINDOW TUMBLING (SIZE 5 SECONDS, GRACE PERIOD 2 HOURS)
 
 ### Hopping window
 
-[Hopping window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#hopping-window):
+[Hopping window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#hopping-window) is a time-based windowing mechanism used for aggregating and processing streaming data within **overlapping** time intervals.
 ```C#
 var subscription = context.CreateQueryStream<Tweet>()
   .GroupBy(c => c.Id)
