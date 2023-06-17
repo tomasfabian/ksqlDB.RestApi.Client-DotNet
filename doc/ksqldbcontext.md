@@ -7,6 +7,8 @@ It also exposes a method to perform operations to **create** records.
 ### Creating query streams
 **v1.0.0**
 
+Within the `ksqlDB.RestApi.Client` .NET client library, the `KSqlDBContext` class is responsible for handling the sending of requests to the `/query-stream` endpoint in `ksqlDB` using the **HTTP 2.0 protocol**.
+
 [Executing pull or push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/#executing-pull-or-push-queries)
 ```JSON
 POST /query-stream HTTP/2.0
@@ -43,7 +45,10 @@ using var disposable = context.CreateQueryStream<Movie>()
 ### Creating queries
 **v1.0.0**
 
-[Run a query](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/query-endpoint/#post-query)
+To **post queries** to `ksqlDB`, you can use the **ksqlDB REST API**.
+The process of posting queries to `ksqlDB` is encapsulated within the `KSqlDBContext` in the `ksqlDB.RestApi.Client` .NET client library.
+
+[Post a query](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/query-endpoint/#post-query)
 ```JSON
 POST /query HTTP/1.1
 Accept: application/vnd.ksql.v1+json
@@ -76,13 +81,12 @@ using var disposable = context.CreateQuery<Movie>()
 ```
 
 # TFM netstandard 2.0 (.Net Framework, NetCoreApp 2.0 etc.)
-netstandard 2.0 does not support Http 2.0. Due to this ```IKSqlDBContext.CreateQueryStream<TEntity>``` is not exposed at the current version. 
-For these reasons ```IKSqlDBContext.CreateQuery<TEntity>``` was introduced to provide the same functionality via Http 1.1. 
+The lack of support for **HTTP 2.0** in netstandard 2.0 prevents the exposure of `IKSqlDBContext.CreateQueryStream<TEntity>` in the current version. To address this limitation, `IKSqlDBContext.CreateQuery<TEntity>` was introduced as an alternative solution utilizing **HTTP 1.1** to provide the same functionality.
 
 ## Basic auth
 **v1.0.0**
 
-In ksqldb you can use the [Http-Basic authentication](https://docs.ksqldb.io/en/latest/operate-and-deploy/installation/server-config/security/#configuring-listener-for-http-basic-authenticationauthorization) mechanism:
+In `ksqlDB` you can use the [Http-Basic authentication](https://docs.ksqldb.io/en/latest/operate-and-deploy/installation/server-config/security/#configuring-listener-for-http-basic-authenticationauthorization) mechanism:
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
 
@@ -99,17 +103,15 @@ var options = new KSqlDbContextOptionsBuilder()
 await using var context = new KSqlDBContext(options);
 ```
 
-See also how to [intercept http requests](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/Interception-of-HTTP-requests-in-ksqlDB.RestApi.Client---Authentication)
+See also how to [intercept http requests](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/Interception-of-HTTP-requests-in--ksqlDB.RestApi.Client-DotNet---Authentication)
 
 ### KSqlDbServiceCollectionExtensions - AddDbContext and AddDbContextFactory
 **v1.4.0**
 
-- AddDbContext - Registers the given ksqldb context as a service in the IServiceCollection
-- AddDbContextFactory - Registers the given ksqldb context factory as a service in the IServiceCollection
+- `AddDbContext` - registers the given ksqlDB context as a service in the `IServiceCollection`
+- `AddDbContextFactory` - registers the given ksqlDB context factory as a service in the `IServiceCollection`
 
 ```C#
-using ksqlDB.Api.Client.Samples;
-using ksqlDB.Api.Client.Samples.Models.Movies;
 using ksqlDb.RestApi.Client.DependencyInjection;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using Microsoft.Extensions.DependencyInjection;
@@ -149,10 +151,19 @@ public interface IApplicationKSqlDbContext : IKSqlDBContext
 }
 ```
 
+```C#
+public record Movie
+{
+  public int Id { get; set; }
+  public string Title { get; set; } = null!;
+  public int Release_Year { get; set; }
+}
+```
+
 ### IKSqlDBContextFactory
 **v1.4.0**
 
-A factory for creating derived KSqlDBContext instances.
+A factory for creating derived `KSqlDBContext` instances.
 
 ```C#
 var contextFactory = serviceCollection.BuildServiceProvider().GetRequiredService<IKSqlDBContextFactory<IKSqlDBContext>>();
@@ -168,10 +179,15 @@ Bellow code demonstrates two new concepts. Logging and registration of services.
 
 `KSqlDbServiceCollectionExtensions.ConfigureKSqlDb` - registers the following dependencies:
 
-- IKSqlDBContext with Scoped ServiceLifetime. Can be altered with `contextLifetime` parameter.
-- IKSqlDbRestApiClient with Scoped ServiceLifetime.
-- IHttpClientFactory with Singleton ServiceLifetime.
-- KSqlDBContextOptions with Singleton ServiceLifetime.
+- `IKSqlDBContext` with **Scoped** ServiceLifetime. Can be altered with `contextLifetime` parameter.
+- `IKSqlDbRestApiClient` with **Scoped** ServiceLifetime.
+- `IHttpClientFactory` with **Singleton** ServiceLifetime.
+- `KSqlDBContextOptions` with **Singleton** ServiceLifetime.
+
+In this example, we use the `Microsoft.Extensions.Logging` library to add **console and debug logging providers**. You can also add additional providers like file-based logging or third-party providers.
+
+In .NET, the `ConfigureServices` extension method is a commonly used method to configure services, including 3rd party services like `KSqlDbContext`, in the **dependency injection container**.
+The `ConfigureKSqlDb` extension method is used to **register** ksqlDB-related service implementations with the `IServiceCollection`.
 
 ```XML
 <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
@@ -293,8 +309,9 @@ public class Worker : IHostedService, IDisposable
 ### Add and SaveChangesAsync
 **v1.3.0**
 
-With IKSqlDBContext.Add and IKSqlDBContext.SaveChangesAsync you can add multiple entities to the context and save them asynchronously in one request (as "batch inserts").
-Internally it doesn't provide an entity change tracker, but merely caches insert statement snapshots which will be executed during `SaveChanges`;
+By utilizing the methods `IKSqlDBContext.Add` and `IKSqlDBContext.SaveChangesAsync`, you have the capability to add multiple entities to the context and asynchronously save them in a single request, also known as **batch inserts**.
+It's important to note that internally, this functionality does not include an **entity change tracker**.
+Instead, it **caches snapshots** of the insert statements, which are executed when the `SaveChangesAsync` method is invoked.
 
 ```C#
 private static async Task AddAndSaveChangesAsync(IKSqlDBContext context)
@@ -311,7 +328,7 @@ private static async Task AddAndSaveChangesAsync(IKSqlDBContext context)
 
 - Inserts - include read-only properties configuration
 
-The initial convention is that all writeable public instance properties and fields are taken into account during the Insert into statement generation.
+The default convention is to include **all public instance properties and fields** that are writable when generating the "INSERT INTO" statement.
 
 ```C#
 public record Foo
@@ -344,8 +361,10 @@ var responseMessage = await context.SaveChangesAsync();
 ```
 
 ### KSqlDbContextOptionsBuilder
-> ⚠ KSqlDBContextOptions created with a constructor or by KSqlDbContextOptionsBuilder sets auto.offset.reset to earliest by default.
-> This was changed in version 2.0.0
+
+`KSqlDbContextOptionsBuilder` provides a fluent API that allows you to configure various aspects of the `ksqlDB` context, such as the connection string, processing guarantee, and other options.
+
+> ⚠When creating `KSqlDBContextOptions` using a constructor or through `KSqlDbContextOptionsBuilder`, the default behavior is to set the `auto.offset.reset` property to "earliest."
 
 ```C#
 public static KSqlDBContextOptions CreateQueryStreamOptions(string ksqlDbUrl)
@@ -368,7 +387,9 @@ public static KSqlDBContextOptions CreateQueryStreamOptions(string ksqlDbUrl)
 ### Setting processing guarantee with KSqlDbContextOptionsBuilder
 **v1.0.0**
 
-Enable exactly-once or at_least_once semantics
+When using the `ksqlDB.RestApi.Client`, you have the ability to configure the **processing guarantee** for your queries.
+This can be done by making use of the `SetProcessingGuarantee` method from the `KSqlDbContextOptionsBuilder` class, which allows you to configure the `processing.guarantee` streams property.
+Enable `exactly_once_v2` or `at_least_once` semantics:
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -385,3 +406,5 @@ var contextOptions = new KSqlDbContextOptionsBuilder()
 
 await using var context = new KSqlDBContext(contextOptions);
 ```
+
+The `ProcessingGuarantee` enum offers three options: **ExactlyOnce**, **ExactlyOnceV2** and **AtLeastOnce**.
