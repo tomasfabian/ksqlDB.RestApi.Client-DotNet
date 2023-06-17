@@ -1,6 +1,8 @@
 # Kafka stream processing example
 
-Example of how to consume a table with a kafka consumer. The following code is based on sample named [InsideOut](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/InsideOut)
+In this example, based on the [InsideOut](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/InsideOut) sample solution, the `SensorsTableConsumer` class represents a **Kafka consumer** that consumes messages from an underlying topic of a **ksqlDB table** within a consumer group.
+The `ksqlDB` table in this example is created by utilizing the `CreateOrReplaceTableStatement` and `ExecuteStatementAsync` methods from the **ksqlDB.RestApi.Client** client library.
+
 ```
 Install-Package ksqlDB.RestApi.Client
 ```

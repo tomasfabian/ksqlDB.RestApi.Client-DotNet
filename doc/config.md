@@ -1,8 +1,7 @@
 # Config
 
 ### KSqlDbContextOptionsBuilder.ReplaceHttpClient
-In cases when you would like to provide your own or 3rd party `HttpMessageHandlers` you can do it like in the bellow example:
-
+If you want to use your own or third-party `HttpMessageHandlers`, you can achieve this by following the example below:
 ```C#
 using System;
 using System.Threading.Tasks;
@@ -47,7 +46,7 @@ internal class DebugHandler : System.Net.Http.DelegatingHandler
 }
 ```
 
-### Register KSqlDB dependencies
+### Register ksqlDB dependencies
 
 During application startup, the services required by the `IKSqlDBContext` and `IKSqlDbRestApiClient` can be registered for **dependency injection**. This allows components that need these services to receive them through constructor parameters.
 
@@ -57,7 +56,7 @@ using ksqlDb.RestApi.Client.DependencyInjection;
 serviceCollection.ConfigureKSqlDb(ksqlDbUrl);
 ```
 
-The above used extension method `ConfigureKSqlDb` registers services behalf of you as illustrated bellow:
+The `ConfigureKSqlDb` extension method, as demonstrated below, takes care of registering ksqldDB-related services in the **dependency injection container** on your behalf:
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.RestApi;
@@ -132,7 +131,7 @@ In .NET, it's important to properly **dispose** of `HttpClient`` instances to re
 
 `KSqlDBContextOptions` and `KSqlDbRestApiClient` - `DisposeHttpClient` property is by default set to `false`. From v2.0.0 the used `HttpClients` will not be disposed by default.
 
-The above mentioned behavior can be overridden in the following ways, but it is not recommended:
+It is possible to override the aforementioned behavior in the following ways, although it is not recommended:
 ```C#
 var contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
 {
@@ -156,7 +155,6 @@ var kSqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory)
 The recommended approach is to create a single instance of `HttpClient` and reuse it throughout the lifespan of an application.
 
 To obtain an instance of `HttpClient` using `IHttpClientFactory` from the `ServicesCollection` in .NET for `IKSqlDbRestApiClient` and `IKSqlDBContext`, you can follow the steps in this [section](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#ksqldbservicecollectionextensions---adddbcontext-and-adddbcontextfactory).
-
 
 ### SetJsonSerializerOptions
 **v1.4.0**
