@@ -1,38 +1,66 @@
 # Functions
 In `ksqlDB`, there are various **built-in functions** available for processing and transforming data within streams and tables.
 These functions can be used in queries to perform calculations, aggregations, string operations, date and time manipulations, and more. Here are some commonly used function categories in `ksqlDB`:
-- **string** functions
-- **mathematical** functions
-- **date and time** functions
-- **aggregate** functions
+- **scalar** functions
+  - **string** functions
+  - **mathematical** functions
+  - **date and time** functions
+  - **invocation** functions
+- **aggregation** functions
+- **table** functions
 
 ## String functions
 
 There are several **string** functions available in `ksqlDB` that allow you to **manipulate** and **transform** string data within streams and tables. These functions can be used in KSQL queries to perform operations such as concatenation, substring extraction, case conversion, and more.
 
 ### Concat
+
+The **CONCAT** function is used to concatenate two or more strings together.
+
 ```C#
 Expression<Func<Tweet, string>> expression = c => K.Functions.Concat(c.Message, "_Value");
 ```
 
-### LPad, RPad, Trim, Substring
+### LPad, RPad
+
+The **LPAD** function pads a string from the left side, and the **RPAD** function pads a string from the right side. The padding is performed by adding characters to the specified side until the desired length is reached.
+
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 
 Expression<Func<Tweet, string>> expression1 = c => KSql.Functions.LPad(c.Message, 8, "x");
 Expression<Func<Tweet, string>> expression2 = c => KSql.Functions.RPad(c.Message, 8, "x");
-Expression<Func<Tweet, string>> expression3 = c => KSql.Functions.Trim(c.Message);
-Expression<Func<Tweet, string>> expression4 = c => K.Functions.Substring(c.Message, 2, 3);
 ```
+
 KSQL
 ```KSQL
 LPAD(Message, 8, 'x')
 RPAD(Message, 8, 'x')
+```
+
+### Trim, Substring
+
+The **TRIM** function is used to remove leading and trailing spaces from a string. It helps in cleaning up string values.
+
+The **SUBSTRING** function is used to extract a substring from a given string. It allows you to retrieve a portion of a string based on specified starting position and length.
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
+
+Expression<Func<Tweet, string>> expression3 = c => KSql.Functions.Trim(c.Message);
+Expression<Func<Tweet, string>> expression4 = c => K.Functions.Substring(c.Message, 2, 3);
+```
+
+KSQL
+```KSQL
 TRIM(Message)
 Substring(Message, 2, 3)
 ```
 
 ### UCase, LCase
+
+The **UCASE** and **LCASE** functions are used to convert strings to **uppercase** and **lowercase**, respectively. These functions take a string expression as an argument and return the converted string.
+
 ```C#
 l => l.Message.ToLower() != "hi";
 l => l.Message.ToUpper() != "HI";
@@ -43,6 +71,9 @@ UCASE(Latitude) != 'HI'
 ```
 
 ### Length (LEN)
+
+The **LENGTH** function is used to determine the length of a string. It returns the number of characters in the given string.
+
 ```C#
 Expression<Func<Tweet, int>> lengthExpression = c => c.Message.Length;
 ```
@@ -53,6 +84,8 @@ LEN(Message)
 
 ### Like
 
+The **LIKE** operator is used in combination with the % (percent sign) wildcard characters for prefix or suffix matching.
+
 See also [String.StartsWith, String.EndsWith, String.Contains](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#operator-like---stringstartswith-stringendswith-stringcontains)
 
 ```C#
@@ -62,7 +95,7 @@ Expression<Func<Tweet, bool>> likeExpression = c => KSql.Functions.Like(c.Messag
 
 Expression<Func<Tweet, bool>> likeLCaseExpression = c => KSql.Functions.Like(c.Message.ToLower(), "%santa%".ToLower());
 ```
-KSQL
+Here's the generated KSQL syntax:
 ```KSQL
 "LCASE(Message) LIKE LCASE('%santa%')"
 ```
@@ -387,7 +420,7 @@ Equivalent KSQL:
 REDUCE(DictionaryInValues, 2, (s, k, v) => CEIL(s / v))
 ```
 
-### improved invocation function extensions
+### Improved invocation function extensions
 **v1.5.0**
 
 ```C#
@@ -414,7 +447,9 @@ record Lambda
 
 ### Dynamic - calling not supported ksqldb functions
 
-Some of the ksqldb functions have not been implemented yet. This can be circumvented by calling K.Functions.Dynamic with the appropriate function call and its parameters. The type of the column value is set with C# **as** operator.
+Certain functions in `ksqlDB` are currently unavailable in the .NET client library, but you can work around this limitation by utilizing `K.Functions.Dynamic`.
+By constructing the appropriate function call and providing the necessary parameters, you can achieve the desired functionality. When dealing with column values, you can specify their types using the **as operator** for **explicit type casting** in C#.
+
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 
@@ -438,7 +473,7 @@ Result:
 |n/a                         |1                           |0.1                         |null                        |
 ```
 
-Dynamic function call with array result example:
+You can achieve a dynamic function call in C# that returns an array by using the appropriate syntax. Here's an example:
 ```C#
 using K = ksqlDB.RestApi.Client.KSql.Query.Functions.KSql;
 
