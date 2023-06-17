@@ -1,7 +1,9 @@
 # ksqlDB.RestApi.Client.ProtoBuf
 
-- adds support for Protobuf content type. The package uses [protobuf-net](https://github.com/protobuf-net/protobuf-net).
-
+- adds support for **Protobuf** content type. The package uses [protobuf-net](https://github.com/protobuf-net/protobuf-net).
+- [Protocol Buffers](https://protobuf.dev/), which is a language-agnostic data serialization format developed by Google.
+- It is designed to efficiently and reliably serialize structured data for communication between different systems or for storing data.
+ 
 Install:
 ```
 dotnet add package ksqlDb.RestApi.Client.ProtoBuf
