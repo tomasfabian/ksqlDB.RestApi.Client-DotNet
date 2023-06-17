@@ -136,6 +136,7 @@ FROM Tweets EMIT CHANGES;
 
 ### Time types DATE, TIME AND TIMESTAMP
 **v1.5.0** (ksqldb 0.20.0)
+
 In `ksqlDB`, there are three main [time-related types](https://docs.ksqldb.io/en/0.22.0-ksqldb/reference/sql/data-types/#time-types): `DATE`, `TIME`, and `TIMESTAMP`.
 
 The **DATE** type represents a calendar date without any time information.
@@ -278,6 +279,10 @@ FROM_BYTES(Message, 'utf8')
 ```
 
 ### Decimal precision
+
+The **DECIMAL** data type in `ksqlDB` allows you to specify the precision and scale of decimal values.
+The **precision** represents the total number of digits (both before and after the decimal point), while the **scale** represents the number of digits after the decimal point.
+
 ```C#
 class Transaction
 {

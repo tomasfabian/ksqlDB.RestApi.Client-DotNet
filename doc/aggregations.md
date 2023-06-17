@@ -201,7 +201,7 @@ new KSqlDBContext(@"http://localhost:8088").CreateQueryStream<Tweet>()
 
 ### EarliestByOffset, LatestByOffset, EarliestByOffsetAllowNulls, LatestByOffsetAllowNull
 
-- [EarliestByOffset](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/#earliest_by_offset) - return the earliest value for the specified column.
+- [EarliestByOffset](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/#earliest_by_offset) - returns the earliest value for the specified column.
 - [LatestByOffset](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/#latest_by_offset) - returns the latest value for the specified column.
 
 ```C#

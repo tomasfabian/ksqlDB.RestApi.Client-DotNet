@@ -127,7 +127,7 @@ internal class BearerAuthHandler : DelegatingHandler
 ```
 
 ### DisposeHttpClient
-In .NET, it's important to properly **dispose** of `HttpClient`` instances to release underlying resources and avoid potential issues with resource exhaustion.
+In .NET, it's important to properly **dispose** of `HttpClient` instances to release underlying resources and avoid potential issues with resource exhaustion.
 
 `KSqlDBContextOptions` and `KSqlDbRestApiClient` - `DisposeHttpClient` property is by default set to `false`. From v2.0.0 the used `HttpClients` will not be disposed by default.
 
@@ -211,6 +211,7 @@ For more info check [exactly once semantics](https://docs.ksqldb.io/en/latest/op
 public enum ProcessingGuarantee
 {
   ExactlyOnce,
+  ExactlyOnceV2,
   AtLeastOnce
 }
 ```

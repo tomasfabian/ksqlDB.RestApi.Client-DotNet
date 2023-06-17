@@ -1,7 +1,7 @@
 # Breaking changes
 
 # v3.0.0
-- property AsyncDisposableObject.IsDisposed was changed from public to an internal access modifier
+- The **accessibility modifier** of the `IsDisposed` property in `AsyncDisposableObject` was modified from public to internal.
 
 Removed not supported TFMs:
 - netcoreapp3.1;net5.0
@@ -32,11 +32,11 @@ Upgraded .NET package dependencies:
 **Breaking changes:**
 
 ### HttpClientFactory
-The constructor argument of `HttpClientFactory` was changed from `Uri` to `HttpClient`. The `IHttpClientFactory` is registered with `System.Net.Http.AddHttpClient` for better lifecycle management of the resources used by `HttpClients`.
-`IHttpClientFactory` in this case should be probably renamed to `IHttpClientProvider` or something similar, but I decided to avoid such a "big"
- breaking change. In case of too much confusion please let me know.
 
-This design decision was made based on the eBook ".NET Microservices Architecture for Containerized .NET Applications" to be able to take advantage of the AddHttpClient extension method. 
+The constructor parameter in `HttpClientFactory` was updated from 'Uri' to 'HttpClient' to improve the management of resources used by `HttpClient`s. The `IHttpClientFactory` is registered using `System.Net.Http.AddHttpClient` to facilitate better lifecycle management.
+Although it may be appropriate to rename `IHttpClientFactory` to `IHttpClientProvider` or a similar name, I opted not to make such a significant breaking change. If this decision causes significant confusion, please inform me.
+
+The decision to make this design change was influenced by the eBook ".NET Microservices Architecture for Containerized .NET Applications" in order to leverage the benefits offered by the `AddHttpClient` extension method:
 
 > Though this class (HtppClient) implements IDisposable, declaring and instantiating it within a using statement is not preferred because when the HttpClient object gets disposed of, the underlying socket is not immediately released, which can lead to a socket exhaustion problem.
 
