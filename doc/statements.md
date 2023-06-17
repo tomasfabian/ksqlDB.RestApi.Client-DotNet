@@ -3,7 +3,7 @@
 ## Basic auth
 **v1.0.0**
 
-In ksqldb you can use the [Http-Basic authentication](https://docs.ksqldb.io/en/latest/operate-and-deploy/installation/server-config/security/#configuring-listener-for-http-basic-authenticationauthorization) mechanism:
+In `ksqlDB` you can use the [Http-Basic authentication](https://docs.ksqldb.io/en/latest/operate-and-deploy/installation/server-config/security/#configuring-listener-for-http-basic-authenticationauthorization) mechanism:
 ```C#
 var httpClient = new HttpClient
 {
@@ -152,6 +152,8 @@ ARRAY_REMOVE(ARRAY[0], 0))
 ### Insert Into
 **v1.0.0**
 
+**INSERT INTO** statement is used to insert new rows of data into a stream or table.
+
 [Insert values](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/insert-values/) - Produce a row into an existing stream or table and its underlying topic based on explicitly specified values.
 ```C#
 string ksqlDbUrl = @"http://localhost:8088";
@@ -215,7 +217,7 @@ INSERT INTO tweetsTest (Id, Amount, AccountBalance) VALUES (1, 4.2E-004, 5333333
 ### ToInsertStatement
 **v1.8.0**
 
-- Generates raw string Insert Into, but does not execute it.
+Generates raw string Insert Into, but does not execute it.
 
 ```C#
 Movie movie = new()
@@ -540,6 +542,9 @@ DROP CONNECTOR `mock-connector`;
 ### Create types
 **v1.6.0**
 
+In `ksqlDB`, you can create **custom types** using the `CREATE TYPE` statement.
+This allows you to define structured data types that can be used in the schema of streams and tables.
+
 - `IKSqlDbRestApiClient.CreateTypeAsync<TEntity>` - Create an alias for a complex type declaration.
 
 ```C#
@@ -618,6 +623,8 @@ record Event
 ```SQL
 CREATE TYPE EVENTCATEGORY AS STRUCT<Name VARCHAR>;
 ```
+
+In this example, we create a custom type named `EVENTCATEGORY` with 1 field: `Name` specified with the **VARCHAR** data type, but you can use other supported data types in `ksqlDB`, such as **INT**, **BOOLEAN**, **DOUBLE**, **ARRAY**, or even other custom types.
 
 ### Droping types
 **v1.0.0**
@@ -772,6 +779,12 @@ Parameters:
 ### Creating connectors
 **v1.0.0**
 
+A **connector** is a pre-built component that acts as a bridge between Kafka and an external system.
+There are 2 types of connectors:
+- **source** connectors allow you to ingest data from external systems into Kafka topics
+- **sink** connectors enable you to stream data from Kafka topics to external systems
+
+--- 
 - `CreateSourceConnectorAsync` - Create a new source connector in the Kafka Connect cluster with the configuration passed in the config parameter.
 
 - `CreateSinkConnectorAsync` - Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
@@ -809,6 +822,11 @@ private static async Task CreateConnectorsAsync(IKSqlDbRestApiClient restApiClie
 ### Get topics
 **v1.0.0**
 
+In **Apache Kafka**, a **topic** is a durable and distributed data storage mechanism, to which messages are **published**.
+It represents a stream of records, where each record consists of a **key**, a **value**, and a **timestamp**.
+
+In `ksqlDB`, a Kafka topic represents a stream of events or records that are processed and analyzed using the `ksqlDB` engine.
+
 - `GetTopicsAsync` - lists the available topics in the Kafka cluster that ksqlDB is configured to connect to.
 - `GetAllTopicsAsync` - lists all topics, including hidden topics.
 - `GetTopicsExtendedAsync` - list of topics. Also displays consumer groups and their active consumer counts.
@@ -845,7 +863,7 @@ SHOW ALL TOPICS EXTENDED;
 
 - `GetQueriesAsync` - Lists queries running in the cluster.
 
-- `TerminatePersistentQueryAsync` - Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
+- `TerminatePersistentQueryAsync` - **Terminate** a persistent query. Persistent queries run continuously until they are explicitly terminated.
 
 ```C#
 using System.Linq;
@@ -871,7 +889,8 @@ SHOW QUERIES;
 ### ExecuteStatementAsync
 **v1.0.0**
 
-[Execute a statement](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/ksql-endpoint/) - The /ksql resource runs a sequence of SQL statements. All statements, except those starting with SELECT, can be run on this endpoint. To run SELECT statements use the /query endpoint.
+[Execute a statement](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/ksql-endpoint/) - The /ksql resource runs a sequence of SQL statements.
+All statements, except those starting with SELECT, can be run on this endpoint. To run SELECT statements use the /query or /query-stream endpoint.
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.RestApi;
@@ -1088,6 +1107,8 @@ CREATE TABLE IF NOT EXISTS MyMovies (
 ### Get streams
 **v1.0.0**
 
+To get a list of **streams** defined in `ksqlDB`, you can use the `SHOW STREAMS` statement.
+
 - `IKSqlDbRestApiClient.GetStreamsAsync` - List the defined streams.
 
 ```SQL
@@ -1100,8 +1121,12 @@ var streamResponses = await restApiClient.GetStreamsAsync();
 Console.WriteLine(string.Join(',', streamResponses[0].Streams.Select(c => c.Name)));
 ```
 
+The result of executing this statement will be an array showing the names and details of the streams available in the `ksqlDB` server.
+
 ### Get tables
 **v1.0.0**
+
+To get a list of **tables** defined in `ksqlDB`, you can use the `SHOW TABLES` statement.
 
 - `IKSqlDbRestApiClient.GetTablesAsync` - List the defined tables.
 
@@ -1114,6 +1139,8 @@ var tableResponses = await restApiClient.GetTablesAsync();
 
 Console.WriteLine(string.Join(',', tableResponses[0].Tables.Select(c => c.Name)));
 ```
+
+The result of executing this statement will be an array showing the names and details of the tables available in the `ksqlDB` server.
 
 ### Insert values with KSQL functions
 **v2.7.0**
