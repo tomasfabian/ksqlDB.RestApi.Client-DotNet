@@ -25,6 +25,44 @@ The **VALUE_FORMAT** configuration indicates the format of the values stored in 
 
 When you create a stream in `ksqlDB`, it sets up the necessary infrastructure to consume and process events from the specified Kafka topic. The stream continuously reads events from the topic and makes them available for querying and processing in real-time.
 
+The above `ksqlDB` statement can be executed from C# in a more type safe manner:
+
+```C#
+private static async Task CreateUsersStreamAsync()
+{
+  var ksqlDbUrl = @"http://localhost:8088";
+
+  var httpClient = new HttpClient
+  {
+    BaseAddress = new Uri(ksqlDbUrl)
+  };
+
+  var httpClientFactory = new HttpClientFactory(httpClient);
+
+  var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+  var metadata = new EntityCreationMetadata
+  {
+    KafkaTopic = "my_topic",
+    ValueFormat = SerializationFormats.Json
+  };
+
+  var httpResponseMessage = await restApiClient.CreateStreamAsync<User>(metadata);
+}
+```
+
+```C#
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+
+public record User
+{
+  [Key]
+  public int Key { get; set; }
+
+  public string Value { get; set; }
+}
+```
+
 ## Tables
 A table in `ksqlDB` represents a **mutable** view of a stream. It is a continuously updated result set derived from one or more streams.
 Tables have to define a required **key** that allows efficient retrieval of specific records based on the key value.
