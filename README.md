@@ -1,5 +1,5 @@
 This package generates **KSQL** push and pull queries from your .NET C# LINQ queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
-You can continually process computations over unbounded (theoretically never-ending) streams of data.
+You can continually process computations over unbounded (potentially never-ending) streams of data.
 It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the REST API such as inserting records into streams and creating tables, types, etc. or execute admin operations such as listing streams.
 
 [ksqlDB.RestApi.Client](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet) is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
@@ -187,6 +187,36 @@ List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 
 - [IKSqlGrouping.Source](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/push_queries.md#iksqlgroupingsource)
 
+# Register the KSqlDbContext
+`IKSqlDBContext` and `IKSqlDbRestApiClient` can be provided with **dependency injection**. These services can be registered during app startup and components that require these services, are provided with these services via constructor parameters.
+
+To register `KsqlDbContext` as a service, open `Program.cs`, and add the lines to the `ConfigureServices` method shown bellow or see some more details in [the workshop](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/ksqlDB.RestApi.Client-workshop):
+
+```
+using ksqlDB.RestApi.Client.Sensors;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDb.RestApi.Client.DependencyInjection;
+using ksqlDB.RestApi.Client.Sensors.KSqlDb;
+
+IHost host = Host.CreateDefaultBuilder(args)
+    .ConfigureServices(services =>
+    {
+      var ksqlDbUrl = @"http://localhost:8088";
+
+      services.AddDbContext<ISensorsKSqlDbContext, SensorsKSqlDbContext>(
+        options =>
+        {
+          var setupParameters = options.UseKSqlDb(ksqlDbUrl);
+
+          setupParameters.SetAutoOffsetReset(AutoOffsetReset.Earliest);
+
+        }, ServiceLifetime.Transient, restApiLifetime: ServiceLifetime.Transient);
+    })
+    .Build();
+
+await host.RunAsync();
+```
+
 # Setting query parameters
 Default settings:
 'auto.offset.reset' is set to 'earliest' by default. 
@@ -227,36 +257,6 @@ context.CreateQueryStream<Tweet>("custom_topic_name");
 ```
 ```SQL
 FROM custom_topic_name
-```
-
-# Register the KSqlDbContext
-`IKSqlDBContext` and `IKSqlDbRestApiClient` can be provided with dependency injection. These services can be registered during app startup and components that require these services, are provided with these services via constructor parameters.
-
-To register `KsqlDbContext` as a service, open `Program.cs`, and add the lines to the `ConfigureServices` method shown bellow or see some more details in [the workshop](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/ksqlDB.RestApi.Client-workshop):
-
-```
-using ksqlDB.RestApi.Client.Sensors;
-using ksqlDB.RestApi.Client.KSql.Query.Options;
-using ksqlDb.RestApi.Client.DependencyInjection;
-using ksqlDB.RestApi.Client.Sensors.KSqlDb;
-
-IHost host = Host.CreateDefaultBuilder(args)
-    .ConfigureServices(services =>
-    {
-      var ksqlDbUrl = @"http://localhost:8088";
-
-      services.AddDbContext<ISensorsKSqlDbContext, SensorsKSqlDbContext>(
-        options =>
-        {
-          var setupParameters = options.UseKSqlDb(ksqlDbUrl);
-
-          setupParameters.SetAutoOffsetReset(AutoOffsetReset.Earliest);
-
-        }, ServiceLifetime.Transient, restApiLifetime: ServiceLifetime.Transient);
-    })
-    .Build();
-
-await host.RunAsync();
 ```
 
 ### Aggregation functions
