@@ -136,8 +136,13 @@ FROM Tweets EMIT CHANGES;
 
 ### Time types DATE, TIME AND TIMESTAMP
 **v1.5.0** (ksqldb 0.20.0)
+In `ksqlDB`, there are three main [time-related types](https://docs.ksqldb.io/en/0.22.0-ksqldb/reference/sql/data-types/#time-types): `DATE`, `TIME`, and `TIMESTAMP`.
 
-Documentation for [Time types](https://docs.ksqldb.io/en/0.22.0-ksqldb/reference/sql/data-types/#time-types)
+The **DATE** type represents a calendar date without any time information.
+
+The **TIME** type represents a specific time of day without any date information.
+
+The **TIMESTAMP** type represents a specific point in time with both date and time information.
 
 ```C#
 public record MyClass
@@ -194,10 +199,14 @@ print 'MyClass' from beginning;
 _rowtime: 2021/12/11 10:36:55.678 Z, key: `<null>`, value: {"DT":18718,"TS":3723000,"DTOFFSET":1625390985447}, partition: 0_
 
 **NOTE**: 
-ksqldb 0.22.0 REST API doesn't contain the offset in the payload for the TIMESTAMP values. Needs further investigation (possible bug in ksqldb).
+Further investigation is required to determine if there is a possible bug in `ksqlDB 0.22.0`, as the REST API payload does not include the offset for TIMESTAMP values.
 
 
 # System.GUID as ksqldb VARCHAR type (v2.4.0)
+
+`ksqlDB` does not have a specific data type for GUIDs. If you have **GUID**s as part of your data, you would typically represent them as strings.
+
+Under the hood, the `ksqlDB.RestApi.Client` automatically converts the `System.Guid` from the base class library into a string without requiring explicit handling or conversion by the user.
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;

@@ -1,7 +1,8 @@
 # Change data capture
 
-### CDC - Push notifications from Sql Server tables with Kafka
-Monitor Sql Server tables for changes and forward them to the appropriate Kafka topics. You can consume (react to) these row-level table changes (CDC - Change Data Capture) from Sql Server databases with SqlServer.Connector package together with the Debezium connector streaming platform.
+### Push notifications from SQL Server tables using Kafka, utilizing Change Data Capture (CDC)
+You can utilize the `SqlServer.Connector` package and the `Debezium` connector streaming platform to capture **Create**, **Update**, and **Delete** (CUD) operations that occur at the row level in tables,
+This process is known as **Change Data Capture** (CDC) and it is performed in this case on SQL Server databases.
 
 ### Nuget
 ```
@@ -11,7 +12,7 @@ Install-Package ksqlDB.RestApi.Client
 
 [SqlServer.Connector WIKI](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/SqlServer.Connector/Wiki.md)
 
-Full example is available in [Blazor example](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/Blazor.Sample) - InsideOut.sln: (The initial run takes a few minutes until all containers are up and running.)
+Full example is available in [Blazor example](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/Blazor.Sample) - InsideOut.sln: (It may take a few minutes for the initial run to complete and for all containers to become operational.)
 
 The following example demonstrates ksqldb server side filtering of database transactions: 
 ```C#
