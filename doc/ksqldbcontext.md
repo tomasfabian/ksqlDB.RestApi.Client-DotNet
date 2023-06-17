@@ -177,17 +177,17 @@ var context = contextFactory.Create();
 
 Bellow code demonstrates two new concepts. Logging and registration of services.
 
+In this example, we use the `Microsoft.Extensions.Logging` library to add **console and debug logging providers**. You can also add additional providers like file-based logging or third-party providers.
+
+In .NET, the `ConfigureServices` extension method is a commonly used method to configure services, including 3rd party services like `KSqlDbContext`, in the **dependency injection container**.
+The `ConfigureKSqlDb` extension method is used to **register** ksqlDB-related service implementations with the `IServiceCollection`.
+
 `KSqlDbServiceCollectionExtensions.ConfigureKSqlDb` - registers the following dependencies:
 
 - `IKSqlDBContext` with **Scoped** ServiceLifetime. Can be altered with `contextLifetime` parameter.
 - `IKSqlDbRestApiClient` with **Scoped** ServiceLifetime.
 - `IHttpClientFactory` with **Singleton** ServiceLifetime.
 - `KSqlDBContextOptions` with **Singleton** ServiceLifetime.
-
-In this example, we use the `Microsoft.Extensions.Logging` library to add **console and debug logging providers**. You can also add additional providers like file-based logging or third-party providers.
-
-In .NET, the `ConfigureServices` extension method is a commonly used method to configure services, including 3rd party services like `KSqlDbContext`, in the **dependency injection container**.
-The `ConfigureKSqlDb` extension method is used to **register** ksqlDB-related service implementations with the `IServiceCollection`.
 
 ```XML
 <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
@@ -252,6 +252,10 @@ appsettings.json
 }
 ```
 
+In .NET, a **hosted service** is a long-running background task or service that is managed by the .NET runtime environment. It is typically used for performing asynchronous or recurring operations, such as processing queues, executing scheduled tasks, or handling background data processing.
+
+The example demonstrates how to inject dependencies related to `ksqlDB` operations.
+
 ```C#
 using System;
 using System.Threading;
@@ -309,7 +313,7 @@ public class Worker : IHostedService, IDisposable
 ### Add and SaveChangesAsync
 **v1.3.0**
 
-By utilizing the methods `IKSqlDBContext.Add` and `IKSqlDBContext.SaveChangesAsync`, you have the capability to add multiple entities to the context and asynchronously save them in a single request, also known as **batch inserts**.
+By leveraging the methods `Add` and `SaveChangesAsync` provided by the `IKSqlDBContext` interface, you have the capability to add multiple entities to the context and asynchronously save them in a single request, also known as **batch inserts**.
 It's important to note that internally, this functionality does not include an **entity change tracker**.
 Instead, it **caches snapshots** of the insert statements, which are executed when the `SaveChangesAsync` method is invoked.
 
