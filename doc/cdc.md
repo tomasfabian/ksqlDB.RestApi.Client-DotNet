@@ -105,7 +105,12 @@ class Program
 
     var ksqlDbUrl = "http://localhost:8088";
 
-    var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
+    var httpClient = new HttpClient
+    {
+      BaseAddress = new Uri(ksqlDbUrl)
+    };
+
+    var httpClientFactory = new HttpClientFactory(httpClient);
 
     var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
