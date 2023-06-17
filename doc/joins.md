@@ -1,7 +1,12 @@
 # JOIN clause - Joining collections
 
+In `ksqlDB`, the **JOIN clause** is used to combine data from two or more streams or tables based on a common field or condition. It allows you to perform relational operations on the streams and tables in real-time.
+
 ### Multiple joins with query comprehension syntax (GroupJoin, SelectMany, DefaultIfEmpty)
 **v1.1.0**
+
+Query comprehension syntax provides a more declarative and readable way to express LINQ queries compared to method chaining syntax.
+However, it's worth noting that query comprehension syntax is just a different way of writing LINQ queries and is ultimately translated to method calls behind the scenes.
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
@@ -229,7 +234,7 @@ SELECT M.Id Id, L.Title ActorTitle
 
 **v2.1.0**
 
-- Select all records for the right side of the join and the matching records from the left side. If the matching records on the left side are missing, the corresponding columns will contain null values.
+Select all records for the right side of the join and the matching records from the left side. If the matching records on the left side are missing, the corresponding columns will contain null values.
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -259,6 +264,9 @@ SELECT movie.Id Id, movie.Title Title, movie.Release_Year Release_Year, SUBSTRIN
 
 ### Inner Joins
 **v1.0.0**
+
+An **inner join** is a type of join operation that returns only the matching records from two or more streams or tables based on a specified condition.
+It combines the rows from the participating streams or tables that satisfy the join condition.
 
 How to [join table and table](https://kafka-tutorials.confluent.io/join-a-table-to-a-table/ksql.html)
 ```C#
