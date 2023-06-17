@@ -1,4 +1,4 @@
-This package generates **KSQL** push and pull queries from your .NET C# LINQ queries. You can filter, project, limit, etc. your push notifications server side with [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
+This package enables the generation of **KSQL** push and pull queries from LINQ queries in your .NET C# code. It allows you to perform server-side filtering, projection, limiting, and other operations on push notifications using [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
 You can continually process computations over unbounded (potentially never-ending) streams of data.
 It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the REST API such as inserting records into streams and creating tables, types, etc. or execute admin operations such as listing streams.
 
@@ -54,7 +54,9 @@ using var subscription = context.CreateQueryStream<Tweet>()
 Console.WriteLine("Press any key to stop the subscription");
 
 Console.ReadKey();
+```
 
+```C#
 public class Tweet : Record
 {
   public int Id { get; set; }
@@ -74,7 +76,7 @@ SELECT Message, Id
  LIMIT 2;
 ```
 
-In the above mentioned C# code snippet everything runs server side except of the ```IQbservable<TEntity>.Subscribe``` extension method. It subscribes to your ksqlDB stream created in the following manner:
+In the provided C# code snippet, most of the code executes on the server side except for the `IQbservable<TEntity>.Subscribe` extension method. This method is responsible for subscribing to your `ksqlDB` stream, which is created using the following approach:
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
@@ -108,7 +110,7 @@ CREATE OR REPLACE STREAM Tweets (
 ) WITH ( KAFKA_TOPIC='Tweet', VALUE_FORMAT='Json', PARTITIONS='3', REPLICAS='3' );
 ```
 
-Run the following insert statements to publish some messages with your ksqldb-cli
+Execute the following insert statements to **publish messages** using your `ksqldb-cli`
 ```
 docker exec -it $(docker ps -q -f name=ksqldb-cli) ksql http://ksqldb-server:8088
 ```
@@ -157,6 +159,9 @@ run in command line:
 ```docker compose up -d```
 
 **AspNet Blazor server side sample:**
+
+In **Blazor Server**, the application logic and UI rendering occur on the server. The client's web browser receives updates and UI changes through a **SignalR** connection. 
+This ensures smooth integration with the `ksqlDB.RestApi.Client` library, allowing the **Kafka broker** and **ksqlDB** to remain hidden from direct exposure to clients.
 
 - set `docker-compose.csproj` as startup project in `InsideOut.sln` for an embedded Kafka connect integration and stream processing examples.
 
