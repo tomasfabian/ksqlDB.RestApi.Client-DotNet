@@ -1,4 +1,13 @@
 # KSqlDbRestApiClient
+`ksqlDB` provides various **statements** to perform operations on streaming data. Here's a description of some commonly used KSQLDB statements:
+
+- **CREATE STREAM**: By creating a stream with the provided columns and properties, a new stateless stream is established, and the stream is registered on a corresponding Apache Kafka® topic.
+
+- **CREATE TABLE**: By creating a table with the provided columns and properties, a new stream is established, and the stream is registered on a corresponding Apache Kafka® topic. Similar to a stream, but table are stateful entities and maintain the latest value for each key.
+
+- **CREATE STREAM AS SELECT**: Creates a new stream based on the result of a query. It creates a new stream with the specified name and schema, populating it with the results of the SELECT query.
+
+- **DROP STREAM**: Deletes a stream and its associated data. It removes the stream definition and all the data associated with it.
 
 ## Basic auth
 **v1.0.0**
@@ -217,7 +226,7 @@ INSERT INTO tweetsTest (Id, Amount, AccountBalance) VALUES (1, 4.2E-004, 5333333
 ### ToInsertStatement
 **v1.8.0**
 
-Generates raw string Insert Into, but does not execute it.
+Generates raw string Insert Into statement, but does not execute it.
 
 ```C#
 Movie movie = new()
