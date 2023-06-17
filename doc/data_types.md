@@ -2,6 +2,9 @@
 
 ### Supported data types mapping
 
+In `ksqlDB`, there are several built-in data types that can be used to define the structure of streams and tables.
+These data types represent the type of data stored in each column of a stream or table. Here is a list of supported data types:
+
 |     ksql     |            c#            |
 |:------------:|:------------------------:|
 |    VARCHAR   |          string          |
