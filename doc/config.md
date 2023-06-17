@@ -49,6 +49,8 @@ internal class DebugHandler : System.Net.Http.DelegatingHandler
 
 ### Register KSqlDB dependencies
 
+During application startup, the services required by the `IKSqlDBContext` and `IKSqlDbRestApiClient` can be registered for **dependency injection**. This allows components that need these services to receive them through constructor parameters.
+
 ```C#
 using ksqlDb.RestApi.Client.DependencyInjection;
 
@@ -78,6 +80,8 @@ var restApiClient = provider.GetRequiredService<IKSqlDbRestApiClient>();
 ```
 
 ### Bearer token authentication
+
+In your client application, you can include a **Bearer token** in the request headers when interacting with the `ksqlDB` server. This can typically be done by adding an "Authorization" header with the value `"Bearer <token>"`.
 
 ```C#
 using System.Net.Http.Headers;
@@ -124,9 +128,11 @@ internal class BearerAuthHandler : DelegatingHandler
 ```
 
 ### DisposeHttpClient
+In .NET, it's important to properly **dispose** of `HttpClient`` instances to release underlying resources and avoid potential issues with resource exhaustion.
+
 `KSqlDBContextOptions` and `KSqlDbRestApiClient` - `DisposeHttpClient` property is by default set to `false`. From v2.0.0 the used `HttpClients` will not be disposed by default.
 
-The above mentioned behavior can be overridden in the following ways:
+The above mentioned behavior can be overridden in the following ways, but it is not recommended:
 ```C#
 var contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
 {
@@ -147,12 +153,19 @@ var kSqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory)
 };
 ```
 
+The recommended approach is to create a single instance of `HttpClient` and reuse it throughout the lifespan of an application.
+
+To obtain an instance of `HttpClient` using `IHttpClientFactory` from the `ServicesCollection` in .NET for `IKSqlDbRestApiClient` and `IKSqlDBContext`, you can follow the steps in this [section](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#ksqldbservicecollectionextensions---adddbcontext-and-adddbcontextfactory).
+
+
 ### SetJsonSerializerOptions
 **v1.4.0**
 
-- KSqlDbContextOptionsBuilder and KSqlDbContextOptions SetJsonSerializerOptions - a way to configure the JsonSerializerOptions for the materialization of the incoming values.
+- KSqlDbContextOptionsBuilder and KSqlDbContextOptions `SetJsonSerializerOptions` - a way to configure the JsonSerializerOptions for the materialization of the incoming values.
 
-For better performance you can use the new `System.Text.Json` source generator:
+With `System.Text.Json` **source generators**, you can automatically generate serialization and deserialization code for **JSON models**, eliminating the need for manual code writing and reducing boilerplate code. This feature improves performance and reduces maintenance efforts when working with JSON data.
+
+For better performance you can use the new `System.Text.Json` **source generator** in this way:
 
 ```C#
 var contextOptions = new KSqlDbContextOptionsBuilder()
@@ -188,7 +201,10 @@ internal partial class SourceGenerationContext : JsonSerializerContext
 ### ProcessingGuarantee enum
 **v1.0.0**
 
+In `ksqlDB`, **processing guarantees** refer to the level of reliability and consistency provided by the system when processing and handling streaming data.
+
 **ExactlyOnce** - Records are processed once. To achieve a true exactly-once system, end consumers and producers must also implement exactly-once semantics.
+
 **AtLeastOnce** - Records are never lost but may be redelivered.
 
 For more info check [exactly once semantics](https://docs.ksqldb.io/en/latest/operate-and-deploy/exactly-once-semantics/)
