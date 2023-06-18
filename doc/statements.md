@@ -282,11 +282,17 @@ var httpResponseMessage = await restApiClient.ExecuteStatementAsync(statement);
 ### Stream and table properties KEY_SCHEMA_ID and VALUE_SCHEMA_ID 
 **v1.6.0** (ksqldb v0.24.0)
 
-KEY_SCHEMA_ID - The schema ID of the key schema in Schema Registry. The schema is used for schema inference and data serialization.
-VALUE_SCHEMA_ID - The schema ID of the value schema in Schema Registry. The schema is used for schema inference and data serialization.
+The **WITH** clause in the **CREATE STREAM** statement is used to specify additional configuration options for the creation of the stream, such as the serialization format, key format, number of partitions, replication factor, and various other settings specific to the stream.
+
+The `EntityCreationMetadata` class in the `ksqlDB.RestApi.Client` library provides a convenient way to work with the metadata related to the creation of entities such as streams and tables in `ksqlDB`. 
+Both streams and tables in `ksqlDB` are treated as **entities** that can be created, modified, and queried using the SQL-like language provided by `ksqlDB`. They have associated schemas, properties, and metadata that define their structure, behavior, and relationship with underlying Kafka topics.
+
+**KEY_SCHEMA_ID** - The schema ID of the key schema in Schema Registry. The schema is used for schema inference and data serialization.
+
+**VALUE_SCHEMA_ID** - The schema ID of the value schema in Schema Registry. The schema is used for schema inference and data serialization.
 
 ```C#
-EntityCreationMetadata metadata2 = new()
+EntityCreationMetadata metadata = new()
 {
   KafkaTopic = "tweets",
   Partitions = 1,
@@ -301,6 +307,11 @@ Generated KSQL statement:
 ```
  WITH ( KAFKA_TOPIC='tweets', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='3', KEY_SCHEMA_ID=1, VALUE_SCHEMA_ID=2 )
 ```
+
+**Schema Registry** is a centralized service that provides a repository for storing and managing schemas for data **serialized** in Apache Kafka. It ensures data compatibility and consistency by enforcing schema evolution rules. When data is **produced** or **consumed** from Kafka topics, the Schema Registry is used to validate and ensure that the data adheres to the defined schema. It allows for schema evolution, versioning, and compatibility checks between producers and consumers.
+
+`ksqlDB` can leverage the Schema Registry to handle the **serialization** and **deserialization** of data streams. When defining streams or tables in `ksqlDB`, you can specify the `Avro` or `Protobuf` schema associated with the data.
+`ksqlDB` uses the Schema Registry to register and manage the schema information for the data streams. This integration ensures that the data being processed in `ksqlDB` is properly serialized and deserialized according to the schema defined in the Schema Registry.
 
 ### CreateSourceStreamAsync and CreateSourceTableAsync
 **v1.4.0**
