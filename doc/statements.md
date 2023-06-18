@@ -26,6 +26,9 @@ var restApiClient = new KSqlDbRestApiClient(httpClientFactory)
 ```
 
 ### InsertIntoAsync
+
+The `InsertIntoAsync` method is a method used to insert data into a target stream or table in a `ksqlDB` cluster asynchronously. It allows you to send data records from your application to `ksqlDB` for further processing or storage.
+
 - added support for deeply nested types - Maps, Structs and Arrays
 
 ```C#
@@ -91,8 +94,7 @@ INSERT INTO `my_order` (Id, ItemsList) VALUES (1, ARRAY[1.1,2]);
 ### InsertIntoAsync for complex types
 **v1.6.0**
 
-In v1.0.0 support for inserting entities with primitive types and strings was added. This version adds support for `List<T>` and records, classes and structs. 
-Deeply nested types and dictionaries are not yet supported.
+Support for inserting entities with primitive types and strings was introduced in version 1.0.0. However, the latest version expands on this by adding support for `List<T>` as well as records, classes, and structs. It's important to note that deeply nested types and dictionaries are not yet supported in this version (<=1.6.0).
 
 ```C#
 var testEvent = new EventWithList
@@ -316,11 +318,15 @@ Generated KSQL statement:
 ### CreateSourceStreamAsync and CreateSourceTableAsync
 **v1.4.0**
 
+To enable the execution of pull queries on a **table**, you can include the **SOURCE** clause in the table's definition.
+
+The **SOURCE** clause triggers an internal query for the table, which generates a materialized state that is utilized by pull queries. It's important to note that this internal query cannot be manually terminated. If you wish to end it, you can do so by using the DROP TABLE statement to remove the table `from ksqlDB`.
+
 - `CreateSourceStreamAsync` - creates a read-only stream
 - `CreateSourceTableAsync` - creates a read-only table
 
 ```C#
-string entityName = nameof(IoTSensor;
+string entityName = nameof(IoTSensor);
 
 var metadata = new EntityCreationMetadata(entityName, 1)
                {
@@ -376,7 +382,7 @@ internal record Update
 
 **v2.4.0**
 
-UseInstanceType set to true will include the public fields and properties from the instance type for the insert statements.
+When `UseInstanceType` is set to true, the insert statements will include the public fields and properties from the instance type.
 
 ```C#
 IMyUpdate value = new MyUpdate
@@ -500,6 +506,8 @@ var creationMetadata = new CreationMetadata
 
 ### Connectors
 **v1.0.0**
+
+**Connectors** are used to integrate external data **sources** and **sinks** with the ksqlDB engine. Connectors enable seamless ingestion and egress of data between ksqlDB and various external systems. They allow you to connect ksqlDB to different data platforms, messaging systems, databases, or custom sources and sinks.
 
 `GetConnectorsAsync` - List all connectors in the Connect cluster.
 
@@ -704,6 +712,8 @@ Parameters:
 ### PartitionBy
 **v1.0.0**
 
+The **PARTITION BY** clause is used in stream queries to specify the column or expression by which the resulting stream should be partitioned. It determines how the data within the stream is distributed across different partitions.
+
 [Repartition a stream.](https://docs.ksqldb.io/en/0.15.0-ksqldb/developer-guide/joins/partition-data/)
 
 ```C#
@@ -718,13 +728,18 @@ var httpResponseMessage = await context.CreateOrReplaceTableStatement(tableName:
 
 ```SQL
 CREATE OR REPLACE TABLE MoviesByTitle
- WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
-AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
-WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
+  WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
+    AS SELECT Title, Release_Year AS ReleaseYear
+       FROM Movies
+       WHERE Id < 3
+       PARTITION BY Title
+       EMIT CHANGES;
 ```
 
 ### Pause and resume persistent queries
 **v2.5.0**
+
+In `ksqlDB`, the ability to **pause** and **resume** persistent queries is used to control the processing of data and the execution of continuous queries within the `ksqlDB` engine. Pausing and resuming queries provide a way to temporarily halt query processing or reactivate them as needed.
 
 `PausePersistentQueryAsync` - Pause a persistent query.
 `ResumePersistentQueryAsync` - Resume a paused persistent query.
