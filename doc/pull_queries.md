@@ -178,6 +178,8 @@ public class OrderData: Record
 
 ### `IPullable<T>.FirstOrDefaultAsync` (v1.0.0)
 
+The `FirstOrDefaultAsync` method is specifically designed for asynchronous operations. It is an extension method available on collections or sequences that allows you to retrieve the first element, or the default value if no such element is found, in an asynchronous manner.
+
 ```C#
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 

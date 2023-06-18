@@ -1,5 +1,7 @@
 # ksqlDB streams and tables
 
+In `ksqlDB`, there are two main types of objects: **streams** and **tables**. In `ksqlDB`, tables are stateful entities, whereas streams are stateless.
+
 Both **streams** and **tables** in `ksqlDB` are defined using a SQL-like syntax and can be queried using standard SQL statements. They provide a declarative way to express the desired computations on the streaming data, enabling real-time processing and analyzying of this data.
 The data in streams and tables can be transformed, filtered, joined and aggregated.
 
@@ -65,8 +67,15 @@ public record User
 
 ## Tables
 A table in `ksqlDB` represents a **mutable** view of a stream. It is a continuously updated result set derived from one or more streams.
+Tables are used for maintaining the current state and performing aggregations or joining operations on the data.
 Tables have to define a required **key** that allows efficient retrieval of specific records based on the key value.
-`ksqlDB` tables are usually stored in compacted Kafka topics that are a special type of topic in Kafka that retains only the most recent value for each key within the topic after compaction.
+`ksqlDB` tables are usually stored in **compacted** Kafka topics that are a special type of topic in Kafka that retains only the most recent value for each key within the topic after compaction.
+
+Retention policies determine how long or how much data is retained in a topic based on either **time** or **space** constraints. These policies are configured using the `cleanup.policy` and related properties.
+
+The `retention.ms` configuration specifies the maximum amount of time that a message will be retained in a topic.
+
+The `retention.bytes` configuration sets the maximum size of the log segments in a topic. 
 
 Example:
 ```bash
@@ -127,7 +136,7 @@ public record Message
 
 The **KEY** configuration specifies the column that will be used as the primary key for the table. In this example, the `'key'` column is designated as the key.
 
-When you create a table in `ksqlDB`, it sets up the necessary infrastructure to consume and process events from the specified Kafka topic, similar to a stream. However, unlike a stream, a table maintains the latest state of the data based on the key column(s). The table continuously updates its state as new events arrive, allowing random access and lookup operations based on the key(s).
+When you create a table in `ksqlDB`, it sets up the necessary infrastructure to consume and process events from the specified Kafka topic, similar to a stream. However, unlike a stream, a table maintains the **latest state** of the data based on the key column(s). The table continuously updates its state as new events arrive, allowing random access and lookup operations based on the key(s).
 
 In the following example the underlying Kafka topic will be automatically configured as compacted:
 ```SQL

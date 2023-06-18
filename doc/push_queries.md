@@ -1,6 +1,7 @@
 # Push queries
 
 **Push queries** in `ksqlDB` provide a way to obtain continuous updates as new data arrives and matches the specified criteria.
+They don't rely on batch processing or waiting for a predefined interval to produce query results.
 
 It is important to note that `ksqlDB` does not support the **ORDER BY** clause. `ksqlDB` processes data in a streaming manner, and the order of events is based on their **arrival time** rather than explicit sorting.
 
