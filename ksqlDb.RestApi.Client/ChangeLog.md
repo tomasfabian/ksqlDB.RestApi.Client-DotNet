@@ -1,5 +1,8 @@
 # ksqlDB.RestApi.Client
 
+# 3.1.0
+- added `ProcessingGuarantee` enum value **ExactlyOnceV2**
+
 # 3.0.1
 - GUID in Contains/IN #45
 
