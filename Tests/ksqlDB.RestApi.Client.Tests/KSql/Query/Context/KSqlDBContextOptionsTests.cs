@@ -111,6 +111,23 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
   }
 
   [Test]
+  public void SetProcessingGuarantee_SetToExactlyOnceV2()
+  {
+    //Arrange
+    var processingGuarantee = ProcessingGuarantee.ExactlyOnceV2;
+    string parameterName = KSqlDbConfigs.ProcessingGuarantee;
+
+    //Act
+    ClassUnderTest.SetProcessingGuarantee(processingGuarantee);
+
+    //Assert
+    string expectedValue = "exactly_once_v2";
+
+    ClassUnderTest.QueryParameters[parameterName].Should().Be(expectedValue);
+    ClassUnderTest.QueryStreamParameters[parameterName].Should().Be(expectedValue);
+  }
+
+  [Test]
   public void SetAutoOffsetReset()
   {
     //Arrange

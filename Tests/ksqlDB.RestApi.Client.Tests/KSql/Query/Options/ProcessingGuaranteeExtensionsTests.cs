@@ -31,6 +31,18 @@ public class ProcessingGuaranteeExtensionsTests
     //Assert
     value.Should().Be(ProcessingGuarantee.ExactlyOnce);
   }
+
+  [Test]
+  public void ToProcessingGuarantee_ExactlyOnceV2()
+  {
+    //Arrange
+
+    //Act
+    var value = ProcessingGuaranteeExtensions.ExactlyOnceV2.ToProcessingGuarantee();
+
+    //Assert
+    value.Should().Be(ProcessingGuarantee.ExactlyOnceV2);
+  }
     
   [Test]
   public void ToProcessingGuarantee_AtLeastOnce()
