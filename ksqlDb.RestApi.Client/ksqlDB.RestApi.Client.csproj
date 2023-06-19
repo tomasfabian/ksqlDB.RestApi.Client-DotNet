@@ -16,8 +16,8 @@
             Documentation for the library can be found at https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/README.md.
         </Description>
         <PackageTags>ksql ksqlDB LINQ .NET csharp push query</PackageTags>
-        <Version>3.1.0</Version>
-        <AssemblyVersion>3.1.0.0</AssemblyVersion>
+        <Version>3.2.0</Version>
+        <AssemblyVersion>3.2.0.0</AssemblyVersion>
         <LangVersion>10.0</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
@@ -31,7 +31,7 @@
         <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
         <PackageReference Include="System.Interactive.Async" Version="6.0.1" />
-        <PackageReference Include="System.Reactive" Version="5.0.0" />
+        <PackageReference Include="System.Reactive" Version="6.0.0" />
         <PackageReference Include="System.Text.Json" Version="7.0.0" />
         <PackageReference Include="Pluralize.NET" Version="1.0.2" />
     </ItemGroup>

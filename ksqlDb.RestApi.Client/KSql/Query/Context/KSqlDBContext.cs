@@ -22,11 +22,21 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 {
   private readonly KSqlDBContextOptions contextOptions;
 
+  /// <summary>
+  /// Initializes a new instance of the KSqlDBContext class with the specified ksqlDB server URL.
+  /// </summary>
+  /// <param name="ksqlDbUrl">The URL of the ksqlDB server.</param>
+  /// <param name="loggerFactory">An optional logger factory to use for logging (defaults to null).</param>
   public KSqlDBContext(string ksqlDbUrl, ILoggerFactory loggerFactory = null)
     : this(new KSqlDBContextOptions(ksqlDbUrl), loggerFactory)
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the KSqlDBContext class with the specified context options.
+  /// </summary>
+  /// <param name="contextOptions">The options for configuring the KSqlDBContext.</param>
+  /// <param name="loggerFactory">An optional logger factory to use for logging (defaults to null).</param>
   public KSqlDBContext(KSqlDBContextOptions contextOptions, ILoggerFactory loggerFactory = null)
     : base(contextOptions, loggerFactory)
   {
@@ -50,6 +60,13 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
     serviceCollection.TryAddSingleton<IKSqlDbParameters>(contextOptions.QueryStreamParameters);
   }
 
+  /// <summary>
+  /// Creates a query stream for retrieving entities asynchronously.
+  /// </summary>
+  /// <typeparam name="TEntity">The type of the entities to retrieve.</typeparam>
+  /// <param name="queryStreamParameters">The parameters for the query stream.</param>
+  /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation (optional).</param>
+  /// <returns>An asynchronous enumerable of entities representing the query stream.</returns>
   public IAsyncEnumerable<TEntity> CreateQueryStream<TEntity>(QueryStreamParameters queryStreamParameters, CancellationToken cancellationToken = default)
   {
     var serviceScopeFactory = Initialize(contextOptions);
@@ -82,6 +99,13 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 
 #endif
 
+  /// <summary>
+  /// Creates a query for retrieving entities asynchronously.
+  /// </summary>
+  /// <typeparam name="TEntity">The type of the entities to retrieve.</typeparam>
+  /// <param name="queryParameters">The parameters for the query.</param>
+  /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation (optional).</param>
+  /// <returns>An asynchronous enumerable of entities.</returns>
   public IAsyncEnumerable<TEntity> CreateQuery<TEntity>(QueryParameters queryParameters, CancellationToken cancellationToken = default)
   {
     var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
@@ -114,21 +138,41 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 
   #region CreateStatements
 
+  /// <summary>
+  /// Create a new materialized stream view, along with the corresponding Kafka topic, and stream the result of the query into the topic.
+  /// </summary>
+  /// <param name="streamName">Name of the stream to create.</param>
+  /// <returns>An instance of IWithOrAsClause to continue building the stream statement.</returns>
   public IWithOrAsClause CreateStreamStatement(string streamName)
   {
     return CreateStatement(streamName, CreationType.Create, KSqlEntityType.Stream);
   }
 
+  /// <summary>
+  /// Create or replace a materialized stream view, along with the corresponding Kafka topic, and stream the result of the query into the topic.
+  /// </summary>
+  /// <param name="streamName">Name of the stream to create or replace.</param>
+  /// <returns>An instance of IWithOrAsClause to continue building the stream statement.</returns>
   public IWithOrAsClause CreateOrReplaceStreamStatement(string streamName)
   {
     return CreateStatement(streamName, CreationType.CreateOrReplace, KSqlEntityType.Stream);
   }
 
+  /// <summary>
+  /// Create a new ksqlDB materialized table view, along with the corresponding Kafka topic, and stream the result of the query as a changelog into the topic.
+  /// </summary>
+  /// <param name="tableName">Name of the table to create.</param>
+  /// <returns>An instance of IWithOrAsClause to continue building the stream statement.</returns>
   public IWithOrAsClause CreateTableStatement(string tableName)
   {
     return CreateStatement(tableName, CreationType.Create, KSqlEntityType.Table);
   }
 
+  /// <summary>
+  /// Create or replace a ksqlDB materialized table view, along with the corresponding Kafka topic, and stream the result of the query as a changelog into the topic.
+  /// </summary>
+  /// <param name="tableName">Name of the table to create or replace.</param>
+  /// <returns>An instance of IWithOrAsClause to continue building the stream statement.</returns>
   public IWithOrAsClause CreateOrReplaceTableStatement(string tableName)
   {
     return CreateStatement(tableName, CreationType.CreateOrReplace, KSqlEntityType.Table);
@@ -177,12 +221,12 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
   }
 
   /// <summary>
-  /// Executes the provided ksql query.
+  /// Executes a pull query with the specified KSQL statement and retrieves the result as a single entity.
   /// </summary>
-  /// <typeparam name="TEntity"></typeparam>
-  /// <param name="ksql">The KSQL query to execute.</param>
-  /// <param name="cancellationToken"></param>
-  /// <returns>The first item.</returns>
+  /// <typeparam name="TEntity">The type of the entity to retrieve.</typeparam>
+  /// <param name="ksql">The KSQL statement representing the pull query.</param>
+  /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation (optional).</param>
+  /// <returns>A ValueTask representing the asynchronous operation. The result is the retrieved entity.</returns>
   public ValueTask<TEntity> ExecutePullQuery<TEntity>(string ksql, CancellationToken cancellationToken = default)
   {
     if (string.IsNullOrEmpty(ksql))
@@ -241,9 +285,10 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
   private readonly CancellationTokenSource cts = new();
 
   /// <summary>
-  /// Save the entities added to context.
+  /// Asynchronously saves the changes made in the context to the underlying data store.
   /// </summary>
-  /// <returns>Save response.</returns>
+  /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation (optional).</param>
+  /// <returns>A task representing the asynchronous save operation. The task result is an HttpResponseMessage.</returns>
   public async Task<HttpResponseMessage> SaveChangesAsync(CancellationToken cancellationToken = default)
   {
     if (ChangesCache.IsEmpty)
