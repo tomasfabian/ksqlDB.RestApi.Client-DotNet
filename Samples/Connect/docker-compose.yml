@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.8'
 
 volumes:
   sqlserver2019data:
@@ -24,7 +24,8 @@ services:
      - ZOOKEEPER_CONNECT=zookeeper:2181
 
   sqlserver2019:
-    image: "mcr.microsoft.com/mssql/server:2019-latest" 
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    container_name: sqlserver2019
     ports:
       - "1433:1433"
     environment:
