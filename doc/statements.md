@@ -824,7 +824,7 @@ There are 2 types of connectors:
 
 - `CreateSinkConnectorAsync` - Create a new sink connector in the Kafka Connect cluster with the configuration passed in the config parameter.
 
-See also how to create a SQL Server source connector with [SqlServer.Connector](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/SqlServer.Connector/Wiki.md)
+See also how to create a SQL Server source connector with [SqlServer.Connector](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/SqlServer.Connector/README.md)
 
 ```C#
 using System.Collections.Generic;

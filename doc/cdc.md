@@ -10,7 +10,7 @@ Install-Package SqlServer.Connector -Version 1.0.0
 Install-Package ksqlDB.RestApi.Client
 ```
 
-[SqlServer.Connector WIKI](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/SqlServer.Connector/Wiki.md)
+[SqlServer.Connector README](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/SqlServer.Connector/README.md)
 
 Full example is available in [Blazor example](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/Blazor.Sample) - InsideOut.sln: (It may take a few minutes for the initial run to complete and for all containers to become operational.)
 
@@ -47,7 +47,7 @@ class Program
 
     await CreateSensorsCdcStreamAsync();
 
-    await TryEnableCdcAsync(); //see full example https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/SqlServer.Connector/Wiki.md
+    await TryEnableCdcAsync(); //see full example https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/SqlServer.Connector/README.md
 
     await CreateConnectorAsync(); //see full example
 
