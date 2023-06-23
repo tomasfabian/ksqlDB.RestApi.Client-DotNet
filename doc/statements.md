@@ -1,9 +1,9 @@
 # KSqlDbRestApiClient
-`ksqlDB` provides various **statements** to perform operations on streaming data. Here's a description of some commonly used KSQLDB statements:
+`ksqlDB` provides various **statements** to perform operations on streaming data. Here's a description of some commonly used `ksqlDB` statements:
 
 - **CREATE STREAM**: By creating a stream with the provided columns and properties, a new stateless stream is established, and the stream is registered on a corresponding Apache Kafka® topic.
 
-- **CREATE TABLE**: By creating a table with the provided columns and properties, a new stream is established, and the stream is registered on a corresponding Apache Kafka® topic. Similar to a stream, but table are stateful entities and maintain the latest value for each key.
+- **CREATE TABLE**: By creating a table with the provided columns and properties, a new table is established, and the table is registered on a corresponding Apache Kafka® topic. Similar to a stream, but table are stateful entities and maintain the latest value for each key.
 
 - **CREATE STREAM AS SELECT**: Creates a new stream based on the result of a query. It creates a new stream with the specified name and schema, populating it with the results of the SELECT query.
 
@@ -182,7 +182,7 @@ var movie = new Movie() { Id = 1, Release_Year = 1988, Title = "Title" };
 var response = await restApiClient.InsertIntoAsync(movie);
 ```
 
-Properties and fields decorated with the IgnoreByInsertsAttribute are not part of the insert statements:
+Properties and fields decorated with the `IgnoreByInsertsAttribute` are not part of the insert statements:
 ```C#
 public class Movie
 {
@@ -270,7 +270,7 @@ async Task<HttpResponseMessage> ExecuteAsync(string statement)
 ### Substitute variables
 **v2.6.0**
 
-[Variable substitution](https://docs.ksqldb.io/en/latest/how-to-guides/substitute-variables/) allows you to to supply different values in specific SQL statements:
+[Variable substitution](https://docs.ksqldb.io/en/latest/how-to-guides/substitute-variables/) allows you to supply different values in specific SQL statements:
 
 ```C#
 var statement = new KSqlDbStatement("CREATE TYPE ${typeName} AS STRUCT<name VARCHAR, address ADDRESS>;")
@@ -507,7 +507,9 @@ var creationMetadata = new CreationMetadata
 ### Connectors
 **v1.0.0**
 
-**Connectors** are used to integrate external data **sources** and **sinks** with the ksqlDB engine. Connectors enable seamless ingestion and egress of data between ksqlDB and various external systems. They allow you to connect ksqlDB to different data platforms, messaging systems, databases, or custom sources and sinks.
+**Connectors** are used to integrate external data **sources** and **sinks** with the `ksqlDB` engine.
+Connectors enable seamless ingestion and egress of data between `ksqlDB` and various external systems.
+They allow you to connect `ksqlDB` to different data platforms, messaging systems, databases, or custom sources and sinks.
 
 `GetConnectorsAsync` - List all connectors in the Connect cluster.
 
@@ -657,7 +659,7 @@ In this example, we create a custom type named `EVENTCATEGORY` with 1 field: `Na
 ### Droping types
 **v1.0.0**
 
-- DropTypeAsync and DropTypeIfExistsAsync - Removes a type alias from ksqlDB. If the IF EXISTS clause is present, the statement doesn't fail if the type doesn't exist.
+- `DropTypeAsync` and `DropTypeIfExistsAsync` - Removes a type alias from ksqlDB. If the IF EXISTS clause is present, the statement doesn't fail if the type doesn't exist.
 
 ```C#
 string typeName = nameof(EventCategory);
@@ -767,7 +769,7 @@ RESUME xyz123;
 ### Terminate push queries
 **v1.0.0**
 
-- TerminatePushQueryAsync - terminates push query by query id
+- TerminatePushQueryAsync - terminates a push query by query ID
 
 ```C#
 string queryId = "xyz123"; // <----- the ID of the query to terminate
@@ -971,7 +973,7 @@ public record Movies
 ```
 
 ### KSqlDbStatement
-KSqlDbStatement allows you to set the statement, content encoding and [CommandSequenceNumber](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/ksql-endpoint/#coordinate-multiple-requests). 
+With `KSqlDbStatement`, you have the ability to define the KSQL statement itself, specify the content encoding, and set the [CommandSequenceNumber](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/ksql-endpoint/#coordinate-multiple-requests).
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
@@ -1051,9 +1053,12 @@ private static async Task CreateOrReplaceTableStatement(IKSqlDBStatementsContext
 Generated KSQL statement:
 ```KSQL
 CREATE OR REPLACE TABLE MoviesByTitle
-WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
-AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
-WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
+  WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
+    AS
+SELECT Title, Release_Year AS ReleaseYear
+  FROM Movies
+ WHERE Id < 3 PARTITION BY Title
+  EMIT CHANGES;
 ```
 
 ### Creating streams and tables
