@@ -1,5 +1,4 @@
 # Aggregation functions
-[Rest api reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
 SQL **aggregation functions** are built-in functions that operate on a set of values from a column of a database table and return a single, aggregated value.
 These functions are commonly used in SQL queries to perform calculations on groups of data or to summarize data.
@@ -7,6 +6,11 @@ These functions are commonly used in SQL queries to perform calculations on grou
 In a **streaming database** such as `ksqlDB` the concept of SQL aggregation functions is similar, but there are some differences due to the nature of streaming data and the capabilities of the streaming database.
 In `ksqlDB`, you can use aggregation functions to perform calculations and transformations on streaming data.
 `ksqlDB` also provides additional features for working with streaming data, such as **windowing** and **time-based** operations, which allow you to aggregate data over specified time intervals.
+
+The list of available `kslqdb` aggregate functions is available [here](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
+
+[Rest api reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
+
 
 ### GroupBy
 Group records in a window. Required by the WINDOW clause. Windowing queries must group by the keys that are selected in the query.
@@ -152,12 +156,38 @@ MAX(col1)
 
 ### COLLECT_LIST, COLLECT_SET
 **v1.0.0**
-- **COLLECT_LIST** - returns an array containing all the values of col1 from each input row (for the specified grouping and time window, if any).
-- **COLLECT_SET** - returns an array containing the distinct values of col1 from each input row (for the specified grouping and time window, if any).
+- **COLLECT_LIST** - returns an array containing all the values of column from each input row (for the specified grouping and time window, if any).
+- **COLLECT_SET** - returns an array containing the distinct values of column from each input row (for the specified grouping and time window, if any).
+
+```C#
+var subscription = context.CreateQueryStream<Tweet>()
+  .GroupBy(c => c.Id)
+  .Select(g => new { Id = g.Key, Array = g.CollectSet(c => c.Message) })
+  //.Select(g => new { Id = g.Key, Array = g.CollectList(c => c.Message) })
+  .Subscribe(c =>
+  {
+    Console.WriteLine($"{c.Id}:");
+    foreach (var value in c.Array)
+    {
+      Console.WriteLine($"  {value}");
+    }
+  }, exception => { Console.WriteLine(exception.Message); });
+```
+
+Generated KSQL:
+```SQL
+SELECT Id, COLLECT_SET(Message) Array 
+  FROM Tweets
+ GROUP BY Id
+  EMIT CHANGES;
+
+SELECT Id, COLLECT_LIST(Message) Array 
+  FROM Tweets
+ GROUP BY Id
+  EMIT CHANGES;
+```
 
 - with Structs, Arrays, and Maps
-
-The list of available `kslqdb` aggregate functions is available [here](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
 ```C#
 var dict = new Dictionary<string, int>()
@@ -244,6 +274,32 @@ SELECT Id, EARLIEST_BY_OFFSET(Amount, 2, True) EarliestByOffset
   EMIT CHANGES;
 ```
 
+### CountDistinct
+**v1.0.0**
+
+**COUNT_DISTINCT** returns the approximate number of unique values of column in a group.
+
+CountDistinct, LongCountDistinct
+
+```C#
+var subscription = context.CreateQueryStream<Tweet>()
+  .GroupBy(c => c.Id)
+  // .Select(g => new { Id = g.Key, Count = g.CountDistinct(c => c.Message) })
+  .Select(g => new { Id = g.Key, Count = g.LongCountDistinct(c => c.Message) })
+  .Subscribe(c =>
+  {
+    Console.WriteLine($"{c.Id} - {c.Count}");
+  }, exception => { Console.WriteLine(exception.Message); });
+```
+
+Generated KSQL:
+```SQL
+SELECT Id, COUNT_DISTINCT(Message) Count 
+  FROM Tweets
+ GROUP BY Id
+  EMIT CHANGES;
+```
+
 ### TimeWindows - EMIT FINAL
 **v2.5.0**
 
@@ -270,56 +326,6 @@ SELECT Id, COUNT(MESSAGE) Count
   FROM tweets
 WINDOW TUMBLING (SIZE 2 SECONDS, GRACE PERIOD 2 SECONDS)
  GROUP BY Id EMIT FINAL;
-```
-
-### CollectSet, CollectList, CountDistinct
-**v1.0.0**
-
-```C#
-var subscription = context.CreateQueryStream<Tweet>()
-  .GroupBy(c => c.Id)
-  .Select(g => new { Id = g.Key, Array = g.CollectSet(c => c.Message) })
-  //.Select(g => new { Id = g.Key, Array = g.CollectList(c => c.Message) })
-  .Subscribe(c =>
-  {
-    Console.WriteLine($"{c.Id}:");
-    foreach (var value in c.Array)
-    {
-      Console.WriteLine($"  {value}");
-    }
-  }, exception => { Console.WriteLine(exception.Message); });
-```
-Generated KSQL:
-```SQL
-SELECT Id, COLLECT_SET(Message) Array 
-  FROM Tweets
- GROUP BY Id
-  EMIT CHANGES;
-
-SELECT Id, COLLECT_LIST(Message) Array 
-  FROM Tweets
- GROUP BY Id
-  EMIT CHANGES;
-```
-
-CountDistinct, LongCountDistinct
-```C#
-var subscription = context.CreateQueryStream<Tweet>()
-  .GroupBy(c => c.Id)
-  // .Select(g => new { Id = g.Key, Count = g.CountDistinct(c => c.Message) })
-  .Select(g => new { Id = g.Key, Count = g.LongCountDistinct(c => c.Message) })
-  .Subscribe(c =>
-  {
-    Console.WriteLine($"{c.Id} - {c.Count}");
-  }, exception => { Console.WriteLine(exception.Message); });
-```
-
-Generated KSQL:
-```SQL
-SELECT Id, COUNT_DISTINCT(Message) Count 
-  FROM Tweets
- GROUP BY Id
-  EMIT CHANGES;
 ```
 
 ## WindowedBy
