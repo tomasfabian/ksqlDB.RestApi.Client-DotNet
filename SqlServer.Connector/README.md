@@ -1,14 +1,15 @@
-﻿⚠ Package had to be renamed to SqlServer.Connector
-
+# SqlServer.Connector
 SqlServer.Connector is a client API for consuming row-level table changes (CDC - [Change Data Capture](https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/about-change-data-capture-sql-server?view=sql-server-ver15)) from a Sql Server databases with the Debezium connector streaming platform.
 
+**Kafka Connect** is an open-source component of the Apache Kafka ecosystem that provides a scalable and reliable framework for connecting external systems with Kafka. It allows you to easily integrate data from various sources and sinks into Kafka, enabling efficient and real-time data pipelines.
+
+A **Kafka Connector** is a plug-in or module that extends the functionality of Kafka Connect. It provides the integration logic necessary to connect external systems or applications with Apache Kafka.
+Connectors enable the ingestion of data from external sources into Kafka (source connectors) or the delivery of data from Kafka to external sinks (sink connectors).
+
 ### Blazor Sample 
-Set docker-compose.csproj as startup project in InsideOut.sln for an embedded Kafka connect integration.
+Set `docker-compose.csproj` as startup project in `InsideOut.sln` for an embedded Kafka connect integration.
 
 The initial run takes a few minutes until all containers are up and running.
-
-### External Kafka Connect (WIP)
-Set docker-compose.csproj as startup project in Samples\Connect\Connect.SqlServer.sln for an external Kafka connect integration.
 
 ### Nuget
 ```
