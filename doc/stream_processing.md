@@ -49,6 +49,8 @@ public record IoTSensor
 }
 ```
 
+The provided code snippet includes a class called `SensorsTableConsumer` and a record called `IoTSensorStats`.
+
 ```C#
 public class SensorsTableConsumer : KafkaConsumer<string, IoTSensorStats>
 {
@@ -57,7 +59,11 @@ public class SensorsTableConsumer : KafkaConsumer<string, IoTSensorStats>
   {
   }
 }
+```
 
+Class called `IoTSensorStats` represents a Plain Old CLR Object (POCO).
+
+```C#
 public record IoTSensorStats
 {
   public string SensorId { get; set; }
@@ -66,22 +72,26 @@ public record IoTSensorStats
 }
 ```
 
-```
-Install-Package System.Interactive.Async -Version 5.0.0
-```
-
 Committing offsets directly through the `ksqlDB` REST API is not supported.
 Kafka provides different strategies for **committing offsets**, allowing consumers to track their progress in consuming messages from topics.
 
 With **automatic** committing, the consumer periodically commits offsets to Kafka without any explicit action from the application. The frequency of automatic commits is determined by the `auto.commit.interval.ms` configuration property. This strategy is simple to use but provides less control over the commit process.
 
 The choice of offset committing strategy depends on the requirements of the application.
+
 **Automatic** committing is simple to use but provides less control.
+
 **Manual** committing allows for precise control but requires explicit management of commit points.
+
 **Synchronous** committing provides strong guarantees at the cost of some latency, while **asynchronous** committing reduces potential delays.
+
 **Transactional** committing is useful when consuming messages as part of larger atomic operations.
 
 This code snippet demonstrates a basic example of consuming messages from a Kafka topic using a Kafka consumer class. You can customize the consumer configuration and the processing logic inside the await foreach loop to fit your specific requirements.
+
+```
+Install-Package System.Interactive.Async -Version 5.0.0
+```
 
 ```C#
 using System;
