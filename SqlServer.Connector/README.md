@@ -1,5 +1,5 @@
 # SqlServer.Connector
-SqlServer.Connector is a client API for consuming row-level table changes (CDC - [Change Data Capture](https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/about-change-data-capture-sql-server?view=sql-server-ver15)) from a Sql Server databases with the Debezium connector streaming platform.
+The `SqlServer.Connector` is a .NET client API that enables the consumption of row-level table changes, specifically utilizing **Change Data Capture** (CDC) functionality, from SQL Server databases. This API works seamlessly with the `Debezium` connector streaming platform.
 
 **Kafka Connect** is an open-source component of the Apache Kafka ecosystem that provides a scalable and reliable framework for connecting external systems with Kafka. It allows you to easily integrate data from various sources and sinks into Kafka, enabling efficient and real-time data pipelines.
 
@@ -33,7 +33,9 @@ var restApiClient = new KsqlDbConnect(httpClientFactory);
 ```
 
 ### Subscribing to a CDC stream (v0.1.0)
-The Debezium connector produces change events from row-level table changes into a kafka topic. The following program shows how to subscribe to such streams with ksqldb
+The Debezium connector produces change events from row-level table changes into a Kafka topic.
+The following program shows how to subscribe to such streams with `ksqlDB`.
+
 ```C#
 using System;
 using System.Net.Http;
@@ -124,7 +126,7 @@ public record IoTSensor
 }
 ```
 
-Navigate to http://localhost:9000/topic/sqlserver2019.dbo.Sensors for information about the created kafka topic and view messages with [Kafdrop](https://github.com/obsidiandynamics/kafdrop)
+Navigate to http://localhost:9000/topic/sqlserver2019.dbo.Sensors for information about the created Kafka topic and view messages with [Kafdrop](https://github.com/obsidiandynamics/kafdrop)
 
 ### Creating a CDC stream in ksqldb-cli
 TODO: Create stream as select with ksqlDb.RestApi.Client
@@ -166,7 +168,7 @@ Output:
 |    |                                         |                                       |ver}                                                             |  
 ```
 
-### Consuming table change events directly from a kafka topic
+### Consuming table change events directly from a Kafka topic
 ```
 Install-Package SqlServer.Connector -Version 0.1.0
 Install-Package System.Interactive.Async -Version 5.0.0
@@ -234,7 +236,7 @@ bool isTableCdcEnabled = await CdcProvider.IsCdcTableEnabledAsync(tableName)
 ```
 
 ### CdcEnableTable (v0.1.0)
-Sql parameters for [sys.sp_cdc_enable_table](https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sys-sp-cdc-enable-table-transact-sql?view=sql-server-ver15#arguments)
+SQL parameters for [sys.sp_cdc_enable_table](https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sys-sp-cdc-enable-table-transact-sql?view=sql-server-ver15#arguments)
 Default schema name is 'dbo'.
 
 ```C#
@@ -278,7 +280,8 @@ private static SqlServerConnectorMetadata CreateConnectorMetadata()
 ```
 
 ### KsqlDbConnect (v.0.1.0)
-Creating the connector with ksqldb
+Creating the connector with `ksqlDB`
+
 ```C#
 using SqlServer.Connector.Connect;
 
@@ -456,7 +459,7 @@ Install-Package SqlServer.Connector -Version 0.3.0-rc.1
 Install-Package ksqlDb.RestApi.Client -Version 1.0.0
 ```
 
-The following example demonstrates ksqldb server side filtering of database transactions: 
+The following example demonstrates `ksqlDB` server side filtering of database transactions: 
 ```C#
 using System;
 using System.Threading;
@@ -591,7 +594,7 @@ DROP CONNECTOR MSSQL_SENSORS_CONNECTOR;
 DROP STREAM sqlserversensors DELETE TOPIC;
 ```
 
-### Debezium connector for Sql Server
+### Debezium connector for SQL Server
 [Download Debezium connector](https://www.confluent.io/hub/debezium/debezium-connector-sqlserver)
 
 [Deployment](https://debezium.io/documentation/reference/1.5/connectors/sqlserver.html#sqlserver-deploying-a-connector)
@@ -602,7 +605,7 @@ DROP STREAM sqlserversensors DELETE TOPIC;
 ### Related sources
 [Debezium](https://github.com/debezium/debezium)
 
-[Debezium source connector for Sql server](https://debezium.io/documentation/reference/1.5/connectors/sqlserver.html)
+[Debezium source connector for SQL server](https://debezium.io/documentation/reference/1.5/connectors/sqlserver.html)
 
 [ksqlDB](https://ksqldb.io/)
 
