@@ -1,7 +1,20 @@
-﻿InsideOut is an example of a client API for producing and consuming kafka topics and ksqlDB push queries and views generated with ksqlDB.RestApi.Client or by other means. This package is based on [Confluent.Kafka](https://github.com/confluentinc/confluent-kafka-dotnet)
+`InsideOut.sln` showcases a .NET client API example that enables message **production and consumption** from Kafka topics, along with the execution of `ksqlDB` push queries and views. These functionalities are implemented using the `ksqlDB.RestApi.Client`.
 
-### Blazor Sample 
-Set docker-compose.csproj as startup project in InsideOut.sln.
+`KafkaConsumer` and `KafkaProducer` are based on [Confluent.Kafka](https://github.com/confluentinc/confluent-kafka-dotnet)
+
+### Blazor Sample
+
+**Blazor Server-side** is a web development framework that allows developers to build interactive web applications using .NET.
+It enables the execution of server-side code to handle user interactions and update the UI dynamically without requiring JavaScript.
+
+On the other hand, `ksqlDB` is a streaming database built on Apache Kafka that allows developers to process and analyze real-time streaming data using SQL-like queries.
+It provides capabilities for stream processing, and data querying.
+
+When used in conjunction, Blazor Server-side can be integrated with `ksqlDB` to create real-time interactive applications that leverage the power of streaming data processing.
+
+Blazor Server-side, as a web development framework, does not directly expose or provide direct access to the internal workings of a Kafka broker or `ksqlDB`.
+
+Set `docker-compose.csproj` as startup project in `InsideOut.sln`.
 
 ### Nuget
 ```
@@ -9,6 +22,9 @@ Install-Package ksqlDB.Api.Client
 ```
 
 # KafkaProducer (v0.1.0)
+
+A **Kafka producer** is a client application or component that publishes or sends data to Kafka topics.
+It is responsible for producing messages or events and making them available to be consumed by Kafka consumers.
 
 ```C#
 public class SensorsProducer : KafkaProducer<string, IoTSensorStats>
@@ -24,6 +40,7 @@ public class SensorsProducer : KafkaProducer<string, IoTSensorStats>
   }
 }
 ```
+
 ```C#
 public record IoTSensorStats
 {
@@ -61,6 +78,10 @@ private async Task ProduceValueAsync()
 ```
 
 # KafkaConsumer (v1.0.0)
+
+A **Kafka consumer** is a client application that reads data from Kafka topics and processes it in real-time.
+It is responsible for subscribing to one or more Kafka topics and consuming the messages or events published to those topics by Kafka producers.
+
 ```
 Install-Package System.Interactive.Async -Version 5.0.0
 ```
@@ -134,7 +155,10 @@ public class SensorsTableConsumer : KafkaConsumer<string, IoTSensorStats>
 
 ```
 
-### Create a materialized view (ksqlDb.RestApi.Client)
+### Create a materialized view with ksqlDb.RestApi.Client
+
+In `ksqlDB`, a **materialized view** is a persistent and continuously updated result of a query or transformation applied to one or more Kafka topics.
+Materialized views in `ksqlDB` provide a powerful mechanism for building real-time data pipelines, stream processing, and real-time analytics applications.
 
 ```C#
 using System.Threading.Tasks;
@@ -171,6 +195,18 @@ private async Task CreateOrReplaceMaterializedTableAsync()
 
 ### Create a stream (ksqlDb.RestApi.Client)
 
+The provided code snippet demonstrates the creation of a `ksqlDB` stream using the `KSqlDbRestApiClient` class.
+
+First, an instance of the `HttpClientFactory` class is created, specifying the base URL for the `ksqlDB` server as the constructor parameter. This will be used for making HTTP requests to the `ksqlDB` server.
+
+Next, a `KSqlDbRestApiClient` object is instantiated, passing the `HttpClientFactory` instance as the constructor argument. This client will handle the communication with the `ksqlDB` server.
+
+The code then calls the `CreateStreamAsync` method on the restApiClient object to create a `ksqlDB` stream.
+
+The `ifNotExists` parameter is a boolean flag that indicates whether the stream should only be created if it doesn't already exist.
+
+Finally, the code awaits the `CreateStreamAsync` method, which returns an `HttpResponseMessage`. This allows for handling the response from the `ksqlDB` server, such as checking for success or handling any errors or exceptions that may occur during the stream creation process.
+
 ```C#
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -198,7 +234,17 @@ private async Task<HttpResponseMessage> TryCreateStreamAsync()
 }
 ```
 
+In summary, the provided code creates a `ksqlDB` stream using the `KSqlDbRestApiClient` class.
+It utilizes an `HttpClientFactory` to establish a connection to the `ksqlDB` server, and then calls the `CreateStreamAsync` method on the client, passing the stream metadata and the `ifNotExists` flag to specify the desired behavior.
+
 ### Serialization
+
+The following code overrides the `CreateDeserializer` method, which is responsible for creating a deserializer for the `IoTSensorStats` type.
+In this case, the code uses the `KafkaDataContractJsonDeserializer` class to create a deserializer that can handle JSON data and convert it into `IoTSensorStats` objects.
+
+By implementing the `CreateDeserializer` method, the code customizes the deserialization process for the `IoTSensorStats` type in the consumer.
+This allows the consumer to properly deserialize and process messages received from the Kafka topic, ensuring compatibility between the JSON data and the `IoTSensorStats` class.
+
 ```C#
 using System.Runtime.Serialization;
 
@@ -233,8 +279,11 @@ public class SensorsTableConsumer : KafkaConsumer<string, IoTSensorStats>
 }
 ```
 
-# Interception of consumer build
-How to set offset end:
+# Intercepting a consumer construction
+
+The provided code represents a custom consumer implementation named "SensorsTableConsumer" that extends the KafkaConsumer class. 
+
+This code intercepts the Kafka consumer builder for the "SensorsTableConsumer" and modifies it to set the offset end based on the last consumed offset plus 1 or the beginning offset, providing control over where the consumer starts consuming messages from the Kafka topic.
 
 ```C#
 using InsideOut.Consumer.Extensions;
@@ -256,14 +305,17 @@ public class SensorsTableConsumer : KafkaConsumer<string, IoTSensorStats>
 ```
 
 ### Cleanup
+The provided code demonstrates a cleanup process in `ksqlDB`.
+It involves executing commands to drop tables and streams, as well as deleting associated topics.
+
 ```KSQL
 drop table SENSORSTABLE delete topic;
 drop stream SENSORSSTREAM delete topic;
 drop stream IOTSENSORS delete topic;
 ```
 
-# Linqpad
-[Kafka streaming](https://github.com/tomasfabian/ksqlDb.RestApi.Client-DotNet/blob/main/Samples/ksqlDb.RestApi.Client.LinqPad/ksqldb.Streaming.linq)
+### Linqpad example
+[Kafka streaming](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/Samples/ksqlDB.RestApi.Client.LinqPad/ksqldb.Streaming.linq)
 
 # Acknowledgements:
 - [Confluent.Kafka](https://www.nuget.org/packages/Confluent.Kafka/)
