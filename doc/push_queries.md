@@ -75,7 +75,7 @@ List of supported operators is [documented here](https://github.com/tomasfabian/
 
 **Subscribe** refers to the action of a client or consumer connecting to a query result stream and **receiving** continuous updates as new data arrives or the state of the underlying stream or table changes.
 
-When you subscribe to a push query in `ksqlDB`, you establish a connection between the client application and the `ksqlDB` server, enabling the client to receive and process the continuously pushed query results.
+When you subscribe to a push query in `ksqlDB.RestApi.Client`, you establish a connection between the client application and the `ksqlDB` server, enabling the client to receive and process the continuously pushed query results.
 
 Implementing the `IObserver<T>` interface:
 
@@ -123,7 +123,8 @@ using var subscription = new KSqlDBContext(@"http://localhost:8088")
 ### ToObservable
 **v1.0.0**
 
-Moving to [Rx.NET](https://github.com/dotnet/reactive)
+Moving to [Rx.NET](https://github.com/dotnet/reactive)...
+
 The following code snippet shows how to observe messages on the desired [IScheduler](http://introtorx.com/Content/v1.0.10621.0/15_SchedulingAndThreading.html): 
 
 ```C#
@@ -408,24 +409,12 @@ The AutoOffsetReset property can have two possible values:
 
 Overrides the AutoOffsetReset policy for the current query:
 ```C#
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+
 var subscription = context.CreateQueryStream<Movie>()
   .WithOffsetResetPolicy(AutoOffsetReset.Latest)
   .Subscribe(movie =>
   {
     Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
   }, e => { Console.WriteLine($"Exception: {e.Message}"); });   
-```
-
-### Record (row) class
-
-The `Record` class serves as a foundational class for rows that are returned in push queries. It includes a property called `RowTime` which represents the timestamp associated with the row.
-
-```C#
-public class Tweet : ksqlDB.RestApi.Client.KSql.Query.Record
-{
-  public string Message { get; set; }
-}
-
-context.CreateQueryStream<Tweet>()
-  .Select(c => new { c.RowTime, c.Message });
 ```
