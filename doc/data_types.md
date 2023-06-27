@@ -294,3 +294,35 @@ Generated KSQL:
 ```KSQL
 Amount DECIMAL(3,2)
 ```
+
+### Record type
+
+In `ksqlDB`, a [pseudocolumn](https://docs.ksqldb.io/en/0.27.2-ksqldb/reference/sql/data-definition/#pseudocolumns) is an automatically populated column that carries meta-information inferred about a row during its creation.
+
+|Pseudocolumn|Record Property|Meaning|
+|:----|:----|
+|HEADERS|Headers|Columns that are populated by the Kafka record's header.|
+|ROWOFFSET|RowOffset|The offset of the source record.|
+|ROWPARTITION|RowPartition|The partition of the source record.|
+|ROWTIME|RowTime|Row timestamp, inferred from the underlying Kafka record if not overridden.|
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Query;
+
+public class Movie : Record
+{
+  public string Title { get; set; } = null!;
+  public int Id { get; set; }
+}
+```
+
+Selecting pseudocolumns columns:
+```C#
+query.Select(movie => new { movie.Id, movie.RowTime, movie.RowOffset, movie.RowPartition, movie.Headers }) 
+```
+
+```SQL
+SELECT Id, ROWTIME, ROWOFFSET, ROWPARTITION, HEADERS
+  FROM movies
+  EMIT CHANGES;
+```
