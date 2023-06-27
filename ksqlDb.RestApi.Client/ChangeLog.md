@@ -1,5 +1,8 @@
 # ksqlDB.RestApi.Client
 
+# 3.2.0
+- added `Headers`, `RowOffset` and `RowPartition` pseudocolumns to `Record` type
+
 # 3.1.0
 - added `ProcessingGuarantee` enum value **ExactlyOnceV2**
 
