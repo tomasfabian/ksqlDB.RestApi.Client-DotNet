@@ -1,4 +1,4 @@
-﻿using ksqlDB.RestApi.Client.Infrastructure.Extensions;
+using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
@@ -62,6 +62,9 @@ internal static class CreateStatements
 
     if (metadata.ValueSchemaFullName.IsNotNullOrEmpty())
       properties.Add(@$"VALUE_SCHEMA_FULL_NAME={metadata.ValueSchemaFullName}");
+
+    if (metadata.RetentionMs.HasValue)
+      properties.Add(@$"RETENTION_MS={metadata.RetentionMs}");
 
     string result = string.Join(", ", properties);
 		

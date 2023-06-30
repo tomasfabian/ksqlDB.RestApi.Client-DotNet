@@ -2,6 +2,7 @@
 
 # 3.2.0
 - added `Headers`, `RowOffset` and `RowPartition` pseudocolumns to `Record` type
+- entity creation added WITH RETENTION_MS property
 
 # 3.1.0
 - added `ProcessingGuarantee` enum value **ExactlyOnceV2**

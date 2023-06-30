@@ -1,4 +1,4 @@
-﻿using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
+using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
@@ -41,12 +41,18 @@ public record CreationMetadata
   public int? ValueSchemaId { get; set; }
 
   /// <summary>
-  /// 
+  /// The full name of the key schema.
   /// </summary>
   public string KeySchemaFullName { get; set; }
 
   /// <summary>
-  /// 
+  /// The full name of the value schema.
   /// </summary>
   public string ValueSchemaFullName { get; set; }
+
+  /// <summary>
+  /// The retention specified in milliseconds in the backing topic.
+  /// Available starting in ksqlDB version 0.28.3-RC7.
+  /// </summary>
+  public int? RetentionMs { get; set; }
 }
