@@ -264,4 +264,20 @@ public class CreateStatementsTests
     //Assert
     withClause.Should().BeEquivalentTo(@$" WITH ( VALUE_SCHEMA_FULL_NAME={metadata.ValueSchemaFullName} )");
   }
+
+  [Test]
+  public void GenerateWithClause_RetentionMs()
+  {
+    //Arrange
+    var metadata = new CreationMetadata
+    {
+      RetentionMs = 2000
+    };
+
+    //Act
+    var withClause = CreateStatements.GenerateWithClause(metadata);
+
+    //Assert
+    withClause.Should().BeEquivalentTo(@$" WITH ( RETENTION_MS={metadata.RetentionMs} )");
+  }
 }
