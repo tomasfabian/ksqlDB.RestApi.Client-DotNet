@@ -131,7 +131,18 @@ class Program
       .ConfigureAwait(false);
   }
 }
+```
 
+`DatabaseChangeObject<TEntity>`:
+Represents a generic database change object.
+It takes a generic type parameter TEntity, which represents the entity type associated with the database change.
+
+`DatabaseChangeObject<TEntity>` contains the following properties:
+- **Before**: Represents the state of the entity before the change occurred.
+- **After**: Represents the state of the entity after the change occurred.
+- **Op**: Represents the operation performed on the database (e.g., "insert," "update," or "delete").
+
+```C#
 public record IoTSensorChange : DatabaseChangeObject<IoTSensor>
 {
 }
@@ -143,3 +154,5 @@ public record IoTSensor
   public int Value { get; set; }
 }
 ```
+
+The provided C# code defines a set of record classes for handling database change objects in an IoT sensor context.
