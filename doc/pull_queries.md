@@ -85,19 +85,33 @@ async Task<HttpResponseMessage> InsertAsync(IoTSensor sensor)
 
   return await ExecuteAsync(insert);
 }
+```
 
+The bellow provided C# code defines an asynchronous method called `ExecuteAsync` that takes a string parameter `statement` and returns a `Task<HttpResponseMessage>`.
+
+Inside the method, it creates a `KSqlDbStatement` object using the provided statement. It then calls an asynchronous method `ExecuteStatementAsync` on the `restApiClient` object, passing the `ksqlDbStatement` as a parameter.
+The method awaits the execution of the statement and stores the resulting `HttpResponseMessage` in the httpResponseMessage variable.
+
+Next, it reads the response content as a string using the `ReadAsStringAsync` method on `httpResponseMessage.Content` and assigns it to the `responseContent` variable.
+
+Finally, the method returns the `httpResponseMessage`. The use of `ConfigureAwait(false)` ensures that the method does not capture the context during the continuation, which can improve performance in certain scenarios.
+
+```C#
 async Task<HttpResponseMessage> ExecuteAsync(string statement)
 {
   KSqlDbStatement ksqlDbStatement = new(statement);
 
   var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement)
-    .ConfigureAwait(false);
+        .ConfigureAwait(false);
 
-  string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
+  string responseContent = await httpResponseMessage.Content.ReadAsStringAsync()
+        .ConfigureAwait(false);
 
   return httpResponseMessage;
 }
+```
 
+```C#
 public record IoTSensor
 {
   public string SensorId { get; init; }
