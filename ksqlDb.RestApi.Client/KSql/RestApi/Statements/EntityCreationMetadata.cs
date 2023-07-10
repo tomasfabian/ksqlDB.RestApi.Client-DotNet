@@ -1,12 +1,21 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
+/// <summary>
+/// Configuration for creating entities e.g. streams and tables.
+/// </summary>
 public record EntityCreationMetadata : CreationMetadata, IEntityCreationProperties
 {
+  /// <summary>
+  /// Initializes a new instance of the <see cref="T:EntityCreationMetadata"></see> class, specifying the backing Kafka topic for the entity.
+  /// The default ValueFormat is set to Json.
+  /// </summary>
+  /// <param name="kafkaTopic">Name for the backing Kafka topic.</param>
+  /// <param name="partitions">Optional number of partitions in the backing topic.</param>
   public EntityCreationMetadata(string kafkaTopic, short? partitions = null)
     : this()
   {
@@ -14,13 +23,22 @@ public record EntityCreationMetadata : CreationMetadata, IEntityCreationProperti
     Partitions = partitions;
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="T:EntityCreationMetadata"></see> class with default configuration values.
+  /// </summary>
   public EntityCreationMetadata()
   {
     ValueFormat = SerializationFormats.Json;
   }
 
+  /// <summary>
+  /// Name of the entity e.g. stream or table.
+  /// </summary>
   public string EntityName { get; set; }
 
+  /// <summary>
+  /// By setting the value of this field to "true," the entity name will be automatically pluralized during code generation. 
+  /// </summary>
   public bool ShouldPluralizeEntityName { get; set; } = true;
 
   /// <summary>
