@@ -62,7 +62,10 @@ async Task Main()
 
   Console.WriteLine($"{result?.SensorId} - {result?.AvgValue}");
 }
+```
 
+The `CreateOrReplaceStreamAsync` method creates or replaces a stream with a specific schema and configuration by executing the provided SQL-like statement, and it returns the response from the execution as a `Task<HttpResponseMessage>`.
+```C#
 async Task<HttpResponseMessage> CreateOrReplaceStreamAsync()
 {
   const string createOrReplaceStream = 
@@ -77,7 +80,12 @@ async Task<HttpResponseMessage> CreateOrReplaceStreamAsync()
 
   return await ExecuteAsync(createOrReplaceStream);
 }
+```
 
+Inside the following method, we will generate an SQL INSERT statement using the sensor object's properties. The `sensor.SensorId` and `sensor.Value` values are interpolated into the statement string.
+
+Then, the method calls another asynchronous method `ExecuteAsync` and passes the generated insert statement as an argument. It awaits the execution of the `ExecuteAsync` method and returns the resulting `Task<HttpResponseMessage>`.
+```C#
 async Task<HttpResponseMessage> InsertAsync(IoTSensor sensor)
 {
   string insert =
