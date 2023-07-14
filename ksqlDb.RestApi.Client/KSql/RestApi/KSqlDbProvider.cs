@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
@@ -130,6 +130,14 @@ internal abstract class KSqlDbProvider : IKSqlDbProvider
     }, cancellationToken);
   }
 
+  /// <summary>
+  /// Asynchronously consumes data from a <see cref="StreamReader"/> and yields elements of type <typeparamref name="T"/>.
+  /// </summary>
+  /// <typeparam name="T">The type of elements to yield.</typeparam>
+  /// <param name="streamReader">The <see cref="StreamReader"/> to read data from.</param>
+  /// <param name="semaphoreSlim">The <see cref="SemaphoreSlim"/> used for synchronization.</param>
+  /// <param name="cancellationToken">The cancellation token to observe.</param>
+  /// <returns>An asynchronous enumerable of elements of type <typeparamref name="T"/>.</returns>
   private async IAsyncEnumerable<T> ConsumeAsync<T>(StreamReader streamReader, SemaphoreSlim semaphoreSlim, [EnumeratorCancellation] CancellationToken cancellationToken)
   {
     if (cancellationToken.IsCancellationRequested)
@@ -137,7 +145,8 @@ internal abstract class KSqlDbProvider : IKSqlDbProvider
 
     var cancellationTask = Task.Run(async () =>
     {
-      await semaphoreSlim.WaitAsync().ConfigureAwait(false);
+      await semaphoreSlim.WaitAsync(cancellationToken).ConfigureAwait(false);
+
       return false;
     }, cancellationToken);
 
@@ -146,7 +155,12 @@ internal abstract class KSqlDbProvider : IKSqlDbProvider
       if (cancellationToken.IsCancellationRequested)
         yield break;
         
-      var rawData = await streamReader.ReadLineAsync()
+      var rawData = await streamReader
+#if NET7_0_OR_GREATER
+        .ReadLineAsync(cancellationToken)
+#else
+        .ReadLineAsync()
+#endif
         .ConfigureAwait(false);
 
       logger?.LogDebug($"Raw data received: {rawData}");
