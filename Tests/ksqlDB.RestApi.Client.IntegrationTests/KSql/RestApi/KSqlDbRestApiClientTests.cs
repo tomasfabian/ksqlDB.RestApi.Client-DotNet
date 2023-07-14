@@ -116,15 +116,19 @@ public class KSqlDbRestApiClientTests
     return metadata;
   }
 
+  internal record MyMoviesTable2 : MyMoviesStreamTest
+  {
+  }
+
   [Test]
   public async Task CreateOrReplaceStream()
   {
     //Arrange
-    var metadata = GetEntityCreationMetadata(nameof(MyMoviesStreamTest));
+    var metadata = GetEntityCreationMetadata(nameof(MyMoviesTable2));
 
     //Act
-    var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MyMoviesStreamTest>(metadata);
-    var c = await httpResponseMessage.ToStatementResponsesAsync().ConfigureAwait(false);
+    var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MyMoviesTable2>(metadata);
+    var _ = await httpResponseMessage.ToStatementResponsesAsync().ConfigureAwait(false);
 
     //Assert
     httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
