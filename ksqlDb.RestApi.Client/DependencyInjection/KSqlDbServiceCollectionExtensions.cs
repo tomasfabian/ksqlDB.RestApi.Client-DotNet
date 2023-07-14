@@ -6,6 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ksqlDb.RestApi.Client.DependencyInjection;
 
+/// <summary>
+/// Provides extensions methods for IServiceCollection to register KSqlDb services.
+/// </summary>
 public static class KSqlDbServiceCollectionExtensions
 {
   /// <summary>
