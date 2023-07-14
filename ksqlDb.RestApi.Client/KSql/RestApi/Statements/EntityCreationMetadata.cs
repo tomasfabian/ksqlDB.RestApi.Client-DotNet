@@ -37,7 +37,7 @@ public record EntityCreationMetadata : CreationMetadata, IEntityCreationProperti
   public string EntityName { get; set; }
 
   /// <summary>
-  /// By setting the value of this field to "true," the entity name will be automatically pluralized during code generation. 
+  /// By setting the value of this field to "true" the entity name will be automatically pluralized during code generation. 
   /// </summary>
   public bool ShouldPluralizeEntityName { get; set; } = true;
 
