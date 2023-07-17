@@ -1,5 +1,8 @@
 namespace ksqlDB.RestApi.Client.KSql.Query.Functions;
 
+/// <summary>
+/// This class contains extension methods for KSql functions.
+/// </summary>
 public static class KSqlFunctionsExtensions
 {
   internal static string ServerSideOperationErrorMessage = "Operator is not intended for client side operations";
