@@ -1,7 +1,10 @@
-﻿using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Operators;
 
+/// <summary>
+/// Defines extension methods that provide KSql operators such as BETWEEN operator.
+/// </summary>
 public static class KSqlOperatorExtensions
 {
   #region Between
