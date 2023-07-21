@@ -8,8 +8,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context;
 
+/// <summary>
+/// Options class for ksqlDB context configuration.
+/// </summary>
 public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
 {
+  /// <summary>
+  /// Creates a new instance of <see cref="KSqlDBContextOptions"/> with the specified ksqlDB REST API URL.
+  /// </summary>
+  /// <param name="url">The ksqlDB REST API URL.</param>
   public KSqlDBContextOptions(string url)
   {
     if(string.IsNullOrEmpty(url))
@@ -17,12 +24,12 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
 
     Url = url;
 
-    QueryParameters ??= new QueryParameters
+    QueryParameters = new QueryParameters
     {
       [RestApi.Parameters.QueryParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToString().ToLower()
     };
 
-    QueryStreamParameters ??= new QueryStreamParameters
+    QueryStreamParameters = new QueryStreamParameters
     {
       [QueryStreamParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToString().ToLower(),
     };
@@ -30,12 +37,24 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
 
   internal IServiceCollection ServiceCollection { get; set; } = new ServiceCollection();
 
+  /// <summary>
+  /// Gets or sets a value indicating whether table or stream name should be pluralized from the item name (by default: true).
+  /// </summary>
   public bool ShouldPluralizeFromItemName { get; set; } = true;
 
+  /// <summary>
+  /// Gets the ksqlDB REST API URL.
+  /// </summary>
   public string Url { get; }
-    
+
+  /// <summary>
+  /// Gets or sets the query stream parameters.
+  /// </summary>
   public QueryStreamParameters QueryStreamParameters { get; internal set; }
 
+  /// <summary>
+  /// Gets or sets the IKSqlDb query parameters.
+  /// </summary>
   public IKSqlDbParameters QueryParameters { get; internal set; }
 
   public static NumberFormatInfo NumberFormatInfo { get; set; }
@@ -52,6 +71,10 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
     QueryParameters[KSqlDbConfigs.ProcessingGuarantee] = guarantee;
   }
 
+  /// <summary>
+  /// Sets the auto offset reset using <see cref="AutoOffsetReset"/>.
+  /// </summary>
+  /// <param name="autoOffsetReset">The type of auto offset reset.</param>
   public void SetAutoOffsetReset(AutoOffsetReset autoOffsetReset)
   {
     QueryParameters[RestApi.Parameters.QueryParameters.AutoOffsetResetPropertyName] =
@@ -65,7 +88,7 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   /// Interception of JsonSerializerOptions.
   /// </summary>
   /// <param name="optionsAction">Action to configure the JsonSerializerOptions for the materialization of the incoming values.</param>
-  /// <returns>The original KSqlDb context options builder</returns>
+  /// <returns>The original ksqlDB context options builder</returns>
   public void SetJsonSerializerOptions(Action<JsonSerializerOptions> optionsAction)
   {
     JsonSerializerOptions ??= KSqlDbJsonSerializerOptions.CreateInstance();
@@ -93,6 +116,12 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   private string password;
   internal string BasicAuthPassword => string.IsNullOrEmpty(password) ? "" : password;
 
+  /// <summary>
+  /// Sets the basic authentication credentials.
+  /// Note: Credentials are stored only when using <see cref="UseBasicAuth"/>.
+  /// </summary>
+  /// <param name="userName">The user name.</param>
+  /// <param name="password">The password.</param>
   public void SetBasicAuthCredentials(string userName, string password)
   {
     this.userName = userName;
