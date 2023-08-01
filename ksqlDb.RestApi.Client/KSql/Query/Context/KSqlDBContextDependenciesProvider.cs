@@ -7,9 +7,17 @@ using Microsoft.Extensions.Logging;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context;
 
+/// <summary>
+/// Dependencies provider for ksqlDB context queries using REST API.
+/// </summary>
 public abstract class KSqlDBContextDependenciesProvider : AsyncDisposableObject, IDisposable
 {
   private readonly ILoggerFactory loggerFactory;
+
+  /// <summary>
+  /// Initializes a new instance of <see cref="KSqlDBContextDependenciesProvider"/> with the specified <see cref="KSqlDBContextOptions"/>. 
+  /// </summary>
+  /// <param name="kSqlDbContextOptions">The options for ksqlDB context.</param>
 
   protected KSqlDBContextDependenciesProvider(KSqlDBContextOptions kSqlDbContextOptions, ILoggerFactory loggerFactory = null)
   {
