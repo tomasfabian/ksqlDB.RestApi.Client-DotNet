@@ -19,7 +19,10 @@ jobs:
           cache: yarn
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: |
+          yarn install --frozen-lockfile
+          ls -al node_modules
+
       - name: Build website
         run: yarn build
 
