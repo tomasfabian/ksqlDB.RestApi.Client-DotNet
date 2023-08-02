@@ -37,6 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{0ABA2B0A-0
 		doc\config.md = doc\config.md
 		doc\data_definitions.md = doc\data_definitions.md
 		doc\data_types.md = doc\data_types.md
+		docusaurus.config.js = docusaurus.config.js
 		doc\functions.md = doc\functions.md
 		doc\joins.md = doc\joins.md
 		doc\ksqldbcontext.md = doc\ksqldbcontext.md
