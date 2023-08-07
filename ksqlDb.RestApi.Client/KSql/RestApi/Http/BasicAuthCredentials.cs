@@ -1,22 +1,48 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Http;
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Http;
 
+/// <summary>
+/// Represents basic authentication credentials.
+/// </summary>
 public record BasicAuthCredentials
 {
+  /// <summary>
+  /// Initializes a new instance of the <see cref="BasicAuthCredentials"/> class.
+  /// </summary>
+  /// <param name="userName">The username.</param>
+  /// <param name="password">The password.</param>
   public BasicAuthCredentials(string userName, string password)
   {
     UserName = userName;
     Password = password;
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="BasicAuthCredentials"/> class.
+  /// </summary>
   internal BasicAuthCredentials()
   {
   }
 
+
+  /// <summary>
+  /// Gets the username.
+  /// </summary>
   public string UserName { get; internal set; }
+
+  /// <summary>
+  /// Gets the password.
+  /// </summary>
   public string Password { get; internal set; }
 
+  /// <summary>
+  /// Gets the schema for basic authentication.
+  /// </summary>
   public string Schema => "basic";
 
+  /// <summary>
+  /// Creates a token for basic authentication.
+  /// </summary>
+  /// <returns>A base64 encoded string representing the username and password.</returns>
   internal string CreateToken()
   {
     string credentials = $"{UserName}:{Password}";
