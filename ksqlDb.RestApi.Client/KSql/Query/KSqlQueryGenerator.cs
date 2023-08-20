@@ -42,7 +42,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
     string finalFromItemName = InterceptFromItemName(queryContext.FromItemName ?? fromItemName);
 
     queryContext.AutoOffsetReset = autoOffsetReset;
-      
+
     queryMetadata.FromItemType = fromTableType;
 
     if (joins.Any())
@@ -58,17 +58,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
         Alias = alias
       };
 
-      queryMetadata.Joins = joins.Select(c =>
-        {
-          var items = c.Item2.ToArray();
-          var lambdaExpression = StripQuotes(items[2]) as LambdaExpression;
-          var alias = lambdaExpression.Parameters[0].Name; 
-
-          var type = items[0].Type.GenericTypeArguments[0];
-
-          return new FromItem {Type = type, Alias = alias};
-        }).Append(fromTable)
-        .ToArray();
+      queryMetadata.Joins = GetFromItems(joins, fromTable);
 
       var joinsVisitor = new KSqlJoinsVisitor(kSqlVisitor.StringBuilder, options, new QueryContext { FromItemName = finalFromItemName }, queryMetadata);
 
@@ -135,8 +125,8 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
       kSqlVisitor.Append($"{separator}EMIT {outputRefinement}");
     }
 
-    if (Limit.HasValue)
-      kSqlVisitor.Append($" LIMIT {Limit}");
+    if (limit.HasValue)
+      kSqlVisitor.Append($" LIMIT {limit}");
 
     kSqlVisitor.Append(";");
 
@@ -152,8 +142,8 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
 
     new KSqlWindowsVisitor(kSqlVisitor.StringBuilder, queryMetadata).Visit(windowedBy);
 
-    var constantExpression = windowedBy; 
-      
+    var constantExpression = windowedBy;
+
     return (TimeWindows)constantExpression.Value;
   }
 
@@ -243,7 +233,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
     if (methodInfo.Name.IsOneOfFollowing(nameof(QbservableExtensions.Take), nameof(CreateStatementExtensions.Take)))
     {
       var arg = (ConstantExpression)methodCallExpression.Arguments[1];
-      Limit = (int)arg.Value;
+      limit = (int)arg.Value;
 
       VisitChained(methodCallExpression);
     }
@@ -282,7 +272,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
       var joinTable = methodCallExpression.Arguments.Skip(1);
 
       joins.Add((methodInfo, joinTable, selectManyGroupJoin));
-        
+
       selectManyGroupJoin = null;
 
       VisitChained(methodCallExpression);
@@ -302,7 +292,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
       case nameof(QbservableExtensions.RightJoin):
       case nameof(QbservableExtensions.FullOuterJoin):
         var joinTable = methodCallExpression.Arguments.Skip(1);
-        
+
         joins.Add((methodInfo, joinTable, null));
 
         VisitChained(methodCallExpression);
@@ -312,7 +302,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
     return methodCallExpression;
   }
 
-  protected void VisitChained(MethodCallExpression methodCallExpression)
+  private void VisitChained(MethodCallExpression methodCallExpression)
   {
     var firstPart = methodCallExpression.Arguments[0];
 
@@ -323,14 +313,14 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
   private Queue<Expression> whereClauses;
   private LambdaExpression partitionBy;
   private AutoOffsetReset? autoOffsetReset;
-  protected int? Limit;
+  private int? limit;
   private ConstantExpression windowedBy;
   private LambdaExpression groupBy;
   private LambdaExpression selectManyGroupJoin;
   private LambdaExpression having;
   private List<(MethodInfo, IEnumerable<Expression>, LambdaExpression)> joins;
 
-  protected static Expression StripQuotes(Expression expression)
+  private static Expression StripQuotes(Expression expression)
   {
     while (expression.NodeType == ExpressionType.Quote)
     {
@@ -338,5 +328,20 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
     }
 
     return expression;
+  }
+
+  private static FromItem[] GetFromItems(List<(MethodInfo, IEnumerable<Expression>, LambdaExpression)> joins, FromItem fromItem)
+  {
+    return joins.Select(c =>
+      {
+        var items = c.Item2.ToArray();
+        var lambdaExpression = StripQuotes(items[2]) as LambdaExpression;
+        var alias = lambdaExpression.Parameters[0].Name;
+
+        var type = items[0].Type.GenericTypeArguments[0];
+
+        return new FromItem {Type = type, Alias = alias};
+      }).Append(fromItem)
+      .ToArray();
   }
 }
