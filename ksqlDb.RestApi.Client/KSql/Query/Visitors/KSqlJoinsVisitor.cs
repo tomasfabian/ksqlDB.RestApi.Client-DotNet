@@ -67,7 +67,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
       var (methodInfo, e, groupJoin) = join;
 
       var expressions = e.ToArray();
-      
+
       expressions = expressions.Select(StripQuotes).ToArray();
 
       Visit(expressions[0]);
@@ -86,7 +86,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
       }
 
       var lambdaExpression = expressions[3] as LambdaExpression;
-      
+
       bool isFirst = i == 0;
 
       if (isFirst)
@@ -100,7 +100,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
         new KSqlJoinSelectFieldsVisitor(StringBuilder, queryMetadata).Visit(body);
 
         var fromItemAlias = queryMetadata.Joins.Skip(i).Where(c => c.Type == queryMetadata.FromItemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).LastOrDefault();
-          
+
         outerItemAlias = fromItemAlias ?? outerItemAlias;
 
         AppendLine($" FROM {queryContext.FromItemName} {outerItemAlias}");
@@ -117,7 +117,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
       };
 
       var itemType = join.Item2.First().Type.GetGenericArguments()[0];
-        
+
       var joinItemAlias = queryMetadata.Joins.Where(c => c.Type == itemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).FirstOrDefault();
 
       itemAlias = joinItemAlias ?? itemAlias;
@@ -125,13 +125,13 @@ internal class KSqlJoinsVisitor : KSqlVisitor
       AppendLine($"{joinType} JOIN {fromItemName} {itemAlias}");
 
       TryAppendWithin(@join);
-      
+
       Append(GetOn(outerItemAlias, expressions));
       Visit(expressions[1]);
 
       Append(GetEqualsTo(itemAlias, expressions));
       Visit(expressions[2]);
-      
+
       Append(Environment.NewLine);
 
       i++;
@@ -141,9 +141,9 @@ internal class KSqlJoinsVisitor : KSqlVisitor
   private string GetOn(string outerItemAlias, Expression[] expressions)
   {
     bool useAlias = !IsKSqlFunctionsExtension(expressions[1]);
-    
+
     string on = useAlias ? $"{outerItemAlias}." : string.Empty;
-    
+
     return $"ON {on}";
   }
 
@@ -233,13 +233,20 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
     if (constantExpression.Value is ISource source)
     {
-      fromItemName = constantExpression.Type.GenericTypeArguments[0].Name;
-
-      fromItemName = source?.QueryContext?.FromItemName ?? fromItemName;
-
-      fromItemName = InterceptFromItemName(fromItemName);
+      fromItemName = GetFromItemName(source, constantExpression);
     }
 
     return constantExpression;
+  }
+
+  private string GetFromItemName(ISource source, ConstantExpression constantExpression)
+  {
+    var name = constantExpression.Type.GenericTypeArguments[0].Name;
+
+    name = source?.QueryContext?.FromItemName ?? name;
+
+    name = InterceptFromItemName(name);
+
+    return name;
   }
 }
