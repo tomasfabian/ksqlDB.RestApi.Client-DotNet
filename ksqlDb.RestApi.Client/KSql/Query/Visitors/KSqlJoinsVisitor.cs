@@ -27,23 +27,28 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
   private string GenerateAlias(string name)
   {
-    if (aliasDictionary.ContainsKey(name))
-      return aliasDictionary[name];
+    if (aliasDictionary.TryGetValue(name, out var existingAlias))
+      return existingAlias;
 
-    var streamAlias = name[0].ToString();
+    var newAlias = CreateDistinctAliasFrom(name);
+    aliasDictionary[name] = newAlias;
 
-    int i = 0;
+    return newAlias;
+  }
 
-    var streamAliasAttempt = streamAlias;
+  private string CreateDistinctAliasFrom(string name)
+  {
+    var aliasBase = name[0].ToString();
+    int suffix = 0;
 
-    while (aliasDictionary.Values.Any(c => c == streamAliasAttempt))
+    var newAlias = aliasBase;
+
+    while (aliasDictionary.Values.Contains(newAlias))
     {
-      streamAliasAttempt = $"{streamAlias}{++i}";
+      newAlias = $"{aliasBase}{++suffix}";
     }
 
-    aliasDictionary.Add(name, streamAliasAttempt);
-
-    return streamAliasAttempt;
+    return newAlias;
   }
 
   private PropertyInfo GetPropertyType(Type type)
