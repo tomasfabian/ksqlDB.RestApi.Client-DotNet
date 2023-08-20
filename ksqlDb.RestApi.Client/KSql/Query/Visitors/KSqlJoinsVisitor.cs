@@ -23,33 +23,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
     this.queryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
   }
 
-  private readonly Dictionary<string, string> aliasDictionary = new();
-
-  private string GenerateAlias(string name)
-  {
-    if (aliasDictionary.TryGetValue(name, out var existingAlias))
-      return existingAlias;
-
-    var newAlias = CreateDistinctAliasFrom(name);
-    aliasDictionary[name] = newAlias;
-
-    return newAlias;
-  }
-
-  private string CreateDistinctAliasFrom(string name)
-  {
-    var aliasBase = name[0].ToString();
-    int suffix = 0;
-
-    var newAlias = aliasBase;
-
-    while (aliasDictionary.Values.Contains(newAlias))
-    {
-      newAlias = $"{aliasBase}{++suffix}";
-    }
-
-    return newAlias;
-  }
+  private readonly JoinAliasGenerator joinAliasGenerator = new();
 
   private PropertyInfo GetPropertyType(Type type)
   {
@@ -77,9 +51,9 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
       Visit(expressions[0]);
 
-      var outerItemAlias = GenerateAlias(queryContext.FromItemName);
+      var outerItemAlias = joinAliasGenerator.GenerateAlias(queryContext.FromItemName);
 
-      var itemAlias = GenerateAlias(fromItemName);
+      var itemAlias = joinAliasGenerator.GenerateAlias(fromItemName);
 
       if (groupJoin != null)
       {
