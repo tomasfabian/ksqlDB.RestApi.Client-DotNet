@@ -221,3 +221,6 @@ NuPkg/**
 /img/
 LICENSE
 *.pubxml
+
+# editor and IDE paraphernalia
+.idea
