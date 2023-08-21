@@ -13,7 +13,7 @@ internal class StringVisitor : KSqlVisitor
 
   protected override Expression VisitMethodCall(MethodCallExpression methodCallExpression)
   {
-    if (methodCallExpression.Object?.Type != typeof(string)) 
+    if (methodCallExpression.Object?.Type != typeof(string))
       return methodCallExpression;
 
     var methodInfo = methodCallExpression.Method;
@@ -53,9 +53,9 @@ internal class StringVisitor : KSqlVisitor
 
   private void VisitLike(MethodCallExpression methodCallExpression, string methodName)
   {
-    likeMethodName = methodName;
-
     AppendLike(methodCallExpression);
+
+    likeMethodName = methodName;
 
     Visit(methodCallExpression.Arguments[0]);
 
@@ -71,21 +71,24 @@ internal class StringVisitor : KSqlVisitor
     return base.VisitParameter(node);
   }
 
+  private const string WildCard = "%";
+  private const string StringLiteralDelimiter = "'";
+
   protected override Expression VisitConstant(ConstantExpression constantExpression)
   {
     if (likeMethodName.IsNotNullOrEmpty() && constantExpression.Value is string value)
     {
-      Append("'");
+      Append(StringLiteralDelimiter);
 
-      if (likeMethodName.IsOneOfFollowing(nameof(String.EndsWith), nameof(String.Contains)))
-        Append("%");
+      if (likeMethodName.IsOneOfFollowing(nameof(string.EndsWith), nameof(string.Contains)))
+        Append(WildCard);
 
       Append(value);
 
-      if (likeMethodName.IsOneOfFollowing(nameof(String.StartsWith), nameof(String.Contains)))
-        Append("%");
+      if (likeMethodName.IsOneOfFollowing(nameof(string.StartsWith), nameof(string.Contains)))
+        Append(WildCard);
 
-      Append("'");
+      Append(StringLiteralDelimiter);
 
       return constantExpression;
     }

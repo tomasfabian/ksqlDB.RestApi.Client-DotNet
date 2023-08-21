@@ -4,7 +4,6 @@
         <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
         <Authors>Tomas Fabian</Authors>
         <Company />
-        <PackageLicenseFile></PackageLicenseFile>
         <PackageProjectUrl>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/ksqlDb.RestApi.Client</PackageProjectUrl>
         <RepositoryUrl>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet</RepositoryUrl>
         <Copyright>@tomasfabian</Copyright>
@@ -16,8 +15,8 @@
             Documentation for the library can be found at https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/README.md.
         </Description>
         <PackageTags>ksql ksqlDB LINQ .NET csharp push query</PackageTags>
-        <Version>3.2.0</Version>
-        <AssemblyVersion>3.2.0.0</AssemblyVersion>
+        <Version>3.2.1</Version>
+        <AssemblyVersion>3.2.1.0</AssemblyVersion>
         <LangVersion>10.0</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>

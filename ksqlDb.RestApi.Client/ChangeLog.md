@@ -1,5 +1,8 @@
 # ksqlDB.RestApi.Client
 
+# 3.2.1
+- fixed SQL LIKE statement generation from expressions starting with a constant
+
 # 3.2.0
 - added `Headers`, `RowOffset` and `RowPartition` pseudocolumns to `Record` type
 - entity creation added WITH RETENTION_MS property
