@@ -26,7 +26,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
   }
 
   #region Collection functions
-    
+
   private class Collection
   {
     public int[] Items1 { get; set; } = null!;
@@ -64,7 +64,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
   #endregion
 
   #region ArrayDistinct
-    
+
   [Test]
   public void ArrayDistinct_BuildKSql_PrintsFunction()
   {
@@ -77,12 +77,12 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
     //Assert
     query.Should().BeEquivalentTo($"ARRAY_DISTINCT({nameof(Collection.Items1)})");
   }
-    
+
 
   #endregion
 
   #region ArrayExcept
-    
+
   [Test]
   public void ArrayExcept_BuildKSql_PrintsFunction()
   {
@@ -111,7 +111,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo($"ARRAY_INTERSECT({nameof(Collection.Items1)}, {nameof(Collection.Items2)})");
-  }    
+  }
 
   #endregion
 
@@ -121,14 +121,14 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
   public void ArrayJoin_BuildKSql_PrintsFunction()
   {
     //Arrange
-    Expression<Func<Collection, string>> expression = c => K.Functions.ArrayJoin(c.Items1, ";;");
+    Expression<Func<Collection, string>> expression = c => K.Functions.ArrayJoin(c.Items1, ";");
 
     //Act
     var query = ClassUnderTest.BuildKSql(expression);
 
     //Assert
-    query.Should().BeEquivalentTo($"ARRAY_JOIN({nameof(Collection.Items1)}, ';;')");
-  }    
+    query.Should().BeEquivalentTo($"ARRAY_JOIN({nameof(Collection.Items1)}, ';')");
+  }
 
   #endregion
 
@@ -145,7 +145,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo($"ARRAY_REMOVE({nameof(Collection.Items1)}, 1)");
-  }    
+  }
 
   #endregion
 
@@ -162,7 +162,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo($"ARRAY_LENGTH({nameof(Collection.Items1)})");
-  }    
+  }
 
   #endregion
 
@@ -179,10 +179,10 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo($"ARRAY_MIN({nameof(Collection.Items1)})");
-  }    
+  }
 
   #endregion
-    
+
   #region ArrayMax
 
   [Test]
@@ -196,12 +196,12 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo($"ARRAY_Max({nameof(Collection.Items1)})");
-  }    
+  }
 
   #endregion
 
   #region ArraySort
-    
+
   [Test]
   public void ArraySortNewArray_BuildKSql_PrintsFunction()
   {
@@ -213,7 +213,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo("ARRAY_SORT(ARRAY[3, NULL, 1], 'ASC')");
-  } 
+  }
 
   [Test]
   public void ArraySort_BuildKSql_PrintsFunction()
@@ -226,12 +226,12 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo($"ARRAY_SORT({nameof(Collection.Items1)}, 'DESC')");
-  }    
+  }
 
   #endregion
 
   #region ArrayUnion
-    
+
   [Test]
   public void ArrayUnionNewArray_BuildKSql_PrintsFunction()
   {
@@ -243,7 +243,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo("ARRAY_UNION(ARRAY[3, NULL, 1], ARRAY[3, NULL])");
-  } 
+  }
 
   [Test]
   public void ArrayUnion_BuildKSql_PrintsFunction()
@@ -256,12 +256,12 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo($"ARRAY_UNION({nameof(Collection.Items1)}, {nameof(Collection.Items1)})");
-  }    
+  }
 
   #endregion
 
   #region AsMap
-    
+
   [Test]
   public void AsMap_BuildKSql_PrintsFunction()
   {
@@ -273,12 +273,12 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo("AS_MAP(ARRAY['1', '2'], ARRAY[11, 22])");
-  } 
+  }
 
   #endregion
 
   #region JsonArrayContains
-    
+
   [Test]
   public void JsonArrayContains_BuildKSql_PrintsFunction()
   {
@@ -290,12 +290,12 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo("JSON_ARRAY_CONTAINS('[1, 2, 3]', 2)");
-  } 
+  }
 
   #endregion
 
   #region MapKeys
-    
+
   [Test]
   public void MapKeys_BuildKSql_PrintsFunction()
   {
@@ -311,7 +311,7 @@ public class KSqlFunctionVisitorCollectionsTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo("MAP_KEYS(MAP('apple' := 10, 'banana' := 20))");
-  } 
+  }
 
   #endregion
 

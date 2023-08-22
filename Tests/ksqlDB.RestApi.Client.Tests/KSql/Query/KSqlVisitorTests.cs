@@ -683,6 +683,20 @@ public class KSqlVisitorTests : TestBase
   }
 
   [Test]
+  public void ConstantStartsWith_BuildKSql_PrintsLike()
+  {
+    //Arrange
+    string text = "ET";
+    Expression<Func<Tweet, bool>> expression = c => "message".StartsWith(text);
+
+    //Act
+    var query = ClassUnderTest.BuildKSql(expression);
+
+    //Assert
+    query.Should().BeEquivalentTo($"'message' LIKE '{text}%'");
+  }
+
+  [Test]
   public void EndsWith_BuildKSql_PrintsLike()
   {
     //Arrange
@@ -760,7 +774,7 @@ public class KSqlVisitorTests : TestBase
     //Assert
     query.Should().BeEquivalentTo($"LEN({nameof(Person.FirstName)}) / LEN({nameof(Person.LastName)})");
   }
-    
+
   [Test]
   public void Multiply_BuildKSql_PrintsQuery()
   {
@@ -773,7 +787,7 @@ public class KSqlVisitorTests : TestBase
     //Assert
     query.Should().BeEquivalentTo($"LEN({nameof(Person.FirstName)}) * LEN({nameof(Person.LastName)})");
   }
-    
+
   [Test]
   public void Modulo_BuildKSql_PrintsQuery()
   {
@@ -845,9 +859,9 @@ public class KSqlVisitorTests : TestBase
   }
 
   #endregion
-    
+
   #region ListContains
-    
+
   class OrderData
   {
     public int OrderType { get; set; }
@@ -865,7 +879,7 @@ public class KSqlVisitorTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 3)");
-  } 
+  }
 
   [Test]
   public void ListMemberContains()
@@ -880,7 +894,7 @@ public class KSqlVisitorTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 3)");
-  } 
+  }
 
   [Test]
   public void VisitNewArrayContains()
@@ -893,7 +907,7 @@ public class KSqlVisitorTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 3)");
-  } 
+  }
 
   [Test]
   public void EnumerableContains()
@@ -908,7 +922,7 @@ public class KSqlVisitorTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 2, 3)");
-  } 
+  }
 
   [Test]
   public void EnumerableOfStringContains()
@@ -923,7 +937,7 @@ public class KSqlVisitorTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo($"{nameof(OrderData.Category)} IN ('1', '2')");
-  } 
+  }
 
   [Test]
   public void IListMemberContains()
@@ -938,7 +952,7 @@ public class KSqlVisitorTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 3)");
-  } 
+  }
 
   [Test]
   public void IEnumerableMemberContains()
@@ -953,7 +967,7 @@ public class KSqlVisitorTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo($"{nameof(OrderData.OrderType)} IN (1, 3)");
-  } 
+  }
 
   #endregion
 
