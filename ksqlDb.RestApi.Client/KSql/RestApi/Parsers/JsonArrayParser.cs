@@ -33,7 +33,7 @@ internal class JsonArrayParser
 
   readonly char[] structuredTypeStarted = { '[', '{' };
   readonly char[] structuredTypeEnded = { ']', '}' };
-    
+
   private IEnumerable<string> Split(string row)
   {
     var stringBuilder = new StringBuilder();
@@ -47,17 +47,17 @@ internal class JsonArrayParser
     {
       if(structuredTypeStarted.Contains(currentChar) && !isInsideString)
         isStructuredType++;
-		 
+
       if(structuredTypeEnded.Contains(currentChar) && !isInsideString)
         isStructuredType--;
 
       if (currentChar == '"' && (previousChar == null || previousChar != '\\'))
         isInsideString = !isInsideString;
 
-      if(currentChar != ',' || isInsideString || isStructuredType > 0)
+      if (ShouldAppend(currentChar, isInsideString, isStructuredType))
         stringBuilder.Append(currentChar);
 
-      if(currentChar == ',' && !isInsideString && !(isStructuredType > 0))
+      if (IsRowEnd(currentChar, isInsideString, isStructuredType))
       {
         yield return stringBuilder.ToString();
         stringBuilder.Clear();
@@ -65,7 +65,17 @@ internal class JsonArrayParser
 
       previousChar = currentChar;
     }
-	
+
     yield return stringBuilder.ToString();
+  }
+
+  private bool ShouldAppend(char currentChar, bool isInsideString, int isStructuredType)
+  {
+    return currentChar != ',' || isInsideString || isStructuredType > 0;
+  }
+
+  private bool IsRowEnd(char currentChar, bool isInsideString, int isStructuredType)
+  {
+    return currentChar == ',' && !isInsideString && !(isStructuredType > 0);
   }
 }
