@@ -6,14 +6,11 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 
 internal class TypeGenerator : CreateEntityStatement
 {
-  private readonly StringBuilder stringBuilder = new();
-
   internal string Print<T>(string typeName = null)
   {
-    stringBuilder.Clear();
-
+    StringBuilder stringBuilder = new();
     var type = typeof(T);
-      
+
     if(string.IsNullOrEmpty(typeName))
     {
       typeName = type.ExtractTypeName();
@@ -23,14 +20,14 @@ internal class TypeGenerator : CreateEntityStatement
 
     stringBuilder.Append($"CREATE TYPE {typeName} AS STRUCT<");
 
-    PrintProperties<T>();
+    PrintProperties<T>(stringBuilder);
 
     stringBuilder.Append(">;");
 
     return stringBuilder.ToString();
   }
 
-  private void PrintProperties<T>()
+  private void PrintProperties<T>(StringBuilder stringBuilder)
   {
     var ksqlProperties = new List<string>();
 
