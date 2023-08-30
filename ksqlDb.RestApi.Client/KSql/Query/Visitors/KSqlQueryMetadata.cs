@@ -12,6 +12,8 @@ internal sealed record KSqlQueryMetadata
 
   internal bool IsInNestedFunctionScope { get; set; }
 
+  internal bool IsInContainsScope { get; set; }
+
   internal FromItem TrySetAlias(MemberExpression memberExpression, Func<FromItem, string, bool> predicate)
   {
     var parameterName = ((ParameterExpression)memberExpression.Expression).Name;

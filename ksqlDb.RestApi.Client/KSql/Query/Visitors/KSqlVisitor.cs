@@ -24,7 +24,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
     stringBuilder = new StringBuilder();
   }
-     
+
   internal KSqlVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
     : this(queryMetadata)
   {
@@ -60,13 +60,13 @@ internal class KSqlVisitor : ExpressionVisitor
       case ExpressionType.Constant:
         VisitConstant((ConstantExpression)expression);
         break;
-          
+
       //arithmetic
       case ExpressionType.Add:
-      case ExpressionType.Subtract: 
-      case ExpressionType.Divide: 
-      case ExpressionType.Multiply: 
-      case ExpressionType.Modulo: 
+      case ExpressionType.Subtract:
+      case ExpressionType.Divide:
+      case ExpressionType.Multiply:
+      case ExpressionType.Modulo:
       //conditionals
       case ExpressionType.AndAlso:
       case ExpressionType.OrElse:
@@ -120,7 +120,7 @@ internal class KSqlVisitor : ExpressionVisitor
       case ExpressionType.MemberInit:
         VisitMemberInit((MemberInitExpression)expression);
         break;
-        
+
       case ExpressionType.Conditional:
         VisitConditional((ConditionalExpression) expression);
         break;
@@ -128,18 +128,18 @@ internal class KSqlVisitor : ExpressionVisitor
 
     return expression;
   }
-    
+
   protected override Expression VisitConditional(ConditionalExpression node)
   {
     Append(" WHEN ");
     Visit(node.Test);
-      
+
     Append(" THEN ");
     Visit(node.IfTrue);
-      
+
     if(node.IfFalse.NodeType != ExpressionType.Conditional)
       Append(" ELSE ");
-      
+
     Visit(node.IfFalse);
 
     return node;
@@ -151,7 +151,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
     bool isFirst = true;
     foreach (var memberBinding in node.Bindings.Where(c => c.BindingType == MemberBindingType.Assignment).OfType<MemberAssignment>())
-    {        
+    {
       if (isFirst)
         isFirst = false;
       else
@@ -172,14 +172,14 @@ internal class KSqlVisitor : ExpressionVisitor
   protected override Expression VisitListInit(ListInitExpression listInitExpression)
   {
     var isDictionary = listInitExpression.Type.IsDictionary();
-      
+
     if (isDictionary)
     {
       //MAP('c' := 2, 'd' := 4)
       Append("MAP(");
 
       bool isFirst = true;
-        
+
       foreach (var elementInit in listInitExpression.Initializers)
       {
         if (isFirst)
@@ -188,7 +188,7 @@ internal class KSqlVisitor : ExpressionVisitor
           Append(ColumnsSeparator);
 
         Visit(elementInit.Arguments[0]);
-          
+
         Append(" := ");
         Visit(elementInit.Arguments[1]);
       }
@@ -199,7 +199,7 @@ internal class KSqlVisitor : ExpressionVisitor
     {
       var arguments = listInitExpression.Initializers.SelectMany(c => c.Arguments);
 
-      if (isInContainsScope)
+      if (queryMetadata.IsInContainsScope)
         JoinAppend(arguments);
       else
         PrintArray(arguments);
@@ -210,7 +210,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
   protected override Expression VisitNewArray(NewArrayExpression node)
   {
-    if (isInContainsScope)
+    if (queryMetadata.IsInContainsScope)
       JoinAppend(node.Expressions);
     else
       PrintArray(node.Expressions);
@@ -253,30 +253,28 @@ internal class KSqlVisitor : ExpressionVisitor
     }
   }
 
-  private bool isInContainsScope;
-
   private void PrintArrayContainsForEnumerable(IReadOnlyCollection<Expression> arguments)
   {
-    isInContainsScope = true;
+    queryMetadata.IsInContainsScope = true;
 
     Visit(arguments.Last());
     Append(" IN (");
     Visit(arguments.First());
     Append(")");
 
-    isInContainsScope = false;
+    queryMetadata.IsInContainsScope = false;
   }
 
   private void PrintArrayContains(MethodCallExpression methodCallExpression)
   {
-    isInContainsScope = true;
+    queryMetadata.IsInContainsScope = true;
 
     Visit(methodCallExpression.Arguments);
     Append(" IN (");
     Visit(methodCallExpression.Object);
     Append(")");
 
-    isInContainsScope = false;
+    queryMetadata.IsInContainsScope = false;
   }
 
   protected void PrintFunctionArguments(IEnumerable<Expression> expressions)
@@ -307,49 +305,9 @@ internal class KSqlVisitor : ExpressionVisitor
   {
     if (constantExpression == null) throw new ArgumentNullException(nameof(constantExpression));
 
-    var value = constantExpression.Value;
-    var type = value?.GetType();
+    var constantExpressionVisitor = new ConstantVisitor(stringBuilder, queryMetadata);
 
-    if (value is byte[])
-      throw new NotSupportedException();
-
-    if (value is not string && isInContainsScope && value is IEnumerable enumerable)
-    {
-      Append(enumerable);
-    }
-    else if (value != null && (type.IsClass || type.IsStruct() || type.IsDictionary()))
-    {
-      var ksqlValue = new CreateKSqlValue().ExtractValue(value, null, null, type);
-
-      stringBuilder.Append(ksqlValue);
-    }
-    else if (KSqlDBContextOptions.NumberFormatInfo != null && value is double doubleValue)
-    {
-      var formatted = doubleValue.ToString(KSqlDBContextOptions.NumberFormatInfo);
-
-      stringBuilder.Append(formatted);
-    }
-    else switch (value)
-    {
-      case ListSortDirection listSortDirection:
-      {
-        string direction = listSortDirection == ListSortDirection.Ascending ? "ASC" : "DESC";
-        stringBuilder.Append($"'{direction}'");
-        break;
-      }
-      case string:
-        stringBuilder.Append($"'{value}'");
-        break;
-      default:
-      {
-        var stringValue = value != null ? value.ToString() : "NULL";
-
-        stringBuilder.Append(stringValue ?? "Unknown");
-        break;
-      }
-    }
-
-    return constantExpression;
+    return constantExpressionVisitor.Visit(constantExpression) ?? constantExpression;
   }
 
   protected override Expression VisitBinary(BinaryExpression binaryExpression)
@@ -583,7 +541,7 @@ internal class KSqlVisitor : ExpressionVisitor
       Append(alias);
       Append(".");
     }
-    
+
     if (type != fromItem?.Type)
       Append(memberExpression.Member.GetMemberName());
   }
@@ -692,7 +650,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
   protected void Append(IEnumerable enumerable)
   {
-    if (isInContainsScope)
+    if (queryMetadata.IsInContainsScope)
       JoinAppend(enumerable);
     else
       PrintArray(enumerable.OfType<object>().Select(Expression.Constant));
