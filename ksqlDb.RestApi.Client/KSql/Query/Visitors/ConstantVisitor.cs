@@ -78,7 +78,6 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
           default:
           {
             var stringValue = value != null ? value.ToString() : "NULL";
-
             StringBuilder.Append(stringValue ?? "Unknown");
             break;
           }
