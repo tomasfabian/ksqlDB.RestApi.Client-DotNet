@@ -486,40 +486,46 @@ internal class KSqlVisitor : ExpressionVisitor
 
     var memberName = memberExpression.Member.GetMemberName();
 
-    if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
+    switch (memberExpression.Expression.NodeType)
     {
-      AppendVisitMemberParameter(memberExpression);
-    }
-    else if (memberExpression.Expression.NodeType == ExpressionType.MemberInit)
-    {
-      Destructure(memberExpression);
-    }
-    else if (memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
-    {
-      if (memberName == nameof(string.Length))
-      {
-        Append("LEN(");
-        Visit(memberExpression.Expression);
-        Append(")");
-      }
-      else if(memberExpression.NodeType == ExpressionType.MemberAccess && memberExpression.Expression is MemberExpression
-              {
-                Member: { ReflectedType: { } }
-              } me && !me.Member.ReflectedType.IsKsqlGrouping())
-      {
+      case ExpressionType.Parameter:
+        AppendVisitMemberParameter(memberExpression);
+        break;
+      case ExpressionType.MemberInit:
         Destructure(memberExpression);
-      }
-      else
-        Append($"{memberExpression.Member.Name.ToUpper()}");
-    }
-    else
-    {
-      var outerObj = ExtractFieldValue(memberExpression);
+        break;
+      case ExpressionType.MemberAccess:
+        HandleMemberAccess(memberExpression, memberName);
+        break;
+      default:
+      {
+        var outerObj = ExtractFieldValue(memberExpression);
 
-      Visit(Expression.Constant(outerObj));
+        Visit(Expression.Constant(outerObj));
+        break;
+      }
     }
 
     return memberExpression;
+  }
+
+  private void HandleMemberAccess(MemberExpression memberExpression, string memberName)
+  {
+    if (memberName == nameof(string.Length))
+    {
+      Append("LEN(");
+      Visit(memberExpression.Expression);
+      Append(")");
+    }
+    else if (memberExpression.NodeType == ExpressionType.MemberAccess && memberExpression.Expression is MemberExpression
+             {
+               Member.ReflectedType: not null
+             } me && !me.Member.ReflectedType.IsKsqlGrouping())
+    {
+      Destructure(memberExpression);
+    }
+    else
+      Append($"{memberExpression.Member.Name.ToUpper()}");
   }
 
   private void AppendVisitMemberParameter(MemberExpression memberExpression)
