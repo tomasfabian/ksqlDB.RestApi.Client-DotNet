@@ -26,7 +26,7 @@ internal class KSqlFunctionVisitor : KSqlVisitor
             Append($"{constantExpression.Value}");
           else
           {
-            var value = ExtractFieldValue((MemberExpression)methodCallExpression.Arguments[1]);
+            var value = ExtractMemberValue((MemberExpression)methodCallExpression.Arguments[1]);
             Append(value.ToString());
           }
           break;          

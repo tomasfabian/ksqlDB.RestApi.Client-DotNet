@@ -1,12 +1,9 @@
 using System.Collections;
-using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDb.RestApi.Client.KSql.Entities;
-using ksqlDB.RestApi.Client.KSql.Query.Context;
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using DateTime = System.DateTime;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
@@ -497,9 +494,13 @@ internal class KSqlVisitor : ExpressionVisitor
       case ExpressionType.MemberAccess:
         HandleMemberAccess(memberExpression, memberName);
         break;
+      case ExpressionType.Convert:
+      case ExpressionType.ConvertChecked:
+        stringBuilder.Append(memberName);
+        break;
       default:
       {
-        var outerObj = ExtractFieldValue(memberExpression);
+        var outerObj = ExtractMemberValue(memberExpression);
 
         Visit(Expression.Constant(outerObj));
         break;
@@ -580,13 +581,17 @@ internal class KSqlVisitor : ExpressionVisitor
     Append(memberName);
   }
 
-  internal static object ExtractFieldValue(MemberExpression memberExpression)
+  internal static object ExtractMemberValue(MemberExpression memberExpression)
   {
-    var fieldInfo = (FieldInfo) memberExpression.Member;
-    var innerMember = (ConstantExpression) memberExpression.Expression;
+    var innerMember = (ConstantExpression)memberExpression.Expression;
     var innerField = innerMember.Value;
 
-    object outerObj = fieldInfo.GetValue(innerField);
+    object outerObj = memberExpression.Member switch
+    {
+      PropertyInfo propertyInfo => propertyInfo.GetValue(innerField),
+      FieldInfo fieldInfo => fieldInfo.GetValue(innerField),
+      _ => throw new InvalidOperationException($"Unsupported member type: {memberExpression.Member.GetType()}")
+    };
 
     return outerObj;
   }

@@ -1,5 +1,8 @@
 # ksqlDB.RestApi.Client
 
+# 3.2.2
+- fixed exception in ExtractFieldValue when using generics #48
+
 # 3.2.1
 - fixed SQL LIKE statement generation from expressions starting with a constant
 

@@ -479,4 +479,34 @@ WHERE IP_ADDRESS IS NULL EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKSql);
   }
+
+  internal interface IIdentifiable
+  {
+    public Guid Id { get; }
+  }
+
+  [Test]
+  public void Where_GenericType_PropertyAccess()
+  {
+    //Arrange
+    var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
+    string tableName = "my_table";
+    Guid uniqueId = Guid.NewGuid();
+
+    //Act
+    var ksql = GetQuery<IIdentifiable>(context, tableName, uniqueId)
+      .ToQueryString();
+
+    //Assert
+    string expectedKSql = $@"SELECT * FROM {tableName}s
+WHERE Id = '{uniqueId}' EMIT CHANGES;";
+
+    ksql.Should().BeEquivalentTo(expectedKSql);
+  }
+
+  internal IQbservable<T> GetQuery<T>(TestableDbProvider context, string tableName, Guid uniqueId)
+    where T : IIdentifiable
+  {
+    return context.CreateQueryStream<T>(tableName).Where(l => l.Id == uniqueId);
+  }
 }

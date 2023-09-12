@@ -449,6 +449,59 @@ public class KSqlVisitorTests : TestBase
 
   #endregion
 
+  #region Generics
+
+  public interface IIdentifiable
+  {
+    public Guid Id { get; }
+  }
+
+  [Test]
+  public void GenericType_Convert_AccessProperty()
+  {
+    //Arrange
+    Guid uniqueId = Guid.NewGuid();
+    Expression<Func<IIdentifiable, bool>> predicate = GetUniqueIdExpression<IIdentifiable>(uniqueId);
+
+    //Act
+    var query = ClassUnderTest.BuildKSql(predicate);
+    
+    //Assert
+    query.Should().BeEquivalentTo($"Id = '{uniqueId}'");
+  }
+
+  private static Expression<Func<T, bool>> GetUniqueIdExpression<T>(Guid uniqueId)
+    where T : IIdentifiable
+  {
+    return c => c.Id == uniqueId;
+  }
+
+  [Test]
+  public void GenericType_Convert_AccessNestedProperty()
+  {
+    //Arrange
+    Expression<Func<IWrapper, bool>> predicate = CompareNestedProperty<IWrapper>();
+
+    //Act
+    var query = ClassUnderTest.BuildKSql(predicate);
+
+    //Assert
+    query.Should().BeEquivalentTo("Nested->SensorId = 'v-42'");
+  }
+
+  interface IWrapper
+  {
+    public IoTSensor Nested { get; set; }
+  }
+
+  private static Expression<Func<T, bool>> CompareNestedProperty<T>()
+    where T : IWrapper
+  {
+    return l => l.Nested.SensorId == "v-42";
+  }
+
+  #endregion
+
   #region Parameter
 
   [Test]

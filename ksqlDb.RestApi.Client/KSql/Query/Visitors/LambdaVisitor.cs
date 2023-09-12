@@ -88,7 +88,7 @@ internal class LambdaVisitor : KSqlVisitor
     }
     else
     {
-      var outerObj = ExtractFieldValue(memberExpression);
+      var outerObj = ExtractMemberValue(memberExpression);
 
       Visit(Expression.Constant(outerObj));
     }
