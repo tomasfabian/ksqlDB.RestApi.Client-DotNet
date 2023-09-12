@@ -292,7 +292,7 @@ internal class KSqlVisitor : ExpressionVisitor
       if (isFirst)
         isFirst = false;
       else
-        stringBuilder.Append(ColumnsSeparator);
+        Append(ColumnsSeparator);
 
       Visit(expression);
     }
@@ -496,7 +496,7 @@ internal class KSqlVisitor : ExpressionVisitor
         break;
       case ExpressionType.Convert:
       case ExpressionType.ConvertChecked:
-        stringBuilder.Append(memberName);
+        Append(memberName);
         break;
       default:
       {
@@ -533,7 +533,7 @@ internal class KSqlVisitor : ExpressionVisitor
   {
     FromItem fromItem = null;
 
-    Type type = default(Type);
+    Type type = default;
 
     if (memberExpression.Member is PropertyInfo propertyInfo)
       type = propertyInfo.PropertyType;
@@ -650,7 +650,7 @@ internal class KSqlVisitor : ExpressionVisitor
       if (isFirst)
         isFirst = false;
       else
-        stringBuilder.Append(ColumnsSeparator);
+        Append(ColumnsSeparator);
 
       if(value is ConstantExpression constantExpression)
         Visit(constantExpression);
