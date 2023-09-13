@@ -146,8 +146,12 @@ internal class KSqlVisitor : ExpressionVisitor
   {
     Append("STRUCT(");
 
+    var memberAssignments = node.Bindings
+      .Where(c => c.BindingType == MemberBindingType.Assignment)
+      .OfType<MemberAssignment>();
+
     bool isFirst = true;
-    foreach (var memberBinding in node.Bindings.Where(c => c.BindingType == MemberBindingType.Assignment).OfType<MemberAssignment>())
+    foreach (var memberBinding in memberAssignments)
     {
       if (isFirst)
         isFirst = false;
@@ -168,41 +172,11 @@ internal class KSqlVisitor : ExpressionVisitor
 
   protected override Expression VisitListInit(ListInitExpression listInitExpression)
   {
-    var isDictionary = listInitExpression.Type.IsDictionary();
+    if (listInitExpression == null) throw new ArgumentNullException(nameof(listInitExpression));
 
-    if (isDictionary)
-    {
-      //MAP('c' := 2, 'd' := 4)
-      Append("MAP(");
+    var listInitExpressionVisitor = new ListInitVisitor(stringBuilder, queryMetadata);
 
-      bool isFirst = true;
-
-      foreach (var elementInit in listInitExpression.Initializers)
-      {
-        if (isFirst)
-          isFirst = false;
-        else
-          Append(ColumnsSeparator);
-
-        Visit(elementInit.Arguments[0]);
-
-        Append(" := ");
-        Visit(elementInit.Arguments[1]);
-      }
-
-      Append(")");
-    }
-    else if (listInitExpression.Type.IsList())
-    {
-      var arguments = listInitExpression.Initializers.SelectMany(c => c.Arguments);
-
-      if (queryMetadata.IsInContainsScope)
-        JoinAppend(arguments);
-      else
-        PrintArray(arguments);
-    }
-
-    return listInitExpression;
+    return listInitExpressionVisitor.Visit(listInitExpression) ?? listInitExpression;
   }
 
   protected override Expression VisitNewArray(NewArrayExpression node)
@@ -215,7 +189,7 @@ internal class KSqlVisitor : ExpressionVisitor
     return node;
   }
 
-  private void PrintArray(IEnumerable<Expression> expressions)
+  private protected void PrintArray(IEnumerable<Expression> expressions)
   {
     Append("ARRAY[");
     PrintCommaSeparated(expressions);
@@ -639,7 +613,7 @@ internal class KSqlVisitor : ExpressionVisitor
     stringBuilder.AppendLine(value);
   }
 
-  private const string ColumnsSeparator = ", ";
+  private protected const string ColumnsSeparator = ", ";
 
   protected void JoinAppend(IEnumerable enumerable)
   {
