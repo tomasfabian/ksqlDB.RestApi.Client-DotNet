@@ -292,80 +292,12 @@ internal class KSqlVisitor : ExpressionVisitor
   {
     if (newExpression == null) throw new ArgumentNullException(nameof(newExpression));
 
-    if (newExpression.Type.IsAnonymousType())
-    {
-      bool isFirst = true;
+    var newExpressionVisitor = new NewVisitor(stringBuilder, queryMetadata);
 
-      foreach (var memberWithArguments in newExpression.Members.Zip(newExpression.Arguments,
-                 (x, y) => new {First = x, Second = y}))
-      {
-        if (isFirst)
-          isFirst = false;
-        else
-          Append(ColumnsSeparator);
-
-        switch (memberWithArguments.Second.NodeType)
-        {
-          case ExpressionType.Not:
-          case ExpressionType.TypeAs:
-          case ExpressionType.ArrayLength:
-          case ExpressionType.Constant:
-          case ExpressionType.NewArrayInit:
-          case ExpressionType.ListInit:
-          case ExpressionType.MemberInit:
-          case ExpressionType.Call:
-            Visit(memberWithArguments.Second);
-            Append(" ");
-            break;
-          case ExpressionType.MemberAccess:
-            if (memberWithArguments.Second is MemberExpression
-                {
-                  Expression: MemberInitExpression memberInitExpression
-                } && memberInitExpression.Type.IsStruct())
-            {
-              Visit(memberWithArguments.Second);
-              Append(" ");
-            }
-            else if (memberWithArguments.Second.NodeType == ExpressionType.MemberAccess &&
-                     memberWithArguments.Second is MemberExpression me5 && me5.Expression?.Type != null &&
-                     me5.Expression.Type.IsKsqlGrouping())
-            {
-              VisitMemberWithArguments(memberWithArguments.First, memberWithArguments.Second);
-
-              continue;
-            }
-
-            if (memberWithArguments.Second is MemberExpression {Expression: null} && TryVisitTimeTypes(memberWithArguments.Second))
-            {
-              Append(" ");
-            }
-
-            break;
-
-          case ExpressionType.Conditional:
-            Append("CASE");
-            Visit(memberWithArguments.Second);
-            Append(" END AS ");
-            break;
-        }
-
-        if (memberWithArguments.Second is BinaryExpression)
-        {
-          PrintColumnWithAlias(memberWithArguments.First, memberWithArguments.Second);
-
-          continue;
-        }
-
-        VisitMemberWithArguments(memberWithArguments.First, memberWithArguments.Second);
-      }
-    }
-    else
-      TryVisitTimeTypes(newExpression);
-
-    return newExpression;
+    return newExpressionVisitor.Visit(newExpression) ?? newExpression;
   }
 
-  private bool TryVisitTimeTypes(Expression expression)
+  private protected bool TryVisitTimeTypes(Expression expression)
   {
     if (expression.Type == typeof(DateTime))
     {
@@ -396,15 +328,7 @@ internal class KSqlVisitor : ExpressionVisitor
     return constantExpression;
   }
 
-  private void VisitMemberWithArguments(MemberInfo memberInfo, Expression expression)
-  {
-    if (ShouldAppendAlias(memberInfo, expression))
-      PrintColumnWithAlias(memberInfo, expression);
-    else
-      ProcessVisitNewMember(memberInfo, expression);
-  }
-
-  private bool ShouldAppendAlias(MemberInfo memberInfo, Expression expression)
+  private protected bool ShouldAppendAlias(MemberInfo memberInfo, Expression expression)
   {
     if (expression is MemberExpression me2 && me2.Member.DeclaringType.IsKsqlGrouping())
       return false;
@@ -413,7 +337,7 @@ internal class KSqlVisitor : ExpressionVisitor
            me.Member.Name != memberInfo.Name;
   }
 
-  private void PrintColumnWithAlias(MemberInfo memberInfo, Expression expression)
+  private protected void PrintColumnWithAlias(MemberInfo memberInfo, Expression expression)
   {
     Visit(expression);
     Append(" AS ");
@@ -422,6 +346,14 @@ internal class KSqlVisitor : ExpressionVisitor
 
   protected virtual void ProcessVisitNewMember(MemberInfo memberInfo, Expression expression)
   {
+    if (queryMetadata.Joins != null && queryMetadata.Joins.Any() && expression.NodeType == ExpressionType.MemberAccess)
+    {
+      Visit(expression);
+
+      Append(" " + memberInfo.Name);
+      return;
+    }
+
     if (expression is MemberExpression { Expression: MemberExpression me3 } && me3.Expression != null && me3.Expression.Type.IsKsqlGrouping())
     {
       Append(memberInfo.Name);
@@ -446,6 +378,41 @@ internal class KSqlVisitor : ExpressionVisitor
   {
     if (memberExpression == null) throw new ArgumentNullException(nameof(memberExpression));
 
+    if (queryMetadata.Joins != null && queryMetadata.Joins.Any())
+    {
+      if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
+      {
+        var foundFromItem = queryMetadata.TrySetAlias(memberExpression, (_, alias) => string.IsNullOrEmpty(alias));
+
+        var memberName = memberExpression.Member.GetMemberName();
+
+        string alias = ((ParameterExpression)memberExpression.Expression).Name;
+
+        Append(foundFromItem?.Alias ?? alias);
+        Append(".");
+        Append(memberName);
+
+        return memberExpression;
+      }
+
+      var fromItem = queryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
+
+      if (fromItem != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
+      {
+        string alias = ((MemberExpression)memberExpression.Expression).Member.Name;
+
+        fromItem.Alias = alias;
+
+        Append(alias);
+
+        Append(".");
+
+        var memberName = memberExpression.Member.GetMemberName();
+        Append(memberName);
+        return memberExpression;
+      }
+    }
+
     if (memberExpression.Expression == null)
     {
       TryVisitTimeTypes(memberExpression);
@@ -455,7 +422,7 @@ internal class KSqlVisitor : ExpressionVisitor
       return memberExpression;
     }
 
-    var memberName = memberExpression.Member.GetMemberName();
+    var memberName2 = memberExpression.Member.GetMemberName();
 
     switch (memberExpression.Expression.NodeType)
     {
@@ -466,11 +433,11 @@ internal class KSqlVisitor : ExpressionVisitor
         Destructure(memberExpression);
         break;
       case ExpressionType.MemberAccess:
-        HandleMemberAccess(memberExpression, memberName);
+        HandleMemberAccess(memberExpression, memberName2);
         break;
       case ExpressionType.Convert:
       case ExpressionType.ConvertChecked:
-        Append(memberName);
+        Append(memberName2);
         break;
       default:
       {

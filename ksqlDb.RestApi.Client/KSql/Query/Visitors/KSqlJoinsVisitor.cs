@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
@@ -76,7 +76,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
         body = groupJoin != null ? groupJoin.Body : body;
 
-        new KSqlJoinSelectFieldsVisitor(StringBuilder, queryMetadata).Visit(body);
+        new KSqlVisitor(StringBuilder, queryMetadata).Visit(body);
 
         var fromItemAlias = queryMetadata.Joins.Skip(i).Where(c => c.Type == queryMetadata.FromItemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).LastOrDefault();
 
