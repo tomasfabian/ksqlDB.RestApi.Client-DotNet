@@ -166,7 +166,7 @@ This ensures smooth integration with the `ksqlDB.RestApi.Client` library, allowi
 - set `docker-compose.csproj` as startup project in [InsideOut.sln](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/InsideOut) for an embedded Kafka connect integration and stream processing examples.
 
 # ```IQbservable<T>``` extension methods
-As depicted bellow `IObservable<T>` is the dual of `IEnumerable<T>` and `IQbservable<T>` is the dual of `IQueryable<T>`. In all four cases LINQ providers are using deferred execution.
+As depicted below `IObservable<T>` is the dual of `IEnumerable<T>` and `IQbservable<T>` is the dual of `IQueryable<T>`. In all four cases LINQ providers are using deferred execution.
 While the first two are executed locally the latter two are executed server side. The server side execution is possible thanks to traversing **AST**s (Abstract Syntax Trees) with visitors. The `KSqlDbProvider` will create the **KSQL syntax** for you from **expression trees** and pass it along to ksqlDB.
 
 Both `IObservable<T>` and `IQbservable<T>` represent **push-based** sequences of asynchronous and potentially infinite events, while `IEnumerable<T>` and `IQueryable<T>` represent collections or **pull-based** sequences of items that can be iterated or queried, respectively.
@@ -195,7 +195,7 @@ List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 # Register the KSqlDbContext
 `IKSqlDBContext` and `IKSqlDbRestApiClient` can be provided with **dependency injection**. These services can be registered during app startup and components that require these services, are provided with these services via constructor parameters.
 
-To register `KsqlDbContext` as a service, open `Program.cs`, and add the lines to the `ConfigureServices` method shown bellow or see some more details in [the workshop](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/ksqlDB.RestApi.Client-workshop):
+To register `KsqlDbContext` as a service, open `Program.cs`, and add the lines to the `ConfigureServices` method shown below or see some more details in [the workshop](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/ksqlDB.RestApi.Client-workshop):
 
 ```
 using ksqlDB.RestApi.Client.Sensors;
