@@ -2,17 +2,17 @@
 
 Supported **comparison** and **logical** operators that can be used in value expressions:
 
-|   ksql   |           meaning           |  c#  |
-|:--------:|:---------------------------:|:----:|
-| =        | is equal to                 | ==   |
-| != or <> | is not equal to             | !=   |
-| <        | is less than                | <    |
-| <=       | is less than or equal to    | <=   |
-| >        | is greater than             | >    |
-| >=       | is greater than or equal to | >=   |
-| AND      | logical AND                 | &&   |
-| OR       | logical OR                  | \|\| |
-| NOT      | logical NOT                 |  !   |
+|   ksql   | meaning                     |  c#  |
+|:--------:|:----------------------------|:----:|
+|    =     | is equal to                 |  ==  |
+| != or <> | is not equal to             |  !=  |
+|    <     | is less than                |  <   |
+|    <=    | is less than or equal to    |  <=  |
+|    >     | is greater than             |  >   |
+|    >=    | is greater than or equal to |  >=  |
+|   AND    | logical AND                 |  &&  |
+|    OR    | logical OR                  | \|\| |
+|   NOT    | logical NOT                 |  !   |
 
 ### Operator LIKE - String.StartsWith, String.EndsWith, String.Contains
 **v1.3.0**
@@ -161,12 +161,12 @@ var query = new KSqlDBContext(@"http://localhost:8088")
 ```
 
 ```SQL
-SELECT 
-  CASE 
-    WHEN Amount < 2 THEN 'small' 
-    WHEN Amount < 4.1 THEN 'medium' 
-    ELSE 'large' 
-  END AS case_result 
+SELECT
+  CASE
+    WHEN Amount < 2 THEN 'small'
+    WHEN Amount < 4.1 THEN 'medium'
+    ELSE 'large'
+  END AS case_result
  FROM Tweets EMIT CHANGES;
 ```
 
