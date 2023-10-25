@@ -5,20 +5,20 @@
 In `ksqlDB`, there are several built-in data types that can be used to define the structure of streams and tables.
 These data types represent the type of data stored in each column of a stream or table. Here is a list of supported data types:
 
-|     ksql     |            c#            |
-|:------------:|:------------------------:|
-|    VARCHAR   |          string          |
-|    INTEGER   |            int           |
-|    BIGINT    |           long           |
-|    DOUBLE    |          double          |
-|    BOOLEAN   |           bool           |
-|     BYTES    |          byte[]          |
-|  ```ARRAY``` | C#Type[] or IEnumerable  |
-|   ```MAP```  |        IDictionary       |
-| ```STRUCT``` |          struct          |
-|     DATE     |     System.DateTime      |
-|     TIME     |     System.TimeSpan      |
-|   TIMESTAMP  |    System.DateTimeOffset |
+|     ksql     |             c#             |
+|:------------:|:--------------------------:|
+|   VARCHAR    |           string           |
+|   INTEGER    |            int             |
+|    BIGINT    |            long            |
+|    DOUBLE    |           double           |
+|   BOOLEAN    |            bool            |
+|    BYTES     |           byte[]           |
+| ```ARRAY```  |  C#Type[] or IEnumerable   |
+|  ```MAP```   |        IDictionary         |
+| ```STRUCT``` |           struct           |
+|     DATE     |      System.DateTime       |
+|     TIME     |      System.TimeSpan       |
+|  TIMESTAMP   |   System.DateTimeOffset    |
 
 Array type mapping example:
 All of the elements in the array must be of the same type. The element type can be any valid SQL type.
@@ -104,7 +104,7 @@ var dictionary = new Dictionary<string, int>()
   { "c", 2 },
   { "d", 4 }
 };
-``` 
+```
 ```KSQL
 MAP('c' := 2, 'd' := 4)
 ```
@@ -112,9 +112,9 @@ MAP('c' := 2, 'd' := 4)
 Accessing map elements:
 ```C#
 dictionary["c"]
-``` 
+```
 ```KSQL
-MAP('c' := 2, 'd' := 4)['d'] 
+MAP('c' := 2, 'd' := 4)['d']
 ```
 Deeply nested types:
 ```C#
@@ -130,7 +130,7 @@ context.CreateQueryStream<Tweet>()
 ```
 Generated KSQL:
 ```KSQL
-SELECT MAP('a' := ARRAY[1, 2], 'b' := ARRAY[3, 4]) Map 
+SELECT MAP('a' := ARRAY[1, 2], 'b' := ARRAY[3, 4]) Map
 FROM Tweets EMIT CHANGES;
 ```
 
@@ -199,7 +199,7 @@ print 'MyClass' from beginning;
 
 _rowtime: 2021/12/11 10:36:55.678 Z, key: `<null>`, value: {"DT":18718,"TS":3723000,"DTOFFSET":1625390985447}, partition: 0_
 
-**NOTE**: 
+**NOTE**:
 Further investigation is required to determine if there is a possible bug in `ksqlDB 0.22.0`, as the REST API payload does not include the offset for TIMESTAMP values.
 
 
@@ -219,7 +219,7 @@ public record LinkCreated
   [Key]
   public Guid AggregateRootId { get; set; }
 }
-``` 
+```
 ```C#
 EntityCreationMetadata metadata = new()
 {
@@ -297,14 +297,14 @@ Amount DECIMAL(3,2)
 
 ### Record type
 
-In `ksqlDB`, a [pseudocolumn](https://docs.ksqldb.io/en/0.27.2-ksqldb/reference/sql/data-definition/#pseudocolumns) is an automatically populated column that carries meta-information inferred about a row during its creation.
+In `ksqlDB`, a [pseudo-column](https://docs.ksqldb.io/en/0.27.2-ksqldb/reference/sql/data-definition/#pseudocolumns) is an automatically populated column that carries meta-information inferred about a row during its creation.
 
-|Pseudocolumn|Record Property|Meaning|
-|:----|:----|
-|HEADERS|Headers|Columns that are populated by the Kafka record's header.|
-|ROWOFFSET|RowOffset|The offset of the source record.|
-|ROWPARTITION|RowPartition|The partition of the source record.|
-|ROWTIME|RowTime|Row timestamp, inferred from the underlying Kafka record if not overridden.|
+| Pseudo-column | Record Property | Meaning                                                                     |
+|:--------------|:----------------|:----------------------------------------------------------------------------|
+| HEADERS       | Headers         | Columns that are populated by the Kafka record's header.                    |
+| ROWOFFSET     | RowOffset       | The offset of the source record.                                            |
+| ROWPARTITION  | RowPartition    | The partition of the source record.                                         |
+| ROWTIME       | RowTime         | Row timestamp, inferred from the underlying Kafka record if not overridden. |
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query;
@@ -316,9 +316,9 @@ public class Movie : Record
 }
 ```
 
-Selecting pseudocolumns columns:
+Selecting pseudo-columns columns:
 ```C#
-query.Select(movie => new { movie.Id, movie.RowTime, movie.RowOffset, movie.RowPartition, movie.Headers }) 
+query.Select(movie => new { movie.Id, movie.RowTime, movie.RowOffset, movie.RowPartition, movie.Headers })
 ```
 
 ```SQL
