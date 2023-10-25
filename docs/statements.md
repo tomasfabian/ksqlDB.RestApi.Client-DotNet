@@ -992,6 +992,9 @@ public KSqlDbStatement CreateStatement(string statement)
 
 ### HttpResponseMessage ToStatementResponses extension
 
+The `HttpResponseMessage` extension `ToStatementResponses` is used to transform a HTTP response received from a ksqlDB REST API call into a collection of statement responses.
+These statement responses contain information about the execution status.
+
 ```C#
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 
