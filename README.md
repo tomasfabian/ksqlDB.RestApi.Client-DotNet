@@ -71,8 +71,8 @@ LINQ code written in C# from the sample is equivalent to this KSQL query:
 ```SQL
 SELECT Message, Id
   FROM Tweets
- WHERE Message != 'Hello world' OR Id = 1 
-  EMIT CHANGES 
+ WHERE Message != 'Hello world' OR Id = 1
+  EMIT CHANGES
  LIMIT 2;
 ```
 
@@ -136,7 +136,7 @@ context.Add(new Tweet { Id = 2, Message = "ksqlDB rulez!" });
 var saveChangesResponse = await context.SaveChangesAsync();
 ```
 
-Sample projects can be found under [Samples](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.Sample) solution folder in ksqlDB.RestApi.Client.sln 
+Sample projects can be found under [Samples](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/ksqlDB.RestApi.Client.Sample) solution folder in ksqlDB.RestApi.Client.sln
 
 
 **External dependencies:**
@@ -160,8 +160,10 @@ run in command line:
 
 **AspNet Blazor server side sample:**
 
-In **Blazor Server**, the application logic and UI rendering occur on the server. The client's web browser receives updates and UI changes through a **SignalR** connection. 
-This ensures smooth integration with the `ksqlDB.RestApi.Client` library, allowing the **Kafka broker** and **ksqlDB** to remain hidden from direct exposure to clients.
+In [Blazor](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor), the application logic and UI rendering occur on the server. The client's web browser receives updates and UI changes through a **SignalR** connection.
+This ensures smooth integration with the `ksqlDB.RestApi.Client` library, allowing the **Apache Kafka broker** and **ksqlDB** to remain hidden from direct exposure to clients.
+The **server-side Blazor** application communicates with ksqlDB using the `ksqlDB.RestApi.Client`.
+Whenever an event in `ksqlDB` occurs, the server-side Blazor app responds and signals the UI in the client's browser to update. This setup allows a smooth and continuous update flow, creating a real-time, reactive user interface.
 
 - set `docker-compose.csproj` as startup project in [InsideOut.sln](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/InsideOut) for an embedded Kafka connect integration and stream processing examples.
 
@@ -224,7 +226,7 @@ await host.RunAsync();
 
 # Setting query parameters
 Default settings:
-'auto.offset.reset' is set to 'earliest' by default. 
+'auto.offset.reset' is set to 'earliest' by default.
 New parameters could be added or existing ones changed in the following manner:
 ```C#
 var contextOptions = new KSqlDBContextOptions(@"http://localhost:8088");
@@ -235,7 +237,7 @@ contextOptions.QueryStreamParameters["auto.offset.reset"] = "latest";
 ### Overriding stream names
 Stream names are generated based on the generic record types. They are pluralized with Pluralize.NET package.
 
-**By default the generated from item names such as stream and table names are pluralized**. This behavior could be switched off with the following `ShouldPluralizeStreamName` configuration. 
+**By default the generated from item names such as stream and table names are pluralized**. This behavior could be switched off with the following `ShouldPluralizeStreamName` configuration.
 
 ```C#
 context.CreateQueryStream<Person>();
