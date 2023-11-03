@@ -1,7 +1,12 @@
 # Config
 
 ### KSqlDbContextOptionsBuilder.ReplaceHttpClient
-If you want to use your own or third-party `HttpMessageHandlers`, you can achieve this by following the example below:
+The function `Configure` is an extension method for `IServiceCollection` whose purpose is to set up a `ksqlDB` context.
+The code provided here is for integrating custom or third-party HttpMessageHandlers within your application.
+
+The method `ConfigurePrimaryHttpMessageHandler` accepts a lambda expression which is used to configure the primary `HttpMessageHandler`.
+In the provided code, a new `HttpClientHandler` is created, a client certificate is added to it, and then this `HttpClientHandler` is returned from the lambda.
+
 ```C#
 using System;
 using System.Threading.Tasks;
@@ -33,7 +38,11 @@ private static void Configure(this IServiceCollection serviceCollection, string 
      .AddHttpMessageHandler(_ => new DebugHandler());
   });
 }
+```
 
+This `DebugHandler` class is a custom `HttpMessageHandler` that logs the request URI to the debug output before delegating the request processing to the next handler in the pipeline.
+
+```C#
 internal class DebugHandler : System.Net.Http.DelegatingHandler
 {
   protected override Task<System.Net.Http.HttpResponseMessage> SendAsync(
