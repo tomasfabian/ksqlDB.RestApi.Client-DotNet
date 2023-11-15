@@ -1,5 +1,8 @@
 # ksqlDB.RestApi.Client
 
+# 3.3.0
+- added **net8.0** TFM
+
 # 3.2.2
 - fixed exception in ExtractFieldValue when using generics #48
 
