@@ -67,7 +67,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitWorkflows", "GitWorkflow
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\deploy.yml = .github\workflows\deploy.yml
 		.github\workflows\dotnetblazor.yml = .github\workflows\dotnetblazor.yml
-		.github\workflows\dotnetcore.yml = .github\workflows\dotnetcore.yml
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 		.github\workflows\test-deploy.yml = .github\workflows\test-deploy.yml
 	EndProjectSection
 EndProject
