@@ -1,6 +1,9 @@
 # ksqlDB.RestApi.Client.ProtoBuf
 
-# v2.0.0-rc.1
+# 2.1.0
+- added **net8.0** TFM
+
+# v2.0.0
 Removed not supported **TFM**s:
 - netcoreapp3.1
 - upgraded ksqlDB.RestApi.Client. package dependency
