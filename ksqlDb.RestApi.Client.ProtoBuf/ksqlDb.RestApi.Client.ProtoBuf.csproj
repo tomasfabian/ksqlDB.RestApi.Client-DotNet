@@ -13,8 +13,8 @@
             Documentation for the library can be found at https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/README.md.
         </Description>
 		<PackageTags>ksql ksqlDB ProtoBuf LINQ .NET csharp push query</PackageTags>
-		<Version>2.0.0</Version>
-		<AssemblyVersion>2.0.0.0</AssemblyVersion>
+		<Version>3.0.0</Version>
+		<AssemblyVersion>3.0.0.0</AssemblyVersion>
 		<LangVersion>10.0</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -24,7 +24,7 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="ksqlDb.RestApi.Client" Version="3.0.0" />
+		<PackageReference Include="ksqlDb.RestApi.Client" Version="3.3.0" />
 		<!-- <ProjectReference Include="..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" /> -->
 		<PackageReference Include="protobuf-net" Version="3.2.0" />
 	</ItemGroup>
