@@ -4,18 +4,9 @@ using ksqlDB.RestApi.Client.WorkerService.Models;
 
 namespace ksqlDB.RestApi.Client.WorkerService;
 
-public class Worker : IHostedService
+public class Worker(IMoviesKSqlDbContext context, ILogger<Worker> logger) : IHostedService
 {
-  private readonly IMoviesKSqlDbContext context;
-  private readonly ILogger<Worker> logger;
-
-  public Worker(IMoviesKSqlDbContext context, ILogger<Worker> logger)
-  {
-    this.context = context;
-    this.logger = logger;
-  }
-
-  public  Task StartAsync(CancellationToken cancellationToken)
+  public Task StartAsync(CancellationToken cancellationToken)
   {
     logger.LogInformation("Worker started at: {time}", DateTimeOffset.Now);
 

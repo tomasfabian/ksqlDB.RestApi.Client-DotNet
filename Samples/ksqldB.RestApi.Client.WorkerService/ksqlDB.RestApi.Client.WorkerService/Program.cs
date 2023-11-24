@@ -6,7 +6,7 @@ using ksqlDB.RestApi.Client.WorkerService.ksqlDB;
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
-      var ksqlDbUrl = @"http://ksqldb-server:8088"; // use command ksqlDB.RestApi.Client-DotNet\Samples\ksqlDB.RestApi.Client.Sample> docker-compose up -d
+      var ksqlDbUrl = @"http://ksqldb-server:8088"; // use command ksqlDB.RestApi.Client-DotNet\Samples\ksqlDB.RestApi.Client.Sample> docker compose up -d
 
       services.AddDbContext<IMoviesKSqlDbContext, MoviesKSqlDbContext>(
         options =>
