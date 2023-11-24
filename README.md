@@ -142,7 +142,7 @@ Sample projects can be found under [Samples](https://github.com/tomasfabian/ksql
 **External dependencies:**
 - [kafka broker](https://kafka.apache.org/intro) and [ksqlDB-server](https://ksqldb.io/overview.html) 0.14.0
 - the solution requires [Docker desktop](https://www.docker.com/products/docker-desktop) and Visual Studio 2019
-- [.NET 6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+- [.NET 8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 
 Clone the repository
 ```
