@@ -13,7 +13,7 @@
       SqlServer.Connector is a C# / .NET client API for consuming row-level table changes (CDC - Change Data Capture) from a SQL Server database with the Debezium connector streaming platform.
       With Kafka Connect and Debezium connectors you can stream data to and from Kafka and use it as your integral component of the ETL pipeline or create materialized views (caches) where it is needed, precompute the results of a query and store them for fast read access. See also https://www.nuget.org/packages/ksqlDb.RestApi.Client/
 
-      Targets .NET 5, .NET Core 3.1 and .NET Standard 2.0.
+      Targets .NET 8.0,and .NET Standard 2.0/2.1.
 
       Documentation for the library can be found at https://github.com/tomasfabian/ksqlDb.RestApi.Client-DotNet/blob/main/SqlServer.Connector/README.md. </description>
 		<releaseNotes>https://github.com/tomasfabian/ksqlDb.RestApi.Client-DotNet/blob/main/SqlServer.Connector/ChangeLog.md</releaseNotes>
@@ -21,11 +21,7 @@
 		<tags>Kafka Connect Monitoring SqlServer C# .NET push notifications</tags>
 
 		<dependencies>
-			<group targetFramework=".NETCoreApp3.1">
-				<dependency id="Microsoft.Data.SqlClient" version="3.0" exclude="Build,Analyzers" />
-        <dependency id="ksqlDb.RestApi.Client" version="1.0.0" exclude="Build,Analyzers" />
-			</group>
-			<group targetFramework="net5.0">
+			<group targetFramework="net8.0">
         <dependency id="Microsoft.Data.SqlClient" version="3.0" exclude="Build,Analyzers" />
         <dependency id="ksqlDb.RestApi.Client" version="1.0.0" exclude="Build,Analyzers" />
 			</group>
@@ -40,9 +36,8 @@
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="bin\Release\netstandard2.0\SqlServer.Connector.dll" target="lib\netstandard2.0\SqlServer.Connector.dll" />
- 		<file src="bin\Release\netstandard2.1\SqlServer.Connector.dll" target="lib\netstandard2.1\SqlServer.Connector.dll" />
- 		<file src="bin\Release\netcoreapp3.1\SqlServer.Connector.dll" target="lib\netcoreapp3.1\SqlServer.Connector.dll" />
- 		<file src="bin\Release\net6.0\SqlServer.Connector.dll" target="lib\net6.0\SqlServer.Connector.dll" />
+        <file src="bin\Release\net8.0\SqlServer.Connector.dll" target="lib\net6.0\SqlServer.Connector.dll" />
+        <file src="bin\Release\netstandard2.1\SqlServer.Connector.dll" target="lib\netstandard2.1\SqlServer.Connector.dll" />
+        <file src="bin\Release\netstandard2.0\SqlServer.Connector.dll" target="lib\netstandard2.0\SqlServer.Connector.dll" />
 	</files>
 </package>
