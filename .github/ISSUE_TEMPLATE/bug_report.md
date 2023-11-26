@@ -20,9 +20,9 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Environment (please complete the following information):**
- - ksqldb version: [e.g. 0.19.0]
- - ksqlDB.RestApi.Client nuget package version [e.g. 2.0.0]
- - TFM [e.g. netstandard2.0, netcoreapp3.1, net6.0, etc.]
+ - `ksqlDb` version: [e.g. 0.29.0]
+ - `ksqlDb.RestApi.Client` Nuget package version [e.g. 3.3.0]
+ - TFM [e.g. netstandard2.0, net8.0, etc.]
 
 **Additional context**
 Add any other context about the problem here.
