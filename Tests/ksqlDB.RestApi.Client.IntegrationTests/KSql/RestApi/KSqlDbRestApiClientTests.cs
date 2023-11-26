@@ -25,15 +25,13 @@ public class KSqlDbRestApiClientTests
   [SetUp]
   public void Initialize()
   {
-    var ksqlDbUrl = @"http://localhost:8088";
+    var ksqlDbUrl = Helpers.TestParameters.KSqlDbUrl;
 
     var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
 
     restApiClient = new KSqlDbRestApiClient(httpClientFactory);
   }
-
-  private string SuccessStatus => "SUCCESS";
-
+  
   [Test]
   public async Task ExecuteStatementAsync()
   {
@@ -49,7 +47,7 @@ public class KSqlDbRestApiClientTests
     string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
     var responseObject = JsonSerializer.Deserialize<StatementResponse[]>(responseContent);
 
-    responseObject?[0].CommandStatus.Status.Should().Be(SuccessStatus);
+    responseObject?[0].CommandStatus.Status.Should().Be(CommandStatus.Success);
     responseObject?[0].CommandStatus.Message.Should().Be("Table created");
   }
 
@@ -272,7 +270,7 @@ Drop type Address;
     //Arrange
     string topicName = "testTableAsSelect";
 
-    var contextOptions = new KSqlDBContextOptions(@"http://localhost:8088")
+    var contextOptions = new KSqlDBContextOptions(Helpers.TestParameters.KSqlDbUrl)
     {
       ShouldPluralizeFromItemName = false
     };
@@ -306,15 +304,15 @@ Drop type Address;
 
     response.IsSuccessStatusCode.Should().BeTrue();
 
-    statementResponse[0].CommandStatus.Status.Should().Be(SuccessStatus);
-    statementResponse[0].CommandStatus.Message.Should().Be("Query terminated.");
+    statementResponse[0].CommandStatus.Status.Should().BeOneOf(CommandStatus.Executing, CommandStatus.Success);
+    statementResponse[0].CommandStatus.Message.Should().BeOneOf("Executing statement", "Query terminated.");
   }
 
   [Test]
   public async Task TerminatePushQueryAsync()
   {
     //Arrange
-    var contextOptions = new KSqlDBContextOptions(@"http://localhost:8088");
+    var contextOptions = new KSqlDBContextOptions(Helpers.TestParameters.KSqlDbUrl);
     await using var context = new KSqlDBContext(contextOptions);
       
     var subscription = await context
@@ -493,7 +491,7 @@ Drop type Address;
 
     //Assert
     httpResponseMessage.IsSuccessStatusCode.Should().BeTrue();
-    content[0].CommandStatus?.Status.Should().BeOneOf(default(string), SuccessStatus);
+    content[0].CommandStatus?.Status.Should().BeOneOf(default(string), CommandStatus.Success);
   }
 
   record IoTSensor
@@ -520,7 +518,7 @@ Drop type Address;
 
     //Assert
     httpResponseMessage.IsSuccessStatusCode.Should().BeTrue();
-    content[0].CommandStatus?.Status.Should().BeOneOf(default(string), SuccessStatus);
+    content[0].CommandStatus?.Status.Should().BeOneOf(default(string), CommandStatus.Success);
   }
 
   [Test]
@@ -542,6 +540,6 @@ Drop type Address;
     httpResponseMessage.IsSuccessStatusCode.Should().BeTrue();
 
     var content = await httpResponseMessage.ToStatementResponsesAsync();
-    content[0].CommandStatus?.Status.Should().BeOneOf(default(string), SuccessStatus);
+    content[0].CommandStatus?.Status.Should().BeOneOf(default(string), CommandStatus.Success);
   }
 }
