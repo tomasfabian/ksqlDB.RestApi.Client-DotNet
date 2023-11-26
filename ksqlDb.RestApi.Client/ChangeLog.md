@@ -1,5 +1,8 @@
 # ksqlDB.RestApi.Client
 
+# 3.4.0
+- added `CommandStatus`
+
 # 3.3.0
 - added **net8.0** TFM
 
