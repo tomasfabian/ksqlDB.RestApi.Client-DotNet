@@ -233,7 +233,7 @@ public class KSqlFunctionVisitorStringTests : TestBase
     Assert.Throws<NotSupportedException>(() =>
     {
       //Act
-      var _ = ClassUnderTest.BuildKSql(expression);
+      _ = ClassUnderTest.BuildKSql(expression);
     });
   }
 

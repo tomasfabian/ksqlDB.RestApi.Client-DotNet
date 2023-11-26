@@ -623,7 +623,7 @@ WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;";
   class OrderData
   {
     public int OrderType { get; set; }
-    public string Category { get; set; } = null!;
+    public string Category { get; init; } = null!;
   }
 
   [Test]
@@ -1160,7 +1160,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
   private struct Point
   {
-    public int X { get; set; }
+    public int X { get; init; }
 
     public int Y { get; set; }
   }
@@ -1833,14 +1833,14 @@ WHERE Message LIKE UCASE('%hard') EMIT CHANGES;";
   {
     var location = new Location();
 
-    var case_result = location.Longitude switch
+    var caseResult = location.Longitude switch
     {
-      var value when value < 2.0 => "small",
-      var value when (value <= 4.0) => "medium",
+      < 2.0 => "small",
+      <= 4.0 => "medium",
       _ => "large"
     };
 
-    return case_result;
+    return caseResult;
   }
 
   //TODO:IfElse

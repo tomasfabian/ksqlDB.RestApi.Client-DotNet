@@ -125,8 +125,13 @@ public class KSqlDBContextTests : TestBase
   public void CreateStreamSet_Subscribe_KSqlQueryGenerator()
   {
     //Arrange
-    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDBUrl);
-    contextOptions.QueryStreamParameters["auto.offset.reset"] = "latest";
+    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDBUrl)
+    {
+      QueryStreamParameters =
+      {
+        ["auto.offset.reset"] = "latest"
+      }
+    };
 
     var context = new TestableDbProvider<string>(contextOptions);
 

@@ -10,12 +10,12 @@ public class ChangesCacheTests
 {
   private ChangesCache ClassUnderTest { get; set; } = null!;
 
-  private Mock<IKSqlDbRestApiClient> KSqlDbRestApiClientMock = null!;
+  private Mock<IKSqlDbRestApiClient> kSqlDbRestApiClientMock = null!;
 
   [SetUp]
   public void TestInitialize()
   {
-    KSqlDbRestApiClientMock = new Mock<IKSqlDbRestApiClient>();
+    kSqlDbRestApiClientMock = new Mock<IKSqlDbRestApiClient>();
 
     ClassUnderTest = new ChangesCache();
   }
@@ -28,12 +28,12 @@ public class ChangesCacheTests
     ClassUnderTest.Enqueue(new KSqlDbStatement("Insert 2;"));
 
     //Act
-    var result = await ClassUnderTest.SaveChangesAsync(KSqlDbRestApiClientMock.Object, new CancellationToken());
+    var result = await ClassUnderTest.SaveChangesAsync(kSqlDbRestApiClientMock.Object, new CancellationToken());
 
     //Assert
     string expectedSql = @"Insert 1;
 Insert 2;
 ";
-    KSqlDbRestApiClientMock.Verify(c => c.ExecuteStatementAsync(It.Is<KSqlDbStatement>(c => c.Sql == expectedSql), It.IsAny<CancellationToken>()), Times.Once);
+    kSqlDbRestApiClientMock.Verify(c => c.ExecuteStatementAsync(It.Is<KSqlDbStatement>(c => c.Sql == expectedSql), It.IsAny<CancellationToken>()), Times.Once);
   }
 }

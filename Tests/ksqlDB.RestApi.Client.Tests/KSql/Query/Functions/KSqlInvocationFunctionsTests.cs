@@ -27,11 +27,11 @@ public class KSqlInvocationFunctionsTests : TestBase
   class Tweets
   {
     public int Id { get; set; }
-    public string[] Messages { get; set; } = null!;
-    public int[] Values { get; set; } = null!;
-    public IDictionary<string, int[]> Dictionary { get; set; } = null!;
-    public IDictionary<string, int> Dictionary2 { get; set; } = null!;
-    public IDictionary<string, QbservableGroupByExtensionsTests.City> Dictionary3 { get; set; } = null!;
+    public string[] Messages { get; init; } = null!;
+    public int[] Values { get; init; } = null!;
+    public IDictionary<string, int[]> Dictionary { get; init; } = null!;
+    public IDictionary<string, int> Dictionary2 { get; init; } = null!;
+    public IDictionary<string, QbservableGroupByExtensionsTests.City> Dictionary3 { get; init; } = null!;
   }
 
   #region Array
