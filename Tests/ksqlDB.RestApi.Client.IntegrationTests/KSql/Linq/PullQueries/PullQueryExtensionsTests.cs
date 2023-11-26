@@ -1,12 +1,12 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
-using ksqlDB.Api.Client.IntegrationTests.Models.Sensors;
+using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
+using ksqlDb.RestApi.Client.IntegrationTests.Models.Sensors;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq.PullQueries;
+namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq.PullQueries;
 
 public class PullQueryExtensionsTests
 {

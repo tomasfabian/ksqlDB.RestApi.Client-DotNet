@@ -1,6 +1,6 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.IntegrationTests.Http;
-using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
+using ksqlDb.RestApi.Client.IntegrationTests.Http;
+using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
@@ -10,7 +10,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
+namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq;
 
 public class ComplexTypesTests
 {

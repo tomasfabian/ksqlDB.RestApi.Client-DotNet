@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{AA56
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDb.RestApi.Client.Tests", "Tests\ksqlDB.RestApi.Client.Tests\ksqlDb.RestApi.Client.Tests.csproj", "{1B81259E-59F0-48E1-ACD3-A3DCFCCC5B3E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDB.Api.Client.IntegrationTests", "Tests\ksqlDB.RestApi.Client.IntegrationTests\ksqlDB.Api.Client.IntegrationTests.csproj", "{EE55516C-160D-4715-ADC6-3E76DE3D89E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDb.RestApi.Client.IntegrationTests", "Tests\ksqlDB.RestApi.Client.IntegrationTests\ksqlDb.RestApi.Client.IntegrationTests.csproj", "{EE55516C-160D-4715-ADC6-3E76DE3D89E9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDB.Api.Client.Samples", "Samples\ksqlDB.RestApi.Client.Sample\ksqlDB.Api.Client.Samples.csproj", "{9AD222F8-4535-4297-A4F8-9F40FFA8A133}"
 EndProject
@@ -135,6 +135,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{ED404C96-CAAA-4CAC-ACDE-F3E0D48FB2E3} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}
+		{1B81259E-59F0-48E1-ACD3-A3DCFCCC5B3E} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}
 		{EE55516C-160D-4715-ADC6-3E76DE3D89E9} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}
 		{9AD222F8-4535-4297-A4F8-9F40FFA8A133} = {AA5681E8-1682-47E9-9159-4AE95A92E694}
 		{7462D56C-A4AA-4347-BE2A-A6B0F84BE426} = {08E77D02-0DE4-49A5-ACAB-B6DF7E56D405}

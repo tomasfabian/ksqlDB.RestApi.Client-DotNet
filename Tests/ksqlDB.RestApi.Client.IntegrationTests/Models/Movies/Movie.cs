@@ -1,4 +1,4 @@
-namespace ksqlDB.Api.Client.IntegrationTests.Models.Movies;
+namespace ksqlDb.RestApi.Client.IntegrationTests.Models.Movies;
 
 public record Movie : Record
 {

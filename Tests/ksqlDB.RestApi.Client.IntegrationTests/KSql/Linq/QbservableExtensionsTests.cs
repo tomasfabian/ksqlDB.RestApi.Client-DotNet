@@ -1,8 +1,8 @@
-using System.Reactive.Linq;
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using FluentAssertions;
-using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
-using ksqlDB.Api.Client.IntegrationTests.Models;
+using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
+using ksqlDb.RestApi.Client.IntegrationTests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
@@ -16,7 +16,7 @@ using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;
 using CollectionAssert = NUnit.Framework.CollectionAssert;
 
-namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
+namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq;
 
 public class QbservableExtensionsTests : Infrastructure.IntegrationTests
 {

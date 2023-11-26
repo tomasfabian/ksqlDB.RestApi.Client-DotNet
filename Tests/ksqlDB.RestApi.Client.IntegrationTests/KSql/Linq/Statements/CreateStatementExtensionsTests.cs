@@ -1,13 +1,13 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
-using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
+using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
+using ksqlDb.RestApi.Client.IntegrationTests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq.Statements;
+namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq.Statements;
 
 public class CreateStatementExtensionsTests : Infrastructure.IntegrationTests
 {

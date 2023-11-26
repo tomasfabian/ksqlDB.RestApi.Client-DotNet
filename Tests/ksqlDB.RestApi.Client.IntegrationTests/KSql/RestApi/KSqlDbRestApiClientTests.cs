@@ -2,8 +2,8 @@ using System.Net;
 using System.Reactive.Concurrency;
 using System.Text.Json;
 using FluentAssertions;
-using ksqlDB.Api.Client.IntegrationTests.Http;
-using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
+using ksqlDb.RestApi.Client.IntegrationTests.Http;
+using ksqlDb.RestApi.Client.IntegrationTests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -16,7 +16,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
+namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
 
 public class KSqlDbRestApiClientTests
 {
@@ -25,7 +25,7 @@ public class KSqlDbRestApiClientTests
   [SetUp]
   public void Initialize()
   {
-    var ksqlDbUrl = Helpers.TestParameters.KSqlDbUrl;
+    var ksqlDbUrl = Helpers.TestConfig.KSqlDbUrl;
 
     var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
 
@@ -270,7 +270,7 @@ Drop type Address;
     //Arrange
     string topicName = "testTableAsSelect";
 
-    var contextOptions = new KSqlDBContextOptions(Helpers.TestParameters.KSqlDbUrl)
+    var contextOptions = new KSqlDBContextOptions(Helpers.TestConfig.KSqlDbUrl)
     {
       ShouldPluralizeFromItemName = false
     };
@@ -312,7 +312,7 @@ Drop type Address;
   public async Task TerminatePushQueryAsync()
   {
     //Arrange
-    var contextOptions = new KSqlDBContextOptions(Helpers.TestParameters.KSqlDbUrl);
+    var contextOptions = new KSqlDBContextOptions(Helpers.TestConfig.KSqlDbUrl);
     await using var context = new KSqlDBContext(contextOptions);
       
     var subscription = await context

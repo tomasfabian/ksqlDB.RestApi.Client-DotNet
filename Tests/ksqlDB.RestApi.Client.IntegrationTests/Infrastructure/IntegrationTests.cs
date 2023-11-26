@@ -1,9 +1,9 @@
-using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
+using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 
-namespace ksqlDB.Api.Client.IntegrationTests.Infrastructure;
+namespace ksqlDb.RestApi.Client.IntegrationTests.Infrastructure;
 
 [TestClass]
 public abstract class IntegrationTests : TestBase

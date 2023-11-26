@@ -1,9 +1,9 @@
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-using HttpClientFactory = ksqlDB.Api.Client.IntegrationTests.Http.HttpClientFactory;
+using HttpClientFactory = ksqlDb.RestApi.Client.IntegrationTests.Http.HttpClientFactory;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
-namespace ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
+namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
 
 public class KSqlDbRestApiProvider : KSqlDbRestApiClient
 {

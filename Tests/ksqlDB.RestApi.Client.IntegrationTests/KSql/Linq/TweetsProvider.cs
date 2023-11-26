@@ -1,10 +1,10 @@
 ﻿using System.Globalization;
-using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
-using ksqlDB.Api.Client.IntegrationTests.Models;
+using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
+using ksqlDb.RestApi.Client.IntegrationTests.Models;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
-namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
+namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq;
 
 public class TweetsProvider
 {

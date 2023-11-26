@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace ksqlDB.Api.Client.IntegrationTests.Models;
+namespace ksqlDb.RestApi.Client.IntegrationTests.Models;
 
 public record Tweet : Record
 {

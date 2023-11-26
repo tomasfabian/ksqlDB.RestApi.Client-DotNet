@@ -1,22 +1,22 @@
+using System.Linq.Expressions;
 using System.Net;
 using FluentAssertions;
-using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
-using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
 using ksqlDb.RestApi.Client.DependencyInjection;
+using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
+using ksqlDb.RestApi.Client.IntegrationTests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
-using Microsoft.Extensions.DependencyInjection;
-using System.Linq.Expressions;
 using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Context;
+namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Query.Context;
 
 public class KSqlDbContextTests : Infrastructure.IntegrationTests
 {

@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 
-namespace ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
+namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq;
 
 internal static class HttpResponseMessageExtensions
 {

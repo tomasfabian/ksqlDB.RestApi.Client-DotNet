@@ -1,11 +1,11 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
+using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query.Functions;
+namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Query.Functions;
 
 public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
 {

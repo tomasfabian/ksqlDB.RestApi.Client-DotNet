@@ -1,6 +1,6 @@
 ﻿using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
-namespace ksqlDB.Api.Client.IntegrationTests.Models;
+namespace ksqlDb.RestApi.Client.IntegrationTests.Models;
 
 public record Record
 {

@@ -1,4 +1,4 @@
-namespace ksqlDB.Api.Client.IntegrationTests.Models.Sensors;
+namespace ksqlDb.RestApi.Client.IntegrationTests.Models.Sensors;
 
 public record IoTSensor
 {

@@ -1,11 +1,11 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.IntegrationTests.KSql.Linq;
-using ksqlDB.Api.Client.IntegrationTests.KSql.RestApi;
-using ksqlDB.Api.Client.IntegrationTests.Models.Movies;
+using ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq;
+using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
+using ksqlDb.RestApi.Client.IntegrationTests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.IntegrationTests.KSql.Query;
+namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Query;
 
 public class KSqlLexicalPrecedenceTests : Infrastructure.IntegrationTests
 {
