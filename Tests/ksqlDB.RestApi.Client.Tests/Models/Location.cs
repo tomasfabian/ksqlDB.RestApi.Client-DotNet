@@ -1,4 +1,4 @@
-namespace ksqlDB.Api.Client.Tests.Models;
+namespace ksqlDb.RestApi.Client.Tests.Models;
 
 public class Location
 {

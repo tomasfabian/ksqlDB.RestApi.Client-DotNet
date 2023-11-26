@@ -3,7 +3,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Connectors;
 using NUnit.Framework;
 using UnitTests;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements.Connectors;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements.Connectors;
 
 public class ConnectorGeneratorTests : TestBase
 {

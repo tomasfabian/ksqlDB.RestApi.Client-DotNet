@@ -8,9 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using NUnit.Framework;
-using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
+using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
-namespace ksqlDB.Api.Client.Tests.Mocking;
+namespace ksqlDb.RestApi.Client.Tests.Mocking;
 
 public class TestableKSqlDBContext : KSqlDBContext
 {
@@ -79,7 +79,7 @@ public class KSqlDbTests
   public async Task Subscribe()
   {
     //Arrange
-    var ksqlDbContext = new TestableKSqlDBContext(TestParameters.KsqlDBUrl);
+    var ksqlDbContext = new TestableKSqlDBContext(TestParameters.KsqlDbUrl);
 
     ksqlDbContext.KSqlDbProviderMock
       .Setup(c => c.Run<ElasticSearchEvent>(It.IsAny<QueryStreamParameters>(), It.IsAny<CancellationToken>()))

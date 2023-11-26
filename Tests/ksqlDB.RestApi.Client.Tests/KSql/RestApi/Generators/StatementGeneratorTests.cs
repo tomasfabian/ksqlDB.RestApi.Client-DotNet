@@ -1,12 +1,12 @@
 ﻿using FluentAssertions;
-using ksqlDB.Api.Client.Tests.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Generators;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators;
 
 public class StatementGeneratorTests
 {    

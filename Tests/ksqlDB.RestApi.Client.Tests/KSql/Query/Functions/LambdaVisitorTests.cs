@@ -6,7 +6,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Visitors;
 using NUnit.Framework;
 using UnitTests;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Functions;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Functions;
 
 public class LambdaVisitorTests : TestBase
 {

@@ -1,12 +1,12 @@
-﻿using ksqlDB.Api.Client.Tests.Helpers;
-using ksqlDB.RestApi.Client.KSql.Query.Context;
+﻿using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
+using ksqlDb.RestApi.Client.Tests.Helpers;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 
 internal static class TestKSqlDBContextOptions
 {
-  public static readonly KSqlDBContextOptions Instance = new (TestParameters.KsqlDBUrl)
+  public static readonly KSqlDBContextOptions Instance = new (TestParameters.KsqlDbUrl)
   {
     JsonSerializerOptions =
       KSqlDbJsonSerializerOptions.CreateInstance()

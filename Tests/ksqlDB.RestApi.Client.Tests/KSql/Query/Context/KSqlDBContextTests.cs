@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -11,13 +10,14 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+using ksqlDb.RestApi.Client.Tests.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using UnitTests;
-using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
+using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Context;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Context;
 
 public class KSqlDBContextTests : TestBase
 {
@@ -25,7 +25,7 @@ public class KSqlDBContextTests : TestBase
   public void CreateQueryStream_Subscribe_KSqlDbProvidersRunWasCalled()
   {
     //Arrange
-    var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
     //Act
     using var subscription = context.CreateQueryStream<string>().Subscribe(_ => {});
@@ -39,7 +39,7 @@ public class KSqlDBContextTests : TestBase
   public void CreateStreamSet_Subscribe_QueryOptionsWereTakenFromContext()
   {
     //Arrange
-    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDBUrl)
+    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
     {
       QueryStreamParameters =
       {
@@ -60,7 +60,7 @@ public class KSqlDBContextTests : TestBase
   public void WithOffsetResetPolicy_Subscribe_QueryOptionsWereTakenFromContext()
   {
     //Arrange
-    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDBUrl);
+    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDbUrl);
 
     var context = new TestableDbProvider<string>(contextOptions)
     {
@@ -80,7 +80,7 @@ public class KSqlDBContextTests : TestBase
   public void SetAutoOffsetReset_Subscribe_ProcessingGuarantee()
   {
     //Arrange
-    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDBUrl);
+    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDbUrl);
     contextOptions.SetAutoOffsetReset(AutoOffsetReset.Latest); 
 
     var context = new TestableDbProvider<string>(contextOptions);
@@ -96,7 +96,7 @@ public class KSqlDBContextTests : TestBase
   public void CreateStreamSet_Subscribe_ProcessingGuarantee()
   {
     //Arrange
-    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDBUrl);
+    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDbUrl);
     contextOptions.SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce); 
 
     var context = new TestableDbProvider<string>(contextOptions);
@@ -112,7 +112,7 @@ public class KSqlDBContextTests : TestBase
   public void CreateStreamSet_CalledMultipleTimes_KSqlQueryGeneratorBuildKSqlWasNotCalled()
   {
     //Arrange
-    var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
     //Act
     using var subscription = context.CreateQueryStream<string>().Subscribe(_ => {});
@@ -125,7 +125,7 @@ public class KSqlDBContextTests : TestBase
   public void CreateStreamSet_Subscribe_KSqlQueryGenerator()
   {
     //Arrange
-    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDBUrl)
+    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
     {
       QueryStreamParameters =
       {
@@ -146,7 +146,7 @@ public class KSqlDBContextTests : TestBase
   public async Task DisposeAsync_ServiceProviderIsNull_ContextWasDisposed()
   {
     //Arrange
-    var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
     //Act
     await context.DisposeAsync().ConfigureAwait(false);
@@ -159,7 +159,7 @@ public class KSqlDBContextTests : TestBase
   public async Task DisposeAsync_ServiceProviderWasBuilt_ContextWasDisposed()
   {
     //Arrange
-    var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
     context.CreateQueryStream<string>();
 
     //Act
@@ -181,7 +181,7 @@ public class KSqlDBContextTests : TestBase
       [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
     };
 
-    var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
     //Act
     var source = context.CreateQueryStream<string>(queryStreamParameters);
@@ -202,7 +202,7 @@ public class KSqlDBContextTests : TestBase
       [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
     };
 
-    var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
     //Act
     var source = context.CreateQuery<string>(queryParameters);
@@ -215,7 +215,7 @@ public class KSqlDBContextTests : TestBase
   public async Task AddAndSaveChangesAsync()
   {
     //Arrange
-    var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
       
     var entity = new Tweet();
     context.KSqlDbRestApiClientMock.Setup(c => c.ToInsertStatement(It.IsAny<InsertValues<Tweet>>(), null)).Returns(new KSqlDbStatement("Insert Into"));
@@ -233,7 +233,7 @@ public class KSqlDBContextTests : TestBase
   public void AddTwice_SaveChangesAsyncWasNotCalled()
   {
     //Arrange
-    var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
     var entity = new Tweet();
     context.KSqlDbRestApiClientMock.Setup(c => c.ToInsertStatement(It.IsAny<InsertValues<Tweet>>(), null)).Returns(new KSqlDbStatement("Insert Into"));
       
@@ -252,7 +252,7 @@ public class KSqlDBContextTests : TestBase
   public void Add_InsertValues_WereCached()
   {
     //Arrange
-    var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
     var entity = new Tweet();
     var insertValues = new InsertValues<Tweet>(entity);
@@ -269,7 +269,7 @@ public class KSqlDBContextTests : TestBase
   public void AddWithInsertProperties()
   {
     //Arrange
-    var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl); 
+    var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl); 
     var entity = new Tweet();
     var insertProperties = new InsertProperties();
 
@@ -284,7 +284,7 @@ public class KSqlDBContextTests : TestBase
   public async Task NothingWasAdded_SaveChangesAsync_WasNotCalled()
   {
     //Arrange
-    var context = new TestableDbProvider<string>(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
       
     //Act
     var response = await context.SaveChangesAsync();
@@ -297,7 +297,7 @@ public class KSqlDBContextTests : TestBase
   public void CreateQueryAndCreateQueryStreamShouldNotInfluenceEachOther()
   {
     //Arrange
-    var context = new KSqlDBContext(TestParameters.KsqlDBUrl);
+    var context = new KSqlDBContext(TestParameters.KsqlDbUrl);
 
     _ = context.CreateQuery<int>();
     _ = context.CreateQueryStream<int>();
@@ -317,7 +317,7 @@ public class KSqlDBContextTests : TestBase
   public void CreateQueryStreamAndCreateQueryShouldNotInfluenceEachOther()
   {
     //Arrange
-    var context = new KSqlDBContext(TestParameters.KsqlDBUrl);
+    var context = new KSqlDBContext(TestParameters.KsqlDbUrl);
 
     _ = context.CreateQueryStream<int>();
     _ = context.CreateQuery<int>();

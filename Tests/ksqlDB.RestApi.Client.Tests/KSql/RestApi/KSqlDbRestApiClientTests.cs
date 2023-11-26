@@ -1,23 +1,23 @@
+using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Fakes.Logging;
-using ksqlDB.Api.Client.Tests.Models.Movies;
 using ksqlDb.RestApi.Client.Infrastructure.Logging;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Moq.Protected;
-using System.Linq.Expressions;
 using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
+using ksqlDb.RestApi.Client.Tests.Fakes.Logging;
+using ksqlDb.RestApi.Client.Tests.Models.Movies;
+using Microsoft.Extensions.Logging;
+using Moq;
+using Moq.Protected;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 
 public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 {

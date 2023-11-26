@@ -1,4 +1,4 @@
-namespace ksqlDB.Api.Client.Tests.Models.Sensors;
+namespace ksqlDb.RestApi.Client.Tests.Models.Sensors;
 
 public class IoTSensorStats
 {

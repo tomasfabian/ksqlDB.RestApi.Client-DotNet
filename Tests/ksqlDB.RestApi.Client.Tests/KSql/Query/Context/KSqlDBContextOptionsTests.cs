@@ -7,9 +7,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 using UnitTests;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
-using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
+using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Context;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Context;
 
 public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
 {
@@ -18,7 +18,7 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
   {
     base.TestInitialize();
 
-    ClassUnderTest = new KSqlDBContextOptions(TestParameters.KsqlDBUrl);
+    ClassUnderTest = new KSqlDBContextOptions(TestParameters.KsqlDbUrl);
   }
 
   [Test]
@@ -30,7 +30,7 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
     var url = ClassUnderTest.Url;
 
     //Assert
-    url.Should().Be(TestParameters.KsqlDBUrl);
+    url.Should().Be(TestParameters.KsqlDbUrl);
   }
     
   [Test]
@@ -157,7 +157,7 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
     //Assert
     string expectedValue = "at_least_once";
       
-    ClassUnderTest.Url.Should().Be(TestParameters.KsqlDBUrl);
+    ClassUnderTest.Url.Should().Be(TestParameters.KsqlDbUrl);
 
     clone.QueryParameters[parameterName].Should().Be(expectedValue);
     clone.QueryStreamParameters[parameterName].Should().Be(expectedValue);

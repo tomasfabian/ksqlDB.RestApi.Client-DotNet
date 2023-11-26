@@ -4,7 +4,7 @@ using NUnit.Framework;
 using UnitTests;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
-namespace ksqlDB.Api.Client.Tests.Disposables;
+namespace ksqlDb.RestApi.Client.Tests.Disposables;
 
 public class AsyncDisposableObjectTests : TestBase<AsyncDisposableObjectTests.TestableAsyncDisposableObject>
 {

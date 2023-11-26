@@ -1,6 +1,6 @@
 ﻿using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 
 internal class MapResultsKsqlDbQueryStreamProvider : TestableKSqlDbQueryStreamProvider
 {

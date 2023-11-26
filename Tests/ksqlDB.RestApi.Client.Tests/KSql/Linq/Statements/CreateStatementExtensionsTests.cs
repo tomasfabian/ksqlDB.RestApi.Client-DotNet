@@ -1,16 +1,16 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Models;
-using ksqlDB.Api.Client.Tests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDb.RestApi.Client.Tests.Models;
+using ksqlDb.RestApi.Client.Tests.Models.Movies;
 using NUnit.Framework;
 using UnitTests;
-using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
+using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Linq.Statements;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Linq.Statements;
 
 public class CreateStatementExtensionsTests : TestBase
 {
@@ -23,7 +23,7 @@ public class CreateStatementExtensionsTests : TestBase
   {
     base.TestInitialize();
 
-    DbProvider = new TestableDbProvider(TestParameters.KsqlDBUrl, StatementResponse);
+    DbProvider = new TestableDbProvider(TestParameters.KsqlDbUrl, StatementResponse);
   }
 
   private const string StreamName = "TestStream";

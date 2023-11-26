@@ -3,12 +3,11 @@ using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 using UnitTests;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 
 public class RowValueJsonSerializerTests : TestBase
 {

@@ -1,14 +1,14 @@
 using System.Linq.Expressions;
-using ksqlDB.RestApi.Client.KSql.Query.Visitors;
 using System.Text;
-using ksqlDB.Api.Client.Tests.Models;
 using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Linq;
-using ksqlDB.RestApi.Client.KSql.Query.Operators;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Operators;
+using ksqlDB.RestApi.Client.KSql.Query.Visitors;
+using ksqlDb.RestApi.Client.Tests.Models;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Visitors;
 
 public class MethodCallVisitorTests
 {

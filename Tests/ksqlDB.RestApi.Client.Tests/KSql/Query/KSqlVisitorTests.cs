@@ -1,15 +1,15 @@
 using System.Linq.Expressions;
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
+using ksqlDb.RestApi.Client.Tests.Models;
 using NUnit.Framework;
 using UnitTests;
-using Location = ksqlDB.Api.Client.Tests.Models.Location;
+using Location = ksqlDb.RestApi.Client.Tests.Models.Location;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query;
 
 public class KSqlVisitorTests : TestBase
 {

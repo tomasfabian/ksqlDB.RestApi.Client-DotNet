@@ -8,9 +8,9 @@ using NUnit.Framework;
 using UnitTests;
 using static System.String;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
-using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
+using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Context.Options;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Context.Options;
 
 public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBuilder>
 {
@@ -54,10 +54,10 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     //Arrange
 
     //Act
-    var options = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl).Options;
+    var options = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl).Options;
 
     //Assert
-    options.Url.Should().BeEquivalentTo(TestParameters.KsqlDBUrl);
+    options.Url.Should().BeEquivalentTo(TestParameters.KsqlDbUrl);
   }
 
   [Test]
@@ -68,7 +68,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     string password = "letmein";
 
     //Act
-    var options = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl)
+    var options = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl)
       .SetBasicAuthCredentials(userName, password).Options;
 
     //Assert
@@ -83,7 +83,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     //Arrange
 
     //Act
-    var options = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl).Options;
+    var options = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl).Options;
 
     //Assert
     options.UseBasicAuth.Should().BeFalse();
@@ -95,7 +95,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
   public void SetProcessingGuarantee()
   {
     //Arrange
-    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl);
+    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
 
     //Act
     var options = setupParameters.SetProcessingGuarantee(ProcessingGuarantee.AtLeastOnce).Options;
@@ -109,7 +109,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
   public void SetProcessingGuarantee_ThenSetupQueryStream()
   {
     //Arrange
-    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl)
+    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl)
       .SetProcessingGuarantee(ProcessingGuarantee.AtLeastOnce);
 
     //Act
@@ -129,7 +129,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     //Arrange
     var autoOffsetReset = AutoOffsetReset.Latest;
 
-    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl);
+    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
 
     //Act
     var options = setupParameters
@@ -145,7 +145,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
   public void SetJsonSerializerOptions_DefaultPropertyNameCaseInsensitiveIsTrue()
   {
     //Arrange
-    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl);
+    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
 
     //Act
     var options = setupParameters.Options;
@@ -158,7 +158,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
   public void SetJsonSerializerOptions()
   {
     //Arrange
-    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl);
+    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
 
     //Act
     var options = setupParameters
@@ -174,7 +174,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
   public void SetupQueryStream_OptionsQueryStreamParameters_AutoOffsetResetIsSetToDefault()
   {
     //Arrange
-    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl);
+    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
 
     //Act
     var options = setupParameters.SetupQueryStream(c =>
@@ -190,7 +190,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
   public void SetupQueryStreamNotCalled_OptionsQueryStreamParameters_AutoOffsetResetIsSetToDefault()
   {
     //Arrange
-    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl);
+    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
     string earliestAtoOffsetReset = AutoOffsetReset.Earliest.ToString().ToLower();
 
     //Act
@@ -204,7 +204,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
   public void SetupQueryStream_AmendOptionsQueryStreamParametersProperty_AutoOffsetResetWasChanged()
   {
     //Arrange
-    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl);
+    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
     string latestAtoOffsetReset = AutoOffsetReset.Latest.ToString().ToLower();
 
     //Act
@@ -225,7 +225,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
   public void SetupQuery_OptionsQueryParameters_AutoOffsetResetIsSetToDefault()
   {
     //Arrange
-    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl);
+    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
 
     //Act
     var options = setupParameters.SetupQuery(c =>
@@ -241,7 +241,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
   public void SetupQueryNotCalled_OptionsQueryParameters_AutoOffsetResetIsSetToDefault()
   {
     //Arrange
-    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl);
+    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
     string earliestAtoOffsetReset = AutoOffsetReset.Earliest.ToString().ToLower();
 
     //Act
@@ -255,7 +255,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
   public void SetupQuery_AmendOptionsQueryParametersProperty_AutoOffsetResetWasChanged()
   {
     //Arrange
-    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDBUrl);
+    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
     string latestAtoOffsetReset = AutoOffsetReset.Latest.ToString().ToLower();
 
     //Act

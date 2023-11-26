@@ -3,7 +3,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Generators;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators;
 
 public class TypeGeneratorTests
 {

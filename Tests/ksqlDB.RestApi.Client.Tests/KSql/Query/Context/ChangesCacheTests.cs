@@ -4,7 +4,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using Moq;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Context;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Context;
 
 public class ChangesCacheTests
 {

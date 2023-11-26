@@ -1,6 +1,6 @@
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
-namespace ksqlDB.Api.Client.Tests.Models.Movies;
+namespace ksqlDb.RestApi.Client.Tests.Models.Movies;
 
 public class Movie
 { 

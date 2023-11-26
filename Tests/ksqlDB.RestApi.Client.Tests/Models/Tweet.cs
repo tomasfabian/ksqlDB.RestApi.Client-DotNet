@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using ksqlDB.RestApi.Client.KSql.Query;
 
-namespace ksqlDB.Api.Client.Tests.Models;
+namespace ksqlDb.RestApi.Client.Tests.Models;
 
 public class Tweet : Record
 {

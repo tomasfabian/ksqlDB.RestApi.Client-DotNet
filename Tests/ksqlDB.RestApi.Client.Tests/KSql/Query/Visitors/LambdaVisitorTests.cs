@@ -1,14 +1,12 @@
-﻿using ksqlDB.RestApi.Client.KSql.Query.Functions;
-
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
-
-using Models;
-using ksqlDB.RestApi.Client.KSql.Query.Visitors;
-using NUnit.Framework;
-using FluentAssertions;
-using System;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Text;
+using FluentAssertions;
+using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Visitors;
+using ksqlDb.RestApi.Client.Tests.Models;
+using NUnit.Framework;
+
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Visitors;
 
 public class LambdaVisitorTests
 {

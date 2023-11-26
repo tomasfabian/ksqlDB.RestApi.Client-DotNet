@@ -2,7 +2,7 @@
 using ksqlDB.RestApi.Client.KSql.Config;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Config;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Config;
 
 public class KSqlDbConfigsTests
 {

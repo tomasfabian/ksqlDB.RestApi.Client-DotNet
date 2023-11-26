@@ -8,7 +8,7 @@ using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.Infrastructure.Extensions;
+namespace ksqlDb.RestApi.Client.Tests.Infrastructure.Extensions;
 
 public class TypeExtensionsTests
 {

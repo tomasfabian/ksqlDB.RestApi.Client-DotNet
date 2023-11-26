@@ -1,4 +1,4 @@
-﻿namespace ksqlDB.Api.Client.Tests.Helpers.Http;
+﻿namespace ksqlDb.RestApi.Client.Tests.Helpers.Http;
 
 internal class IsDisposedHttpClient : HttpClient
 {

@@ -3,7 +3,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using NUnit.Framework;
 using UnitTests;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Http;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Http;
 
 public class BasicAuthHandlerTests : TestBase
 {

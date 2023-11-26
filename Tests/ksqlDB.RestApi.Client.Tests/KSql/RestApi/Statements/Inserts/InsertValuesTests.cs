@@ -4,7 +4,7 @@ using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements.Inserts;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements.Inserts;
 
 public class InsertValuesTests
 {

@@ -36,7 +36,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="ksqlDB.Api.Client.Tests" />
+        <InternalsVisibleTo Include="ksqlDB.RestApi.Client.Tests" />
         <InternalsVisibleTo Include="ksqlDB.Api.Client.IntegrationTests" />
         <InternalsVisibleTo Include="ksqlDB.RestApi.Client.ProtoBuf" />
         <InternalsVisibleTo Include="ksqlDB.RestApi.Client.ProtoBuf.Tests" />

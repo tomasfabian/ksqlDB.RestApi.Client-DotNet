@@ -1,13 +1,13 @@
 using System.Globalization;
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+using ksqlDb.RestApi.Client.Tests.Models.Movies;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements;
 
 public class CreateInsertTests
 {

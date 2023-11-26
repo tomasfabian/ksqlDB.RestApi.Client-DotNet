@@ -4,7 +4,7 @@ using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Visitors;
 
 public class BinaryVisitorTests
 {

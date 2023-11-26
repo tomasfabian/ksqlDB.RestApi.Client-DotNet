@@ -1,12 +1,12 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Models.Sensors;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDb.RestApi.Client.Tests.Models.Sensors;
 using NUnit.Framework;
 using UnitTests;
-using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
+using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Linq.PullQueries;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Linq.PullQueries;
 
 public class PullQueryExtensionsTests : TestBase
 {
@@ -18,7 +18,7 @@ public class PullQueryExtensionsTests : TestBase
   [SetUp]
   public void SetUp()
   {
-    DbProvider = new TestableDbProvider(TestParameters.KsqlDBUrl, PullQueryResponse);
+    DbProvider = new TestableDbProvider(TestParameters.KsqlDbUrl, PullQueryResponse);
   }
 
   [Test]

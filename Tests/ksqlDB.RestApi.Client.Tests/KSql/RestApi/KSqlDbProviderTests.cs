@@ -1,15 +1,15 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Fakes.Logging;
-using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+using ksqlDb.RestApi.Client.Tests.Fakes.Logging;
+using ksqlDb.RestApi.Client.Tests.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Ninject;
 using NUnit.Framework;
 using UnitTests;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 
 public class KSqlDbProviderTests : TestBase
 {  

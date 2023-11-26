@@ -1,14 +1,14 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
+using ksqlDb.RestApi.Client.Tests.Models.Movies;
 using NUnit.Framework;
 using UnitTests;
-using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
+using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Visitors;
 
 public class JoinVisitorTests : TestBase
 {
@@ -19,7 +19,7 @@ public class JoinVisitorTests : TestBase
   {
     base.TestInitialize();
 
-    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDBUrl);
+    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDbUrl);
     KSqlDBContext = new KSqlDBContext(contextOptions);
   }
 

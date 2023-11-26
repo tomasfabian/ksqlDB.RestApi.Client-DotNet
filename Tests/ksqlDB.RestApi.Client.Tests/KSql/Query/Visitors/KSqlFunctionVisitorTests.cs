@@ -1,13 +1,13 @@
 using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
+using ksqlDb.RestApi.Client.Tests.Models;
 using NUnit.Framework;
 using UnitTests;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Visitors;
 
 public class KSqlFunctionVisitorTests : TestBase
 {

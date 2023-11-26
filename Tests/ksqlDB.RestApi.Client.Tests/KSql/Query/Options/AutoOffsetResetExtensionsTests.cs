@@ -2,7 +2,7 @@ using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Options;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Options;
 
 public class AutoOffsetResetExtensionsTests
 {

@@ -1,21 +1,21 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.KSql.Query.Context;
-using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
+using ksqlDb.RestApi.Client.Tests.KSql.Query.Context;
+using ksqlDb.RestApi.Client.Tests.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Reactive.Testing;
 using Moq;
 using NUnit.Framework;
 using UnitTests;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
-using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
+using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Linq;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Linq;
 
 public class QbservableExtensionsTests : TestBase
 {
@@ -225,7 +225,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
   public void ToQueryString_BuildKSqlOnDerivedClass_PrintsQuery()
   {
     //Arrange
-    var context = new TestableDbProviderExt(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProviderExt(TestParameters.KsqlDbUrl);
     var query = context.CreateTweetsStreamSet();
 
     //Act
@@ -239,7 +239,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
   public async Task ToAsyncEnumerable_Query_KSqldbProviderRunWasCalled()
   {
     //Arrange
-    var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
     context.KSqlDbProviderMock.Setup(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
       .Returns(GetTestValues);
     var query = context.CreateQueryStream<string>();
@@ -274,7 +274,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
   public void ToObservable_QueryShouldBeDeferred_KSqlDbProviderRunWasNotCalled()
   {
     //Arrange
-    var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
       
     var query = context.CreateQueryStream<string>();
 
@@ -293,7 +293,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     //Arrange
     CancellationToken cancellationToken = default;
 
-    var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
     context.KSqlDbProviderMock.Setup(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
       .Callback<object, CancellationToken>((par, ct) => { cancellationToken = ct; })
       .Returns(GetTestValues);
@@ -406,14 +406,14 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
 
   private IQbservable<Location> CreateStreamSource()
   {
-    var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
       
     return context.CreateQueryStream<Location>();
   }
 
   private IQbservable<string> CreateTestableKStreamSet()
   {
-    var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
       
     context.KSqlDbProviderMock.Setup(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
       .Returns(GetTestValues);
@@ -444,7 +444,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
   public void WhereIsNotNull_BuildKSql_PrintsQuery()
   {
     //Arrange
-    var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
 
     var grouping = context.CreateQueryStream<Click>()
       .Where(c => c.IP_ADDRESS != null)
@@ -464,7 +464,7 @@ WHERE IP_ADDRESS IS NOT NULL EMIT CHANGES;";
   public void WhereIsNull_BuildKSql_PrintsQuery()
   {
     //Arrange
-    var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
 
     var grouping = context.CreateQueryStream<Click>()
       .Where(c => c.IP_ADDRESS == null)
@@ -489,7 +489,7 @@ WHERE IP_ADDRESS IS NULL EMIT CHANGES;";
   public void Where_GenericType_PropertyAccess()
   {
     //Arrange
-    var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
     string tableName = "my_table";
     Guid uniqueId = Guid.NewGuid();
 

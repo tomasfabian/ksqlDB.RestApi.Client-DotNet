@@ -1,16 +1,16 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.KSql.Query.Context;
-using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
+using ksqlDb.RestApi.Client.Tests.KSql.Query.Context;
+using ksqlDb.RestApi.Client.Tests.Models;
 using NUnit.Framework;
 using UnitTests;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
-using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
+using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Linq;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Linq;
 
 public class QbservableExtensionsWindowsTests : TestBase
 {
@@ -18,7 +18,7 @@ public class QbservableExtensionsWindowsTests : TestBase
   public void GroupByAndCount_BuildKSql_PrintsQueryWithWindowSession()
   {
     //Arrange
-    var context = new TransactionsDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
     var grouping = context.CreateQueryStream<Transaction>()
       .GroupBy(c => c.CardNumber)
@@ -36,7 +36,7 @@ public class QbservableExtensionsWindowsTests : TestBase
   public void GroupByAndCount_BuildKSql_PrintsQueryWithHoppingWindow()
   {
     //Arrange
-    var context = new TransactionsDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
     var grouping = context.CreateQueryStream<Transaction>()
       .GroupBy(c => c.CardNumber)
@@ -54,7 +54,7 @@ public class QbservableExtensionsWindowsTests : TestBase
   public void WindowStartAndEnd_BuildKSql_PrintsQueryWithHoppingWindow()
   {
     //Arrange
-    var context = new TransactionsDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
     var grouping = context.CreateQueryStream<Transaction>()
       .GroupBy(c => c.CardNumber)
@@ -72,7 +72,7 @@ public class QbservableExtensionsWindowsTests : TestBase
   public void GroupByAndCount_BuildKSql_PrintsQueryWithHoppingWindowAdvanceBy()
   {
     //Arrange
-    var context = new TransactionsDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
     var grouping = context.CreateQueryStream<Transaction>()
       .GroupBy(c => c.CardNumber)
@@ -90,7 +90,7 @@ public class QbservableExtensionsWindowsTests : TestBase
   public void GroupByAndCount_BuildKSql_PrintsQueryWithHoppingWindowRetention()
   {
     //Arrange
-    var context = new TransactionsDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
     var grouping = context.CreateQueryStream<Transaction>()
       .GroupBy(c => c.CardNumber)
@@ -108,7 +108,7 @@ public class QbservableExtensionsWindowsTests : TestBase
   public void AdvanceByIsBiggerThenWindowSize_BuildKSql_Throws()
   {
     //Arrange
-    var context = new TransactionsDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
     //Assert
     Assert.ThrowsException<InvalidOperationException>(() =>
@@ -125,7 +125,7 @@ public class QbservableExtensionsWindowsTests : TestBase
   public void GroupByAndCount_BuildKSql_PrintsQueryWithTumblingWindow()
   {
     //Arrange
-    var context = new TransactionsDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
     var grouping = context.CreateQueryStream<Transaction>()
       .GroupBy(c => c.CardNumber)
@@ -143,7 +143,7 @@ public class QbservableExtensionsWindowsTests : TestBase
   public void FinalRefinement_BuildKSql_PrintsQueryWithEmitFinal()
   {
     //Arrange
-    var context = new TransactionsDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
     var grouping = context.CreateQueryStream<Transaction>()
       .GroupBy(c => c.CardNumber)
@@ -161,7 +161,7 @@ public class QbservableExtensionsWindowsTests : TestBase
   public void GroupByAndCount_BuildKSql_PrintsQueryWithTumblingWindowAndGracePeriod()
   {
     //Arrange
-    var context = new TransactionsDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
     var grouping = context.CreateQueryStream<Transaction>()
       .GroupBy(c => c.CardNumber)
@@ -179,7 +179,7 @@ public class QbservableExtensionsWindowsTests : TestBase
   public void QueriesFromSameCreateStreamSetShouldNotAffectEachOther()
   {
     //Arrange
-    var options = new KSqlDBContextOptions(TestParameters.KsqlDBUrl)
+    var options = new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
     {
       ShouldPluralizeFromItemName = false
     };

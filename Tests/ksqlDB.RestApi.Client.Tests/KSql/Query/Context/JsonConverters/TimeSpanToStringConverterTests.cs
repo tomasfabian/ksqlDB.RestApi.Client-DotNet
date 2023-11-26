@@ -1,11 +1,11 @@
 using System.Text.Json;
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context.JsonConverters;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
+using ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Context.JsonConverters;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Context.JsonConverters;
 
 public class TimeSpanToStringConverterTests
 {

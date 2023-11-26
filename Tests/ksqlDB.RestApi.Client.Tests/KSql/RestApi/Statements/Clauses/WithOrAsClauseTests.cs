@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements.Clauses;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements.Clauses;
 
 public class WithOrAsClauseTests
 {

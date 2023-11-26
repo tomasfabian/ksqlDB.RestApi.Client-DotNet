@@ -8,7 +8,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using NUnit.Framework;
 using Pluralize.NET;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Statements;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements;
 
 public class CreateEntityTests
 {

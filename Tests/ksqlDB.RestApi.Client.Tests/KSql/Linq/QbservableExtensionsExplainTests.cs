@@ -1,17 +1,17 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Fakes.Http;
-using ksqlDB.Api.Client.Tests.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDb.RestApi.Client.Tests.Fakes.Http;
+using ksqlDb.RestApi.Client.Tests.KSql.Query.Context;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using UnitTests;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
-using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
+using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Linq;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Linq;
 
 public class QbservableExtensionsExplainTests : TestBase
 {
@@ -25,7 +25,7 @@ public class QbservableExtensionsExplainTests : TestBase
 
     Mock.Get(httpClientFactory).Setup(c => c.CreateClient()).Returns(() => httpClient);
 
-    dbProvider = new TestableDbProviderForExplain(TestParameters.KsqlDBUrl, httpClientFactory);
+    dbProvider = new TestableDbProviderForExplain(TestParameters.KsqlDbUrl, httpClientFactory);
   }
 
   private readonly string response =

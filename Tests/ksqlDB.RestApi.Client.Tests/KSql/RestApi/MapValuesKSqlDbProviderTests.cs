@@ -4,7 +4,7 @@ using Ninject;
 using NUnit.Framework;
 using UnitTests;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 
 public class MapValuesKSqlDbProviderTests : TestBase
 {

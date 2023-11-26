@@ -1,8 +1,5 @@
 using System.Text.Json.Serialization;
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.KSql.Linq;
-using ksqlDB.Api.Client.Tests.KSql.RestApi.Statements;
-using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -10,12 +7,15 @@ using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Formats;
+using ksqlDb.RestApi.Client.Tests.KSql.Linq;
+using ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements;
+using ksqlDb.RestApi.Client.Tests.Models;
 using NUnit.Framework;
 using UnitTests;
-using Location = ksqlDB.Api.Client.Tests.Models.Location;
-using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
+using Location = ksqlDb.RestApi.Client.Tests.Models.Location;
+using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query;
 
 public class KSqlQueryLanguageVisitorTests : TestBase
 {
@@ -31,7 +31,7 @@ public class KSqlQueryLanguageVisitorTests : TestBase
   {
     base.TestInitialize();
 
-    contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDBUrl);
+    contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDbUrl);
     queryContext = new QueryContext();
     ClassUnderTest = new KSqlQueryGenerator(contextOptions);
   }

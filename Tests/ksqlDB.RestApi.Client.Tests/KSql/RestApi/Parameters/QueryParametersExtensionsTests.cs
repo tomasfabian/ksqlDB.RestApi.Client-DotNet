@@ -4,7 +4,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Parameters;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Parameters;
 
 public class QueryParametersExtensionsTests
 {

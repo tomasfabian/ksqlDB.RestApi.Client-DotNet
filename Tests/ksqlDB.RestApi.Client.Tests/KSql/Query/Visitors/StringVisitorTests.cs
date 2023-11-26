@@ -1,12 +1,10 @@
-﻿using FluentAssertions;
-
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors;
-
+﻿using System.Linq.Expressions;
+using System.Text;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
 using NUnit.Framework;
-using System.Linq.Expressions;
-using System;
-using System.Text;
+
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Visitors;
 
 public class StringVisitorTests
 {

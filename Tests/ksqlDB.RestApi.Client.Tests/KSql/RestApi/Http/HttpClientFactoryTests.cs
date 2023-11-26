@@ -2,9 +2,9 @@ using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using NUnit.Framework;
 using UnitTests;
-using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
+using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Http;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Http;
 
 public class HttpClientFactoryTests : TestBase
 {
@@ -14,7 +14,7 @@ public class HttpClientFactoryTests : TestBase
     //Arrange
     var httpClient = new HttpClient()
     {
-      BaseAddress = new Uri(TestParameters.KsqlDBUrl)
+      BaseAddress = new Uri(TestParameters.KsqlDbUrl)
     };
 
     var httpClientFactory = new HttpClientFactory(httpClient);
@@ -25,6 +25,6 @@ public class HttpClientFactoryTests : TestBase
     //Assert
     receivedHttpClient.Should().BeSameAs(httpClient);
     receivedHttpClient.Should().BeOfType<HttpClient>();
-    receivedHttpClient.BaseAddress!.OriginalString.Should().BeEquivalentTo(TestParameters.KsqlDBUrl);
+    receivedHttpClient.BaseAddress!.OriginalString.Should().BeEquivalentTo(TestParameters.KsqlDbUrl);
   }
 }

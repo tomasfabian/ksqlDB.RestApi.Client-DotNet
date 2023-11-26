@@ -2,9 +2,9 @@ using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using NUnit.Framework;
 using UnitTests;
-using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
+using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Http;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Http;
 
 public class HttpClientFactoryWithBasicAuthTests : TestBase
 {
@@ -18,13 +18,13 @@ public class HttpClientFactoryWithBasicAuthTests : TestBase
       Password = "letmein"
     };
 
-    var httpClientFactory = new HttpClientFactoryWithBasicAuth(new Uri(TestParameters.KsqlDBUrl), credentials);
+    var httpClientFactory = new HttpClientFactoryWithBasicAuth(new Uri(TestParameters.KsqlDbUrl), credentials);
 
     //Act
     var httpClient = httpClientFactory.CreateClient();
 
     //Assert
     httpClient.Should().BeOfType<HttpClient>();
-    httpClient.BaseAddress!.OriginalString.Should().BeEquivalentTo(TestParameters.KsqlDBUrl);
+    httpClient.BaseAddress!.OriginalString.Should().BeEquivalentTo(TestParameters.KsqlDbUrl);
   }
 }

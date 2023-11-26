@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace ksqlDB.Api.Client.Tests.Fakes.Logging;
+namespace ksqlDb.RestApi.Client.Tests.Fakes.Logging;
 
 internal static class LoggerMockExtensions
 {

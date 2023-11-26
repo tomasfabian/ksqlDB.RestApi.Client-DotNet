@@ -4,7 +4,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Context;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Context;
 
 public class TestableDbProvider<TValue> : KSqlDBContext
 {

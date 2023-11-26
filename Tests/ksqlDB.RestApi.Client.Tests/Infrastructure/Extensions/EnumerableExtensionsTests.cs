@@ -2,7 +2,7 @@ using FluentAssertions;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.Infrastructure.Extensions;
+namespace ksqlDb.RestApi.Client.Tests.Infrastructure.Extensions;
 
 public class EnumerableExtensionsTests
 {

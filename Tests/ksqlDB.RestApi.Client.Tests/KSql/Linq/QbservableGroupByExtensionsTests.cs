@@ -1,26 +1,26 @@
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Fakes.Http;
-using ksqlDB.Api.Client.Tests.KSql.Query.Context;
-using ksqlDB.Api.Client.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
-using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
+using ksqlDb.RestApi.Client.Tests.Fakes.Http;
+using ksqlDb.RestApi.Client.Tests.KSql.Query.Context;
+using ksqlDb.RestApi.Client.Tests.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Reactive.Testing;
 using Moq;
 using NUnit.Framework;
 using UnitTests;
-using TestParameters = ksqlDB.Api.Client.Tests.Helpers.TestParameters;
+using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
+using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Linq;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Linq;
 
 public class QbservableGroupByExtensionsTests : TestBase
 {
   private IQbservable<City> CreateQbservable()
   {
-    var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
       
     context.KSqlDbProviderMock.Setup(c => c.Run<int>(It.IsAny<object>(), It.IsAny<CancellationToken>())).Returns(GetTestValues);
     context.KSqlDbProviderMock.Setup(c => c.Run<long>(It.IsAny<object>(), It.IsAny<CancellationToken>())).Returns(GetDecimalTestValues);
@@ -205,7 +205,7 @@ public class QbservableGroupByExtensionsTests : TestBase
   public void GroupByCompoundKey_BuildKSql_PrintsQuery()
   {
     //Arrange
-    var context = new TestableDbProvider(TestParameters.KsqlDBUrl);
+    var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
 
     //https://kafka-tutorials.confluent.io/finding-distinct-events/ksql.html
     var grouping = context.CreateQueryStream<Click>()

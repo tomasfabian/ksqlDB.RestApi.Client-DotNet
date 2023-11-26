@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using UnitTests;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Parsers;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Parsers;
 
 public class JsonArrayParserTests : TestBase
 {

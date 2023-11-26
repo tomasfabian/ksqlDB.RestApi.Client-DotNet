@@ -1,13 +1,13 @@
 using System.Net;
-using ksqlDB.Api.Client.Tests.Helpers;
-using ksqlDB.Api.Client.Tests.Helpers.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDb.RestApi.Client.Tests.Helpers;
+using ksqlDb.RestApi.Client.Tests.Helpers.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 
 internal class TestableKSqlDbQueryStreamProvider : KSqlDbQueryStreamProvider
 {
@@ -48,7 +48,7 @@ internal class TestableKSqlDbQueryStreamProvider : KSqlDbQueryStreamProvider
 
     return LastUsedHttpClient = new IsDisposedHttpClient(handlerMock.Object)
     {
-      BaseAddress = new Uri(TestParameters.KsqlDBUrl)
+      BaseAddress = new Uri(TestParameters.KsqlDbUrl)
     };
   }
 

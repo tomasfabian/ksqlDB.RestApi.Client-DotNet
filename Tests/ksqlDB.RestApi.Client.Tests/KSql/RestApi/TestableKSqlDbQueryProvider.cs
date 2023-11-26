@@ -1,8 +1,8 @@
-﻿using ksqlDB.Api.Client.Tests.Fakes.Http;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+﻿using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
+using ksqlDb.RestApi.Client.Tests.Fakes.Http;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 
 internal class TestableKSqlDbQueryProvider : KSqlDbQueryProvider
 {

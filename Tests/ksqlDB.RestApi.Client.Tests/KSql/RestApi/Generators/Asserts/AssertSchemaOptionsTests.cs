@@ -1,7 +1,7 @@
 ﻿using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Generators.Asserts;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators.Asserts;
 
 public class AssertSchemaOptionsTests
 {

@@ -2,12 +2,12 @@
 using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
-using ksqlDB.Api.Client.Tests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
+using ksqlDb.RestApi.Client.Tests.Models.Movies;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Visitors
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Visitors
 {
   public class ConstantVisitorTests
   {

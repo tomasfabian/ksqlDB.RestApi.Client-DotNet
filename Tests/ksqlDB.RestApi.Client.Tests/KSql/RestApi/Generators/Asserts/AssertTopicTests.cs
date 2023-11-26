@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
-using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
+using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.RestApi.Generators.Asserts;
+namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators.Asserts;
 
 public class AssertTopicTests
 {

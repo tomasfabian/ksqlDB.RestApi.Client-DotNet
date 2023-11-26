@@ -3,7 +3,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Context.JsonConverters;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using NUnit.Framework;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Context.Options;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Context.Options;
 
 public class KSqlDbJsonSerializerOptionsTests
 {

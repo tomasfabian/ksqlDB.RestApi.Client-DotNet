@@ -2,7 +2,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UnitTests;
 
-namespace ksqlDB.Api.Client.Tests.KSql.Query.Functions;
+namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Functions;
 
 [TestClass]
 public class KSqlFunctionsExtensionsTests : TestBase
