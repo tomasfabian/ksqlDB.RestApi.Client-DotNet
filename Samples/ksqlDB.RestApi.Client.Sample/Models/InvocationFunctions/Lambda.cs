@@ -1,4 +1,4 @@
-﻿namespace ksqlDB.Api.Client.Samples.Models.InvocationFunctions;
+﻿namespace ksqlDB.RestApi.Client.Samples.Models.InvocationFunctions;
 
 internal record Lambda
 {

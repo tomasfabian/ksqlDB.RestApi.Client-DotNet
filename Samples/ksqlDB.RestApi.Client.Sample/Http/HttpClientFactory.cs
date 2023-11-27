@@ -1,6 +1,6 @@
 ﻿using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
-namespace ksqlDB.Api.Client.Samples.Http;
+namespace ksqlDB.RestApi.Client.Samples.Http;
 
 public class HttpClientFactory : IHttpClientFactory
 {

@@ -1,9 +1,9 @@
-﻿using ksqlDB.Api.Client.Samples.Models.Movies;
-using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+﻿using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+using ksqlDB.RestApi.Client.Samples.Models.Movies;
 
-namespace ksqlDB.Api.Client.Samples.Providers;
+namespace ksqlDB.RestApi.Client.Samples.Providers;
 
 public class MoviesProvider
 {

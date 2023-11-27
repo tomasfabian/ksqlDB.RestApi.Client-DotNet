@@ -1,6 +1,6 @@
-﻿using ksqlDB.Api.Client.Samples.Models;
+﻿using ksqlDB.RestApi.Client.Samples.Models;
 
-namespace ksqlDB.Api.Client.Samples.Observers;
+namespace ksqlDB.RestApi.Client.Samples.Observers;
 
 public class TweetsObserver : IObserver<Tweet>
 {

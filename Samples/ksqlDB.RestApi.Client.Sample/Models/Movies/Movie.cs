@@ -1,6 +1,6 @@
 ﻿using ksqlDB.RestApi.Client.KSql.Query;
 
-namespace ksqlDB.Api.Client.Samples.Models.Movies;
+namespace ksqlDB.RestApi.Client.Samples.Models.Movies;
 
 public class Movie : Record
 {

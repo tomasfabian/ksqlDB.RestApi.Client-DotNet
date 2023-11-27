@@ -1,6 +1,6 @@
 ﻿using ProtoBuf;
 
-namespace ksqlDB.Api.Client.Samples.ProtoBuf;
+namespace ksqlDB.RestApi.Client.Samples.ProtoBuf;
 
 [ProtoContract]
 internal record MovieProto

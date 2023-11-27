@@ -1,6 +1,6 @@
 ﻿using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
-namespace ksqlDB.Api.Client.Samples.Models.Sensors;
+namespace ksqlDB.RestApi.Client.Samples.Models.Sensors;
 
 public record IoTSensor
 {

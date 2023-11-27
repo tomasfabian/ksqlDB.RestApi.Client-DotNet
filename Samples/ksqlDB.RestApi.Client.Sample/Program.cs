@@ -1,12 +1,5 @@
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using ksqlDB.Api.Client.Samples.Json;
-using ksqlDB.Api.Client.Samples.Models;
-using ksqlDB.Api.Client.Samples.Models.InvocationFunctions;
-using ksqlDB.Api.Client.Samples.Models.Movies;
-using ksqlDB.Api.Client.Samples.Observers;
-using ksqlDB.Api.Client.Samples.Providers;
-using ksqlDB.Api.Client.Samples.PullQuery;
 using ksqlDb.RestApi.Client.DependencyInjection;
 using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -23,14 +16,21 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query.Descriptors;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.Samples.Json;
+using ksqlDB.RestApi.Client.Samples.Models;
+using ksqlDB.RestApi.Client.Samples.Models.InvocationFunctions;
+using ksqlDB.RestApi.Client.Samples.Models.Movies;
+using ksqlDB.RestApi.Client.Samples.Observers;
+using ksqlDB.RestApi.Client.Samples.Providers;
+using ksqlDB.RestApi.Client.Samples.PullQuery;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
 using K = ksqlDB.RestApi.Client.KSql.Query.Functions.KSql;
-using HttpClientFactory = ksqlDB.Api.Client.Samples.Http.HttpClientFactory;
+using HttpClientFactory = ksqlDB.RestApi.Client.Samples.Http.HttpClientFactory;
 
-namespace ksqlDB.Api.Client.Samples;
+namespace ksqlDB.RestApi.Client.Samples;
 
 public static class Program
 {

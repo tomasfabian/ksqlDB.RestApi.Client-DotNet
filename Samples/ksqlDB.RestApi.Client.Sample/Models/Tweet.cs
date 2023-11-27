@@ -2,7 +2,7 @@
 using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
-namespace ksqlDB.Api.Client.Samples.Models;
+namespace ksqlDB.RestApi.Client.Samples.Models;
 
 public class Tweet : Record
 {

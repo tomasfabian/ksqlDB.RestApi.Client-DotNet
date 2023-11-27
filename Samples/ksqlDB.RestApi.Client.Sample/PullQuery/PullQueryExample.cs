@@ -1,5 +1,4 @@
-﻿using ksqlDB.Api.Client.Samples.Models.Sensors;
-using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
+﻿using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
@@ -8,8 +7,9 @@ using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.Samples.Models.Sensors;
 
-namespace ksqlDB.Api.Client.Samples.PullQuery;
+namespace ksqlDB.RestApi.Client.Samples.PullQuery;
 
 public class PullQueryExample
 {

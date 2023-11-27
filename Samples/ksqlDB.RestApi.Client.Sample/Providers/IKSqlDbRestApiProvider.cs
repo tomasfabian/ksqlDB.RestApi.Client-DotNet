@@ -1,6 +1,6 @@
 ﻿using ksqlDB.RestApi.Client.KSql.RestApi;
 
-namespace ksqlDB.Api.Client.Samples.Providers;
+namespace ksqlDB.RestApi.Client.Samples.Providers;
 
 public interface IKSqlDbRestApiProvider : IKSqlDbRestApiClient
 {

@@ -1,9 +1,9 @@
 using System.Reactive.Linq;
-using ksqlDB.Api.Client.Samples.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDb.RestApi.Client.ProtoBuf.KSql.Query.Context;
+using ksqlDB.RestApi.Client.Samples.Models.Movies;
 
-namespace ksqlDB.Api.Client.Samples.ProtoBuf;
+namespace ksqlDB.RestApi.Client.Samples.ProtoBuf;
 
 public class ProtoBufQueryStream
 {
