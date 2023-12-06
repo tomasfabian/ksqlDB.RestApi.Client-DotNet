@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Reflection;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDb.RestApi.Client.KSql.Entities;
@@ -88,7 +88,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
         isFirst = false;
       }
       else
-        kSqlVisitor.Append(" AND ");
+        kSqlVisitor.Append($" {BinaryOperators.AndAlso} ");
 
       kSqlVisitor.Visit(methodCallExpression);
     }

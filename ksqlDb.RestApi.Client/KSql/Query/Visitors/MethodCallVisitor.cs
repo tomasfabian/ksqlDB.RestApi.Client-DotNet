@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -102,9 +103,22 @@ internal class MethodCallVisitor : KSqlVisitor
       new StringVisitor(stringBuilder, queryMetadata).Visit(methodCallExpression);
     }
 
+    TryPrintEquals(methodCallExpression, methodInfo);
+
     TryPrintContains(methodCallExpression, methodInfo);
 
     return methodCallExpression;
+  }
+
+  private void TryPrintEquals(MethodCallExpression methodCallExpression, MethodInfo methodInfo)
+  {
+    if (methodInfo.Name == "Equals" && methodCallExpression.Arguments.Count == 1 &&
+        methodInfo.ReturnType == typeof(bool))
+    {
+      Visit(methodCallExpression.Object);
+      Append($" {BinaryOperators.Equal} ");
+      Visit(methodCallExpression.Arguments[0]);
+    }
   }
 
   private protected void TryCast(MethodCallExpression methodCallExpression)

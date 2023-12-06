@@ -1,7 +1,8 @@
 # ksqlDB.RestApi.Client
 
 # 3.4.0
-- added `CommandStatus`
+- added `CommandStatus` class for introspecting [query status](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/status-endpoint/)
+- fixed usage of `Equals` in queries (Predicate with .Equals fails. #50)
 
 # 3.3.0
 - added **net8.0** TFM

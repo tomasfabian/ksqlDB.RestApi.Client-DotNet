@@ -54,8 +54,6 @@ internal class BinaryVisitor : KSqlVisitor
     return expression;
   }
 
-  private const string OperatorAnd = "AND";
-
   private static readonly ISet<ExpressionType> SupportedBinaryOperators = new HashSet<ExpressionType>
   {
     ExpressionType.Add,
@@ -102,22 +100,22 @@ internal class BinaryVisitor : KSqlVisitor
     string @operator = binaryExpression.NodeType switch
     {
       //arithmetic
-      ExpressionType.Add => "+",
-      ExpressionType.Subtract => "-",
-      ExpressionType.Divide => "/",
-      ExpressionType.Multiply => "*",
-      ExpressionType.Modulo => "%",
+      ExpressionType.Add => BinaryOperators.Add,
+      ExpressionType.Subtract => BinaryOperators.Subtract,
+      ExpressionType.Divide => BinaryOperators.Divide,
+      ExpressionType.Multiply => BinaryOperators.Multiply,
+      ExpressionType.Modulo => BinaryOperators.Modulo,
       //conditionals
-      ExpressionType.AndAlso => OperatorAnd,
-      ExpressionType.OrElse => "OR",
+      ExpressionType.AndAlso => BinaryOperators.AndAlso,
+      ExpressionType.OrElse => BinaryOperators.OrElse,
       ExpressionType.Equal when binaryExpression.Right is ConstantExpression ce && ce.Value == null => "IS",
-      ExpressionType.Equal => "=",
+      ExpressionType.Equal => BinaryOperators.Equal,
       ExpressionType.NotEqual when binaryExpression.Right is ConstantExpression ce && ce.Value == null => "IS NOT",
-      ExpressionType.NotEqual => "!=",
-      ExpressionType.LessThan => "<",
-      ExpressionType.LessThanOrEqual => "<=",
-      ExpressionType.GreaterThan => ">",
-      ExpressionType.GreaterThanOrEqual => ">=",
+      ExpressionType.NotEqual => BinaryOperators.NotEqual,
+      ExpressionType.LessThan => BinaryOperators.LessThan,
+      ExpressionType.LessThanOrEqual => BinaryOperators.LessThanOrEqual,
+      ExpressionType.GreaterThan => BinaryOperators.GreaterThan,
+      ExpressionType.GreaterThanOrEqual => BinaryOperators.GreaterThanOrEqual,
       _ => throw new ArgumentOutOfRangeException(nameof(binaryExpression.NodeType))
     };
 
