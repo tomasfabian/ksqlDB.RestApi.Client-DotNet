@@ -202,7 +202,7 @@ EMIT CHANGES;";
 
     //Assert
     string expectedKsql =
-      @$"SELECT {nameof(Location.Longitude)} AS Lngt, {nameof(Location.Latitude)} FROM {streamName} EMIT CHANGES;";
+      $"SELECT {nameof(Location.Longitude)} AS Lngt, {nameof(Location.Latitude)} FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -219,7 +219,7 @@ EMIT CHANGES;";
 
     //Assert
     string expectedKsql =
-      @$"SELECT {nameof(Location.Longitude)} / 2 AS Lngt, {nameof(Location.Latitude)} + '' AS Lat FROM {streamName} EMIT CHANGES;";
+      $"SELECT {nameof(Location.Longitude)} / 2 AS Lngt, {nameof(Location.Latitude)} + '' AS Lat FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -335,7 +335,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"SELECT {nameof(OrderData.OrderType)} IN (1, 3) FROM {nameof(OrderData)} EMIT CHANGES;");
+    ksql.Should().BeEquivalentTo($"SELECT {nameof(OrderData.OrderType)} IN (1, 3) FROM {nameof(OrderData)} EMIT CHANGES;");
   }
 
   [Test]
@@ -352,7 +352,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"SELECT {nameof(OrderData.OrderType)} IN (1, 3) Contains FROM {nameof(OrderData)} EMIT CHANGES;");
+    ksql.Should().BeEquivalentTo($"SELECT {nameof(OrderData.OrderType)} IN (1, 3) Contains FROM {nameof(OrderData)} EMIT CHANGES;");
   }
 
   #region CapturedVariables
@@ -460,7 +460,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
 
     //Assert
     string expectedKsql =
-      @"SELECT '2021-07-04T13:29:45.447+04:00' FROM TimeTypes EMIT CHANGES;";
+      "SELECT '2021-07-04T13:29:45.447+04:00' FROM TimeTypes EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -480,7 +480,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
 
     //Assert
     string expectedKsql =
-      @"SELECT '2021-07-04T13:29:45.447+04:00' FROM TimeTypes EMIT CHANGES;";
+      "SELECT '2021-07-04T13:29:45.447+04:00' FROM TimeTypes EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -498,7 +498,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
 
     //Assert
     string expectedKsql =
-      @"SELECT '2021-04-01' Time FROM TimeTypes EMIT CHANGES;";
+      "SELECT '2021-04-01' Time FROM TimeTypes EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -535,7 +535,7 @@ WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;";
 
     //Assert
     string expectedKsql =
-      @$"SELECT '{DateTime.Now.ToString(ValueFormats.DateFormat)}' FROM TimeTypes EMIT CHANGES;";
+      $"SELECT '{DateTime.Now.ToString(ValueFormats.DateFormat)}' FROM TimeTypes EMIT CHANGES;";
 
     ksql.Should().Be(expectedKsql);
   }
@@ -555,7 +555,7 @@ WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;";
 
     //Assert
     string expectedKsql =
-      @"SELECT '2021-10-01' FROM TimeTypes EMIT CHANGES;";
+      "SELECT '2021-10-01' FROM TimeTypes EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -575,7 +575,7 @@ WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;";
 
     //Assert
     string expectedKsql =
-      @"SELECT '2021-10-01' AS Ts, '0001-01-01' MinValue FROM TimeTypes EMIT CHANGES;";
+      "SELECT '2021-10-01' AS Ts, '0001-01-01' MinValue FROM TimeTypes EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -599,6 +599,36 @@ WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;";
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM {streamName}
 WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;");
+  }
+
+  [Test]
+  public void WhereStringsEquals_BuildKSql_PrintsWhere()
+  {
+    //Arrange
+    var query = CreateStreamSource()
+      .Where(p => p.Latitude.Equals("1"));
+
+    //Act
+    var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+    //Assert
+    ksql.Should().BeEquivalentTo(@$"SELECT * FROM {streamName}
+WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;");
+  }
+
+  [Test]
+  public void WhereDoublesEquals_BuildKSql_PrintsWhere()
+  {
+    //Arrange
+    var query = CreateStreamSource()
+      .Where(p => p.Longitude.Equals(1.1));
+
+    //Act
+    var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+    //Assert
+    ksql.Should().BeEquivalentTo(@$"SELECT * FROM {streamName}
+WHERE {nameof(Location.Longitude)} = 1.1 EMIT CHANGES;");
   }
 
   [Test]
@@ -911,7 +941,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"SELECT * FROM {streamName} EMIT CHANGES LIMIT {limit};");
+    ksql.Should().BeEquivalentTo($"SELECT * FROM {streamName} EMIT CHANGES LIMIT {limit};");
   }
 
   #endregion
@@ -931,7 +961,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"SELECT * FROM {streamName} EMIT CHANGES LIMIT {limit};");
+    ksql.Should().BeEquivalentTo($"SELECT * FROM {streamName} EMIT CHANGES LIMIT {limit};");
   }
 
   #endregion
@@ -949,7 +979,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT * FROM {nameof(Location)} EMIT CHANGES;";
+      $"SELECT * FROM {nameof(Location)} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -966,7 +996,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT * FROM {queryContext.FromItemName}s EMIT CHANGES;";
+      $"SELECT * FROM {queryContext.FromItemName}s EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -983,7 +1013,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT * FROM {queryContext.FromItemName} EMIT CHANGES;";
+      $"SELECT * FROM {queryContext.FromItemName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1004,7 +1034,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT ARRAY_LENGTH(ARRAY[1, 2, 3]) FROM {streamName} EMIT CHANGES;";
+      $"SELECT ARRAY_LENGTH(ARRAY[1, 2, 3]) FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1021,7 +1051,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT ARRAY_LENGTH(ARRAY[1, 2, 3]) Length FROM {streamName} EMIT CHANGES;";
+      $"SELECT ARRAY_LENGTH(ARRAY[1, 2, 3]) Length FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1038,7 +1068,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT ARRAY[1, 2, 3][1] AS FirstItem FROM {streamName} EMIT CHANGES;";
+      $"SELECT ARRAY[1, 2, 3][1] AS FirstItem FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1055,7 +1085,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT ARRAY[1, 2, 3] Str FROM {streamName} EMIT CHANGES;";
+      $"SELECT ARRAY[1, 2, 3] Str FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1080,7 +1110,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT MAP('c' := 2, 'd' := 4) FROM {streamName} EMIT CHANGES;";
+      $"SELECT MAP('c' := 2, 'd' := 4) FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1104,7 +1134,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT MAP('c' := 2, 'd' := 4) Map FROM {streamName} EMIT CHANGES;";
+      $"SELECT MAP('c' := 2, 'd' := 4) Map FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1125,7 +1155,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT MAP('c' := 2, 'd' := 4)['d'] FROM {streamName} EMIT CHANGES;";
+      $"SELECT MAP('c' := 2, 'd' := 4)['d'] FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1149,7 +1179,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT MAP('c' := 2, 'd' := 4)['d'] Element FROM {streamName} EMIT CHANGES;";
+      $"SELECT MAP('c' := 2, 'd' := 4)['d'] Element FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1177,7 +1207,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT STRUCT(X := 1, Y := 2) FROM {streamName} EMIT CHANGES;";
+      $"SELECT STRUCT(X := 1, Y := 2) FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1194,7 +1224,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT STRUCT(X := 1, Y := 2) V FROM {streamName} EMIT CHANGES;";
+      $"SELECT STRUCT(X := 1, Y := 2) V FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1211,7 +1241,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT STRUCT(X := 1, Y := 2)->X FROM {streamName} EMIT CHANGES;";
+      $"SELECT STRUCT(X := 1, Y := 2)->X FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1228,7 +1258,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT STRUCT(X := 1, Y := 2)->X X FROM {streamName} EMIT CHANGES;";
+      $"SELECT STRUCT(X := 1, Y := 2)->X X FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1253,7 +1283,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT STRUCT(X := {nameof(Location.Latitude)}, Y := {nameof(Location.Longitude)}) LS, 'Text' Text FROM {streamName} EMIT CHANGES;";
+      $"SELECT STRUCT(X := {nameof(Location.Latitude)}, Y := {nameof(Location.Longitude)}) LS, 'Text' Text FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1279,7 +1309,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT STRUCT(X := {nameof(Location.Latitude)}, Arr := ARRAY[{nameof(Location.Latitude)}, {nameof(Location.Latitude)}], Y := {nameof(Location.Longitude)}) LS, 'Text' Text FROM {streamName} EMIT CHANGES;";
+      $"SELECT STRUCT(X := {nameof(Location.Latitude)}, Arr := ARRAY[{nameof(Location.Latitude)}, {nameof(Location.Latitude)}], Y := {nameof(Location.Longitude)}) LS, 'Text' Text FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1309,7 +1339,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT STRUCT(X := {nameof(Location.Latitude)}, Map := MAP('c' := {nameof(Location.Longitude)}, 'd' := 4), Y := {nameof(Location.Longitude)}) LS, 'Text' Text FROM {streamName} EMIT CHANGES;";
+      $"SELECT STRUCT(X := {nameof(Location.Latitude)}, Map := MAP('c' := {nameof(Location.Longitude)}, 'd' := 4), Y := {nameof(Location.Longitude)}) LS, 'Text' Text FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1349,7 +1379,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT {nameof(DatabaseChangeObject<object>.After)}->{nameof(Entity.SensorId)} FROM {nameof(DatabaseChangeObject<object>)}s EMIT CHANGES;";
+      $"SELECT {nameof(DatabaseChangeObject<object>.After)}->{nameof(Entity.SensorId)} FROM {nameof(DatabaseChangeObject<object>)}s EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1402,7 +1432,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     string after = nameof(DatabaseChangeObject<object>.After);
     string substr = $"SUBSTRING({after}->{nameof(Entity.SensorId)}, 2)";
     string expectedKsql =
-      @$"SELECT {after}->{nameof(Entity.SensorId)} AS X, LEN({after}->{nameof(Entity.SensorId)}) AS Y, {substr} Substr FROM {nameof(DatabaseChangeObject<object>)}s EMIT CHANGES;";
+      $"SELECT {after}->{nameof(Entity.SensorId)} AS X, LEN({after}->{nameof(Entity.SensorId)}) AS Y, {substr} Substr FROM {nameof(DatabaseChangeObject<object>)}s EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1430,7 +1460,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT MAP('a' := ARRAY[1, 2], 'b' := ARRAY[3, 4]) Map FROM {streamName} EMIT CHANGES;";
+      $"SELECT MAP('a' := ARRAY[1, 2], 'b' := ARRAY[3, 4]) Map FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1454,7 +1484,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT MAP('a' := MAP('a' := 1, 'b' := 2), 'b' := MAP('c' := 3, 'd' := 4)) Map FROM {streamName} EMIT CHANGES;";
+      $"SELECT MAP('a' := MAP('a' := 1, 'b' := 2), 'b' := MAP('c' := 3, 'd' := 4)) Map FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1486,7 +1516,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT MAP('a' := STRUCT(X := {nameof(Location.Latitude)}, Y := {nameof(Location.Longitude)}), 'b' := STRUCT(X := 'test', Y := 1)) Str FROM {streamName} EMIT CHANGES;";
+      $"SELECT MAP('a' := STRUCT(X := {nameof(Location.Latitude)}, Y := {nameof(Location.Longitude)}), 'b' := STRUCT(X := 'test', Y := 1)) Str FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1510,7 +1540,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT ARRAY[MAP('a' := 1, 'b' := 2), MAP('c' := 3, 'd' := 4)] Arr FROM {streamName} EMIT CHANGES;";
+      $"SELECT ARRAY[MAP('a' := 1, 'b' := 2), MAP('c' := 3, 'd' := 4)] Arr FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1534,7 +1564,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT ARRAY[ARRAY[1, 2], ARRAY[3, 4]] Arr FROM {streamName} EMIT CHANGES;";
+      $"SELECT ARRAY[ARRAY[1, 2], ARRAY[3, 4]] Arr FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1565,7 +1595,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT ARRAY[STRUCT(X := {nameof(Location.Latitude)}, Y := {nameof(Location.Longitude)}), STRUCT(X := 'test', Y := 1)] Arr FROM {streamName} EMIT CHANGES;";
+      $"SELECT ARRAY[STRUCT(X := {nameof(Location.Latitude)}, Y := {nameof(Location.Longitude)}), STRUCT(X := 'test', Y := 1)] Arr FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1591,7 +1621,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT ARRAY[ARRAY[1, 2], ARRAY[3, 4]] AS Arr FROM {streamName} EMIT CHANGES;";
+      $"SELECT ARRAY[ARRAY[1, 2], ARRAY[3, 4]] AS Arr FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1619,7 +1649,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT MAP('a' := ARRAY[1, 2], 'b' := ARRAY[3, 4])['a'][1] AS Map FROM {streamName} EMIT CHANGES;";
+      $"SELECT MAP('a' := ARRAY[1, 2], 'b' := ARRAY[3, 4])['a'][1] AS Map FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1643,7 +1673,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT MAP('a' := MAP('a' := 1, 'b' := 2), 'b' := MAP('c' := 3, 'd' := 4))['a']['d'] Map FROM {streamName} EMIT CHANGES;";
+      $"SELECT MAP('a' := MAP('a' := 1, 'b' := 2), 'b' := MAP('c' := 3, 'd' := 4))['a']['d'] Map FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1667,7 +1697,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT ARRAY[MAP('a' := 1, 'b' := 2), MAP('c' := 3, 'd' := 4)][1]['d'] Arr FROM {streamName} EMIT CHANGES;";
+      $"SELECT ARRAY[MAP('a' := 1, 'b' := 2), MAP('c' := 3, 'd' := 4)][1]['d'] Arr FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1691,7 +1721,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
 
     //Assert
     string expectedKsql =
-      @$"SELECT ARRAY[ARRAY[1, 2], ARRAY[3, 4]][0][1] AS Arr FROM {streamName} EMIT CHANGES;";
+      $"SELECT ARRAY[ARRAY[1, 2], ARRAY[3, 4]][0][1] AS Arr FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1795,7 +1825,7 @@ WHERE Message LIKE UCASE('%hard') EMIT CHANGES;";
 
     //Assert
     string expectedKsql =
-      @$"SELECT ENTRIES(MAP('a' := 'value'), true) Col FROM {streamName} EMIT CHANGES;";
+      $"SELECT ENTRIES(MAP('a' := 'value'), true) Col FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1823,7 +1853,7 @@ WHERE Message LIKE UCASE('%hard') EMIT CHANGES;";
 
     //Assert
     string expectedKsql =
-      @$"SELECT CASE WHEN {nameof(Location.Longitude)} < 2 THEN 'small' WHEN {nameof(Location.Longitude)} < 4.1 THEN 'medium' ELSE 'large' END AS case_result FROM {streamName} EMIT CHANGES;";
+      $"SELECT CASE WHEN {nameof(Location.Longitude)} < 2 THEN 'small' WHEN {nameof(Location.Longitude)} < 4.1 THEN 'medium' ELSE 'large' END AS case_result FROM {streamName} EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
