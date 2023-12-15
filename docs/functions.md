@@ -86,7 +86,7 @@ LEN(Message)
 
 The **LIKE** operator is used in combination with the % (percent sign) wildcard characters for prefix or suffix matching.
 
-See also [String.StartsWith, String.EndsWith, String.Contains](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md#operator-like---stringstartswith-stringendswith-stringcontains)
+See also [String.StartsWith, String.EndsWith, String.Contains](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/operators.md#operator-like---stringstartswith-stringendswith-stringcontains)
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Functions;

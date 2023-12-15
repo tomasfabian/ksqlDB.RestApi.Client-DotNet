@@ -68,7 +68,7 @@ SELECT *
   EMIT CHANGES;
 ```
 
-List of supported operators is [documented here](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/operators.md).
+List of supported operators is [documented here](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/operators.md).
 
 ### Subscribe
 **v1.0.0**

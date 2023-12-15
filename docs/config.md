@@ -163,7 +163,7 @@ var kSqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory)
 
 The recommended approach is to create a single instance of `HttpClient` and reuse it throughout the lifespan of an application.
 
-To obtain an instance of `HttpClient` using `IHttpClientFactory` from the `ServicesCollection` in .NET for `IKSqlDbRestApiClient` and `IKSqlDBContext`, you can follow the steps in this [section](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/doc/ksqldbcontext.md#ksqldbservicecollectionextensions---adddbcontext-and-adddbcontextfactory).
+To obtain an instance of `HttpClient` using `IHttpClientFactory` from the `ServicesCollection` in .NET for `IKSqlDbRestApiClient` and `IKSqlDBContext`, you can follow the steps in this [section](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/ksqldbcontext.md#ksqldbservicecollectionextensions---adddbcontext-and-adddbcontextfactory).
 
 ### SetJsonSerializerOptions
 **v1.4.0**
