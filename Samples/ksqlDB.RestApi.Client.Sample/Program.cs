@@ -42,7 +42,7 @@ public static class Program
       .SetJsonSerializerOptions(jsonOptions =>
       {
         jsonOptions.IgnoreReadOnlyFields = true;
-        jsonOptions.AddContext<SourceGenerationContext>();
+        jsonOptions.TypeInfoResolver = SourceGenerationContext.Default;
       })
       //.SetAutoOffsetReset(AutoOffsetReset.Earliest) // global setting
       .SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce) // global setting
