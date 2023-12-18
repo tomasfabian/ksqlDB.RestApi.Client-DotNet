@@ -83,8 +83,12 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 
     if (logger != null)
     {
-      string response = await httpResponseMessage.Content.ReadAsStringAsync();
-
+      string response = await httpResponseMessage.Content
+#if NETSTANDARD
+        .ReadAsStringAsync();
+#else
+        .ReadAsStringAsync(cancellationToken);
+#endif
       logger?.LogDebug($"Command response ({httpResponseMessage.StatusCode}): {response}");
     }
 
