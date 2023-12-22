@@ -172,7 +172,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 
     var ksql = StatementGenerator.CreateStream<T>(creationMetadata, ifNotExists);
 
-    return ExecuteAsync<T>(ksql, cancellationToken);
+    return ExecuteAsync(ksql, cancellationToken);
   }
 
   /// <summary>
@@ -188,7 +188,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 
     var ksql = StatementGenerator.CreateOrReplaceStream<T>(creationMetadata);
 
-    return ExecuteAsync<T>(ksql, cancellationToken);
+    return ExecuteAsync(ksql, cancellationToken);
   }
 
   /// <summary>
@@ -207,7 +207,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 
     var ksql = StatementGenerator.CreateStream<T>(creationMetadata, ifNotExists);
 
-    return ExecuteAsync<T>(ksql, cancellationToken);
+    return ExecuteAsync(ksql, cancellationToken);
   }
 
   /// <summary>
@@ -224,7 +224,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 
     var ksql = StatementGenerator.CreateTable<T>(creationMetadata, ifNotExists);
 
-    return ExecuteAsync<T>(ksql, cancellationToken);
+    return ExecuteAsync(ksql, cancellationToken);
   }
 
   /// <summary>
@@ -243,7 +243,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 
     var ksql = StatementGenerator.CreateTable<T>(creationMetadata, ifNotExists);
 
-    return ExecuteAsync<T>(ksql, cancellationToken);
+    return ExecuteAsync(ksql, cancellationToken);
   }
 
   /// <summary>
@@ -259,10 +259,10 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 
     var ksql = StatementGenerator.CreateOrReplaceTable<T>(creationMetadata);
 
-    return ExecuteAsync<T>(ksql, cancellationToken);
+    return ExecuteAsync(ksql, cancellationToken);
   }
 
-  private Task<HttpResponseMessage> ExecuteAsync<T>(string ksql, CancellationToken cancellationToken = default)
+  private Task<HttpResponseMessage> ExecuteAsync(string ksql, CancellationToken cancellationToken = default)
   {
     var ksqlStatement = new KSqlDbStatement(ksql);
 
@@ -275,7 +275,6 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// Any attempt to register the same type twice, without a corresponding DROP TYPE statement, will fail.
   /// </summary>
   /// <typeparam name="T"></typeparam>
-  /// <param name="typeName">Optional name of the type. Otherwise the type name is inferred from the generic type name.</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> CreateTypeAsync<T>(CancellationToken cancellationToken = default)
@@ -289,14 +288,14 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// Any attempt to register the same type twice, without a corresponding DROP TYPE statement, will fail.
   /// </summary>
   /// <typeparam name="T"></typeparam>
-  /// <param name="typeName">Optional name of the type. Otherwise the type name is inferred from the generic type name.</param>
+  /// <param name="typeName">Optional name of the type. Otherwise, the type name is inferred from the generic type name.</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> CreateTypeAsync<T>(string typeName, CancellationToken cancellationToken = default)
   {
     var ksql = new TypeGenerator().Print<T>(typeName);
 
-    return ExecuteAsync<T>(ksql, cancellationToken);
+    return ExecuteAsync(ksql, cancellationToken);
   }
 
   /// <summary>
@@ -676,7 +675,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <summary>
   /// Pause a persistent query.
   /// </summary>
-  /// <param name="queryId">Id of the query to pause.</param>
+  /// <param name="queryId">ID of the query to pause.</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Statement response</returns>
   public async Task<StatementResponse[]> PausePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default)
@@ -695,7 +694,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <summary>
   /// Resume a paused persistent query.
   /// </summary>
-  /// <param name="queryId">Id of the query to resume.</param>
+  /// <param name="queryId">ID of the query to resume.</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Statement response</returns>
   public async Task<StatementResponse[]> ResumePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default)
@@ -714,7 +713,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <summary>
   /// Terminate a persistent query. Persistent queries run continuously until they are explicitly terminated.
   /// </summary>
-  /// <param name="queryId">Id of the query to terminate.</param>
+  /// <param name="queryId">ID of the query to terminate.</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Statement response</returns>
   public async Task<StatementResponse[]> TerminatePersistentQueryAsync(string queryId, CancellationToken cancellationToken = default)
@@ -733,7 +732,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <summary>
   /// Terminate a push query.
   /// </summary>
-  /// <param name="queryId">Id of the query to terminate.</param>
+  /// <param name="queryId">ID of the query to terminate.</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Statement response</returns>
   public async Task<HttpResponseMessage> TerminatePushQueryAsync(string queryId, CancellationToken cancellationToken = default)
@@ -754,7 +753,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <summary>
   /// Show the execution plan of a running query, show the execution plan plus additional runtime information and metrics.
   /// </summary>
-  /// <param name="queryId">Id of the query to explain.</param>
+  /// <param name="queryId">ID of the query to explain.</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation.</param>
   /// <returns>ExplainResponse with execution plan plus additional runtime information and metrics.</returns>
   private Task<ExplainResponse[]> ExplainAsync(string queryId, CancellationToken cancellationToken = default)
