@@ -1,4 +1,4 @@
-﻿using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
+using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
@@ -18,7 +18,7 @@ public class PullQueryExample
 
   public async Task ExecuteAsync()
   {
-    var ksqlDbUrl = @"http://localhost:8088";
+    var ksqlDbUrl = "http://localhost:8088";
 
     var contextOptions = new KSqlDbContextOptionsBuilder()
       .UseKSqlDb(ksqlDbUrl)

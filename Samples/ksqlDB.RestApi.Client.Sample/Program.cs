@@ -284,7 +284,7 @@ public static class Program
     {
       Console.WriteLine(movie.Title);
 
-      cts.Cancel();
+      await cts.CancelAsync();
     }
   }
 
