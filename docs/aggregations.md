@@ -9,13 +9,10 @@ In `ksqlDB`, you can use aggregation functions to perform calculations and trans
 
 The list of available `kslqdb` aggregate functions is available [here](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 
-[Rest api reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
-
-
-### GroupBy
+## GroupBy
 Group records in a window. Required by the WINDOW clause. Windowing queries must group by the keys that are selected in the query.
 
-### Count
+## Count
 **v1.0.0**
 
 Count the number of rows. When * is specified, the count returned will be the total number of rows.
@@ -56,7 +53,7 @@ SELECT COUNT(*)
   EMIT CHANGES;
 ```
 
-### Having
+## Having
 **v1.0.0**
 
 Extract records from an aggregation that fulfill a specified condition.
@@ -103,7 +100,7 @@ HAVING COUNT(IP_ADDRESS) = 1
  LIMIT 3;
 ```
 
-### Sum
+## Sum
 
 Sums the column values.
 
@@ -121,7 +118,7 @@ SELECT Id, SUM(Amount) Agg
   EMIT CHANGES;
 ```
 
-### Avg
+## Avg
 **v1.0.0**
 
 Return the average value for a given column.
@@ -135,7 +132,7 @@ var query = CreateQbservable()
 AVG(col1)
 ``` 
 
-### Min and Max
+## Min and Max
 **v1.0.0**
 
 Return the minimum/maximum value for a given column and window. Rows that have col1 set to null are ignored.
@@ -154,7 +151,7 @@ MIN(col1)
 MAX(col1)
 ``` 
 
-### COLLECT_LIST, COLLECT_SET
+## COLLECT_LIST, COLLECT_SET
 **v1.0.0**
 - **COLLECT_LIST** - returns an array containing all the values of column from each input row (for the specified grouping and time window, if any).
 - **COLLECT_SET** - returns an array containing the distinct values of column from each input row (for the specified grouping and time window, if any).
@@ -201,7 +198,7 @@ var source = Context.CreateQueryStream<Tweet>(TweetsStreamName)
   .Select(l => new { Id = l.Key, Maps = l.CollectList(c => dict) })
 ```
 
-### TopK, TopKDistinct, LongCount, Count(column
+## TopK, TopKDistinct, LongCount, Count(column
 **v1.0.0**
 
 ```C#
@@ -229,7 +226,7 @@ new KSqlDBContext(@"http://localhost:8088").CreateQueryStream<Tweet>()
   }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
 ```
 
-### EarliestByOffset, LatestByOffset, EarliestByOffsetAllowNulls, LatestByOffsetAllowNull
+## EarliestByOffset, LatestByOffset, EarliestByOffsetAllowNulls, LatestByOffsetAllowNull
 
 - [EarliestByOffset](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/#earliest_by_offset) - returns the earliest value for the specified column.
 - [LatestByOffset](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/#latest_by_offset) - returns the latest value for the specified column.
@@ -274,7 +271,7 @@ SELECT Id, EARLIEST_BY_OFFSET(Amount, 2, True) EarliestByOffset
   EMIT CHANGES;
 ```
 
-### CountDistinct
+## CountDistinct
 **v1.0.0**
 
 **COUNT_DISTINCT** returns the approximate number of unique values of column in a group.
@@ -300,7 +297,7 @@ SELECT Id, COUNT_DISTINCT(Message) Count
   EMIT CHANGES;
 ```
 
-### TimeWindows - EMIT FINAL
+## TimeWindows - EMIT FINAL
 **v2.5.0**
 
 - `EMIT FINAL` output refinement was added for windowed aggregations. ksqldb v0.28.2
