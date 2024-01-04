@@ -147,7 +147,9 @@ context.CreatePullQuery<Tweet>()
   .Take(2);
 ```
 ```SQL
-SELECT * from tweets LIMIT 2;
+SELECT *
+  FROM tweets
+ LIMIT 2;
 ```
 
 ### GetManyAsync
