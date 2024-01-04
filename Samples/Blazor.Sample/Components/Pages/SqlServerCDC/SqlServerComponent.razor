@@ -1,0 +1,112 @@
+@page "/sqlserver"
+@rendermode InteractiveServer
+
+@using Blazor.Sample.Collections
+@using Blazor.Sample.Data.Sensors
+@using Blazor.Sample.Components.Pages.SqlServerCDC.Models
+
+<h1>Apache Kafka</h1>
+<p>This component showcases the implementation of Change Data Capture (CDC) within a SQL Server table, enabling real-time observation of data modifications.</p>
+
+@if (items == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <EditForm Model="@Model" FormName="sensor-form" OnSubmit="@(async () => await SaveAsync())">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <br />
+
+        <div class="form-group">
+            <label for="sensorValue">Sensor Value:</label>
+            <input type="number" class="form-control" id="sensorValue" placeholder="New value..." @bind="@Model.Value">
+        </div>
+
+        <br />
+        <button type="submit" class="btn btn-info">Save</button>
+    </EditForm>
+
+    <br />
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <b>Change data capture notifications:</b>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Operation</th>
+                            <th>Value Before</th>
+                            <th>Value After</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in items)
+                        {
+                            <tr>
+                                <td>@TranslateOperation(item.Op)</td>
+                                <td>@item.EntityBefore</td>
+                                <td>@item.EntityAfter</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col">
+                @if (IsLoading)
+                {
+                    <span>Loading...</span>
+                }
+                else
+                {
+                    <b>Sensors (@TotalCount):</b>
+                }
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Sensor Id</th>
+                            <th>Value</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var sensor in sensors)
+                        {
+                            <tr>
+                                <td>@sensor.SensorId</td>
+                                <td>@sensor.Value</td>
+                                <td>
+                                    <button class="btn btn-info" @onclick="@(async () => await UpdateAsync(sensor))">
+                                        <i class="bi bi-pencil" style="color: #fff"></i>
+                                    </button>
+                                </td>
+                                <td>
+                                    <a class="btn btn-danger" @onclick="@(async () => await DeleteAsync(sensor))">
+                                        <span class="bi bi-trash" title="delete" aria-hidden="true" style="color: #fff"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+}
+
+@code {
+    private FixedSizedQueue<IDbRecord<IoTSensor>> items;
+    private IList<IoTSensor> sensors;
+
+    protected override void OnInitialized()
+    {
+        items = new FixedSizedQueue<IDbRecord<IoTSensor>>();
+
+        sensors = new List<IoTSensor>();
+    }
+}

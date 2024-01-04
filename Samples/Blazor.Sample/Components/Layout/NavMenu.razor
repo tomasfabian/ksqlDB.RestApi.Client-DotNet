@@ -1,0 +1,27 @@
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Blazor.Sample</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="sqlserver" Match="NavLinkMatch.All">
+                <span class="bi-database" aria-hidden="true" style="margin-right: 5px;"></span>SqlServer-CDC
+            </NavLink>
+        </div>
+        <div class="nav-item px-3" style="display: flex; align-items: center;">
+            <NavLink class="nav-link" href="kafkastream">
+                <span class="bi-water" aria-hidden="true" style="margin-right: 5px;"></span> Stream
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="kafkatable">
+                <span class="bi-table" aria-hidden="true" style="margin-right: 5px;"></span> Table
+            </NavLink>
+        </div>
+    </nav>
+</div>

@@ -1,0 +1,45 @@
+@page "/kafkastream"
+@rendermode InteractiveServer
+
+@using Blazor.Sample.Collections
+@using Blazor.Sample.Data.Sensors
+
+<h1>Apache Kafka</h1>
+
+<p>This component demonstrates observing data from a Kafka stream.</p>
+<span>Last @items.Limit items</span>
+
+@if (items == null)
+{
+  <p><em>Loading...</em></p>
+}
+else
+{
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var item in items)
+      {
+        <tr>
+          <td>@item.Id</td>
+          <td>@item.Value</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
+
+@code {
+  private FixedSizedQueue<SensorsStream> items;
+
+  protected override void OnInitialized()
+  {
+    items = new FixedSizedQueue<SensorsStream>();
+  }
+
+}
