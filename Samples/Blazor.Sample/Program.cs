@@ -58,7 +58,7 @@ static async Task TryMigrateDatabaseAsync(IHost host)
 
   if (hostEnvironment.IsDevelopment() || hostEnvironment.IsStaging())
   {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    await db.Database.MigrateAsync();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await context.Database.MigrateAsync();
   }
 }

@@ -139,7 +139,7 @@ services:
       - kafkanetwork
     environment:
       ksqlDb__Url: "http://ksqldb-server:8088"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver2019,1433;User Id = SA;Password=<YourNewStrong@Passw0rd>;Initial Catalog = Sensors;MultipleActiveResultSets=true"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver2019,1433;User Id = SA;Password=<YourNewStrong@Passw0rd>;Initial Catalog = Sensors;MultipleActiveResultSets=true;TrustServerCertificate=true"
     depends_on:
       ksqldb-server:
         condition: service_healthy
