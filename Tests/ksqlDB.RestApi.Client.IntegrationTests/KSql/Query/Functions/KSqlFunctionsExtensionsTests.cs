@@ -7,7 +7,9 @@ using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
 using ksqlDb.RestApi.Client.IntegrationTests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Query.Functions;
 
@@ -179,7 +181,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
   }
 
   [Test]
-  [Ignore("Cannot construct an array with all NULL elements")]
+  [NUnit.Framework.Ignore("Cannot construct an array with all NULL elements")]
   public async Task ArrayMin_Null()
   {
     //Arrange
@@ -330,7 +332,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
   }
     
   [Test]
-  [Ignore("TODO")]
+  [NUnit.Framework.Ignore("TODO")]
   public async Task FromBytes_CapturedVariable()
   {
     //Arrange

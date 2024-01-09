@@ -1,3 +1,4 @@
+using FluentAssertions;
 using System.Linq.Expressions;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
@@ -63,7 +64,7 @@ public class KSqlDbTests
     var elasticSearchEvent = await classUnderTest.GetByIdAsync(42);
 
     //Assert
-    Assert.AreEqual(42, elasticSearchEvent.Key);
+    elasticSearchEvent.Key.Should().Be(42);
   }
 
   internal static async IAsyncEnumerable<ElasticSearchEvent> ElasticSearchEventsSource()
@@ -104,9 +105,9 @@ public class KSqlDbTests
     await semaphoreSlim.WaitAsync();
 
     //Assert
-    Assert.AreEqual(2, receivedValues.Count);
+    receivedValues.Count.Should().Be(2);
 
-    using(subscription){}
+    using (subscription){}
   }
 }
 

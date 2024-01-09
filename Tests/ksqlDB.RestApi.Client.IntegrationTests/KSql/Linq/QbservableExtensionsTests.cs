@@ -12,9 +12,9 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
-using Assert = NUnit.Framework.Assert;
-using CollectionAssert = NUnit.Framework.CollectionAssert;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq;
 
@@ -83,7 +83,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     {
       Tweet1, Tweet2
     };
-      
+
     Assert.AreEqual(expectedItemsCount, actualValues.Count);
     CollectionAssert.AreEqual(expectedValues, actualValues);
   }
@@ -192,7 +192,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     //Arrange
     var source = Context.CreateQueryStream<Tweet>(StreamName+"xyz");
 
-    Assert.ThrowsAsync<KSqlQueryException>(() =>
+    NUnit.Framework.Assert.ThrowsAsync<KSqlQueryException>(() =>
     {
       //Act
       var subscription = source.SubscribeAsync(c => { }, e => { }, () => { });
@@ -245,7 +245,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
   }
 
   [Test]
-  [Ignore("TODO")]
+  [NUnit.Framework.Ignore("TODO")]
   public async Task SubscribeOn_Blocks()
   {
     //Arrange

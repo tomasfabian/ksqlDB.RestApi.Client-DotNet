@@ -10,6 +10,8 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using NUnit.Framework;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
+
 
 namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq;
 
@@ -79,7 +81,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
 
     //Assert
     Assert.AreEqual(expectedItemsCount, actualValues.Count);
-
+    
     Assert.AreEqual(MoviesProvider.Movie1.Title, actualValues[0].Title);
     Assert.AreEqual(MoviesProvider.LeadActor1.Title, actualValues[0].Title);
     Assert.AreEqual("lien", actualValues[0].Substr);
