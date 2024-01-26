@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+using System.Threading.Channels;
 using Confluent.Kafka;
 using InsideOut.Serdes;
 
@@ -59,9 +61,9 @@ public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     return new KafkaJsonDeserializer<TValue>();
   }
 
-  public IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic()
+  public IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic(CancellationToken cancellationToken = default)
   {
-    return ConnectToTopic(timeout: null, cancellationTokenSource.Token);
+    return ConnectToTopic(timeout: null, cancellationToken);
   }
 
   private readonly CancellationTokenSource cancellationTokenSource = new();
@@ -100,6 +102,61 @@ public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
       finally
       {
         Dispose();
+      }
+    }
+  }
+
+  public async IAsyncEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopicAsync(TimeSpan? timeout, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+  {
+    var channel = Channel.CreateUnbounded<ConsumeResult<TKey, TValue>>();
+
+    _ = Task.Run(async () =>
+    {
+      try
+      {
+        using (consumer = CreateConsumer())
+        {
+          try
+          {
+            OnConnectToTopic();
+
+            while (!cancellationToken.IsCancellationRequested && !disposed)
+            {
+              ConsumeResult<TKey, TValue> consumeResult;
+
+              if (timeout.HasValue)
+                consumeResult = consumer.Consume(timeout.Value);
+              else
+                consumeResult = consumer.Consume(cancellationToken);
+
+              await channel.Writer.WriteAsync(consumeResult, cancellationToken);
+
+              if (consumeResult != null)
+                LastConsumedOffset = consumeResult.Offset;
+            }
+          }
+          catch (OperationCanceledException e)
+          {
+            Console.WriteLine(e.Message);
+          }
+          finally
+          {
+            Dispose();
+          }
+        }
+      }
+      finally
+      {
+        channel.Writer.Complete();
+      }
+    }, cancellationToken);
+
+
+    while (await channel.Reader.WaitToReadAsync(cancellationToken))
+    {
+      while (channel.Reader.TryRead(out var message))
+      {
+        yield return message;
       }
     }
   }
