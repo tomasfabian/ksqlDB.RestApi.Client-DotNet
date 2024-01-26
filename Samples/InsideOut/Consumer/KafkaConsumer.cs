@@ -44,8 +44,15 @@ public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
 
   protected IConsumer<TKey, TValue> CreateConsumer()
   {
-    var consumerBuilder = new ConsumerBuilder<TKey, TValue>(consumerConfig)
-      .SetValueDeserializer(CreateDeserializer());
+    var keyDeserializer = CreateKeyDeserializer();
+    var valueDeserializer = CreateValueDeserializer();
+
+    var consumerBuilder = new ConsumerBuilder<TKey, TValue>(consumerConfig);
+
+    if (keyDeserializer != null)
+      consumerBuilder.SetKeyDeserializer(keyDeserializer);
+    if (valueDeserializer != null)
+      consumerBuilder.SetValueDeserializer(valueDeserializer);
 
     InterceptConsumerBuilder(consumerBuilder);
 
@@ -56,7 +63,12 @@ public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
   {
   }
 
-  protected virtual IDeserializer<TValue> CreateDeserializer()
+  protected virtual IDeserializer<TKey> CreateKeyDeserializer()
+  {
+    return null;
+  }
+
+  protected virtual IDeserializer<TValue> CreateValueDeserializer()
   {
     return new KafkaJsonDeserializer<TValue>();
   }
