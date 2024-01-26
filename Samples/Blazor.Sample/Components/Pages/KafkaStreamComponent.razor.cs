@@ -57,7 +57,7 @@ partial class KafkaStreamComponent : IDisposable
 
   private void SubscribeToSensors(SynchronizationContext synchronizationContext)
   {
-    topicSubscription = ItemsConsumer.ConnectToTopic()
+    topicSubscription = ItemsConsumer.ConnectToTopicAsync(null)
       .ToObservable()
       .Select(c => c.Message)
       .SubscribeOn(NewThreadScheduler.Default)
