@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Channels;
 using Confluent.Kafka;
 using InsideOut.Serdes;
+using Microsoft.Extensions.Logging;
 
 namespace InsideOut.Consumer;
 
@@ -10,12 +11,13 @@ public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
   #region Fields
 
   private readonly ConsumerConfig consumerConfig;
+  private readonly ILogger logger;
 
   #endregion
 
   #region Constructors
 
-  public KafkaConsumer(string topicName, ConsumerConfig consumerConfig)
+  public KafkaConsumer(string topicName, ConsumerConfig consumerConfig, ILogger logger = null)
   {
     if(topicName == null)
       throw new ArgumentNullException(nameof(topicName));
@@ -26,6 +28,12 @@ public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     TopicName = topicName;
 
     this.consumerConfig = consumerConfig ?? throw new ArgumentNullException(nameof(consumerConfig));
+    this.logger = logger;
+  }
+
+  public KafkaConsumer(string topicName, ConsumerConfig consumerConfig)
+  : this(topicName, consumerConfig, null)
+  {
   }
 
   #endregion
@@ -85,39 +93,6 @@ public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     return ConnectToTopic(timeout, cancellationTokenSource.Token);
   }
 
-  private IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic(TimeSpan? timeout, CancellationToken cancellationToken = default)
-  {
-    if (disposed)
-      throw new ObjectDisposedException("Cannot access a disposed object.");
-
-    using (consumer = CreateConsumer())
-    {
-      try
-      {
-        OnConnectToTopic();
-
-        while (!cancellationToken.IsCancellationRequested && !disposed)
-        {
-          ConsumeResult<TKey, TValue> consumeResult;
-
-          if (timeout.HasValue) 
-            consumeResult = consumer.Consume(timeout.Value);
-          else
-            consumeResult = consumer.Consume(cancellationToken);
-
-          yield return consumeResult;
-
-          if(consumeResult != null)
-            LastConsumedOffset = consumeResult.Offset;
-        }
-      }
-      finally
-      {
-        Dispose();
-      }
-    }
-  }
-
   public async IAsyncEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopicAsync(TimeSpan? timeout, [EnumeratorCancellation] CancellationToken cancellationToken = default)
   {
     var channel = Channel.CreateUnbounded<ConsumeResult<TKey, TValue>>();
@@ -149,7 +124,7 @@ public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
           }
           catch (OperationCanceledException e)
           {
-            Console.WriteLine(e.Message);
+            logger?.LogError(e.Message);
           }
           finally
           {
@@ -169,6 +144,39 @@ public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
       while (channel.Reader.TryRead(out var message))
       {
         yield return message;
+      }
+    }
+  }
+
+  private IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic(TimeSpan? timeout, CancellationToken cancellationToken = default)
+  {
+    if (disposed)
+      throw new ObjectDisposedException("Cannot access a disposed object.");
+
+    using (consumer = CreateConsumer())
+    {
+      try
+      {
+        OnConnectToTopic();
+
+        while (!cancellationToken.IsCancellationRequested && !disposed)
+        {
+          ConsumeResult<TKey, TValue> consumeResult;
+
+          if (timeout.HasValue) 
+            consumeResult = consumer.Consume(timeout.Value);
+          else
+            consumeResult = consumer.Consume(cancellationToken);
+
+          yield return consumeResult;
+
+          if(consumeResult != null)
+            LastConsumedOffset = consumeResult.Offset;
+        }
+      }
+      finally
+      {
+        Dispose();
       }
     }
   }

@@ -9,8 +9,7 @@ public interface IKafkaConsumer : IDisposable
 
 public interface IKafkaConsumer<TKey, TValue> : IKafkaConsumer
 {
+  IAsyncEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopicAsync(TimeSpan? timeout, CancellationToken cancellationToken = default);
   IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic(CancellationToken cancellationToken = default);
   IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic(TimeSpan timeout);
-
-  IAsyncEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopicAsync(TimeSpan? timeout, CancellationToken cancellationToken = default);
 }

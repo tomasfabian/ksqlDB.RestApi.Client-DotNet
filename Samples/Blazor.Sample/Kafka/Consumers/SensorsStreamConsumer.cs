@@ -6,8 +6,8 @@ namespace Blazor.Sample.Kafka.Consumers;
 
 public class SensorsStreamConsumer : KafkaConsumer<string, SensorsStream>
 {
-  public SensorsStreamConsumer(ConsumerConfig consumerConfig)
-    : base(TopicNames.SensorsStream, consumerConfig)
+  public SensorsStreamConsumer(ConsumerConfig consumerConfig, ILogger<SensorsStreamConsumer> logger)
+    : base(TopicNames.SensorsStream, consumerConfig, logger)
   {
     consumerConfig.Debug += ",consumer";
   }
@@ -17,8 +17,7 @@ public class SensorsStreamConsumer : KafkaConsumer<string, SensorsStream>
     consumerBuilder
       .SetPartitionsRevokedHandler((c, partitions) =>
       {
-        var remaining = c.Assignment.Where(tp =>
-          partitions.Where(x => x.TopicPartition == tp).Count() == 0);
+        var remaining = c.Assignment.Where(tp => partitions.All(x => x.TopicPartition != tp));
 
         var message =
           "** MapWords consumer group partitions revoked: [" +
