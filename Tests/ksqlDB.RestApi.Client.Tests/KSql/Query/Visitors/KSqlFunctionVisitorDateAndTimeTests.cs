@@ -220,4 +220,54 @@ public class KSqlFunctionVisitorDateAndTimeTests : TestBase
   }
 
   #endregion
+
+  #region Explode
+
+  public record Table
+  {
+    public string[] Array { get; set; } = null!;
+    public List<int> List { get; set; } = null!;
+  }
+
+  [Test]
+  public void Explode_BuildKSql_PrintsFunction()
+  {
+    //Arrange
+    Expression<Func<Table, string>> expression = t => t.Array.Explode();
+
+    //Act
+    var kSqlFunction = ClassUnderTest.BuildKSql(expression);
+
+    //Assert
+    kSqlFunction.Should().BeEquivalentTo($"EXPLODE({nameof(Table.Array)})");
+  }
+
+  [Test]
+  public void ExplodeCapturedArray_BuildKSql_PrintsFunction()
+  {
+    //Arrange
+    string[] array = ["a", "b"];
+    Expression<Func<Table, string>> expression = t => array.Explode();
+
+    //Act
+    var kSqlFunction = ClassUnderTest.BuildKSql(expression);
+
+    //Assert
+    kSqlFunction.Should().BeEquivalentTo("EXPLODE(ARRAY['a', 'b'])");
+  }
+
+  [Test]
+  public void ExplodeList_BuildKSql_PrintsFunction()
+  {
+    //Arrange
+    Expression<Func<Table, int>> expression = t => t.List.Explode();
+
+    //Act
+    var kSqlFunction = ClassUnderTest.BuildKSql(expression);
+
+    //Assert
+    kSqlFunction.Should().BeEquivalentTo($"EXPLODE({nameof(Table.List)})");
+  }
+  
+  #endregion
 }
