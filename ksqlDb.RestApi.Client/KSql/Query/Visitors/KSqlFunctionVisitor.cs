@@ -51,6 +51,11 @@ internal class KSqlFunctionVisitor : KSqlVisitor
           Visit(methodCallExpression.Arguments[1]);
           Append(")");
           break;
+        case nameof(KSqlFunctionsExtensions.Explode):
+          Append($"{methodInfo.Name.ToUpper()}(");
+          Visit(methodCallExpression.Arguments[0]);
+          Append(")");
+          break;
         case nameof(KSqlFunctionsExtensions.LPad):
         case nameof(KSqlFunctionsExtensions.Round):
         case nameof(KSqlFunctionsExtensions.Entries):

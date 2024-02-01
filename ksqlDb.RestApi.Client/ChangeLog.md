@@ -1,5 +1,8 @@
 # ksqlDB.RestApi.Client
 
+# 3.5.0
+- added [Explode](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/table-functions/#explode) table function
+
 # 3.4.0
 - added `CommandStatus` class for introspecting [query status](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/status-endpoint/)
 - fixed usage of `Equals` in queries (Predicate with .Equals fails. #50)

@@ -2196,4 +2196,18 @@ public static class KSqlFunctionsExtensions
   }
 
   #endregion
+
+  #region Table functions
+
+  /// <summary>
+  /// Explodes an array. This function outputs one value for each element of the array.
+  /// </summary>
+  /// <typeparam name="T">Type of array element.</typeparam>
+  /// <param name="items">The array to explode.</param>
+  public static T Explode<T>(this IEnumerable<T> items)
+  {
+    throw new InvalidOperationException(ServerSideOperationErrorMessage);
+  }
+
+  #endregion
 }
