@@ -93,9 +93,12 @@ public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     return ConnectToTopic(timeout, cancellationTokenSource.Token);
   }
 
+  private CancellationTokenSource? linkedCts;
+
   public async IAsyncEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopicAsync(TimeSpan? timeout, [EnumeratorCancellation] CancellationToken cancellationToken = default)
   {
     var channel = Channel.CreateUnbounded<ConsumeResult<TKey, TValue>>();
+    linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
     _ = Task.Run(async () =>
     {
@@ -107,16 +110,16 @@ public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
           {
             OnConnectToTopic();
 
-            while (!cancellationToken.IsCancellationRequested && !disposed)
+            while (!linkedCts.Token.IsCancellationRequested && !disposed)
             {
               ConsumeResult<TKey, TValue> consumeResult;
 
               if (timeout.HasValue)
                 consumeResult = consumer.Consume(timeout.Value);
               else
-                consumeResult = consumer.Consume(cancellationToken);
+                consumeResult = consumer.Consume(linkedCts.Token);
 
-              await channel.Writer.WriteAsync(consumeResult, cancellationToken);
+              await channel.Writer.WriteAsync(consumeResult, linkedCts.Token);
 
               if (consumeResult != null)
                 LastConsumedOffset = consumeResult.Offset;
@@ -135,17 +138,22 @@ public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
       finally
       {
         channel.Writer.Complete();
+        await linkedCts.CancelAsync();
       }
-    }, cancellationToken);
+    }, linkedCts.Token);
 
 
-    while (await channel.Reader.WaitToReadAsync(cancellationToken))
+    Console.WriteLine("start");
+
+    while (await channel.Reader.WaitToReadAsync(linkedCts.Token))
     {
       while (channel.Reader.TryRead(out var message))
       {
         yield return message;
       }
     }
+
+    Console.WriteLine("huhuuu");
   }
 
   private IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic(TimeSpan? timeout, CancellationToken cancellationToken = default)
@@ -218,6 +226,7 @@ public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
       OnDispose();
         
       cancellationTokenSource.Cancel();
+      linkedCts?.Cancel();
 
       LastConsumedOffset = null;
     }

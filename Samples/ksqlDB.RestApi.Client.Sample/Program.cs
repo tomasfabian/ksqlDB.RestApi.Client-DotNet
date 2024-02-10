@@ -76,8 +76,6 @@ public static class Program
       DisposeHttpClient = false
     };
 
-    restApiProvider.SetCredentials(new BasicAuthCredentials("fred", "letmein"));
-
     var moviesProvider = new MoviesProvider(restApiProvider);
 
     await moviesProvider.CreateTablesAsync();
@@ -318,6 +316,13 @@ public static class Program
       .Subscribe(new TweetsObserver());
 
     return subscriptions;
+  }
+
+  private static async Task DescribeFunction(IKSqlDbRestApiClient restApiProvider, string functionName)
+  {
+    var httpResponseMessage = await restApiProvider.ExecuteStatementAsync(new KSqlDbStatement($"DESCRIBE FUNCTION {functionName};"));
+    var content = await httpResponseMessage.Content.ReadAsStringAsync();
+    Console.WriteLine(content);
   }
 
   private static async Task ToQueryStringExample(string ksqlDbUrl)
