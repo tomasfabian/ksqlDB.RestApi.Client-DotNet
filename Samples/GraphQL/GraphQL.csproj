@@ -5,12 +5,14 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <UserSecretsId>6d373017-8ee0-46db-a336-4bce7215a030</UserSecretsId>
+    <UserSecretsId>a90c5753-bd0a-4529-8b1e-551b407ab272</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="HotChocolate.AspNetCore" Version="13.8.1" />
+    <PackageReference Include="HotChocolate.Data" Version="13.8.1" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
   </ItemGroup>
 
