@@ -71,6 +71,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitWorkflows", "GitWorkflow
 		.github\workflows\test-deploy.yml = .github\workflows\test-deploy.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL", "Samples\GraphQL\GraphQL.csproj", "{25FD72C9-7292-4911-9B74-C562DE312690}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,6 +131,10 @@ Global
 		{EDEBF0B8-1A4B-4092-A5D4-E8103DC1527F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDEBF0B8-1A4B-4092-A5D4-E8103DC1527F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDEBF0B8-1A4B-4092-A5D4-E8103DC1527F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25FD72C9-7292-4911-9B74-C562DE312690}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25FD72C9-7292-4911-9B74-C562DE312690}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25FD72C9-7292-4911-9B74-C562DE312690}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25FD72C9-7292-4911-9B74-C562DE312690}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -147,6 +153,7 @@ Global
 		{CA0416C7-5534-4DB2-A560-6FBD65337643} = {AA5681E8-1682-47E9-9159-4AE95A92E694}
 		{EDEBF0B8-1A4B-4092-A5D4-E8103DC1527F} = {AA5681E8-1682-47E9-9159-4AE95A92E694}
 		{5D9DDA2E-69B0-44D1-A125-95DDC79E2D2B} = {999C8EEC-CCFA-4183-805A-1804367D8F75}
+		{25FD72C9-7292-4911-9B74-C562DE312690} = {AA5681E8-1682-47E9-9159-4AE95A92E694}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {08C8585D-5006-4484-AC12-72B1F42058D7}
