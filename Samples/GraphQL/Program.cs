@@ -14,7 +14,9 @@ builder.Services.AddGraphQLServer()
   .AddSubscriptionType()
   .AddTypeExtension<Subscription>();
 
-var ksqlDbUrl = "http://localhost:8088";
+var config = Configuration();
+
+var ksqlDbUrl = config.GetValue<string>("ksqlDbUrl") ?? throw new Exception("ksqlDbUrl is missing in appsettings.json");
 
 builder.Services.AddDbContext<IMoviesKSqlDbContext, MoviesKSqlDbContext>(
   options =>
@@ -44,3 +46,10 @@ app.MapGraphQL();
 app.UseWebSockets();
 
 app.Run();
+
+IConfiguration Configuration()
+{
+  return new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .Build();
+}
