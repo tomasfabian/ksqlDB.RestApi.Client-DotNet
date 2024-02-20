@@ -158,7 +158,7 @@ public class StatementGeneratorTests
     string statement = StatementGenerator.CreateOrReplaceTable<Port>(creationMetadata);
 
     //Assert
-    statement.Should().Contain("PortType VARCHAR");
+    statement.Should().Contain($"{nameof(PortType)} VARCHAR");
   }
 
   internal class Port
