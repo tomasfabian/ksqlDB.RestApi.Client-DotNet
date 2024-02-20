@@ -7,6 +7,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using NUnit.Framework;
 using UnitTests;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
+using ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 
@@ -339,5 +340,53 @@ public class RowValueJsonSerializerTests : TestBase
       //Act
       ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
     });
+  }
+
+  [Test]
+  public void Deserialize_VarcharAsEnum()
+  {
+    //Arrange
+    var queryStreamHeader = new QueryStreamHeader()
+    {
+      ColumnTypes = [KSqlTypes.Varchar],
+      ColumnNames = ["KSQL_COL_0"],
+    };
+
+    ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
+
+    var value = "Snowflake";
+
+    string rawJson = $"[\"{value}\"]";
+    var jsonSerializationOptions = KSqlDbJsonSerializerOptions.CreateInstance();
+
+    //Act
+    var rowValue = ClassUnderTest.Deserialize<StatementGeneratorTests.PortType>(rawJson, jsonSerializationOptions);
+
+    //Assert
+    rowValue.Value.Should().Be(StatementGeneratorTests.PortType.Snowflake);
+  }
+
+  [Test]
+  public void Deserialize_IntoClass_VarcharAsEnumProperty()
+  {
+    //Arrange
+    var queryStreamHeader = new QueryStreamHeader()
+    {
+      ColumnTypes = [KSqlTypes.Int, KSqlTypes.Varchar],
+      ColumnNames = [nameof(StatementGeneratorTests.Port.Id).ToUpper(), nameof(StatementGeneratorTests.Port.PortType).ToUpper()],
+    };
+
+    ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
+
+    var value = "Snowflake";
+
+    string rawJson = $"[42,\"{value}\"]";
+    var jsonSerializationOptions = KSqlDbJsonSerializerOptions.CreateInstance();
+
+    //Act
+    var rowValue = ClassUnderTest.Deserialize<StatementGeneratorTests.Port>(rawJson, jsonSerializationOptions);
+
+    //Assert
+    rowValue.Value.PortType.Should().Be(StatementGeneratorTests.PortType.Snowflake);
   }
 }
