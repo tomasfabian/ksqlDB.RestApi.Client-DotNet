@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -61,6 +61,8 @@ internal sealed class CreateEntity : CreateEntityStatement
     {
       ksqlType = type.Name.ToUpper();
     }
+    else if (type.IsEnum)
+      ksqlType = "VARCHAR";
     else
     {
       Type elementType = null;
