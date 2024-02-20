@@ -1,9 +1,10 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
+using ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators;
 using ksqlDb.RestApi.Client.Tests.Models.Movies;
 using NUnit.Framework;
 
@@ -152,6 +153,25 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Visitors
       //Assert
       var ksql = stringBuilder.ToString();
       ksql.Should().BeEquivalentTo("STRUCT(Title := 'title', Id := 0, Release_Year := 0)");
+    }
+
+    [Test]
+    public void Enum()
+    {
+      //Arrange
+      var value = new StatementGeneratorTests.Port
+      {
+        Id = 42,
+        PortType = StatementGeneratorTests.PortType.Kafka
+      };
+      Expression expression = Expression.Constant(value);
+
+      //Act
+      constantVisitor.Visit(expression);
+
+      //Assert
+      var ksql = stringBuilder.ToString();
+      ksql.Should().BeEquivalentTo("STRUCT(Id := 42, PortType := 'Kafka')");
     }
   }
 }
