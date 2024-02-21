@@ -100,7 +100,7 @@ public class JsonArrayParserTests : TestBase
     var json = ClassUnderTest.CreateJson(headerColumns, row);
 
     //Assert
-    json.Should().BeEquivalentTo("{\r\n\"Value\": 1\r\n,\"Arr\": [[1,2],[3,4]]\r\n}\r\n");
+    json.Should().BeEquivalentTo($$"""{{{Environment.NewLine}}"Value": 1{{Environment.NewLine}},"Arr": [[1,2],[3,4]]{{Environment.NewLine}}}{{Environment.NewLine}}""");
   }
 
   [Test]
@@ -115,7 +115,7 @@ public class JsonArrayParserTests : TestBase
     var json = ClassUnderTest.CreateJson(headerColumns, row);
 
     //Assert
-    json.Should().BeEquivalentTo("{\r\n\"Value\": 1\r\n,\"Arr\": [{\"a\":1,\"b\":2},{\"d\":4,\"c\":3}]\r\n}\r\n");
+    json.Should().BeEquivalentTo($$"""{{{Environment.NewLine}}"Value": 1{{Environment.NewLine}},"Arr": [{"a":1,"b":2},{"d":4,"c":3}]{{Environment.NewLine}}}{{Environment.NewLine}}""");
   }
 
   [Test]
@@ -130,7 +130,7 @@ public class JsonArrayParserTests : TestBase
     var json = ClassUnderTest.CreateJson(headerColumns, row);
 
     //Assert
-    json.Should().BeEquivalentTo("{\r\n\"Value\": 1\r\n,\"Map\": {\"a\":{\"a\":1,\"b\":2},\"b\":{\"d\":4,\"c\":3}}\r\n}\r\n");
+    json.Should().BeEquivalentTo($$$"""{{{{Environment.NewLine}}}"Value": 1{{{Environment.NewLine}}},"Map": {"a":{"a":1,"b":2},"b":{"d":4,"c":3}}{{{Environment.NewLine}}}}{{{Environment.NewLine}}}""");
   }
 
   [Test]
