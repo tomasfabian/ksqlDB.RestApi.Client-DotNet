@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
@@ -70,6 +70,8 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
       value = $"'{value}'";
     else if (type.IsPrimitive)
       value = value.ToString();
+    else if (type.IsEnum)
+      value = $"'{value}'";
     else if (type.IsDictionary())
       GenerateMap(valueFormatters, type, ref value);
     else if (type.IsArray)

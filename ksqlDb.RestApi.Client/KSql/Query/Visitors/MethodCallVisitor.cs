@@ -5,6 +5,7 @@ using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
 
@@ -135,11 +136,11 @@ internal class MethodCallVisitor : KSqlVisitor
 
       string ksqlType = methodName switch
       {
-        nameof(string.ToString) => "VARCHAR",
-        nameof(Convert.ToInt32) => "INT",
-        nameof(Convert.ToInt64) => "BIGINT",
-        nameof(KSQLConvert.ToDecimal) => $"DECIMAL({methodCallExpression.Arguments[1]},{methodCallExpression.Arguments[2]})",
-        nameof(Convert.ToDouble) => "DOUBLE",
+        nameof(string.ToString) => KSqlTypes.Varchar,
+        nameof(Convert.ToInt32) => KSqlTypes.Int,
+        nameof(Convert.ToInt64) => KSqlTypes.BigInt,
+        nameof(KSQLConvert.ToDecimal) => $"{KSqlTypes.Decimal}({methodCallExpression.Arguments[1]},{methodCallExpression.Arguments[2]})",
+        nameof(Convert.ToDouble) => KSqlTypes.Double,
         _ => throw new ArgumentOutOfRangeException(nameof(methodName))
       };
 

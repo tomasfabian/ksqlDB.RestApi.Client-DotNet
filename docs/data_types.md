@@ -7,7 +7,7 @@ These data types represent the type of data stored in each column of a stream or
 
 |     ksql     |             c#             |
 |:------------:|:--------------------------:|
-|   VARCHAR    |           string           |
+|   VARCHAR    |    string or System.Enum   |
 |   INTEGER    |            int             |
 |    BIGINT    |            long            |
 |    DOUBLE    |           double           |

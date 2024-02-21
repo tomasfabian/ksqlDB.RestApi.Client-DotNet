@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -15,7 +15,7 @@ internal sealed class CreateEntity : CreateEntityStatement
     var ksqlType = string.Empty;
       
     if (type == typeof(byte[]))
-      ksqlType = "BYTES";
+      ksqlType = KSqlTypes.Bytes;
     else if (type.IsArray)
     {
       var elementType = KSqlTypeTranslator(type.GetElementType());
@@ -32,25 +32,25 @@ internal sealed class CreateEntity : CreateEntityStatement
       ksqlType = $"MAP<{keyType}, {valueType}>";
     }
     else if (type == typeof(string))
-      ksqlType = "VARCHAR";
+      ksqlType = KSqlTypes.Varchar;
     else if (type == typeof(Guid))
-      ksqlType = "VARCHAR";
+      ksqlType = KSqlTypes.Varchar;
     else if (type.IsOneOfFollowing(typeof(int), typeof(int?), typeof(short), typeof(short?)))
-      ksqlType = "INT";
+      ksqlType = KSqlTypes.Int;
     else if (type.IsOneOfFollowing(typeof(long), typeof(long?)))
-      ksqlType = "BIGINT";
+      ksqlType = KSqlTypes.BigInt;
     else if (type.IsOneOfFollowing(typeof(double), typeof(double?)))
-      ksqlType = "DOUBLE";
+      ksqlType = KSqlTypes.Double;
     else if (type.IsOneOfFollowing(typeof(bool), typeof(bool?)))
-      ksqlType = "BOOLEAN";
+      ksqlType = KSqlTypes.Boolean;
     else if (type == typeof(decimal))
-      ksqlType = "DECIMAL";
+      ksqlType = KSqlTypes.Decimal;
     else if (type == typeof(DateTime))
-      ksqlType = "DATE";
+      ksqlType = KSqlTypes.Date;
     else if (type == typeof(TimeSpan))
-      ksqlType = "TIME";
+      ksqlType = KSqlTypes.Time;
     else if (type == typeof(DateTimeOffset))
-      ksqlType = "TIMESTAMP";
+      ksqlType = KSqlTypes.Timestamp;
     else if (!type.IsGenericType && type.TryGetAttribute<StructAttribute>() != null)
     {
       var ksqlProperties = GetProperties(type);
@@ -61,6 +61,8 @@ internal sealed class CreateEntity : CreateEntityStatement
     {
       ksqlType = type.Name.ToUpper();
     }
+    else if (type.IsEnum)
+      ksqlType = KSqlTypes.Varchar;
     else
     {
       Type elementType = null;

@@ -1,8 +1,9 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements;
 using NUnit.Framework;
 
@@ -146,4 +147,30 @@ public class StatementGeneratorTests
     //Assert
     statement.Should().Be($"CREATE SOURCE STREAM{GetExpectedClauses(isTable: false)}");
   }
+
+  [Test]
+  public void CreateOrReplaceTableWithEnumProperty()
+  {
+    //Arrange
+    var creationMetadata = GetEntityCreationMetadata(topicName: nameof(Port).ToLower());
+
+    //Act
+    string statement = StatementGenerator.CreateOrReplaceTable<Port>(creationMetadata);
+
+    //Assert
+    statement.Should().Contain($"{nameof(PortType)} VARCHAR");
+  }
+}
+
+internal class Port
+{
+  [Key]
+  public int Id { get; set; }
+  public PortType PortType { get; set; }
+}
+
+internal enum PortType
+{
+  Kafka = 0,
+  Snowflake = 1,
 }

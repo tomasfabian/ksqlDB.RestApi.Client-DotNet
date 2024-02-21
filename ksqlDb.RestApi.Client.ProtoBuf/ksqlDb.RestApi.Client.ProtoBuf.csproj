@@ -30,7 +30,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="ksqlDB.RestApi.Client.ProtoBuf.Tests" />
+		<InternalsVisibleTo Include="ksqlDb.RestApi.Client.ProtoBuf.Tests" />
 	</ItemGroup>
 
 	<ItemGroup>

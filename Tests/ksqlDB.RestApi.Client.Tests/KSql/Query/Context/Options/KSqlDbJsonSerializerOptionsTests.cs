@@ -2,6 +2,7 @@ using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Context.JsonConverters;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using NUnit.Framework;
+using System.Text.Json.Serialization;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Context.Options;
 
@@ -44,5 +45,18 @@ public class KSqlDbJsonSerializerOptionsTests
 
     //Assert
     converters.OfType<JsonConverterGuid>().Any().Should().BeTrue();
+  }
+
+  [Test]
+  public void CreateInstance_Converters_ContainsJsonStringEnumConverter()
+  {
+    //Arrange
+    var options = KSqlDbJsonSerializerOptions.CreateInstance();
+
+    //Act
+    var converters = options.Converters;
+
+    //Assert
+    converters.OfType<JsonStringEnumConverter>().Any().Should().BeTrue();
   }
 }

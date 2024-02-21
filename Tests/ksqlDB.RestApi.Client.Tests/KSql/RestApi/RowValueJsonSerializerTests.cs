@@ -3,9 +3,11 @@ using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using NUnit.Framework;
 using UnitTests;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
+using ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 
@@ -20,8 +22,8 @@ public class RowValueJsonSerializerTests : TestBase
 
     var queryStreamHeader = new QueryStreamHeader()
     {
-      ColumnTypes = new[] { "STRING" },
-      ColumnNames = new[] { "NAME" },
+      ColumnTypes = [KSqlTypes.Varchar],
+      ColumnNames = ["NAME"],
     };
 
     ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
@@ -38,8 +40,8 @@ public class RowValueJsonSerializerTests : TestBase
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
     {
-      ColumnTypes = new[] { "STRING" },
-      ColumnNames = new[] { "NAME" },
+      ColumnTypes = [KSqlTypes.Varchar],
+      ColumnNames = ["NAME"],
     };
 
     ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
@@ -60,8 +62,8 @@ public class RowValueJsonSerializerTests : TestBase
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
     {
-      ColumnTypes = new[] { "STRING" },
-      ColumnNames = new[] { "KSQL_COL_0" },
+      ColumnTypes = [KSqlTypes.Varchar],
+      ColumnNames = ["KSQL_COL_0"],
     };
 
     ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
@@ -82,8 +84,8 @@ public class RowValueJsonSerializerTests : TestBase
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
     {
-      ColumnTypes = new[] { "STRING" },
-      ColumnNames = new[] { "KSQL_COL_0" },
+      ColumnTypes = [KSqlTypes.Varchar],
+      ColumnNames = ["KSQL_COL_0"],
     };
 
     ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
@@ -107,8 +109,8 @@ public class RowValueJsonSerializerTests : TestBase
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
     {
-      ColumnTypes = new[] { "MAP<STRING, INTEGER>" },
-      ColumnNames = new[] { "KSQL_COL_0" },
+      ColumnTypes = ["MAP<STRING, INTEGER>"],
+      ColumnNames = ["KSQL_COL_0"],
     };
 
     ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
@@ -131,8 +133,8 @@ public class RowValueJsonSerializerTests : TestBase
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
     {
-      ColumnTypes = new[] { "INTEGER" },
-      ColumnNames = new[] { "KSQL_COL_0" },
+      ColumnTypes = [KSqlTypes.Int],
+      ColumnNames = ["KSQL_COL_0"],
     };
 
     ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
@@ -160,8 +162,8 @@ public class RowValueJsonSerializerTests : TestBase
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
     {
-      ColumnTypes = new[] { "STRUCT<`NAME` STRING>" },
-      ColumnNames = new[] { "KSQL_COL_0" },
+      ColumnTypes = ["STRUCT<`NAME` STRING>"],
+      ColumnNames = ["KSQL_COL_0"],
     };
 
     ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
@@ -190,8 +192,8 @@ public class RowValueJsonSerializerTests : TestBase
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
     {
-      ColumnTypes = new[] { "INTEGER", "STRING", "INTEGER", "BIGINT" },
-      ColumnNames = new[] { "ID", "TITLE", "RELEASE_NAME", "ROWTIME" },
+      ColumnTypes = [KSqlTypes.Int, KSqlTypes.Varchar, KSqlTypes.Int, KSqlTypes.BigInt],
+      ColumnNames = ["ID", "TITLE", "RELEASE_NAME", "ROWTIME"],
     };
 
     ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
@@ -234,8 +236,8 @@ public class RowValueJsonSerializerTests : TestBase
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
     {
-      ColumnTypes = new[] { "STRING" },
-      ColumnNames = new[] { "KSQL_COL_0" },
+      ColumnTypes = [KSqlTypes.Varchar],
+      ColumnNames = ["KSQL_COL_0"],
     };
 
     ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
@@ -261,8 +263,8 @@ public class RowValueJsonSerializerTests : TestBase
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
     {
-      ColumnTypes = new[] { "MAP<STRING, INTEGER>" },
-      ColumnNames = new[] { "DICT" },
+      ColumnTypes = ["MAP<STRING, INTEGER>"],
+      ColumnNames = ["DICT"],
     };
 
     ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
@@ -282,8 +284,8 @@ public class RowValueJsonSerializerTests : TestBase
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
     {
-      ColumnTypes = new[] { "BYTES" },
-      ColumnNames = new[] { "MESSAGE" },
+      ColumnTypes = [KSqlTypes.Bytes],
+      ColumnNames = ["MESSAGE"],
     };
 
     ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
@@ -306,8 +308,8 @@ public class RowValueJsonSerializerTests : TestBase
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
     {
-      ColumnTypes = new[] { "INT" },
-      ColumnNames = new[] { "MESSAGE" },
+      ColumnTypes = [KSqlTypes.Int],
+      ColumnNames = ["MESSAGE"],
     };
 
     ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
@@ -328,8 +330,8 @@ public class RowValueJsonSerializerTests : TestBase
     //Arrange
     var queryStreamHeader = new QueryStreamHeader()
     {
-      ColumnTypes = new[] { "INT", "STRING" },
-      ColumnNames = new[] { "MESSAGE" },
+      ColumnTypes = [KSqlTypes.Int, KSqlTypes.Varchar],
+      ColumnNames = ["MESSAGE"],
     };
 
     //Assert
@@ -338,5 +340,53 @@ public class RowValueJsonSerializerTests : TestBase
       //Act
       ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
     });
+  }
+
+  [Test]
+  public void Deserialize_VarcharAsEnum()
+  {
+    //Arrange
+    var queryStreamHeader = new QueryStreamHeader()
+    {
+      ColumnTypes = [KSqlTypes.Varchar],
+      ColumnNames = ["KSQL_COL_0"],
+    };
+
+    ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
+
+    var value = "Snowflake";
+
+    string rawJson = $"[\"{value}\"]";
+    var jsonSerializationOptions = KSqlDbJsonSerializerOptions.CreateInstance();
+
+    //Act
+    var rowValue = ClassUnderTest.Deserialize<PortType>(rawJson, jsonSerializationOptions);
+
+    //Assert
+    rowValue.Value.Should().Be(PortType.Snowflake);
+  }
+
+  [Test]
+  public void Deserialize_IntoClass_VarcharAsEnumProperty()
+  {
+    //Arrange
+    var queryStreamHeader = new QueryStreamHeader()
+    {
+      ColumnTypes = [KSqlTypes.Int, KSqlTypes.Varchar],
+      ColumnNames = [nameof(Port.Id).ToUpper(), nameof(Port.PortType).ToUpper()],
+    };
+
+    ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
+
+    var value = "Snowflake";
+
+    string rawJson = $"[42,\"{value}\"]";
+    var jsonSerializationOptions = KSqlDbJsonSerializerOptions.CreateInstance();
+
+    //Act
+    var rowValue = ClassUnderTest.Deserialize<Port>(rawJson, jsonSerializationOptions);
+
+    //Assert
+    rowValue.Value.PortType.Should().Be(PortType.Snowflake);
   }
 }
