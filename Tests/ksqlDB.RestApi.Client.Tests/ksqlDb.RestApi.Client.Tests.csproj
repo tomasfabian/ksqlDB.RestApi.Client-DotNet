@@ -21,7 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDB.RestApi.Client.csproj" />
+		<ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />
 		<ProjectReference Include="..\UnitTests\UnitTests.csproj" />
 	</ItemGroup>
 </Project>
