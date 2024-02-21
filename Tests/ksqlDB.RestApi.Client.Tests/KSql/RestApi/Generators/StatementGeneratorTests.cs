@@ -160,17 +160,17 @@ public class StatementGeneratorTests
     //Assert
     statement.Should().Contain($"{nameof(PortType)} VARCHAR");
   }
+}
 
-  internal class Port
-  {
-    [Key]
-    public int Id { get; set; }
-    public PortType PortType { get; set; }
-  }
+internal class Port
+{
+  [Key]
+  public int Id { get; set; }
+  public PortType PortType { get; set; }
+}
 
-  internal enum PortType
-  {
-    Kafka = 0,
-    Snowflake = 1,
-  }
+internal enum PortType
+{
+  Kafka = 0,
+  Snowflake = 1,
 }

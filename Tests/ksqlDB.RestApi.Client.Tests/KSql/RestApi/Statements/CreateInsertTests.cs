@@ -4,6 +4,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+using ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators;
 using ksqlDb.RestApi.Client.Tests.Models.Movies;
 using NUnit.Framework;
 
@@ -723,6 +724,23 @@ public class CreateInsertTests
 
     //Assert
     statement.Should().Be($"INSERT INTO {nameof(IMyUpdate)}s ({nameof(IMyUpdate.Field)}) VALUES ('{value.Field}');");
+  }
+
+  [Test]
+  public void Generate_Enum()
+  {
+    //Arrange
+    var value = new Port
+    {
+      Id = 42,
+      PortType = PortType.Snowflake,
+    };
+
+    //Act
+    string statement = new CreateInsert().Generate(value, insertProperties: null);
+
+    //Assert
+    statement.Should().Be($"INSERT INTO {nameof(Port)}s ({nameof(Port.Id)}, {nameof(Port.PortType)}) VALUES (42, '{value.PortType}');");
   }
 
   #region TODO insert with functions

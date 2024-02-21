@@ -360,10 +360,10 @@ public class RowValueJsonSerializerTests : TestBase
     var jsonSerializationOptions = KSqlDbJsonSerializerOptions.CreateInstance();
 
     //Act
-    var rowValue = ClassUnderTest.Deserialize<StatementGeneratorTests.PortType>(rawJson, jsonSerializationOptions);
+    var rowValue = ClassUnderTest.Deserialize<PortType>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value.Should().Be(StatementGeneratorTests.PortType.Snowflake);
+    rowValue.Value.Should().Be(PortType.Snowflake);
   }
 
   [Test]
@@ -373,7 +373,7 @@ public class RowValueJsonSerializerTests : TestBase
     var queryStreamHeader = new QueryStreamHeader()
     {
       ColumnTypes = [KSqlTypes.Int, KSqlTypes.Varchar],
-      ColumnNames = [nameof(StatementGeneratorTests.Port.Id).ToUpper(), nameof(StatementGeneratorTests.Port.PortType).ToUpper()],
+      ColumnNames = [nameof(Port.Id).ToUpper(), nameof(Port.PortType).ToUpper()],
     };
 
     ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
@@ -384,9 +384,9 @@ public class RowValueJsonSerializerTests : TestBase
     var jsonSerializationOptions = KSqlDbJsonSerializerOptions.CreateInstance();
 
     //Act
-    var rowValue = ClassUnderTest.Deserialize<StatementGeneratorTests.Port>(rawJson, jsonSerializationOptions);
+    var rowValue = ClassUnderTest.Deserialize<Port>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value.PortType.Should().Be(StatementGeneratorTests.PortType.Snowflake);
+    rowValue.Value.PortType.Should().Be(PortType.Snowflake);
   }
 }

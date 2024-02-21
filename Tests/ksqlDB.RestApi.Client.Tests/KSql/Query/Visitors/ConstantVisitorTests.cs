@@ -159,10 +159,10 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Visitors
     public void Enum()
     {
       //Arrange
-      var value = new StatementGeneratorTests.Port
+      var value = new Port
       {
         Id = 42,
-        PortType = StatementGeneratorTests.PortType.Kafka
+        PortType = PortType.Kafka
       };
       Expression expression = Expression.Constant(value);
 
