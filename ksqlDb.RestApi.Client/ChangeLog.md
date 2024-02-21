@@ -1,5 +1,8 @@
 # ksqlDB.RestApi.Client
 
+# 3.6.0-rc.1
+- added .NET Enums to VARCHAR mapping #55. `JsonStringEnumConverter` was added to `KSqlDbJsonSerializerOptions`.
+
 # 3.5.0
 - added [Explode](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/table-functions/#explode) table function
 
