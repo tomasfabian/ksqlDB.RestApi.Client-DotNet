@@ -326,3 +326,45 @@ SELECT Id, ROWTIME, ROWOFFSET, ROWPARTITION, HEADERS
   FROM movies
   EMIT CHANGES;
 ```
+
+### System.Enum to VARCHAR type
+
+This C# code demonstrates how to insert data into a `ksqlDB` table where an enum value is converted to a `VARCHAR` type.
+
+The `CreateInsert()` method is used to generate a SQL insert statement.
+
+```C#
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+
+var port = new Port
+{
+  Id = 42,
+  PortType = PortType.Snowflake,
+};
+
+string statement = new CreateInsert().Generate(port, insertProperties: null);
+```
+
+The `Port` class represents the structure of the data to be inserted, where `Id` is the primary key and `PortType` is an enum representing different types of ports.
+
+```C#
+internal class Port
+{
+  [Key]
+  public int Id { get; set; }
+  public PortType PortType { get; set; }
+}
+
+internal enum PortType
+{
+  Kafka = 0,
+  Snowflake = 1,
+}
+```
+
+The generated SQL insert statement inserts the values 42 and 'Snowflake' into the `Ports` table, representing the ID and port type respectively.
+
+```SQL
+INSERT INTO Ports (Id, PortType) VALUES (42, 'Snowflake');
+```
