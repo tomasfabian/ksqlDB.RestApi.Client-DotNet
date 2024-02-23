@@ -204,7 +204,7 @@ public class JsonArrayParserTests : TestBase
     var json = ClassUnderTest.CreateJson(headerColumns, row);
 
     //Assert
-    string expectedJson = JObject.Parse("{\r\n\"INTERNALID\": \"7775dee282f011724d3108f25302b999\"\r\n,\"FILENAME\": \"test.json\"\r\n,\"TYPE\": \"Monitor\"\r\n,\"NAME\": \"27\\\" XZ272UVBMIIPHX Black\"\r\n}").ToString();
+    string expectedJson = JObject.Parse($$$"""{{{{Environment.NewLine}}}"INTERNALID": "7775dee282f011724d3108f25302b999"{{{Environment.NewLine}}},"FILENAME": "test.json"{{{Environment.NewLine}}},"TYPE": "Monitor"{{{Environment.NewLine}}},"NAME": "27\" XZ272UVBMIIPHX Black"{{{Environment.NewLine}}}}""").ToString();
     JObject.Parse(json).ToString().Should().BeEquivalentTo(expectedJson);
   }
 
