@@ -18,5 +18,27 @@ Vagrant.configure("2") do |config|
     
     sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 
+    declare repo_version=$(if command -v lsb_release &> /dev/null; then lsb_release -r -s; else grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"'; fi)
+
+    # Download Microsoft signing key and repository
+    wget https://packages.microsoft.com/config/ubuntu/$repo_version/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+
+    # Install Microsoft signing key and repository
+    sudo dpkg -i packages-microsoft-prod.deb
+
+    # Clean up
+    rm packages-microsoft-prod.deb
+
+    # Update packages
+    sudo apt update
+    sudo apt install -y dotnet-sdk-8.0
+    sudo apt install -y nuget
+
+    cd /vagrant
+
+    #dotnet clean ksqlDb.RestApi.Client.sln --configuration Release && dotnet nuget locals all --clear
+    #dotnet restore ksqlDb.RestApi.Client.sln
+    #dotnet build ksqlDb.RestApi.Client.sln --configuration Release
+    #dotnet test ./Tests/ksqlDB.RestApi.Client.Tests/ksqlDb.RestApi.Client.Tests.csproj
   SHELL
 end
