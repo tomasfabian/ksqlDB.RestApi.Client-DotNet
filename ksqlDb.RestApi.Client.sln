@@ -24,6 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 		README.md = README.md
+		Vagrantfile = Vagrantfile
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ksqlDb.RestApi.Client.ProtoBuf", "ksqlDb.RestApi.Client.ProtoBuf\ksqlDb.RestApi.Client.ProtoBuf.csproj", "{304FA9F7-9B0F-49FD-8CB5-B3286C1F988E}"
@@ -71,7 +72,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitWorkflows", "GitWorkflow
 		.github\workflows\test-deploy.yml = .github\workflows\test-deploy.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL", "Samples\GraphQL\GraphQL.csproj", "{25FD72C9-7292-4911-9B74-C562DE312690}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL", "Samples\GraphQL\GraphQL.csproj", "{25FD72C9-7292-4911-9B74-C562DE312690}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
