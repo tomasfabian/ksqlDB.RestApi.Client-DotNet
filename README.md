@@ -12,16 +12,16 @@ Install-Package ksqlDB.RestApi.Client
 ```
 or with .NET CLI
 ```
-dotnet add package ksqlDB.RestApi.Client
+dotnet add package ksqlDb.RestApi.Client
 ```
 This adds a `<PackageReference>` to your csproj file, similar to the following:
 ```XML
-<PackageReference Include="ksqlDB.RestApi.Client" Version="3.0.0" />
+<PackageReference Include="ksqlDb.RestApi.Client" Version="3.5.0" />
 ```
 
 Alternative option is to use [Protobuf content type](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/protobuf.md):
 ```
-dotnet add package ksqlDB.RestApi.Client.ProtoBuf
+dotnet add package ksqlDb.RestApi.Client.ProtoBuf
 ```
 
 The following example can be tried out with a [.NET interactive Notebook](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/Notebooks):
