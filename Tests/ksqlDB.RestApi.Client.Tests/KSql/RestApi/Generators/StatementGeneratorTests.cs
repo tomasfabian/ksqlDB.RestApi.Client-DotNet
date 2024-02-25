@@ -39,7 +39,7 @@ public class StatementGeneratorTests
 	Dictionary MAP<VARCHAR, INT>,
 	Dictionary2 MAP<VARCHAR, INT>,
 	Field DOUBLE
-) WITH ( WINDOW_TYPE='Tumbling', WINDOW_SIZE='10 SECONDS', KAFKA_TOPIC='my_movie', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1', TIMESTAMP_FORMAT='yyyy-MM-dd''T''HH:mm:ssX' );";
+) WITH ( WINDOW_TYPE='Tumbling', WINDOW_SIZE='10 SECONDS', KAFKA_TOPIC='my_movie', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1', TIMESTAMP_FORMAT='yyyy-MM-dd''T''HH:mm:ssX' );".ReplaceLineEndings();
   }
 
   [Test]
@@ -52,7 +52,7 @@ public class StatementGeneratorTests
     string statement = StatementGenerator.CreateTable<CreateEntityTests.MyMovie>(creationMetadata);
 
     //Assert
-    statement.Should().Be($"CREATE TABLE{GetExpectedClauses(isTable: true)}");
+    statement.Should().Be($"CREATE TABLE{GetExpectedClauses(isTable: true)}".ReplaceLineEndings());
   }
 
   [Test]
@@ -65,7 +65,7 @@ public class StatementGeneratorTests
     string statement = StatementGenerator.CreateTable<CreateEntityTests.MyMovie>(creationMetadata, ifNotExists: true);
 
     //Assert
-    statement.Should().Be($"CREATE TABLE IF NOT EXISTS{GetExpectedClauses(isTable: true)}");
+    statement.Should().Be($"CREATE TABLE IF NOT EXISTS{GetExpectedClauses(isTable: true)}".ReplaceLineEndings());
   }
 
   [Test]
@@ -78,7 +78,7 @@ public class StatementGeneratorTests
     string statement = StatementGenerator.CreateOrReplaceTable<CreateEntityTests.MyMovie>(creationMetadata);
 
     //Assert
-    statement.Should().Be($"CREATE OR REPLACE TABLE{GetExpectedClauses(isTable: true)}");
+    statement.Should().Be($"CREATE OR REPLACE TABLE{GetExpectedClauses(isTable: true)}".ReplaceLineEndings());
   }
 
   [Test]
@@ -92,7 +92,7 @@ public class StatementGeneratorTests
     string statement = StatementGenerator.CreateTable<CreateEntityTests.MyMovie>(creationMetadata);
 
     //Assert
-    statement.Should().Be($"CREATE SOURCE TABLE{GetExpectedClauses(isTable: true)}");
+    statement.Should().Be($"CREATE SOURCE TABLE{GetExpectedClauses(isTable: true)}".ReplaceLineEndings());
   }
 
   [Test]
@@ -105,7 +105,7 @@ public class StatementGeneratorTests
     string statement = StatementGenerator.CreateStream<CreateEntityTests.MyMovie>(creationMetadata);
 
     //Assert
-    statement.Should().Be($"CREATE STREAM{GetExpectedClauses(isTable: false)}");
+    statement.Should().Be($"CREATE STREAM{GetExpectedClauses(isTable: false)}".ReplaceLineEndings());
   }
 
   [Test]
@@ -118,7 +118,7 @@ public class StatementGeneratorTests
     string statement = StatementGenerator.CreateStream<CreateEntityTests.MyMovie>(creationMetadata, ifNotExists: true);
 
     //Assert
-    statement.Should().Be($"CREATE STREAM IF NOT EXISTS{GetExpectedClauses(isTable: false)}");
+    statement.Should().Be($"CREATE STREAM IF NOT EXISTS{GetExpectedClauses(isTable: false)}".ReplaceLineEndings());
   }
 
   [Test]
@@ -131,7 +131,7 @@ public class StatementGeneratorTests
     string statement = StatementGenerator.CreateOrReplaceStream<CreateEntityTests.MyMovie>(creationMetadata);
 
     //Assert
-    statement.Should().Be($"CREATE OR REPLACE STREAM{GetExpectedClauses(isTable: false)}");
+    statement.Should().Be($"CREATE OR REPLACE STREAM{GetExpectedClauses(isTable: false)}".ReplaceLineEndings());
   }
 
   [Test]
@@ -145,7 +145,7 @@ public class StatementGeneratorTests
     string statement = StatementGenerator.CreateStream<CreateEntityTests.MyMovie>(creationMetadata);
 
     //Assert
-    statement.Should().Be($"CREATE SOURCE STREAM{GetExpectedClauses(isTable: false)}");
+    statement.Should().Be($"CREATE SOURCE STREAM{GetExpectedClauses(isTable: false)}".ReplaceLineEndings());
   }
 
   [Test]

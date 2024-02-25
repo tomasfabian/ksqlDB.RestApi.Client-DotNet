@@ -42,7 +42,7 @@ public class CreateEntityTests
 	Dictionary MAP<VARCHAR, INT>,
 	Dictionary2 MAP<VARCHAR, INT>,
 	Field DOUBLE
-) WITH ( KAFKA_TOPIC='{creationMetadata.KafkaTopic}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );";
+) WITH ( KAFKA_TOPIC='{creationMetadata.KafkaTopic}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings();
 
     return expectedStatementTemplate;
   }
@@ -285,7 +285,7 @@ public class CreateEntityTests
     //Assert
     statement.Should().Be(@"CREATE STREAM Transactions (
 	Amount DECIMAL(3,2)
-) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );");
+) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
   }
     
   [Test]
@@ -448,7 +448,7 @@ public class CreateEntityTests
     statement.Should().Be(@"CREATE OR REPLACE TABLE MyItems (
 	Id INT PRIMARY KEY,
 	Items ARRAY<INT>
-) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );");
+) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
   }
 
   public abstract record AbstractProducerClass
@@ -531,7 +531,7 @@ public class CreateEntityTests
     statement.Should().Be(@$"CREATE TABLE IF NOT EXISTS Enrichedevents (
 	EventCategories ARRAY<{arrayElementType}>,
 	Key VARCHAR PRIMARY KEY
-) WITH ( KAFKA_TOPIC='enrichedevents', VALUE_FORMAT='Json', PARTITIONS='1' );");
+) WITH ( KAFKA_TOPIC='enrichedevents', VALUE_FORMAT='Json', PARTITIONS='1' );".ReplaceLineEndings());
   }
 
   internal class MyMovie
@@ -594,7 +594,7 @@ public class CreateEntityTests
 	Dt DATE,
 	Ts TIME,
 	DtOffset TIMESTAMP
-) WITH ( KAFKA_TOPIC='enrichedevents', VALUE_FORMAT='Json', PARTITIONS='1' );");
+) WITH ( KAFKA_TOPIC='enrichedevents', VALUE_FORMAT='Json', PARTITIONS='1' );".ReplaceLineEndings());
   }
 
   internal record Renamed
@@ -627,7 +627,7 @@ public class CreateEntityTests
     //Assert
     statement.Should().Be(@$"CREATE STREAM {nameof(Renamed)} (
 	data_id VARCHAR
-) WITH ( KAFKA_TOPIC='{streamCreationMetadata.KafkaTopic}', VALUE_FORMAT='Json', PARTITIONS='1' );");
+) WITH ( KAFKA_TOPIC='{streamCreationMetadata.KafkaTopic}', VALUE_FORMAT='Json', PARTITIONS='1' );".ReplaceLineEndings());
   }
 
   internal record GuidKey
@@ -659,6 +659,6 @@ public class CreateEntityTests
     //Assert
     statement.Should().Be(@$"CREATE STREAM {nameof(GuidKey)} (
 	DataId VARCHAR
-) WITH ( KAFKA_TOPIC='{streamCreationMetadata.KafkaTopic}', VALUE_FORMAT='Json', PARTITIONS='1' );");
+) WITH ( KAFKA_TOPIC='{streamCreationMetadata.KafkaTopic}', VALUE_FORMAT='Json', PARTITIONS='1' );".ReplaceLineEndings());
   }
 }

@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
 using ksqlDb.RestApi.Client.IntegrationTests.Models;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
@@ -35,7 +35,7 @@ public class TweetsProvider
 
   public async Task<bool> CreateTweetsStream(string streamName, string topicName)
   {
-    var ksql = $"CREATE OR REPLACE STREAM {streamName}(id INT, message VARCHAR, isRobot BOOLEAN, amount DOUBLE, accountBalance DECIMAL(16,4))\r\n  WITH (kafka_topic='{topicName}', value_format='json', partitions=1);";
+    var ksql = $"CREATE OR REPLACE STREAM {streamName}(id INT, message VARCHAR, isRobot BOOLEAN, amount DOUBLE, accountBalance DECIMAL(16,4)){Environment.NewLine}  WITH (kafka_topic='{topicName}', value_format='json', partitions=1);";
       
     KSqlDbStatement ksqlDbStatement = new(ksql);
 

@@ -20,7 +20,7 @@ public class QueryParametersExtensionsTests
     //Assert
     result.Should().Be(@"Sql: 
 Parameters:
-");
+".ReplaceLineEndings());
   }
 
   [Test]
@@ -41,7 +41,7 @@ Parameters:
 Parameters:
 auto.offset.reset = earliest
 processing.guarantee = at_least_once
-");
+".ReplaceLineEndings());
   }
 
   [Test]
@@ -61,7 +61,7 @@ processing.guarantee = at_least_once
     //Assert
     result.Should().Be($@"Sql: {sql}
 Parameters:
-");
+".ReplaceLineEndings());
   }
 
   [Test]
@@ -82,6 +82,6 @@ Parameters:
 Parameters:
 ksql.streams.auto.offset.reset = earliest
 processing.guarantee = at_least_once
-");
+".ReplaceLineEndings());
   }
 }
