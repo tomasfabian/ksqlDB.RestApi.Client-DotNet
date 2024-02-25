@@ -82,7 +82,7 @@ public class KSqlQueryLanguageVisitorTests : TestBase
       @$"SELECT SensorId FROM {nameof(MySensor)}s
 WHERE SensorId = '1' EMIT CHANGES;";
 
-    ksql.Should().BeEquivalentTo(expectedKsql);
+    ksql.Should().BeEquivalentTo(expectedKsql.ReplaceLineEndings());
   }
 
   [Test]
@@ -117,7 +117,7 @@ WHERE SensorId = '1' EMIT CHANGES;";
       @$"SELECT endusers.data_id AS EnduserId, transactions.data_id AS TransactionsId, EXTRACTJSONFIELD(endusers.Data, '$.customer_id') CustomerId, endusers.Data AS EndusersData, transactions.Data AS TransactionsData FROM {stream1TableName} endusers
 INNER JOIN {stream2TableName} transactions
 WITHIN 1 DAYS ON EXTRACTJSONFIELD(endusers.Data, '$.customer_id') = EXTRACTJSONFIELD(transactions.Data, '$.customer_id')
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -147,7 +147,7 @@ EMIT CHANGES;";
       @$"SELECT a.data_id DataId FROM {stream1TableName} a
 INNER JOIN {stream2TableName} b
 ON a.data_id = b.data_id
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -185,7 +185,7 @@ INNER JOIN {stream3TableName} c
 ON a.data_id = c.data_id
 INNER JOIN {stream2TableName} b
 ON a.data_id = b.data_id
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -202,7 +202,7 @@ EMIT CHANGES;";
 
     //Assert
     string expectedKsql =
-      $"SELECT {nameof(Location.Longitude)} AS Lngt, {nameof(Location.Latitude)} FROM {streamName} EMIT CHANGES;";
+      $"SELECT {nameof(Location.Longitude)} AS Lngt, {nameof(Location.Latitude)} FROM {streamName} EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -219,7 +219,7 @@ EMIT CHANGES;";
 
     //Assert
     string expectedKsql =
-      $"SELECT {nameof(Location.Longitude)} / 2 AS Lngt, {nameof(Location.Latitude)} + '' AS Lat FROM {streamName} EMIT CHANGES;";
+      $"SELECT {nameof(Location.Longitude)} / 2 AS Lngt, {nameof(Location.Latitude)} + '' AS Lat FROM {streamName} EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -238,7 +238,7 @@ EMIT CHANGES;";
     //Assert
     string expectedKsql =
       @$"SELECT {nameof(Location.Longitude)}, {nameof(Location.Latitude)} FROM {streamName}
-WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;";
+WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -263,7 +263,7 @@ WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;";
     //Assert
     string expectedKsql =
       @$"SELECT {nameof(Location.Longitude)}, {nameof(Location.Latitude)} FROM {streamName}
-WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 EMIT CHANGES;";
+WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -280,7 +280,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
 
     //Assert
     string expectedKsql =
-      @$"SELECT {nameof(Location.Longitude)}, {nameof(Location.Latitude)}, IFNULL(Latitude, 'n/a') Col FROM {streamName} EMIT CHANGES;";
+      $"SELECT {nameof(Location.Longitude)}, {nameof(Location.Latitude)}, IFNULL(Latitude, 'n/a') Col FROM {streamName} EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -297,7 +297,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
 
     //Assert
-    string expectedKsql = @$"SELECT ARRAY[1, 3] FROM {nameof(OrderData)} EMIT CHANGES;";
+    string expectedKsql = $"SELECT ARRAY[1, 3] FROM {nameof(OrderData)} EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -316,7 +316,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
 
     //Assert
-    string expectedKsql = @$"SELECT ARRAY[1, 3] AS OrderTypes FROM {nameof(OrderData)} EMIT CHANGES;";
+    string expectedKsql = $"SELECT ARRAY[1, 3] AS OrderTypes FROM {nameof(OrderData)} EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -335,7 +335,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
 
     //Assert
-    ksql.Should().BeEquivalentTo($"SELECT {nameof(OrderData.OrderType)} IN (1, 3) FROM {nameof(OrderData)} EMIT CHANGES;");
+    ksql.Should().BeEquivalentTo($"SELECT {nameof(OrderData.OrderType)} IN (1, 3) FROM {nameof(OrderData)} EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [Test]
@@ -352,7 +352,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
 
     //Assert
-    ksql.Should().BeEquivalentTo($"SELECT {nameof(OrderData.OrderType)} IN (1, 3) Contains FROM {nameof(OrderData)} EMIT CHANGES;");
+    ksql.Should().BeEquivalentTo($"SELECT {nameof(OrderData.OrderType)} IN (1, 3) Contains FROM {nameof(OrderData)} EMIT CHANGES;".ReplaceLineEndings());
   }
 
   #region CapturedVariables
@@ -376,7 +376,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     var ksql = query.ToQueryString();
 
     //Assert
-    ksql.Should().Be($"SELECT TRANSFORM(MAP('a' := MAP('a' := 1, 'b' := 2), 'b' := MAP('a' := 3, 'd' := 4)), (k, v) => UCASE(k), (k, v) => v['a'] + 1) Dict FROM {streamName} EMIT CHANGES;");
+    ksql.Should().Be($"SELECT TRANSFORM(MAP('a' := MAP('a' := 1, 'b' := 2), 'b' := MAP('a' := 3, 'd' := 4)), (k, v) => UCASE(k), (k, v) => v['a'] + 1) Dict FROM {streamName} EMIT CHANGES;".ReplaceLineEndings());
   }
 
   struct Foo
@@ -399,7 +399,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     var ksql = query.ToQueryString();
 
     //Assert
-    ksql.Should().Be($"SELECT STRUCT(Prop := 42) AS C FROM {streamName} EMIT CHANGES;");
+    ksql.Should().Be($"SELECT STRUCT(Prop := 42) AS C FROM {streamName} EMIT CHANGES;".ReplaceLineEndings());
   }
 
   class FooClass
@@ -422,7 +422,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     var ksql = query.ToQueryString();
 
     //Assert
-    ksql.Should().Be($"SELECT STRUCT(Prop := 42) AS C FROM {streamName} EMIT CHANGES;");
+    ksql.Should().Be($"SELECT STRUCT(Prop := 42) AS C FROM {streamName} EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [Test]
@@ -440,7 +440,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     var ksql = query.ToQueryString();
 
     //Assert
-    ksql.Should().Be($"SELECT STRUCT(Prop := 42) FROM {streamName} EMIT CHANGES;");
+    ksql.Should().Be($"SELECT STRUCT(Prop := 42) FROM {streamName} EMIT CHANGES;".ReplaceLineEndings());
   }
 
   #endregion
@@ -460,7 +460,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
 
     //Assert
     string expectedKsql =
-      "SELECT '2021-07-04T13:29:45.447+04:00' FROM TimeTypes EMIT CHANGES;";
+      "SELECT '2021-07-04T13:29:45.447+04:00' FROM TimeTypes EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -480,7 +480,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
 
     //Assert
     string expectedKsql =
-      "SELECT '2021-07-04T13:29:45.447+04:00' FROM TimeTypes EMIT CHANGES;";
+      "SELECT '2021-07-04T13:29:45.447+04:00' FROM TimeTypes EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -498,7 +498,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
 
     //Assert
     string expectedKsql =
-      "SELECT '2021-04-01' Time FROM TimeTypes EMIT CHANGES;";
+      "SELECT '2021-04-01' Time FROM TimeTypes EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -517,7 +517,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     //Assert
     string expectedKsql =
       @"SELECT * FROM TimeTypes
-WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;";
+WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -535,7 +535,7 @@ WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;";
 
     //Assert
     string expectedKsql =
-      $"SELECT '{DateTime.Now.ToString(ValueFormats.DateFormat)}' FROM TimeTypes EMIT CHANGES;";
+      $"SELECT '{DateTime.Now.ToString(ValueFormats.DateFormat)}' FROM TimeTypes EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().Be(expectedKsql);
   }
@@ -598,7 +598,7 @@ WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;";
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM {streamName}
-WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;");
+WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [Test]
@@ -613,7 +613,7 @@ WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;");
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM {streamName}
-WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;");
+WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [Test]
@@ -628,7 +628,7 @@ WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;");
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM {streamName}
-WHERE {nameof(Location.Longitude)} = 1.1 EMIT CHANGES;");
+WHERE {nameof(Location.Longitude)} = 1.1 EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [Test]
@@ -645,7 +645,7 @@ WHERE {nameof(Location.Longitude)} = 1.1 EMIT CHANGES;");
     //Assert
     string expectedKsql =
       @$"SELECT {nameof(Location.Longitude)}, {nameof(Location.Latitude)} FROM {streamName}
-WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;";
+WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -669,7 +669,7 @@ WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;";
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM {nameof(OrderData)}
-WHERE ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)}) EMIT CHANGES;");
+WHERE ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)}) EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [Test]
@@ -687,7 +687,7 @@ WHERE ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)}) EMIT CHANGES;")
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM {nameof(OrderData)}
-WHERE ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)}) EMIT CHANGES;");
+WHERE ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)}) EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [Test]
@@ -705,7 +705,7 @@ WHERE ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)}) EMIT CHANGES;")
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM {nameof(OrderData)}
-WHERE {nameof(OrderData.OrderType)} IN (1, 3) EMIT CHANGES;");
+WHERE {nameof(OrderData.OrderType)} IN (1, 3) EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [Test]
@@ -723,7 +723,7 @@ WHERE {nameof(OrderData.OrderType)} IN (1, 3) EMIT CHANGES;");
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM {nameof(OrderData)}
-WHERE {nameof(OrderData.Category)} IN ('1', '3') EMIT CHANGES;");
+WHERE {nameof(OrderData.Category)} IN ('1', '3') EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [Test]
@@ -741,7 +741,7 @@ WHERE {nameof(OrderData.Category)} IN ('1', '3') EMIT CHANGES;");
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM {nameof(OrderData)}
-WHERE {nameof(OrderData.OrderType)} IN (1, 3) EMIT CHANGES;");
+WHERE {nameof(OrderData.OrderType)} IN (1, 3) EMIT CHANGES;".ReplaceLineEndings());
   }
 
   #endregion
@@ -761,7 +761,7 @@ WHERE {nameof(OrderData.OrderType)} IN (1, 3) EMIT CHANGES;");
     //Assert
     string expectedKsql =
       @$"SELECT * FROM Tweets
-WHERE {nameof(Tweet.Message)} BETWEEN '1' AND '3' EMIT CHANGES;";
+WHERE {nameof(Tweet.Message)} BETWEEN '1' AND '3' EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -779,7 +779,7 @@ WHERE {nameof(Tweet.Message)} BETWEEN '1' AND '3' EMIT CHANGES;";
     //Assert
     string expectedKsql =
       @$"SELECT * FROM Tweets
-WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;";
+WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -796,7 +796,7 @@ WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;";
 
     //Assert
     string expectedKsql =
-      @$"SELECT {nameof(Tweet.Id)} BETWEEN 1 AND 3 FROM Tweets EMIT CHANGES;";
+      $"SELECT {nameof(Tweet.Id)} BETWEEN 1 AND 3 FROM Tweets EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -813,7 +813,7 @@ WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;";
 
     //Assert
     string expectedKsql =
-      @$"SELECT {nameof(Tweet.Id)} BETWEEN 1 AND 3 IsBetween FROM Tweets EMIT CHANGES;";
+      $"SELECT {nameof(Tweet.Id)} BETWEEN 1 AND 3 IsBetween FROM Tweets EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -833,7 +833,7 @@ WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;";
 
     //Assert
     string expectedKsql =
-      @$"SELECT {nameof(Tweet.Id)} BETWEEN 1 AND 3 IsBetween FROM Tweets EMIT CHANGES;";
+      $"SELECT {nameof(Tweet.Id)} BETWEEN 1 AND 3 IsBetween FROM Tweets EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -853,7 +853,7 @@ WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;";
 
     //Assert
     string expectedKsql =
-      @$"SELECT 3 BETWEEN 1 AND 3 IsBetween FROM Tweets EMIT CHANGES;";
+      "SELECT 3 BETWEEN 1 AND 3 IsBetween FROM Tweets EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -871,7 +871,7 @@ WHERE {nameof(Tweet.Id)} BETWEEN 1 AND 3 EMIT CHANGES;";
     //Assert
     string expectedKsql =
       @$"SELECT * FROM Tweets
-WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
+WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -900,7 +900,7 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;";
     //Assert
     string expectedKsql =
       @$"SELECT * FROM TimeTypes
-WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10-12' EMIT CHANGES;";
+WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10-12' EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -919,7 +919,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     //Assert
     string expectedKsql =
       @$"SELECT * FROM TimeTypes
-WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10-12' EMIT CHANGES;";
+WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10-12' EMIT CHANGES;".ReplaceLineEndings().ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1777,7 +1777,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     //Assert
     string expectedKsql =
       @$"SELECT * FROM {nameof(Tweet)}s
-WHERE LCASE(Message) LIKE LCASE('%hard%') EMIT CHANGES;";
+WHERE LCASE(Message) LIKE LCASE('%hard%') EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -1797,7 +1797,7 @@ WHERE LCASE(Message) LIKE LCASE('%hard%') EMIT CHANGES;";
     //Assert
     string expectedKsql =
       @$"SELECT * FROM {nameof(Tweet)}s
-WHERE Message LIKE UCASE('%hard') EMIT CHANGES;";
+WHERE Message LIKE UCASE('%hard') EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }

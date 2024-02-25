@@ -57,7 +57,7 @@ public class JoinVisitorTests : TestBase
     var expectedQuery = @$"SELECT {MovieAlias}.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
 INNER JOIN {joinItemName}s {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().Be(expectedQuery);
   }
@@ -89,7 +89,7 @@ EMIT CHANGES;";
     var expectedQuery = @$"SELECT {MovieAlias}.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
 INNER JOIN Lead_Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().Be(expectedQuery);
   }
@@ -119,7 +119,7 @@ EMIT CHANGES;";
     var expectedQuery = @$"SELECT {myMovieAlias}.Title Title, LEN({ActorAlias}.Actor_Name) Length FROM Movies {myMovieAlias}
 INNER JOIN Lead_Actors {ActorAlias}
 ON {myMovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().Be(expectedQuery);
   }
@@ -150,7 +150,7 @@ EMIT CHANGES;";
     var expectedQuery = @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
 INNER JOIN MovieExts ext
 ON {MovieAlias}.Title = ext.Title
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().Be(expectedQuery);
   }
@@ -177,7 +177,7 @@ EMIT CHANGES;";
     var expectedQuery = @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
 INNER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().Be(expectedQuery);
   }
@@ -205,7 +205,7 @@ EMIT CHANGES;";
     var expectedQuery = @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 INNER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().Be(expectedQuery);
   }
@@ -229,7 +229,7 @@ EMIT CHANGES;";
     var expectedQuery = @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 INNER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().Be(expectedQuery);
   }
@@ -273,7 +273,7 @@ INNER JOIN Shipments S1
 ON O.OrderId = S1.Id
 INNER JOIN Payments P1
 ON O.OrderId = P1.Id
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
@@ -320,7 +320,7 @@ INNER JOIN Shipments {shipmentsAlias}
 ON O.OrderId = {shipmentsAlias}.Id
 INNER JOIN LambdaMaps {lambdaAlias}
 ON O.OrderId = {lambdaAlias}.Id
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
@@ -367,7 +367,7 @@ EMIT CHANGES;";
     var expectedQuery = @$"SELECT {lambdaAlias}.Nested->Prop Prop, O.OrderId AS orderId FROM Orders O
 INNER JOIN LambdaMaps {lambdaAlias}
 ON O.OrderId = {lambdaAlias}.Id
-WHERE {lambdaAlias}.Nested->Prop = 'Nested' EMIT CHANGES;";
+WHERE {lambdaAlias}.Nested->Prop = 'Nested' EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
@@ -394,7 +394,7 @@ WHERE {lambdaAlias}.Nested->Prop = 'Nested' EMIT CHANGES;";
     var expectedQuery = @$"SELECT CONCAT({lambdaAlias}.Nested->Prop, '_new') Concat, {ordersAlias}.OrderId AS orderId FROM Orders {ordersAlias}
 INNER JOIN LambdaMaps {lambdaAlias}
 ON {ordersAlias}.OrderId = {lambdaAlias}.Id
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
@@ -424,7 +424,7 @@ INNER JOIN Shipments S1
 ON O.OrderId = S1.Id
 INNER JOIN Payments P1
 ON O.OrderId = P1.Id
-EMIT CHANGES LIMIT 2;";
+EMIT CHANGES LIMIT 2;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
@@ -455,7 +455,7 @@ LEFT JOIN Shipments {shipmentsAlias}
 ON o.OrderId = {shipmentsAlias}.Id
 INNER JOIN Payments p1
 ON o.OrderId = p1.Id
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
@@ -485,7 +485,7 @@ INNER JOIN Shipments s
 WITHIN 5 DAYS ON {ordersAlias}.OrderId = s.Id
 INNER JOIN Payments p
 WITHIN 1 HOURS ON {ordersAlias}.OrderId = p.Id
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
@@ -511,7 +511,7 @@ EMIT CHANGES;";
     var expectedQuery = @$"SELECT {ordersAlias}.OrderId AS orderId, p.Id AS paymentId FROM Orders {ordersAlias}
 INNER JOIN Payments p
 WITHIN (1 HOURS, 5 DAYS) ON {ordersAlias}.OrderId = p.Id
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
@@ -534,7 +534,7 @@ EMIT CHANGES;";
     var expectedQuery = @"SELECT actor.Title AS EnduserId, actor.Actor_Name AS Name, movie.Title AS Raw FROM movies movie
 INNER JOIN actors actor
 WITHIN 1 DAYS ON EXTRACTJSONFIELD(movie.Title, '$.movie_title') = EXTRACTJSONFIELD(actor.Actor_Name, '$.actor_name')
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
@@ -569,7 +569,7 @@ EMIT CHANGES;";
     var expectedQuery = @$"SELECT movie.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Lead_Actors {ActorAlias}
 ON movie.Title = {ActorAlias}.Title
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().Be(expectedQuery);
   }
@@ -597,7 +597,7 @@ EMIT CHANGES;";
     var expectedQuery = @$"SELECT {MovieAlias}.Id Id, UCASE(a.Actor_Name) UpperActorName, a.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Actors a
 ON {MovieAlias}.Title = a.Title
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().Be(expectedQuery);
   }
@@ -625,7 +625,7 @@ EMIT CHANGES;";
     var expectedQuery = @$"SELECT {MovieAlias}.Id Id, UCASE(a.Actor_Name) UpperActorName, a.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Actors a
 ON {MovieAlias}.Title = a.Title
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().Be(expectedQuery);
   }
@@ -675,7 +675,7 @@ LEFT JOIN Items items
 ON orders.ItemId = items.ItemId
 LEFT JOIN Customers customers
 ON orders.CustomerId = customers.CustomerId
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().Be(expectedQuery);
   }
@@ -703,7 +703,7 @@ EMIT CHANGES;";
     var expectedQuery = @$"SELECT {ActorAlias}.RowTime RowTime, {MovieAlias}.Title Title FROM Movies {MovieAlias}
 LEFT JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().Be(expectedQuery);
   }
@@ -735,7 +735,7 @@ EMIT CHANGES;";
     var expectedQuery = @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 FULL OUTER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().Be(expectedQuery);
   }
@@ -767,7 +767,7 @@ EMIT CHANGES;";
     var expectedQuery = @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 RIGHT JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().Be(expectedQuery);
   }

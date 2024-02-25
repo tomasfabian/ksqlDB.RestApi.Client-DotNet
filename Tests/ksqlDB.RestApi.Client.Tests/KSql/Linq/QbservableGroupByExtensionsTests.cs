@@ -219,7 +219,7 @@ public class QbservableGroupByExtensionsTests : TestBase
     var ksql = grouping.ToQueryString();
 
     //Assert
-    string expectedKSql = @"SELECT IP_ADDRESS, URL, TIMESTAMP FROM Clicks WINDOW TUMBLING (SIZE 2 MINUTES) GROUP BY IP_ADDRESS, URL, TIMESTAMP HAVING COUNT(IP_ADDRESS) = 1 EMIT CHANGES LIMIT 3;";
+    string expectedKSql = "SELECT IP_ADDRESS, URL, TIMESTAMP FROM Clicks WINDOW TUMBLING (SIZE 2 MINUTES) GROUP BY IP_ADDRESS, URL, TIMESTAMP HAVING COUNT(IP_ADDRESS) = 1 EMIT CHANGES LIMIT 3;";
       
     ksql.Should().BeEquivalentTo(expectedKSql);
   }
@@ -319,7 +319,7 @@ public class QbservableGroupByExtensionsTests : TestBase
 
     //Assert
     ksql.Should().BeEquivalentTo(@"SELECT RegionCode, STATE->Name, COUNT(*) num_times FROM Cities
-WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES;");
+WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [Test]
@@ -343,7 +343,7 @@ WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES;");
 
     //Assert
     ksql.Should().BeEquivalentTo(@"SELECT RegionCode, STATE->Name, COUNT(*) num_times FROM Cities
-WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES LIMIT 2;");
+WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES LIMIT 2;".ReplaceLineEndings());
   }
 
   [Test]
@@ -365,7 +365,7 @@ WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES LIMIT 2;");
 
     //Assert
     ksql.Should().BeEquivalentTo(@"SELECT RegionCode, COUNT(*) num_times FROM Cities
-WHERE RegionCode != 'xx' GROUP BY RegionCode EMIT CHANGES;");
+WHERE RegionCode != 'xx' GROUP BY RegionCode EMIT CHANGES;".ReplaceLineEndings());
   }
 
   #endregion
@@ -422,7 +422,7 @@ WHERE RegionCode != 'xx' GROUP BY RegionCode EMIT CHANGES;");
     var ksql = grouping.ToQueryString();
 
     //Assert
-    ksql.Should().BeEquivalentTo(@"SELECT RegionCode, CAST(COUNT(*) AS VARCHAR) Count FROM Cities GROUP BY RegionCode EMIT CHANGES;");
+    ksql.Should().BeEquivalentTo("SELECT RegionCode, CAST(COUNT(*) AS VARCHAR) Count FROM Cities GROUP BY RegionCode EMIT CHANGES;");
   }
     
   [Test]
@@ -437,7 +437,7 @@ WHERE RegionCode != 'xx' GROUP BY RegionCode EMIT CHANGES;");
     var ksql = grouping.ToQueryString();
 
     //Assert
-    ksql.Should().BeEquivalentTo(@"SELECT RegionCode, CAST(COUNT(*) AS VARCHAR) Count FROM Cities GROUP BY RegionCode EMIT CHANGES;");
+    ksql.Should().BeEquivalentTo("SELECT RegionCode, CAST(COUNT(*) AS VARCHAR) Count FROM Cities GROUP BY RegionCode EMIT CHANGES;");
   }
 
   #endregion

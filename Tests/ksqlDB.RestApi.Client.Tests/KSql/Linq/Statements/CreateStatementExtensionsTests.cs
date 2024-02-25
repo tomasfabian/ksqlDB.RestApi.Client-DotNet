@@ -36,12 +36,12 @@ public class CreateStatementExtensionsTests : TestBase
       .As<Location>();
 
     //Act
-    var ksql1 = query.ToStatementString();
-    var ksql2 = query.ToStatementString();
+    var ksql1 = query.ToStatementString().ReplaceLineEndings();
+    var ksql2 = query.ToStatementString().ReplaceLineEndings();
 
     //Assert
     ksql1.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
-AS SELECT * FROM {nameof(Location)}s EMIT CHANGES;");
+AS SELECT * FROM {nameof(Location)}s EMIT CHANGES;".ReplaceLineEndings());
 
     ksql1.Should().BeEquivalentTo(ksql2);
   }
@@ -70,10 +70,10 @@ AS SELECT * FROM {nameof(Location)}s EMIT CHANGES;");
     var ksql = query.ToStatementString();
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
+    ksql.ReplaceLineEndings().Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
  WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
 AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
-WHERE Id < 3 PARTITION BY Title EMIT CHANGES;");
+WHERE Id < 3 PARTITION BY Title EMIT CHANGES;".ReplaceLineEndings());
   }
 
   private const string TableName = "TestTable";
@@ -106,8 +106,8 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;");
     var ksql = query.ToStatementString();
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
-AS SELECT * FROM Movies GROUP BY Title HAVING Count(*) > 2 EMIT CHANGES;");
+    ksql.ReplaceLineEndings().Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
+AS SELECT * FROM Movies GROUP BY Title HAVING Count(*) > 2 EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [Test]
@@ -124,8 +124,8 @@ AS SELECT * FROM Movies GROUP BY Title HAVING Count(*) > 2 EMIT CHANGES;");
     var ksql = query.ToStatementString();
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
-AS SELECT * FROM Movies EMIT CHANGES LIMIT {limit};");
+    ksql.ReplaceLineEndings().Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
+AS SELECT * FROM Movies EMIT CHANGES LIMIT {limit};".ReplaceLineEndings());
   }
 
   [Test]
@@ -141,8 +141,8 @@ AS SELECT * FROM Movies EMIT CHANGES LIMIT {limit};");
     var ksql = query.ToStatementString();
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
-AS SELECT * FROM Movies WINDOW TUMBLING (SIZE 2 MINUTES) GROUP BY Title EMIT CHANGES;");
+    ksql.ReplaceLineEndings().Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
+AS SELECT * FROM Movies WINDOW TUMBLING (SIZE 2 MINUTES) GROUP BY Title EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [Test]
@@ -165,11 +165,11 @@ AS SELECT * FROM Movies WINDOW TUMBLING (SIZE 2 MINUTES) GROUP BY Title EMIT CHA
     var ksql = query.ToStatementString();
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
+    ksql.ReplaceLineEndings().Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
 AS SELECT movie.Title Title, actor.Actor_Name AS ActorName FROM Movies movie
 INNER JOIN Actors actor
 ON movie.Title = actor.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [Test]
@@ -192,11 +192,11 @@ EMIT CHANGES;");
     var ksql = query.ToStatementString();
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
+    ksql.ReplaceLineEndings().Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
 AS SELECT movie.Title Title, actor.Actor_Name AS ActorName FROM Movies movie
 FULL OUTER JOIN Actors actor
 ON movie.Title = actor.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [Test]
@@ -219,10 +219,10 @@ EMIT CHANGES;");
     var ksql = query.ToStatementString();
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
+    ksql.ReplaceLineEndings().Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
 AS SELECT movie.Title Title, actor.Actor_Name AS ActorName FROM Movies movie
 LEFT JOIN Actors actor
 ON movie.Title = actor.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 }

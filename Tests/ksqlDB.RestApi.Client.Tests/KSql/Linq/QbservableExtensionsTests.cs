@@ -46,7 +46,7 @@ public class QbservableExtensionsTests : TestBase
     var ksql = query.ToQueryString();
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"SELECT ({nameof(Location.Longitude)} + {nameof(Location.Longitude)}) * {nameof(Location.Longitude)} FROM Locations EMIT CHANGES;");
+    ksql.Should().BeEquivalentTo($"SELECT ({nameof(Location.Longitude)} + {nameof(Location.Longitude)}) * {nameof(Location.Longitude)} FROM Locations EMIT CHANGES;");
   }
 
   [Test]
@@ -60,7 +60,7 @@ public class QbservableExtensionsTests : TestBase
     var ksql = query.ToQueryString();
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"SELECT {nameof(Location.Longitude)} + ({nameof(Location.Longitude)} * {nameof(Location.Longitude)}) FROM Locations EMIT CHANGES;");
+    ksql.Should().BeEquivalentTo($"SELECT {nameof(Location.Longitude)} + ({nameof(Location.Longitude)} * {nameof(Location.Longitude)}) FROM Locations EMIT CHANGES;");
   }
 
   [Test]
@@ -74,7 +74,7 @@ public class QbservableExtensionsTests : TestBase
     var ksql = query.ToQueryString();
 
     //Assert
-    var expectedKsql = $@"SELECT {nameof(Location.Longitude)} / ({nameof(Location.Longitude)} / 4) AS First, ({nameof(Location.Longitude)} / {nameof(Location.Longitude)}) / 5 AS Second FROM Locations EMIT CHANGES;";
+    var expectedKsql = $"SELECT {nameof(Location.Longitude)} / ({nameof(Location.Longitude)} / 4) AS First, ({nameof(Location.Longitude)} / {nameof(Location.Longitude)}) / 5 AS Second FROM Locations EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
@@ -93,7 +93,7 @@ public class QbservableExtensionsTests : TestBase
     string columnName = nameof(Location.Latitude);
 
     string expected = @$"SELECT * FROM Locations
-WHERE ({columnName} = '1') OR (({columnName} != '2') AND ({columnName} = '3')) EMIT CHANGES;";
+WHERE ({columnName} = '1') OR (({columnName} != '2') AND ({columnName} = '3')) EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expected);
   }    
@@ -112,7 +112,7 @@ WHERE ({columnName} = '1') OR (({columnName} != '2') AND ({columnName} = '3')) E
     string columnName = nameof(Location.Latitude);
 
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM Locations
-WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') EMIT CHANGES;");
+WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') EMIT CHANGES;".ReplaceLineEndings());
   }
 
   #endregion
@@ -437,7 +437,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     var ksql = query.ToQueryString();
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"SELECT LCASE({nameof(Location.Latitude)}) != LCASE('HI') FROM Locations EMIT CHANGES;");
+    ksql.Should().BeEquivalentTo($"SELECT LCASE({nameof(Location.Latitude)}) != LCASE('HI') FROM Locations EMIT CHANGES;");
   }
     
   [Test]
@@ -455,7 +455,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
 
     //Assert
     string expectedKSql = @"SELECT IP_ADDRESS, URL, TIMESTAMP FROM Clicks
-WHERE IP_ADDRESS IS NOT NULL EMIT CHANGES;";
+WHERE IP_ADDRESS IS NOT NULL EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKSql);
   }
@@ -475,7 +475,7 @@ WHERE IP_ADDRESS IS NOT NULL EMIT CHANGES;";
 
     //Assert
     string expectedKSql = @"SELECT IP_ADDRESS, URL, TIMESTAMP FROM Clicks
-WHERE IP_ADDRESS IS NULL EMIT CHANGES;";
+WHERE IP_ADDRESS IS NULL EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKSql);
   }
@@ -499,7 +499,7 @@ WHERE IP_ADDRESS IS NULL EMIT CHANGES;";
 
     //Assert
     string expectedKSql = $@"SELECT * FROM {tableName}s
-WHERE Id = '{uniqueId}' EMIT CHANGES;";
+WHERE Id = '{uniqueId}' EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKSql);
   }

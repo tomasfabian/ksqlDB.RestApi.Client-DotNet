@@ -51,7 +51,7 @@ public class PullQueryExtensionsTests : TestBase
       
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT {nameof(IoTSensorStats.SensorId)}, AvgValue AS Avg FROM {nameof(IoTSensorStats)}
-WHERE SensorId = '{sensorId}';");
+WHERE SensorId = '{sensorId}';".ReplaceLineEndings());
   }
 
   [Test]
@@ -68,7 +68,7 @@ WHERE SensorId = '{sensorId}';");
 
     //Assert
     ksql1.Should().BeEquivalentTo(@$"SELECT * FROM {nameof(IoTSensorStats)}
-WHERE SensorId = '{sensorId}';");
+WHERE SensorId = '{sensorId}';".ReplaceLineEndings());
 
     ksql1.Should().BeEquivalentTo(ksql2);
   }
@@ -88,7 +88,7 @@ WHERE SensorId = '{sensorId}';");
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM {MaterializedViewName}
-WHERE SensorId = '{sensorId}';");
+WHERE SensorId = '{sensorId}';".ReplaceLineEndings());
   }
 
   [Test]
@@ -107,7 +107,7 @@ WHERE SensorId = '{sensorId}';");
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM {MaterializedViewName}
-WHERE SensorId = '{sensorId}' AND (WINDOWSTART > {windowStart}) AND (WINDOWEND <= {windowEnd});");
+WHERE SensorId = '{sensorId}' AND (WINDOWSTART > {windowStart}) AND (WINDOWEND <= {windowEnd});".ReplaceLineEndings());
   }
 
   [Test]
@@ -126,7 +126,7 @@ WHERE SensorId = '{sensorId}' AND (WINDOWSTART > {windowStart}) AND (WINDOWEND <
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM {MaterializedViewName}
-WHERE SensorId = '{sensorId}' AND (WINDOWSTART > '{windowStart}') AND (WINDOWEND <= '{windowEnd}');");
+WHERE SensorId = '{sensorId}' AND (WINDOWSTART > '{windowStart}') AND (WINDOWEND <= '{windowEnd}');".ReplaceLineEndings());
   }
 
   [Test]
@@ -141,6 +141,6 @@ WHERE SensorId = '{sensorId}' AND (WINDOWSTART > '{windowStart}') AND (WINDOWEND
       .ToQueryString();
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"SELECT * FROM {MaterializedViewName} LIMIT {limit};");
+    ksql.Should().BeEquivalentTo($"SELECT * FROM {MaterializedViewName} LIMIT {limit};");
   }
 }

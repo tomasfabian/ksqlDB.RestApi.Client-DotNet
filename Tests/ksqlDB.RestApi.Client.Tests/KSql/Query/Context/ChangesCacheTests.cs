@@ -33,7 +33,7 @@ public class ChangesCacheTests
     //Assert
     string expectedSql = @"Insert 1;
 Insert 2;
-";
-    kSqlDbRestApiClientMock.Verify(c => c.ExecuteStatementAsync(It.Is<KSqlDbStatement>(c => c.Sql == expectedSql), It.IsAny<CancellationToken>()), Times.Once);
+".ReplaceLineEndings();
+    kSqlDbRestApiClientMock.Verify(c => c.ExecuteStatementAsync(It.Is<KSqlDbStatement>(c => c.Sql.ReplaceLineEndings() == expectedSql), It.IsAny<CancellationToken>()), Times.Once);
   }
 }
