@@ -3,6 +3,7 @@ using System.Text.Json;
 using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -115,6 +116,7 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
 
   private string password;
   internal string BasicAuthPassword => string.IsNullOrEmpty(password) ? "" : password;
+  public IdentifierFormat IdentifierFormat { get; set; }
 
   /// <summary>
   /// Sets the basic authentication credentials.

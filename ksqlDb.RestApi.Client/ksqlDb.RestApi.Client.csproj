@@ -26,6 +26,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+        <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
@@ -47,6 +49,12 @@
             <Pack>True</Pack>
             <PackagePath>\</PackagePath>
         </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Antlr4 Include="SqlBase.g4">
+            <Package>ksqlDb.RestApi.Client.KSql.RestApi.Parsers</Package>
+        </Antlr4>
     </ItemGroup>
 
 </Project>

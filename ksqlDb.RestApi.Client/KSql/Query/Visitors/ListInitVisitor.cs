@@ -6,12 +6,10 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 {
   internal class ListInitVisitor : KSqlVisitor
   {
-    private readonly KSqlQueryMetadata queryMetadata;
-
     internal ListInitVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
       : base(stringBuilder, queryMetadata)
     {
-      this.queryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
+      this.QueryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
     }
 
     public override Expression Visit(Expression expression)
@@ -63,7 +61,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
       {
         var arguments = listInitExpression.Initializers.SelectMany(c => c.Arguments);
 
-        if (queryMetadata.IsInContainsScope)
+        if (QueryMetadata.IsInContainsScope)
           JoinAppend(arguments);
         else
           PrintArray(arguments);

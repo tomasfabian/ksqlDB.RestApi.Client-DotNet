@@ -10,6 +10,8 @@ using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using Pluralize.NET;
 
 namespace ksqlDB.RestApi.Client.KSql.Query;
@@ -31,7 +33,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
 
   public string BuildKSql(Expression expression, QueryContext queryContext)
   {
-    queryMetadata = new KSqlQueryMetadata();
+    queryMetadata = new KSqlQueryMetadata { IdentifierFormat = options.IdentifierFormat };
 
     kSqlVisitor = new KSqlVisitor(queryMetadata);
     whereClauses = new Queue<Expression>();
@@ -39,7 +41,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
 
     Visit(expression);
 
-    string finalFromItemName = InterceptFromItemName(queryContext.FromItemName ?? fromItemName);
+    var finalFromItemName = IdentifierUtil.Format(InterceptFromItemName(queryContext.FromItemName ?? fromItemName), queryMetadata.IdentifierFormat);
 
     queryContext.AutoOffsetReset = autoOffsetReset;
 
@@ -55,10 +57,10 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
       var fromTable = new FromItem
       {
         Type = queryMetadata.FromItemType,
-        Alias = alias
+        Alias = IdentifierUtil.Format(alias, queryMetadata.IdentifierFormat)
       };
 
-      queryMetadata.Joins = GetFromItems(joins, fromTable);
+      queryMetadata.Joins = GetFromItems(joins, fromTable, queryMetadata.IdentifierFormat);
 
       var joinsVisitor = new KSqlJoinsVisitor(kSqlVisitor.StringBuilder, options, new QueryContext { FromItemName = finalFromItemName }, queryMetadata);
 
@@ -330,7 +332,8 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
     return expression;
   }
 
-  private static FromItem[] GetFromItems(List<(MethodInfo, IEnumerable<Expression>, LambdaExpression)> joins, FromItem fromItem)
+  private static FromItem[] GetFromItems(List<(MethodInfo, IEnumerable<Expression>, LambdaExpression)> joins,
+    FromItem fromItem, IdentifierFormat format)
   {
     return joins.Select(c =>
       {
@@ -340,7 +343,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
 
         var type = items[0].Type.GenericTypeArguments[0];
 
-        return new FromItem {Type = type, Alias = alias};
+        return new FromItem {Type = type, Alias = IdentifierUtil.Format(alias, format)};
       }).Append(fromItem)
       .ToArray();
   }

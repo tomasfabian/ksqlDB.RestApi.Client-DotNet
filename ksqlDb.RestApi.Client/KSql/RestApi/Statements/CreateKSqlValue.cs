@@ -11,7 +11,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 internal sealed class CreateKSqlValue : CreateEntityStatement
 {
-  public object ExtractValue<T>(T inputValue, IValueFormatters valueFormatters, MemberInfo memberInfo, Type type)
+  public object ExtractValue<T>(T inputValue, IValueFormatters valueFormatters, MemberInfo memberInfo, Type type, Func<string, string> formatter)
   {
     Type valueType = inputValue.GetType();
 
@@ -73,26 +73,27 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
     else if (type.IsEnum)
       value = $"'{value}'";
     else if (type.IsDictionary())
-      GenerateMap(valueFormatters, type, ref value);
+      GenerateMap(valueFormatters, type, formatter, ref value);
     else if (type.IsArray)
     {
       var source = ((IEnumerable)value).Cast<object>();
-      var array = source.Select(c => ExtractValue(c, valueFormatters, null, type.GetElementType())).ToArray();
+      var array = source.Select(c => ExtractValue(c, valueFormatters, null, type.GetElementType(), formatter)).ToArray();
       value = PrintArray(array);
     }
     else if (!type.IsGenericType && (type.IsClass || type.IsStruct()))
     {
-      GenerateStruct<T>(valueFormatters, type, ref value);
+      GenerateStruct<T>(valueFormatters, type, formatter, ref value);
     }
     else
     {
-      value = GenerateEnumerableValue(type, value, valueFormatters);
+      value = GenerateEnumerableValue(type, value, valueFormatters, formatter);
     }
 
     return value;
   }
 
-  private void GenerateMap(IValueFormatters valueFormatters, Type type, ref object value)
+  private void GenerateMap(IValueFormatters valueFormatters, Type type, Func<string, string> formatter,
+    ref object value)
   {
     if (value is not IDictionary dict)
       return;
@@ -110,13 +111,13 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
       else
         sb.Append(", ");
 
-      var key = ExtractValue(dictionaryEntry.Key, valueFormatters, type, dictionaryEntry.Key.GetType());
+      var key = ExtractValue(dictionaryEntry.Key, valueFormatters, type, dictionaryEntry.Key.GetType(), formatter);
 
       sb.Append(key);
 
       sb.Append(" := ");
 
-      var dictValue = ExtractValue(dictionaryEntry.Value, valueFormatters, type, dictionaryEntry.Value.GetType());
+      var dictValue = ExtractValue(dictionaryEntry.Value, valueFormatters, type, dictionaryEntry.Value.GetType(), formatter);
 
       sb.Append(dictValue);
     }
@@ -126,7 +127,8 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
     value = sb.ToString();
   }
 
-  private void GenerateStruct<T>(IValueFormatters valueFormatters, Type type, ref object value)
+  private void GenerateStruct<T>(IValueFormatters valueFormatters, Type type, Func<string, string> formatter,
+    ref object value)
   {
     var sb = new StringBuilder();
 
@@ -143,8 +145,9 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
 
       type = GetMemberType(memberInfo2);
 
-      var innerValue = ExtractValue(value, valueFormatters, memberInfo2, type);
-      sb.Append($"{memberInfo2.Name} := {innerValue}");
+      var innerValue = ExtractValue(value, valueFormatters, memberInfo2, type, formatter);
+      var name = formatter(memberInfo2.Name);
+      sb.Append($"{name} := {innerValue}");
     }
 
     sb.Append(")");
@@ -152,7 +155,8 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
     value = sb.ToString();
   }
 
-  private object GenerateEnumerableValue(Type type, object value, IValueFormatters valueFormatters)
+  private object GenerateEnumerableValue(Type type, object value, IValueFormatters valueFormatters,
+    Func<string, string> formatter)
   {
     if (value == null)
       return "NULL";
@@ -166,7 +170,7 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
     type = type.GetGenericArguments()[0];
 
     var source = ((IEnumerable)value).Cast<object>();
-    var array = source.Select(c => ExtractValue(c, valueFormatters, null, type)).ToArray();
+    var array = source.Select(c => ExtractValue(c, valueFormatters, null, type, formatter)).ToArray();
 
     if (!array.Any())
       return "ARRAY_REMOVE(ARRAY[0], 0)";

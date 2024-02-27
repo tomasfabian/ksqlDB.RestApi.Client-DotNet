@@ -34,7 +34,7 @@ var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
 
 await using var context = new KSqlDBContext(contextOptions);
 
-using var disposable = context.CreateQueryStream<Movie>()        
+using var disposable = context.CreateQueryStream<Movie>()
   .Subscribe(onNext: movie =>
   {
     Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
@@ -72,7 +72,7 @@ var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
 
 await using var context = new KSqlDBContext(contextOptions);
 
-using var disposable = context.CreateQuery<Movie>()        
+using var disposable = context.CreateQuery<Movie>()
   .Subscribe(onNext: movie =>
   {
     Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
@@ -296,7 +296,7 @@ public class Worker : IHostedService, IDisposable
         onCompleted: () => { },
         cancellationToken: cancellationToken);
   }
-  
+
   public Task StopAsync(CancellationToken cancellationToken)
   {
     logger.LogInformation("Stopping.");
@@ -412,3 +412,29 @@ await using var context = new KSqlDBContext(contextOptions);
 ```
 
 The `ProcessingGuarantee` enum offers three options: **ExactlyOnce**, **ExactlyOnceV2** and **AtLeastOnce**.
+
+
+### Setting formatting for identifiers
+**v3.5.0**
+
+When using the `ksqlDB.RestApi.Client`, you have the ability to configure the formatting for identifiers in your queries.
+This can be done by making use of the `SetIdentifierFormat` method from the `KSqlDbContextOptionsBuilder` class.
+You can choose from these options:
+* `None` - the default option where identifiers are not modified
+* `Keywords` - when an identifier is a reserved keyword it is escaped using **backticks** `` ` ``
+* `Always` - all identifiers are escaped using **backticks** `` ` ``
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+```
+```C#
+var ksqlDbUrl = @"http://localhost:8088";
+
+var contextOptions = new KSqlDbContextOptionsBuilder()
+  .UseKSqlDb(ksqlDbUrl)
+  .SetIdentitifierFormat(IdentifierFormat.Always)
+  .Options;
+
+await using var context = new KSqlDBContext(contextOptions);
+```

@@ -1,8 +1,8 @@
 ﻿using System.Linq.Expressions;
 using System.Text;
-using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.Tests.Models;
 using NUnit.Framework;
 
@@ -22,31 +22,34 @@ public class LambdaVisitorTests
     lambdaVisitor = new LambdaVisitor(stringBuilder, queryMetadata);
   }
 
-  [Test]
-  public void Visit_Length_ShouldBeAppendedCorrectly()
+  [TestCase(IdentifierFormat.None, ExpectedResult = "(c) => LEN(c->MESSAGE) > 0")]
+  [TestCase(IdentifierFormat.Keywords, ExpectedResult = "(c) => LEN(c->MESSAGE) > 0")]
+  [TestCase(IdentifierFormat.Always, ExpectedResult = "(c) => LEN(c->`MESSAGE`) > 0")]
+  public string Visit_Length_ShouldBeAppendedCorrectly(IdentifierFormat format)
   {
     //Arrange
+    lambdaVisitor.QueryMetadata = new KSqlQueryMetadata { IdentifierFormat = format };
     Expression<Func<Tweet, bool>> expression = c => c.Message.Length > 0;
 
     //Act
     lambdaVisitor.Visit(expression);
 
     //Assert
-    var result = stringBuilder.ToString();
-    result.Should().BeEquivalentTo($"(c) => LEN(c->{nameof(Tweet.Message)}) > 0");
+    return stringBuilder.ToString();
   }
 
-  [Test]
-  public void Visit_MultipleArguments_ShouldBeAppendedCorrectly()
+  [TestCase(IdentifierFormat.None, ExpectedResult = "(c) => REDUCE(c->Values, 0, (x, y) => x + y)")]
+  [TestCase(IdentifierFormat.Keywords, ExpectedResult = "(c) => REDUCE(c->`Values`, 0, (x, y) => x + y)")]
+  public string Visit_MultipleArguments_ShouldBeAppendedCorrectly(IdentifierFormat format)
   {
     //Arrange
+    lambdaVisitor.QueryMetadata = new KSqlQueryMetadata { IdentifierFormat = format };
     Expression<Func<Dictionary<string, int>, int>> expression = c => c.Values.Reduce(0, (x,y) => x + y);
 
     //Act
     lambdaVisitor.Visit(expression);
 
     //Assert
-    var result = stringBuilder.ToString();
-    result.Should().BeEquivalentTo("(c) => REDUCE(c->Values, 0, (x, y) => x + y)");
+    return stringBuilder.ToString();
   }
 }

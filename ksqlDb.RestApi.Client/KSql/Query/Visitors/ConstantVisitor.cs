@@ -4,18 +4,17 @@ using System.Linq.Expressions;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
 {
   internal class ConstantVisitor : KSqlVisitor
   {
-    private readonly KSqlQueryMetadata queryMetadata;
-
     internal ConstantVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
       : base(stringBuilder, queryMetadata)
     {
-      this.queryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
+      this.QueryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
     }
 
     public override Expression Visit(Expression expression)
@@ -47,13 +46,13 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
       if (value is byte[])
         throw new NotSupportedException();
 
-      if (value is not string && queryMetadata.IsInContainsScope && value is IEnumerable enumerable)
+      if (value is not string && QueryMetadata.IsInContainsScope && value is IEnumerable enumerable)
       {
         Append(enumerable);
       }
       else if (value != null && (type.IsClass || type.IsStruct() || type.IsDictionary()))
       {
-        var ksqlValue = new CreateKSqlValue().ExtractValue(value, null, null, type);
+        var ksqlValue = new CreateKSqlValue().ExtractValue(value, null, null, type, str => IdentifierUtil.Format(str, QueryMetadata.IdentifierFormat));
 
         StringBuilder.Append(ksqlValue);
       }

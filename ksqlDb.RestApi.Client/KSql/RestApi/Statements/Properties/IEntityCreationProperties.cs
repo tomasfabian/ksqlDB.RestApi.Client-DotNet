@@ -1,7 +1,10 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+﻿using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 public interface IEntityCreationProperties
 {
   public string EntityName { get; }
   public bool ShouldPluralizeEntityName { get; }
+  public IdentifierFormat IdentifierFormat { get; }
 }

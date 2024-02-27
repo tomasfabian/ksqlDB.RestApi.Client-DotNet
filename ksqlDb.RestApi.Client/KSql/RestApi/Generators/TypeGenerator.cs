@@ -1,12 +1,14 @@
 ﻿using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 
 internal class TypeGenerator : CreateEntityStatement
 {
-  internal string Print<T>(string typeName = null)
+  internal string Print<T>(string typeName = null, IdentifierFormat format = IdentifierFormat.None)
   {
     StringBuilder stringBuilder = new();
     var type = typeof(T);
@@ -20,14 +22,14 @@ internal class TypeGenerator : CreateEntityStatement
 
     stringBuilder.Append($"CREATE TYPE {typeName} AS STRUCT<");
 
-    PrintProperties<T>(stringBuilder);
+    PrintProperties<T>(stringBuilder, format);
 
     stringBuilder.Append(">;");
 
     return stringBuilder.ToString();
   }
 
-  private void PrintProperties<T>(StringBuilder stringBuilder)
+  private void PrintProperties<T>(StringBuilder stringBuilder, IdentifierFormat format)
   {
     var ksqlProperties = new List<string>();
 
@@ -35,11 +37,25 @@ internal class TypeGenerator : CreateEntityStatement
     {
       var type = GetMemberType(memberInfo);
 
-      var ksqlType = CreateEntity.KSqlTypeTranslator(type);
+      var ksqlType = CreateEntity.KSqlTypeTranslator(type, format);
 
-      string columnDefinition = $"{memberInfo.Name} {ksqlType}{CreateEntity.ExploreAttributes(memberInfo, type)}";
+      string columnDefinition;
+      switch (format, IdentifierUtil.IsValid(memberInfo.Name))
+      {
+        case (IdentifierFormat.None, _):
+        case (IdentifierFormat.Keywords, true):
+          columnDefinition = $"{memberInfo.Name} {ksqlType}{CreateEntity.ExploreAttributes(memberInfo, type)}";
+          ksqlProperties.Add(columnDefinition);
+          break;
+        case (IdentifierFormat.Keywords, false):
+        case (IdentifierFormat.Always, _):
+          columnDefinition = $"`{memberInfo.Name}` {ksqlType}{CreateEntity.ExploreAttributes(memberInfo, type)}";
+          ksqlProperties.Add(columnDefinition);
+          break;
+        default:
+          throw new ArgumentOutOfRangeException(nameof(format), format, "Non-exhaustive match");
+      }
 
-      ksqlProperties.Add(columnDefinition);
     }
 
     stringBuilder.Append(string.Join(", ", ksqlProperties));

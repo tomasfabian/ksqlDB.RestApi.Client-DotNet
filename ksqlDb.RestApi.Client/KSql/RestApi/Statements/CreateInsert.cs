@@ -1,5 +1,7 @@
 using System.Reflection;
 using System.Text;
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
@@ -40,11 +42,11 @@ internal sealed class CreateInsert : CreateEntityStatement
         valuesStringBuilder.Append(", ");
       }
 
-      columnsStringBuilder.Append(memberInfo.Name);
+      columnsStringBuilder.Append(memberInfo.Format(insertProperties.IdentifierFormat));
 
       var type = GetMemberType(memberInfo);
 
-      var value = GetValue(insertValues, insertProperties, memberInfo, type);
+      var value = GetValue(insertValues, insertProperties, memberInfo, type, str => IdentifierUtil.Format(str, insertProperties.IdentifierFormat));
 
       valuesStringBuilder.Append(value);
     }
@@ -55,16 +57,17 @@ internal sealed class CreateInsert : CreateEntityStatement
     return insert;
   }
 
-  private static object GetValue<T>(InsertValues<T> insertValues, InsertProperties insertProperties, MemberInfo memberInfo, Type type)
+  private static object GetValue<T>(InsertValues<T> insertValues, InsertProperties insertProperties,
+    MemberInfo memberInfo, Type type, Func<string, string> formatter)
   {
-    var hasValue = insertValues.PropertyValues.ContainsKey(memberInfo.Name);
+    var hasValue = insertValues.PropertyValues.ContainsKey(memberInfo.Format(insertProperties.IdentifierFormat));
 
     object value;
 
     if (hasValue)
-      value = insertValues.PropertyValues[memberInfo.Name];
+      value = insertValues.PropertyValues[memberInfo.Format(insertProperties.IdentifierFormat)];
     else
-      value = new CreateKSqlValue().ExtractValue(insertValues.Entity, insertProperties, memberInfo, type);
+      value = new CreateKSqlValue().ExtractValue(insertValues.Entity, insertProperties, memberInfo, type, formatter);
 
     return value;
   }

@@ -1,4 +1,6 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+﻿using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 public record InsertProperties : IEntityCreationProperties, IValueFormatters
 {
@@ -7,6 +9,8 @@ public record InsertProperties : IEntityCreationProperties, IValueFormatters
   public bool UseInstanceType { get; set; }
 
   public bool ShouldPluralizeEntityName { get; set; } = true;
+
+  public IdentifierFormat IdentifierFormat { get; init; } = IdentifierFormat.None;
 
   public bool IncludeReadOnlyProperties { get; set; } = false;
 

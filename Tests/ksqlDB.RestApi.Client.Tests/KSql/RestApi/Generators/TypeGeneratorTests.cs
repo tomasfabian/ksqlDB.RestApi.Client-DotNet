@@ -1,4 +1,5 @@
 using FluentAssertions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using NUnit.Framework;
@@ -68,6 +69,24 @@ public class TypeGeneratorTests
     statement.Should().Be(@$"CREATE TYPE {nameof(Container).ToUpper()} AS STRUCT<Values2 MAP<VARCHAR, INT>>;");
   }
 
+  [TestCase(IdentifierFormat.None, ExpectedResult = "CREATE TYPE ROWTIME AS STRUCT<Value VARCHAR>;")]
+  [TestCase(IdentifierFormat.Keywords, ExpectedResult = "CREATE TYPE ROWTIME AS STRUCT<Value VARCHAR>;")]
+  [TestCase(IdentifierFormat.Always, ExpectedResult = "CREATE TYPE ROWTIME AS STRUCT<`Value` VARCHAR>;")]
+  public string CreateType_WithSystemColumName(IdentifierFormat format) =>
+    new TypeGenerator().Print<Rowtime>(format: format);
+
+  [TestCase(IdentifierFormat.None, ExpectedResult = "CREATE TYPE RESERVED AS STRUCT<Values VARCHAR>;")]
+  [TestCase(IdentifierFormat.Keywords, ExpectedResult = "CREATE TYPE RESERVED AS STRUCT<`Values` VARCHAR>;")]
+  [TestCase(IdentifierFormat.Always, ExpectedResult = "CREATE TYPE RESERVED AS STRUCT<`Values` VARCHAR>;")]
+  public string CreateType_WithReservedWordField(IdentifierFormat format) =>
+    new TypeGenerator().Print<Reserved>(format: format);
+
+  [TestCase(IdentifierFormat.None, ExpectedResult = "CREATE TYPE SYSTEMCOLUMN AS STRUCT<Rowtime VARCHAR, Rowoffset VARCHAR, Rowpartition VARCHAR, Windowstart VARCHAR, Windowend VARCHAR>;")]
+  [TestCase(IdentifierFormat.Keywords, ExpectedResult = "CREATE TYPE SYSTEMCOLUMN AS STRUCT<Rowtime VARCHAR, Rowoffset VARCHAR, Rowpartition VARCHAR, Windowstart VARCHAR, Windowend VARCHAR>;")]
+  [TestCase(IdentifierFormat.Always, ExpectedResult = "CREATE TYPE SYSTEMCOLUMN AS STRUCT<`Rowtime` VARCHAR, `Rowoffset` VARCHAR, `Rowpartition` VARCHAR, `Windowstart` VARCHAR, `Windowend` VARCHAR>;")]
+  public string CreateType_WithSystemColumnNameField(IdentifierFormat format) =>
+    new TypeGenerator().Print<SystemColumn>(format: format);
+
   public record Address
   {
     public int Number { get; set; }
@@ -91,6 +110,17 @@ public class TypeGeneratorTests
     public IDictionary<string, int> Values2 { get; set; } = null!;
   }
 
+  record Rowtime(string Value)
+  {
+  }
+
+  record Reserved(string Values)
+  {
+  }
+
+  record SystemColumn(string Rowtime, string Rowoffset, string Rowpartition, string Windowstart,  string Windowend)
+  {
+  }
   #region GenericType
 
   record DatabaseChangeObject<TEntity> : DatabaseChangeObject

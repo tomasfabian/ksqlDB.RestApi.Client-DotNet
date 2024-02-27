@@ -6,18 +6,17 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
 internal class LambdaVisitor : KSqlVisitor
 {
   private readonly StringBuilder stringBuilder;
-  private readonly KSqlQueryMetadata queryMetadata;
 
   public LambdaVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
     : base(stringBuilder, queryMetadata)
   {
     this.stringBuilder = stringBuilder ?? throw new ArgumentNullException(nameof(stringBuilder));
-    this.queryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
+    this.QueryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
   }
 
   protected override KSqlFunctionVisitor CreateKSqlFunctionVisitor()
   {
-    return new KSqlFunctionLambdaVisitor(stringBuilder, queryMetadata);
+    return new KSqlFunctionLambdaVisitor(stringBuilder, QueryMetadata);
   }
 
   public override Expression Visit(Expression expression)
@@ -114,11 +113,11 @@ internal class LambdaVisitor : KSqlVisitor
       
     Append(") => ");
 
-    queryMetadata.IsInNestedFunctionScope = true;
+    QueryMetadata.IsInNestedFunctionScope = true;
 
     Visit(node.Body);
 
-    queryMetadata.IsInNestedFunctionScope = false;
+    QueryMetadata.IsInNestedFunctionScope = false;
 
     return node;
   }
