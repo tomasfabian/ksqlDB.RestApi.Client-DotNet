@@ -63,5 +63,5 @@ public record EntityCreationMetadata : CreationMetadata, IEntityCreationProperti
   [JsonIgnore]
   public bool IncludeReadOnlyProperties { get; set; }
 
-  public IdentifierFormat IdentifierFormat { get; internal set; } = IdentifierFormat.None;
+  public IdentifierFormat IdentifierFormat { get; set; } = IdentifierFormat.None;
 }
