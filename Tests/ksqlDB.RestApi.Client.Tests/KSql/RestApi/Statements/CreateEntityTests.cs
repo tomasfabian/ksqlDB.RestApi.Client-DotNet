@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Text.Json.Serialization;
 using FluentAssertions;
 using Joker.Extensions;
@@ -7,6 +8,8 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using NUnit.Framework;
 using Pluralize.NET;
+using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierFormat;
+using ArgumentOutOfRangeException = System.ArgumentOutOfRangeException;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements;
 
@@ -24,17 +27,21 @@ public class CreateEntityTests
       Replicas = 1
     };
   }
-    
+
   private static readonly IPluralize EnglishPluralizationService = new Pluralizer();
 
-  private string CreateExpectedStatement(string creationClause, bool hasPrimaryKey, string? entityName = null)
+  private static string CreateExpectedStatement(string creationClause, bool hasPrimaryKey, string? entityName = null, IdentifierFormat format = None)
   {
     string key = hasPrimaryKey ? "PRIMARY KEY" : "KEY";
 
     if (entityName.IsNullOrEmpty())
       entityName = EnglishPluralizationService.Pluralize(nameof(MyMovie));
 
-    string expectedStatementTemplate = @$"{creationClause} {entityName} (
+    switch (format)
+    {
+      case None:
+      case Keywords:
+        return @$"{creationClause} {entityName} (
 	Id INT {key},
 	Title VARCHAR,
 	Release_Year INT,
@@ -42,9 +49,21 @@ public class CreateEntityTests
 	Dictionary MAP<VARCHAR, INT>,
 	Dictionary2 MAP<VARCHAR, INT>,
 	Field DOUBLE
-) WITH ( KAFKA_TOPIC='{creationMetadata.KafkaTopic}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings();
-
-    return expectedStatementTemplate;
+) WITH ( KAFKA_TOPIC='{nameof(MyMovie)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings();
+        break;
+      case Always:
+        return @$"{creationClause} `{entityName}` (
+	`Id` INT {key},
+	`Title` VARCHAR,
+	`Release_Year` INT,
+	`NumberOfDays` ARRAY<INT>,
+	`Dictionary` MAP<VARCHAR, INT>,
+	`Dictionary2` MAP<VARCHAR, INT>,
+	`Field` DOUBLE
+) WITH ( KAFKA_TOPIC='{nameof(MyMovie)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings();
+      default:
+        throw new ArgumentOutOfRangeException(nameof(format), format, "Non-exhaustive match");
+    }
   }
 
   #region KSqlTypeTranslator
@@ -243,24 +262,33 @@ public class CreateEntityTests
     //Assert
     ksqlType.Should().Be("BYTES");
   }
-    
+
   #endregion
 
-  [Test]
-  public void Print_CreateStream()
+
+  public static IEnumerable<(IdentifierFormat, string)> PrintCreateStreamTestCases()
+  {
+    yield return (None, CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false, format: None));
+    yield return (Keywords, CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false, format: Keywords));
+    yield return (Always, CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false, format: Always));
+  }
+
+  [TestCaseSource(nameof(PrintCreateStreamTestCases))]
+  public void Print_CreateStream((IdentifierFormat format, string expected) testCase)
   {
     //Arrange
+    var (format, expected) = testCase;
     var statementContext = new StatementContext
     {
       CreationType = CreationType.Create,
       KSqlEntityType = KSqlEntityType.Stream
     };
-
+    creationMetadata.IdentifierFormat = format;
     //Act
-    string statement = new CreateEntity().Print<MyMovie>(statementContext, creationMetadata, null);
+    var statement = new CreateEntity().Print<MyMovie>(statementContext, creationMetadata, null);
 
     //Assert
-    statement.Should().Be(CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false));
+    statement.Should().Be(expected);
   }
 
   private class Transaction
@@ -269,29 +297,56 @@ public class CreateEntityTests
     public decimal Amount { get; set; }
   }
 
-  [Test]
-  public void DecimalWithPrecision()
+  public static IEnumerable<(IdentifierFormat, string)> DecimalWithPrecisionTestCases()
+  {
+    yield return (None, $@"CREATE STREAM Transactions (
+{"\t"}Amount DECIMAL(3,2)
+) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+    yield return (Keywords, $@"CREATE STREAM Transactions (
+{"\t"}Amount DECIMAL(3,2)
+) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+    yield return (Always, $@"CREATE STREAM `Transactions` (
+{"\t"}`Amount` DECIMAL(3,2)
+) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+  }
+
+  [TestCaseSource(nameof(DecimalWithPrecisionTestCases))]
+  public void DecimalWithPrecision((IdentifierFormat format, string expected) testCase)
   {
     //Arrange
+    var (format, expected) = testCase;
     var statementContext = new StatementContext
     {
       CreationType = CreationType.Create,
       KSqlEntityType = KSqlEntityType.Stream
     };
+    creationMetadata.IdentifierFormat = format;
 
     //Act
-    string statement = new CreateEntity().Print<Transaction>(statementContext, creationMetadata, null);
+    var statement = new CreateEntity().Print<Transaction>(statementContext, creationMetadata, null);
 
     //Assert
-    statement.Should().Be(@"CREATE STREAM Transactions (
-	Amount DECIMAL(3,2)
-) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+    statement.Should().Be(expected);
   }
-    
-  [Test]
-  public void Print_CreateStream_OverrideEntityName()
+
+  public static IEnumerable<(IdentifierFormat, string)> PrintCreatStreamOverrideEntityNameTestCases()
+  {
+    yield return (None,
+      CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false,
+        entityName: EnglishPluralizationService.Pluralize("TestName")));
+    yield return (Keywords,
+      CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false,
+        entityName: EnglishPluralizationService.Pluralize("TestName"), Keywords));
+    yield return (Always,
+      CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false,
+        entityName: EnglishPluralizationService.Pluralize("TestName"), Always));
+  }
+
+  [TestCaseSource(nameof(PrintCreatStreamOverrideEntityNameTestCases))]
+  public void Print_CreateStream_OverrideEntityName((IdentifierFormat format, string expected)  testCase)
   {
     //Arrange
+    var (format, expected) = testCase;
     var statementContext = new StatementContext
     {
       CreationType = CreationType.Create,
@@ -299,18 +354,29 @@ public class CreateEntityTests
     };
 
     creationMetadata.EntityName = "TestName";
+    creationMetadata.IdentifierFormat = format;
 
     //Act
-    string statement = new CreateEntity().Print<MyMovie>(statementContext, creationMetadata, null);
+    var statement = new CreateEntity().Print<MyMovie>(statementContext, creationMetadata, null);
 
     //Assert
-    statement.Should().Be(CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false, entityName: EnglishPluralizationService.Pluralize(creationMetadata.EntityName)));
-  }    
+    statement.Should().Be(expected);
+  }
 
-  [Test]
-  public void Print_CreateStream_OverrideEntityName_DonNotPluralize()
+  public static IEnumerable<(IdentifierFormat, string)> PrintCreateStreamOverrideEntityNameDoNotPluralizeTestCases()
+  {
+    yield return (None, CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false, entityName: "TestName"));
+    yield return (Keywords,
+      CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false, entityName: "TestName", Keywords));
+    yield return (Always,
+      CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false, entityName: "TestName", Always));
+  }
+
+  [TestCaseSource(nameof(PrintCreateStreamOverrideEntityNameDoNotPluralizeTestCases))]
+  public void Print_CreateStream_OverrideEntityName_DonNotPluralize((IdentifierFormat format, string expected) testCase)
   {
     //Arrange
+    var (format, expected) = testCase;
     var statementContext = new StatementContext
     {
       CreationType = CreationType.Create,
@@ -319,14 +385,15 @@ public class CreateEntityTests
 
     creationMetadata.ShouldPluralizeEntityName = false;
     creationMetadata.EntityName = "TestName";
+    creationMetadata.IdentifierFormat = format;
 
     //Act
-    string statement = new CreateEntity().Print<MyMovie>(statementContext, creationMetadata, null);
+    var statement = new CreateEntity().Print<MyMovie>(statementContext, creationMetadata, null);
 
     //Assert
-    statement.Should().Be(CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false, entityName: creationMetadata.EntityName));
+    statement.Should().Be(expected);
   }
-    
+
   [Test]
   public void Print_CreateStream_DoNotPluralize()
   {
@@ -429,10 +496,27 @@ public class CreateEntityTests
     statement.Should().Be(CreateExpectedStatement("CREATE OR REPLACE TABLE", hasPrimaryKey: true));
   }
 
-  [Test]
-  public void Print_CreateOrReplaceTable_IncludeReadOnlyProperties()
+  public static IEnumerable<(IdentifierFormat, string)> PrintCreateOrReplaceTableIncludeReadOnlyPropertiesTestCases()
+  {
+    yield return (None, $@"CREATE OR REPLACE TABLE MyItems (
+{"\t"}Id INT PRIMARY KEY,
+{"\t"}Items ARRAY<INT>
+) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+    yield return (Keywords, $@"CREATE OR REPLACE TABLE MyItems (
+{"\t"}Id INT PRIMARY KEY,
+{"\t"}Items ARRAY<INT>
+) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+    yield return (Always, $@"CREATE OR REPLACE TABLE `MyItems` (
+{"\t"}`Id` INT PRIMARY KEY,
+{"\t"}`Items` ARRAY<INT>
+) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+  }
+
+  [TestCaseSource(nameof(PrintCreateOrReplaceTableIncludeReadOnlyPropertiesTestCases))]
+  public void Print_CreateOrReplaceTable_IncludeReadOnlyProperties((IdentifierFormat format, string expected) testCase)
   {
     //Arrange
+    var (format, expected) = testCase;
     var statementContext = new StatementContext
     {
       CreationType = CreationType.CreateOrReplace,
@@ -440,15 +524,13 @@ public class CreateEntityTests
     };
 
     creationMetadata.IncludeReadOnlyProperties = true;
+    creationMetadata.IdentifierFormat = format;
 
     //Act
-    string statement = new CreateEntity().Print<MyItems>(statementContext, creationMetadata, null);
+    var statement = new CreateEntity().Print<MyItems>(statementContext, creationMetadata, null);
 
     //Assert
-    statement.Should().Be(@"CREATE OR REPLACE TABLE MyItems (
-	Id INT PRIMARY KEY,
-	Items ARRAY<INT>
-) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+    statement.Should().Be(expected);
   }
 
   public abstract record AbstractProducerClass
@@ -461,46 +543,54 @@ public class CreateEntityTests
   {
     public EventCategory[] EventCategories { get; set; } = null!;
   }
-    
-  [Test]
-  public void Print_NestedArrayType_CreateTableIfNotExists()
+
+  [TestCase(None)]
+  [TestCase(Keywords)]
+  [TestCase(Always)]
+  public void Print_NestedArrayType_CreateTableIfNotExists(IdentifierFormat format)
   {
-    TestCreateEntityWithEnumerable<Enrichedevent1>();
+    TestCreateEntityWithEnumerable<Enrichedevent1>(format: format);
   }
 
   record Enrichedevent2 : AbstractProducerClass
   {
     public List<EventCategory> EventCategories { get; set; } = null!;
   }
-    
-  [Test]
-  public void Print_NestedListType_CreateTableIfNotExists()
+
+  [TestCase(None)]
+  [TestCase(Keywords)]
+  [TestCase(Always)]
+  public void Print_NestedListType_CreateTableIfNotExists(IdentifierFormat format)
   {
-    TestCreateEntityWithEnumerable<Enrichedevent2>();
+    TestCreateEntityWithEnumerable<Enrichedevent2>(format: format);
   }
-    
+
   record Enrichedevent3 : AbstractProducerClass
   {
     public IEnumerable<EventCategory> EventCategories { get; set; } = null!;
   }
 
-  [Test]
-  public void Print_NestedGenericEnumerableType_CreateTableIfNotExists()
+  [TestCase(None)]
+  [TestCase(Keywords)]
+  [TestCase(Always)]
+  public void Print_NestedGenericEnumerableType_CreateTableIfNotExists(IdentifierFormat format)
   {
-    TestCreateEntityWithEnumerable<Enrichedevent3>();
+    TestCreateEntityWithEnumerable<Enrichedevent3>(format: format);
   }
-    
+
   record Enrichedevent4 : AbstractProducerClass
   {
     public int[] EventCategories { get; set; } = null!;
   }
 
-  [Test]
-  public void Print_NestedPrimitiveArrayType_CreateTableIfNotExists()
+  [TestCase(None)]
+  [TestCase(Keywords)]
+  [TestCase(Always)]
+  public void Print_NestedPrimitiveArrayType_CreateTableIfNotExists(IdentifierFormat format)
   {
-    TestCreateEntityWithEnumerable<Enrichedevent4>(arrayElementType: "INT");
+    TestCreateEntityWithEnumerable<Enrichedevent4>(arrayElementType: "INT", format);
   }
-    
+
   //CREATE TYPE EventCategories AS STRUCT<id INTEGER, name VARCHAR, description VARCHAR>;
   record EventCategory
   {
@@ -508,7 +598,7 @@ public class CreateEntityTests
     public string Name { get; set; } = null!;
   }
 
-  private static void TestCreateEntityWithEnumerable<TEntity>(string arrayElementType = "EVENTCATEGORY")
+  private static void TestCreateEntityWithEnumerable<TEntity>(string arrayElementType = "EVENTCATEGORY", IdentifierFormat format = None)
   {
     //Arrange
     var statementContext = new StatementContext
@@ -521,17 +611,32 @@ public class CreateEntityTests
     {
       EntityName = "Enrichedevents",
       KafkaTopic = "enrichedevents",
-      Partitions = 1
+      Partitions = 1,
+      IdentifierFormat = format
     };
 
     //Act
-    string statement = new CreateEntity().Print<TEntity>(statementContext, creationMetadata, true);
+    var statement = new CreateEntity().Print<TEntity>(statementContext, creationMetadata, true);
 
     //Assert
-    statement.Should().Be(@$"CREATE TABLE IF NOT EXISTS Enrichedevents (
+    switch (format)
+    {
+      case None:
+      case Keywords:
+        statement.Should().Be(@$"CREATE TABLE IF NOT EXISTS Enrichedevents (
 	EventCategories ARRAY<{arrayElementType}>,
 	Key VARCHAR PRIMARY KEY
 ) WITH ( KAFKA_TOPIC='enrichedevents', VALUE_FORMAT='Json', PARTITIONS='1' );".ReplaceLineEndings());
+        break;
+      case Always:
+        statement.Should().Be(@$"CREATE TABLE IF NOT EXISTS `Enrichedevents` (
+	`EventCategories` ARRAY<{arrayElementType}>,
+	`Key` VARCHAR PRIMARY KEY
+) WITH ( KAFKA_TOPIC='enrichedevents', VALUE_FORMAT='Json', PARTITIONS='1' );".ReplaceLineEndings());
+        break;
+      default:
+        throw new ArgumentOutOfRangeException(nameof(format), format, "Non-exhaustive match");
+    }
   }
 
   internal class MyMovie

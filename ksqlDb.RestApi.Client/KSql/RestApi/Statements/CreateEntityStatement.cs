@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Pluralize.NET;
@@ -27,17 +29,17 @@ internal class CreateEntityStatement
     return properties.Where(c => !c.GetCustomAttributes().OfType<IgnoreByInsertsAttribute>().Any());
   }
 
-  protected string GetEntityName<T>(IEntityCreationProperties metadata)
+  protected static string GetEntityName<T>(IEntityCreationProperties metadata)
   {
     string entityName = metadata?.EntityName;
 
     if (string.IsNullOrEmpty(entityName))
       entityName = typeof(T).Name;
 
-    if (metadata != null && metadata.ShouldPluralizeEntityName)
+    if (metadata is { ShouldPluralizeEntityName: true })
       entityName = EnglishPluralizationService.Pluralize(entityName);
 
-    return entityName;
+    return IdentifierUtil.Format(entityName, metadata?.IdentifierFormat ?? IdentifierFormat.None);
   }
 
   protected static Type GetMemberType(MemberInfo memberInfo)
