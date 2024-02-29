@@ -1,5 +1,9 @@
 # ksqlDB.RestApi.Client
 
+# 3.6.0
+- added escaping using backticks for identifiers in statements #57
+- added `TypeProperties` class to configure type creation #58
+
 # 3.6.0-rc.1
 - added .NET Enums to VARCHAR mapping #55. `JsonStringEnumConverter` was added to `KSqlDbJsonSerializerOptions`.
 
@@ -35,7 +39,7 @@
 
 Removed not supported **TFM**s:
 - netcoreapp3.1;net5.0
- 
+
 Removed obsolete methods:
 - `KSqlFunctionsExtensions.Sign`
 - `IAggregations<TSource>.CollectList`
@@ -47,7 +51,7 @@ Removed obsolete methods:
 # v2.6.0
 - added shared values into KSqlDbStatement #39
 - KSqlDbContext's CreateStream and CreateStreamQuery influence each others services collection during consecutive usages. #37
- 
+
 # v2.5.2
 - RowValueJsonSerializer single field instance deserialization fix for arrays #35
 
@@ -76,13 +80,13 @@ TimeWindows:
 # v2.3.0
 - added TFM for .NET 6.0
 
-### Assert topic 
+### Assert topic
 - asserts that a topic exists or does not exist.
 - IKSqlDbRestApiClient.AssertTopicExistsAsync, IKSqlDbRestApiClient.AssertTopicNotExistsAsync, AssertTopicResponse, AssertTopicOptions
- 
+
 ### Assert schema
 - Asserts that a schema exists or does not exist.
-- IKSqlDbRestApiClient.AssertSchemaExistsAsync, IKSqlDbRestApiClient.AssertSchemaNotExistsAsync, AssertSchemaResponse, AssertSchemaOptions 
+- IKSqlDbRestApiClient.AssertSchemaExistsAsync, IKSqlDbRestApiClient.AssertSchemaNotExistsAsync, AssertSchemaResponse, AssertSchemaOptions
 - IKSqlDbAssertionsRestApiClient
 
 ### Serialization formats
@@ -106,7 +110,7 @@ TimeWindows:
 
 # v2.1.2
 - was unlisted - contains a breaking change
-- 
+-
 # v2.1.1
 - `KSqlDBContext` - added support for IDisposable
 
@@ -129,7 +133,7 @@ Support explicit message types for `Protobuf` with multiple definitions:
 **Breaking changes:**
 
 ### DisposeHttpClient
-`KSqlDBContextOptions` and `KSqlDbRestApiClient` - `DisposeHttpClient` property is by default set to `false`. 
+`KSqlDBContextOptions` and `KSqlDbRestApiClient` - `DisposeHttpClient` property is by default set to `false`.
 
 ### HttpClientFactory
 constructor argument was changed from `Uri` to `HttpClient`. The `IHttpClientFactory` is registered with `System.Net.Http.AddHttpClient` for better lifecycle management
@@ -204,7 +208,7 @@ Bug fix:
 ## KSqlDbRestApiClient
 - CreateTypeAsync added optional type name argument
 
-## Operator LIKE - String.StartsWith, String.EndsWith, String.Contains 
+## Operator LIKE - String.StartsWith, String.EndsWith, String.Contains
 Match a string with a specified pattern
 
 ## IKSqlDBContext Add and SaveChangesAsync
@@ -217,7 +221,7 @@ Saving multiple entities with one request
 ## KSqlDbServiceCollectionExtensions.ConfigureKSqlDb
 - registers the following dependencies: IKSqlDBContext, KSqlDbRestApiClient, IHttpClientFactory, KSqlDBContextOptions
 
-## Logging 
+## Logging
 - LogInformation about received data, executed commands and queries
 - added package reference - Microsoft.Extensions.Logging.Abstractions
 
@@ -303,14 +307,14 @@ Bug fixes:
 ## Invocation (lambda) functions
 - requirements: ksqldb 0.17.0
 - This version covers ARRAY type. MAP types are not included in this release.
- 
-### Transform 
+
+### Transform
 - Transform a collection by using a lambda function.
 
-### Reduce 
+### Reduce
 - Reduce a collection starting from an initial state.
 
-### Filter 
+### Filter
 - Filter a collection with a lambda function.
 
 ## BYTES
@@ -325,7 +329,7 @@ Bug fixes:
 
 ## KSqlDbRestApiClient.InsertIntoAsync
 - added support for ```IEnumerable<T>``` properties #10
- 
+
 ### Inserting empty arrays
 - empty arrays are generated in the following way (workaround)
 ```SQL
@@ -343,23 +347,23 @@ ARRAY_REMOVE(ARRAY[0], 0))
 - KSqlOperatorExtensions - NotBetween - operator is used to indicate that a certain value must not be within a specified range, including boundaries.
 
 # v1.7.0
-- KPullSet - GetManyAsync - Pulls all values from the materialized view asynchronously and terminates. #6 
+- KPullSet - GetManyAsync - Pulls all values from the materialized view asynchronously and terminates. #6
 - QbservableExtensions - ExplainAsync and ExplainAsStringAsync - Show the execution plan for a SQL expression, show the execution plan plus additional runtime information and metrics.
 
 # v1.6.0
-### KSqlDbRestApiClient 
+### KSqlDbRestApiClient
 - CreateTypeAsync -  Create an alias for a complex type declaration. [#4 Complex Types](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/issues/4)
 
 - InsertIntoAsync for Complex types - `List<T>`, record, class and struct
 
-### IN operator 
+### IN operator
 - `IEnumerable<T>` and `IList<T>` Contains method in Where and Select clauses is interpreted as IN.  [#5 Use 'Contains()'](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/issues/5)
 
 FIX:
 - IEnumerables are converted to ksql ARRAY not to a list of comma separated values
 
 # v1.5.0
-### QbservableExtensions 
+### QbservableExtensions
 ObserveOn - Wraps the source sequence in order to run its observer callbacks on the specified scheduler.
 
 SubscribeOn - Wraps the source sequence in order to run its subscription on the specified scheduler.
@@ -392,11 +396,11 @@ Scalar functions: ExtractJsonField, ConcatWS, Encode
 HttpResponseMessageExtensions - added JsonSerializerOptions - PropertyNameCaseInsensitive = true
 
 Bug fix:
-- [#1](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/issues/1) - [Pull Query] JsonException when a field contains a comma 
+- [#1](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/issues/1) - [Pull Query] JsonException when a field contains a comma
 
 # v1.2.0
 
-KSqlDbRestApiClient: 
+KSqlDbRestApiClient:
 - GetConnectorsAsync - List all connectors in the Connect cluster.
 - DropConnectorAsync, DropConnectorIfExistsAsync - Drop a connector and delete it from the Connect cluster.
 
@@ -406,7 +410,7 @@ KSqlDbRestApiClient:
 - StreamsResponse, Stream, StatementResponseBase
 
 - GetTablesAsync - List the defined tables.
-- TablesResponse, Table, 
+- TablesResponse, Table,
 
 - scalar collection functions: AsMap, JsonArrayContains, MapKeys
 
@@ -415,12 +419,12 @@ KSqlDbRestApiClient:
 - Push queries [WithOffsetResetPolicy extension method](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB#withoffsetresetpolicy---push-queries-extension-method-v110)
 - CAST - [ToString](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB#cast---tostring-v110), [string to numeric types](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB#cast---convert-string-to-numeric-types-v110)
 - scalar functions: Concat, ArraySort, ArrayUnion
- 
+
 # v1.0.0
 - [Insert Values](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/README.md#insert-into-v100) - Produce a row into an existing stream or table
 
 Great news are that Confluent added this package to their [documentation](https://github.com/confluentinc/ksql/pull/7520/files) as a contributed .NET client, so before wider adoption I decided to improve the API at cost of some breaking changes.
-Except of one change all of them will be catched by the compiler. For more information see [Wiki](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/README.md#breaking-changes). 
+Except of one change all of them will be catched by the compiler. For more information see [Wiki](https://github.com/tomasfabian/Kafka.DotNet.ksqlDB/blob/main/README.md#breaking-changes).
 
 **Breaking changes.** In order to improve the v1.0 release the following methods and properties were renamed:
 
@@ -466,7 +470,7 @@ Fixes:
 
 # v0.9.0
 [Create or replace stream/table as select](https://github.com/tomasfabian/Joker/wiki/Kafka.DotNet.ksqlDB---push-queries-LINQ-provider#v090-wip---preview):
-- IKSqlDBStatementsContext - CreateStreamStatement, CreateOrReplaceStreamStatement, CreateTableStatement, CreateOrReplaceTableStatement   
+- IKSqlDBStatementsContext - CreateStreamStatement, CreateOrReplaceStreamStatement, CreateTableStatement, CreateOrReplaceTableStatement
 - CreateStatementExtensions - PartitionBy, ToStatementString
 - WithOrAsClause, CreationMetadata
 - ICreateStatement, CreateStatementExtensions
@@ -477,11 +481,11 @@ Fixes:
 Extensions:
 - HttpResponseMessageExtensions - [ToStatementResponse](https://github.com/tomasfabian/Joker/wiki/Kafka.DotNet.ksqlDB---push-queries-LINQ-provider#httpresponsemessage-tostatementresponses-extension-v080)
 
-### KSqlDbRestApiClient: 
+### KSqlDbRestApiClient:
 - ExecuteStatementAsync - The /ksql resource runs a sequence of SQL statements. All statements, except those starting with SELECT, can be run on this endpoint. To run SELECT statements use the /query endpoint.
 
 ### KSqlDbStatement
-- [KSqlDbStatement](https://github.com/tomasfabian/Joker/wiki/Kafka.DotNet.ksqlDB---push-queries-LINQ-provider#ksqldbstatement-v080) allows you to set the statement, content encoding and the CommandSequenceNumber. 
+- [KSqlDbStatement](https://github.com/tomasfabian/Joker/wiki/Kafka.DotNet.ksqlDB---push-queries-LINQ-provider#ksqldbstatement-v080) allows you to set the statement, content encoding and the CommandSequenceNumber.
 
 # v0.7.0:
 - [operator precedence](https://github.com/tomasfabian/Joker/wiki/Kafka.DotNet.ksqlDB---push-queries-LINQ-provider#lexical-precedence-v070)
@@ -529,11 +533,11 @@ Fixes:
 #### Numeric functions
 - Abs, Ceil, Floor, Random, Sign, Round
 
-#### Aggregation functions 
+#### Aggregation functions
 - EarliestByOffset, LatestByOffset, EarliestByOffsetAllowNulls, LatestByOffsetAllowNull
 - TopK, TopKDistinct, LongCount, Count(col)
 - EarliestByOffset - earliestN overload
-- LatestByOffset - latestN overload 
+- LatestByOffset - latestN overload
 - CollectSet, CollectList, CountDistinct
 
 # v0.2.0
@@ -556,7 +560,7 @@ Fixes:
 # v0.1.0
 ### ExtensionsMethods:
 - AsAsyncEnumerable
-- Sum Aggregation 
+- Sum Aggregation
 - Tumbling window, Hopping window
 
 - KSqlDBContext async disposition AsyncDisposableObject
@@ -574,14 +578,14 @@ Fixes:
 
 ### ExtensionsMethods:
 - GroupBy
-- Count Aggregation  
+- Count Aggregation
 
 # v0.1.0-preview2
 - KQuerySet was set to internal for maintanance reasons. Is KQueryStreamSet good enough for all push queries?
 
 ### ToObservable:
 - ToObservable
-- Subscribe overloads 
+- Subscribe overloads
 
 # v0.1.0-preview1
 ### ksql provider:
@@ -592,8 +596,8 @@ Fixes:
 - LIMIT take linq extension method
 
 ### ExtensionsMethods:
-- Subscribe 
- 
+- Subscribe
+
 ### Interfaces:
 - IQbservableProvider
 - ```IQbservable<TEntity>```
