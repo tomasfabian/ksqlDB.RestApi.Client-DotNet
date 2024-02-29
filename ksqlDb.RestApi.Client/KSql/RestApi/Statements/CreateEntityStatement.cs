@@ -39,7 +39,7 @@ internal class CreateEntityStatement
     if (metadata is { ShouldPluralizeEntityName: true })
       entityName = EnglishPluralizationService.Pluralize(entityName);
 
-    return IdentifierUtil.Format(entityName, metadata?.IdentifierFormat ?? IdentifierFormat.None);
+    return IdentifierUtil.Format(entityName, metadata?.IdentifierEscaping ?? IdentifierEscaping.Never);
   }
 
   protected static Type GetMemberType(MemberInfo memberInfo)

@@ -9,50 +9,50 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators;
 using ksqlDb.RestApi.Client.Tests.Models.Movies;
 using NUnit.Framework;
-using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierFormat;
+using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements;
 
 public class CreateInsertTests
 {
-  public static IEnumerable<(IdentifierFormat, string)> GenerateTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> GenerateTestCases()
   {
-    yield return (None, @"INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
+    yield return (Never, @"INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
     yield return (Keywords, @"INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
     yield return (Always, @"INSERT INTO `Movies` (`Title`, `Id`, `Release_Year`) VALUES ('Title', 1, 1988);");
   }
 
   [TestCaseSource(nameof(GenerateTestCases))]
-  public void Generate((IdentifierFormat format, string expected) testCase)
+  public void Generate((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
+    var (escaping, expected) = testCase;
     var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title" };
 
     //Act
-    var statement = new CreateInsert().Generate(movie, new InsertProperties {IdentifierFormat = format});
+    var statement = new CreateInsert().Generate(movie, new InsertProperties {IdentifierEscaping = escaping});
 
     //Assert
     statement.Should().Be(expected);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> GenerateOverrideEntityNameTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> GenerateOverrideEntityNameTestCases()
   {
-    yield return (None, $"INSERT INTO TestNames (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
+    yield return (Never, $"INSERT INTO TestNames (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
     yield return (Keywords, $"INSERT INTO TestNames (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
     yield return (Always, $"INSERT INTO `TestNames` (`Title`, `Id`, `Release_Year`) VALUES ('Title', 1, 1988);");
   }
 
   [TestCaseSource(nameof(GenerateOverrideEntityNameTestCases))]
-  public void Generate_OverrideEntityName((IdentifierFormat format, string expected) testCase)
+  public void Generate_OverrideEntityName((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
+    var (escaping, expected) = testCase;
     var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title" };
     var insertProperties = new InsertProperties
     {
       EntityName = "TestName",
-      IdentifierFormat = format
+      IdentifierEscaping = escaping
     };
 
     //Act
@@ -211,19 +211,19 @@ public class CreateInsertTests
     public EventCategory Category { get; set; }
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> ComplexTypeTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> ComplexTypeTestCases()
   {
-    yield return (None, "INSERT INTO Events (Id, Category) VALUES (1, STRUCT(Count := 1, Name := 'Planet Earth'));");
+    yield return (Never, "INSERT INTO Events (Id, Category) VALUES (1, STRUCT(Count := 1, Name := 'Planet Earth'));");
     yield return (Keywords, "INSERT INTO Events (Id, Category) VALUES (1, STRUCT(Count := 1, Name := 'Planet Earth'));");
     yield return (Always,
       "INSERT INTO `Events` (`Id`, `Category`) VALUES (1, STRUCT(`Count` := 1, `Name` := 'Planet Earth'));");
   }
 
   [TestCaseSource(nameof(ComplexTypeTestCases))]
-  public void ComplexType((IdentifierFormat format, string expected) testCase)
+  public void ComplexType((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
+    var (escaping, expected) = testCase;
     var eventCategory = new EventCategory
     {
       Count = 1,
@@ -237,7 +237,7 @@ public class CreateInsertTests
       //Categories = new[] { eventCategory, new EventCategory { Name = "Discovery" } }
     };
 
-    var insertProperties = new InsertProperties { EntityName = "Events", IdentifierFormat = format};
+    var insertProperties = new InsertProperties { EntityName = "Events", IdentifierEscaping = escaping};
 
     //Act
     string statement = new CreateInsert().Generate(testEvent, insertProperties);
@@ -246,25 +246,25 @@ public class CreateInsertTests
     statement.Should().Be(expected);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> ComplexTypeNullReferenceTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> ComplexTypeNullReferenceTestCases()
   {
-    yield return (None, "INSERT INTO Events (Id, Category) VALUES (1, NULL);");
+    yield return (Never, "INSERT INTO Events (Id, Category) VALUES (1, NULL);");
     yield return (Keywords, "INSERT INTO Events (Id, Category) VALUES (1, NULL);");
     yield return (Always, "INSERT INTO `Events` (`Id`, `Category`) VALUES (1, NULL);");
   }
 
   [TestCaseSource(nameof(ComplexTypeNullReferenceTestCases))]
-  public void ComplexType_NullReferenceValue((IdentifierFormat format, string expected) testCase)
+  public void ComplexType_NullReferenceValue((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
+    var (escaping, expected) = testCase;
     var testEvent = new ComplexEvent
     {
       Id = 1,
       Category = null!
     };
 
-    var insertProperties = new InsertProperties { EntityName = "Events", IdentifierFormat = format};
+    var insertProperties = new InsertProperties { EntityName = "Events", IdentifierEscaping = escaping};
 
     //Act
     var statement = new CreateInsert().Generate(testEvent, insertProperties);
@@ -279,24 +279,24 @@ public class CreateInsertTests
     public IEnumerable<double> Items { get; set; } = null!;
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> IncludeReadOnlyPropertiedTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> IncludeReadOnlyPropertiedTestCases()
   {
-    yield return (None, $"INSERT INTO {nameof(Movie)}s (Title, Id, Release_Year, ReadOnly) VALUES (NULL, 1, 0, ARRAY[1, 2]);");
+    yield return (Never, $"INSERT INTO {nameof(Movie)}s (Title, Id, Release_Year, ReadOnly) VALUES (NULL, 1, 0, ARRAY[1, 2]);");
     yield return (Keywords, $"INSERT INTO {nameof(Movie)}s (Title, Id, Release_Year, ReadOnly) VALUES (NULL, 1, 0, ARRAY[1, 2]);");
     yield return (Always, $"INSERT INTO `{nameof(Movie)}s` (`Title`, `Id`, `Release_Year`, `ReadOnly`) VALUES (NULL, 1, 0, ARRAY[1, 2]);");
   }
 
   [TestCaseSource(nameof(IncludeReadOnlyPropertiedTestCases))]
-  public void IncludeReadOnlyProperties((IdentifierFormat format, string expected) testCase)
+  public void IncludeReadOnlyProperties((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
+    var (escaping, expected) = testCase;
     var order = new Movie { Id = 1 };
 
     var insertProperties = new InsertProperties
     {
       IncludeReadOnlyProperties = true,
-      IdentifierFormat = format
+      IdentifierEscaping = escaping
     };
 
     //Act
@@ -306,20 +306,20 @@ public class CreateInsertTests
     statement.Should().Be(expected);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> EnumerableTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> EnumerableTestCases()
   {
-    yield return (None, "INSERT INTO Kafka_table_orders (Id, Items) VALUES (1, ARRAY[1, 2, 3]);");
+    yield return (Never, "INSERT INTO Kafka_table_orders (Id, Items) VALUES (1, ARRAY[1, 2, 3]);");
     yield return (Keywords, "INSERT INTO Kafka_table_orders (Id, Items) VALUES (1, ARRAY[1, 2, 3]);");
     yield return (Always, "INSERT INTO `Kafka_table_orders` (`Id`, `Items`) VALUES (1, ARRAY[1, 2, 3]);");
   }
 
   [TestCaseSource(nameof(EnumerableTestCases))]
-  public void Enumerable((IdentifierFormat format, string expected) testCase)
+  public void Enumerable((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
+    var (escaping, expected) = testCase;
     var order = new Kafka_table_order { Id = 1, Items = System.Linq.Enumerable.Range(1, 3).Select(c => (double)c) };
-    var insertProperties = new InsertProperties { IdentifierFormat = format };
+    var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
 
     //Act
     string statement = new CreateInsert().Generate(order, insertProperties);
@@ -422,18 +422,18 @@ public class CreateInsertTests
     public Dictionary<string, int[]> Map { get; set; } = null!;
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> NestedArrayInMapTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> NestedArrayInMapTestCases()
   {
-    yield return (None, "INSERT INTO FooNestedArrayInMaps (Map) VALUES (MAP('a' := ARRAY[1, 2], 'b' := ARRAY[3, 4]));");
+    yield return (Never, "INSERT INTO FooNestedArrayInMaps (Map) VALUES (MAP('a' := ARRAY[1, 2], 'b' := ARRAY[3, 4]));");
     yield return (Keywords, "INSERT INTO FooNestedArrayInMaps (Map) VALUES (MAP('a' := ARRAY[1, 2], 'b' := ARRAY[3, 4]));");
     yield return (Always, "INSERT INTO `FooNestedArrayInMaps` (`Map`) VALUES (MAP('a' := ARRAY[1, 2], 'b' := ARRAY[3, 4]));");
   }
 
   [TestCaseSource(nameof(NestedArrayInMapTestCases))]
-  public void NestedArrayInMap((IdentifierFormat format, string expected) testCase)
+  public void NestedArrayInMap((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
+    var (escaping, expected) = testCase;
     var order = new FooNestedArrayInMap
     {
       Map = new Dictionary<string, int[]>
@@ -444,7 +444,7 @@ public class CreateInsertTests
 
     };
 
-    var insertProperties = new InsertProperties { IdentifierFormat = format };
+    var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
     //Act
     var statement = new CreateInsert().Generate(order, insertProperties);
 
@@ -457,9 +457,9 @@ public class CreateInsertTests
     public Dictionary<string, Dictionary<string, int>> Map { get; set; } = null!;
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> NestedMapInMapTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> NestedMapInMapTestCases()
   {
-    yield return (None,
+    yield return (Never,
       "INSERT INTO FooNestedMapInMaps (Map) VALUES (MAP('a' := MAP('a' := 1, 'b' := 2), 'b' := MAP('c' := 3, 'd' := 4)));");
     yield return (Keywords,
       "INSERT INTO FooNestedMapInMaps (Map) VALUES (MAP('a' := MAP('a' := 1, 'b' := 2), 'b' := MAP('c' := 3, 'd' := 4)));");
@@ -468,10 +468,10 @@ public class CreateInsertTests
   }
 
   [TestCaseSource(nameof(NestedMapInMapTestCases))]
-  public void NestedMapInMap((IdentifierFormat format, string expected) testCase)
+  public void NestedMapInMap((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
+    var (escaping, expected) = testCase;
     var value = new FooNestedMapInMap
     {
       Map = new Dictionary<string, Dictionary<string, int>>
@@ -482,7 +482,7 @@ public class CreateInsertTests
 
     };
 
-    var insertProperties = new InsertProperties { IdentifierFormat = format };
+    var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
 
     //Act
     var statement = new CreateInsert().Generate(value, insertProperties);
@@ -511,9 +511,9 @@ public class CreateInsertTests
     public LocationStruct Nested { get; set; }
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> NestedStructTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> NestedStructTestCases()
   {
-    yield return (None,
+    yield return (Never,
       "INSERT INTO FooStructs (Property, Str) VALUES ('ET', STRUCT(NestedProperty := 2, Nested := STRUCT(X := 'test', Y := 1)));");
     yield return (Keywords,
       "INSERT INTO FooStructs (Property, Str) VALUES ('ET', STRUCT(NestedProperty := 2, Nested := STRUCT(X := 'test', Y := 1)));");
@@ -522,10 +522,10 @@ public class CreateInsertTests
   }
 
   [TestCaseSource(nameof(NestedStructTestCases))]
-  public void NestedStruct((IdentifierFormat format, string expected) testCase)
+  public void NestedStruct((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
+    var (escaping, expected) = testCase;
     var value = new FooStruct
     {
       Property = "ET",
@@ -540,7 +540,7 @@ public class CreateInsertTests
       }
     };
 
-    var insertProperties = new InsertProperties { IdentifierFormat = format };
+    var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
 
     //Act
     var statement = new CreateInsert().Generate(value, insertProperties);
@@ -554,9 +554,9 @@ public class CreateInsertTests
     public Dictionary<string, LocationStruct> Str { get; set; } = null!;
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> NestedStructInMapTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> NestedStructInMapTestCases()
   {
-    yield return (None,
+    yield return (Never,
       "INSERT INTO FooNestedStructInMaps (Str) VALUES (MAP('a' := STRUCT(X := 'go', Y := 2), 'b' := STRUCT(X := 'test', Y := 1)));");
     yield return (Keywords,
       "INSERT INTO FooNestedStructInMaps (Str) VALUES (MAP('a' := STRUCT(X := 'go', Y := 2), 'b' := STRUCT(X := 'test', Y := 1)));");
@@ -565,10 +565,10 @@ public class CreateInsertTests
   }
 
   [TestCaseSource(nameof(NestedStructInMapTestCases))]
-  public void NestedStructInMap((IdentifierFormat format, string expected) testCase)
+  public void NestedStructInMap((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
+    var (escaping, expected) = testCase;
     var value = new FooNestedStructInMap
     {
       Str = new Dictionary<string, LocationStruct>
@@ -587,7 +587,7 @@ public class CreateInsertTests
       }
     };
 
-    var insertProperties = new InsertProperties { IdentifierFormat = format };
+    var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
     //Act
     var statement = new CreateInsert().Generate(value, insertProperties);
 
@@ -600,9 +600,9 @@ public class CreateInsertTests
     public Dictionary<string, int>[] Arr { get; init; } = null!;
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> NestedMapInArrayTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> NestedMapInArrayTestCases()
   {
-    yield return (None,
+    yield return (Never,
       "INSERT INTO FooNestedMapInArrays (Arr) VALUES (ARRAY[MAP('a' := 1, 'b' := 2), MAP('c' := 3, 'd' := 4)]);");
     yield return (Keywords,
       "INSERT INTO FooNestedMapInArrays (Arr) VALUES (ARRAY[MAP('a' := 1, 'b' := 2), MAP('c' := 3, 'd' := 4)]);");
@@ -611,10 +611,10 @@ public class CreateInsertTests
   }
 
   [TestCaseSource(nameof(NestedMapInArrayTestCases))]
-  public void NestedMapInArray((IdentifierFormat format, string expected) testCase)
+  public void NestedMapInArray((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
+    var (escaping, expected) = testCase;
     var value = new FooNestedMapInArray
     {
       Arr = new[]
@@ -624,7 +624,7 @@ public class CreateInsertTests
       }
     };
 
-    var insertProperties = new InsertProperties { IdentifierFormat = format};
+    var insertProperties = new InsertProperties { IdentifierEscaping = escaping};
 
     //Act
     string statement = new CreateInsert().Generate(value, insertProperties);
@@ -638,17 +638,17 @@ public class CreateInsertTests
     public int[][] Arr { get; init; } = null!;
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> NestedArrayInArrayTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> NestedArrayInArrayTestCases()
   {
-    yield return (None, "INSERT INTO FooNestedArrayInArrays (Arr) VALUES (ARRAY[ARRAY[1, 2], ARRAY[3, 4]]);");
+    yield return (Never, "INSERT INTO FooNestedArrayInArrays (Arr) VALUES (ARRAY[ARRAY[1, 2], ARRAY[3, 4]]);");
     yield return (Keywords, "INSERT INTO FooNestedArrayInArrays (Arr) VALUES (ARRAY[ARRAY[1, 2], ARRAY[3, 4]]);");
     yield return (Always, "INSERT INTO `FooNestedArrayInArrays` (`Arr`) VALUES (ARRAY[ARRAY[1, 2], ARRAY[3, 4]]);");
   }
   [TestCaseSource(nameof(NestedArrayInArrayTestCases))]
-  public void NestedArrayInArray((IdentifierFormat format, string expected) testCase)
+  public void NestedArrayInArray((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
+    var (escaping, expected) = testCase;
     var value = new FooNestedArrayInArray
     {
       Arr =
@@ -658,7 +658,7 @@ public class CreateInsertTests
       ]
     };
 
-    var insertProperties = new InsertProperties { IdentifierFormat = format };
+    var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
 
     //Act
     var statement = new CreateInsert().Generate(value, insertProperties);
@@ -672,9 +672,9 @@ public class CreateInsertTests
     public LocationStruct[] Arr { get; set; } = null!;
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> NestedStructInArrayTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> NestedStructInArrayTestCases()
   {
-    yield return (None,
+    yield return (Never,
       "INSERT INTO FooNestedStructInArrays (Arr) VALUES (ARRAY[STRUCT(X := 'go', Y := 2), STRUCT(X := 'test', Y := 1)]);");
     yield return (Keywords,
       "INSERT INTO FooNestedStructInArrays (Arr) VALUES (ARRAY[STRUCT(X := 'go', Y := 2), STRUCT(X := 'test', Y := 1)]);");
@@ -682,10 +682,10 @@ public class CreateInsertTests
       "INSERT INTO `FooNestedStructInArrays` (`Arr`) VALUES (ARRAY[STRUCT(`X` := 'go', `Y` := 2), STRUCT(`X` := 'test', `Y` := 1)]);");
   }
   [TestCaseSource(nameof(NestedStructInArrayTestCases))]
-  public void NestedStructInArray((IdentifierFormat format, string expected) testCase)
+  public void NestedStructInArray((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
+    var (escaping, expected) = testCase;
     var value = new FooNestedStructInArray
     {
       Arr = new[]
@@ -702,7 +702,7 @@ public class CreateInsertTests
       }
     };
 
-    var insertProperties = new InsertProperties { IdentifierFormat = format };
+    var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
 
     //Act
     var statement = new CreateInsert().Generate(value, insertProperties);

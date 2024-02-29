@@ -3,12 +3,12 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Enums
   /// <summary>
   /// Formats for column identifiers
   /// </summary>
-  public enum IdentifierFormat
+  public enum IdentifierEscaping
   {
     /// <summary>
     ///  No identifier is formatted
     /// </summary>
-    None = 0,
+    Never = 0,
     /// <summary>
     /// Identifiers that are keywords are formatted
     /// </summary>

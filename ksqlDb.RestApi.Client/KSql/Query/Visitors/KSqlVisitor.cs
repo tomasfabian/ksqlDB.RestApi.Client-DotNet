@@ -160,7 +160,7 @@ internal class KSqlVisitor : ExpressionVisitor
       else
         Append(ColumnsSeparator);
 
-      var memberName = IdentifierUtil.Format(memberBinding.Member.GetMemberName(), QueryMetadata.IdentifierFormat);
+      var memberName = IdentifierUtil.Format(memberBinding.Member.GetMemberName(), QueryMetadata.IdentifierEscaping);
 
       Append($"{memberName} := ");
 
@@ -343,7 +343,7 @@ internal class KSqlVisitor : ExpressionVisitor
   {
     Visit(expression);
     Append(" AS ");
-    Append(memberInfo.Format(QueryMetadata.IdentifierFormat));
+    Append(memberInfo.Format(QueryMetadata.IdentifierEscaping));
   }
 
   protected virtual void ProcessVisitNewMember(MemberInfo memberInfo, Expression expression)
@@ -352,13 +352,13 @@ internal class KSqlVisitor : ExpressionVisitor
     {
       Visit(expression);
 
-      Append(" " + IdentifierUtil.Format(memberInfo.Name, QueryMetadata.IdentifierFormat));
+      Append(" " + IdentifierUtil.Format(memberInfo.Name, QueryMetadata.IdentifierEscaping));
       return;
     }
 
     if (expression is MemberExpression { Expression: MemberExpression me3 } && me3.Expression != null && me3.Expression.Type.IsKsqlGrouping())
     {
-      Append(IdentifierUtil.Format(memberInfo.Name, QueryMetadata.IdentifierFormat));
+      Append(IdentifierUtil.Format(memberInfo.Name, QueryMetadata.IdentifierEscaping));
       return;
     }
 
@@ -373,7 +373,7 @@ internal class KSqlVisitor : ExpressionVisitor
     else if (expression is MemberExpression me2 && me2.Expression?.NodeType == ExpressionType.Constant)
       Visit(expression);
     else
-      Append(IdentifierUtil.Format(memberInfo.Name, QueryMetadata.IdentifierFormat));
+      Append(IdentifierUtil.Format(memberInfo.Name, QueryMetadata.IdentifierEscaping));
   }
 
   protected override Expression VisitMember(MemberExpression memberExpression)
@@ -386,9 +386,9 @@ internal class KSqlVisitor : ExpressionVisitor
       {
         var foundFromItem = QueryMetadata.TrySetAlias(memberExpression, (_, alias) => string.IsNullOrEmpty(alias));
 
-        var memberName = IdentifierUtil.Format(memberExpression.Member.GetMemberName(), QueryMetadata.IdentifierFormat);
+        var memberName = IdentifierUtil.Format(memberExpression.Member.GetMemberName(), QueryMetadata.IdentifierEscaping);
 
-        var alias = IdentifierUtil.Format(((ParameterExpression)memberExpression.Expression).Name, QueryMetadata.IdentifierFormat);
+        var alias = IdentifierUtil.Format(((ParameterExpression)memberExpression.Expression).Name, QueryMetadata.IdentifierEscaping);
 
         Append(foundFromItem?.Alias ?? alias);
         Append(".");
@@ -401,7 +401,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
       if (fromItem != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
       {
-        string alias = ((MemberExpression)memberExpression.Expression).Member.Format(QueryMetadata.IdentifierFormat);
+        string alias = ((MemberExpression)memberExpression.Expression).Member.Format(QueryMetadata.IdentifierEscaping);
 
         fromItem.Alias = alias;
 
@@ -409,7 +409,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
         Append(".");
 
-        var memberName = IdentifierUtil.Format(memberExpression.Member.GetMemberName(), QueryMetadata.IdentifierFormat);
+        var memberName = IdentifierUtil.Format(memberExpression.Member.GetMemberName(), QueryMetadata.IdentifierEscaping);
         Append(memberName);
         return memberExpression;
       }
@@ -493,7 +493,7 @@ internal class KSqlVisitor : ExpressionVisitor
     }
 
     if (type != fromItem?.Type)
-      Append(IdentifierUtil.Format(memberExpression.Member.GetMemberName(), QueryMetadata.IdentifierFormat));
+      Append(IdentifierUtil.Format(memberExpression.Member.GetMemberName(), QueryMetadata.IdentifierEscaping));
   }
 
   private FromItem TrySetFromItemAlias(MemberExpression memberExpression, Type propertyInfo)
@@ -519,7 +519,7 @@ internal class KSqlVisitor : ExpressionVisitor
     if (fromItem == null)
       Append("->");
 
-    var memberName = IdentifierUtil.Format(memberExpression.Member.GetMemberName(), QueryMetadata.IdentifierFormat);
+    var memberName = IdentifierUtil.Format(memberExpression.Member.GetMemberName(), QueryMetadata.IdentifierEscaping);
 
     Append(memberName);
   }

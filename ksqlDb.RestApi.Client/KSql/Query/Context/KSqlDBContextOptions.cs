@@ -116,7 +116,7 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
 
   private string password;
   internal string BasicAuthPassword => string.IsNullOrEmpty(password) ? "" : password;
-  public IdentifierFormat IdentifierFormat { get; set; }
+  public IdentifierEscaping IdentifierEscaping { get; set; }
 
   /// <summary>
   /// Sets the basic authentication credentials.

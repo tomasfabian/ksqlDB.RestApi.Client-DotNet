@@ -18,18 +18,18 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Parsers
     [TestCase("VALUES", ExpectedResult = false)]
     public bool ShouldNotBeValid(string identifier) => IdentifierUtil.IsValid(identifier);
 
-    [TestCase(SystemColumns.ROWTIME, IdentifierFormat.Keywords, ExpectedResult = $"`{SystemColumns.ROWTIME}`")]
-    [TestCase(SystemColumns.ROWTIME, IdentifierFormat.Always, ExpectedResult = $"`{SystemColumns.ROWTIME}`")]
-    [TestCase(SystemColumns.ROWOFFSET, IdentifierFormat.Keywords, ExpectedResult = $"`{SystemColumns.ROWOFFSET}`")]
-    [TestCase(SystemColumns.ROWOFFSET, IdentifierFormat.Always, ExpectedResult = $"`{SystemColumns.ROWOFFSET}`")]
-    [TestCase(SystemColumns.ROWPARTITION, IdentifierFormat.Keywords,
+    [TestCase(SystemColumns.ROWTIME, IdentifierEscaping.Keywords, ExpectedResult = $"`{SystemColumns.ROWTIME}`")]
+    [TestCase(SystemColumns.ROWTIME, IdentifierEscaping.Always, ExpectedResult = $"`{SystemColumns.ROWTIME}`")]
+    [TestCase(SystemColumns.ROWOFFSET, IdentifierEscaping.Keywords, ExpectedResult = $"`{SystemColumns.ROWOFFSET}`")]
+    [TestCase(SystemColumns.ROWOFFSET, IdentifierEscaping.Always, ExpectedResult = $"`{SystemColumns.ROWOFFSET}`")]
+    [TestCase(SystemColumns.ROWPARTITION, IdentifierEscaping.Keywords,
       ExpectedResult = $"`{SystemColumns.ROWPARTITION}`")]
-    [TestCase(SystemColumns.ROWPARTITION, IdentifierFormat.Always, ExpectedResult = $"`{SystemColumns.ROWPARTITION}`")]
-    [TestCase(SystemColumns.WINDOWSTART, IdentifierFormat.Keywords, ExpectedResult = $"`{SystemColumns.WINDOWSTART}`")]
-    [TestCase(SystemColumns.WINDOWSTART, IdentifierFormat.Always, ExpectedResult = $"`{SystemColumns.WINDOWSTART}`")]
-    [TestCase(SystemColumns.WINDOWEND, IdentifierFormat.Keywords, ExpectedResult = $"`{SystemColumns.WINDOWEND}`")]
-    [TestCase(SystemColumns.WINDOWEND, IdentifierFormat.Always, ExpectedResult = $"`{SystemColumns.WINDOWEND}`")]
-    public string ShouldBeFormatted(string identifier, IdentifierFormat format) =>
-      IdentifierUtil.Format(identifier, format);
+    [TestCase(SystemColumns.ROWPARTITION, IdentifierEscaping.Always, ExpectedResult = $"`{SystemColumns.ROWPARTITION}`")]
+    [TestCase(SystemColumns.WINDOWSTART, IdentifierEscaping.Keywords, ExpectedResult = $"`{SystemColumns.WINDOWSTART}`")]
+    [TestCase(SystemColumns.WINDOWSTART, IdentifierEscaping.Always, ExpectedResult = $"`{SystemColumns.WINDOWSTART}`")]
+    [TestCase(SystemColumns.WINDOWEND, IdentifierEscaping.Keywords, ExpectedResult = $"`{SystemColumns.WINDOWEND}`")]
+    [TestCase(SystemColumns.WINDOWEND, IdentifierEscaping.Always, ExpectedResult = $"`{SystemColumns.WINDOWEND}`")]
+    public string ShouldBeFormatted(string identifier, IdentifierEscaping escaping) =>
+      IdentifierUtil.Format(identifier, escaping);
   }
 }

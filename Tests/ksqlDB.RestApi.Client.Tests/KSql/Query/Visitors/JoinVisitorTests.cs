@@ -7,6 +7,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.Tests.Models.Movies;
 using NUnit.Framework;
 using UnitTests;
+using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
 using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Visitors;
@@ -29,19 +30,19 @@ public class JoinVisitorTests : TestBase
 
   #region Join
 
-  public static IEnumerable<(IdentifierFormat, string)> JoinTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> JoinTestCases()
   {
-    yield return (IdentifierFormat.None,
+    yield return (Never,
       @$"SELECT {MovieAlias}.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
 INNER JOIN LeadActors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords,
+    yield return (Keywords,
       @$"SELECT {MovieAlias}.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
 INNER JOIN LeadActors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always,
+    yield return (Always,
       @$"SELECT `{MovieAlias}`.`Id` `Id`, `{MovieAlias}`.`Title` `Title`, `{MovieAlias}`.`Release_Year` `Release_Year`, TRIM(`{ActorAlias}`.`Actor_Name`) `ActorName`, UCASE(`{ActorAlias}`.`Actor_Name`) `UpperActorName`, `{ActorAlias}`.`Title` AS `ActorTitle` FROM `Movies` `{MovieAlias}`
 INNER JOIN `LeadActors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
@@ -49,12 +50,12 @@ EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(JoinTestCases))]
-  public void Join_BuildKSql_PrintsInnerJoin((IdentifierFormat format, string expectedQuery) testCase)
+  public void Join_BuildKSql_PrintsInnerJoin((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = kSqlDbContext.CreateQueryStream<Movie>()
       .Join(
         Source.Of<Lead_Actor>("LeadActor"),
@@ -78,19 +79,19 @@ EMIT CHANGES;");
     ksql.Should().Be(expectedQuery);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> JoinPluralizedJointItemTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> JoinPluralizedJointItemTestCases()
   {
-    yield return (IdentifierFormat.None,
+    yield return (Never,
       @$"SELECT {MovieAlias}.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
 INNER JOIN Lead_Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords,
+    yield return (Keywords,
       @$"SELECT {MovieAlias}.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
 INNER JOIN Lead_Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always,
+    yield return (Always,
       @$"SELECT `{MovieAlias}`.`Id` `Id`, `{MovieAlias}`.`Title` `Title`, `{MovieAlias}`.`Release_Year` `Release_Year`, TRIM(`{ActorAlias}`.`Actor_Name`) `ActorName`, UCASE(`{ActorAlias}`.`Actor_Name`) `UpperActorName`, `{ActorAlias}`.`Title` AS `ActorTitle` FROM `Movies` `{MovieAlias}`
 INNER JOIN `Lead_Actors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
@@ -98,12 +99,12 @@ EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(JoinPluralizedJointItemTestCases))]
-  public void Join_BuildKSql_PrintsInnerJoin_PluralizedJoinItem((IdentifierFormat format, string expectedQuery) testCase)
+  public void Join_BuildKSql_PrintsInnerJoin_PluralizedJoinItem((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = kSqlDbContext.CreateQueryStream<Movie>()
       .Join(
         Source.Of<Lead_Actor>(),
@@ -127,19 +128,19 @@ EMIT CHANGES;");
     ksql.Should().Be(expectedQuery);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> JoinAndSelectWithAliasesPrintsInnerJoinTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> JoinAndSelectWithAliasesPrintsInnerJoinTestCases()
   {
-    yield return (IdentifierFormat.None,
+    yield return (Never,
       @$"SELECT myMovie.Title Title, LEN({ActorAlias}.Actor_Name) Length FROM Movies myMovie
 INNER JOIN Lead_Actors {ActorAlias}
 ON myMovie.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords,
+    yield return (Keywords,
       @$"SELECT myMovie.Title Title, LEN({ActorAlias}.Actor_Name) Length FROM Movies myMovie
 INNER JOIN Lead_Actors {ActorAlias}
 ON myMovie.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always,
+    yield return (Always,
       @$"SELECT `myMovie`.`Title` `Title`, LEN(`{ActorAlias}`.`Actor_Name`) `Length` FROM `Movies` `myMovie`
 INNER JOIN `Lead_Actors` `{ActorAlias}`
 ON `myMovie`.`Title` = `{ActorAlias}`.`Title`
@@ -147,12 +148,12 @@ EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(JoinAndSelectWithAliasesPrintsInnerJoinTestCases))]
-  public void JoinAndSelectWithAliases_BuildKSql_PrintsInnerJoin((IdentifierFormat format, string expectedQuery) testCase)
+  public void JoinAndSelectWithAliases_BuildKSql_PrintsInnerJoin((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = kSqlDbContext.CreateQueryStream<Movie>()
       .Join(
         Source.Of<Lead_Actor>(),
@@ -176,29 +177,29 @@ EMIT CHANGES;");
   {
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> SameStreamNameDifferentAliasesTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> SameStreamNameDifferentAliasesTestCases()
   {
-    yield return (IdentifierFormat.None, @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
+    yield return (Never, @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
 INNER JOIN MovieExts ext
 ON {MovieAlias}.Title = ext.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords, @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
+    yield return (Keywords, @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
 INNER JOIN MovieExts ext
 ON {MovieAlias}.Title = ext.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always, @$"SELECT `{MovieAlias}`.`Title` `Title` FROM `Movies` `{MovieAlias}`
+    yield return (Always, @$"SELECT `{MovieAlias}`.`Title` `Title` FROM `Movies` `{MovieAlias}`
 INNER JOIN `MovieExts` `ext`
 ON `{MovieAlias}`.`Title` = `ext`.`Title`
 EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(SameStreamNameDifferentAliasesTestCases))]
-  public void SameStreamName_BuildKSql_PrintsDifferentAliases((IdentifierFormat format, string expectedQuery) testCase)
+  public void SameStreamName_BuildKSql_PrintsDifferentAliases((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = kSqlDbContext.CreateQueryStream<Movie>()
       .Join(
         Source.Of<MovieExt>(),
@@ -217,29 +218,29 @@ EMIT CHANGES;");
     ksql.Should().Be(expectedQuery);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> InnerJoinOverrideStatementNoProjectionFromJoinTableTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> InnerJoinOverrideStatementNoProjectionFromJoinTableTestCases()
   {
-    yield return (IdentifierFormat.None, @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
+    yield return (Never, @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
 INNER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords, @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
+    yield return (Keywords, @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
 INNER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always, @$"SELECT `{MovieAlias}`.`Title` `Title` FROM `Movies` `{MovieAlias}`
+    yield return (Always, @$"SELECT `{MovieAlias}`.`Title` `Title` FROM `Movies` `{MovieAlias}`
 INNER JOIN `Actors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
 EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(InnerJoinOverrideStatementNoProjectionFromJoinTableTestCases))]
-  public void InnerJoinOverrideStreamName_NoProjectionFromJoinTable_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void InnerJoinOverrideStreamName_NoProjectionFromJoinTable_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = kSqlDbContext.CreateQueryStream<Movie>()
       .Join(
         Source.Of<Lead_Actor>("Actors"),
@@ -258,19 +259,19 @@ EMIT CHANGES;");
     ksql.Should().Be(expectedQuery);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> InnerJoinOverrideStatementTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> InnerJoinOverrideStatementTestCases()
   {
-    yield return (IdentifierFormat.None,
+    yield return (Never,
       @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 INNER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords,
+    yield return (Keywords,
       @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 INNER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always,
+    yield return (Always,
       @$"SELECT `{MovieAlias}`.`Title` `Title`, `{ActorAlias}`.`Actor_Name` AS `ActorName` FROM `Movies` `{MovieAlias}`
 INNER JOIN `Actors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
@@ -278,12 +279,12 @@ EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(InnerJoinOverrideStatementTestCases))]
-  public void InnerJoinOverrideStreamName_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void InnerJoinOverrideStreamName_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = kSqlDbContext.CreateQueryStream<Movie>()
       .Join(
         Source.Of<Lead_Actor>("Actors"),
@@ -303,29 +304,29 @@ EMIT CHANGES;");
     ksql.Should().Be(expectedQuery);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> InnerJoinQuerySyntaxTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> InnerJoinQuerySyntaxTestCases()
   {
-    yield return (IdentifierFormat.None, @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
+    yield return (Never, @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 INNER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords, @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
+    yield return (Keywords, @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 INNER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always, @$"SELECT `{MovieAlias}`.`Title` `Title`, `{ActorAlias}`.`Actor_Name` AS `ActorName` FROM `Movies` `{MovieAlias}`
+    yield return (Always, @$"SELECT `{MovieAlias}`.`Title` `Title`, `{ActorAlias}`.`Actor_Name` AS `ActorName` FROM `Movies` `{MovieAlias}`
 INNER JOIN `Actors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
 EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(InnerJoinQuerySyntaxTestCases))]
-  public void InnerJoinQuerySyntax_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void InnerJoinQuerySyntax_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = from movie in kSqlDbContext.CreateQueryStream<Movie>()
       join actor in Source.Of<Lead_Actor>("Actors") on movie.Title equals actor.Title
       select new
@@ -354,23 +355,23 @@ EMIT CHANGES;");
     public int Prop { get; set; }
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> MultipleInnerJoinsQuerySyntaxTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> MultipleInnerJoinsQuerySyntaxTestCases()
   {
-    yield return (IdentifierFormat.None,
+    yield return (Never,
       @"SELECT STRUCT(Prop := 42) value, O.OrderId AS orderId, S1.Id AS shipmentId, P1.Id AS paymentId FROM Orders O
 INNER JOIN Shipments S1
 ON O.OrderId = S1.Id
 INNER JOIN Payments P1
 ON O.OrderId = P1.Id
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords,
+    yield return (Keywords,
       @"SELECT STRUCT(Prop := 42) value, O.OrderId AS orderId, S1.Id AS shipmentId, P1.Id AS paymentId FROM Orders O
 INNER JOIN Shipments S1
 ON O.OrderId = S1.Id
 INNER JOIN Payments P1
 ON O.OrderId = P1.Id
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always,
+    yield return (Always,
       @"SELECT STRUCT(`Prop` := 42) `value`, `O`.`OrderId` AS `orderId`, `S1`.`Id` AS `shipmentId`, `P1`.`Id` AS `paymentId` FROM `Orders` `O`
 INNER JOIN `Shipments` `S1`
 ON `O`.`OrderId` = `S1`.`Id`
@@ -380,13 +381,13 @@ EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(MultipleInnerJoinsQuerySyntaxTestCases))]
-  public void MultipleInnerJoinsQuerySyntax_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void MultipleInnerJoinsQuerySyntax_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var value = new Foo { Prop = 42 };
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = from o in kSqlDbContext.CreateQueryStream<Order>()
       join p1 in Source.Of<Payment>() on o.OrderId equals p1.Id
       join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id
@@ -421,23 +422,23 @@ EMIT CHANGES;");
     public string Prop { get; set; } = null!;
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> TestCasesJoinWithInvocation()
+  public static IEnumerable<(IdentifierEscaping, string)> TestCasesJoinWithInvocation()
   {
-    yield return (IdentifierFormat.None,
+    yield return (Never,
       @$"SELECT TRANSFORM(lm.{nameof(LambdaMap.Dictionary)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->Values, (x) => x * x)) A, O.OrderId AS orderId, s1.Id AS shipmentId FROM Orders O
 INNER JOIN Shipments s1
 ON O.OrderId = s1.Id
 INNER JOIN LambdaMaps lm
 ON O.OrderId = lm.Id
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords,
+    yield return (Keywords,
       @$"SELECT TRANSFORM(lm.{nameof(LambdaMap.Dictionary)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->`Values`, (x) => x * x)) A, O.OrderId AS orderId, s1.Id AS shipmentId FROM Orders O
 INNER JOIN Shipments s1
 ON O.OrderId = s1.Id
 INNER JOIN LambdaMaps lm
 ON O.OrderId = lm.Id
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always,
+    yield return (Always,
       @$"SELECT TRANSFORM(`lm`.`{nameof(LambdaMap.Dictionary)}`, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->`Values`, (x) => x * x)) `A`, `O`.`OrderId` AS `orderId`, `s1`.`Id` AS `shipmentId` FROM `Orders` `O`
 INNER JOIN `Shipments` `s1`
 ON `O`.`OrderId` = `s1`.`Id`
@@ -447,12 +448,12 @@ EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(TestCasesJoinWithInvocation))]
-  public void JoinWithInvocationFunction_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void JoinWithInvocationFunction_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = from o in kSqlDbContext.CreateQueryStream<Order>()
       join lm in Source.Of<LambdaMap>() on o.OrderId equals lm.Id
       join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id
@@ -490,29 +491,29 @@ EMIT CHANGES;");
     //TODO:
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> JoinWithNestedTypeTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> JoinWithNestedTypeTestCases()
   {
-    yield return (IdentifierFormat.None, @$"SELECT lm.Nested->Prop Prop, O.OrderId AS orderId FROM Orders O
+    yield return (Never, @$"SELECT lm.Nested->Prop Prop, O.OrderId AS orderId FROM Orders O
 INNER JOIN LambdaMaps lm
 ON O.OrderId = lm.Id
 WHERE lm.Nested->Prop = 'Nested' EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords, @$"SELECT lm.Nested->Prop Prop, O.OrderId AS orderId FROM Orders O
+    yield return (Keywords, @$"SELECT lm.Nested->Prop Prop, O.OrderId AS orderId FROM Orders O
 INNER JOIN LambdaMaps lm
 ON O.OrderId = lm.Id
 WHERE lm.Nested->Prop = 'Nested' EMIT CHANGES;");
-    yield return (IdentifierFormat.Always, @$"SELECT `lm`.`Nested`->`Prop` `Prop`, `O`.`OrderId` AS `orderId` FROM `Orders` `O`
+    yield return (Always, @$"SELECT `lm`.`Nested`->`Prop` `Prop`, `O`.`OrderId` AS `orderId` FROM `Orders` `O`
 INNER JOIN `LambdaMaps` `lm`
 ON `O`.`OrderId` = `lm`.`Id`
 WHERE `lm`.`Nested`->`Prop` = 'Nested' EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(JoinWithNestedTypeTestCases))]
-  public void JoinWithNestedType_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void JoinWithNestedType_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = from o in kSqlDbContext.CreateQueryStream<Order>()
       join lm in Source.Of<LambdaMap>() on o.OrderId equals lm.Id
       where lm.Nested.Prop == "Nested"
@@ -529,19 +530,19 @@ WHERE `lm`.`Nested`->`Prop` = 'Nested' EMIT CHANGES;");
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> JoinWithFunctionAndNestedTypeTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> JoinWithFunctionAndNestedTypeTestCases()
   {
-    yield return (IdentifierFormat.None,
+    yield return (Never,
       @$"SELECT CONCAT(lm.Nested->Prop, '_new') Concat, o.OrderId AS orderId FROM Orders o
 INNER JOIN LambdaMaps lm
 ON o.OrderId = lm.Id
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords,
+    yield return (Keywords,
       @$"SELECT CONCAT(lm.Nested->Prop, '_new') Concat, o.OrderId AS orderId FROM Orders o
 INNER JOIN LambdaMaps lm
 ON o.OrderId = lm.Id
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always,
+    yield return (Always,
       @$"SELECT CONCAT(`lm`.`Nested`->`Prop`, '_new') `Concat`, `o`.`OrderId` AS `orderId` FROM `Orders` `o`
 INNER JOIN `LambdaMaps` `lm`
 ON `o`.`OrderId` = `lm`.`Id`
@@ -549,12 +550,12 @@ EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(JoinWithFunctionAndNestedTypeTestCases))]
-  public void JoinWithFunctionAndNestedType_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void JoinWithFunctionAndNestedType_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = from o in kSqlDbContext.CreateQueryStream<Order>()
       join lm in Source.Of<LambdaMap>() on o.OrderId equals lm.Id
       select new
@@ -570,23 +571,23 @@ EMIT CHANGES;");
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> MultipleInnerJoinsQuerySyntaxWithTakeTestCase()
+  public static IEnumerable<(IdentifierEscaping, string)> MultipleInnerJoinsQuerySyntaxWithTakeTestCase()
   {
-    yield return (IdentifierFormat.None,
+    yield return (Never,
       @"SELECT O.OrderId AS orderId, S1.Id AS shipmentId, P1.Id AS paymentId FROM Orders O
 INNER JOIN Shipments S1
 ON O.OrderId = S1.Id
 INNER JOIN Payments P1
 ON O.OrderId = P1.Id
 EMIT CHANGES LIMIT 2;");
-    yield return (IdentifierFormat.Keywords,
+    yield return (Keywords,
       @"SELECT O.OrderId AS orderId, S1.Id AS shipmentId, P1.Id AS paymentId FROM Orders O
 INNER JOIN Shipments S1
 ON O.OrderId = S1.Id
 INNER JOIN Payments P1
 ON O.OrderId = P1.Id
 EMIT CHANGES LIMIT 2;");
-    yield return (IdentifierFormat.Always,
+    yield return (Always,
       @"SELECT `O`.`OrderId` AS `orderId`, `S1`.`Id` AS `shipmentId`, `P1`.`Id` AS `paymentId` FROM `Orders` `O`
 INNER JOIN `Shipments` `S1`
 ON `O`.`OrderId` = `S1`.`Id`
@@ -596,12 +597,12 @@ EMIT CHANGES LIMIT 2;");
   }
 
   [TestCaseSource(nameof(MultipleInnerJoinsQuerySyntaxWithTakeTestCase))]
-  public void MultipleInnerJoinsQuerySyntax_WithTake_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void MultipleInnerJoinsQuerySyntax_WithTake_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = from o in kSqlDbContext.CreateQueryStream<Order>()
       join p1 in Source.Of<Payment>() on o.OrderId equals p1.Id
       join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id
@@ -621,21 +622,21 @@ EMIT CHANGES LIMIT 2;");
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> JoinAndLeftJoinWithTakeTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> JoinAndLeftJoinWithTakeTestCases()
   {
-    yield return (IdentifierFormat.None, @$"SELECT o.OrderId AS orderId, sa.Id AS shipmentId, p1.Id AS paymentId FROM Orders o
+    yield return (Never, @$"SELECT o.OrderId AS orderId, sa.Id AS shipmentId, p1.Id AS paymentId FROM Orders o
 LEFT JOIN Shipments sa
 ON o.OrderId = sa.Id
 INNER JOIN Payments p1
 ON o.OrderId = p1.Id
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords, @$"SELECT o.OrderId AS orderId, sa.Id AS shipmentId, p1.Id AS paymentId FROM Orders o
+    yield return (Keywords, @$"SELECT o.OrderId AS orderId, sa.Id AS shipmentId, p1.Id AS paymentId FROM Orders o
 LEFT JOIN Shipments sa
 ON o.OrderId = sa.Id
 INNER JOIN Payments p1
 ON o.OrderId = p1.Id
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always, @$"SELECT `o`.`OrderId` AS `orderId`, `sa`.`Id` AS `shipmentId`, `p1`.`Id` AS `paymentId` FROM `Orders` `o`
+    yield return (Always, @$"SELECT `o`.`OrderId` AS `orderId`, `sa`.`Id` AS `shipmentId`, `p1`.`Id` AS `paymentId` FROM `Orders` `o`
 LEFT JOIN `Shipments` `sa`
 ON `o`.`OrderId` = `sa`.`Id`
 INNER JOIN `Payments` `p1`
@@ -644,12 +645,12 @@ EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(JoinAndLeftJoinWithTakeTestCases))]
-  public void JoinAndLeftJoin_WithTake_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void JoinAndLeftJoin_WithTake_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = from o in kSqlDbContext.CreateQueryStream<Order>()
       join p1 in Source.Of<Payment>() on o.OrderId equals p1.Id
       join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id into gj
@@ -668,23 +669,23 @@ EMIT CHANGES;");
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> JoinWithinTimeUnitTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> JoinWithinTimeUnitTestCases()
   {
-    yield return (IdentifierFormat.None,
+    yield return (Never,
       @$"SELECT o.OrderId AS orderId, s.Id AS shipmentId, p.Id AS paymentId FROM Orders o
 INNER JOIN Shipments s
 WITHIN 5 DAYS ON o.OrderId = s.Id
 INNER JOIN Payments p
 WITHIN 1 HOURS ON o.OrderId = p.Id
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords,
+    yield return (Keywords,
       @$"SELECT o.OrderId AS orderId, s.Id AS shipmentId, p.Id AS paymentId FROM Orders o
 INNER JOIN Shipments s
 WITHIN 5 DAYS ON o.OrderId = s.Id
 INNER JOIN Payments p
 WITHIN 1 HOURS ON o.OrderId = p.Id
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always,
+    yield return (Always,
       @$"SELECT `o`.`OrderId` AS `orderId`, `s`.`Id` AS `shipmentId`, `p`.`Id` AS `paymentId` FROM `Orders` `o`
 INNER JOIN `Shipments` `s`
 WITHIN 5 DAYS ON `o`.`OrderId` = `s`.`Id`
@@ -694,12 +695,12 @@ EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(JoinWithinTimeUnitTestCases))]
-  public void JoinWithinTimeUnit_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void JoinWithinTimeUnit_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = from o in kSqlDbContext.CreateQueryStream<Order>()
       join p in Source.Of<Payment>().Within(Duration.OfHours(1)) on o.OrderId equals p.Id
       join s in Source.Of<Shipment>().Within(Duration.OfDays(5)) on o.OrderId equals s.Id
@@ -717,29 +718,29 @@ EMIT CHANGES;");
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> JoinWithTimeUnitBeforeAfterTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> JoinWithTimeUnitBeforeAfterTestCases()
   {
-    yield return (IdentifierFormat.None, @$"SELECT o.OrderId AS orderId, p.Id AS paymentId FROM Orders o
+    yield return (Never, @$"SELECT o.OrderId AS orderId, p.Id AS paymentId FROM Orders o
 INNER JOIN Payments p
 WITHIN (1 HOURS, 5 DAYS) ON o.OrderId = p.Id
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords, @$"SELECT o.OrderId AS orderId, p.Id AS paymentId FROM Orders o
+    yield return (Keywords, @$"SELECT o.OrderId AS orderId, p.Id AS paymentId FROM Orders o
 INNER JOIN Payments p
 WITHIN (1 HOURS, 5 DAYS) ON o.OrderId = p.Id
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always, @$"SELECT `o`.`OrderId` AS `orderId`, `p`.`Id` AS `paymentId` FROM `Orders` `o`
+    yield return (Always, @$"SELECT `o`.`OrderId` AS `orderId`, `p`.`Id` AS `paymentId` FROM `Orders` `o`
 INNER JOIN `Payments` `p`
 WITHIN (1 HOURS, 5 DAYS) ON `o`.`OrderId` = `p`.`Id`
 EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(JoinWithTimeUnitBeforeAfterTestCases))]
-  public void JoinWithinTimeUnit_BeforeAfter_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void JoinWithinTimeUnit_BeforeAfter_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = from o in kSqlDbContext.CreateQueryStream<Order>()
       join p in Source.Of<Payment>().Within(Duration.OfHours(1), Duration.OfDays(5)) on o.OrderId equals p.Id
       select new
@@ -755,29 +756,29 @@ EMIT CHANGES;");
     ksql.Should().BeEquivalentTo(expectedQuery);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> JoinKSqlFunctionKeySelectorTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> JoinKSqlFunctionKeySelectorTestCases()
   {
-    yield return (IdentifierFormat.None, @"SELECT actor.Title AS EnduserId, actor.Actor_Name AS Name, movie.Title AS Raw FROM movies movie
+    yield return (Never, @"SELECT actor.Title AS EnduserId, actor.Actor_Name AS Name, movie.Title AS Raw FROM movies movie
 INNER JOIN actors actor
 WITHIN 1 DAYS ON EXTRACTJSONFIELD(movie.Title, '$.movie_title') = EXTRACTJSONFIELD(actor.Actor_Name, '$.actor_name')
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords, @"SELECT actor.Title AS EnduserId, actor.Actor_Name AS Name, movie.Title AS Raw FROM movies movie
+    yield return (Keywords, @"SELECT actor.Title AS EnduserId, actor.Actor_Name AS Name, movie.Title AS Raw FROM movies movie
 INNER JOIN actors actor
 WITHIN 1 DAYS ON EXTRACTJSONFIELD(movie.Title, '$.movie_title') = EXTRACTJSONFIELD(actor.Actor_Name, '$.actor_name')
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always, @"SELECT `actor`.`Title` AS `EnduserId`, `actor`.`Actor_Name` AS `Name`, `movie`.`Title` AS `Raw` FROM `movies` `movie`
+    yield return (Always, @"SELECT `actor`.`Title` AS `EnduserId`, `actor`.`Actor_Name` AS `Name`, `movie`.`Title` AS `Raw` FROM `movies` `movie`
 INNER JOIN `actors` `actor`
 WITHIN 1 DAYS ON EXTRACTJSONFIELD(`movie`.`Title`, '$.movie_title') = EXTRACTJSONFIELD(`actor`.`Actor_Name`, '$.actor_name')
 EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(JoinKSqlFunctionKeySelectorTestCases))]
-  public void Join_KSqlFunctionKeySelector_ShouldBeWithoutAlias((IdentifierFormat format, string expectedQuery) testCase)
+  public void Join_KSqlFunctionKeySelector_ShouldBeWithoutAlias((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = kSqlDbContext
       .CreateQueryStream<Movie>("movies")
       .Join(Source.Of<Lead_Actor>("actors").Within(Duration.OfDays(1)),
@@ -795,19 +796,19 @@ EMIT CHANGES;");
 
   #region LeftJoin
 
-  public static IEnumerable<(IdentifierFormat, string)> LeftJoinTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> LeftJoinTestCases()
   {
-    yield return (IdentifierFormat.None,
+    yield return (Never,
       @$"SELECT movie.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Lead_Actors {ActorAlias}
 ON movie.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords,
+    yield return (Keywords,
       @$"SELECT movie.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Lead_Actors {ActorAlias}
 ON movie.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always,
+    yield return (Always,
       @$"SELECT `movie`.`Id` `Id`, `{MovieAlias}`.`Title` `Title`, `{MovieAlias}`.`Release_Year` `Release_Year`, TRIM(`{ActorAlias}`.`Actor_Name`) `ActorName`, UCASE(`{ActorAlias}`.`Actor_Name`) `UpperActorName`, `{ActorAlias}`.`Title` AS `ActorTitle` FROM `Movies` `{MovieAlias}`
 LEFT JOIN `Lead_Actors` `{ActorAlias}`
 ON `movie`.`Title` = `{ActorAlias}`.`Title`
@@ -815,12 +816,12 @@ EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(LeftJoinTestCases))]
-  public void LeftJoin_BuildKSql_PrintsLeftJoin((IdentifierFormat format, string expectedQuery) testCase)
+  public void LeftJoin_BuildKSql_PrintsLeftJoin((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = kSqlDbContext.CreateQueryStream<Movie>()
       .LeftJoin(
         Source.Of<Lead_Actor>(),
@@ -844,19 +845,19 @@ EMIT CHANGES;");
     ksql.Should().Be(expectedQuery);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> LeftJoinQuerySyntaxTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> LeftJoinQuerySyntaxTestCases()
   {
-    yield return (IdentifierFormat.None,
+    yield return (Never,
       @$"SELECT {MovieAlias}.Id Id, UCASE(a.Actor_Name) UpperActorName, a.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Actors a
 ON {MovieAlias}.Title = a.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords,
+    yield return (Keywords,
       @$"SELECT {MovieAlias}.Id Id, UCASE(a.Actor_Name) UpperActorName, a.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Actors a
 ON {MovieAlias}.Title = a.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always,
+    yield return (Always,
       @$"SELECT `{MovieAlias}`.`Id` `Id`, UCASE(`a`.`Actor_Name`) `UpperActorName`, `a`.`Title` AS `ActorTitle` FROM `Movies` `{MovieAlias}`
 LEFT JOIN `Actors` `a`
 ON `{MovieAlias}`.`Title` = `a`.`Title`
@@ -864,12 +865,12 @@ EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(LeftJoinQuerySyntaxTestCases))]
-  public void LeftJoinQuerySyntax_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void LeftJoinQuerySyntax_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query =
       from movie in kSqlDbContext.CreateQueryStream<Movie>()
       join actor in Source.Of<Lead_Actor>("Actors")
@@ -889,19 +890,19 @@ EMIT CHANGES;");
     ksql.Should().Be(expectedQuery);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> TestCasesGroupJoinSelectMany()
+  public static IEnumerable<(IdentifierEscaping, string)> TestCasesGroupJoinSelectMany()
   {
-    yield return (IdentifierFormat.None,
+    yield return (Never,
       @$"SELECT {MovieAlias}.Id Id, UCASE(a.Actor_Name) UpperActorName, a.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Actors a
 ON {MovieAlias}.Title = a.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords,
+    yield return (Keywords,
       @$"SELECT {MovieAlias}.Id Id, UCASE(a.Actor_Name) UpperActorName, a.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Actors a
 ON {MovieAlias}.Title = a.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always,
+    yield return (Always,
       @$"SELECT `{MovieAlias}`.`Id` `Id`, UCASE(`a`.`Actor_Name`) `UpperActorName`, `a`.`Title` AS `ActorTitle` FROM `Movies` `{MovieAlias}`
 LEFT JOIN `Actors` `a`
 ON `{MovieAlias}`.`Title` = `a`.`Title`
@@ -909,12 +910,12 @@ EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(TestCasesGroupJoinSelectMany))]
-  public void GroupJoinSelectMany_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void GroupJoinSelectMany_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(
-      new KSqlDBContextOptions(TestParameters.KsqlDbUrl) { IdentifierFormat = format } );
+      new KSqlDBContextOptions(TestParameters.KsqlDbUrl) { IdentifierEscaping = escaping } );
     var query = kSqlDbContext.CreateQueryStream<Movie>()
       .GroupJoin(Source.Of<Lead_Actor>("Actors"), c => c.Title, d => d.Title, (movie, gj) => new
       {
@@ -950,23 +951,23 @@ EMIT CHANGES;");
     public string ItemName { get; set; } = null!;
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> MultipleLeftJoinsQuerySyntax()
+  public static IEnumerable<(IdentifierEscaping, string)> MultipleLeftJoinsQuerySyntax()
   {
-    yield return (IdentifierFormat.None,
+    yield return (Never,
       @"SELECT customers.CustomerId AS customerid, orders.OrderId OrderId, items.ItemId ItemId, items.ItemName ItemName FROM Orders orders
 LEFT JOIN Items items
 ON orders.ItemId = items.ItemId
 LEFT JOIN Customers customers
 ON orders.CustomerId = customers.CustomerId
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords,
+    yield return (Keywords,
       @"SELECT customers.CustomerId AS customerid, orders.OrderId OrderId, items.ItemId ItemId, items.ItemName ItemName FROM Orders orders
 LEFT JOIN Items items
 ON orders.ItemId = items.ItemId
 LEFT JOIN Customers customers
 ON orders.CustomerId = customers.CustomerId
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always,
+    yield return (Always,
       @"SELECT `customers`.`CustomerId` AS `customerid`, `orders`.`OrderId` `OrderId`, `items`.`ItemId` `ItemId`, `items`.`ItemName` `ItemName` FROM `Orders` `orders`
 LEFT JOIN `Items` `items`
 ON `orders`.`ItemId` = `items`.`ItemId`
@@ -976,12 +977,12 @@ EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(MultipleLeftJoinsQuerySyntax))]
-  public void MultipleLeftJoinsQuerySyntax_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void MultipleLeftJoinsQuerySyntax_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query =
       from orders in kSqlDbContext.CreateQueryStream<Order>()
       join customer in Source.Of<Customer>()
@@ -1005,19 +1006,19 @@ EMIT CHANGES;");
     ksql.Should().Be(expectedQuery);
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> LeftJoinOverrideStreamNameTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> LeftJoinOverrideStreamNameTestCases()
   {
-    yield return (IdentifierFormat.None,
+    yield return (Never,
       @$"SELECT {ActorAlias}.RowTime RowTime, {MovieAlias}.Title Title FROM Movies {MovieAlias}
 LEFT JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords,
+    yield return (Keywords,
       @$"SELECT {ActorAlias}.`RowTime` `RowTime`, {MovieAlias}.Title Title FROM Movies {MovieAlias}
 LEFT JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always,
+    yield return (Always,
       @$"SELECT `{ActorAlias}`.`RowTime` `RowTime`, `{MovieAlias}`.`Title` `Title` FROM `Movies` `{MovieAlias}`
 LEFT JOIN `Actors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
@@ -1025,12 +1026,12 @@ EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(LeftJoinOverrideStreamNameTestCases))]
-  public void LeftJoinOverrideStreamName_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void LeftJoinOverrideStreamName_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = kSqlDbContext.CreateQueryStream<Movie>()
       .LeftJoin(
         Source.Of<Lead_Actor>("Actors"),
@@ -1054,19 +1055,19 @@ EMIT CHANGES;");
 
   #region FullOuterJoin
 
-  public static IEnumerable<(IdentifierFormat, string)> FullOuterJoinOverrideStatementTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> FullOuterJoinOverrideStatementTestCases()
   {
-    yield return (IdentifierFormat.None,
+    yield return (Never,
       @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 FULL OUTER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords,
+    yield return (Keywords,
       @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 FULL OUTER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always,
+    yield return (Always,
       @$"SELECT `{MovieAlias}`.`Title` `Title`, `{ActorAlias}`.`Actor_Name` AS `ActorName` FROM `Movies` `{MovieAlias}`
 FULL OUTER JOIN `Actors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
@@ -1074,12 +1075,12 @@ EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(FullOuterJoinOverrideStatementTestCases))]
-  public void FullOuterJoinOverrideStreamName_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void FullOuterJoinOverrideStreamName_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = kSqlDbContext.CreateQueryStream<Movie>()
       .FullOuterJoin(
         Source.Of<Lead_Actor>("Actors"),
@@ -1103,19 +1104,19 @@ EMIT CHANGES;");
 
   #region RightJoin
 
-  public static IEnumerable<(IdentifierFormat, string)> RightJoinOverrideStreamNameTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> RightJoinOverrideStreamNameTestCases()
   {
-    yield return (IdentifierFormat.None,
+    yield return (Never,
       @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 RIGHT JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Keywords,
+    yield return (Keywords,
       @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 RIGHT JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
-    yield return (IdentifierFormat.Always,
+    yield return (Always,
       @$"SELECT `{MovieAlias}`.`Title` `Title`, `{ActorAlias}`.`Actor_Name` AS `ActorName` FROM `Movies` `{MovieAlias}`
 RIGHT JOIN `Actors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
@@ -1123,12 +1124,12 @@ EMIT CHANGES;");
   }
 
   [TestCaseSource(nameof(RightJoinOverrideStreamNameTestCases))]
-  public void RightJoinOverrideStreamName_BuildKSql_Prints((IdentifierFormat format, string expectedQuery) testCase)
+  public void RightJoinOverrideStreamName_BuildKSql_Prints((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
-    var (format, expectedQuery) = testCase;
+    var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-      { IdentifierFormat = format });
+      { IdentifierEscaping = escaping });
     var query = kSqlDbContext.CreateQueryStream<Movie>()
       .RightJoin(
         Source.Of<Lead_Actor>("Actors"),

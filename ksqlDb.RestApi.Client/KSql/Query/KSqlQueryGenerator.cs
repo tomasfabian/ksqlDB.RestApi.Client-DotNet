@@ -33,7 +33,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
 
   public string BuildKSql(Expression expression, QueryContext queryContext)
   {
-    queryMetadata = new KSqlQueryMetadata { IdentifierFormat = options.IdentifierFormat };
+    queryMetadata = new KSqlQueryMetadata { IdentifierEscaping = options.IdentifierEscaping };
 
     kSqlVisitor = new KSqlVisitor(queryMetadata);
     whereClauses = new Queue<Expression>();
@@ -41,7 +41,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
 
     Visit(expression);
 
-    var finalFromItemName = IdentifierUtil.Format(InterceptFromItemName(queryContext.FromItemName ?? fromItemName), queryMetadata.IdentifierFormat);
+    var finalFromItemName = IdentifierUtil.Format(InterceptFromItemName(queryContext.FromItemName ?? fromItemName), queryMetadata.IdentifierEscaping);
 
     queryContext.AutoOffsetReset = autoOffsetReset;
 
@@ -57,10 +57,10 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
       var fromTable = new FromItem
       {
         Type = queryMetadata.FromItemType,
-        Alias = IdentifierUtil.Format(alias, queryMetadata.IdentifierFormat)
+        Alias = IdentifierUtil.Format(alias, queryMetadata.IdentifierEscaping)
       };
 
-      queryMetadata.Joins = GetFromItems(joins, fromTable, queryMetadata.IdentifierFormat);
+      queryMetadata.Joins = GetFromItems(joins, fromTable, queryMetadata.IdentifierEscaping);
 
       var joinsVisitor = new KSqlJoinsVisitor(kSqlVisitor.StringBuilder, options, new QueryContext { FromItemName = finalFromItemName }, queryMetadata);
 
@@ -333,7 +333,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
   }
 
   private static FromItem[] GetFromItems(List<(MethodInfo, IEnumerable<Expression>, LambdaExpression)> joins,
-    FromItem fromItem, IdentifierFormat format)
+    FromItem fromItem, IdentifierEscaping escaping)
   {
     return joins.Select(c =>
       {
@@ -343,7 +343,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
 
         var type = items[0].Type.GenericTypeArguments[0];
 
-        return new FromItem {Type = type, Alias = IdentifierUtil.Format(alias, format)};
+        return new FromItem {Type = type, Alias = IdentifierUtil.Format(alias, escaping)};
       }).Append(fromItem)
       .ToArray();
   }

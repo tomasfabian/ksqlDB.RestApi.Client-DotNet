@@ -7,6 +7,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.Tests.KSql.Linq;
 using NUnit.Framework;
 using UnitTests;
+using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Functions;
 
@@ -42,7 +43,7 @@ public class KSqlInvocationFunctionsTests : TestBase
   {
     //Arrange
     Expression<Func<Tweets, string[]>> expression = c => K.Functions.Transform(c.Messages, x => x.ToUpper());
-      
+
     //Act
     var ksql = ClassUnderTest.BuildKSql(expression);
 
@@ -90,21 +91,21 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => k, (k, v) => UCASE(v->RegionCode))");
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> TestCasesTransformConstant()
+  public static IEnumerable<(IdentifierEscaping, string)> TestCasesTransformConstant()
   {
-    yield return (IdentifierFormat.None, $"TRANSFORM({nameof(Tweets.Values)}, (x) => x + 1)");
-    yield return (IdentifierFormat.Keywords, $"TRANSFORM(`{nameof(Tweets.Values)}`, (x) => x + 1)");
-    yield return (IdentifierFormat.Always, $"TRANSFORM(`{nameof(Tweets.Values)}`, (x) => x + 1)");
+    yield return (Never, $"TRANSFORM({nameof(Tweets.Values)}, (x) => x + 1)");
+    yield return (Keywords, $"TRANSFORM(`{nameof(Tweets.Values)}`, (x) => x + 1)");
+    yield return (Always, $"TRANSFORM(`{nameof(Tweets.Values)}`, (x) => x + 1)");
   }
 
   [TestCaseSource(nameof(TestCasesTransformConstant))]
-  public void Transform_Constant((IdentifierFormat format, string expected) testCase)
+  public void Transform_Constant((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
-    ClassUnderTest.QueryMetadata = new KSqlQueryMetadata { IdentifierFormat = format };
+    var (escaping, expected) = testCase;
+    ClassUnderTest.QueryMetadata = new KSqlQueryMetadata { IdentifierEscaping = escaping };
     Expression<Func<Tweets, int[]>> expression = c => K.Functions.Transform(c.Values, x => x + 1);
-      
+
     //Act
     var ksql = ClassUnderTest.BuildKSql(expression);
 
@@ -117,7 +118,7 @@ public class KSqlInvocationFunctionsTests : TestBase
   {
     //Arrange
     Expression<Func<Tweets, string[]>> expression = c => K.Functions.Transform(c.Messages, y => K.Functions.Concat(y, "_new"));
-      
+
     //Act
     var ksql = ClassUnderTest.BuildKSql(expression);
 
@@ -130,7 +131,7 @@ public class KSqlInvocationFunctionsTests : TestBase
   {
     //Arrange
     Expression<Func<Tweets, IDictionary<string ,string>>> expression = c => K.Functions.Transform(c.Dictionary3, (k, v) => k, (k, v) => v.State.Name);
-      
+
     //Act
     var ksql = ClassUnderTest.BuildKSql(expression);
 
@@ -143,7 +144,7 @@ public class KSqlInvocationFunctionsTests : TestBase
   {
     //Arrange
     Expression<Func<Tweets, IDictionary<string, int>>> expression = c => K.Functions.Transform(c.Dictionary3, (k, v) => k, (k, v) => v.State.Name.Length);
-      
+
     //Act
     var ksql = ClassUnderTest.BuildKSql(expression);
 
@@ -151,19 +152,19 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => k, (k, v) => LEN(v->State->Name))");
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> TestCasesTransform()
+  public static IEnumerable<(IdentifierEscaping, string)> TestCasesTransform()
   {
-    yield return (IdentifierFormat.None, $"TRANSFORM({nameof(Tweets.Values)}, (x) => x + 1) Col");
-    yield return (IdentifierFormat.Keywords, $"TRANSFORM(`{nameof(Tweets.Values)}`, (x) => x + 1) Col");
-    yield return (IdentifierFormat.Always, $"TRANSFORM(`{nameof(Tweets.Values)}`, (x) => x + 1) `Col`");
+    yield return (Never, $"TRANSFORM({nameof(Tweets.Values)}, (x) => x + 1) Col");
+    yield return (Keywords, $"TRANSFORM(`{nameof(Tweets.Values)}`, (x) => x + 1) Col");
+    yield return (Always, $"TRANSFORM(`{nameof(Tweets.Values)}`, (x) => x + 1) `Col`");
   }
 
   [TestCaseSource(nameof(TestCasesTransform))]
-  public void Transform_AnonymousType((IdentifierFormat format, string expected) testCase)
+  public void Transform_AnonymousType((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
-    ClassUnderTest.QueryMetadata = new KSqlQueryMetadata { IdentifierFormat = format };
+    var (escaping, expected) = testCase;
+    ClassUnderTest.QueryMetadata = new KSqlQueryMetadata { IdentifierEscaping = escaping };
     Expression<Func<Tweets, object>> expression = c => new { Col = K.Functions.Transform(c.Values, x => x + 1) };
 
     //Act
@@ -174,14 +175,14 @@ public class KSqlInvocationFunctionsTests : TestBase
   }
 
   [TestCaseSource(nameof(TestCasesTransform))]
-  public void Transform_CapturedVariable_AnonymousType((IdentifierFormat format, string expected) testCase)
+  public void Transform_CapturedVariable_AnonymousType((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
-    ClassUnderTest.QueryMetadata = new KSqlQueryMetadata { IdentifierFormat = format };
+    var (escaping, expected) = testCase;
+    ClassUnderTest.QueryMetadata = new KSqlQueryMetadata { IdentifierEscaping = escaping };
     int value = 1;
     Expression<Func<Tweets, object>> expression = c => new { Col = K.Functions.Transform(c.Values, x => x + value)};
-      
+
     //Act
     var ksql = ClassUnderTest.BuildKSql(expression);
 
@@ -194,7 +195,7 @@ public class KSqlInvocationFunctionsTests : TestBase
   {
     //Arrange
     Expression<Func<Tweets, string[]>> expression = c => K.Functions.Filter(c.Messages, x => x == "E.T.");
-      
+
     //Act
     var ksql = ClassUnderTest.BuildKSql(expression);
 
@@ -215,19 +216,19 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"FILTER({nameof(Tweets.Messages)}, (x) => x = 'E.T.')");
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> TestCasesReduce()
+  public static IEnumerable<(IdentifierEscaping, string)> TestCasesReduce()
   {
-    yield return (IdentifierFormat.None, $"REDUCE({nameof(Tweets.Values)}, 0, (x, y) => x + y)");
-    yield return (IdentifierFormat.Keywords, $"REDUCE(`{nameof(Tweets.Values)}`, 0, (x, y) => x + y)");
-    yield return (IdentifierFormat.Always, $"REDUCE(`{nameof(Tweets.Values)}`, 0, (x, y) => x + y)");
+    yield return (Never, $"REDUCE({nameof(Tweets.Values)}, 0, (x, y) => x + y)");
+    yield return (Keywords, $"REDUCE(`{nameof(Tweets.Values)}`, 0, (x, y) => x + y)");
+    yield return (Always, $"REDUCE(`{nameof(Tweets.Values)}`, 0, (x, y) => x + y)");
   }
 
   [TestCaseSource(nameof(TestCasesReduce))]
-  public void Reduce((IdentifierFormat format, string expected) testCase)
+  public void Reduce((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
-    ClassUnderTest.QueryMetadata = new KSqlQueryMetadata { IdentifierFormat = format };
+    var (escaping, expected) = testCase;
+    ClassUnderTest.QueryMetadata = new KSqlQueryMetadata { IdentifierEscaping = escaping };
     Expression<Func<Tweets, int>> expression = c => K.Functions.Reduce(c.Values, 0, (x, y) => x + y);
 
     //Act
@@ -238,11 +239,11 @@ public class KSqlInvocationFunctionsTests : TestBase
   }
 
   [TestCaseSource(nameof(TestCasesReduce))]
-  public void ReduceExtensionMethod((IdentifierFormat format, string expected) testCase)
+  public void ReduceExtensionMethod((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
-    ClassUnderTest.QueryMetadata = new KSqlQueryMetadata { IdentifierFormat = format };
+    var (escaping, expected) = testCase;
+    ClassUnderTest.QueryMetadata = new KSqlQueryMetadata { IdentifierEscaping = escaping };
     Expression<Func<Tweets, int>> expression = c => c.Values.Reduce(0, (x, y) => x + y);
 
     //Act
@@ -261,7 +262,7 @@ public class KSqlInvocationFunctionsTests : TestBase
   {
     //Arrange
     Expression<Func<Tweets, IDictionary<string, int[]>>> expression = c => K.Functions.Transform(c.Dictionary, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v, x => x * x));
-      
+
     //Act
     var ksql = ClassUnderTest.BuildKSql(expression);
 
@@ -269,19 +270,19 @@ public class KSqlInvocationFunctionsTests : TestBase
     ksql.Should().Be($"TRANSFORM({nameof(Tweets.Dictionary)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v, (x) => x * x))");
   }
 
-  public static IEnumerable<(IdentifierFormat, string)> TestCasesTransformMap()
+  public static IEnumerable<(IdentifierEscaping, string)> TestCasesTransformMap()
   {
-    yield return (IdentifierFormat.None, $"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->Values, (x) => x * x))");
-    yield return (IdentifierFormat.Keywords, $"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->`Values`, (x) => x * x))");
-    yield return (IdentifierFormat.Always, $"TRANSFORM(`{nameof(Tweets.Dictionary3)}`, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->`Values`, (x) => x * x))");
+    yield return (Never, $"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->Values, (x) => x * x))");
+    yield return (Keywords, $"TRANSFORM({nameof(Tweets.Dictionary3)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->`Values`, (x) => x * x))");
+    yield return (Always, $"TRANSFORM(`{nameof(Tweets.Dictionary3)}`, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->`Values`, (x) => x * x))");
   }
 
   [TestCaseSource(nameof(TestCasesTransformMap))]
-  public void TransformMap_NestedTransformWithPropertyAccessor((IdentifierFormat format, string expected) testCase)
+  public void TransformMap_NestedTransformWithPropertyAccessor((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
-    ClassUnderTest.QueryMetadata = new KSqlQueryMetadata { IdentifierFormat = format };
+    var (escaping, expected) = testCase;
+    ClassUnderTest.QueryMetadata = new KSqlQueryMetadata { IdentifierEscaping = escaping };
     Expression<Func<Tweets, IDictionary<string, int[]>>> expression = c => K.Functions.Transform(c.Dictionary3,
       (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v.Values, x => x * x));
 
@@ -293,11 +294,11 @@ public class KSqlInvocationFunctionsTests : TestBase
   }
 
   [TestCaseSource(nameof(TestCasesTransformMap))]
-  public void TransformMapTwice((IdentifierFormat format, string expected) testCase)
+  public void TransformMapTwice((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
-    var (format, expected) = testCase;
-    ClassUnderTest.QueryMetadata = new KSqlQueryMetadata { IdentifierFormat = format };
+    var (escaping, expected) = testCase;
+    ClassUnderTest.QueryMetadata = new KSqlQueryMetadata { IdentifierEscaping = escaping };
     Expression<Func<Tweets, object>> expression =
       c => new
       {
@@ -311,7 +312,7 @@ public class KSqlInvocationFunctionsTests : TestBase
     var ksql = ClassUnderTest.BuildKSql(expression);
 
     //Assert
-    ksql.Should().Be(format == IdentifierFormat.Always
+    ksql.Should().Be(escaping == Always
       ? $"{expected} `A`, {expected} `B`"
       : $"{expected} A, {expected} B");
   }
@@ -321,7 +322,7 @@ public class KSqlInvocationFunctionsTests : TestBase
   {
     //Arrange
     Expression<Func<Tweets, IDictionary<string, int>>> expression = c => K.Functions.Filter(c.Dictionary2, (k, v) => K.Functions.Instr(k, "name") > 0 && k != "E.T" && v > 0);
-      
+
     //Act
     var ksql = ClassUnderTest.BuildKSql(expression);
 

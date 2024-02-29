@@ -415,26 +415,41 @@ The `ProcessingGuarantee` enum offers three options: **ExactlyOnce**, **ExactlyO
 
 
 ### Setting formatting for identifiers
-**v3.5.0**
+**v3.6.0**
 
 When using the `ksqlDB.RestApi.Client`, you have the ability to configure the formatting for identifiers in your queries.
-This can be done by making use of the `SetIdentifierFormat` method from the `KSqlDbContextOptionsBuilder` class.
+This can be done by making use of the `SetIdentifierEscaping` method from the `KSqlDbContextOptionsBuilder` class.
 You can choose from these options:
-* `None` - the default option where identifiers are not modified
+* `Never` - the default option where identifiers are not modified
 * `Keywords` - when an identifier is a reserved keyword it is escaped using **backticks** `` ` ``
 * `Always` - all identifiers are escaped using **backticks** `` ` ``
+
+See here for additional details: https://docs.ksqldb.io/en/latest/reference/sql/syntax/lexical-structure/#identifiers
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
-```
-```C#
+
 var ksqlDbUrl = @"http://localhost:8088";
 
 var contextOptions = new KSqlDbContextOptionsBuilder()
   .UseKSqlDb(ksqlDbUrl)
-  .SetIdentitifierFormat(IdentifierFormat.Always)
+  .SetIdentitifierFormat(IdentifierEscpaing.Always)
   .Options;
 
 await using var context = new KSqlDBContext(contextOptions);
+```
+The resulting statements will escape identifiers like this when you use the `Always` option:
+```genericsql
+SELECT `Message`, `Id`, `Values`
+  FROM `Tweets`
+ WHERE `Message` != 'Hello world' OR Id = 1
+  EMIT CHANGES;
+```
+For the `Keywords` option only ksql keywords will be escaped:
+```genericsql
+SELECT MESSAGE, ID, `Values`
+  FROM TWEETS
+ WHERE MESSAGE != 'Hello world' OR ID = 1
+  EMIT CHANGES;
 ```

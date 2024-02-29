@@ -1,35 +1,28 @@
 ﻿using System.Text;
-using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 
 internal class TypeGenerator : CreateEntityStatement
 {
-  internal string Print<T>(string typeName = null, IdentifierFormat format = IdentifierFormat.None)
+  internal string Print<T>(TypeProperties properties)
   {
     StringBuilder stringBuilder = new();
-    var type = typeof(T);
-
-    if(string.IsNullOrEmpty(typeName))
-    {
-      typeName = type.ExtractTypeName();
-
-      typeName = typeName.ToUpper();
-    }
-
+    var typeName = EscapeName(properties.IdentifierEscaping, properties.EntityName);
     stringBuilder.Append($"CREATE TYPE {typeName} AS STRUCT<");
 
-    PrintProperties<T>(stringBuilder, format);
+    PrintProperties<T>(stringBuilder, properties.IdentifierEscaping);
 
     stringBuilder.Append(">;");
 
     return stringBuilder.ToString();
   }
 
-  private void PrintProperties<T>(StringBuilder stringBuilder, IdentifierFormat format)
+  private void PrintProperties<T>(StringBuilder stringBuilder, IdentifierEscaping escaping)
   {
     var ksqlProperties = new List<string>();
 
@@ -37,27 +30,22 @@ internal class TypeGenerator : CreateEntityStatement
     {
       var type = GetMemberType(memberInfo);
 
-      var ksqlType = CreateEntity.KSqlTypeTranslator(type, format);
+      var ksqlType = CreateEntity.KSqlTypeTranslator(type, escaping);
 
-      string columnDefinition;
-      switch (format, IdentifierUtil.IsValid(memberInfo.Name))
-      {
-        case (IdentifierFormat.None, _):
-        case (IdentifierFormat.Keywords, true):
-          columnDefinition = $"{memberInfo.Name} {ksqlType}{CreateEntity.ExploreAttributes(memberInfo, type)}";
-          ksqlProperties.Add(columnDefinition);
-          break;
-        case (IdentifierFormat.Keywords, false):
-        case (IdentifierFormat.Always, _):
-          columnDefinition = $"`{memberInfo.Name}` {ksqlType}{CreateEntity.ExploreAttributes(memberInfo, type)}";
-          ksqlProperties.Add(columnDefinition);
-          break;
-        default:
-          throw new ArgumentOutOfRangeException(nameof(format), format, "Non-exhaustive match");
-      }
-
+      var columnDefinition = $"{EscapeName(escaping, memberInfo.Name)} {ksqlType}{CreateEntity.ExploreAttributes(memberInfo, type)}";
+      ksqlProperties.Add(columnDefinition);
     }
 
     stringBuilder.Append(string.Join(", ", ksqlProperties));
   }
+
+  private static string EscapeName(IdentifierEscaping escaping, string name) =>
+    (escaping, IdentifierUtil.IsValid(name)) switch
+    {
+      (Never, _) => name,
+      (Keywords, true) => name,
+      (Keywords, false) => $"`{name}`",
+      (Always, _) => $"`{name}`",
+      _ => throw new ArgumentOutOfRangeException(nameof(escaping), escaping, "Non-exhaustive match")
+    };
 }

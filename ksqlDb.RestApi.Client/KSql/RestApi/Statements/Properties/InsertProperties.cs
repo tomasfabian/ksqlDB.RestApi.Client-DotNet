@@ -10,7 +10,7 @@ public record InsertProperties : IEntityCreationProperties, IValueFormatters
 
   public bool ShouldPluralizeEntityName { get; set; } = true;
 
-  public IdentifierFormat IdentifierFormat { get; init; } = IdentifierFormat.None;
+  public IdentifierEscaping IdentifierEscaping { get; init; } = IdentifierEscaping.Never;
 
   public bool IncludeReadOnlyProperties { get; set; } = false;
 

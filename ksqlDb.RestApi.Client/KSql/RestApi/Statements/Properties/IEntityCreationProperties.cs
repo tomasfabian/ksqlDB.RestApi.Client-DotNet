@@ -6,5 +6,5 @@ public interface IEntityCreationProperties
 {
   public string EntityName { get; }
   public bool ShouldPluralizeEntityName { get; }
-  public IdentifierFormat IdentifierFormat { get; }
+  public IdentifierEscaping IdentifierEscaping { get; }
 }

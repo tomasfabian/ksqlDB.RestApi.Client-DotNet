@@ -12,7 +12,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 internal sealed class CreateEntity : CreateEntityStatement
 {
-  internal static string KSqlTypeTranslator(Type type, IdentifierFormat format = IdentifierFormat.None)
+  internal static string KSqlTypeTranslator(Type type, IdentifierEscaping escaping = IdentifierEscaping.Never)
   {
     var ksqlType = string.Empty;
 
@@ -20,7 +20,7 @@ internal sealed class CreateEntity : CreateEntityStatement
       ksqlType = KSqlTypes.Bytes;
     else if (type.IsArray)
     {
-      var elementType = KSqlTypeTranslator(type.GetElementType(), format);
+      var elementType = KSqlTypeTranslator(type.GetElementType(), escaping);
 
       ksqlType = $"ARRAY<{elementType}>";
     }
@@ -28,8 +28,8 @@ internal sealed class CreateEntity : CreateEntityStatement
     {
       Type[] typeParameters = type.GetGenericArguments();
 
-      var keyType = KSqlTypeTranslator(typeParameters[0], format);
-      var valueType = KSqlTypeTranslator(typeParameters[1], format);
+      var keyType = KSqlTypeTranslator(typeParameters[0], escaping);
+      var valueType = KSqlTypeTranslator(typeParameters[1], escaping);
 
       ksqlType = $"MAP<{keyType}, {valueType}>";
     }
@@ -55,7 +55,7 @@ internal sealed class CreateEntity : CreateEntityStatement
       ksqlType = KSqlTypes.Timestamp;
     else if (!type.IsGenericType && type.TryGetAttribute<StructAttribute>() != null)
     {
-      var ksqlProperties = GetProperties(type, format);
+      var ksqlProperties = GetProperties(type, escaping);
 
       ksqlType = $"STRUCT<{string.Join(", ", ksqlProperties)}>";
     }
@@ -83,7 +83,7 @@ internal sealed class CreateEntity : CreateEntityStatement
 
       if (elementType != null)
       {
-        string ksqlElementType = KSqlTypeTranslator(elementType, format);
+        string ksqlElementType = KSqlTypeTranslator(elementType, escaping);
 
         ksqlType = $"ARRAY<{ksqlElementType}>";
       }
@@ -149,15 +149,15 @@ internal sealed class CreateEntity : CreateEntityStatement
   private void PrintProperties<T>(StatementContext statementContext, EntityCreationMetadata metadata)
   {
     var ksqlProperties = new List<string>();
-
-    foreach (var memberInfo in Members<T>(metadata?.IncludeReadOnlyProperties))
+    metadata??= new EntityCreationMetadata();
+    foreach (var memberInfo in Members<T>(metadata.IncludeReadOnlyProperties))
     {
       var type = GetMemberType(memberInfo);
 
-      var ksqlType = KSqlTypeTranslator(type, metadata?.IdentifierFormat ?? IdentifierFormat.None);
+      var ksqlType = KSqlTypeTranslator(type, metadata.IdentifierEscaping);
 
       var columnName = memberInfo.GetMemberName();
-      columnName = IdentifierUtil.Format(columnName, metadata?.IdentifierFormat ?? IdentifierFormat.None);
+      columnName = IdentifierUtil.Format(columnName, metadata.IdentifierEscaping);
       string columnDefinition = $"\t{columnName} {ksqlType}{ExploreAttributes(memberInfo, type)}";
 
       columnDefinition += TryAttachKey(statementContext.KSqlEntityType, memberInfo);
@@ -168,7 +168,7 @@ internal sealed class CreateEntity : CreateEntityStatement
     stringBuilder.AppendLine(string.Join($",{Environment.NewLine}", ksqlProperties));
   }
 
-  internal static IEnumerable<string> GetProperties(Type type, IdentifierFormat format)
+  internal static IEnumerable<string> GetProperties(Type type, IdentifierEscaping escaping)
   {
     var ksqlProperties = new List<string>();
 
@@ -176,9 +176,9 @@ internal sealed class CreateEntity : CreateEntityStatement
     {
       var memberType = GetMemberType(memberInfo);
 
-      var ksqlType = KSqlTypeTranslator(memberType, format);
+      var ksqlType = KSqlTypeTranslator(memberType, escaping);
 
-      string columnDefinition = $"{memberInfo.Format(format)} {ksqlType}{ExploreAttributes(memberInfo, memberType)}";
+      string columnDefinition = $"{memberInfo.Format(escaping)} {ksqlType}{ExploreAttributes(memberInfo, memberType)}";
 
       ksqlProperties.Add(columnDefinition);
     }

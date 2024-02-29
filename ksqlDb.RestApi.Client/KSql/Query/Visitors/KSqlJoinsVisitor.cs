@@ -52,17 +52,17 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
       Visit(expressions[0]);
 
-      var outerItemAlias = IdentifierUtil.Format(joinAliasGenerator.GenerateAlias(queryContext.FromItemName), QueryMetadata.IdentifierFormat);
+      var outerItemAlias = IdentifierUtil.Format(joinAliasGenerator.GenerateAlias(queryContext.FromItemName), QueryMetadata.IdentifierEscaping);
 
-      var itemAlias = IdentifierUtil.Format(joinAliasGenerator.GenerateAlias(fromItemName), QueryMetadata.IdentifierFormat);
+      var itemAlias = IdentifierUtil.Format(joinAliasGenerator.GenerateAlias(fromItemName), QueryMetadata.IdentifierEscaping);
 
       if (groupJoin != null)
       {
         var prop = GetPropertyType(groupJoin.Parameters[0].Type);
 
-        outerItemAlias = IdentifierUtil.Format(prop.Name, QueryMetadata.IdentifierFormat);
+        outerItemAlias = IdentifierUtil.Format(prop.Name, QueryMetadata.IdentifierEscaping);
 
-        itemAlias = IdentifierUtil.Format(groupJoin.Parameters[1].Name, QueryMetadata.IdentifierFormat);
+        itemAlias = IdentifierUtil.Format(groupJoin.Parameters[1].Name, QueryMetadata.IdentifierEscaping);
       }
 
       var lambdaExpression = expressions[3] as LambdaExpression;
@@ -190,7 +190,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
     if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
     {
-      var memberName = IdentifierUtil.Format(memberExpression.Member.GetMemberName(), QueryMetadata.IdentifierFormat);
+      var memberName = IdentifierUtil.Format(memberExpression.Member.GetMemberName(), QueryMetadata.IdentifierEscaping);
 
       Append(memberName);
 
@@ -199,7 +199,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
     if (QueryMetadata.Joins != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
     {
-      Append(memberExpression.Member.Format(QueryMetadata.IdentifierFormat));
+      Append(memberExpression.Member.Format(QueryMetadata.IdentifierEscaping));
     }
     else
       base.VisitMember(memberExpression);
@@ -227,6 +227,6 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
     name = InterceptFromItemName(name);
 
-    return IdentifierUtil.Format(name, QueryMetadata.IdentifierFormat);
+    return IdentifierUtil.Format(name, QueryMetadata.IdentifierEscaping);
   }
 }

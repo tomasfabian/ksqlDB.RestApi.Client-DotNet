@@ -31,17 +31,17 @@ namespace ksqlDb.RestApi.Client.KSql.RestApi.Parsers
     /// Format the <c>identifier</c>.
     /// </summary>
     /// <param name="identifier">the identifier</param>
-    /// <param name="format">the format</param>
+    /// <param name="escaping">the format</param>
     /// <returns>the identifier modified based on the provided <c>format</c></returns>
-    public static string Format(string identifier, IdentifierFormat format)
+    public static string Format(string identifier, IdentifierEscaping escaping)
     {
-      return format switch
+      return escaping switch
       {
-        IdentifierFormat.None => identifier,
-        IdentifierFormat.Keywords when IsValid(identifier) && SystemColumns.IsValid(identifier) => identifier,
-        IdentifierFormat.Keywords => string.Concat("`", identifier, "`"),
-        IdentifierFormat.Always => string.Concat("`", identifier, "`"),
-        _ => throw new ArgumentOutOfRangeException(nameof(format), format, "Non-exhaustive match.")
+        IdentifierEscaping.Never => identifier,
+        IdentifierEscaping.Keywords when IsValid(identifier) && SystemColumns.IsValid(identifier) => identifier,
+        IdentifierEscaping.Keywords => string.Concat("`", identifier, "`"),
+        IdentifierEscaping.Always => string.Concat("`", identifier, "`"),
+        _ => throw new ArgumentOutOfRangeException(nameof(escaping), escaping, "Non-exhaustive match.")
       };
     }
   }

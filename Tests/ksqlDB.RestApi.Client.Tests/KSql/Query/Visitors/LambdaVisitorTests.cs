@@ -22,13 +22,13 @@ public class LambdaVisitorTests
     lambdaVisitor = new LambdaVisitor(stringBuilder, queryMetadata);
   }
 
-  [TestCase(IdentifierFormat.None, ExpectedResult = "(c) => LEN(c->MESSAGE) > 0")]
-  [TestCase(IdentifierFormat.Keywords, ExpectedResult = "(c) => LEN(c->MESSAGE) > 0")]
-  [TestCase(IdentifierFormat.Always, ExpectedResult = "(c) => LEN(c->`MESSAGE`) > 0")]
-  public string Visit_Length_ShouldBeAppendedCorrectly(IdentifierFormat format)
+  [TestCase(IdentifierEscaping.Never, ExpectedResult = "(c) => LEN(c->MESSAGE) > 0")]
+  [TestCase(IdentifierEscaping.Keywords, ExpectedResult = "(c) => LEN(c->MESSAGE) > 0")]
+  [TestCase(IdentifierEscaping.Always, ExpectedResult = "(c) => LEN(c->`MESSAGE`) > 0")]
+  public string Visit_Length_ShouldBeAppendedCorrectly(IdentifierEscaping escaping)
   {
     //Arrange
-    lambdaVisitor.QueryMetadata = new KSqlQueryMetadata { IdentifierFormat = format };
+    lambdaVisitor.QueryMetadata = new KSqlQueryMetadata { IdentifierEscaping = escaping };
     Expression<Func<Tweet, bool>> expression = c => c.Message.Length > 0;
 
     //Act
@@ -38,12 +38,12 @@ public class LambdaVisitorTests
     return stringBuilder.ToString();
   }
 
-  [TestCase(IdentifierFormat.None, ExpectedResult = "(c) => REDUCE(c->Values, 0, (x, y) => x + y)")]
-  [TestCase(IdentifierFormat.Keywords, ExpectedResult = "(c) => REDUCE(c->`Values`, 0, (x, y) => x + y)")]
-  public string Visit_MultipleArguments_ShouldBeAppendedCorrectly(IdentifierFormat format)
+  [TestCase(IdentifierEscaping.Never, ExpectedResult = "(c) => REDUCE(c->Values, 0, (x, y) => x + y)")]
+  [TestCase(IdentifierEscaping.Keywords, ExpectedResult = "(c) => REDUCE(c->`Values`, 0, (x, y) => x + y)")]
+  public string Visit_MultipleArguments_ShouldBeAppendedCorrectly(IdentifierEscaping escaping)
   {
     //Arrange
-    lambdaVisitor.QueryMetadata = new KSqlQueryMetadata { IdentifierFormat = format };
+    lambdaVisitor.QueryMetadata = new KSqlQueryMetadata { IdentifierEscaping = escaping };
     Expression<Func<Dictionary<string, int>, int>> expression = c => c.Values.Reduce(0, (x,y) => x + y);
 
     //Act
