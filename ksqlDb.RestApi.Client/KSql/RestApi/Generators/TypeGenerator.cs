@@ -9,7 +9,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 
 internal class TypeGenerator : CreateEntityStatement
 {
-  internal string Print<T>(TypeProperties properties)
+  internal string Print<T>(TypeProperties<T> properties)
   {
     StringBuilder stringBuilder = new();
     var typeName = EscapeName(properties.IdentifierEscaping, properties.EntityName);

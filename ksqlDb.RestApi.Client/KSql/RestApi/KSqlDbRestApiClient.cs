@@ -1,9 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDb.RestApi.Client.Infrastructure.Logging;
-using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using ksqlDb.RestApi.Client.KSql.RestApi.Responses.Asserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
@@ -281,7 +279,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> CreateTypeAsync<T>(CancellationToken cancellationToken = default)
   {
-    var properties = new TypeProperties { EntityName = typeof(T).ExtractTypeName().ToUpper() };
+    var properties = new TypeProperties<T>();
     return CreateTypeAsync<T>(properties, cancellationToken);
   }
 
@@ -296,7 +294,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> CreateTypeAsync<T>(string typeName, CancellationToken cancellationToken = default)
   {
-    var properties = new TypeProperties { EntityName = typeName ?? typeof(T).ExtractTypeName().ToUpper() };
+    var properties = new TypeProperties<T> { EntityName = typeName };
     return CreateTypeAsync<T>(properties, cancellationToken);
   }
 
@@ -309,7 +307,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <param name="properties">Type configuration</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Http response object.</returns>
-  public Task<HttpResponseMessage> CreateTypeAsync<T>(TypeProperties properties, CancellationToken cancellationToken = default)
+  public Task<HttpResponseMessage> CreateTypeAsync<T>(TypeProperties<T> properties, CancellationToken cancellationToken = default)
   {
     var ksql = new TypeGenerator().Print<T>(properties);
 
