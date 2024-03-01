@@ -3,8 +3,6 @@
 # 3.6.0
 - added escaping options using backticks for [Identifiers](https://docs.ksqldb.io/en/latest/reference/sql/syntax/lexical-structure/#identifiers) in statements #57 (contributed by @mrt181)
 - added `TypeProperties` class to configure type creation #58 (contributed by @mrt181)
-
-# 3.6.0-rc.1
 - added .NET Enums to VARCHAR mapping #55. `JsonStringEnumConverter` was added to `KSqlDbJsonSerializerOptions`.
 
 # 3.5.0
