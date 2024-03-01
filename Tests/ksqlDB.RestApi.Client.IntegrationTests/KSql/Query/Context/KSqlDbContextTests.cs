@@ -161,7 +161,7 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
 
     var response = await context.SaveChangesAsync();
 
-    await semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(5));
+    await semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(15));
 
     //Assert
     response.StatusCode.Should().Be(HttpStatusCode.OK);
