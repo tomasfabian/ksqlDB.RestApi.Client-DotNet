@@ -6,6 +6,7 @@ using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDb.RestApi.Client.KSql.Entities;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using DateTime = System.DateTime;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
@@ -160,7 +161,7 @@ internal class KSqlVisitor : ExpressionVisitor
       else
         Append(ColumnsSeparator);
 
-      var memberName = IdentifierUtil.Format(memberBinding.Member.GetMemberName(), QueryMetadata.IdentifierEscaping);
+      var memberName = IdentifierUtil.Format(memberBinding.Member, QueryMetadata.IdentifierEscaping);
 
       Append($"{memberName} := ");
 
@@ -386,7 +387,7 @@ internal class KSqlVisitor : ExpressionVisitor
       {
         var foundFromItem = QueryMetadata.TrySetAlias(memberExpression, (_, alias) => string.IsNullOrEmpty(alias));
 
-        var memberName = IdentifierUtil.Format(memberExpression.Member.GetMemberName(), QueryMetadata.IdentifierEscaping);
+        var memberName = IdentifierUtil.Format(memberExpression.Member, QueryMetadata.IdentifierEscaping);
 
         var alias = IdentifierUtil.Format(((ParameterExpression)memberExpression.Expression).Name, QueryMetadata.IdentifierEscaping);
 
@@ -409,7 +410,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
         Append(".");
 
-        var memberName = IdentifierUtil.Format(memberExpression.Member.GetMemberName(), QueryMetadata.IdentifierEscaping);
+        var memberName = IdentifierUtil.Format(memberExpression.Member, QueryMetadata.IdentifierEscaping);
         Append(memberName);
         return memberExpression;
       }
@@ -493,7 +494,9 @@ internal class KSqlVisitor : ExpressionVisitor
     }
 
     if (type != fromItem?.Type)
-      Append(IdentifierUtil.Format(memberExpression.Member.GetMemberName(), QueryMetadata.IdentifierEscaping));
+    {
+        Append(IdentifierUtil.Format(memberExpression.Member, QueryMetadata.IdentifierEscaping));
+    }
   }
 
   private FromItem TrySetFromItemAlias(MemberExpression memberExpression, Type propertyInfo)
@@ -519,7 +522,7 @@ internal class KSqlVisitor : ExpressionVisitor
     if (fromItem == null)
       Append("->");
 
-    var memberName = IdentifierUtil.Format(memberExpression.Member.GetMemberName(), QueryMetadata.IdentifierEscaping);
+    var memberName = IdentifierUtil.Format(memberExpression.Member, QueryMetadata.IdentifierEscaping);
 
     Append(memberName);
   }

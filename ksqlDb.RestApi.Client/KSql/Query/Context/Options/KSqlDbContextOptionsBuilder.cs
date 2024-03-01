@@ -1,6 +1,7 @@
 using System.Text.Json;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -85,6 +86,18 @@ public class KSqlDbContextOptionsBuilder : ISetupParameters
   ISetupParameters ISetupParameters.SetJsonSerializerOptions(Action<JsonSerializerOptions> optionsAction)
   {
     optionsAction(jsonSerializerOptions);
+
+    return this;
+  }
+
+  /// <summary>
+  /// allows you to set escaping for identifiers
+  /// </summary>
+  /// <param name="escaping">Escaping mode</param>
+  /// <returns>Returns this instance.</returns>
+  ISetupParameters ISetupParameters.SetIdentifierEscaping(IdentifierEscaping escaping)
+  {
+    InternalOptions.IdentifierEscaping = escaping;
 
     return this;
   }

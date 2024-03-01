@@ -156,8 +156,7 @@ internal sealed class CreateEntity : CreateEntityStatement
 
       var ksqlType = KSqlTypeTranslator(type, metadata.IdentifierEscaping);
 
-      var columnName = memberInfo.GetMemberName();
-      columnName = IdentifierUtil.Format(columnName, metadata.IdentifierEscaping);
+      var columnName = IdentifierUtil.Format(memberInfo, metadata.IdentifierEscaping);
       string columnDefinition = $"\t{columnName} {ksqlType}{ExploreAttributes(memberInfo, type)}";
 
       columnDefinition += TryAttachKey(statementContext.KSqlEntityType, memberInfo);

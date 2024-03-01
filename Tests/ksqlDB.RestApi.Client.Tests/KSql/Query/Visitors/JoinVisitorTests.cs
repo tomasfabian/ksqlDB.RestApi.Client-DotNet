@@ -1014,12 +1014,12 @@ LEFT JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
     yield return (Keywords,
-      @$"SELECT {ActorAlias}.`RowTime` `RowTime`, {MovieAlias}.Title Title FROM Movies {MovieAlias}
+      @$"SELECT {ActorAlias}.RowTime `RowTime`, {MovieAlias}.Title Title FROM Movies {MovieAlias}
 LEFT JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
 EMIT CHANGES;");
     yield return (Always,
-      @$"SELECT `{ActorAlias}`.`RowTime` `RowTime`, `{MovieAlias}`.`Title` `Title` FROM `Movies` `{MovieAlias}`
+      @$"SELECT `{ActorAlias}`.RowTime `RowTime`, `{MovieAlias}`.`Title` `Title` FROM `Movies` `{MovieAlias}`
 LEFT JOIN `Actors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
 EMIT CHANGES;");

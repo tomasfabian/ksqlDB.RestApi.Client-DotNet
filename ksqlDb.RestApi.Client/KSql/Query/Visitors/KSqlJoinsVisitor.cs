@@ -190,7 +190,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
     if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
     {
-      var memberName = IdentifierUtil.Format(memberExpression.Member.GetMemberName(), QueryMetadata.IdentifierEscaping);
+      var memberName = IdentifierUtil.Format(memberExpression.Member, QueryMetadata.IdentifierEscaping);
 
       Append(memberName);
 

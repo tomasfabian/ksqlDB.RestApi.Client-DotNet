@@ -417,12 +417,15 @@ The `ProcessingGuarantee` enum offers three options: **ExactlyOnce**, **ExactlyO
 ### Setting formatting for identifiers
 **v3.6.0**
 
-When using the `ksqlDB.RestApi.Client`, you have the ability to configure the formatting for identifiers in your queries.
+When using the `ksqlDB.RestApi.Client`, you have the ability to configure the formatting for identifiers in your statements.
 This can be done by making use of the `SetIdentifierEscaping` method from the `KSqlDbContextOptionsBuilder` class.
 You can choose from these options:
 * `Never` - the default option where identifiers are not modified
 * `Keywords` - when an identifier is a reserved keyword it is escaped using **backticks** `` ` ``
 * `Always` - all identifiers are escaped using **backticks** `` ` ``
+
+Escaping options can also be set on types that derive from `IEntityCreationProperties`. When you create a stream or table
+that escapes identifiers your insert statements must also use the same escaping option to work
 
 See here for additional details: https://docs.ksqldb.io/en/latest/reference/sql/syntax/lexical-structure/#identifiers
 ```C#
@@ -434,7 +437,7 @@ var ksqlDbUrl = @"http://localhost:8088";
 
 var contextOptions = new KSqlDbContextOptionsBuilder()
   .UseKSqlDb(ksqlDbUrl)
-  .SetIdentitifierFormat(IdentifierEscpaing.Always)
+  .SetIdentifierEscaping(IdentifierEscaping.Always)
   .Options;
 
 await using var context = new KSqlDBContext(contextOptions);
@@ -445,6 +448,8 @@ SELECT `Message`, `Id`, `Values`
   FROM `Tweets`
  WHERE `Message` != 'Hello world' OR Id = 1
   EMIT CHANGES;
+
+INSERT INTO `Message` (`Message`, `Id`, `Values`) VALUES ('Hello', 42, '123, abc');
 ```
 For the `Keywords` option only ksql keywords will be escaped:
 ```genericsql
@@ -452,4 +457,6 @@ SELECT MESSAGE, ID, `Values`
   FROM TWEETS
  WHERE MESSAGE != 'Hello world' OR ID = 1
   EMIT CHANGES;
+
+INSERT INTO Message (Message, Id, `Values`) VALUES ('Hello', 42, '123, abc');
 ```

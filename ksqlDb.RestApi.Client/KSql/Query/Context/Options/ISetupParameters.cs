@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context.Options;
@@ -26,4 +27,6 @@ public interface ISetupParameters : ICreateOptions
   /// <param name="optionsAction">Action to configure the JsonSerializerOptions for the materialization of the incoming values.</param>
   /// <returns>The original KSqlDb context options builder</returns>
   ISetupParameters SetJsonSerializerOptions(Action<JsonSerializerOptions> optionsAction);
+
+  ISetupParameters SetIdentifierEscaping(IdentifierEscaping escaping);
 }
