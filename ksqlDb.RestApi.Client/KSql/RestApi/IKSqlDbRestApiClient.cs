@@ -44,7 +44,7 @@ public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient
   /// <param name="creationMetadata">Stream properties, specify details about your stream by using the WITH clause.</param>
   /// <param name="cancellationToken"></param>
   /// <returns>Http response object.</returns>
-  /// 
+  ///
   Task<HttpResponseMessage> CreateOrReplaceStreamAsync<T>(EntityCreationMetadata creationMetadata, CancellationToken cancellationToken = default);
 
 
@@ -96,7 +96,7 @@ public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient
   /// <param name="cancellationToken"></param>
   /// <returns>Http response object.</returns>
   Task<HttpResponseMessage> InsertIntoAsync<T>(T entity, InsertProperties insertProperties = null, CancellationToken cancellationToken = default);
-  
+
   /// <summary>
   /// Generates raw 'Insert Into' string, but does not execute it.
   /// </summary>
@@ -299,6 +299,17 @@ public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Http response object.</returns>
   Task<HttpResponseMessage> CreateTypeAsync<T>(string typeName, CancellationToken cancellationToken = default);
+
+  /// <summary>
+  /// Create an alias for a complex type declaration.
+  /// The CREATE TYPE statement registers a type alias directly in KSQL. Any types registered by using this command can be leveraged in future statements. The CREATE TYPE statement works in interactive and headless modes.
+  /// Any attempt to register the same type twice, without a corresponding DROP TYPE statement, will fail.
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
+  /// <param name="properties">Type configuration</param>
+  /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+  /// <returns>Http response object.</returns>
+  Task<HttpResponseMessage> CreateTypeAsync<T>(TypeProperties<T> properties, CancellationToken cancellationToken = default);
 
   /// <summary>
   /// Removes a type alias from ksqlDB. This statement doesn't fail if the type is in use in active queries or user-defined functions.

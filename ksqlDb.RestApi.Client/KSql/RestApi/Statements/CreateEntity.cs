@@ -3,6 +3,8 @@ using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using DateTime = System.DateTime;
 
@@ -10,15 +12,15 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 internal sealed class CreateEntity : CreateEntityStatement
 {
-  internal static string KSqlTypeTranslator(Type type)
+  internal static string KSqlTypeTranslator(Type type, IdentifierEscaping escaping = IdentifierEscaping.Never)
   {
     var ksqlType = string.Empty;
-      
+
     if (type == typeof(byte[]))
       ksqlType = KSqlTypes.Bytes;
     else if (type.IsArray)
     {
-      var elementType = KSqlTypeTranslator(type.GetElementType());
+      var elementType = KSqlTypeTranslator(type.GetElementType(), escaping);
 
       ksqlType = $"ARRAY<{elementType}>";
     }
@@ -26,8 +28,8 @@ internal sealed class CreateEntity : CreateEntityStatement
     {
       Type[] typeParameters = type.GetGenericArguments();
 
-      var keyType = KSqlTypeTranslator(typeParameters[0]);
-      var valueType = KSqlTypeTranslator(typeParameters[1]);
+      var keyType = KSqlTypeTranslator(typeParameters[0], escaping);
+      var valueType = KSqlTypeTranslator(typeParameters[1], escaping);
 
       ksqlType = $"MAP<{keyType}, {valueType}>";
     }
@@ -53,7 +55,7 @@ internal sealed class CreateEntity : CreateEntityStatement
       ksqlType = KSqlTypes.Timestamp;
     else if (!type.IsGenericType && type.TryGetAttribute<StructAttribute>() != null)
     {
-      var ksqlProperties = GetProperties(type);
+      var ksqlProperties = GetProperties(type, escaping);
 
       ksqlType = $"STRUCT<{string.Join(", ", ksqlProperties)}>";
     }
@@ -81,7 +83,7 @@ internal sealed class CreateEntity : CreateEntityStatement
 
       if (elementType != null)
       {
-        string ksqlElementType = KSqlTypeTranslator(elementType);
+        string ksqlElementType = KSqlTypeTranslator(elementType, escaping);
 
         ksqlType = $"ARRAY<{ksqlElementType}>";
       }
@@ -147,15 +149,14 @@ internal sealed class CreateEntity : CreateEntityStatement
   private void PrintProperties<T>(StatementContext statementContext, EntityCreationMetadata metadata)
   {
     var ksqlProperties = new List<string>();
-
-    foreach (var memberInfo in Members<T>(metadata?.IncludeReadOnlyProperties))
+    metadata??= new EntityCreationMetadata();
+    foreach (var memberInfo in Members<T>(metadata.IncludeReadOnlyProperties))
     {
       var type = GetMemberType(memberInfo);
 
-      var ksqlType = KSqlTypeTranslator(type);
+      var ksqlType = KSqlTypeTranslator(type, metadata.IdentifierEscaping);
 
-      var columnName = memberInfo.GetMemberName();
-
+      var columnName = IdentifierUtil.Format(memberInfo, metadata.IdentifierEscaping);
       string columnDefinition = $"\t{columnName} {ksqlType}{ExploreAttributes(memberInfo, type)}";
 
       columnDefinition += TryAttachKey(statementContext.KSqlEntityType, memberInfo);
@@ -166,7 +167,7 @@ internal sealed class CreateEntity : CreateEntityStatement
     stringBuilder.AppendLine(string.Join($",{Environment.NewLine}", ksqlProperties));
   }
 
-  internal static IEnumerable<string> GetProperties(Type type)
+  internal static IEnumerable<string> GetProperties(Type type, IdentifierEscaping escaping)
   {
     var ksqlProperties = new List<string>();
 
@@ -174,9 +175,9 @@ internal sealed class CreateEntity : CreateEntityStatement
     {
       var memberType = GetMemberType(memberInfo);
 
-      var ksqlType = KSqlTypeTranslator(memberType);
+      var ksqlType = KSqlTypeTranslator(memberType, escaping);
 
-      string columnDefinition = $"{memberInfo.Name} {ksqlType}{ExploreAttributes(memberInfo, memberType)}";
+      string columnDefinition = $"{memberInfo.Format(escaping)} {ksqlType}{ExploreAttributes(memberInfo, memberType)}";
 
       ksqlProperties.Add(columnDefinition);
     }

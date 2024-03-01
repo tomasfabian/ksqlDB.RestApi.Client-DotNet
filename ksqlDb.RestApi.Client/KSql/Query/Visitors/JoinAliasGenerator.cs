@@ -19,7 +19,7 @@ internal class JoinAliasGenerator
 
   private string CreateDistinctAliasFrom(string name)
   {
-    var aliasBase = name[0].ToString();
+    var aliasBase = name.FirstOrDefault(c => c != '`').ToString();
     int suffix = 0;
 
     var newAlias = aliasBase;

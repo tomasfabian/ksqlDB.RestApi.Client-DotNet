@@ -1,6 +1,8 @@
 using FluentAssertions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using NUnit.Framework;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators;
@@ -9,24 +11,25 @@ public class TypeGeneratorTests
 {
   [Test]
   public void CreateType()
-  {      
+  {
     //Arrange
 
     //Act
-    string statement = new TypeGenerator().Print<Address>();
+    var statement = new TypeGenerator().Print(new TypeProperties<Address>());
 
     //Assert
-    statement.Should().Be($@"CREATE TYPE {nameof(Address).ToUpper()} AS STRUCT<Number INT, Street VARCHAR, City VARCHAR>;");
+    statement.Should()
+      .Be($@"CREATE TYPE {nameof(Address).ToUpper()} AS STRUCT<Number INT, Street VARCHAR, City VARCHAR>;");
   }
 
   [Test]
   public void CreateType_WithTypeName()
-  {      
+  {
     //Arrange
-    string typeName = "MyType";
+    var typeName = "MyType";
 
     //Act
-    string statement = new TypeGenerator().Print<Address>(typeName);
+    var statement = new TypeGenerator().Print(new TypeProperties<Address> { EntityName = typeName });
 
     //Assert
     statement.Should().Be($@"CREATE TYPE {typeName} AS STRUCT<Number INT, Street VARCHAR, City VARCHAR>;");
@@ -34,11 +37,11 @@ public class TypeGeneratorTests
 
   [Test]
   public void CreateType_NestedType()
-  {      
+  {
     //Arrange
 
     //Act
-    string statement = new TypeGenerator().Print<Person>();
+    var statement = new TypeGenerator().Print(new TypeProperties<Person>());
 
     //Assert
     statement.Should().Be($@"CREATE TYPE {nameof(Person).ToUpper()} AS STRUCT<Name VARCHAR, Address ADDRESS>;");
@@ -46,11 +49,11 @@ public class TypeGeneratorTests
 
   [Test]
   public void CreateType_BytesType()
-  {      
+  {
     //Arrange
 
     //Act
-    string statement = new TypeGenerator().Print<Thumbnail>();
+    var statement = new TypeGenerator().Print(new TypeProperties<Thumbnail>());
 
     //Assert
     statement.Should().Be(@$"CREATE TYPE {nameof(Thumbnail).ToUpper()} AS STRUCT<Image BYTES>;");
@@ -58,15 +61,39 @@ public class TypeGeneratorTests
 
   [Test]
   public void CreateType_MapType()
-  {      
+  {
     //Arrange
 
     //Act
-    string statement = new TypeGenerator().Print<Container>();
+    var statement = new TypeGenerator().Print(new TypeProperties<Container>());
 
     //Assert
     statement.Should().Be(@$"CREATE TYPE {nameof(Container).ToUpper()} AS STRUCT<Values2 MAP<VARCHAR, INT>>;");
   }
+
+  [TestCase(IdentifierEscaping.Never, ExpectedResult = "CREATE TYPE ROWTIME AS STRUCT<Value VARCHAR>;")]
+  [TestCase(IdentifierEscaping.Keywords, ExpectedResult = "CREATE TYPE ROWTIME AS STRUCT<Value VARCHAR>;")]
+  [TestCase(IdentifierEscaping.Always, ExpectedResult = "CREATE TYPE `ROWTIME` AS STRUCT<`Value` VARCHAR>;")]
+  public string CreateType_WithSystemColumName(IdentifierEscaping escaping) =>
+    new TypeGenerator().Print(new TypeProperties<Rowtime> { IdentifierEscaping = escaping });
+
+  [TestCase(IdentifierEscaping.Never, ExpectedResult = "CREATE TYPE VALUES AS STRUCT<Value VARCHAR>;")]
+  [TestCase(IdentifierEscaping.Keywords, ExpectedResult = "CREATE TYPE `VALUES` AS STRUCT<Value VARCHAR>;")]
+  [TestCase(IdentifierEscaping.Always, ExpectedResult = "CREATE TYPE `VALUES` AS STRUCT<`Value` VARCHAR>;")]
+  public string CreateType_WithReservedWord(IdentifierEscaping escaping) =>
+    new TypeGenerator().Print(new TypeProperties<Values> { IdentifierEscaping = escaping });
+
+  [TestCase(IdentifierEscaping.Never,
+    ExpectedResult =
+      "CREATE TYPE SYSTEMCOLUMN AS STRUCT<Rowtime VARCHAR, Rowoffset VARCHAR, Rowpartition VARCHAR, Windowstart VARCHAR, Windowend VARCHAR>;")]
+  [TestCase(IdentifierEscaping.Keywords,
+    ExpectedResult =
+      "CREATE TYPE SYSTEMCOLUMN AS STRUCT<Rowtime VARCHAR, Rowoffset VARCHAR, Rowpartition VARCHAR, Windowstart VARCHAR, Windowend VARCHAR>;")]
+  [TestCase(IdentifierEscaping.Always,
+    ExpectedResult =
+      "CREATE TYPE `SYSTEMCOLUMN` AS STRUCT<`Rowtime` VARCHAR, `Rowoffset` VARCHAR, `Rowpartition` VARCHAR, `Windowstart` VARCHAR, `Windowend` VARCHAR>;")]
+  public string CreateType_WithSystemColumnNameField(IdentifierEscaping escaping) =>
+    new TypeGenerator().Print(new TypeProperties<SystemColumn> { IdentifierEscaping = escaping });
 
   public record Address
   {
@@ -89,6 +116,18 @@ public class TypeGeneratorTests
   record Container
   {
     public IDictionary<string, int> Values2 { get; set; } = null!;
+  }
+
+  record Rowtime(string Value)
+  {
+  }
+
+  record Values(string Value)
+  {
+  }
+
+  record SystemColumn(string Rowtime, string Rowoffset, string Rowpartition, string Windowstart, string Windowend)
+  {
   }
 
   #region GenericType
@@ -120,8 +159,7 @@ public class TypeGeneratorTests
 
   record IoTSensor
   {
-    [Key]
-    public string SensorId { get; set; } = null!;
+    [Key] public string SensorId { get; set; } = null!;
     public int Value { get; set; }
   }
 
@@ -133,14 +171,17 @@ public class TypeGeneratorTests
 
   [Test]
   public void CreateType_GenericType()
-  {      
+  {
     //Arrange
 
     //Act
-    string statement = new TypeGenerator().Print<DatabaseChangeObject<IoTSensor>>();
+    var statement =
+      new TypeGenerator().Print(new TypeProperties<DatabaseChangeObject<IoTSensor>>());
 
     //Assert
-    statement.Should().Be(@"CREATE TYPE DATABASECHANGEOBJECT AS STRUCT<Before IOTSENSOR, After IOTSENSOR, Source SOURCE, Op VARCHAR, TsMs BIGINT>;"); //, Transaction OBJECT
+    statement.Should()
+      .Be(
+        @"CREATE TYPE DATABASECHANGEOBJECT AS STRUCT<Before IOTSENSOR, After IOTSENSOR, Source SOURCE, Op VARCHAR, TsMs BIGINT>;"); //, Transaction OBJECT
   }
 
   #endregion

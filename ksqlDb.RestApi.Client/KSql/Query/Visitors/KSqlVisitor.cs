@@ -4,6 +4,9 @@ using System.Reflection;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDb.RestApi.Client.KSql.Entities;
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using DateTime = System.DateTime;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
@@ -11,13 +14,13 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
 internal class KSqlVisitor : ExpressionVisitor
 {
   private readonly StringBuilder stringBuilder;
-  private readonly KSqlQueryMetadata queryMetadata;
+  public KSqlQueryMetadata QueryMetadata { get; internal set; }
 
   internal StringBuilder StringBuilder => stringBuilder;
 
   public KSqlVisitor(KSqlQueryMetadata queryMetadata)
   {
-    this.queryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
+    QueryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
 
     stringBuilder = new StringBuilder();
   }
@@ -158,7 +161,7 @@ internal class KSqlVisitor : ExpressionVisitor
       else
         Append(ColumnsSeparator);
 
-      var memberName = memberBinding.Member.GetMemberName();
+      var memberName = IdentifierUtil.Format(memberBinding.Member, QueryMetadata.IdentifierEscaping);
 
       Append($"{memberName} := ");
 
@@ -174,14 +177,14 @@ internal class KSqlVisitor : ExpressionVisitor
   {
     if (listInitExpression == null) throw new ArgumentNullException(nameof(listInitExpression));
 
-    var listInitExpressionVisitor = new ListInitVisitor(stringBuilder, queryMetadata);
+    var listInitExpressionVisitor = new ListInitVisitor(stringBuilder, QueryMetadata);
 
     return listInitExpressionVisitor.Visit(listInitExpression) ?? listInitExpression;
   }
 
   protected override Expression VisitNewArray(NewArrayExpression node)
   {
-    if (queryMetadata.IsInContainsScope)
+    if (QueryMetadata.IsInContainsScope)
       JoinAppend(node.Expressions);
     else
       PrintArray(node.Expressions);
@@ -198,12 +201,12 @@ internal class KSqlVisitor : ExpressionVisitor
 
   protected virtual KSqlFunctionVisitor CreateKSqlFunctionVisitor()
   {
-    return new KSqlFunctionVisitor(stringBuilder, queryMetadata);
+    return new KSqlFunctionVisitor(stringBuilder, QueryMetadata);
   }
 
   protected override Expression VisitMethodCall(MethodCallExpression methodCallExpression)
   {
-    new MethodCallVisitor(StringBuilder, queryMetadata).Visit(methodCallExpression);
+    new MethodCallVisitor(StringBuilder, QueryMetadata).Visit(methodCallExpression);
 
     return methodCallExpression;
   }
@@ -226,26 +229,26 @@ internal class KSqlVisitor : ExpressionVisitor
 
   private void PrintArrayContainsForEnumerable(IReadOnlyCollection<Expression> arguments)
   {
-    queryMetadata.IsInContainsScope = true;
+    QueryMetadata.IsInContainsScope = true;
 
     Visit(arguments.Last());
     Append(" IN (");
     Visit(arguments.First());
     Append(")");
 
-    queryMetadata.IsInContainsScope = false;
+    QueryMetadata.IsInContainsScope = false;
   }
 
   private void PrintArrayContains(MethodCallExpression methodCallExpression)
   {
-    queryMetadata.IsInContainsScope = true;
+    QueryMetadata.IsInContainsScope = true;
 
     Visit(methodCallExpression.Arguments);
     Append(" IN (");
     Visit(methodCallExpression.Object);
     Append(")");
 
-    queryMetadata.IsInContainsScope = false;
+    QueryMetadata.IsInContainsScope = false;
   }
 
   protected void PrintFunctionArguments(IEnumerable<Expression> expressions)
@@ -276,7 +279,7 @@ internal class KSqlVisitor : ExpressionVisitor
   {
     if (constantExpression == null) throw new ArgumentNullException(nameof(constantExpression));
 
-    var constantExpressionVisitor = new ConstantVisitor(stringBuilder, queryMetadata);
+    var constantExpressionVisitor = new ConstantVisitor(stringBuilder, QueryMetadata);
 
     return constantExpressionVisitor.Visit(constantExpression) ?? constantExpression;
   }
@@ -285,14 +288,14 @@ internal class KSqlVisitor : ExpressionVisitor
   {
     if (binaryExpression == null) throw new ArgumentNullException(nameof(binaryExpression));
 
-    return new BinaryVisitor(StringBuilder, queryMetadata).Visit(binaryExpression) ?? binaryExpression;
+    return new BinaryVisitor(StringBuilder, QueryMetadata).Visit(binaryExpression) ?? binaryExpression;
   }
 
   protected override Expression VisitNew(NewExpression newExpression)
   {
     if (newExpression == null) throw new ArgumentNullException(nameof(newExpression));
 
-    var newExpressionVisitor = new NewVisitor(stringBuilder, queryMetadata);
+    var newExpressionVisitor = new NewVisitor(stringBuilder, QueryMetadata);
 
     return newExpressionVisitor.Visit(newExpression) ?? newExpression;
   }
@@ -341,22 +344,22 @@ internal class KSqlVisitor : ExpressionVisitor
   {
     Visit(expression);
     Append(" AS ");
-    Append(memberInfo.Name);
+    Append(memberInfo.Format(QueryMetadata.IdentifierEscaping));
   }
 
   protected virtual void ProcessVisitNewMember(MemberInfo memberInfo, Expression expression)
   {
-    if (queryMetadata.Joins != null && queryMetadata.Joins.Any() && expression.NodeType == ExpressionType.MemberAccess)
+    if (QueryMetadata.Joins != null && QueryMetadata.Joins.Any() && expression.NodeType == ExpressionType.MemberAccess)
     {
       Visit(expression);
 
-      Append(" " + memberInfo.Name);
+      Append(" " + IdentifierUtil.Format(memberInfo.Name, QueryMetadata.IdentifierEscaping));
       return;
     }
 
     if (expression is MemberExpression { Expression: MemberExpression me3 } && me3.Expression != null && me3.Expression.Type.IsKsqlGrouping())
     {
-      Append(memberInfo.Name);
+      Append(IdentifierUtil.Format(memberInfo.Name, QueryMetadata.IdentifierEscaping));
       return;
     }
 
@@ -371,22 +374,22 @@ internal class KSqlVisitor : ExpressionVisitor
     else if (expression is MemberExpression me2 && me2.Expression?.NodeType == ExpressionType.Constant)
       Visit(expression);
     else
-      Append(memberInfo.Name);
+      Append(IdentifierUtil.Format(memberInfo.Name, QueryMetadata.IdentifierEscaping));
   }
 
   protected override Expression VisitMember(MemberExpression memberExpression)
   {
     if (memberExpression == null) throw new ArgumentNullException(nameof(memberExpression));
 
-    if (queryMetadata.Joins != null && queryMetadata.Joins.Any())
+    if (QueryMetadata.Joins != null && QueryMetadata.Joins.Any())
     {
       if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
       {
-        var foundFromItem = queryMetadata.TrySetAlias(memberExpression, (_, alias) => string.IsNullOrEmpty(alias));
+        var foundFromItem = QueryMetadata.TrySetAlias(memberExpression, (_, alias) => string.IsNullOrEmpty(alias));
 
-        var memberName = memberExpression.Member.GetMemberName();
+        var memberName = IdentifierUtil.Format(memberExpression.Member, QueryMetadata.IdentifierEscaping);
 
-        string alias = ((ParameterExpression)memberExpression.Expression).Name;
+        var alias = IdentifierUtil.Format(((ParameterExpression)memberExpression.Expression).Name, QueryMetadata.IdentifierEscaping);
 
         Append(foundFromItem?.Alias ?? alias);
         Append(".");
@@ -395,11 +398,11 @@ internal class KSqlVisitor : ExpressionVisitor
         return memberExpression;
       }
 
-      var fromItem = queryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
+      var fromItem = QueryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
 
       if (fromItem != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
       {
-        string alias = ((MemberExpression)memberExpression.Expression).Member.Name;
+        string alias = ((MemberExpression)memberExpression.Expression).Member.Format(QueryMetadata.IdentifierEscaping);
 
         fromItem.Alias = alias;
 
@@ -407,7 +410,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
         Append(".");
 
-        var memberName = memberExpression.Member.GetMemberName();
+        var memberName = IdentifierUtil.Format(memberExpression.Member, QueryMetadata.IdentifierEscaping);
         Append(memberName);
         return memberExpression;
       }
@@ -417,7 +420,7 @@ internal class KSqlVisitor : ExpressionVisitor
     {
       TryVisitTimeTypes(memberExpression);
 
-      new KSqlWindowBoundsVisitor(StringBuilder, queryMetadata).Visit(memberExpression);
+      new KSqlWindowBoundsVisitor(StringBuilder, QueryMetadata).Visit(memberExpression);
 
       return memberExpression;
     }
@@ -481,7 +484,7 @@ internal class KSqlVisitor : ExpressionVisitor
     else if (memberExpression.Member is FieldInfo fieldInfo)
       type = fieldInfo.FieldType;
 
-    if (queryMetadata.Joins?.Any() ?? false)
+    if (QueryMetadata.Joins?.Any() ?? false)
     {
       fromItem = TrySetFromItemAlias(memberExpression, type);
 
@@ -491,18 +494,20 @@ internal class KSqlVisitor : ExpressionVisitor
     }
 
     if (type != fromItem?.Type)
-      Append(memberExpression.Member.GetMemberName());
+    {
+        Append(IdentifierUtil.Format(memberExpression.Member, QueryMetadata.IdentifierEscaping));
+    }
   }
 
   private FromItem TrySetFromItemAlias(MemberExpression memberExpression, Type propertyInfo)
   {
-    var fromItem = queryMetadata.Joins.FirstOrDefault(c => c.Type == propertyInfo);
+    var fromItem = QueryMetadata.Joins.FirstOrDefault(c => c.Type == propertyInfo);
 
     if (fromItem != null)
       fromItem.Alias = memberExpression.Member.Name;
     else
     {
-      fromItem = queryMetadata.TrySetAlias(memberExpression, (fromItem, alias) => fromItem.Alias == alias);
+      fromItem = QueryMetadata.TrySetAlias(memberExpression, (fromItem, alias) => fromItem.Alias == alias);
     }
 
     return fromItem;
@@ -512,12 +517,12 @@ internal class KSqlVisitor : ExpressionVisitor
   {
     Visit(memberExpression.Expression);
 
-    var fromItem = queryMetadata.Joins?.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
+    var fromItem = QueryMetadata.Joins?.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
 
     if (fromItem == null)
       Append("->");
 
-    var memberName = memberExpression.Member.GetMemberName();
+    var memberName = IdentifierUtil.Format(memberExpression.Member, QueryMetadata.IdentifierEscaping);
 
     Append(memberName);
   }
@@ -602,7 +607,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
   protected void Append(IEnumerable enumerable)
   {
-    if (queryMetadata.IsInContainsScope)
+    if (QueryMetadata.IsInContainsScope)
       JoinAppend(enumerable);
     else
       PrintArray(enumerable.OfType<object>().Select(Expression.Constant));

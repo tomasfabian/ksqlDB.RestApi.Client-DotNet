@@ -2,6 +2,7 @@ using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
@@ -90,7 +91,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     options.BasicAuthUserName.Should().BeEmpty();
     options.BasicAuthPassword.Should().BeEmpty();
   }
-    
+
   [Test]
   public void SetProcessingGuarantee()
   {
@@ -104,7 +105,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     options.QueryParameters[KSqlDbConfigs.ProcessingGuarantee].Should().Be("at_least_once");
     options.QueryStreamParameters[KSqlDbConfigs.ProcessingGuarantee].Should().Be("at_least_once");
   }
-    
+
   [Test]
   public void SetProcessingGuarantee_ThenSetupQueryStream()
   {
@@ -122,7 +123,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     options.QueryParameters[KSqlDbConfigs.ProcessingGuarantee].Should().Be("at_least_once");
     options.QueryStreamParameters[KSqlDbConfigs.ProcessingGuarantee].Should().Be("at_least_once");
   }
-    
+
   [Test]
   public void SetAutoOffsetReset()
   {
@@ -140,7 +141,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     options.QueryParameters.Properties[QueryParameters.AutoOffsetResetPropertyName].Should().Be(expectedValue);
     options.QueryStreamParameters[QueryStreamParameters.AutoOffsetResetPropertyName].Should().Be(expectedValue);
   }
-    
+
   [Test]
   public void SetJsonSerializerOptions_DefaultPropertyNameCaseInsensitiveIsTrue()
   {
@@ -153,7 +154,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     //Assert
     options.JsonSerializerOptions.PropertyNameCaseInsensitive.Should().BeTrue();
   }
-    
+
   [Test]
   public void SetJsonSerializerOptions()
   {
@@ -166,6 +167,21 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
 
     //Assert
     options.JsonSerializerOptions.PropertyNameCaseInsensitive.Should().BeFalse();
+  }
+
+  public static IdentifierEscaping[] SetIdentifierEscapingTestCases() => Enum.GetValues<IdentifierEscaping>();
+
+  [TestCaseSource(nameof(SetIdentifierEscapingTestCases))]
+  public void SetIdentifierEscaping(IdentifierEscaping escaping)
+  {
+    //Arrange
+    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
+
+    //Act
+    setupParameters.SetIdentifierEscaping(escaping);
+
+    //Assert
+    ((KSqlDbContextOptionsBuilder)setupParameters).InternalOptions.IdentifierEscaping.Should().Be(escaping);
   }
 
   #region QueryStream

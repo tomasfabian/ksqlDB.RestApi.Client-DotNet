@@ -5,6 +5,8 @@ using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using Pluralize.NET;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
@@ -13,14 +15,13 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 {
   private readonly KSqlDBContextOptions contextOptions;
   private readonly QueryContext queryContext;
-  private readonly KSqlQueryMetadata queryMetadata;
 
   public KSqlJoinsVisitor(StringBuilder stringBuilder, KSqlDBContextOptions contextOptions, QueryContext queryContext, KSqlQueryMetadata queryMetadata)
     : base(stringBuilder, queryMetadata)
   {
     this.contextOptions = contextOptions ?? throw new ArgumentNullException(nameof(contextOptions));
     this.queryContext = queryContext ?? throw new ArgumentNullException(nameof(queryContext));
-    this.queryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
+    this.QueryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
   }
 
   private readonly JoinAliasGenerator joinAliasGenerator = new();
@@ -51,17 +52,17 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
       Visit(expressions[0]);
 
-      var outerItemAlias = joinAliasGenerator.GenerateAlias(queryContext.FromItemName);
+      var outerItemAlias = IdentifierUtil.Format(joinAliasGenerator.GenerateAlias(queryContext.FromItemName), QueryMetadata.IdentifierEscaping);
 
-      var itemAlias = joinAliasGenerator.GenerateAlias(fromItemName);
+      var itemAlias = IdentifierUtil.Format(joinAliasGenerator.GenerateAlias(fromItemName), QueryMetadata.IdentifierEscaping);
 
       if (groupJoin != null)
       {
         var prop = GetPropertyType(groupJoin.Parameters[0].Type);
 
-        outerItemAlias = prop.Name;
+        outerItemAlias = IdentifierUtil.Format(prop.Name, QueryMetadata.IdentifierEscaping);
 
-        itemAlias = groupJoin.Parameters[1].Name;
+        itemAlias = IdentifierUtil.Format(groupJoin.Parameters[1].Name, QueryMetadata.IdentifierEscaping);
       }
 
       var lambdaExpression = expressions[3] as LambdaExpression;
@@ -72,13 +73,13 @@ internal class KSqlJoinsVisitor : KSqlVisitor
       {
         Append("SELECT ");
 
-        var body = queryMetadata.Select?.Body ?? lambdaExpression?.Body;
+        var body = QueryMetadata.Select?.Body ?? lambdaExpression?.Body;
 
         body = groupJoin != null ? groupJoin.Body : body;
 
-        new KSqlVisitor(StringBuilder, queryMetadata).Visit(body);
+        new KSqlVisitor(StringBuilder, QueryMetadata).Visit(body);
 
-        var fromItemAlias = queryMetadata.Joins.Skip(i).Where(c => c.Type == queryMetadata.FromItemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).LastOrDefault();
+        var fromItemAlias = QueryMetadata.Joins.Skip(i).Where(c => c.Type == QueryMetadata.FromItemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).LastOrDefault();
 
         outerItemAlias = fromItemAlias ?? outerItemAlias;
 
@@ -97,7 +98,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
       var itemType = join.Item2.First().Type.GetGenericArguments()[0];
 
-      var joinItemAlias = queryMetadata.Joins.Where(c => c.Type == itemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).FirstOrDefault();
+      var joinItemAlias = QueryMetadata.Joins.Where(c => c.Type == itemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).FirstOrDefault();
 
       itemAlias = joinItemAlias ?? itemAlias;
 
@@ -189,16 +190,16 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
     if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
     {
-      var memberName = memberExpression.Member.GetMemberName();
+      var memberName = IdentifierUtil.Format(memberExpression.Member, QueryMetadata.IdentifierEscaping);
 
       Append(memberName);
 
       return memberExpression;
     }
 
-    if (queryMetadata.Joins != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
+    if (QueryMetadata.Joins != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
     {
-      Append(memberExpression.Member.Name);
+      Append(memberExpression.Member.Format(QueryMetadata.IdentifierEscaping));
     }
     else
       base.VisitMember(memberExpression);
@@ -226,6 +227,6 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
     name = InterceptFromItemName(name);
 
-    return name;
+    return IdentifierUtil.Format(name, QueryMetadata.IdentifierEscaping);
   }
 }

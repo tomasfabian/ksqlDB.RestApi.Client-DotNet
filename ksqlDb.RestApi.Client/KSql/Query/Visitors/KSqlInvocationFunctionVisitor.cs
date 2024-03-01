@@ -8,13 +8,12 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
 internal class KSqlInvocationFunctionVisitor : KSqlVisitor
 {
   private readonly StringBuilder stringBuilder;
-  private readonly KSqlQueryMetadata queryMetadata;
 
   public KSqlInvocationFunctionVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
     : base(stringBuilder, queryMetadata)
   {
     this.stringBuilder = stringBuilder ?? throw new ArgumentNullException(nameof(stringBuilder));
-    this.queryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
+    this.QueryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
   }
   
   protected override Expression VisitMethodCall(MethodCallExpression methodCallExpression)
@@ -37,7 +36,7 @@ internal class KSqlInvocationFunctionVisitor : KSqlVisitor
           if (arguments[0].Type == typeof(KSqlFunctions))
             arguments = arguments.Skip(1).ToList();
 
-          if (queryMetadata.IsInNestedFunctionScope)
+          if (QueryMetadata.IsInNestedFunctionScope)
             VisitArgument(arguments[0]);
           else
             base.Visit(arguments[0]);
@@ -66,6 +65,6 @@ internal class KSqlInvocationFunctionVisitor : KSqlVisitor
 
   private void VisitArgument(Expression expression)
   {
-    new LambdaVisitor(stringBuilder, queryMetadata).Visit(expression);
+    new LambdaVisitor(stringBuilder, QueryMetadata).Visit(expression);
   }
 }

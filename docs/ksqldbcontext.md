@@ -34,7 +34,7 @@ var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
 
 await using var context = new KSqlDBContext(contextOptions);
 
-using var disposable = context.CreateQueryStream<Movie>()        
+using var disposable = context.CreateQueryStream<Movie>()
   .Subscribe(onNext: movie =>
   {
     Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
@@ -72,7 +72,7 @@ var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
 
 await using var context = new KSqlDBContext(contextOptions);
 
-using var disposable = context.CreateQuery<Movie>()        
+using var disposable = context.CreateQuery<Movie>()
   .Subscribe(onNext: movie =>
   {
     Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
@@ -296,7 +296,7 @@ public class Worker : IHostedService, IDisposable
         onCompleted: () => { },
         cancellationToken: cancellationToken);
   }
-  
+
   public Task StopAsync(CancellationToken cancellationToken)
   {
     logger.LogInformation("Stopping.");
@@ -412,3 +412,51 @@ await using var context = new KSqlDBContext(contextOptions);
 ```
 
 The `ProcessingGuarantee` enum offers three options: **ExactlyOnce**, **ExactlyOnceV2** and **AtLeastOnce**.
+
+
+### Setting formatting for identifiers
+**v3.6.0**
+
+When using the `ksqlDB.RestApi.Client`, you have the ability to configure the formatting for identifiers in your statements.
+This can be done by making use of the `SetIdentifierEscaping` method from the `KSqlDbContextOptionsBuilder` class.
+You can choose from these options:
+* `Never` - the default option where identifiers are not modified
+* `Keywords` - when an identifier is a reserved keyword it is escaped using **backticks** `` ` ``
+* `Always` - all identifiers are escaped using **backticks** `` ` ``
+
+Escaping options can also be set on types that derive from `IEntityCreationProperties`. When you create a stream or table
+that escapes identifiers your insert statements must also use the same escaping option to work
+
+See here for additional details: https://docs.ksqldb.io/en/latest/reference/sql/syntax/lexical-structure/#identifiers
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+
+var ksqlDbUrl = @"http://localhost:8088";
+
+var contextOptions = new KSqlDbContextOptionsBuilder()
+  .UseKSqlDb(ksqlDbUrl)
+  .SetIdentifierEscaping(IdentifierEscaping.Always)
+  .Options;
+
+await using var context = new KSqlDBContext(contextOptions);
+```
+The resulting statements will escape identifiers like this when you use the `Always` option:
+```genericsql
+SELECT `Message`, `Id`, `Values`
+  FROM `Tweets`
+ WHERE `Message` != 'Hello world' OR Id = 1
+  EMIT CHANGES;
+
+INSERT INTO `Message` (`Message`, `Id`, `Values`) VALUES ('Hello', 42, '123, abc');
+```
+For the `Keywords` option only ksql keywords will be escaped:
+```genericsql
+SELECT MESSAGE, ID, `Values`
+  FROM TWEETS
+ WHERE MESSAGE != 'Hello world' OR ID = 1
+  EMIT CHANGES;
+
+INSERT INTO Message (Message, Id, `Values`) VALUES ('Hello', 42, '123, abc');
+```

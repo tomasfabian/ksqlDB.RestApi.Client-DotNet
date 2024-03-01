@@ -5,12 +5,10 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
 
 internal class BinaryVisitor : KSqlVisitor
 {
-  private readonly KSqlQueryMetadata queryMetadata;
-
   public BinaryVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
     : base(stringBuilder, queryMetadata)
   {
-    this.queryMetadata = queryMetadata;
+    this.QueryMetadata = queryMetadata;
   }
 
   protected override Expression VisitParameter(ParameterExpression node)
@@ -138,8 +136,8 @@ internal class BinaryVisitor : KSqlVisitor
 
   protected override Expression VisitMember(MemberExpression memberExpression)
   {
-    if (queryMetadata.IsInNestedFunctionScope)
-      return new LambdaVisitor(StringBuilder, queryMetadata).Visit(memberExpression) ?? memberExpression;
+    if (QueryMetadata.IsInNestedFunctionScope)
+      return new LambdaVisitor(StringBuilder, QueryMetadata).Visit(memberExpression) ?? memberExpression;
 
     return base.VisitMember(memberExpression);
   }
