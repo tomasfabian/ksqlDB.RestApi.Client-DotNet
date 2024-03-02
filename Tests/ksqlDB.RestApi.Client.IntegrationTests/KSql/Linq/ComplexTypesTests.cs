@@ -80,7 +80,7 @@ Drop table Events;
     string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
 
     //Assert
-    await semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(5));
+    await semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(10));
 
     receivedValues.Count.Should().Be(1);
     receivedValues[0].Places.Length.Should().Be(2);

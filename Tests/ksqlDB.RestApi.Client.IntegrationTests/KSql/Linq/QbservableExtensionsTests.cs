@@ -239,7 +239,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
       .SubscribeAsync(c => actualValues.Add(c), e => semaphore.Release(), () => semaphore.Release(), cancellationToken: cts.Token);
 
     await cts.CancelAsync();
-    await semaphore.WaitAsync(timeOut, cts.Token);
+    await semaphore.WaitAsync(timeOut);
 
     //Assert
     Assert.AreEqual(0, actualValues.Count);

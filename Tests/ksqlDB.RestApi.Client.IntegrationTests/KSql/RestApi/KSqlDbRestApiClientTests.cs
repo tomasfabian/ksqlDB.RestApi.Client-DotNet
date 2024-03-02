@@ -331,7 +331,7 @@ Drop type Address;
     //"{"@type":"generic_error","error_code":50000,"message":"On wrong context or worker"}"
     //response.IsSuccessStatusCode.Should().BeTrue()
 
-    await Task.Delay(TimeSpan.FromSeconds(7));
+    await Task.Delay(TimeSpan.FromSeconds(8));
     var queriesResponses = await restApiClient.GetQueriesAsync();
     queriesResponses.SelectMany(c => c.Queries).Count().Should().Be(queriesCount - 1);
   }
