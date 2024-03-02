@@ -314,26 +314,32 @@ Drop type Address;
     //Arrange
     var contextOptions = new KSqlDBContextOptions(Helpers.TestConfig.KSqlDbUrl);
     await using var context = new KSqlDBContext(contextOptions);
+    var cts = new CancellationTokenSource();
       
     var subscription = await context
       .CreateQueryStream<MyMoviesTable>()
       .SubscribeOn(ThreadPoolScheduler.Instance)
-      .SubscribeAsync(_ => {}, e => { }, () => { });
+      .SubscribeAsync(_ => {}, e => { }, () => { }, cts.Token);
       
-    int queriesCount = (await restApiClient.GetQueriesAsync()).SelectMany(c => c.Queries).Count();
+    int queriesCount = await GetPersistentQueriesCountAsync(cts.Token);
 
     //Act
-    var response = await restApiClient.TerminatePushQueryAsync(subscription.QueryId);
+    var response = await restApiClient.TerminatePushQueryAsync(subscription.QueryId, cts.Token);
 
     //Assert
       
     //https://github.com/confluentinc/ksql/issues/7559
     //"{"@type":"generic_error","error_code":50000,"message":"On wrong context or worker"}"
-    //response.IsSuccessStatusCode.Should().BeTrue()
+    //response.IsSuccessStatusCode.Should().BeTrue();
 
-    await Task.Delay(TimeSpan.FromSeconds(8));
-    var queriesResponses = await restApiClient.GetQueriesAsync();
-    queriesResponses.SelectMany(c => c.Queries).Count().Should().Be(queriesCount - 1);
+    await Task.Delay(TimeSpan.FromSeconds(10), cts.Token);
+    (await GetPersistentQueriesCountAsync(cts.Token)).Should().Be(queriesCount - 1);
+    await cts.CancelAsync();
+  }
+
+  private async Task<int> GetPersistentQueriesCountAsync(CancellationToken token)
+  {
+    return (await restApiClient.GetQueriesAsync(token)).SelectMany(c => c.Queries).Count(c => c.QueryType == "PERSISTENT");
   }
 
   [Test]
