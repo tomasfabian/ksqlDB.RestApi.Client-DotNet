@@ -6,7 +6,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Enums
   public enum IdentifierEscaping
   {
     /// <summary>
-    ///  No identifier is formatted
+    /// No identifier is formatted
     /// </summary>
     Never = 0,
     /// <summary>
