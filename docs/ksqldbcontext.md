@@ -306,6 +306,7 @@ public class Worker : IHostedService, IDisposable
 
   public void Dispose()
   {
+    using (subscription) { }
   }
 }
 ```
