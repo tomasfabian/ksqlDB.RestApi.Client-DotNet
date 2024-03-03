@@ -10,8 +10,8 @@ using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query.Descriptors;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
@@ -46,6 +46,7 @@ public static class Program
       })
       //.SetAutoOffsetReset(AutoOffsetReset.Earliest) // global setting
       .SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce) // global setting
+      .SetIdentifierEscaping(IdentifierEscaping.Keywords)
       .SetupQueryStream(options =>
       {
         //SetupQueryStream affects only IKSqlDBContext.CreateQueryStream<T>

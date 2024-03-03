@@ -197,7 +197,7 @@ List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 # Register the KSqlDbContext
 `IKSqlDBContext` and `IKSqlDbRestApiClient` can be provided with **dependency injection**. These services can be registered during app startup and components that require these services, are provided with these services via constructor parameters.
 
-To register `KsqlDbContext` as a service, open `Program.cs`, and add the lines to the `ConfigureServices` method shown below or see some more details in [the workshop](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/ksqlDB.RestApi.Client-workshop):
+To register `KSqlDbContext` as a service, open `Program.cs`, and add the lines to the `ConfigureServices` method shown below or see some more details in [the workshop](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/ksqlDB.RestApi.Client-workshop):
 
 ```
 using ksqlDB.RestApi.Client.Sensors;
