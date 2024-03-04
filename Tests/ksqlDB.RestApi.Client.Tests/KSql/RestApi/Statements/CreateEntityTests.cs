@@ -28,7 +28,7 @@ public class CreateEntityTests
     };
   }
 
-  private static readonly IPluralize EnglishPluralizationService = new Pluralizer();
+  private static readonly Pluralizer EnglishPluralizationService = new();
 
   private static string CreateExpectedStatement(string creationClause, bool hasPrimaryKey, string? entityName = null, IdentifierEscaping escaping = Never)
   {
@@ -37,11 +37,9 @@ public class CreateEntityTests
     if (entityName.IsNullOrEmpty())
       entityName = EnglishPluralizationService.Pluralize(nameof(MyMovie));
 
-    switch (escaping)
+    return escaping switch
     {
-      case Never:
-      case Keywords:
-        return @$"{creationClause} {entityName} (
+      Never => @$"{creationClause} {entityName} (
 	Id INT {key},
 	Title VARCHAR,
 	Release_Year INT,
@@ -49,10 +47,17 @@ public class CreateEntityTests
 	Dictionary MAP<VARCHAR, INT>,
 	Dictionary2 MAP<VARCHAR, INT>,
 	Field DOUBLE
-) WITH ( KAFKA_TOPIC='{nameof(MyMovie)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings();
-        break;
-      case Always:
-        return @$"{creationClause} `{entityName}` (
+) WITH ( KAFKA_TOPIC='{nameof(MyMovie)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings(),
+      Keywords => @$"{creationClause} {entityName} (
+	Id INT {key},
+	Title VARCHAR,
+	Release_Year INT,
+	NumberOfDays ARRAY<INT>,
+	Dictionary MAP<VARCHAR, INT>,
+	Dictionary2 MAP<VARCHAR, INT>,
+	Field DOUBLE
+) WITH ( KAFKA_TOPIC='{nameof(MyMovie)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings(),
+      Always => @$"{creationClause} `{entityName}` (
 	`Id` INT {key},
 	`Title` VARCHAR,
 	`Release_Year` INT,
@@ -60,10 +65,9 @@ public class CreateEntityTests
 	`Dictionary` MAP<VARCHAR, INT>,
 	`Dictionary2` MAP<VARCHAR, INT>,
 	`Field` DOUBLE
-) WITH ( KAFKA_TOPIC='{nameof(MyMovie)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings();
-      default:
-        throw new ArgumentOutOfRangeException(nameof(escaping), escaping, "Non-exhaustive match");
-    }
+) WITH ( KAFKA_TOPIC='{nameof(MyMovie)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings(),
+      _ => throw new ArgumentOutOfRangeException(nameof(escaping), escaping, "Non-exhaustive match")
+    };
   }
 
   #region KSqlTypeTranslator
@@ -664,7 +668,7 @@ public class CreateEntityTests
     [Key]
     public int Id { get; set; }
 
-    public IEnumerable<int> Items { get; } = new List<int>();
+    public IEnumerable<int> Items { get; } = [];
   }
 
   internal record TimeTypes
