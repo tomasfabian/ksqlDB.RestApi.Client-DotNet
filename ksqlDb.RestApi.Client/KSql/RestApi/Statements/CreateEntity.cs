@@ -75,7 +75,7 @@ internal sealed class CreateEntity : CreateEntityStatement
       {
         var enumerableInterfaces = type.GetEnumerableTypeDefinition().ToArray();
 
-        if (enumerableInterfaces.Any())
+        if (enumerableInterfaces.Length > 0)
         {
           elementType = enumerableInterfaces[0].GetGenericArguments()[0];
         }
@@ -109,7 +109,7 @@ internal sealed class CreateEntity : CreateEntityStatement
 
     PrintProperties<T>(statementContext, metadata);
 
-    stringBuilder.Append(")");
+    stringBuilder.Append(')');
 
     string with = CreateStatements.GenerateWithClause(metadata);
 
@@ -191,14 +191,14 @@ internal sealed class CreateEntity : CreateEntityStatement
     {
       CreationType.Create => "CREATE",
       CreationType.CreateOrReplace => "CREATE OR REPLACE",
-      _ => throw new ArgumentOutOfRangeException(nameof(statementContext.CreationType))
+      _ => throw new ArgumentOutOfRangeException(nameof(statementContext), $"Unknown '{nameof(CreationType)}' value {statementContext.CreationType}.")
     };
 
     string entityTypeText = statementContext.KSqlEntityType switch
     {
       KSqlEntityType.Table => KSqlEntityType.Table.ToString().ToUpper(),
       KSqlEntityType.Stream => KSqlEntityType.Stream.ToString().ToUpper(),
-      _ => throw new ArgumentOutOfRangeException(nameof(statementContext.KSqlEntityType))
+      _ => throw new ArgumentOutOfRangeException(nameof(statementContext), $"Unknown '{nameof(KSqlEntityType)}' value {statementContext.KSqlEntityType}.")
     };
 
     statementContext.EntityName = GetEntityName<T>(metadata);
@@ -208,7 +208,7 @@ internal sealed class CreateEntity : CreateEntityStatement
     stringBuilder.Append($"{creationTypeText}{source} {entityTypeText}");
   }
 
-  private string TryAttachKey(KSqlEntityType entityType, MemberInfo memberInfo)
+  private static string TryAttachKey(KSqlEntityType entityType, MemberInfo memberInfo)
   {
     if (!memberInfo.HasKey())
       return string.Empty;
