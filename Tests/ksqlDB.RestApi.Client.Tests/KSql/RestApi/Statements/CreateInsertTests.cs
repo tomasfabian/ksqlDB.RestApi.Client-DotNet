@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Globalization;
+using System.Text.Json.Serialization;
 using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
@@ -30,7 +31,7 @@ public class CreateInsertTests
     var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title" };
 
     //Act
-    var statement = new CreateInsert().Generate(movie, new InsertProperties {IdentifierEscaping = escaping});
+    var statement = new CreateInsert().Generate(movie, new InsertProperties { IdentifierEscaping = escaping });
 
     //Assert
     statement.Should().Be(expected);
@@ -115,6 +116,71 @@ public class CreateInsertTests
 
     //Assert
     statement.Should().Be($"INSERT INTO {nameof(Book)} (Title, Author) VALUES ('Title', 'Author');");
+  }
+
+  class Pen(string colour)
+  {
+    [JsonPropertyName("color")] public string Colour { get; set; } = colour;
+  }
+
+  [TestCase(Never, ExpectedResult = "INSERT INTO Pen (color) VALUES ('red');")]
+  [TestCase(Keywords, ExpectedResult = "INSERT INTO Pen (color) VALUES ('red');")]
+  [TestCase(Always, ExpectedResult = "INSERT INTO `Pen` (`color`) VALUES ('red');")]
+  public string Generate_JsonPropertyName(IdentifierEscaping escaping)
+  {
+    //Arrange
+    var pen = new Pen("red");
+
+    var insertProperties = new InsertProperties
+    {
+      ShouldPluralizeEntityName = false,
+      IdentifierEscaping = escaping
+    };
+
+    //Act
+    var statement = new CreateInsert().Generate(pen, insertProperties);
+
+    //Assert
+    return statement;
+  }
+
+  public class Star(string name)
+  {
+    [JsonPropertyName("name")] public string Name { get; set; } = name;
+  }
+
+  [Struct]
+  class BinaryStar(Star star1, Star star2)
+  {
+    [JsonPropertyName("first_star")] public Star Star1 { get; set; } = star1;
+    [JsonPropertyName("second_star")] public Star Star2 { get; set; } = star2;
+  }
+
+  [TestCase(Never,
+    ExpectedResult =
+      "INSERT INTO BinaryStar (first_star, second_star) VALUES (STRUCT(name := 'Alpha Centauri A'), STRUCT(name := 'Alpha Centauri B'));")]
+  [TestCase(Keywords,
+    ExpectedResult =
+      "INSERT INTO BinaryStar (first_star, second_star) VALUES (STRUCT(name := 'Alpha Centauri A'), STRUCT(name := 'Alpha Centauri B'));")]
+  [TestCase(Always,
+    ExpectedResult =
+      "INSERT INTO `BinaryStar` (`first_star`, `second_star`) VALUES (STRUCT(`name` := 'Alpha Centauri A'), STRUCT(`name` := 'Alpha Centauri B'));")]
+  public string Generate_JsonPropertyNameInStruct(IdentifierEscaping escaping)
+  {
+    //Arrange
+    var binaryStar = new BinaryStar(new Star("Alpha Centauri A"), new Star("Alpha Centauri B"));
+
+    var insertProperties = new InsertProperties
+    {
+      ShouldPluralizeEntityName = false,
+      IdentifierEscaping = escaping
+    };
+
+    //Act
+    var statement = new CreateInsert().Generate(binaryStar, insertProperties);
+
+    //Assert
+    return statement;
   }
 
   record EventCategory
@@ -237,7 +303,7 @@ public class CreateInsertTests
       //Categories = new[] { eventCategory, new EventCategory { Name = "Discovery" } }
     };
 
-    var insertProperties = new InsertProperties { EntityName = "Events", IdentifierEscaping = escaping};
+    var insertProperties = new InsertProperties { EntityName = "Events", IdentifierEscaping = escaping };
 
     //Act
     string statement = new CreateInsert().Generate(testEvent, insertProperties);
@@ -264,7 +330,7 @@ public class CreateInsertTests
       Category = null!
     };
 
-    var insertProperties = new InsertProperties { EntityName = "Events", IdentifierEscaping = escaping};
+    var insertProperties = new InsertProperties { EntityName = "Events", IdentifierEscaping = escaping };
 
     //Act
     var statement = new CreateInsert().Generate(testEvent, insertProperties);
@@ -441,7 +507,6 @@ public class CreateInsertTests
         { "a", new[] { 1, 2 } },
         { "b", new[] { 3, 4 } },
       }
-
     };
 
     var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
@@ -479,7 +544,6 @@ public class CreateInsertTests
         { "a", new Dictionary<string, int> { { "a", 1 }, { "b", 2 } } },
         { "b", new Dictionary<string, int> { { "c", 3 }, { "d", 4 } } },
       }
-
     };
 
     var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
@@ -494,6 +558,7 @@ public class CreateInsertTests
   private struct LocationStruct
   {
     public string X { get; set; }
+
     public double Y { get; set; }
     //public string[] Arr { get; set; }
     //public Dictionary<string, double> Map { get; set; }
@@ -624,7 +689,7 @@ public class CreateInsertTests
       }
     };
 
-    var insertProperties = new InsertProperties { IdentifierEscaping = escaping};
+    var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
 
     //Act
     string statement = new CreateInsert().Generate(value, insertProperties);
@@ -644,6 +709,7 @@ public class CreateInsertTests
     yield return (Keywords, "INSERT INTO FooNestedArrayInArrays (Arr) VALUES (ARRAY[ARRAY[1, 2], ARRAY[3, 4]]);");
     yield return (Always, "INSERT INTO `FooNestedArrayInArrays` (`Arr`) VALUES (ARRAY[ARRAY[1, 2], ARRAY[3, 4]]);");
   }
+
   [TestCaseSource(nameof(NestedArrayInArrayTestCases))]
   public void NestedArrayInArray((IdentifierEscaping escaping, string expected) testCase)
   {
@@ -681,6 +747,7 @@ public class CreateInsertTests
     yield return (Always,
       "INSERT INTO `FooNestedStructInArrays` (`Arr`) VALUES (ARRAY[STRUCT(`X` := 'go', `Y` := 2), STRUCT(`X` := 'test', `Y` := 1)]);");
   }
+
   [TestCaseSource(nameof(NestedStructInArrayTestCases))]
   public void NestedStructInArray((IdentifierEscaping escaping, string expected) testCase)
   {

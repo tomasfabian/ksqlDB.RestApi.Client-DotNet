@@ -161,7 +161,7 @@ internal class KSqlVisitor : ExpressionVisitor
       else
         Append(ColumnsSeparator);
 
-      var memberName = IdentifierUtil.Format(memberBinding.Member, QueryMetadata.IdentifierEscaping);
+      var memberName = memberBinding.Member.Format(QueryMetadata.IdentifierEscaping);
 
       Append($"{memberName} := ");
 
@@ -353,13 +353,13 @@ internal class KSqlVisitor : ExpressionVisitor
     {
       Visit(expression);
 
-      Append(" " + IdentifierUtil.Format(memberInfo.Name, QueryMetadata.IdentifierEscaping));
+      Append(" " + memberInfo.Format(QueryMetadata.IdentifierEscaping));
       return;
     }
 
     if (expression is MemberExpression { Expression: MemberExpression me3 } && me3.Expression != null && me3.Expression.Type.IsKsqlGrouping())
     {
-      Append(IdentifierUtil.Format(memberInfo.Name, QueryMetadata.IdentifierEscaping));
+      Append(memberInfo.Format(QueryMetadata.IdentifierEscaping));
       return;
     }
 
@@ -374,7 +374,7 @@ internal class KSqlVisitor : ExpressionVisitor
     else if (expression is MemberExpression me2 && me2.Expression?.NodeType == ExpressionType.Constant)
       Visit(expression);
     else
-      Append(IdentifierUtil.Format(memberInfo.Name, QueryMetadata.IdentifierEscaping));
+      Append(memberInfo.Format(QueryMetadata.IdentifierEscaping));
   }
 
   protected override Expression VisitMember(MemberExpression memberExpression)
@@ -387,7 +387,7 @@ internal class KSqlVisitor : ExpressionVisitor
       {
         var foundFromItem = QueryMetadata.TrySetAlias(memberExpression, (_, alias) => string.IsNullOrEmpty(alias));
 
-        var memberName = IdentifierUtil.Format(memberExpression.Member, QueryMetadata.IdentifierEscaping);
+        var memberName = memberExpression.Member.Format(QueryMetadata.IdentifierEscaping);
 
         var alias = IdentifierUtil.Format(((ParameterExpression)memberExpression.Expression).Name, QueryMetadata.IdentifierEscaping);
 
@@ -410,7 +410,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
         Append(".");
 
-        var memberName = IdentifierUtil.Format(memberExpression.Member, QueryMetadata.IdentifierEscaping);
+        var memberName = memberExpression.Member.Format(QueryMetadata.IdentifierEscaping);
         Append(memberName);
         return memberExpression;
       }
@@ -495,7 +495,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
     if (type != fromItem?.Type)
     {
-        Append(IdentifierUtil.Format(memberExpression.Member, QueryMetadata.IdentifierEscaping));
+        Append(memberExpression.Member.Format(QueryMetadata.IdentifierEscaping));
     }
   }
 
@@ -522,7 +522,7 @@ internal class KSqlVisitor : ExpressionVisitor
     if (fromItem == null)
       Append("->");
 
-    var memberName = IdentifierUtil.Format(memberExpression.Member, QueryMetadata.IdentifierEscaping);
+    var memberName = memberExpression.Member.Format(QueryMetadata.IdentifierEscaping);
 
     Append(memberName);
   }

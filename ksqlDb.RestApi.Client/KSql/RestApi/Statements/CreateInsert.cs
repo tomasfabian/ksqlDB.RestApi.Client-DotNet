@@ -7,7 +7,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-internal sealed class CreateInsert : CreateEntityStatement 
+internal sealed class CreateInsert : CreateEntityStatement
 {
   internal string Generate<T>(T entity, InsertProperties insertProperties = null)
   {
@@ -19,7 +19,7 @@ internal sealed class CreateInsert : CreateEntityStatement
     if (insertValues == null) throw new ArgumentNullException(nameof(insertValues));
 
     insertProperties ??= new InsertProperties();
-		
+
     var entityName = GetEntityName<T>(insertProperties);
 
     bool isFirst = true;
@@ -46,7 +46,7 @@ internal sealed class CreateInsert : CreateEntityStatement
 
       var type = GetMemberType(memberInfo);
 
-      var value = GetValue(insertValues, insertProperties, memberInfo, type, str => IdentifierUtil.Format(str, insertProperties.IdentifierEscaping));
+      var value = GetValue(insertValues, insertProperties, memberInfo, type, memberInfo => IdentifierUtil.Format(memberInfo, insertProperties.IdentifierEscaping));
 
       valuesStringBuilder.Append(value);
     }
@@ -58,7 +58,7 @@ internal sealed class CreateInsert : CreateEntityStatement
   }
 
   private static object GetValue<T>(InsertValues<T> insertValues, InsertProperties insertProperties,
-    MemberInfo memberInfo, Type type, Func<string, string> formatter)
+    MemberInfo memberInfo, Type type, Func<MemberInfo, string> formatter)
   {
     var hasValue = insertValues.PropertyValues.ContainsKey(memberInfo.Format(insertProperties.IdentifierEscaping));
 
