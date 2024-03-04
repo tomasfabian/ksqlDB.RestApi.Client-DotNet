@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Globalization;
 using System.Text.Json.Serialization;
 using FluentAssertions;
@@ -18,9 +17,9 @@ public class CreateInsertTests
 {
   public static IEnumerable<(IdentifierEscaping, string)> GenerateTestCases()
   {
-    yield return (Never, @"INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
-    yield return (Keywords, @"INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
-    yield return (Always, @"INSERT INTO `Movies` (`Title`, `Id`, `Release_Year`) VALUES ('Title', 1, 1988);");
+    yield return (Never, "INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
+    yield return (Keywords, "INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
+    yield return (Always, "INSERT INTO `Movies` (`Title`, `Id`, `Release_Year`) VALUES ('Title', 1, 1988);");
   }
 
   [TestCaseSource(nameof(GenerateTestCases))]
@@ -39,9 +38,9 @@ public class CreateInsertTests
 
   public static IEnumerable<(IdentifierEscaping, string)> GenerateOverrideEntityNameTestCases()
   {
-    yield return (Never, $"INSERT INTO TestNames (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
-    yield return (Keywords, $"INSERT INTO TestNames (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
-    yield return (Always, $"INSERT INTO `TestNames` (`Title`, `Id`, `Release_Year`) VALUES ('Title', 1, 1988);");
+    yield return (Never, "INSERT INTO TestNames (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
+    yield return (Keywords, "INSERT INTO TestNames (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
+    yield return (Always, "INSERT INTO `TestNames` (`Title`, `Id`, `Release_Year`) VALUES ('Title', 1, 1988);");
   }
 
   [TestCaseSource(nameof(GenerateOverrideEntityNameTestCases))]
@@ -204,7 +203,7 @@ public class CreateInsertTests
     var testEvent = new Event
     {
       Id = 1,
-      Places = new[] { "Place1", "Place2", "Place3" },
+      Places = ["Place1", "Place2", "Place3"],
     };
 
     //Act
@@ -229,7 +228,7 @@ public class CreateInsertTests
     var testEvent = new EventWithPrimitiveEnumerable
     {
       Id = "1",
-      Places = new[] { 1, 2, 3 }
+      Places = [1, 2, 3]
     };
 
     //Act
@@ -254,7 +253,7 @@ public class CreateInsertTests
     var testEvent = new EventWithList
     {
       Id = "1",
-      Places = new List<int> { 1, 2, 3 }
+      Places = [1, 2, 3]
     };
 
     //Act
@@ -398,7 +397,7 @@ public class CreateInsertTests
   public void FromList()
   {
     //Arrange
-    var order = new Kafka_table_order { Id = 1, Items = new List<double> { 1.1, 2 } };
+    var order = new Kafka_table_order { Id = 1, Items = [1.1, 2] };
 
     var insertProperties = new InsertProperties
     {
@@ -422,7 +421,7 @@ public class CreateInsertTests
   public void List()
   {
     //Arrange
-    var order = new Kafka_table_order2 { Id = 1, ItemsList = new List<double> { 1.1, 2 } };
+    var order = new Kafka_table_order2 { Id = 1, ItemsList = [1.1, 2] };
 
     var config = new InsertProperties
     {
@@ -442,7 +441,7 @@ public class CreateInsertTests
   public void FromEmptyList()
   {
     //Arrange
-    var order = new Kafka_table_order2 { Id = 1, ItemsList = new List<double>() };
+    var order = new Kafka_table_order2 { Id = 1, ItemsList = [] };
 
     //Act
     string statement = new CreateInsert().Generate(order);
@@ -474,7 +473,7 @@ public class CreateInsertTests
   public void ListInterface()
   {
     //Arrange
-    var order = new Kafka_table_order3 { Id = 1, ItemsList = new List<int> { 1, 2 } };
+    var order = new Kafka_table_order3 { Id = 1, ItemsList = [1, 2] };
 
     //Act
     string statement = new CreateInsert().Generate(order, new InsertProperties { ShouldPluralizeEntityName = false, EntityName = nameof(Kafka_table_order) });
@@ -504,8 +503,8 @@ public class CreateInsertTests
     {
       Map = new Dictionary<string, int[]>
       {
-        { "a", new[] { 1, 2 } },
-        { "b", new[] { 3, 4 } },
+        { "a", [1, 2]},
+        { "b", [3, 4]},
       }
     };
 
@@ -682,11 +681,11 @@ public class CreateInsertTests
     var (escaping, expected) = testCase;
     var value = new FooNestedMapInArray
     {
-      Arr = new[]
-      {
+      Arr =
+      [
         new Dictionary<string, int> { { "a", 1 }, { "b", 2 } },
         new Dictionary<string, int> { { "c", 3 }, { "d", 4 } }
-      }
+      ]
     };
 
     var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
@@ -755,8 +754,8 @@ public class CreateInsertTests
     var (escaping, expected) = testCase;
     var value = new FooNestedStructInArray
     {
-      Arr = new[]
-      {
+      Arr =
+      [
         new LocationStruct
         {
           X = "go",
@@ -766,7 +765,7 @@ public class CreateInsertTests
           X = "test",
           Y = 1,
         }
-      }
+      ]
     };
 
     var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
@@ -951,7 +950,7 @@ public class CreateInsertTests
 
   #region TODO insert with functions
 
-  struct MovieBytes
+  readonly struct MovieBytes
   {
     public string Title { get; init; }
     public byte[] RawTitle { get; init; }
@@ -974,13 +973,11 @@ public class CreateInsertTests
     statement.Should().Be(@"INSERT INTO Movies (Title) VALUES (TO_BYTES('Alien', 'utf8'));");
   }
 
-  struct Invoke
+  readonly struct Invoke
   {
     public string Title { get; init; }
 
-    public Func<string, string> TitleConverter => c => K.Functions.Concat(c, "_new");
-    //public Expression<Func<string, string>> TitleConverter => c => K.Functions.Concat(c, "_new");
-    //public Expression<Func<Invoke, string>> TitleConverter => c => K.Functions.Concat(c.Title, "_new");
+    public static Func<string, string> TitleConverter => c => K.Functions.Concat(c, "_new");
   }
 
   [Test]
