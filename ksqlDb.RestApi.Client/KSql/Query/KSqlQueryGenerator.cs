@@ -208,8 +208,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
     {
       LambdaExpression lambda = (LambdaExpression)StripQuotes(methodCallExpression.Arguments[1]);
 
-      if (queryMetadata.Select == null)
-        queryMetadata.Select = lambda;
+      queryMetadata.Select ??= lambda;
 
       VisitChained(methodCallExpression);
     }
@@ -218,8 +217,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
     {
       LambdaExpression lambda = (LambdaExpression)StripQuotes(methodCallExpression.Arguments[1]);
 
-      if (partitionBy == null)
-        partitionBy = lambda;
+      partitionBy ??= lambda;
 
       VisitChained(methodCallExpression);
     }
