@@ -40,7 +40,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 
   internal static readonly string MediaType = "application/vnd.ksql.v1+json";
 
-  private string NullOrWhiteSpaceErrorMessage => "Can't be null, empty, or contain only whitespace.";
+  private static string NullOrWhiteSpaceErrorMessage => "Can't be null, empty, or contain only whitespace.";
 
   private BasicAuthCredentials credentials;
 
@@ -64,7 +64,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns></returns>
   public Task<HttpResponseMessage> ExecuteStatementAsync(KSqlDbStatement ksqlDbStatement, CancellationToken cancellationToken = default)
   {
-    logger?.LogInformation($"Executing command: {ksqlDbStatement.Sql}");
+    logger?.LogInformation("Executing command: {SQL}", ksqlDbStatement.Sql);
 
     return ExecuteStatementAsync(ksqlDbStatement, ksqlDbStatement.EndpointType, ksqlDbStatement.ContentEncoding, cancellationToken);
   }
@@ -89,7 +89,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 #else
         .ReadAsStringAsync(cancellationToken);
 #endif
-      logger?.LogDebug($"Command response ({httpResponseMessage.StatusCode}): {response}");
+      logger?.LogDebug("Command response ({StatusCode}): {Response}", httpResponseMessage.StatusCode, response);
     }
 
     if (DisposeHttpClient)
@@ -124,7 +124,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     return httpRequestMessage;
   }
 
-  internal StringContent CreateContent(KSqlDbStatement ksqlDbStatement)
+  internal static StringContent CreateContent(KSqlDbStatement ksqlDbStatement)
   {
     return CreateContent(ksqlDbStatement, ksqlDbStatement.ContentEncoding);
   }
@@ -150,7 +150,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
       EndpointType.KSql => "/ksql",
       EndpointType.Query => "/query",
       EndpointType.CloseQuery => "/close-query",
-      _ => throw new ArgumentOutOfRangeException()
+      _ => throw new ArgumentOutOfRangeException(nameof(endpointType), $"Unknown '{nameof(EndpointType)}' type {endpointType}.")
     };
 
     return endpoint;
@@ -168,7 +168,11 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> CreateStreamAsync<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false, CancellationToken cancellationToken = default)
   {
+#if NETSTANDARD
     if (creationMetadata == null) throw new ArgumentNullException(nameof(creationMetadata));
+#else
+    ArgumentNullException.ThrowIfNull(creationMetadata);
+#endif
 
     var ksql = StatementGenerator.CreateStream<T>(creationMetadata, ifNotExists);
 
@@ -184,7 +188,11 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> CreateOrReplaceStreamAsync<T>(EntityCreationMetadata creationMetadata, CancellationToken cancellationToken = default)
   {
+#if NETSTANDARD
     if (creationMetadata == null) throw new ArgumentNullException(nameof(creationMetadata));
+#else
+    ArgumentNullException.ThrowIfNull(creationMetadata);
+#endif
 
     var ksql = StatementGenerator.CreateOrReplaceStream<T>(creationMetadata);
 
@@ -201,7 +209,11 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> CreateSourceStreamAsync<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false, CancellationToken cancellationToken = default)
   {
+#if NETSTANDARD
     if (creationMetadata == null) throw new ArgumentNullException(nameof(creationMetadata));
+#else
+    ArgumentNullException.ThrowIfNull(creationMetadata);
+#endif
 
     creationMetadata.IsReadOnly = true;
 
@@ -220,7 +232,11 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> CreateTableAsync<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false, CancellationToken cancellationToken = default)
   {
+#if NETSTANDARD
     if (creationMetadata == null) throw new ArgumentNullException(nameof(creationMetadata));
+#else
+    ArgumentNullException.ThrowIfNull(creationMetadata);
+#endif
 
     var ksql = StatementGenerator.CreateTable<T>(creationMetadata, ifNotExists);
 
@@ -237,7 +253,11 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> CreateSourceTableAsync<T>(EntityCreationMetadata creationMetadata, bool ifNotExists = false, CancellationToken cancellationToken = default)
   {
+#if NETSTANDARD
     if (creationMetadata == null) throw new ArgumentNullException(nameof(creationMetadata));
+#else
+    ArgumentNullException.ThrowIfNull(creationMetadata);
+#endif
 
     creationMetadata.IsReadOnly = true;
 
@@ -255,7 +275,11 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> CreateOrReplaceTableAsync<T>(EntityCreationMetadata creationMetadata, CancellationToken cancellationToken = default)
   {
+#if NETSTANDARD
     if (creationMetadata == null) throw new ArgumentNullException(nameof(creationMetadata));
+#else
+    ArgumentNullException.ThrowIfNull(creationMetadata);
+#endif
 
     var ksql = StatementGenerator.CreateOrReplaceTable<T>(creationMetadata);
 
@@ -554,7 +578,11 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns></returns>
   public Task<HttpResponseMessage> CreateSourceConnectorAsync(IDictionary<string, string> config, string connectorName, bool ifNotExists = false, CancellationToken cancellationToken = default)
   {
+#if NETSTANDARD
     if (config == null) throw new ArgumentNullException(nameof(config));
+#else
+    ArgumentNullException.ThrowIfNull(config);
+#endif
 
     if (string.IsNullOrWhiteSpace(connectorName))
       throw new ArgumentException(NullOrWhiteSpaceErrorMessage, nameof(connectorName));
@@ -576,7 +604,11 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns></returns>
   public Task<HttpResponseMessage> CreateSinkConnectorAsync(IDictionary<string, string> config, string connectorName, bool ifNotExists = false, CancellationToken cancellationToken = default)
   {
+#if NETSTANDARD
     if (config == null) throw new ArgumentNullException(nameof(config));
+#else
+    ArgumentNullException.ThrowIfNull(config);
+#endif
 
     if (string.IsNullOrWhiteSpace(connectorName))
       throw new ArgumentException(NullOrWhiteSpaceErrorMessage, nameof(connectorName));
