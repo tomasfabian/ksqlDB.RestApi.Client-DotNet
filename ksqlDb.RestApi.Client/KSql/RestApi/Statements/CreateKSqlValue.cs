@@ -11,7 +11,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 internal sealed class CreateKSqlValue : CreateEntityStatement
 {
-  public object ExtractValue<T>(T inputValue, IValueFormatters valueFormatters, MemberInfo memberInfo, Type type, Func<string, string> formatter)
+  public object ExtractValue<T>(T inputValue, IValueFormatters valueFormatters, MemberInfo memberInfo, Type type, Func<MemberInfo, string> formatter)
   {
     Type valueType = inputValue.GetType();
 
@@ -54,7 +54,7 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
     else if (type == typeof(DateTimeOffset))
     {
       var dateTimeOffset = (DateTimeOffset)value;
-        
+
       value = dateTimeOffset.ToString(ValueFormats.DateTimeOffsetFormat, CultureInfo.InvariantCulture);
 
       value = $"'{value}'";
@@ -92,7 +92,7 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
     return value;
   }
 
-  private void GenerateMap(IValueFormatters valueFormatters, Type type, Func<string, string> formatter,
+  private void GenerateMap(IValueFormatters valueFormatters, Type type, Func<MemberInfo, string> formatter,
     ref object value)
   {
     if (value is not IDictionary dict)
@@ -127,7 +127,7 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
     value = sb.ToString();
   }
 
-  private void GenerateStruct<T>(IValueFormatters valueFormatters, Type type, Func<string, string> formatter,
+  private void GenerateStruct<T>(IValueFormatters valueFormatters, Type type, Func<MemberInfo, string> formatter,
     ref object value)
   {
     var sb = new StringBuilder();
@@ -146,7 +146,7 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
       type = GetMemberType(memberInfo2);
 
       var innerValue = ExtractValue(value, valueFormatters, memberInfo2, type, formatter);
-      var name = formatter(memberInfo2.Name);
+      var name = formatter(memberInfo2);
       sb.Append($"{name} := {innerValue}");
     }
 
@@ -156,7 +156,7 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
   }
 
   private object GenerateEnumerableValue(Type type, object value, IValueFormatters valueFormatters,
-    Func<string, string> formatter)
+    Func<MemberInfo, string> formatter)
   {
     if (value == null)
       return "NULL";

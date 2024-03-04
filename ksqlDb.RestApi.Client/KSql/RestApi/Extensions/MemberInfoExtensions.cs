@@ -12,6 +12,6 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Extensions
     /// <param name="memberInfo"></param>
     /// <param name="escaping"></param>
     /// <returns>the <c>memberInfo.Name</c> modified based on the provided <c>format</c></returns>
-    public static string Format(this MemberInfo memberInfo, IdentifierEscaping escaping) => IdentifierUtil.Format(memberInfo.Name, escaping);
+    public static string Format(this MemberInfo memberInfo, IdentifierEscaping escaping) => IdentifierUtil.Format(memberInfo, escaping);
   }
 }
