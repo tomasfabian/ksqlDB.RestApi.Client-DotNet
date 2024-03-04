@@ -17,7 +17,7 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
 
     object value = inputValue;
 
-    if (memberInfo?.MemberType == MemberTypes.Property && ((PropertyInfo) memberInfo).GetAccessors().Any())
+    if (memberInfo?.MemberType == MemberTypes.Property && ((PropertyInfo) memberInfo).GetAccessors().Length > 0)
       value = valueType.GetProperty(memberInfo.Name)?.GetValue(inputValue);
     else if (memberInfo?.MemberType == MemberTypes.Field)
       value = valueType.GetField(memberInfo.Name)?.GetValue(inputValue);
@@ -122,7 +122,7 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
       sb.Append(dictValue);
     }
 
-    sb.Append(")");
+    sb.Append(')');
 
     value = sb.ToString();
   }
@@ -150,7 +150,7 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
       sb.Append($"{name} := {innerValue}");
     }
 
-    sb.Append(")");
+    sb.Append(')');
 
     value = sb.ToString();
   }
@@ -172,13 +172,13 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
     var source = ((IEnumerable)value).Cast<object>();
     var array = source.Select(c => ExtractValue(c, valueFormatters, null, type, formatter)).ToArray();
 
-    if (!array.Any())
+    if (array.Length == 0)
       return "ARRAY_REMOVE(ARRAY[0], 0)";
 
     return PrintArray(array);
   }
 
-  private static object PrintArray(object[] array)
+  private static string PrintArray(object[] array)
   {
     var sb = new StringBuilder();
     sb.Append("ARRAY[");
@@ -188,7 +188,7 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
     var value = string.Join(", ", array);
 #endif
     sb.Append(value);
-    sb.Append("]");
+    sb.Append(']');
 
     value = sb.ToString();
 
