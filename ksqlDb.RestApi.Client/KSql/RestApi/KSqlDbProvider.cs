@@ -35,9 +35,9 @@ internal abstract class KSqlDbProvider : IKSqlDbProvider
 
   public async Task<QueryStream<T>> RunAsync<T>(object parameters, CancellationToken cancellationToken = default)
   {
-    logger?.LogInformation($"Executing query {parameters}");
+    logger?.LogInformation("Executing query {parameters}", parameters);
 
-    var streamReader = await TryGetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
+    var streamReader = await TryGetStreamReaderAsync(parameters, cancellationToken).ConfigureAwait(false);
 
     var semaphoreSlim = new SemaphoreSlim(0, 1);
 
@@ -56,9 +56,9 @@ internal abstract class KSqlDbProvider : IKSqlDbProvider
   /// <param name="cancellationToken">A token that can be used to request cancellation of the asynchronous operation.</param>
   public async IAsyncEnumerable<T> Run<T>(object parameters, [EnumeratorCancellation] CancellationToken cancellationToken = default)
   {
-    logger?.LogInformation($"Executing query {parameters}");
+    logger?.LogInformation("Executing query {parameters}", parameters);
 
-    using var streamReader = await TryGetStreamReaderAsync<T>(parameters, cancellationToken).ConfigureAwait(false);
+    using var streamReader = await TryGetStreamReaderAsync(parameters, cancellationToken).ConfigureAwait(false);
 
     var semaphoreSlim = new SemaphoreSlim(0, 1);
 
@@ -67,15 +67,15 @@ internal abstract class KSqlDbProvider : IKSqlDbProvider
       semaphoreSlim.Release();
     });
 
-    await foreach (var entity in ConsumeAsync<T>(streamReader, semaphoreSlim, cancellationToken).WithCancellation(cancellationToken).ConfigureAwait(false))
+    await foreach (var entity in ConsumeAsync<T>(streamReader, semaphoreSlim, cancellationToken).ConfigureAwait(false))
       yield return entity;
   }
 
-  private async Task<StreamReader> TryGetStreamReaderAsync<T>(object parameters, CancellationToken cancellationToken)
+  private async Task<StreamReader> TryGetStreamReaderAsync(object parameters, CancellationToken cancellationToken)
   {
     try
     {
-      return await GetStreamReaderAsync<T>(parameters, cancellationToken);
+      return await GetStreamReaderAsync(parameters, cancellationToken);
     }
     catch (Exception exception)
     {
@@ -85,7 +85,7 @@ internal abstract class KSqlDbProvider : IKSqlDbProvider
     }
   }
 
-  private async Task<StreamReader> GetStreamReaderAsync<T>(object parameters, CancellationToken cancellationToken)
+  private async Task<StreamReader> GetStreamReaderAsync(object parameters, CancellationToken cancellationToken)
   {
     var httpClient = OnCreateHttpClient();
 
@@ -163,7 +163,7 @@ internal abstract class KSqlDbProvider : IKSqlDbProvider
 #endif
         .ConfigureAwait(false);
 
-      logger?.LogDebug($"Raw data received: {rawData}");
+      logger?.LogDebug("Raw data received: {rawData}", rawData);
 
       var record = OnLineRead<T>(rawData);
 
@@ -190,10 +190,7 @@ internal abstract class KSqlDbProvider : IKSqlDbProvider
 
   protected JsonSerializerOptions GetOrCreateJsonSerializerOptions()
   {
-    if (jsonSerializerOptions == null)
-      jsonSerializerOptions = OnCreateJsonSerializerOptions();
-
-    return jsonSerializerOptions;
+    return jsonSerializerOptions ??= OnCreateJsonSerializerOptions();
   }
 
   protected virtual JsonSerializerOptions OnCreateJsonSerializerOptions()
@@ -218,7 +215,7 @@ internal abstract class KSqlDbProvider : IKSqlDbProvider
     return httpRequestMessage;
   }
 
-  protected bool IsErrorRow(string rawJson)
+  protected static bool IsErrorRow(string rawJson)
   {
     return KSqlDbProviderValueReader.IsErrorRow(rawJson);
   }
