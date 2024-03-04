@@ -31,7 +31,11 @@ internal class RowValueJsonSerializer
 
   internal RowValue<T> Deserialize<T>(string rawJson, JsonSerializerOptions jsonSerializerOptions)
   {
+#if NETSTANDARD
     var result = rawJson.Substring(1, rawJson.Length - 2);
+#else
+    var result = rawJson[1 .. ^1];
+#endif
 
     if (queryStreamHeader.ColumnTypes.Length == 1 && !typeof(T).IsAnonymousType())
     {
