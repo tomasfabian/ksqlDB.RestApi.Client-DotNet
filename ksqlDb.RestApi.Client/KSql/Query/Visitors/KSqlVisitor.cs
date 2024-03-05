@@ -6,7 +6,6 @@ using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDb.RestApi.Client.KSql.Entities;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using DateTime = System.DateTime;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
@@ -14,8 +13,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
 internal class KSqlVisitor : ExpressionVisitor
 {
   private readonly StringBuilder stringBuilder;
-  public KSqlQueryMetadata QueryMetadata { get; internal set; }
-
+  internal KSqlQueryMetadata QueryMetadata { get; set; }
   internal StringBuilder StringBuilder => stringBuilder;
 
   public KSqlVisitor(KSqlQueryMetadata queryMetadata)
@@ -357,7 +355,7 @@ internal class KSqlVisitor : ExpressionVisitor
       return;
     }
 
-    if (expression is MemberExpression { Expression: MemberExpression me3 } && me3.Expression != null && me3.Expression.Type.IsKsqlGrouping())
+    if (expression is MemberExpression { Expression: MemberExpression {Expression: not null} me3 } && me3.Expression.Type.IsKsqlGrouping())
     {
       Append(memberInfo.Format(QueryMetadata.IdentifierEscaping));
       return;
@@ -369,9 +367,9 @@ internal class KSqlVisitor : ExpressionVisitor
       Append(" ");
     }
 
-    if (expression is MemberExpression { Expression: { NodeType: ExpressionType.MemberAccess } } me)
+    if (expression is MemberExpression { Expression.NodeType: ExpressionType.MemberAccess} me)
       Destructure(me);
-    else if (expression is MemberExpression me2 && me2.Expression?.NodeType == ExpressionType.Constant)
+    else if (expression is MemberExpression {Expression.NodeType: ExpressionType.Constant})
       Visit(expression);
     else
       Append(memberInfo.Format(QueryMetadata.IdentifierEscaping));
@@ -383,7 +381,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
     if (QueryMetadata.Joins != null && QueryMetadata.Joins.Any())
     {
-      if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
+      if (memberExpression.Expression?.NodeType == ExpressionType.Parameter)
       {
         var foundFromItem = QueryMetadata.TrySetAlias(memberExpression, (_, alias) => string.IsNullOrEmpty(alias));
 
@@ -400,7 +398,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
       var fromItem = QueryMetadata.Joins.FirstOrDefault(c => c.Type == memberExpression.Member.DeclaringType);
 
-      if (fromItem != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
+      if (fromItem != null && memberExpression.Expression?.NodeType == ExpressionType.MemberAccess)
       {
         string alias = ((MemberExpression)memberExpression.Expression).Member.Format(QueryMetadata.IdentifierEscaping);
 
@@ -488,7 +486,7 @@ internal class KSqlVisitor : ExpressionVisitor
     {
       fromItem = TrySetFromItemAlias(memberExpression, type);
 
-      string alias = fromItem?.Alias ?? ((ParameterExpression)memberExpression.Expression).Name;
+      string alias = fromItem?.Alias ?? ((ParameterExpression)memberExpression.Expression)?.Name;
       Append(alias);
       Append(".");
     }
@@ -507,7 +505,7 @@ internal class KSqlVisitor : ExpressionVisitor
       fromItem.Alias = memberExpression.Member.Name;
     else
     {
-      fromItem = QueryMetadata.TrySetAlias(memberExpression, (fromItem, alias) => fromItem.Alias == alias);
+      fromItem = QueryMetadata.TrySetAlias(memberExpression, (fi, alias) => fi.Alias == alias);
     }
 
     return fromItem;
@@ -530,7 +528,7 @@ internal class KSqlVisitor : ExpressionVisitor
   internal static object ExtractMemberValue(MemberExpression memberExpression)
   {
     var innerMember = (ConstantExpression)memberExpression.Expression;
-    var innerField = innerMember.Value;
+    var innerField = innerMember!.Value;
 
     object outerObj = memberExpression.Member switch
     {
@@ -573,6 +571,11 @@ internal class KSqlVisitor : ExpressionVisitor
     }
 
     return expression;
+  }
+
+  protected void Append(char value)
+  {
+    stringBuilder.Append(value);
   }
 
   public void Append(string value)

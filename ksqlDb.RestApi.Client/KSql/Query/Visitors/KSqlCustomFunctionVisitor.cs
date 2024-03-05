@@ -39,10 +39,10 @@ internal class KSqlCustomFunctionVisitor : KSqlVisitor
 
   protected void VisitParams(NewArrayExpression node)
   {
-    Append("(");
+    Append('(');
 
     PrintCommaSeparated(node.Expressions);
 
-    Append(")");
+    Append(')');
   }
 }

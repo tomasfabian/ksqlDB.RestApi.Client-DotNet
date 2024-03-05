@@ -104,7 +104,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
       AppendLine($"{joinType} JOIN {fromItemName} {itemAlias}");
 
-      TryAppendWithin(@join);
+      TryAppendWithin(join);
 
       Append(GetOn(outerItemAlias, expressions));
       Visit(expressions[1]);
@@ -188,7 +188,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
   {
     if (memberExpression == null) throw new ArgumentNullException(nameof(memberExpression));
 
-    if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
+    if (memberExpression.Expression?.NodeType == ExpressionType.Parameter)
     {
       var memberName = IdentifierUtil.Format(memberExpression.Member, QueryMetadata.IdentifierEscaping);
 
@@ -197,7 +197,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
       return memberExpression;
     }
 
-    if (QueryMetadata.Joins != null && memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
+    if (QueryMetadata.Joins != null && memberExpression.Expression?.NodeType == ExpressionType.MemberAccess)
     {
       Append(memberExpression.Member.Format(QueryMetadata.IdentifierEscaping));
     }

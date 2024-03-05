@@ -16,7 +16,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
     {
       if (newExpression == null) throw new ArgumentNullException(nameof(newExpression));
 
-      if (newExpression.Type.IsAnonymousType())
+      if (newExpression.Members != null && newExpression.Type.IsAnonymousType())
       {
         bool isFirst = true;
 

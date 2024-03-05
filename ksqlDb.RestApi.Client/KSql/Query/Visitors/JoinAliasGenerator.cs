@@ -1,4 +1,4 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
+namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
 
 internal class JoinAliasGenerator
 {
@@ -24,7 +24,7 @@ internal class JoinAliasGenerator
 
     var newAlias = aliasBase;
 
-    while (aliasDictionary.Values.Contains(newAlias))
+    while (aliasDictionary.ContainsValue(newAlias))
     {
       newAlias = $"{aliasBase}{++suffix}";
     }

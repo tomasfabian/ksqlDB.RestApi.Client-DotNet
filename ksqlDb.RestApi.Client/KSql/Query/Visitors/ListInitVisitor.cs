@@ -9,7 +9,6 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
     internal ListInitVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
       : base(stringBuilder, queryMetadata)
     {
-      this.QueryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
     }
 
     public override Expression Visit(Expression expression)

@@ -5,18 +5,14 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
 
 internal class LambdaVisitor : KSqlVisitor
 {
-  private readonly StringBuilder stringBuilder;
-
   public LambdaVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
     : base(stringBuilder, queryMetadata)
   {
-    this.stringBuilder = stringBuilder ?? throw new ArgumentNullException(nameof(stringBuilder));
-    this.QueryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
   }
 
   protected override KSqlFunctionVisitor CreateKSqlFunctionVisitor()
   {
-    return new KSqlFunctionLambdaVisitor(stringBuilder, QueryMetadata);
+    return new KSqlFunctionLambdaVisitor(StringBuilder, QueryMetadata);
   }
 
   public override Expression Visit(Expression expression)
@@ -59,37 +55,35 @@ internal class LambdaVisitor : KSqlVisitor
 
     var memberName = memberExpression.Member.Name;
     
-    if (memberExpression.Expression.NodeType == ExpressionType.MemberInit)
+    switch (memberExpression.Expression?.NodeType)
     {
-      Destructure(memberExpression);
-    }
-    else if (memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
-    {
-      if (memberName == nameof(string.Length))
-      {
+      case ExpressionType.MemberInit:
+        Destructure(memberExpression);
+        break;
+      case ExpressionType.MemberAccess when memberName == nameof(string.Length):
         Append("LEN(");
         Visit(memberExpression.Expression);
         Append(")");
-      }
-      else if(memberExpression.NodeType == ExpressionType.MemberAccess)
-      {
+        break;
+      case ExpressionType.MemberAccess when memberExpression.NodeType == ExpressionType.MemberAccess:
         Destructure(memberExpression);
-      }
-      else
+        break;
+      case ExpressionType.MemberAccess:
         Append($"{memberExpression.Member.Name.ToUpper()}");
-    }
-    else if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
-    {
-      if(memberExpression.NodeType == ExpressionType.MemberAccess)
+        break;
+      case ExpressionType.Parameter when memberExpression.NodeType == ExpressionType.MemberAccess:
         Destructure(memberExpression);
-      else
+        break;
+      case ExpressionType.Parameter:
         Append(memberExpression.Member.Name);
-    }
-    else
-    {
-      var outerObj = ExtractMemberValue(memberExpression);
+        break;
+      default:
+      {
+        var outerObj = ExtractMemberValue(memberExpression);
 
-      Visit(Expression.Constant(outerObj));
+        Visit(Expression.Constant(outerObj));
+        break;
+      }
     }
     
     return memberExpression;

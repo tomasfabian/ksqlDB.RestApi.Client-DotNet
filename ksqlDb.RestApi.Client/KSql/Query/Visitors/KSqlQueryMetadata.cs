@@ -8,6 +8,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
 internal sealed record KSqlQueryMetadata
 {
   public Type FromItemType { get; set; }
+
   public FromItem[] Joins { get; set; }
 
   internal LambdaExpression Select { get; set; }
@@ -15,11 +16,12 @@ internal sealed record KSqlQueryMetadata
   internal bool IsInNestedFunctionScope { get; set; }
 
   internal bool IsInContainsScope { get; set; }
+
   public IdentifierEscaping IdentifierEscaping { get; init; } = IdentifierEscaping.Never;
 
   internal FromItem TrySetAlias(MemberExpression memberExpression, Func<FromItem, string, bool> predicate)
   {
-    var parameterName = IdentifierUtil.Format(((ParameterExpression)memberExpression.Expression).Name, IdentifierEscaping);
+    var parameterName = IdentifierUtil.Format(((ParameterExpression)memberExpression.Expression)?.Name, IdentifierEscaping);
 
     var joinsOfType = Joins.Where(c => c.Type == memberExpression.Expression.Type).ToArray();
 

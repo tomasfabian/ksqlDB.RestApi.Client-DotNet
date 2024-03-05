@@ -8,7 +8,6 @@ internal class BinaryVisitor : KSqlVisitor
   public BinaryVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
     : base(stringBuilder, queryMetadata)
   {
-    this.QueryMetadata = queryMetadata;
   }
 
   protected override Expression VisitParameter(ParameterExpression node)
@@ -52,7 +51,7 @@ internal class BinaryVisitor : KSqlVisitor
     return expression;
   }
 
-  private static readonly ISet<ExpressionType> SupportedBinaryOperators = new HashSet<ExpressionType>
+  private static readonly HashSet<ExpressionType> SupportedBinaryOperators = new()
   {
     ExpressionType.Add,
     ExpressionType.Subtract,
@@ -73,7 +72,7 @@ internal class BinaryVisitor : KSqlVisitor
   {
     if (binaryExpression == null) throw new ArgumentNullException(nameof(binaryExpression));
 
-    bool IsBinaryOperation(ExpressionType expressionType) => SupportedBinaryOperators.Contains(expressionType);
+    static bool IsBinaryOperation(ExpressionType expressionType) => SupportedBinaryOperators.Contains(expressionType);
 
     bool shouldAddParentheses = IsBinaryOperation(binaryExpression.Left.NodeType);
 
@@ -106,15 +105,15 @@ internal class BinaryVisitor : KSqlVisitor
       //conditionals
       ExpressionType.AndAlso => BinaryOperators.AndAlso,
       ExpressionType.OrElse => BinaryOperators.OrElse,
-      ExpressionType.Equal when binaryExpression.Right is ConstantExpression ce && ce.Value == null => "IS",
+      ExpressionType.Equal when binaryExpression.Right is ConstantExpression {Value: null} => "IS",
       ExpressionType.Equal => BinaryOperators.Equal,
-      ExpressionType.NotEqual when binaryExpression.Right is ConstantExpression ce && ce.Value == null => "IS NOT",
+      ExpressionType.NotEqual when binaryExpression.Right is ConstantExpression {Value: null} => "IS NOT",
       ExpressionType.NotEqual => BinaryOperators.NotEqual,
       ExpressionType.LessThan => BinaryOperators.LessThan,
       ExpressionType.LessThanOrEqual => BinaryOperators.LessThanOrEqual,
       ExpressionType.GreaterThan => BinaryOperators.GreaterThan,
       ExpressionType.GreaterThanOrEqual => BinaryOperators.GreaterThanOrEqual,
-      _ => throw new ArgumentOutOfRangeException(nameof(binaryExpression.NodeType))
+      _ => throw new ArgumentOutOfRangeException(nameof(binaryExpression.NodeType), binaryExpression.NodeType, "Non-exhaustive match")
     };
 
     @operator = $" {@operator} ";
@@ -124,12 +123,12 @@ internal class BinaryVisitor : KSqlVisitor
     shouldAddParentheses = IsBinaryOperation(binaryExpression.Right.NodeType);
 
     if (shouldAddParentheses)
-      Append("(");
+      Append('(');
 
     Visit(binaryExpression.Right);
 
     if (shouldAddParentheses)
-      Append(")");
+      Append(')');
 
     return binaryExpression;
   }

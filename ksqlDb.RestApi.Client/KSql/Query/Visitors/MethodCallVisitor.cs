@@ -11,18 +11,14 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
 
 internal class MethodCallVisitor : KSqlVisitor
 {
-  private readonly StringBuilder stringBuilder;
-
   public MethodCallVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
     : base(stringBuilder, queryMetadata)
   {
-    this.stringBuilder = stringBuilder ?? throw new ArgumentNullException(nameof(stringBuilder));
-    this.QueryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
   }
 
   protected override KSqlFunctionVisitor CreateKSqlFunctionVisitor()
   {
-    return new KSqlFunctionLambdaVisitor(stringBuilder, QueryMetadata);
+    return new KSqlFunctionLambdaVisitor(StringBuilder, QueryMetadata);
   }
 
   public override Expression Visit(Expression expression)
@@ -71,7 +67,7 @@ internal class MethodCallVisitor : KSqlVisitor
 
     if (methodCallExpression.Object == null && methodInfo.DeclaringType is { Name: nameof(KSqlInvocationFunctionsExtensions) })
     {
-      new KSqlInvocationFunctionVisitor(stringBuilder, QueryMetadata).Visit(methodCallExpression);
+      new KSqlInvocationFunctionVisitor(StringBuilder, QueryMetadata).Visit(methodCallExpression);
 
       return methodCallExpression;
     }
@@ -83,24 +79,24 @@ internal class MethodCallVisitor : KSqlVisitor
       return methodCallExpression;
     }
 
-    new KSqlCustomFunctionVisitor(stringBuilder, QueryMetadata).Visit(methodCallExpression);
+    new KSqlCustomFunctionVisitor(StringBuilder, QueryMetadata).Visit(methodCallExpression);
 
     if (methodCallExpression.Object != null && (methodInfo.DeclaringType != null && methodInfo.DeclaringType.Name == typeof(IAggregations<>).Name || methodInfo.DeclaringType is
         {
           Name: nameof(IAggregations)
         }))
     {
-      new AggregationFunctionVisitor(stringBuilder, QueryMetadata).Visit(methodCallExpression);
+      new AggregationFunctionVisitor(StringBuilder, QueryMetadata).Visit(methodCallExpression);
     }
 
     if (methodCallExpression.Object == null && methodInfo.DeclaringType is { Name: nameof(KSqlOperatorExtensions) })
     {
-      new OperatorBetweenKSqlVisitor(stringBuilder, QueryMetadata).Visit(methodCallExpression);
+      new OperatorBetweenKSqlVisitor(StringBuilder, QueryMetadata).Visit(methodCallExpression);
     }
 
     if (methodCallExpression.Object?.Type == typeof(string))
     {
-      new StringVisitor(stringBuilder, QueryMetadata).Visit(methodCallExpression);
+      new StringVisitor(StringBuilder, QueryMetadata).Visit(methodCallExpression);
     }
 
     TryPrintEquals(methodCallExpression, methodInfo);

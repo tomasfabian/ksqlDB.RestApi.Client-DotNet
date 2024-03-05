@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Text;
@@ -14,7 +14,6 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
     internal ConstantVisitor(StringBuilder stringBuilder, KSqlQueryMetadata queryMetadata)
       : base(stringBuilder, queryMetadata)
     {
-      this.QueryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
     }
 
     public override Expression Visit(Expression expression)

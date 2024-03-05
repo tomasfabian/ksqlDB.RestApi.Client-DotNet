@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Text;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 
@@ -28,8 +28,8 @@ internal class KSqlWindowsVisitor : KSqlVisitor
 
     var windowType = windowedBy switch
     {
-      HoppingWindows _ => "HOPPING",
-      SessionWindow _ => "SESSION",
+      HoppingWindows => "HOPPING",
+      SessionWindow => "SESSION",
       _ => "TUMBLING"
     };
 

@@ -17,7 +17,7 @@ internal class KSqlFunctionVisitor : KSqlVisitor
     var methodInfo = methodCallExpression.Method;
 
     if (methodCallExpression.Object == null
-        && methodInfo.DeclaringType.Name == nameof(KSqlFunctionsExtensions))
+        && methodInfo.DeclaringType?.Name == nameof(KSqlFunctionsExtensions))
     {
       switch (methodInfo.Name)
       {          
