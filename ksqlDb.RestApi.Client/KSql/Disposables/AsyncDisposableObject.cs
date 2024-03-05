@@ -35,7 +35,11 @@ public abstract class AsyncDisposableObject : IAsyncDisposable
 
   public async ValueTask DisposeAsync()
   {
+#if NET8_0_OR_GREATER
+    await cancellationTokenSource.CancelAsync();
+#else
     cancellationTokenSource.Cancel();
+#endif
 
     using (await gate.LockAsync().ConfigureAwait(false))
     {
