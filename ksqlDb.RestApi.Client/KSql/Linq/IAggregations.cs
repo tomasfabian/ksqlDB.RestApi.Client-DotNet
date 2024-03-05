@@ -111,7 +111,7 @@ public interface IAggregations<out TSource> : IAggregations
   #region CollectList
 
   /// <summary>
-  /// Gather all of the values from an input grouping into a single Array field.
+  /// Gather all the values from an input grouping into a single Array field.
   /// Although this aggregate works on both Stream and Table inputs, the order of entries in the result array is
   /// not guaranteed when working on Table input data.
   /// This version limits the size of the resultant Array to 1000 entries, beyond which any further values will
@@ -122,7 +122,7 @@ public interface IAggregations<out TSource> : IAggregations
   bool[] CollectList(Func<TSource, bool> selector);
     
   /// <summary>
-  /// Gather all of the values from an input grouping into a single Array field.
+  /// Gather all the values from an input grouping into a single Array field.
   /// Although this aggregate works on both Stream and Table inputs, the order of entries in the result array is
   /// not guaranteed when working on Table input data.
   /// This version limits the size of the resultant Array to 1000 entries, beyond which any further values will
@@ -133,18 +133,18 @@ public interface IAggregations<out TSource> : IAggregations
   string[] CollectList(Func<TSource, string> selector);
 
   /// <summary>
-  /// Gather all of the values from an input grouping into a single Array field.
+  /// Gather all the values from an input grouping into a single Array field.
   /// Although this aggregate works on both Stream and Table inputs, the order of entries in the result array is
   /// not guaranteed when working on Table input data.
   /// This version limits the size of the resultant Array to 1000 entries, beyond which any further values will
   /// be silently ignored.
   /// </summary>
   /// <param name="selector"></param>
-  /// <returns>collect values of a Int field into a single Array</returns>
+  /// <returns>collect values of an Int field into a single Array</returns>
   int[] CollectList(Func<TSource, int> selector);
 
   /// <summary>
-  /// Gather all of the values from an input grouping into a single Array field.
+  /// Gather all the values from an input grouping into a single Array field.
   /// Although this aggregate works on both Stream and Table inputs, the order of entries in the result array is
   /// not guaranteed when working on Table input data.
   /// This version limits the size of the resultant Array to 1000 entries, beyond which any further values will
@@ -155,7 +155,7 @@ public interface IAggregations<out TSource> : IAggregations
   long[] CollectList(Func<TSource, long> selector);
 
   /// <summary>
-  /// Gather all of the values from an input grouping into a single Array field.
+  /// Gather all the values from an input grouping into a single Array field.
   /// Although this aggregate works on both Stream and Table inputs, the order of entries in the result array is
   /// not guaranteed when working on Table input data.
   /// This version limits the size of the resultant Array to 1000 entries, beyond which any further values will
@@ -176,80 +176,80 @@ public interface IAggregations<out TSource> : IAggregations
   #region CollectSet
 
   /// <summary>
-  /// Gather all of the distinct values from an input grouping into a single Array.
+  /// Gather all the distinct values from an input grouping into a single Array.
   /// Not available for aggregating values from an input Table.
   /// This version limits the size of the resultant Array to 1000 entries, beyond which any further values will
-  /// silently ignored.
+  /// be silently ignored.
   /// </summary>
   /// <param name="selector"></param>
   /// <returns></returns>
   bool[] CollectSet(Func<TSource, bool> selector);
 
   /// <summary>
-  /// Gather all of the distinct values from an input grouping into a single Array.
+  /// Gather all the distinct values from an input grouping into a single Array.
   /// Not available for aggregating values from an input Table.
   /// This version limits the size of the resultant Array to 1000 entries, beyond which any further values will
-  /// silently ignored.
+  /// be silently ignored.
   /// </summary>
   /// <param name="selector"></param>
   /// <returns></returns>
     
   string[] CollectSet(Func<TSource, string> selector);
   /// <summary>
-  /// Gather all of the distinct values from an input grouping into a single Array.
+  /// Gather all the distinct values from an input grouping into a single Array.
   /// Not available for aggregating values from an input Table.
   /// This version limits the size of the resultant Array to 1000 entries, beyond which any further values will
-  /// silently ignored.
+  /// be silently ignored.
   /// </summary>
   /// <param name="selector"></param>
   /// <returns></returns>
   short[] CollectSet(Func<TSource, short> selector);
 
   /// <summary>
-  /// Gather all of the distinct values from an input grouping into a single Array.
+  /// Gather all the distinct values from an input grouping into a single Array.
   /// Not available for aggregating values from an input Table.
   /// This version limits the size of the resultant Array to 1000 entries, beyond which any further values will
-  /// silently ignored.
+  /// be silently ignored.
   /// </summary>
   /// <param name="selector"></param>
   /// <returns></returns>
   int[] CollectSet(Func<TSource, int> selector);
 
   /// <summary>
-  /// Gather all of the distinct values from an input grouping into a single Array.
+  /// Gather all the distinct values from an input grouping into a single Array.
   /// Not available for aggregating values from an input Table.
   /// This version limits the size of the resultant Array to 1000 entries, beyond which any further values will
-  /// silently ignored.
+  /// be silently ignored.
   /// </summary>
   /// <param name="selector"></param>
   /// <returns></returns>
   long[] CollectSet(Func<TSource, long> selector);
 
   /// <summary>
-  /// Gather all of the distinct values from an input grouping into a single Array.
+  /// Gather all the distinct values from an input grouping into a single Array.
   /// Not available for aggregating values from an input Table.
   /// This version limits the size of the resultant Array to 1000 entries, beyond which any further values will
-  /// silently ignored.
+  /// be silently ignored.
   /// </summary>
   /// <param name="selector"></param>
   /// <returns></returns>
   float[] CollectSet(Func<TSource, float> selector);
 
   /// <summary>
-  /// Gather all of the distinct values from an input grouping into a single Array.
+  /// Gather all the distinct values from an input grouping into a single Array.
   /// Not available for aggregating values from an input Table.
   /// This version limits the size of the resultant Array to 1000 entries, beyond which any further values will
-  /// silently ignored.
+  /// be silently ignored.
   /// </summary>
   /// <param name="selector"></param>
   /// <returns></returns>
   double[] CollectSet(Func<TSource, double> selector);
 
   /// <summary>
-  /// Gather all of the distinct values from an input grouping into a single Array.
+  /// Gather all the distinct values from an input grouping into a single Array.
   /// Not available for aggregating values from an input Table.
   /// This version limits the size of the resultant Array to 1000 entries, beyond which any further values will
-  /// silently ignored.
+  /// be silently ignored.
   /// </summary>
   /// <param name="selector"></param>
   /// <returns></returns>
@@ -573,7 +573,7 @@ public interface IAggregations<out TSource> : IAggregations
   #region TopKDistinct
 
   /// <summary>
-  /// Calculates the Topk distinct values for a column, per key.
+  /// Calculates the TopK distinct values for a column, per key.
   /// </summary>
   /// <param name="selector"></param>
   /// <param name="k"></param>
@@ -581,7 +581,7 @@ public interface IAggregations<out TSource> : IAggregations
   short[] TopKDistinct(Func<TSource, short> selector, int k);
 
   /// <summary>
-  /// Calculates the Topk distinct values for a column, per key.
+  /// Calculates the TopK distinct values for a column, per key.
   /// </summary>
   /// <param name="selector"></param>
   /// <param name="k"></param>
@@ -589,7 +589,7 @@ public interface IAggregations<out TSource> : IAggregations
   int[] TopKDistinct(Func<TSource, int> selector, int k);
 
   /// <summary>
-  /// Calculates the Topk distinct values for a column, per key.
+  /// Calculates the TopK distinct values for a column, per key.
   /// </summary>
   /// <param name="selector"></param>
   /// <param name="k"></param>
@@ -597,7 +597,7 @@ public interface IAggregations<out TSource> : IAggregations
   long[] TopKDistinct(Func<TSource, long> selector, int k);
 
   /// <summary>
-  /// Calculates the Topk distinct values for a column, per key.
+  /// Calculates the TopK distinct values for a column, per key.
   /// </summary>
   /// <param name="selector"></param>
   /// <param name="k"></param>
@@ -605,7 +605,7 @@ public interface IAggregations<out TSource> : IAggregations
   float[] TopKDistinct(Func<TSource, float> selector, int k);
 
   /// <summary>
-  /// Calculates the Topk distinct values for a column, per key.
+  /// Calculates the TopK distinct values for a column, per key.
   /// </summary>
   /// <param name="selector"></param>
   /// <param name="k"></param>
@@ -613,7 +613,7 @@ public interface IAggregations<out TSource> : IAggregations
   double[] TopKDistinct(Func<TSource, double> selector, int k);
 
   /// <summary>
-  /// Calculates the Topk distinct values for a column, per key.
+  /// Calculates the TopK distinct values for a column, per key.
   /// </summary>
   /// <param name="selector"></param>
   /// <param name="k"></param>

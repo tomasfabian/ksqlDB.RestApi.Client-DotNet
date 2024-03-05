@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -19,9 +19,9 @@ public static class QbservableExtensions
 
   private static MethodInfo selectTSourceTResult;
 
-  private static MethodInfo SelectTSourceTResult(Type TSource, Type TResult) =>
+  private static MethodInfo SelectTSourceTResult(Type source, Type result) =>
     (selectTSourceTResult ??= new Func<IQbservable<object>, Expression<Func<object, object>>, IQbservable<object>>(Select).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource, TResult);
+    .MakeGenericMethod(source, result);
 
   /// <summary>
   /// Projects each element of a stream into a new form.
@@ -30,7 +30,7 @@ public static class QbservableExtensions
   /// <typeparam name="TResult">The type of the value returned by selector.</typeparam>
   /// <param name="source">The sequence to take elements from.</param>
   /// <param name="selector">A transform function to apply to each source element.</param>
-  /// <returns>An continuous sequence whose elements are the result of invoking the transform function on each element of source.</returns>
+  /// <returns>A continuous sequence whose elements are the result of invoking the transform function on each element of source.</returns>
   public static IQbservable<TResult> Select<TSource, TResult>(this IQbservable<TSource> source, Expression<Func<TSource, TResult>> selector)
   {
     if (source == null)
@@ -53,9 +53,9 @@ public static class QbservableExtensions
 
   private static MethodInfo withOffsetResetPolicyTResult;
 
-  private static MethodInfo WithOffsetResetPolicyTResult(Type TSource) =>
+  private static MethodInfo WithOffsetResetPolicyTResult(Type source) =>
     (withOffsetResetPolicyTResult ??= new Func<IQbservable<object>, AutoOffsetReset, IQbservable<object>>(WithOffsetResetPolicy).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource);
+    .MakeGenericMethod(source);
 
   /// <summary>
   /// Determines what to do when there is no initial offset in Apache Kafka® or if the current offset doesn't exist on the server. The default value in ksqlDB is latest, which means all Kafka topics are read from the latest available offset.
@@ -80,9 +80,9 @@ public static class QbservableExtensions
 
   private static MethodInfo whereTSource;
 
-  private static MethodInfo WhereTSource(Type TSource) =>
+  private static MethodInfo WhereTSource(Type source) =>
     (whereTSource ??= new Func<IQbservable<object>, Expression<Func<object, bool>>, IQbservable<object>>(Where).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource);
+    .MakeGenericMethod(source);
 
   /// <summary>
   /// Filters records that fulfill a specified condition.
@@ -113,9 +113,9 @@ public static class QbservableExtensions
 
   private static MethodInfo takeTSource;
 
-  private static MethodInfo TakeTSource(Type TSource) =>
+  private static MethodInfo TakeTSource(Type source) =>
     (takeTSource ??= new Func<IQbservable<object>, int, IQbservable<object>>(Take).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource);
+    .MakeGenericMethod(source);
 
   /// <summary>
   /// Returns a specified number of contiguous elements from the start of an observable sequence.
@@ -167,7 +167,7 @@ public static class QbservableExtensions
 
     var explainStatement = CreateExplainStatement(kStreamSet);
 
-    var httpClientFactory = kStreamSet.GetHttpClientFactory();
+    var httpClientFactory = kStreamSet?.GetHttpClientFactory();
 
     var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
@@ -195,8 +195,11 @@ public static class QbservableExtensions
   public static async Task<string> ExplainAsStringAsync<TSource>(this IQbservable<TSource> source, CancellationToken cancellationToken = default)
   {
     var httpResponseMessage = await source.ExplainInternalAsync(cancellationToken);
-
+#if NETSTANDARD2_0
     return await httpResponseMessage.Content.ReadAsStringAsync();
+#else
+    return await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
+#endif
   }
 
   #endregion
@@ -269,7 +272,7 @@ public static class QbservableExtensions
   #region Subscribe delegate-based overloads
 
   /// <summary>
-  /// Subscribes an element handler and an exception handler to an qbservable stream.
+  /// Subscribes an element handler and an exception handler to a qbservable stream.
   /// </summary>
   /// <typeparam name="T">The type of the elements in the source stream.</typeparam>
   /// <param name="source">Observable stream to subscribe to.</param>
@@ -292,7 +295,7 @@ public static class QbservableExtensions
   }
 
   /// <summary>
-  /// Subscribes an element handler, an exception handler, and a completion handler to an qbservable stream.
+  /// Subscribes an element handler, an exception handler, and a completion handler to a qbservable stream.
   /// </summary>
   /// <typeparam name="T">The type of the elements in the source stream.</typeparam>
   /// <param name="source">Observable sequence to subscribe to.</param>
@@ -386,13 +389,14 @@ public static class QbservableExtensions
   #region SubscribeAsync
 
   /// <summary>
-  /// Subscribes an element handler, an exception handler, and a completion handler to an qbservable stream.
+  /// Subscribes an element handler, an exception handler, and a completion handler to a qbservable stream.
   /// </summary>
   /// <typeparam name="T">The type of the elements in the source stream.</typeparam>
   /// <param name="source">Observable sequence to subscribe to.</param>
   /// <param name="onNext">Action to invoke for each element in the qbservable stream.</param>
   /// <param name="onError">Action to invoke upon exceptional termination of the qbservable stream.</param>
   /// <param name="onCompleted">Action to invoke upon graceful termination of the qbservable stream.</param>
+  /// <param name="cancellationToken">Cancellation token.</param>
   /// <returns>Subscription with query id.</returns>
   /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="onNext"/> or <paramref name="onError"/> or <paramref name="onCompleted"/> is <c>null</c>.</exception>
   public static Task<Subscription> SubscribeAsync<T>(this IQbservable<T> source, Action<T> onNext, Action<Exception> onError, Action onCompleted, CancellationToken cancellationToken = default)
@@ -418,9 +422,9 @@ public static class QbservableExtensions
 
   private static MethodInfo groupByTSourceTKey;
 
-  private static MethodInfo GroupByTSourceTKey(Type TSource, Type TKey) =>
+  private static MethodInfo GroupByTSourceTKey(Type source, Type key) =>
     (groupByTSourceTKey ??= new Func<IQbservable<object>, Expression<Func<object, object>>, IQbservable<IKSqlGrouping<object, object>>>(GroupBy).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource, TKey);
+    .MakeGenericMethod(source, key);
 
   /// <summary>
   /// Group records in a window. Required by the WINDOW clause. Windowing queries must group by the keys that are selected in the query.
@@ -445,9 +449,9 @@ public static class QbservableExtensions
     
   private static MethodInfo groupByTSourceTKeyTElement3;
 
-  private static MethodInfo GroupBy_TSource_TKey_TElement_3(Type TSource, Type TKey, Type TElement) =>
+  private static MethodInfo GroupBy_TSource_TKey_TElement_3(Type source, Type key, Type element) =>
     (groupByTSourceTKeyTElement3 ??= new Func<IQbservable<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, IQbservable<IKSqlGrouping<object, object>>>(GroupBy).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource, TKey, TElement);
+    .MakeGenericMethod(source, key, element);
 
   internal static IQbservable<IKSqlGrouping<TKey, TElement>> GroupBy<TSource, TKey, TElement>(this IQbservable<TSource> source, Expression<Func<TSource, TKey>> keySelector, Expression<Func<TSource, TElement>> elementSelector)
   {
@@ -549,7 +553,7 @@ public static class QbservableExtensions
 
 
   /// <summary>
-  /// Projects each element of an qbservable sequence to a sequence, invokes the result selector for the source element and each of the corresponding inner sequence's elements, and merges the results into one observable sequence.
+  /// Projects each element of a qbservable sequence to a sequence, invokes the result selector for the source element and each of the corresponding inner sequence's elements, and merges the results into one observable sequence.
   /// </summary>
   /// <typeparam name="TSource">The type of the elements in the source sequence.</typeparam>
   /// <typeparam name="TSequence">The type of the elements in the projected intermediate enumerable sequences.</typeparam>
@@ -581,9 +585,9 @@ public static class QbservableExtensions
 
   private static MethodInfo havingTSource;
 
-  private static MethodInfo HavingTSource(Type TSource, Type TKey) =>
+  private static MethodInfo HavingTSource(Type source, Type key) =>
     (havingTSource ??= new Func<IQbservable<IKSqlGrouping<object, object>>, Expression<Func<IKSqlGrouping<object, object>, bool>>, IQbservable<IKSqlGrouping<object, object>>>(Having).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource, TKey);
+    .MakeGenericMethod(source, key);
 
   /// <summary>
   /// Extract records from an aggregation that fulfill a specified condition.
@@ -615,9 +619,9 @@ public static class QbservableExtensions
 
   private static MethodInfo windowedByTSourceTKey;
 
-  private static MethodInfo WindowedByTSourceTKey(Type TSource, Type TKey) =>
+  private static MethodInfo WindowedByTSourceTKey(Type source, Type key) =>
     (windowedByTSourceTKey ??= new Func<IQbservable<IKSqlGrouping<object, object>>, TimeWindows, IQbservable<IWindowedKSql<object, object>>>(WindowedBy).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource, TKey);
+    .MakeGenericMethod(source, key);
 
   /// <summary>
   /// Group input records that have the same key into a window, for operations like aggregations and joins.
@@ -625,7 +629,7 @@ public static class QbservableExtensions
   /// <typeparam name="TSource">The type of the elements in the source sequence.</typeparam>
   /// <typeparam name="TKey">The type of the grouping key computed for each element in the source sequence.</typeparam>
   /// <param name="source">An observable sequence whose elements to group.</param>
-  /// <param name="timeWindows">Type of window TUMBLING, HOPPING, etc and its durations.</param>
+  /// <param name="timeWindows">Type of window TUMBLING, HOPPING, etc. and its durations.</param>
   /// <returns>Grouped elements of an aggregation or join that satisfy the condition.</returns>
   public static IQbservable<IWindowedKSql<TKey, TSource>> WindowedBy<TSource, TKey>(this IQbservable<IKSqlGrouping<TKey, TSource>> source, TimeWindows timeWindows)
   {
@@ -644,9 +648,9 @@ public static class QbservableExtensions
 
   private static MethodInfo joinTOuterTInnerTKeyTResult;
 
-  private static MethodInfo JoinTOuterTInnerTKeyTResult(Type TOuter, Type TInner, Type TKey, Type TResult) =>
+  private static MethodInfo JoinTOuterTInnerTKeyTResult(Type outer, Type inner, Type key, Type result) =>
     (joinTOuterTInnerTKeyTResult ??= new Func<IQbservable<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, IQbservable<object>>(Join).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TOuter, TInner, TKey, TResult);
+    .MakeGenericMethod(outer, inner, key, result);
 
   /// <summary>
   /// Select records in a stream or table that have matching values in another stream or table. (INNER JOIN)
@@ -681,9 +685,9 @@ public static class QbservableExtensions
 
   private static MethodInfo leftJoinTOuterTInnerTKeyTResult;
 
-  private static MethodInfo LeftJoinTOuterTInnerTKeyTResult(Type TOuter, Type TInner, Type TKey, Type TResult) =>
+  private static MethodInfo LeftJoinTOuterTInnerTKeyTResult(Type outer, Type inner, Type key, Type result) =>
     (leftJoinTOuterTInnerTKeyTResult ??= new Func<IQbservable<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, IQbservable<object>>(LeftJoin).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TOuter, TInner, TKey, TResult);
+    .MakeGenericMethod(outer, inner, key, result);
 
   /// <summary>
   /// Select all records from the left stream/table and the matched records from the right stream/table.
@@ -718,9 +722,9 @@ public static class QbservableExtensions
 
   private static MethodInfo rightJoinTOuterTInnerTKeyTResult;
 
-  private static MethodInfo RightJoinTOuterTInnerTKeyTResult(Type TOuter, Type TInner, Type TKey, Type TResult) =>
+  private static MethodInfo RightJoinTOuterTInnerTKeyTResult(Type outer, Type inner, Type key, Type result) =>
     (rightJoinTOuterTInnerTKeyTResult ??= new Func<IQbservable<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, IQbservable<object>>(RightJoin).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TOuter, TInner, TKey, TResult);
+    .MakeGenericMethod(outer, inner, key, result);
 
   /// <summary>
   /// Select all records for the right side of the join and the matching records from the left side. If the matching records on the left side are missing, the corresponding columns will contain null values. ksqldb v0.26.0
@@ -755,9 +759,9 @@ public static class QbservableExtensions
 
   private static MethodInfo fullOuterJoinTOuterTInnerTKeyTResult;
 
-  private static MethodInfo FullOuterJoinTOuterTInnerTKeyTResult(Type TOuter, Type TInner, Type TKey, Type TResult) =>
-    (fullOuterJoinTOuterTInnerTKeyTResult ??= new Func<IQbservable<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, IQbservable<object>>(FullOuterJoin).GetMethodInfo()?.GetGenericMethodDefinition())
-    .MakeGenericMethod(TOuter, TInner, TKey, TResult);
+  private static MethodInfo FullOuterJoinTOuterTInnerTKeyTResult(Type outer, Type inner, Type key, Type result) =>
+    (fullOuterJoinTOuterTInnerTKeyTResult ??= new Func<IQbservable<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, IQbservable<object>>(FullOuterJoin).GetMethodInfo().GetGenericMethodDefinition())
+    .MakeGenericMethod(outer, inner, key, result);
 
   /// <summary>
   /// Select all records when there is a match in the left stream/table or the right stream/table records.

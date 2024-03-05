@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Reflection;
 using ksqlDB.RestApi.Client.KSql.Query.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
@@ -11,9 +11,9 @@ public static class CreateStatementExtensions
 
   private static MethodInfo selectTSourceTResult;
 
-  private static MethodInfo SelectTSourceTResult(Type TSource, Type TResult) =>
+  private static MethodInfo SelectTSourceTResult(Type source, Type result) =>
     (selectTSourceTResult ??= new Func<ICreateStatement<object>, Expression<Func<object, object>>, ICreateStatement<object>>(Select).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource, TResult);
+    .MakeGenericMethod(source, result);
 
   public static ICreateStatement<TResult> Select<TSource, TResult>(this ICreateStatement<TSource> source, Expression<Func<TSource, TResult>> selector)
   {
@@ -37,9 +37,9 @@ public static class CreateStatementExtensions
 
   private static MethodInfo whereTSource;
 
-  private static MethodInfo WhereTSource(Type TSource) =>
+  private static MethodInfo WhereTSource(Type source) =>
     (whereTSource ??= new Func<ICreateStatement<object>, Expression<Func<object, bool>>, ICreateStatement<object>>(Where).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource);
+    .MakeGenericMethod(source);
 
   public static ICreateStatement<TSource> Where<TSource>(this ICreateStatement<TSource> source, Expression<Func<TSource, bool>> predicate)
   {
@@ -63,9 +63,9 @@ public static class CreateStatementExtensions
 
   private static MethodInfo takeTSource;
 
-  private static MethodInfo TakeTSource(Type TSource) =>
+  private static MethodInfo TakeTSource(Type source) =>
     (takeTSource ??= new Func<ICreateStatement<object>, int, ICreateStatement<object>>(Take).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource);
+    .MakeGenericMethod(source);
 
   public static ICreateStatement<TSource> Take<TSource>(this ICreateStatement<TSource> source, int count)
   {
@@ -83,9 +83,9 @@ public static class CreateStatementExtensions
 
   private static MethodInfo groupByTSourceTKey;
 
-  private static MethodInfo GroupByTSourceTKey(Type TSource, Type TKey) =>
+  private static MethodInfo GroupByTSourceTKey(Type source, Type key) =>
     (groupByTSourceTKey ??= new Func<ICreateStatement<object>, Expression<Func<object, object>>, ICreateStatement<IKSqlGrouping<object, object>>>(GroupBy).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource, TKey);
+    .MakeGenericMethod(source, key);
 
   public static ICreateStatement<IKSqlGrouping<TKey, TSource>> GroupBy<TSource, TKey>(this ICreateStatement<TSource> source, Expression<Func<TSource, TKey>> keySelector)
   {
@@ -106,9 +106,9 @@ public static class CreateStatementExtensions
 
   private static MethodInfo havingTSource;
 
-  private static MethodInfo HavingTSource(Type TSource, Type TKey) =>
+  private static MethodInfo HavingTSource(Type source, Type key) =>
     (havingTSource ??= new Func<ICreateStatement<IKSqlGrouping<object, object>>, Expression<Func<IKSqlGrouping<object, object>, bool>>, ICreateStatement<IKSqlGrouping<object, object>>>(Having).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource, TKey);
+    .MakeGenericMethod(source, key);
 
   public static ICreateStatement<IKSqlGrouping<TKey, TSource>> Having<TSource, TKey>(this ICreateStatement<IKSqlGrouping<TKey, TSource>> source, Expression<Func<IKSqlGrouping<TKey, TSource>, bool>> predicate)
   {
@@ -132,9 +132,9 @@ public static class CreateStatementExtensions
 
   private static MethodInfo windowedByTSourceTKey;
 
-  private static MethodInfo WindowedByTSourceTKey(Type TSource, Type TKey) =>
+  private static MethodInfo WindowedByTSourceTKey(Type source, Type key) =>
     (windowedByTSourceTKey ??= new Func<ICreateStatement<IKSqlGrouping<object, object>>, TimeWindows, ICreateStatement<IWindowedKSql<object, object>>>(WindowedBy).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource, TKey);
+    .MakeGenericMethod(source, key);
 
   public static ICreateStatement<IWindowedKSql<TKey, TSource>> WindowedBy<TSource, TKey>(this ICreateStatement<IKSqlGrouping<TKey, TSource>> source, TimeWindows timeWindows)
   {
@@ -153,9 +153,9 @@ public static class CreateStatementExtensions
 
   private static MethodInfo joinTOuterTInnerTKeyTResult;
 
-  private static MethodInfo JoinTOuterTInnerTKeyTResult(Type TOuter, Type TInner, Type TKey, Type TResult) =>
+  private static MethodInfo JoinTOuterTInnerTKeyTResult(Type outer, Type inner, Type key, Type result) =>
     (joinTOuterTInnerTKeyTResult ??= new Func<ICreateStatement<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, ICreateStatement<object>>(Join).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TOuter, TInner, TKey, TResult);
+    .MakeGenericMethod(outer, inner, key, result);
 
   public static ICreateStatement<TResult> Join<TOuter, TInner, TKey, TResult>(this ICreateStatement<TOuter> outer, ISource<TInner> inner, Expression<Func<TOuter, TKey>> outerKeySelector, Expression<Func<TInner, TKey>> innerKeySelector, Expression<Func<TOuter, TInner, TResult>> resultSelector)
   {
@@ -177,9 +177,9 @@ public static class CreateStatementExtensions
 
   private static MethodInfo leftJoinTOuterTInnerTKeyTResult;
 
-  private static MethodInfo LeftJoinTOuterTInnerTKeyTResult(Type TOuter, Type TInner, Type TKey, Type TResult) =>
+  private static MethodInfo LeftJoinTOuterTInnerTKeyTResult(Type outer, Type inner, Type key, Type result) =>
     (leftJoinTOuterTInnerTKeyTResult ??= new Func<ICreateStatement<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, ICreateStatement<object>>(LeftJoin).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TOuter, TInner, TKey, TResult);
+    .MakeGenericMethod(outer, inner, key, result);
 
   public static ICreateStatement<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(this ICreateStatement<TOuter> outer, ISource<TInner> inner, Expression<Func<TOuter, TKey>> outerKeySelector, Expression<Func<TInner, TKey>> innerKeySelector, Expression<Func<TOuter, TInner, TResult>> resultSelector)
   {
@@ -201,9 +201,9 @@ public static class CreateStatementExtensions
 
   private static MethodInfo fullOuterJoinTOuterTInnerTKeyTResult;
 
-  private static MethodInfo FullOuterJoinTOuterTInnerTKeyTResult(Type TOuter, Type TInner, Type TKey, Type TResult) =>
-    (fullOuterJoinTOuterTInnerTKeyTResult ??= new Func<ICreateStatement<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, ICreateStatement<object>>(FullOuterJoin).GetMethodInfo()?.GetGenericMethodDefinition())
-    .MakeGenericMethod(TOuter, TInner, TKey, TResult);
+  private static MethodInfo FullOuterJoinTOuterTInnerTKeyTResult(Type outer, Type inner, Type key, Type result) =>
+    (fullOuterJoinTOuterTInnerTKeyTResult ??= new Func<ICreateStatement<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, ICreateStatement<object>>(FullOuterJoin).GetMethodInfo().GetGenericMethodDefinition())
+    .MakeGenericMethod(outer, inner, key, result);
 
   public static ICreateStatement<TResult> FullOuterJoin<TOuter, TInner, TKey, TResult>(this ICreateStatement<TOuter> outer, ISource<TInner> inner, Expression<Func<TOuter, TKey>> outerKeySelector, Expression<Func<TInner, TKey>> innerKeySelector, Expression<Func<TOuter, TInner, TResult>> resultSelector)
   {

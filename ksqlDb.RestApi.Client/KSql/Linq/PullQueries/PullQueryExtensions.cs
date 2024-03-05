@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Reflection;
 using ksqlDB.RestApi.Client.KSql.Query.PullQueries;
 
@@ -10,9 +10,9 @@ public static class PullQueryExtensions
 
   private static MethodInfo selectTSourceTResult;
 
-  private static MethodInfo SelectTSourceTResult(Type TSource, Type TResult) =>
+  private static MethodInfo SelectTSourceTResult(Type source, Type result) =>
     (selectTSourceTResult ??= new Func<IPullable<object>, Expression<Func<object, object>>, IPullable<object>>(Select).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource, TResult);
+    .MakeGenericMethod(source, result);
 
   /// <summary>
   /// Projects a single pull query response into a new form.
@@ -44,9 +44,9 @@ public static class PullQueryExtensions
 
   private static MethodInfo whereTSource;
 
-  private static MethodInfo WhereTSource(Type TSource) =>
+  private static MethodInfo WhereTSource(Type source) =>
     (whereTSource ??= new Func<IPullable<object>, Expression<Func<object, bool>>, IPullable<object>>(Where).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource);
+    .MakeGenericMethod(source);
 
   /// <summary>
   /// The WHERE clause must contain a value for each primary-key column to retrieve and may optionally include bounds on WINDOWSTART and WINDOWEND if the materialized table is windowed.
@@ -77,9 +77,9 @@ public static class PullQueryExtensions
 
   private static MethodInfo takeTSource;
 
-  private static MethodInfo TakeTSource(Type TSource) =>
+  private static MethodInfo TakeTSource(Type source) =>
     (takeTSource ??= new Func<IPullable<object>, int, IPullable<object>>(Take).GetMethodInfo().GetGenericMethodDefinition())
-    .MakeGenericMethod(TSource);
+    .MakeGenericMethod(source);
 
   /// <summary>
   /// Restrict the number of rows returned by executing a pull query over a STREAM or a TABLE. ksqldb 0.24.0
