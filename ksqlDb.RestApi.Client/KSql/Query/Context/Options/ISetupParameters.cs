@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
@@ -28,5 +28,9 @@ public interface ISetupParameters : ICreateOptions
   /// <returns>The original KSqlDb context options builder</returns>
   ISetupParameters SetJsonSerializerOptions(Action<JsonSerializerOptions> optionsAction);
 
+  /// <summary>
+  /// Sets the identifier escaping type.
+  /// As ksqlDB automatically converts all identifiers to uppercase by default, it's crucial to enclose them within backticks to maintain the desired casing.
+  /// </summary>
   ISetupParameters SetIdentifierEscaping(IdentifierEscaping escaping);
 }

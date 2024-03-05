@@ -91,7 +91,8 @@ public class KSqlDbContextOptionsBuilder : ISetupParameters
   }
 
   /// <summary>
-  /// allows you to set escaping for identifiers
+  /// Allows you to set escaping for identifiers
+  /// As ksqlDB automatically converts all identifiers to uppercase by default, it's crucial to enclose them within backticks to maintain the desired casing.
   /// </summary>
   /// <param name="escaping">Escaping mode</param>
   /// <returns>Returns this instance.</returns>

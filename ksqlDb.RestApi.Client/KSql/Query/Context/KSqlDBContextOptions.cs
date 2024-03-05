@@ -116,6 +116,11 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
 
   private string password;
   internal string BasicAuthPassword => string.IsNullOrEmpty(password) ? "" : password;
+
+  /// <summary>
+  /// Gets or sets the identifier escaping type.
+  /// As ksqlDB automatically converts all identifiers to uppercase by default, it's crucial to enclose them within backticks to maintain the desired casing.
+  /// </summary>
   public IdentifierEscaping IdentifierEscaping { get; set; }
 
   /// <summary>

@@ -1,7 +1,8 @@
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Enums
 {
   /// <summary>
-  /// Formats for column identifiers
+  /// Formats for user-defined identifiers e.g. streams, tables, columns, and other objects.
+  /// As ksqlDB automatically converts all identifiers to uppercase by default, it's crucial to enclose them within backticks to maintain the desired casing.
   /// </summary>
   public enum IdentifierEscaping
   {
