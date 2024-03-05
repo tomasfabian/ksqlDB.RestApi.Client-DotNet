@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Connectors;
 
@@ -12,7 +12,7 @@ internal static class ConnectorGenerator
     {
       ConnectorType.Source => "SOURCE",
       ConnectorType.Sink => "SINK",
-      _ => throw new ArgumentOutOfRangeException()
+      _ => throw new ArgumentOutOfRangeException(nameof(connectorType), connectorType, "Non-exhaustive match.")
     };
 
     string existsCondition = ifNotExists ? "IF NOT EXISTS " : string.Empty;

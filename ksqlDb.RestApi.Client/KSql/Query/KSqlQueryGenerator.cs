@@ -19,7 +19,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query;
 internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
 {
   private readonly KSqlDBContextOptions options;
-  private static readonly IPluralize EnglishPluralizationService = new Pluralizer();
+  private static readonly Pluralizer EnglishPluralizationService = new();
 
   private KSqlVisitor kSqlVisitor;
   private KSqlQueryMetadata queryMetadata;
@@ -47,7 +47,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
 
     queryMetadata.FromItemType = fromTableType;
 
-    if (joins.Any())
+    if (joins.Count > 0)
     {
       var fromItem = joins.Last();
 
@@ -119,7 +119,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
     {
       string separator = string.Empty;
 
-      if (!HasJoins || (HasJoins && whereClauses.Any()))
+      if (!HasJoins || (HasJoins && whereClauses.Count > 0))
         separator = " ";
 
       string outputRefinement = timeWindows is {OutputRefinement: OutputRefinement.Final} ? "FINAL" : "CHANGES";
@@ -135,7 +135,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
     return kSqlVisitor.BuildKSql();
   }
 
-  private bool HasJoins => joins?.Any() ?? false;
+  private bool HasJoins => joins is {Count: > 0};
 
   private TimeWindows TryGenerateWindowAggregation()
   {

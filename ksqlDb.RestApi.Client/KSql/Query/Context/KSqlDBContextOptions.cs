@@ -122,7 +122,7 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   /// Sets the basic authentication credentials.
   /// Note: Credentials are stored only when using <see cref="UseBasicAuth"/>.
   /// </summary>
-  /// <param name="userName">The user name.</param>
+  /// <param name="userName">The username.</param>
   /// <param name="password">The password.</param>
   public void SetBasicAuthCredentials(string userName, string password)
   {

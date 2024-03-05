@@ -1,4 +1,4 @@
-﻿using ksqlDB.RestApi.Client.KSql.Linq.Statements;
+using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
@@ -21,17 +21,17 @@ internal sealed class WithOrAsClause : IWithOrAsClause
     {
       CreationType.Create => "CREATE",
       CreationType.CreateOrReplace => "CREATE OR REPLACE",
-      _ => throw new ArgumentOutOfRangeException(nameof(statementContext.CreationType))
+      _ => throw new ArgumentOutOfRangeException(nameof(statementContext), $"Unknown {nameof(CreationType)} value {statementContext.CreationType}")
     };
 
     string entityTypeText = statementContext.KSqlEntityType switch
     {
       KSqlEntityType.Table => KSqlEntityType.Table.ToString().ToUpper(),
       KSqlEntityType.Stream => KSqlEntityType.Stream.ToString().ToUpper(),
-      _ => throw new ArgumentOutOfRangeException(nameof(statementContext.KSqlEntityType))
+      _ => throw new ArgumentOutOfRangeException(nameof(statementContext), $"Unknown {nameof(KSqlEntityType)} value {statementContext.KSqlEntityType}")
     };
 
-    statementContext.Statement = @$"{creationTypeText} {entityTypeText} {statementContext.EntityName}";
+    statementContext.Statement = $"{creationTypeText} {entityTypeText} {statementContext.EntityName}";
   }
 
   public IAsClause With(CreationMetadata creationMetadata)

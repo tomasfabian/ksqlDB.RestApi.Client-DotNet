@@ -1,4 +1,4 @@
-﻿namespace ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
+namespace ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 
 internal class AssertTopic
 {
@@ -10,7 +10,7 @@ internal class AssertTopic
 
     var timeOut = options.Timeout != null ? $" TIMEOUT {options.Timeout.Value} {options.Timeout.TimeUnit}" : string.Empty;
 
-    var statement = $@"ASSERT {notExists}TOPIC {options.TopicName}{withProperties}{timeOut};";
+    var statement = $"ASSERT {notExists}TOPIC {options.TopicName}{withProperties}{timeOut};";
 
     return statement;
   }

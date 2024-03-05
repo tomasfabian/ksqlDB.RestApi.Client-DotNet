@@ -18,7 +18,7 @@ public abstract class KSqlDBContextDependenciesProvider : AsyncDisposableObject,
   /// Initializes a new instance of <see cref="KSqlDBContextDependenciesProvider"/> with the specified <see cref="KSqlDBContextOptions"/>. 
   /// </summary>
   /// <param name="kSqlDbContextOptions">The options for ksqlDB context.</param>
-
+  /// <param name="loggerFactory">The logger factory.</param>
   protected KSqlDBContextDependenciesProvider(KSqlDBContextOptions kSqlDbContextOptions, ILoggerFactory loggerFactory = null)
   {
     if (kSqlDbContextOptions == null) throw new ArgumentNullException(nameof(kSqlDbContextOptions));

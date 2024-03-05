@@ -18,7 +18,7 @@ internal class JsonArrayParser
     {
       if (!isFirst)
       {
-        stringBuilder.Append(",");
+        stringBuilder.Append(',');
       }
 
       stringBuilder.AppendLine($"\"{column.ColumnName}\": {column.Value}");
@@ -69,12 +69,12 @@ internal class JsonArrayParser
     yield return stringBuilder.ToString();
   }
 
-  private bool ShouldAppend(char currentChar, bool isInsideString, int isStructuredType)
+  private static bool ShouldAppend(char currentChar, bool isInsideString, int isStructuredType)
   {
     return currentChar != ',' || isInsideString || isStructuredType > 0;
   }
 
-  private bool IsRowEnd(char currentChar, bool isInsideString, int isStructuredType)
+  private static bool IsRowEnd(char currentChar, bool isInsideString, int isStructuredType)
   {
     return currentChar == ',' && !isInsideString && !(isStructuredType > 0);
   }

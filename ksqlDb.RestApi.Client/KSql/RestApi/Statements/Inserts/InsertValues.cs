@@ -42,12 +42,12 @@ public class InsertValues<T>
     if (getProperty.Body is not MemberExpression memberExpression)
       throw new ArgumentException($"Expression '{getProperty}' is not a property.");
 
-    PropertyInfo propInfo = memberExpression.Member as PropertyInfo;
+    PropertyInfo propertyInfo = memberExpression.Member as PropertyInfo;
 
-    if (propInfo == null)
+    if (propertyInfo == null)
       throw new ArgumentException($"Expression '{getProperty}' is not a property.");
 
-    var propertyName = propInfo.Name;
+    var propertyName = propertyInfo.Name;
 
     return propertyName;
   }

@@ -3,7 +3,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 namespace ksqlDB.RestApi.Client.KSql.Query;
 
 /// <summary>
-/// Represents a Kafka record with pseudocolumns.
+/// Represents a Kafka record with pseudo-columns.
 /// </summary>
 public class Record
 {

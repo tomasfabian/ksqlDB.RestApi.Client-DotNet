@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
@@ -48,7 +48,7 @@ internal class CreateEntityStatement
     {
       MemberTypes.Field => ((FieldInfo) memberInfo).FieldType,
       MemberTypes.Property => ((PropertyInfo) memberInfo).PropertyType,
-      _ => throw new ArgumentOutOfRangeException(nameof(memberInfo.MemberType))
+      _ => throw new ArgumentOutOfRangeException(nameof(memberInfo), $"Unknown '{nameof(MemberTypes)}' value {memberInfo.MemberType}")
     };
 
     return type;

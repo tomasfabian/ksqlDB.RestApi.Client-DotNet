@@ -178,7 +178,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
     return CreateStatement(tableName, CreationType.CreateOrReplace, KSqlEntityType.Table);
   }
 
-  private IWithOrAsClause CreateStatement(string fromItemName, CreationType creationType, KSqlEntityType entityType)
+  private WithOrAsClause CreateStatement(string fromItemName, CreationType creationType, KSqlEntityType entityType)
   {
     var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
 
