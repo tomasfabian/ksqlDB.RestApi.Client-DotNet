@@ -1,7 +1,7 @@
 # ksqlDB.RestApi.Client
 
 # 3.6.1
-- fix usage of `JsonPropertyName` when creating insert statements (since 3.6.0) (contributed by @mrt181)
+- fix usage of `JsonPropertyName` when creating insert statements (since 3.6.0) #59 (contributed by @mrt181)
 
 # 3.6.0
 - added escaping options using backticks for [Identifiers](https://docs.ksqldb.io/en/latest/reference/sql/syntax/lexical-structure/#identifiers) in statements #57 (contributed by @mrt181)
