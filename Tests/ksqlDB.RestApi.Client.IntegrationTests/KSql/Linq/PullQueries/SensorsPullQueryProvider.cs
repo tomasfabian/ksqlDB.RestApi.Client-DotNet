@@ -13,7 +13,7 @@ internal class SensorsPullQueryProvider
 {
   private static string Url => "http://localhost:8088";
 
-  private readonly IKSqlDbRestApiClient restApiClient;
+  private readonly KSqlDbRestApiClient restApiClient;
 
   public SensorsPullQueryProvider()
   {
@@ -56,7 +56,7 @@ internal class SensorsPullQueryProvider
 
   internal const string MaterializedViewName = "avg_sensor_values";
 
-  internal string StreamName => "test_sensor_values";
+  internal static string StreamName => "test_sensor_values";
 
   async Task CreateOrReplaceStreamAsync()
   {
@@ -88,7 +88,7 @@ internal class SensorsPullQueryProvider
     var httpResponseMessage = await restApiClient.ExecuteStatementAsync(ksqlDbStatement)
       .ConfigureAwait(false);
 
-    string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
+    string _ = await httpResponseMessage.Content.ReadAsStringAsync();
 
     return httpResponseMessage;
   }

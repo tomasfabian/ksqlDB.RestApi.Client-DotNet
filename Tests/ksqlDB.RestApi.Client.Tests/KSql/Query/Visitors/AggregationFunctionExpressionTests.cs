@@ -9,6 +9,8 @@ using UnitTests;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Visitors;
 
+#pragma warning disable IDE0037
+
 public class AggregationFunctionExpressionTests : TestBase
 {
   private AggregationFunctionVisitor ClassUnderTest { get; set; } = null!;
@@ -33,7 +35,7 @@ public class AggregationFunctionExpressionTests : TestBase
     var query = ClassUnderTest.BuildKSql(expression);
 
     //Assert
-    query.Should().BeEquivalentTo($"Key, COUNT(*) Count");
+    query.Should().BeEquivalentTo("Key, COUNT(*) Count");
   }
 
   [Test]
@@ -364,3 +366,5 @@ public class AggregationFunctionExpressionTests : TestBase
     query.Should().BeEquivalentTo($"Key, HISTOGRAM({nameof(Transaction.CardNumber)}) Histogram");
   }
 }
+
+#pragma warning restore IDE0037

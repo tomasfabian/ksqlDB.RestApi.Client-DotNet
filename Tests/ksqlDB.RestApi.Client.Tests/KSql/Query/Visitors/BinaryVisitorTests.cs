@@ -12,7 +12,7 @@ public class BinaryVisitorTests
   public void ArrayIndex()
   {
     //Arrange
-    int[] i = {3};
+    int[] i = [3];
     Expression<Func<int>> expression = () => i[3];
     StringBuilder stringBuilder = new();
     BinaryVisitor visitor = new(stringBuilder, new KSqlQueryMetadata());

@@ -39,12 +39,12 @@ public class KSqlFunctionVisitorTests : TestBase
     query.Should().BeEquivalentTo($"IFNULL({nameof(Tweet.Message)}, 'x')");
   }
 
-  private struct TweetMessage
+  private readonly struct TweetMessage
   {
     public User User { get; init; }
   }
 
-  private struct User
+  private readonly struct User
   {
     public string Description { get; init; }
   }

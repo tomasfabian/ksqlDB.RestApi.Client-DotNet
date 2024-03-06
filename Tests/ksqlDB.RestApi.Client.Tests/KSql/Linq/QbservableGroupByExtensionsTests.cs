@@ -18,7 +18,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.Linq;
 
 public class QbservableGroupByExtensionsTests : TestBase
 {
-  private IQbservable<City> CreateQbservable()
+  private static IQbservable<City> CreateQbservable()
   {
     var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
       
@@ -460,17 +460,6 @@ WHERE RegionCode != 'xx' GROUP BY RegionCode EMIT CHANGES;".ReplaceLineEndings()
     yield return 2;
       
     yield return 3;
-      
-    await Task.CompletedTask;
-  }  
-
-  protected async IAsyncEnumerable<City> GetCities()
-  {
-    yield return new City { RegionCode = "A1" };
-
-    yield return new City { RegionCode = "B1" };
-
-    yield return new City { RegionCode = "A1" };
       
     await Task.CompletedTask;
   }

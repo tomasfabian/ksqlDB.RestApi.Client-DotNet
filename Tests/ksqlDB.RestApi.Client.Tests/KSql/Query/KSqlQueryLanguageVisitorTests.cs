@@ -17,6 +17,8 @@ using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Query;
 
+#pragma warning disable CA1861
+
 public class KSqlQueryLanguageVisitorTests : TestBase
 {
   private KSqlQueryGenerator ClassUnderTest { get; set; } = null!;
@@ -96,14 +98,14 @@ WHERE SensorId = '1' EMIT CHANGES;";
     var query = new TestableDbProvider(contextOptions)
       .CreateQueryStream<MySensor>(stream1TableName)
       .Join(Source.Of<MySensor>(stream2TableName).Within(Duration.OfDays(1)),
-        endusers => K.Functions.ExtractJsonField(endusers.Data, "$.customer_id"),
+        endUsers => K.Functions.ExtractJsonField(endUsers.Data, "$.customer_id"),
         transactions => K.Functions.ExtractJsonField(transactions.Data, "$.customer_id"),
-        (endusers, transactions) => new
+        (endUsers, transactions) => new
         {
-          EnduserId = endusers.DataId,
+          EnduserId = endUsers.DataId,
           TransactionsId = transactions.DataId,
-          CustomerId = K.Functions.ExtractJsonField(endusers.Data, "$.customer_id"),
-          EndusersData = endusers.Data,
+          CustomerId = K.Functions.ExtractJsonField(endUsers.Data, "$.customer_id"),
+          EndusersData = endUsers.Data,
           TransactionsData = transactions.Data
         });
 
@@ -1250,8 +1252,10 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
   public void SelectStructElementProjected_BuildKSql_PrintsElementAccessor()
   {
     //Arrange
+#pragma warning disable IDE0037
     var query = CreateStreamSource()
       .Select(c => new { X = new Point { X = 1, Y = 2 }.X });
+#pragma warning restore IDE0037
 
     //Act
     var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
@@ -1344,7 +1348,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
 
-  record DatabaseChangeObject<TEntity>
+  private record DatabaseChangeObject<TEntity>
   {
     public TEntity After { get; init; } = default!;
   }
@@ -1554,8 +1558,8 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
       {
         Arr = new[]
         {
-          new [] { 1, 2},
-          new [] { 3, 4},
+          new [] { 1, 2 },
+          new [] { 3, 4 },
         }
       });
 
@@ -1607,7 +1611,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
     var nestedArrays = new[]
     {
       new[] {1, 2},
-      new[] {3, 4},
+      [3, 4],
     };
 
     var query = CreateStreamSource()
@@ -1886,3 +1890,5 @@ WHERE Message LIKE UCASE('%hard') EMIT CHANGES;".ReplaceLineEndings();
 
   #endregion
 }
+
+#pragma warning restore CA1861

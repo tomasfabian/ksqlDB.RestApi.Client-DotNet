@@ -49,7 +49,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     await TestHistogram(Context.CreateQueryStream<Movie>(MoviesProvider.MoviesTableName));
   }
 
-  private async Task TestHistogram(IQbservable<Movie> querySource)
+  private static async Task TestHistogram(IQbservable<Movie> querySource)
   {
     //Arrange
     int expectedItemsCount = 2;
@@ -86,7 +86,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     public int Age { get; set; }
   }
 
-  private async Task CollectListStructs(IQbservable<Movie> querySource)
+  private static async Task CollectListStructs(IQbservable<Movie> querySource)
   {
     //Arrange
     int expectedItemsCount = 1;
@@ -110,7 +110,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     await CollectListMaps(Context.CreateQueryStream<Movie>(MoviesProvider.MoviesTableName));
   }
 
-  private async Task CollectListMaps(IQbservable<Movie> querySource)
+  private static async Task CollectListMaps(IQbservable<Movie> querySource)
   {
     //Arrange
     int expectedItemsCount = 1;
@@ -139,7 +139,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     await CollectListArray(Context.CreateQueryStream<Movie>(MoviesProvider.MoviesTableName));
   }
 
-  private async Task CollectListArray(IQbservable<Movie> querySource)
+  private static async Task CollectListArray(IQbservable<Movie> querySource)
   {
     //Arrange
     int expectedItemsCount = 1;
@@ -163,7 +163,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     await CollectSetMaps(Context.CreateQueryStream<Tweet>(TweetsStreamName));
   }
 
-  private async Task CollectSetMaps(IQbservable<Tweet> querySource)
+  private static async Task CollectSetMaps(IQbservable<Tweet> querySource)
   {
     //Arrange
     int expectedItemsCount = 1;
@@ -186,7 +186,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     id1.Maps[0]["Karen"].Should().Be(42);
   }
 
-  protected static string TweetsStreamName = "tweetsTest";
+  protected static string TweetsStreamName => "tweetsTest";
 
   [Test]
   public async Task EarliestByOffsetMaps()
@@ -194,7 +194,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     await EarliestByOffsetMaps(Context.CreateQueryStream<Tweet>(TweetsStreamName));
   }
 
-  private async Task EarliestByOffsetMaps(IQbservable<Tweet> querySource)
+  private static async Task EarliestByOffsetMaps(IQbservable<Tweet> querySource)
   {
     //Arrange
     int expectedItemsCount = 1;
@@ -224,7 +224,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     await LatestByOffsetMaps(Context.CreateQueryStream<Tweet>(TweetsStreamName));
   }
 
-  private async Task LatestByOffsetMaps(IQbservable<Tweet> querySource)
+  private static async Task LatestByOffsetMaps(IQbservable<Tweet> querySource)
   {
     //Arrange
     int expectedItemsCount = 1;
@@ -253,7 +253,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
     await LatestByOffsetStructs(Context.CreateQueryStream<Tweet>(TweetsStreamName));
   }
 
-  private async Task LatestByOffsetStructs(IQbservable<Tweet> querySource)
+  private static async Task LatestByOffsetStructs(IQbservable<Tweet> querySource)
   {
     //Arrange
     int expectedItemsCount = 1;

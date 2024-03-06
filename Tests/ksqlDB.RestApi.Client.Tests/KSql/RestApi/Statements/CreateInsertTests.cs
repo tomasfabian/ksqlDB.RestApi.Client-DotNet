@@ -970,7 +970,7 @@ public class CreateInsertTests
     string statement = new CreateInsert().Generate(movie, new InsertProperties { EntityName = "Movies" });
 
     //Assert
-    statement.Should().Be(@"INSERT INTO Movies (Title) VALUES (TO_BYTES('Alien', 'utf8'));");
+    statement.Should().Be("INSERT INTO Movies (Title) VALUES (TO_BYTES('Alien', 'utf8'));");
   }
 
   readonly struct Invoke
@@ -994,7 +994,7 @@ public class CreateInsertTests
     string statement = new CreateInsert().Generate(movie, new InsertProperties { EntityName = "Movies" });
 
     //Assert
-    statement.Should().Be(@"INSERT INTO Movies (Title) VALUES (CONCAT('Alien', '_new'));");
+    statement.Should().Be("INSERT INTO Movies (Title) VALUES (CONCAT('Alien', '_new'));");
   }
 
   #endregion

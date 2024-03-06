@@ -12,9 +12,11 @@ using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Visitors;
 
+#pragma warning disable IDE0037
+
 public class JoinVisitorTests : TestBase
 {
-  private KSqlDBContext KSqlDBContext { get; set; } = null!;
+  private KSqlDBContext KSqlDbContext { get; set; } = null!;
 
   [SetUp]
   public override void TestInitialize()
@@ -22,7 +24,7 @@ public class JoinVisitorTests : TestBase
     base.TestInitialize();
 
     var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDbUrl);
-    KSqlDBContext = new KSqlDBContext(contextOptions);
+    KSqlDbContext = new KSqlDBContext(contextOptions);
   }
 
   private static string MovieAlias => "movie";
@@ -476,7 +478,7 @@ EMIT CHANGES;");
   public void JoinWithSeveralOnConditions_BuildKSql_Prints()
   {
     //Arrange
-    var query = from o in KSqlDBContext.CreateQueryStream<Order>()
+    var query = from o in KSqlDbContext.CreateQueryStream<Order>()
       join lm in Source.Of<LambdaMap>() on new { OrderId = o.OrderId, NestedProp = "Nested" } equals new { OrderId = lm.Id, NestedProp = lm.Nested.Prop }
       select new
       {
@@ -1151,3 +1153,5 @@ EMIT CHANGES;");
 
   #endregion
 }
+
+#pragma warning restore IDE0037
