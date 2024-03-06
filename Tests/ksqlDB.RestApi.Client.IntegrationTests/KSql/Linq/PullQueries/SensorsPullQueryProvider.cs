@@ -11,37 +11,54 @@ namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq.PullQueries;
 
 internal class SensorsPullQueryProvider
 {
-  IKSqlDbRestApiClient restApiClient = null!;
+  private static string Url => "http://localhost:8088";
 
-  public async Task ExecuteAsync()
+  private readonly IKSqlDbRestApiClient restApiClient;
+
+  public SensorsPullQueryProvider()
   {
-    string url = @"http://localhost:8088";
-    await using var context = new KSqlDBContext(url);
-
-    var http = new HttpClientFactory(new Uri(url));
+    var http = new HttpClientFactory(new Uri(Url));
     restApiClient = new KSqlDbRestApiClient(http);
+  }
+
+  public async Task<StatementResponse> CreateTableAsync()
+  {
+    await using var context = new KSqlDBContext(Url);
 
     await CreateOrReplaceStreamAsync();
+
+    var windowDuration = Duration.OfMilliseconds(100);
 
     var statement = context.CreateTableStatement(MaterializedViewName)
       .As<IoTSensor>(StreamName)
       .GroupBy(c => c.SensorId)
-      .WindowedBy(new TimeWindows(Duration.OfSeconds(5)).WithGracePeriod(Duration.OfHours(2)))
-      .Select(c => new { SensorId = c.Key, AvgValue = c.Avg(g => g.Value) });
+      .WindowedBy(new TimeWindows(windowDuration).WithGracePeriod(Duration.OfHours(2)))
+      .Select(c => new {SensorId = c.Key, AvgValue = c.Avg(g => g.Value)});
 
     var response = await statement.ExecuteStatementAsync();
     var statementResponses = await response.ToStatementResponsesAsync();
 
-    await Task.Delay(TimeSpan.FromSeconds(1));
+    await Task.Delay(TimeSpan.FromSeconds(10));
 
-    response = await InsertAsync(new IoTSensor { SensorId = "sensor-1", Value = 11 });
+    return statementResponses[0];
+  }
+
+  public Task<HttpResponseMessage> InsertSensorAsync(string sensorId)
+  {
+    return InsertAsync(new IoTSensor { SensorId = sensorId, Value = new Random().Next(1, 100) });
+  }
+
+  public async Task DropEntitiesAsync()
+  {
+    await restApiClient.DropTableAsync(MaterializedViewName, useIfExistsClause: true, deleteTopic: true);
+    await restApiClient.DropStreamAsync(StreamName, useIfExistsClause: true, deleteTopic: true);
   }
 
   internal const string MaterializedViewName = "avg_sensor_values";
 
   internal string StreamName => "test_sensor_values";
 
-  async Task<HttpResponseMessage> CreateOrReplaceStreamAsync()
+  async Task CreateOrReplaceStreamAsync()
   {
     string createOrReplaceStream =
       $@"CREATE OR REPLACE STREAM {StreamName} (
@@ -53,7 +70,7 @@ internal class SensorsPullQueryProvider
     value_format = 'json'
 );";
 
-    return await ExecuteAsync(createOrReplaceStream);
+    await ExecuteAsync(createOrReplaceStream);
   }
 
   async Task<HttpResponseMessage> InsertAsync(IoTSensor sensor)
