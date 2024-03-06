@@ -5,7 +5,7 @@ on: [push]
 jobs:
   build:
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     env:
       ksqlDB_Test_Project_Path: Tests\ksqlDB.RestApi.Client.Tests\ksqlDb.RestApi.Client.Tests.csproj
