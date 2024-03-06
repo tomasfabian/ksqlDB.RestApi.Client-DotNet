@@ -1,11 +1,11 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Query.Functions;
+namespace ksqlDB.RestApi.Client.KSql.Query.Functions;
 
 public static class KSqlInvocationFunctionsExtensions
 {
   /// <summary>
   /// Apply a function to each element in a collection. 
   /// </summary>
-  /// <typeparam name="TSource">The type of the elements of <paramref name="source" />.</typeparam>
+  /// <typeparam name="TSource">The type of the elements of <paramref name="array" />.</typeparam>
   /// <typeparam name="TResult">The type of the value returned by <paramref name="selector" />.</typeparam>
   /// <param name="kSqlFunctions"></param>
   /// <param name="array">The array</param>
@@ -141,7 +141,6 @@ public static class KSqlInvocationFunctionsExtensions
   /// </summary>
   /// <typeparam name="TKey"></typeparam>
   /// <typeparam name="TValue"></typeparam>
-  /// <param name="kSqlFunctions"></param>
   /// <param name="dictionary">The dictionary.</param>
   /// <param name="predicate">A function to test each element for a condition.</param>
   /// <returns>Filter the input collection through a given lambda function. The filtered collection is returned.</returns>

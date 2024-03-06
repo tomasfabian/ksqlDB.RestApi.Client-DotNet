@@ -230,7 +230,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
   public ValueTask<TEntity> ExecutePullQuery<TEntity>(string ksql, CancellationToken cancellationToken = default)
   {
     if (string.IsNullOrEmpty(ksql))
-      throw new ArgumentException(nameof(ksql));
+      throw new ArgumentException($"The {nameof(ksql)} statement cannot be null or empty.", nameof(ksql));
 
     var serviceScopeFactory = KSqlDBQueryContext.Initialize(contextOptions);
 

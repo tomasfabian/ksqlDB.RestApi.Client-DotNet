@@ -143,6 +143,7 @@ public static class KSqlFunctionsExtensions
 
   #region Entries
 
+  // ReSharper disable once GrammarMistakeInComment
   //Variation   : ENTRIES(map MAP<VARCHAR, VARCHAR>, sorted BOOLEAN)
   //Returns     : ARRAY<STRUCT<K VARCHAR, V VARCHAR>>
   //map         : The map to create entries from
@@ -160,6 +161,7 @@ public static class KSqlFunctionsExtensions
     throw new InvalidOperationException(ServerSideOperationErrorMessage);
   }
 
+  // ReSharper disable once GrammarMistakeInComment
   //Variation   : ENTRIES(map MAP<VARCHAR, BIGINT>, sorted BOOLEAN)
   //Returns     : ARRAY<STRUCT<K VARCHAR, V BIGINT>>
   //map         : The map to create entries from
@@ -177,6 +179,7 @@ public static class KSqlFunctionsExtensions
     throw new InvalidOperationException(ServerSideOperationErrorMessage);
   }
 
+  // ReSharper disable once GrammarMistakeInComment
   //Variation   : ENTRIES(map MAP<VARCHAR, INT>, sorted BOOLEAN)
   //Returns     : ARRAY<STRUCT<K VARCHAR, V INT>>
   //map         : The map to create entries from
@@ -194,6 +197,7 @@ public static class KSqlFunctionsExtensions
     throw new InvalidOperationException(ServerSideOperationErrorMessage);
   }
 
+  // ReSharper disable once GrammarMistakeInComment
   //Variation   : ENTRIES(map MAP<VARCHAR, DOUBLE>, sorted BOOLEAN)
   //Returns     : ARRAY<STRUCT<K VARCHAR, V DOUBLE>>
   //map         : The map to create entries from
@@ -211,6 +215,7 @@ public static class KSqlFunctionsExtensions
     throw new InvalidOperationException(ServerSideOperationErrorMessage);
   }
 
+  // ReSharper disable once GrammarMistakeInComment
   //Variation   : ENTRIES(map MAP<VARCHAR, BOOLEAN>, sorted BOOLEAN)
   //Returns     : ARRAY<STRUCT<K VARCHAR, V BOOLEAN>>
   //map         : The map to create entries from
@@ -357,6 +362,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="start">The beginning of the series</param>
+  /// <param name="end">The end of the series</param>
   /// <param name="step">Difference between each value in the series</param>
   /// <returns>Constructed array of values between start and end (inclusive)</returns>
   public static int[] GenerateSeries(this KSqlFunctions kSqlFunctions, int start, int end, int step)
@@ -369,6 +375,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="start">The beginning of the series</param>
+  /// <param name="end">The end of the series</param>
   /// <param name="step">Difference between each value in the series</param>
   /// <returns>Constructed array of values between start and end (inclusive)</returns>
   public static long[] GenerateSeries(this KSqlFunctions kSqlFunctions, long start, long end, int step)
@@ -427,7 +434,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="value">The value get the natural logarithm of.</param>
-  /// <returns>Returns the natural logarithm (base e) of a INT value.</returns>
+  /// <returns>Returns the natural logarithm (base e) of an INT value.</returns>
   public static double Ln(this KSqlFunctions kSqlFunctions, int value)
   {
     throw new InvalidOperationException(ServerSideOperationErrorMessage);
@@ -446,7 +453,7 @@ public static class KSqlFunctionsExtensions
   }
 
   /// <summary>
-  /// The natural logarithm of a value..
+  /// The natural logarithm of a value.
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="value">The value get the natural logarithm of.</param>
@@ -624,7 +631,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="value">The value to get the square root of</param>
-  /// <returns>Returns the correctly rounded positive square root of a INT value</returns>
+  /// <returns>Returns the correctly rounded positive square root of an INT value</returns>
   public static double Sqrt(this KSqlFunctions kSqlFunctions, int value)
   {
     throw new InvalidOperationException(ServerSideOperationErrorMessage);
@@ -1246,7 +1253,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">The array to sort</param>
-  /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+  /// <param name="direction">Second parameter is used to specify whether to sort the elements in Ascending or Descending order.</param>
   /// <returns></returns>
   public static string[] ArraySort(this KSqlFunctions kSqlFunctions, string[] input, System.ComponentModel.ListSortDirection direction)
   {
@@ -1258,7 +1265,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">The array to sort</param>
-  /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+  /// <param name="direction">Second parameter is used to specify whether to sort the elements in Ascending or Descending order.</param>
   /// <returns></returns>
   public static int[] ArraySort(this KSqlFunctions kSqlFunctions, int[] input, System.ComponentModel.ListSortDirection direction)
   {
@@ -1270,7 +1277,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">The array to sort</param>
-  /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+  /// <param name="direction">Second parameter is used to specify whether to sort the elements in Ascending or Descending order.</param>
   /// <returns></returns>
   public static int?[] ArraySort(this KSqlFunctions kSqlFunctions, int?[] input, System.ComponentModel.ListSortDirection direction)
   {
@@ -1282,7 +1289,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">The array to sort</param>
-  /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+  /// <param name="direction">Second parameter is used to specify whether to sort the elements in Ascending or Descending order.</param>
   /// <returns></returns>
   public static long[] ArraySort(this KSqlFunctions kSqlFunctions, long[] input, System.ComponentModel.ListSortDirection direction)
   {
@@ -1294,7 +1301,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">The array to sort</param>
-  /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+  /// <param name="direction">Second parameter is used to specify whether to sort the elements in Ascending or Descending order.</param>
   /// <returns></returns>
   public static long?[] ArraySort(this KSqlFunctions kSqlFunctions, long?[] input, System.ComponentModel.ListSortDirection direction)
   {
@@ -1306,7 +1313,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">The array to sort</param>
-  /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+  /// <param name="direction">Second parameter is used to specify whether to sort the elements in Ascending or Descending order.</param>
   /// <returns></returns>
   public static double[] ArraySort(this KSqlFunctions kSqlFunctions, double[] input, System.ComponentModel.ListSortDirection direction)
   {
@@ -1318,7 +1325,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">The array to sort</param>
-  /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+  /// <param name="direction">Second parameter is used to specify whether to sort the elements in Ascending or Descending order.</param>
   /// <returns></returns>
   public static double?[] ArraySort(this KSqlFunctions kSqlFunctions, double?[] input, System.ComponentModel.ListSortDirection direction)
   {
@@ -1330,7 +1337,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">The array to sort</param>
-  /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+  /// <param name="direction">Second parameter is used to specify whether to sort the elements in Ascending or Descending order.</param>
   /// <returns></returns>
   public static decimal[] ArraySort(this KSqlFunctions kSqlFunctions, decimal[] input, System.ComponentModel.ListSortDirection direction)
   {
@@ -1342,7 +1349,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">The array to sort</param>
-  /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+  /// <param name="direction">Second parameter is used to specify whether to sort the elements in Ascending or Descending order.</param>
   /// <returns></returns>
   public static decimal?[] ArraySort(this KSqlFunctions kSqlFunctions, decimal?[] input, System.ComponentModel.ListSortDirection direction)
   {
@@ -1354,7 +1361,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">The array to sort</param>
-  /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+  /// <param name="direction">Second parameter is used to specify whether to sort the elements in Ascending or Descending order.</param>
   /// <returns></returns>
   public static bool[] ArraySort(this KSqlFunctions kSqlFunctions, bool[] input, System.ComponentModel.ListSortDirection direction)
   {
@@ -1366,7 +1373,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">The array to sort</param>
-  /// <param name="direction">Second parameter is used to specify whether to sort the elements in 'ASC'ending or 'DESC'ending order.</param>
+  /// <param name="direction">Second parameter is used to specify whether to sort the elements in Ascending or Descending order.</param>
   /// <returns></returns>
   public static bool?[] ArraySort(this KSqlFunctions kSqlFunctions, bool?[] input, System.ComponentModel.ListSortDirection direction)
   {
@@ -1628,7 +1635,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">Map (dictionary) input.</param>
-  /// <returns>Returns an array that contains all of the keys from the specified map.</returns>
+  /// <returns>Returns an array that contains all the keys from the specified map.</returns>
   public static string[] MapKeys(this KSqlFunctions kSqlFunctions, IDictionary<string, string> input)
   {
     throw new InvalidOperationException(ServerSideOperationErrorMessage);
@@ -1639,7 +1646,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">Map (dictionary) input.</param>
-  /// <returns>Returns an array that contains all of the keys from the specified map.</returns>
+  /// <returns>Returns an array that contains all the keys from the specified map.</returns>
   public static string[] MapKeys(this KSqlFunctions kSqlFunctions, IDictionary<string, int> input)
   {
     throw new InvalidOperationException(ServerSideOperationErrorMessage);
@@ -1650,7 +1657,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">Map (dictionary) input.</param>
-  /// <returns>Returns an array that contains all of the keys from the specified map.</returns>
+  /// <returns>Returns an array that contains all the keys from the specified map.</returns>
   public static string[] MapKeys(this KSqlFunctions kSqlFunctions, IDictionary<string, long> input)
   {
     throw new InvalidOperationException(ServerSideOperationErrorMessage);
@@ -1661,7 +1668,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">Map (dictionary) input.</param>
-  /// <returns>Returns an array that contains all of the keys from the specified map.</returns>
+  /// <returns>Returns an array that contains all the keys from the specified map.</returns>
   public static string[] MapKeys(this KSqlFunctions kSqlFunctions, IDictionary<string, decimal> input)
   {
     throw new InvalidOperationException(ServerSideOperationErrorMessage);
@@ -1672,7 +1679,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">Map (dictionary) input.</param>
-  /// <returns>Returns an array that contains all of the keys from the specified map.</returns>
+  /// <returns>Returns an array that contains all the keys from the specified map.</returns>
   public static string[] MapKeys(this KSqlFunctions kSqlFunctions, IDictionary<string, short> input)
   {
     throw new InvalidOperationException(ServerSideOperationErrorMessage);
@@ -1683,17 +1690,11 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="input">Map (dictionary) input.</param>
-  /// <returns>Returns an array that contains all of the keys from the specified map.</returns>
+  /// <returns>Returns an array that contains all the keys from the specified map.</returns>
   public static string[] MapKeys(this KSqlFunctions kSqlFunctions, IDictionary<string, double> input)
   {
     throw new InvalidOperationException(ServerSideOperationErrorMessage);
   }
-
-  #endregion
-
-  #region MAP_VALUES
-
-
 
   #endregion
 
@@ -1906,7 +1907,7 @@ public static class KSqlFunctionsExtensions
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="str">The source string. If null, then function returns null.</param>
-  /// <returns>Returns the string with the the first letter of each word capitalized and the rest lowercased</returns>
+  /// <returns>Returns the string with the first letter of each word capitalized and the rest lowercased</returns>
   public static string InitCap(this KSqlFunctions kSqlFunctions, string str)
   {
     throw new InvalidOperationException(ServerSideOperationErrorMessage);
@@ -1967,7 +1968,7 @@ public static class KSqlFunctionsExtensions
   /// <summary>
   /// Given a string, parses it as a JSON object and returns a ksqlDB array of strings representing the
   /// top-level keys.Returns NULL if the string can't be interpreted as a JSON object, for example, when the
-  /// string is NULL or it does not contain valid JSON, or the JSON value is not an object. Since: 0.24.0
+  /// string is NULL, or it does not contain valid JSON, or the JSON value is not an object. Since: 0.24.0
   /// </summary>
   /// <param name="kSqlFunctions"></param>
   /// <param name="jsonString">The input JSON string</param>
@@ -2032,11 +2033,15 @@ public static class KSqlFunctionsExtensions
 
   #region Date and time functions
 
+  // ReSharper disable once CommentTypo
   //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#convert_tz
 
+  // ReSharper disable once CommentTypo
   //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#dateadd
 
+  // ReSharper disable once CommentTypo
   //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#datesub
+
 
   /// <summary>
   /// Converts an integer representing days since epoch to a date string using the given format pattern.
@@ -2141,6 +2146,7 @@ public static class KSqlFunctionsExtensions
 
   //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#from_days
 
+  // ReSharper disable once CommentTypo
   //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#from_unixtime
 
   /// <summary>
@@ -2169,12 +2175,16 @@ public static class KSqlFunctionsExtensions
 
   //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#parse_timestamp
 
+  // ReSharper disable once CommentTypo
   //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#timeadd
 
+  // ReSharper disable once CommentTypo
   //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#timesub
 
+  // ReSharper disable once CommentTypo
   //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#timestampadd
 
+  // ReSharper disable once CommentTypo
   //https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#timestampsub
 
   /// <summary>

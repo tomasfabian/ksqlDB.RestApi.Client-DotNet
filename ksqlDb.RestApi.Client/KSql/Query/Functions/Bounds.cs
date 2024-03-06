@@ -1,7 +1,7 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Query.Functions;
-#pragma warning disable CS0660, CS0661
-public struct Bounds
-#pragma warning restore CS0660, CS0661
+namespace ksqlDB.RestApi.Client.KSql.Query.Functions;
+
+#pragma warning disable IDE0060, CS0660, CS0661
+public readonly struct Bounds
 {
   public static readonly Bounds WindowStart = new();
   public static readonly Bounds WindowEnd = new();
@@ -67,3 +67,4 @@ public struct Bounds
     return true;
   }
 }
+#pragma warning restore IDE0060, CS0660, CS0661

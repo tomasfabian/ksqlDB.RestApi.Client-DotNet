@@ -8,12 +8,12 @@ public class Duration
   /// <summary>
   /// Gets the time unit of the duration.
   /// </summary>
-  public TimeUnits TimeUnit { get; private set; }
+  public TimeUnits TimeUnit { get; private init; }
 
   /// <summary>
   /// Gets the value of the duration.
   /// </summary>
-  public uint Value { get; private set; }
+  public uint Value { get; private init; }
 
   /// <summary>
   /// Creates a new <see cref="Duration"/> object with the specified value in milliseconds.
