@@ -38,4 +38,4 @@ jobs:
     
     # Test
     - name: Execute ksqlDb RestApi Client Unit Tests
-      run: dotnet test $env:ksqlDB_Test_Project_Path
+      run: dotnet test ./Tests/ksqlDB.RestApi.Client.Tests/ksqlDb.RestApi.Client.Tests.csproj
