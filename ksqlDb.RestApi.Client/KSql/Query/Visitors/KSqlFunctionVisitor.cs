@@ -46,6 +46,7 @@ internal class KSqlFunctionVisitor : KSqlVisitor
         case nameof(KSqlFunctionsExtensions.Ln):
         case nameof(KSqlFunctionsExtensions.Exp):
         case nameof(KSqlFunctionsExtensions.Floor):
+        case nameof(KSqlFunctionsExtensions.Sqrt):
         case nameof(KSqlFunctionsExtensions.Sign):
           Append($"{methodInfo.Name.ToUpper()}(");
           Visit(methodCallExpression.Arguments[1]);

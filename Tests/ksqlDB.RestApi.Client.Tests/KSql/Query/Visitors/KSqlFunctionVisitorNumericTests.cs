@@ -94,7 +94,7 @@ public class KSqlFunctionVisitorNumericTests : TestBase
 
   private class Test
   {
-    public IDictionary<string, string> Dictionary { get; set; } = null!;
+    public IDictionary<string, string> Dictionary { get; init; } = null!;
   }
 
   [Test]
@@ -305,8 +305,25 @@ public class KSqlFunctionVisitorNumericTests : TestBase
 
   #endregion
 
+  #region Sqrt
+
+  [Test]
+  public void Sqrt_BuildKSql_PrintsFunction()
+  {
+    //Arrange
+    Expression<Func<Tweet, double>> expression = c => K.Functions.Sqrt(c.Amount);
+
+    //Act
+    var query = ClassUnderTest.BuildKSql(expression);
+
+    //Assert
+    query.Should().BeEquivalentTo($"SQRT({nameof(Tweet.Amount)})");
+  }
+
+  #endregion
+
   #region Random
-    
+
   [Test]
   public void Random_BuildKSql_PrintsRandomFunction()
   {
