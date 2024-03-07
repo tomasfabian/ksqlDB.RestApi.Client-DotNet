@@ -57,7 +57,7 @@ public class AggregationTimeTests : Infrastructure.IntegrationTests
     await RestApiProvider.DropStreamAsync(TimesStreamName, useIfExistsClause: false, deleteTopic: true);
   }
 
-  private static string TimesStreamName = "times_test";
+  private static readonly string TimesStreamName = "times_test";
 
   [Test]
   public async Task MinDateTime()
@@ -65,7 +65,7 @@ public class AggregationTimeTests : Infrastructure.IntegrationTests
     await MinDateTime(Context.CreateQueryStream<Times>(TimesStreamName));
   }
 
-  private async Task MinDateTime(IQbservable<Times> querySource)
+  private static async Task MinDateTime(IQbservable<Times> querySource)
   {
     //Arrange
     int expectedItemsCount = 2;
@@ -89,7 +89,7 @@ public class AggregationTimeTests : Infrastructure.IntegrationTests
     await MaxTime(Context.CreateQueryStream<Times>(TimesStreamName));
   }
 
-  private async Task MaxTime(IQbservable<Times> querySource)
+  private static async Task MaxTime(IQbservable<Times> querySource)
   {
     //Arrange
     int expectedItemsCount = 2;
@@ -113,7 +113,7 @@ public class AggregationTimeTests : Infrastructure.IntegrationTests
     await MinDateTimeOffset(Context.CreateQueryStream<Times>(TimesStreamName));
   }
 
-  private async Task MinDateTimeOffset(IQbservable<Times> querySource)
+  private static async Task MinDateTimeOffset(IQbservable<Times> querySource)
   {
     //Arrange
     int expectedItemsCount = 2;

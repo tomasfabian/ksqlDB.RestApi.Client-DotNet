@@ -161,7 +161,8 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     var source = QuerySource;
 
     //Act
-    using var subscription = source.Take(expectedItemsCount).Subscribe(c => actualValues.Add(c), e => semaphore.Release(), () => semaphore.Release());
+    using var subscription = source.Take(expectedItemsCount)
+      .Subscribe(c => actualValues.Add(c), e => semaphore.Release(), () => semaphore.Release());
     await semaphore.WaitAsync(timeOut);
 
     //Assert
@@ -263,6 +264,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
       .SubscribeAsync(c => actualValues.Add(c), e => { }, () => { });
 
     //Assert
+    subscription.QueryId.Should().NotBeNullOrEmpty();
     Assert.AreEqual(expectedItemsCount, actualValues.Count);
   }
 
@@ -285,6 +287,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
 
     //Assert
     observeOnThread.Should().NotBeNull();
+    subscription.QueryId.Should().NotBeNullOrEmpty();
     Assert.AreNotEqual(currentThread, observeOnThread!.Value);
   }
 
@@ -324,7 +327,8 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
       .ToObservable();
 
     //Act
-    using var subscription = source.Take(expectedItemsCount).Subscribe(c => actualValues.Add(c), e => semaphore.Release(), () => semaphore.Release());
+    using var subscription = source.Take(expectedItemsCount)
+      .Subscribe(c => actualValues.Add(c), e => semaphore.Release(), () => semaphore.Release());
     await semaphore.WaitAsync(timeOut);
 
     //Assert
@@ -439,7 +443,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
 
     string ksql = "SELECT * FROM tweetsTest EMIT CHANGES LIMIT 2;";
 
-    QueryParameters queryParameters = new QueryParameters
+    QueryParameters queryParameters = new()
     {
       Sql = ksql,
       [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
@@ -460,9 +464,9 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     //Arrange
     int expectedItemsCount = 2;
 
-    string ksql = @"SELECT * FROM tweetsTest EMIT CHANGES LIMIT 2;";
+    string ksql = "SELECT * FROM tweetsTest EMIT CHANGES LIMIT 2;";
 
-    QueryStreamParameters queryStreamParameters = new QueryStreamParameters
+    QueryStreamParameters queryStreamParameters = new()
     {
       Sql = ksql,
       [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
@@ -654,7 +658,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     var ksql =
       $"SELECT 42 FROM {StreamName} EMIT CHANGES LIMIT 1;";
 
-    QueryStreamParameters queryStreamParameters = new QueryStreamParameters
+    QueryStreamParameters queryStreamParameters = new()
     {
       Sql = ksql,
       [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
@@ -678,7 +682,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     var ksql =
       $"SELECT ARRAY[1, 2] FROM {StreamName} EMIT CHANGES LIMIT 1;";
 
-    QueryStreamParameters queryStreamParameters = new QueryStreamParameters
+    QueryStreamParameters queryStreamParameters = new()
     {
       Sql = ksql,
       [QueryParameters.AutoOffsetResetPropertyName] = "earliest",

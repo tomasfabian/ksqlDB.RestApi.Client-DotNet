@@ -6,14 +6,9 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq;
 
-public class MoviesProvider
+public class MoviesProvider(KSqlDbRestApiProvider restApiProvider)
 {
-  private readonly KSqlDbRestApiProvider restApiProvider;
-
-  public MoviesProvider(KSqlDbRestApiProvider restApiProvider)
-  {
-    this.restApiProvider = restApiProvider ?? throw new ArgumentNullException(nameof(restApiProvider));
-  }
+  private readonly KSqlDbRestApiProvider restApiProvider = restApiProvider ?? throw new ArgumentNullException(nameof(restApiProvider));
 
   public static readonly string MoviesTableName = "movies_test";
   public static readonly string ActorsTableName = "lead_actor_test";

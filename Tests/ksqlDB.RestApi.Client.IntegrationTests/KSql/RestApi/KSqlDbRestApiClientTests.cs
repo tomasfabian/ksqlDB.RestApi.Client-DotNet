@@ -20,7 +20,7 @@ namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
 
 public class KSqlDbRestApiClientTests
 {
-  private IKSqlDbRestApiClient restApiClient = null!;
+  private KSqlDbRestApiClient restApiClient = null!;
 
   [SetUp]
   public void Initialize()
@@ -68,7 +68,7 @@ public class KSqlDbRestApiClientTests
     });
   }
 
-  private string CreateTableStatement(string tableName = "TestTable")
+  private static string CreateTableStatement(string tableName = "TestTable")
   {
     return $@"CREATE OR REPLACE TABLE {tableName} (
         title VARCHAR PRIMARY KEY,
@@ -108,25 +108,25 @@ public class KSqlDbRestApiClientTests
       WindowType = WindowType.Tumbling,
       WindowSize = "10 SECONDS",
       Timestamp = nameof(MyMoviesTable.Timestamp),
-      TimestampFormat = "yyyy-MM-dd''T''HH:mm:ssX"
+      TimestampFormat = "yyyy-MM-dd''T''HH:mm:ssX",
+      ShouldPluralizeEntityName = false
     };
 
     return metadata;
   }
 
-  internal record MyMoviesTable2 : MyMoviesStreamTest
-  {
-  }
+  internal record MyMoviesTableTest : MyMoviesStreamTest;
 
   [Test]
   public async Task CreateOrReplaceStream()
   {
     //Arrange
-    var metadata = GetEntityCreationMetadata(nameof(MyMoviesTable2));
+    var metadata = GetEntityCreationMetadata(nameof(MyMoviesTableTest));
+    await restApiClient.DropStreamAsync(nameof(MyMoviesTableTest));
 
     //Act
-    var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MyMoviesTable2>(metadata);
-    var _ = await httpResponseMessage.ToStatementResponsesAsync().ConfigureAwait(false);
+    var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MyMoviesTableTest>(metadata);
+    var statementResponses = await httpResponseMessage.ToStatementResponsesAsync().ConfigureAwait(false);
 
     //Assert
     httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -134,7 +134,7 @@ public class KSqlDbRestApiClientTests
     string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
     var responseObject = JsonSerializer.Deserialize<StatementResponse[]>(responseContent);
 
-    responseObject?[0].CommandStatus.Status.Should().Be("SUCCESS");
+    responseObject?[0].CommandStatus.Status.Should().Be(CommandStatus.Success);
     responseObject?[0].CommandStatus.Message.Should().Be("Stream created");
   }
 
@@ -146,10 +146,13 @@ public class KSqlDbRestApiClientTests
 Drop type Person;
 Drop type Address;
 "));
-      
+    httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
+
     //Act
     httpResponseMessage = await restApiClient.CreateTypeAsync<Address>();
+    httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
     httpResponseMessage = await restApiClient.CreateTypeAsync<Person>();
+    httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
 
     //Assert
     httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -169,7 +172,7 @@ Drop type Address;
 
   #region Connectors
 
-  private string SinkConnectorName => "mock-sink-connector";
+  private static string SinkConnectorName => "mock-sink-connector";
 
   [Test]
   public async Task CreateSinkConnectorAsync()
@@ -381,7 +384,7 @@ Drop type Address;
     content[0].Type.Should().Contain("error");
   }
 
-  record Movie2
+  private record Movie2
   {
     [Key]
     public int Id { get; set; }
@@ -409,7 +412,7 @@ Drop type Address;
     httpResponseMessage.IsSuccessStatusCode.Should().BeTrue();
   }
 
-  private string CreateStreamStatement(string streamName = "TestTable")
+  private static string CreateStreamStatement(string streamName = "TestTable")
   {
     return $@"CREATE OR REPLACE STREAM {streamName} (
         title VARCHAR KEY,
@@ -441,7 +444,7 @@ Drop type Address;
   public async Task DropTableAsync()
   {
     //Arrange
-    string tableName = Guid.NewGuid().ToString().Substring(0, 8);
+    string tableName = Guid.NewGuid().ToString()[..8];
     var response = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(CreateTableStatement(tableName)));
 
     //Act
@@ -452,10 +455,7 @@ Drop type Address;
     httpResponseMessage.IsSuccessStatusCode.Should().BeTrue();
   }
 
-  internal record MyMoviesTable : MyMoviesStreamTest
-  {
-
-  }
+  internal record MyMoviesTable : MyMoviesStreamTest;
 
   internal record MyMoviesStreamTest
   {
@@ -466,7 +466,7 @@ Drop type Address;
 
     public string Timestamp { get; set; } = null!;
 
-    public int Release_Year { get; set; }
+    public int ReleaseYear { get; set; }
 
     public int[] NumberOfDays { get; set; } = null!;
 
@@ -474,7 +474,7 @@ Drop type Address;
     public Dictionary<string, int> Dictionary2 { get; set; } = null!;
 
     //#pragma warning disable CS0649
-    public int DontFindMe;
+    public int DoNotFindMe;
     //#pragma warning restore CS0649
 
     public int DontFindMe2 { get; }
@@ -500,7 +500,7 @@ Drop type Address;
     content[0].CommandStatus?.Status.Should().BeOneOf(default(string), CommandStatus.Success);
   }
 
-  record IoTSensor
+  private record IoTSensor
   {
     [Key]
     public string SensorId { get; set; } = null!;

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using ksqlDb.RestApi.Client.IntegrationTests.Helpers;
 using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
 using ksqlDb.RestApi.Client.IntegrationTests.Models;
 using ksqlDb.RestApi.Client.IntegrationTests.Models.Movies;
@@ -20,7 +21,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
   private static MoviesProvider moviesProvider = null!;
 
 
-  static readonly EntityCreationMetadata OrderEntityCreationMetadata = new()
+  private static readonly EntityCreationMetadata OrderEntityCreationMetadata = new()
   {
     KafkaTopic = nameof(Order) + "-TestJoin",
     Partitions = 1
@@ -51,8 +52,8 @@ public class JoinsTests : Infrastructure.IntegrationTests
     await moviesProvider.DropTablesAsync();
   }
 
-  private string MoviesTableName => MoviesProvider.MoviesTableName;
-  private string ActorsTableName => MoviesProvider.ActorsTableName;
+  private static string MoviesTableName => MoviesProvider.MoviesTableName;
+  private static string ActorsTableName => MoviesProvider.ActorsTableName;
 
   [Test]
   public async Task Join()
@@ -143,7 +144,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
     await FullOuterJoinTest(Context.CreateQuery<Movie2>(MoviesTableName));
   }
 
-  public async Task FullOuterJoinTest(IQbservable<Movie2> querySource)
+  public static async Task FullOuterJoinTest(IQbservable<Movie2> querySource)
   {
     //Arrange
     int expectedItemsCount = 3;
@@ -174,11 +175,11 @@ public class JoinsTests : Infrastructure.IntegrationTests
     actualValues[2].Title.Should().BeOneOf(MoviesProvider.Movie1.Title, MoviesProvider.Movie2.Title, null);
   }
 
-  class Order
+  private class Order
   {
-    public int OrderId { get; set; }
-    public int PaymentId { get; set; }
-    public int ShipmentId { get; set; }
+    public int OrderId { get; init; }
+    public int PaymentId { get; init; }
+    public int ShipmentId { get; init; }
   }
 
   #region RightJoin
@@ -197,7 +198,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
         ( actor, movie) => new
         {
           movie.Id,
-          Title = movie.Title,
+          movie.Title,
           movie.Release_Year,
           Substr = K.Functions.Substring(movie.Title, 2, 4),
           ActorTitle = actor.Title,
@@ -226,13 +227,13 @@ public class JoinsTests : Infrastructure.IntegrationTests
   class Payment
   {
     [Key]
-    public int Id { get; set; }
+    public int Id { get; init; }
   }
 
   record Shipment
   {
     [Key]
-    public int? Id { get; set; }
+    public int? Id { get; init; }
   }
 
   struct Foo
@@ -250,7 +251,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
     response = await RestApiProvider.CreateTableAsync<Payment>(OrderEntityCreationMetadata with { KafkaTopic = nameof(Payment) + "-TestJoin" }, ifNotExists: true);
     response = await RestApiProvider.CreateTableAsync<Shipment>(OrderEntityCreationMetadata with { KafkaTopic = nameof(Shipment) + "-TestJoin" }, ifNotExists: true);
 
-    var ksqlDbUrl = @"http://localhost:8088";
+    var ksqlDbUrl = TestConfig.KSqlDbUrl;
 
     var context = new KSqlDBContext(ksqlDbUrl);
 
@@ -305,9 +306,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
 
     var response = await RestApiProvider.CreateStreamAsync<Payment>(entityCreationMetadata, ifNotExists: true);
 
-    var ksqlDbUrl = @"http://localhost:8088";
-
-    var context = new KSqlDBContext(ksqlDbUrl);
+    var context = new KSqlDBContext(TestConfig.KSqlDbUrl);
 
     var query = from o in context.CreateQueryStream<Order>()
       join p in Source.Of<Payment>(nameof(Payment) + "Stream").Within(Duration.OfSeconds(0), Duration.OfSeconds(25)) on o.OrderId equals p.Id
@@ -334,14 +333,14 @@ public class JoinsTests : Infrastructure.IntegrationTests
 
   private class Nested
   {
-    public string Prop { get; set; } = null!;
+    public string Prop { get; init; } = null!;
   }
 
-  class PaymentExt
+  private class PaymentExt
   {
     [Key]
-    public int Id { get; set; }
-    public Nested Nested { get; set; } = null!;
+    public int Id { get; init; }
+    public Nested Nested { get; init; } = null!;
   }
 
   [Test]
@@ -354,9 +353,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
     var entityCreationMetadata = new EntityCreationMetadata(nameof(PaymentExt) + "-TestJoin", partitions: 1);
     response = await RestApiProvider.CreateTableAsync<PaymentExt>(entityCreationMetadata, ifNotExists: true);
 
-    var ksqlDbUrl = @"http://localhost:8088";
-
-    var context = new KSqlDBContext(ksqlDbUrl);
+    var context = new KSqlDBContext(TestConfig.KSqlDbUrl);
       
     string prop = "Nested";
 

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using ksqlDb.RestApi.Client.IntegrationTests.Helpers;
 using ksqlDb.RestApi.Client.IntegrationTests.Http;
 using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -14,13 +15,13 @@ namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq;
 
 public class ComplexTypesTests
 {
-  private IKSqlDbRestApiClient restApiClient = null!;
+  private KSqlDbRestApiClient restApiClient = null!;
   protected KSqlDBContext Context = null!;
 
   [SetUp]
   public void Initialize()
   {
-    var ksqlDbUrl = @"http://localhost:8088";
+    var ksqlDbUrl = TestConfig.KSqlDbUrl;
 
     var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
 
@@ -55,8 +56,8 @@ Drop table Events;
     var testEvent = new Event
     {
       Id = 1,
-      Places = new[] { "Place1", "Place2" },
-      Categories = new[] { eventCategory, new EventCategory { Name = "puk" } }
+      Places = [ "Place1", "Place2" ],
+      Categories = [ eventCategory, new EventCategory { Name = "puk" } ]
     };
 
     var semaphoreSlim = new SemaphoreSlim(0, 1);
@@ -90,26 +91,24 @@ Drop table Events;
     using (subscription) { }
   }
 
-  class Foo : Dictionary<string, int>
-  {
-  }
+  private class Foo : Dictionary<string, int>;
 
   [Test]
   public void TransformMap_WithNestedMap()
   {
     //Arrange
     var value = new Dictionary<string, IDictionary<string, int>>()
-      { { "a", new Dictionary<string, int>() { { "a", 1 } } } };
+      { { "A", new Dictionary<string, int>() { { "A", 1 } } } };
 
     string ksql =
       Context.CreateQueryStream<object>(fromItemName: "Events")
         .Select(_ => new
         {
-          Dict = K.Functions.Transform(value, (k, v) => k.ToUpper(), (k, v) => v["a"] + 1)
+          Dict = K.Functions.Transform(value, (k, v) => k.ToUpper(), (k, v) => v["A"] + 1)
         })
         .ToQueryString();
 
-    QueryStreamParameters queryStreamParameters = new QueryStreamParameters
+    QueryStreamParameters queryStreamParameters = new()
     {
       Sql = ksql,
       [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
@@ -127,8 +126,8 @@ Drop table Events;
 
   record MyType
   {
-    public int a { get; set; }
-    public int b { get; set; }
+    public int A { get; init; }
+    public int B { get; set; }
   }
 
   [Test]
@@ -136,17 +135,17 @@ Drop table Events;
   {
     //Arrange
     var value = new Dictionary<string, MyType>
-      { { "a", new MyType { a = 1, b = 2 } } };
+      { { "A", new MyType { A = 1, B = 2 } } };
 
     string ksql =
       Context.CreateQueryStream<object>(fromItemName: "Events")
         .Select(_ => new
         {
-          Dict = K.Functions.Transform(value, (k, v) => k.ToUpper(), (k, v) => v.a + 1)
+          Dict = K.Functions.Transform(value, (k, v) => k.ToUpper(), (k, v) => v.A + 1)
         })
         .ToQueryString();
 
-    QueryStreamParameters queryStreamParameters = new QueryStreamParameters
+    QueryStreamParameters queryStreamParameters = new()
     {
       Sql = ksql,
       [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",

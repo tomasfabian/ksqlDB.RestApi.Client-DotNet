@@ -75,7 +75,7 @@ AS SELECT * FROM {nameof(Movie)} EMIT CHANGES;");
     //Assert
     ksql.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
  WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
-AS SELECT Id, Title, Release_Year AS ReleaseYear FROM {StreamEntityName}
+AS SELECT Id, Title, ReleaseYear AS ReleaseYear FROM {StreamEntityName}
 WHERE Id < 3 PARTITION BY Id EMIT CHANGES;");
 
     var responses = await httpResponseMessage.ToStatementResponsesAsync();

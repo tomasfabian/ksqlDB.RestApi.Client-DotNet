@@ -1,3 +1,4 @@
+using ksqlDb.RestApi.Client.IntegrationTests.Helpers;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using HttpClientFactory = ksqlDb.RestApi.Client.IntegrationTests.Http.HttpClientFactory;
@@ -5,20 +6,15 @@ using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFa
 
 namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
 
-public class KSqlDbRestApiProvider : KSqlDbRestApiClient
+public class KSqlDbRestApiProvider(IHttpClientFactory httpClientFactory) : KSqlDbRestApiClient(httpClientFactory)
 {
-  internal static string KsqlDbUrl { get; } = @"http://localhost:8088";
+  internal static string KsqlDbUrl => TestConfig.KSqlDbUrl;
 
   public static KSqlDbRestApiProvider Create(string? ksqlDbUrl = null)
   {
     var uri = new Uri(ksqlDbUrl ?? KsqlDbUrl);
 
     return new KSqlDbRestApiProvider(new HttpClientFactory(uri));
-  }
-
-  public KSqlDbRestApiProvider(IHttpClientFactory httpClientFactory) 
-    : base(httpClientFactory)
-  {
   }
 
   public Task<HttpResponseMessage> DropStreamAndTopic(string streamName)

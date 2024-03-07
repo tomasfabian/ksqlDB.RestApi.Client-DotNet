@@ -12,7 +12,7 @@ namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq
     private static TweetsProvider? tweetsProvider;
 
     private static readonly string TweetsTopicName = "tweetsFunctionTestTopic";
-    protected static string TweetsStreamName = "tweetsFunctionTest";
+    private static readonly string TweetsStreamName = "tweetsFunctionTest";
 
     [OneTimeSetUp]
     public static async Task ClassInitialize()
@@ -41,7 +41,7 @@ namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq
       await Explode(Context.CreateQueryStream<Tweet>(TweetsStreamName));
     }
 
-    private async Task Explode(IQbservable<Tweet> querySource)
+    private static async Task Explode(IQbservable<Tweet> querySource)
     {
       //Arrange
       int expectedItemsCount = 3;

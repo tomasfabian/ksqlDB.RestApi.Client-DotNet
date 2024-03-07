@@ -20,7 +20,7 @@ public class GroupByTests : Infrastructure.IntegrationTests
     response = await RestApiProvider.CreateTypeAsync<TestCity>();
 
     response = await RestApiProvider.CreateTableAsync<TestCity>(new EntityCreationMetadata { EntityName = CitiesTableName, KafkaTopic = CitiesTableName, Partitions = 1});
-    var c = await response.Content.ReadAsStringAsync();
+    var content = await response.Content.ReadAsStringAsync();
 
     response = await RestApiProvider.InsertIntoAsync(new TestCity
       { RegionCode = "sk", State = State1 }, new InsertProperties { EntityName = CitiesTableName });

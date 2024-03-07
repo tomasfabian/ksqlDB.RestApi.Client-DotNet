@@ -6,15 +6,10 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq;
 
-public class TweetsProvider
+public class TweetsProvider(KSqlDbRestApiProvider restApiProvider)
 {
-  private readonly KSqlDbRestApiProvider restApiProvider;
+  private readonly KSqlDbRestApiProvider restApiProvider = restApiProvider ?? throw new ArgumentNullException(nameof(restApiProvider));
 
-  public TweetsProvider(KSqlDbRestApiProvider restApiProvider)
-  {
-    this.restApiProvider = restApiProvider ?? throw new ArgumentNullException(nameof(restApiProvider));
-  }
-    
   public static readonly Tweet Tweet1 = new()
   {
     Id = 1,
