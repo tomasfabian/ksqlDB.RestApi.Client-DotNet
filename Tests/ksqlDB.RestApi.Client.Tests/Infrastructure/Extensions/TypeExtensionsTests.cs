@@ -77,7 +77,10 @@ public class TypeExtensionsTests
     typeDefinition.Should().BeFalse();
   }
 
-  enum TestTypes{}
+  enum TestTypes
+  {
+    None = 0
+  }
 
   [Test]
   public void IsStruct_EnumType_ReturnsFalse()
@@ -197,7 +200,7 @@ public class TypeExtensionsTests
   {
     public IEnumerator<string> GetEnumerator()
     {
-      throw new System.NotImplementedException();
+      throw new NotImplementedException();
     }
 
     IEnumerator IEnumerable.GetEnumerator()

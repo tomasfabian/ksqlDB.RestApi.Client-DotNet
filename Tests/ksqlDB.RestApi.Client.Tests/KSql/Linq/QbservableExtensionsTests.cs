@@ -144,7 +144,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     var ksql = query.ToQueryString();
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"SELECT * FROM Locations EMIT CHANGES LIMIT {limit};");
+    ksql.Should().BeEquivalentTo($"SELECT * FROM Locations EMIT CHANGES LIMIT {limit};");
   }
 
   record MyType
@@ -190,12 +190,8 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     ksql1.Should().BeEquivalentTo(ksql2);
   }
 
-  internal class TweetsKQueryStreamSet : KQueryStreamSet<Tweet>
-  {
-    public TweetsKQueryStreamSet(IServiceScopeFactory serviceScopeFactory, QueryContext queryContext) : base(serviceScopeFactory, queryContext)
-    {
-    }
-  }
+  internal class TweetsKQueryStreamSet(IServiceScopeFactory serviceScopeFactory, QueryContext queryContext)
+    : KQueryStreamSet<Tweet>(serviceScopeFactory, queryContext);
 
   internal class TestableDbProviderExt : TestableDbProvider<Tweet>
   {
@@ -236,7 +232,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
   }
 
   [Test]
-  public async Task ToAsyncEnumerable_Query_KSqldbProviderRunWasCalled()
+  public async Task ToAsyncEnumerable_Query_KSqlDbProviderRunWasCalled()
   {
     //Arrange
     var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
@@ -307,7 +303,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     cancellationToken.IsCancellationRequested.Should().BeTrue();
   }
 
-  protected async IAsyncEnumerable<string> GetTestValues()
+  protected static async IAsyncEnumerable<string> GetTestValues()
   {
     yield return "Hello world";
 
@@ -404,14 +400,14 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     ((KStreamSet)source).ObserveOnScheduler.Should().Be(testScheduler);
   }
 
-  private IQbservable<Location> CreateStreamSource()
+  private static IQbservable<Location> CreateStreamSource()
   {
     var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
       
     return context.CreateQueryStream<Location>();
   }
 
-  private IQbservable<string> CreateTestableKStreamSet()
+  private static IQbservable<string> CreateTestableKStreamSet()
   {
     var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
       
@@ -504,7 +500,7 @@ WHERE Id = '{uniqueId}' EMIT CHANGES;".ReplaceLineEndings();
     ksql.Should().BeEquivalentTo(expectedKSql);
   }
 
-  internal IQbservable<T> GetQuery<T>(TestableDbProvider context, string tableName, Guid uniqueId)
+  internal static IQbservable<T> GetQuery<T>(TestableDbProvider context, string tableName, Guid uniqueId)
     where T : IIdentifiable
   {
     return context.CreateQueryStream<T>(tableName).Where(l => l.Id == uniqueId);

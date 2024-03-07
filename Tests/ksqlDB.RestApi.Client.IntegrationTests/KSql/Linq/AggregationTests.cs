@@ -82,7 +82,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
   //Struct(Name :='Karen', Age := 55)
   private class Person
   {
-    public string Name { get; set; } = null!;
+    public string Name { get; init; } = null!;
     public int Age { get; set; }
   }
 

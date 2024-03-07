@@ -8,7 +8,6 @@ namespace ksqlDb.RestApi.Client.Tests.Disposables;
 
 public class AsyncDisposableObjectTests : TestBase<AsyncDisposableObjectTests.TestableAsyncDisposableObject>
 {
-  // [TestInitialize]
   public override void TestInitialize()
   {
     base.TestInitialize();

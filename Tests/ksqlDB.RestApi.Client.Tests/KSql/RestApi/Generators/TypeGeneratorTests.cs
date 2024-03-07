@@ -19,7 +19,7 @@ public class TypeGeneratorTests
 
     //Assert
     statement.Should()
-      .Be($@"CREATE TYPE {nameof(Address).ToUpper()} AS STRUCT<Number INT, Street VARCHAR, City VARCHAR>;");
+      .Be($"CREATE TYPE {nameof(Address).ToUpper()} AS STRUCT<Number INT, Street VARCHAR, City VARCHAR>;");
   }
 
   [Test]
@@ -32,7 +32,7 @@ public class TypeGeneratorTests
     var statement = new TypeGenerator().Print(new TypeProperties<Address> { EntityName = typeName });
 
     //Assert
-    statement.Should().Be($@"CREATE TYPE {typeName} AS STRUCT<Number INT, Street VARCHAR, City VARCHAR>;");
+    statement.Should().Be($"CREATE TYPE {typeName} AS STRUCT<Number INT, Street VARCHAR, City VARCHAR>;");
   }
 
   [Test]
@@ -44,7 +44,7 @@ public class TypeGeneratorTests
     var statement = new TypeGenerator().Print(new TypeProperties<Person>());
 
     //Assert
-    statement.Should().Be($@"CREATE TYPE {nameof(Person).ToUpper()} AS STRUCT<Name VARCHAR, Address ADDRESS>;");
+    statement.Should().Be($"CREATE TYPE {nameof(Person).ToUpper()} AS STRUCT<Name VARCHAR, Address ADDRESS>;");
   }
 
   [Test]
@@ -56,7 +56,7 @@ public class TypeGeneratorTests
     var statement = new TypeGenerator().Print(new TypeProperties<Thumbnail>());
 
     //Assert
-    statement.Should().Be(@$"CREATE TYPE {nameof(Thumbnail).ToUpper()} AS STRUCT<Image BYTES>;");
+    statement.Should().Be($"CREATE TYPE {nameof(Thumbnail).ToUpper()} AS STRUCT<Image BYTES>;");
   }
 
   [Test]
@@ -68,7 +68,7 @@ public class TypeGeneratorTests
     var statement = new TypeGenerator().Print(new TypeProperties<Container>());
 
     //Assert
-    statement.Should().Be(@$"CREATE TYPE {nameof(Container).ToUpper()} AS STRUCT<Values2 MAP<VARCHAR, INT>>;");
+    statement.Should().Be($"CREATE TYPE {nameof(Container).ToUpper()} AS STRUCT<Values2 MAP<VARCHAR, INT>>;");
   }
 
   [TestCase(IdentifierEscaping.Never, ExpectedResult = "CREATE TYPE ROWTIME AS STRUCT<Value VARCHAR>;")]
@@ -118,21 +118,21 @@ public class TypeGeneratorTests
     public IDictionary<string, int> Values2 { get; set; } = null!;
   }
 
-  record Rowtime(string Value)
+  private record Rowtime(string Value)
   {
   }
 
-  record Values(string Value)
+  private record Values(string Value)
   {
   }
 
-  record SystemColumn(string Rowtime, string Rowoffset, string Rowpartition, string Windowstart, string Windowend)
+  private record SystemColumn(string Rowtime, string Rowoffset, string Rowpartition, string Windowstart, string Windowend)
   {
   }
 
   #region GenericType
 
-  record DatabaseChangeObject<TEntity> : DatabaseChangeObject
+  private record DatabaseChangeObject<TEntity> : DatabaseChangeObject
   {
     public TEntity Before { get; set; } = default!;
     public TEntity After { get; set; } = default!;
@@ -145,7 +145,7 @@ public class TypeGeneratorTests
 
     public long TsMs { get; set; }
 
-    public ChangeDataCaptureType OperationType => ChangeDataCaptureType.Created;
+    public static ChangeDataCaptureType OperationType => ChangeDataCaptureType.Created;
   }
 
   [Flags]
@@ -180,8 +180,7 @@ public class TypeGeneratorTests
 
     //Assert
     statement.Should()
-      .Be(
-        @"CREATE TYPE DATABASECHANGEOBJECT AS STRUCT<Before IOTSENSOR, After IOTSENSOR, Source SOURCE, Op VARCHAR, TsMs BIGINT>;"); //, Transaction OBJECT
+      .Be("CREATE TYPE DATABASECHANGEOBJECT AS STRUCT<Before IOTSENSOR, After IOTSENSOR, Source SOURCE, Op VARCHAR, TsMs BIGINT>;"); //, Transaction OBJECT
   }
 
   #endregion

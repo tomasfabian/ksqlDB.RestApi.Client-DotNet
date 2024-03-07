@@ -12,6 +12,8 @@ using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Linq.Statements;
 
+#pragma warning disable IDE0037
+
 public class CreateStatementExtensionsTests : TestBase
 {
   private TestableDbProvider DbProvider { get; set; } = null!;
@@ -226,3 +228,5 @@ ON movie.Title = actor.Title
 EMIT CHANGES;".ReplaceLineEndings());
   }
 }
+
+#pragma warning restore IDE0037
