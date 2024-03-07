@@ -33,7 +33,7 @@ public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
     await MoviesProvider.DropTablesAsync();
   }
 
-  protected string MoviesTableName => MoviesProvider.MoviesTableName;
+  protected static string MoviesTableName => MoviesProvider.MoviesTableName;
 
   protected virtual IQbservable<Movie> MoviesStream => Context.CreateQueryStream<Movie>(MoviesTableName);
 
@@ -44,7 +44,7 @@ public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
     var expected = new[]
     {
-      new[] {1, 2},
+      [1, 2],
       new[] {3, 4},
     };
 
@@ -76,8 +76,8 @@ public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
     var expected = new Dictionary<string, int[]>
     {
-      { "a", new[] { 1, 2 } },
-      { "b", new[] { 3, 4 } },
+      { "a", [1, 2] },
+      { "b", [3, 4] },
     };
 
     //Act
@@ -172,11 +172,11 @@ public class KSqlNestedTypesTests : Infrastructure.IntegrationTests
     actual["y"]["d"].Should().Be(expected["y"]["d"]);
   }
 
-  private struct MovieStruct
+  private readonly struct MovieStruct
   {
-    public string Title { get; set; }
+    public string Title { get; init; }
 
-    public int Id { get; set; }
+    public int Id { get; init; }
   }
 
   [Test]

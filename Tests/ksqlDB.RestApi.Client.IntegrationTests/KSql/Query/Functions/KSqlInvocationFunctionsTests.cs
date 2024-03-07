@@ -1,3 +1,4 @@
+using System.Net;
 using FluentAssertions;
 using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -14,35 +15,46 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
   public static async Task ClassInitialize()
   {
     RestApiProvider = KSqlDbRestApiProvider.Create();
-      
+
     var statement =
       new KSqlDbStatement(
-        @"CREATE STREAM stream2 (id INT, lambda_arr ARRAY<INTEGER>) WITH (kafka_topic = 'stream2', partitions = 1, value_format = 'json');");
+        $"CREATE STREAM {StreamName} (id INT, arr ARRAY<INTEGER>) WITH (kafka_topic = '{StreamName}', partitions = 1, value_format = 'json');");
       
     var response = await RestApiProvider.ExecuteStatementAsync(statement);
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
 
     var statement2 =
       new KSqlDbStatement(
-        @"CREATE OR REPLACE STREAM stream4 (id INT, lambda_map MAP<STRING,ARRAY<INTEGER>>) WITH (kafka_topic = 'stream4', partitions = 1, value_format = 'json');");
+        $"CREATE OR REPLACE STREAM {StreamName4} (id INT, map MAP<STRING,ARRAY<INTEGER>>) WITH (kafka_topic = '{StreamName4}', partitions = 1, value_format = 'json');");
 
     response = await RestApiProvider.ExecuteStatementAsync(statement2);
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-    string insertIntoStream3 = "insert into stream4 (id, lambda_map) values (1, MAP('hello':= ARRAY [1,2,3], 'goodbye':= ARRAY [-1,-2,-3]) );";
+    string insertIntoStream3 = $"insert into {StreamName4} (id, map) values (1, MAP('hello':= ARRAY [1,2,3], 'goodbye':= ARRAY [-1,-2,-3]) );";
 
     response = await RestApiProvider.ExecuteStatementAsync(
-      new KSqlDbStatement("insert into stream2 (id, lambda_arr) values (1, ARRAY [1,2,3]);"));
+      new KSqlDbStatement($"insert into {StreamName} (id, arr) values (1, ARRAY [1,2,3]);"));
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
     response = await RestApiProvider.ExecuteStatementAsync(
       new KSqlDbStatement(insertIntoStream3));
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
-  record Lambda
+  [OneTimeTearDown]
+  public static async Task ClassCleanup()
+  {
+    await RestApiProvider.DropStreamAndTopic(StreamName);
+    await RestApiProvider.DropStreamAndTopic(StreamName4);
+  }
+
+  private record Lambda
   {
     public int Id { get; set; }
-    public int[] Lambda_Arr { get; set; } = null!;
-    // public IEnumerable<int> Lambda_Arr { get; set; }
+    public int[] Arr { get; set; } = null!;
   }
 
-  private readonly string streamName = "stream2";
+  private const string StreamName = "stream2";
+  private const string StreamName4 = "stream4";
 
   [Test]
   public async Task TransformArray()
@@ -51,8 +63,8 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
 
     //Act
-    var source = Context.CreateQuery<Lambda>(streamName)
-      .Select(c => new { Col = KSqlFunctions.Instance.Transform(c.Lambda_Arr, x => x + 1) })
+    var source = Context.CreateQuery<Lambda>(StreamName)
+      .Select(c => new { Col = KSqlFunctions.Instance.Transform(c.Arr, x => x + 1) })
       .ToAsyncEnumerable();
       
     var actualValues = await CollectActualValues(source, expectedItemsCount);
@@ -62,10 +74,10 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     actualValues[0].Col.Should().BeEquivalentTo(new[] {2,3,4});
   }
 
-  class LambdaMap
+  private class LambdaMap
   {
     public int Id { get; set; }
-    public IDictionary<string, int[]> Lambda_Map { get; set; } = null!;
+    public IDictionary<string, int[]> Map { get; set; } = null!;
     public IDictionary<string, int> Dictionary2 { get; set; } = null!;
   }
     
@@ -79,7 +91,7 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
       
     //Act
     var source = Context.CreateQuery<LambdaMap>(streamNameWithMap)
-      .Select(c => new { Col = K.Functions.Transform(c.Lambda_Map, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v, x => x * x)) })
+      .Select(c => new { Col = K.Functions.Transform(c.Map, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v, x => x * x)) })
       .ToAsyncEnumerable();
       
     var actualValues = await CollectActualValues(source, expectedItemsCount);
@@ -98,8 +110,8 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
 
     //Act
-    var source = Context.CreateQuery<Lambda>(streamName)
-      .Select(c => new { Col = KSqlFunctions.Instance.Filter(c.Lambda_Arr, x => x > 1) })
+    var source = Context.CreateQuery<Lambda>(StreamName)
+      .Select(c => new { Col = KSqlFunctions.Instance.Filter(c.Arr, x => x > 1) })
       .ToAsyncEnumerable();
       
     var actualValues = await CollectActualValues(source, expectedItemsCount);
@@ -117,7 +129,7 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
       
     //Act
     var source = Context.CreateQuery<LambdaMap>(streamNameWithMap)
-      .Select(c => new { Col = K.Functions.Filter(c.Lambda_Map, (k, v) => k != "E.T" && v[1] > 0) })
+      .Select(c => new { Col = K.Functions.Filter(c.Map, (k, v) => k != "E.T" && v[1] > 0) })
       .ToAsyncEnumerable();
       
     var actualValues = await CollectActualValues(source, expectedItemsCount);
@@ -135,8 +147,8 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
 
     //Act
-    var source = Context.CreateQuery<Lambda>(streamName)
-      .Select(c => new { Acc = K.Functions.Reduce(c.Lambda_Arr, 0, (x,y) => x + y) })
+    var source = Context.CreateQuery<Lambda>(StreamName)
+      .Select(c => new { Acc = K.Functions.Reduce(c.Arr, 0, (x,y) => x + y) })
       .ToAsyncEnumerable();
       
     var actualValues = await CollectActualValues(source, expectedItemsCount);
@@ -154,7 +166,7 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
       
     //Act
     var source = Context.CreateQuery<LambdaMap>(streamNameWithMap)
-      .Select(c => new { Col = K.Functions.Reduce(c.Lambda_Map, 2, (s, k, v) => K.Functions.Ceil(s / v[1])) })
+      .Select(c => new { Col = K.Functions.Reduce(c.Map, 2, (s, k, v) => K.Functions.Ceil(s / v[1])) })
       .ToAsyncEnumerable();
       
     var actualValues = await CollectActualValues(source, expectedItemsCount);

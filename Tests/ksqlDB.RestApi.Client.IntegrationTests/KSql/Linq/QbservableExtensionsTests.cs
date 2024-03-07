@@ -60,7 +60,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
   [OneTimeTearDown]
   public static async Task ClassCleanup()
   {
-    var result = await RestApiProvider.DropStreamAndTopic(StreamName);
+    await RestApiProvider.DropStreamAndTopic(StreamName);
   }
 
   protected virtual ksqlDB.RestApi.Client.KSql.Linq.IQbservable<Tweet> QuerySource =>
@@ -240,7 +240,6 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
       .SubscribeAsync(c => actualValues.Add(c), e => semaphore.Release(), () => semaphore.Release(), cancellationToken: cts.Token);
 
     await cts.CancelAsync();
-    await semaphore.WaitAsync(timeOut);
 
     //Assert
     Assert.AreEqual(0, actualValues.Count);
@@ -275,13 +274,13 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     var semaphore = new SemaphoreSlim(initialCount: 0, 1);
     var source = QuerySource;
 
-    var currentThread = Thread.CurrentThread.ManagedThreadId;
+    var currentThread = Environment.CurrentManagedThreadId;
     int? observeOnThread = null;
 
     //Act
     var subscription = await source.Take(1)
       .ObserveOn(TaskPoolScheduler.Default)
-      .SubscribeAsync(_ => observeOnThread = Thread.CurrentThread.ManagedThreadId, e => semaphore.Release(), () => semaphore.Release());
+      .SubscribeAsync(_ => observeOnThread = Environment.CurrentManagedThreadId, e => semaphore.Release(), () => semaphore.Release());
 
     await semaphore.WaitAsync(timeOut);
 
@@ -509,9 +508,6 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
 
     var orderTypes = new List<int> { 1, 3 };
 
-    var c = QuerySource
-      .Select(c => orderTypes.Contains(c.Id)).ToQueryString();
-
     var source = QuerySource
       .Select(c => orderTypes.Contains(c.Id))
       .ToAsyncEnumerable();
@@ -711,7 +707,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     var ksql =
       $"SELECT STRUCT(NAME := 'E.T.') FROM {StreamName} EMIT CHANGES LIMIT 1;";
 
-    QueryStreamParameters queryStreamParameters = new QueryStreamParameters
+    QueryStreamParameters queryStreamParameters = new()
     {
       Sql = ksql,
       [QueryParameters.AutoOffsetResetPropertyName] = "earliest",

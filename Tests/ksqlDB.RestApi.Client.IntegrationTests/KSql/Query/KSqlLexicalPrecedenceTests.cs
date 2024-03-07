@@ -9,7 +9,7 @@ namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Query;
 
 public class KSqlLexicalPrecedenceTests : Infrastructure.IntegrationTests
 {
-  protected static MoviesProvider MoviesProvider = null!;
+  private static MoviesProvider moviesProvider = null!;
 
   [OneTimeSetUp]
   public static async Task ClassInitialize()
@@ -21,20 +21,20 @@ public class KSqlLexicalPrecedenceTests : Infrastructure.IntegrationTests
   {
     RestApiProvider = KSqlDbRestApiProvider.Create();
 
-    MoviesProvider = new MoviesProvider(RestApiProvider);
-    await MoviesProvider.CreateTablesAsync();
+    moviesProvider = new MoviesProvider(RestApiProvider);
+    await moviesProvider.CreateTablesAsync();
 
-    await MoviesProvider.InsertMovieAsync(MoviesProvider.Movie1);
-    await MoviesProvider.InsertMovieAsync(MoviesProvider.Movie2);
+    await moviesProvider.InsertMovieAsync(MoviesProvider.Movie1);
+    await moviesProvider.InsertMovieAsync(MoviesProvider.Movie2);
   }
 
   [OneTimeTearDown]
   public static async Task ClassCleanup()
   {
-    await MoviesProvider.DropTablesAsync();
+    await moviesProvider.DropTablesAsync();
   }
 
-  protected string MoviesTableName => MoviesProvider.MoviesTableName;
+  protected static string MoviesTableName => MoviesProvider.MoviesTableName;
 
   protected virtual IQbservable<Movie> MoviesStream => Context.CreateQueryStream<Movie>(MoviesTableName);
 

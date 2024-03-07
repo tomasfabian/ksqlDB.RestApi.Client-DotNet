@@ -139,7 +139,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     //Assert
     Assert.AreEqual(expectedItemsCount, actualValues.Count);
     actualValues.Count.Should().Be(1);
-    actualValues[0].Col.Should().Be(@"1;2");
+    actualValues[0].Col.Should().Be("1;2");
   }
 
   [Test]
@@ -308,7 +308,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     //Assert
     Assert.AreEqual(expectedItemsCount, actualValues.Count);
 
-    string result = System.Text.Encoding.UTF8.GetString(actualValues[0].Col);
+    string result = Encoding.UTF8.GetString(actualValues[0].Col);
     result.Should().Be(MoviesProvider.Movie1.Title);
   }
     
@@ -339,9 +339,6 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
     byte[] bytes = Encoding.UTF8.GetBytes(MoviesProvider.Movie1.Title);
     //QWxpZW4=
-
-    var s = Context.CreateQuery<Movie>(MoviesTableName)
-      .Select(c => new { Col = K.Functions.FromBytes(bytes, "utf8") }).ToQueryString();
 
     //Act
     var source = Context.CreateQuery<Movie>(MoviesTableName)
@@ -397,11 +394,6 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
   {
     //Arrange
     int expectedItemsCount = 1;
-    var map = new Dictionary<string, int>
-    {
-      {"apple", 10},
-      {"banana", 20}
-    };
 
     //Act
     var source = Context.CreateQuery<Movie>(MoviesTableName)

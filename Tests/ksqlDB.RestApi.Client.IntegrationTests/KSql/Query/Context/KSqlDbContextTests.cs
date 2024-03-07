@@ -103,12 +103,12 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
 
   private record TimeTypes
   {
-    public DateTime Dt { get; set; }
-    public TimeSpan Ts { get; set; }
+    public DateTime Dt { get; init; }
+    public TimeSpan Ts { get; init; }
     public DateTimeOffset DtOffset { get; set; }
   }
 
-  private readonly EntityCreationMetadata metadata = new EntityCreationMetadata
+  private readonly EntityCreationMetadata metadata = new()
   {
     KafkaTopic = nameof(TimeTypes),
     Partitions = 1,
@@ -126,7 +126,7 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
 
     var buildServiceProvider = serviceCollection.BuildServiceProvider();
     var httpResponseMessage = await buildServiceProvider.GetRequiredService<IKSqlDbRestApiClient>().CreateStreamAsync<TimeTypes>(metadata);
-    var statementResponses = await httpResponseMessage.ToStatementResponsesAsync().ConfigureAwait(false);
+    await httpResponseMessage.ToStatementResponsesAsync().ConfigureAwait(false);
 
     await using var context = buildServiceProvider.GetRequiredService<IKSqlDBContext>();
 
@@ -138,12 +138,12 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     using var subscription = context.CreateQueryStream<TimeTypes>()
       .Take(1)
       .Subscribe(value =>
-      {
-        receivedValues.Add(value);
-      }, error =>
-      {
-        semaphoreSlim.Release();
-      },
+        {
+          receivedValues.Add(value);
+        }, error =>
+        {
+          semaphoreSlim.Release();
+        },
         () =>
         {
           semaphoreSlim.Release();
@@ -154,7 +154,6 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
       Dt = new DateTime(2021, 4, 1),
       Ts = new TimeSpan(1, 2, 3),
       DtOffset = new DateTimeOffset(2021, 7, 4, 13, 29, 45, 447, TimeSpan.Zero)
-      //DtOffset = new DateTimeOffset(2021, 7, 4, 13, 29, 45, 447, TimeSpan.FromHours(4))
     };
 
     context.Add(value);
