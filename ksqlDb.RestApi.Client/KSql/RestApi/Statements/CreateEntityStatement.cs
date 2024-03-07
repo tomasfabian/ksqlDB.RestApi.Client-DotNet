@@ -11,7 +11,7 @@ internal class CreateEntityStatement
 {
   protected static readonly IPluralize EnglishPluralizationService = new Pluralizer();
 
-  protected IEnumerable<MemberInfo> Members<T>(bool? includeReadOnly = null)
+  protected static IEnumerable<MemberInfo> Members<T>(bool? includeReadOnly = null)
   {
     return Members(typeof(T), includeReadOnly);
   }

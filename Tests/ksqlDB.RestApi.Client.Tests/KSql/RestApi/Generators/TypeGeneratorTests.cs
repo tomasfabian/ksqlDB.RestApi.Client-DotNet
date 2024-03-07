@@ -75,7 +75,7 @@ public class TypeGeneratorTests
   [TestCase(IdentifierEscaping.Keywords, ExpectedResult = "CREATE TYPE ROWTIME AS STRUCT<Value VARCHAR>;")]
   [TestCase(IdentifierEscaping.Always, ExpectedResult = "CREATE TYPE `ROWTIME` AS STRUCT<`Value` VARCHAR>;")]
   public string CreateType_WithSystemColumName(IdentifierEscaping escaping) =>
-    new TypeGenerator().Print(new TypeProperties<Rowtime> { IdentifierEscaping = escaping });
+    new TypeGenerator().Print(new TypeProperties<RowTime> { IdentifierEscaping = escaping });
 
   [TestCase(IdentifierEscaping.Never, ExpectedResult = "CREATE TYPE VALUES AS STRUCT<Value VARCHAR>;")]
   [TestCase(IdentifierEscaping.Keywords, ExpectedResult = "CREATE TYPE `VALUES` AS STRUCT<Value VARCHAR>;")]
@@ -85,13 +85,13 @@ public class TypeGeneratorTests
 
   [TestCase(IdentifierEscaping.Never,
     ExpectedResult =
-      "CREATE TYPE SYSTEMCOLUMN AS STRUCT<Rowtime VARCHAR, Rowoffset VARCHAR, Rowpartition VARCHAR, Windowstart VARCHAR, Windowend VARCHAR>;")]
+      "CREATE TYPE SYSTEMCOLUMN AS STRUCT<RowTime VARCHAR, RowOffset VARCHAR, RowPartition VARCHAR, WindowStart VARCHAR, WindowEnd VARCHAR>;")]
   [TestCase(IdentifierEscaping.Keywords,
     ExpectedResult =
-      "CREATE TYPE SYSTEMCOLUMN AS STRUCT<Rowtime VARCHAR, Rowoffset VARCHAR, Rowpartition VARCHAR, Windowstart VARCHAR, Windowend VARCHAR>;")]
+      "CREATE TYPE SYSTEMCOLUMN AS STRUCT<RowTime VARCHAR, RowOffset VARCHAR, RowPartition VARCHAR, WindowStart VARCHAR, WindowEnd VARCHAR>;")]
   [TestCase(IdentifierEscaping.Always,
     ExpectedResult =
-      "CREATE TYPE `SYSTEMCOLUMN` AS STRUCT<`Rowtime` VARCHAR, `Rowoffset` VARCHAR, `Rowpartition` VARCHAR, `Windowstart` VARCHAR, `Windowend` VARCHAR>;")]
+      "CREATE TYPE `SYSTEMCOLUMN` AS STRUCT<`RowTime` VARCHAR, `RowOffset` VARCHAR, `RowPartition` VARCHAR, `WindowStart` VARCHAR, `WindowEnd` VARCHAR>;")]
   public string CreateType_WithSystemColumnNameField(IdentifierEscaping escaping) =>
     new TypeGenerator().Print(new TypeProperties<SystemColumn> { IdentifierEscaping = escaping });
 
@@ -118,7 +118,7 @@ public class TypeGeneratorTests
     public IDictionary<string, int> Values2 { get; set; } = null!;
   }
 
-  private record Rowtime(string Value)
+  private record RowTime(string Value)
   {
   }
 
@@ -126,7 +126,7 @@ public class TypeGeneratorTests
   {
   }
 
-  private record SystemColumn(string Rowtime, string Rowoffset, string Rowpartition, string Windowstart, string Windowend)
+  private record SystemColumn(string RowTime, string RowOffset, string RowPartition, string WindowStart, string WindowEnd)
   {
   }
 
