@@ -674,6 +674,24 @@ DROP TYPE EventCategory;
 DROP TYPE IF EXISTS EventCategory;
 ```
 
+With the `DropTypeAsync` overload, the type name can be automatically inferred from the generic type argument.
+
+```C#
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+
+var properties = new DropTypeProperties
+{
+  ShouldPluralizeEntityName = false,
+  IdentifierEscaping = IdentifierEscaping.Always
+};
+
+var response = await restApiClient.DropTypeAsync<EventCategory>(properties);
+```
+
+```SQL
+DROP TYPE `EventCategory`;
+```
+
 ### Drop a stream
 **v1.0.0**
 
@@ -710,6 +728,38 @@ Parameters:
 `useIfExistsClause` - If the IF EXISTS clause is present, the statement doesn't fail if the stream doesn't exist.
 
 `deleteTopic` - If the DELETE TOPIC clause is present, the stream's source topic is marked for deletion.
+
+#### DropEntityProperties
+
+The `DropFromItemProperties` class is used to configure dropping entitities, such as streams or tables in ksqlDB.
+In the provided example, it's instantiated with specific properties: using "IF EXISTS" clause, deleting the associated topic,
+not pluralizing the entity name, and always escaping identifiers. The `from-item` name is inferred from the generic type argument.
+This configuration is then used to drop a table named `TestTable` and a stream named `TestStream` via the ksqlDB REST API client.
+
+```C#
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+
+class TestTable;
+class TestStream;
+
+var properties = new DropFromItemProperties
+{
+  UseIfExistsClause = true,
+  DeleteTopic = true,
+  ShouldPluralizeEntityName = false,
+  IdentifierEscaping = IdentifierEscaping.Always
+};
+
+//Act
+var response1 = await ksqlDbRestApiClient.DropTableAsync<TestTable>(properties);
+var response2 = await ksqlDbRestApiClient.DropStreamAsync<TestStream>(properties);
+```
+
+The resulting KSQL commands executed are: 
+```SQL
+DROP TABLE IF EXISTS `TestTable` DELETE TOPIC;
+DROP STREAM IF EXISTS `TestStream` DELETE TOPIC;
+```
 
 ### PartitionBy
 **v1.0.0**
