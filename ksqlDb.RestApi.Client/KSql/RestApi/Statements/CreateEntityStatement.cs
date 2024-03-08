@@ -1,15 +1,13 @@
 using System.Reflection;
-using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
-using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
-using Pluralize.NET;
+using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 internal class CreateEntityStatement
 {
-  protected static readonly IPluralize EnglishPluralizationService = new Pluralizer();
+  private static readonly EntityProvider EntityProvider = new();
 
   protected static IEnumerable<MemberInfo> Members<T>(bool? includeReadOnly = null)
   {
@@ -31,15 +29,7 @@ internal class CreateEntityStatement
 
   protected static string GetEntityName<T>(IEntityCreationProperties metadata)
   {
-    string entityName = metadata?.EntityName;
-
-    if (string.IsNullOrEmpty(entityName))
-      entityName = typeof(T).Name;
-
-    if (metadata is { ShouldPluralizeEntityName: true })
-      entityName = EnglishPluralizationService.Pluralize(entityName);
-
-    return IdentifierUtil.Format(entityName, metadata?.IdentifierEscaping ?? IdentifierEscaping.Never);
+    return EntityProvider.GetName<T>(metadata);
   }
 
   protected static Type GetMemberType(MemberInfo memberInfo)

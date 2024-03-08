@@ -10,7 +10,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi;
 
-public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient
+public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient, IKSqlDbDropRestApiClient
 {
   /// <summary>
   /// Sets Basic HTTP authentication mechanism.
@@ -192,22 +192,6 @@ public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient
   Task<HttpResponseMessage> CreateSinkConnectorAsync(IDictionary<string, string> config, string connectorName, bool ifNotExists = false, CancellationToken cancellationToken = default);
 
   /// <summary>
-  /// Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement doesn't fail if the connector doesn't exist.
-  /// </summary>
-  /// <param name="connectorName">Name of the connector to drop.</param>
-  /// <param name="cancellationToken"></param>
-  /// <returns></returns>
-  Task<HttpResponseMessage> DropConnectorIfExistsAsync(string connectorName, CancellationToken cancellationToken = default);
-
-  /// <summary>
-  /// Drop a connector and delete it from the Connect cluster. The topics associated with this cluster are not deleted by this command. The statement fails if the connector doesn't exist.
-  /// </summary>
-  /// <param name="connectorName">Name of the connector to drop.</param>
-  /// <param name="cancellationToken"></param>
-  /// <returns></returns>
-  Task<HttpResponseMessage> DropConnectorAsync(string connectorName, CancellationToken cancellationToken = default);
-
-  /// <summary>
   /// Pause a persistent query.
   /// </summary>
   /// <param name="queryId">ID of the query to pause.</param>
@@ -240,46 +224,6 @@ public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient
   Task<HttpResponseMessage> TerminatePushQueryAsync(string queryId, CancellationToken cancellationToken = default);
 
   /// <summary>
-  /// Drops an existing stream.
-  /// DROP STREAM [IF EXISTS] stream_name [DELETE TOPIC];
-  /// </summary>
-  /// <param name="streamName">Name of the stream to delete.</param>
-  /// <param name="useIfExistsClause">If the IF EXISTS clause is present, the statement doesn't fail if the stream doesn't exist.</param>
-  /// <param name="deleteTopic">If the DELETE TOPIC clause is present, the stream's source topic is marked for deletion.</param>
-  /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
-  /// <returns></returns>
-  Task<HttpResponseMessage> DropStreamAsync(string streamName, bool useIfExistsClause, bool deleteTopic, CancellationToken cancellationToken = default);
-
-  /// <summary>
-  /// Drops an existing stream.
-  /// DROP STREAM stream_name;
-  /// </summary>
-  /// <param name="streamName">Name of the stream to delete.</param>
-  /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
-  /// <returns></returns>
-  Task<HttpResponseMessage> DropStreamAsync(string streamName, CancellationToken cancellationToken = default);
-
-  /// <summary>
-  /// Drops an existing table.
-  /// DROP TABLE [IF EXISTS] table_name [DELETE TOPIC];
-  /// </summary>
-  /// <param name="tableName">Name of the table to delete.</param>
-  /// <param name="useIfExistsClause">If the IF EXISTS clause is present, the statement doesn't fail if the table doesn't exist.</param>
-  /// <param name="deleteTopic">If the DELETE TOPIC clause is present, the table's source topic is marked for deletion.</param>
-  /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
-  /// <returns></returns>
-  Task<HttpResponseMessage> DropTableAsync(string tableName, bool useIfExistsClause, bool deleteTopic, CancellationToken cancellationToken = default);
-
-  /// <summary>
-  /// Drops an existing table.
-  /// DROP TABLE table_name;
-  /// </summary>
-  /// <param name="tableName">Name of the table to delete.</param>
-  /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
-  /// <returns></returns>
-  Task<HttpResponseMessage> DropTableAsync(string tableName, CancellationToken cancellationToken = default);
-
-  /// <summary>
   /// Create an alias for a complex type declaration.
   /// The CREATE TYPE statement registers a type alias directly in KSQL. Any types registered by using this command can be leveraged in future statements. The CREATE TYPE statement works in interactive and headless modes.
   /// Any attempt to register the same type twice, without a corresponding DROP TYPE statement, will fail.
@@ -310,20 +254,4 @@ public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Http response object.</returns>
   Task<HttpResponseMessage> CreateTypeAsync<T>(TypeProperties<T> properties, CancellationToken cancellationToken = default);
-
-  /// <summary>
-  /// Removes a type alias from ksqlDB. This statement doesn't fail if the type is in use in active queries or user-defined functions.
-  /// </summary>
-  /// <param name="typeName">Name of the type to remove.</param>
-  /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
-  /// <returns>Http response object.</returns>
-  Task<HttpResponseMessage> DropTypeAsync(string typeName, CancellationToken cancellationToken = default);
-
-  /// <summary>
-  /// Removes a type alias from ksqlDB. This statement doesn't fail if the type is in use in active queries or user-defined functions. The statement doesn't fail if the type doesn't exist.
-  /// </summary>
-  /// <param name="typeName">Name of the type to remove.</param>
-  /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
-  /// <returns>Http response object.</returns>
-  Task<HttpResponseMessage> DropTypeIfExistsAsync(string typeName, CancellationToken cancellationToken = default);
 }

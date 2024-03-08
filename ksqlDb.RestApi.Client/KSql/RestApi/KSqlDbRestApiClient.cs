@@ -20,11 +20,13 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.Extensions.Logging;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
+using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi;
 
 public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 {
+  private readonly EntityProvider entityProvider = new();
   private readonly IHttpClientFactory httpClientFactory;
   private readonly ILogger logger;
 
@@ -341,6 +343,22 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <summary>
   /// Removes a type alias from ksqlDB. This statement doesn't fail if the type is in use in active queries or user-defined functions.
   /// </summary>
+  /// <param name="dropTypeProperties">Configuration for dropping the type.</param>
+  /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+  /// <returns>Http response object.</returns>
+  public Task<HttpResponseMessage> DropTypeAsync<T>(DropTypeProperties dropTypeProperties, CancellationToken cancellationToken = default)
+  {
+    var typeName = entityProvider.GetName<T>(dropTypeProperties);
+    string dropStatement = StatementTemplates.DropType(typeName);
+
+    KSqlDbStatement ksqlDbStatement = new(dropStatement);
+
+    return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
+  }
+
+  /// <summary>
+  /// Removes a type alias from ksqlDB. This statement doesn't fail if the type is in use in active queries or user-defined functions.
+  /// </summary>
   /// <param name="typeName">Name of the type to remove.</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Http response object.</returns>
@@ -628,7 +646,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns></returns>
   public Task<HttpResponseMessage> DropConnectorIfExistsAsync(string connectorName, CancellationToken cancellationToken = default)
   {
-    string dropIfExistsStatement = $"DROP CONNECTOR IF EXISTS {connectorName};";
+    string dropIfExistsStatement = StatementTemplates.DropConnectorIfExists(connectorName);
 
     KSqlDbStatement ksqlDbStatement = new(dropIfExistsStatement);
 
@@ -656,6 +674,24 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// Drops an existing stream.
   /// DROP STREAM [IF EXISTS] stream_name [DELETE TOPIC];
   /// </summary>
+  /// <param name="dropFromItemProperties">Configuration for dropping the stream.</param>
+  /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+  /// <returns></returns>
+  public Task<HttpResponseMessage> DropStreamAsync<T>(DropFromItemProperties dropFromItemProperties, CancellationToken cancellationToken = default)
+  {
+    var streamName = entityProvider.GetName<T>(dropFromItemProperties);
+    string dropStatement = StatementTemplates.DropStream(streamName, dropFromItemProperties.UseIfExistsClause, dropFromItemProperties.DeleteTopic);
+
+    KSqlDbStatement ksqlDbStatement = new(dropStatement);
+
+    return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
+  }
+
+  /// <summary>
+  /// Drops an existing stream.
+  /// DROP STREAM [IF EXISTS] stream_name [DELETE TOPIC];
+  /// </summary>
+  /// <typeparam name="T">The type that represents the stream.</typeparam>
   /// <param name="streamName">Name of the stream to delete.</param>
   /// <param name="useIfExistsClause">If the IF EXISTS clause is present, the statement doesn't fail if the stream doesn't exist.</param>
   /// <param name="deleteTopic">If the DELETE TOPIC clause is present, the stream's source topic is marked for deletion.</param>
@@ -680,6 +716,24 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   public Task<HttpResponseMessage> DropStreamAsync(string streamName, CancellationToken cancellationToken = default)
   {
     string dropStatement = StatementTemplates.DropStream(streamName, useIfExists: false, deleteTopic: false);
+
+    KSqlDbStatement ksqlDbStatement = new(dropStatement);
+
+    return ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
+  }
+
+  /// <summary>
+  /// Drops an existing table.
+  /// DROP TABLE [IF EXISTS] table_name [DELETE TOPIC];
+  /// </summary>
+  /// <typeparam name="T">The type that represents the table.</typeparam>
+  /// <param name="dropFromItemProperties">Configuration for dropping the table.</param>
+  /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
+  /// <returns></returns>
+  public Task<HttpResponseMessage> DropTableAsync<T>(DropFromItemProperties dropFromItemProperties, CancellationToken cancellationToken = default)
+  {
+    var tableName = entityProvider.GetName<T>(dropFromItemProperties);
+    string dropStatement = StatementTemplates.DropTable(tableName, dropFromItemProperties.UseIfExistsClause, dropFromItemProperties.DeleteTopic);
 
     KSqlDbStatement ksqlDbStatement = new(dropStatement);
 
