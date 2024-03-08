@@ -1,9 +1,13 @@
 using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+using ksqlDb.RestApi.Client.Tests.Models;
 using ksqlDb.RestApi.Client.Tests.Models.Sensors;
 using NUnit.Framework;
 using UnitTests;
+using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
 using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Linq.PullQueries;
@@ -142,5 +146,77 @@ WHERE SensorId = '{sensorId}' AND (WINDOWSTART > '{windowStart}') AND (WINDOWEND
 
     //Assert
     ksql.Should().BeEquivalentTo($"SELECT * FROM {MaterializedViewName} LIMIT {limit};");
+  }
+
+  [TestCase(Never, ExpectedResult = $"SELECT sub FROM {nameof(JsonPropertyNameTestData)};")]
+  [TestCase(Keywords, ExpectedResult = $"SELECT sub FROM {nameof(JsonPropertyNameTestData)};")]
+  [TestCase(Always, ExpectedResult = $"SELECT `sub` FROM `{nameof(JsonPropertyNameTestData)}`;")]
+  public string SelectColumnsUsingPullQueryThatHaveJsonPropertyName(IdentifierEscaping escaping)
+  {
+    //Arrange
+    var dbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
+      { IdentifierEscaping = escaping });
+
+    //Act
+    var ksql = dbContext.CreatePullQuery<JsonPropertyNameTestData>()
+      .Select(c => new { c.SubProperty })
+      .ToQueryString();
+
+    //Assert
+    return ksql.ReplaceLineEndings();
+  }
+
+  [TestCase(Never, ExpectedResult = $"SELECT sub AS Prop FROM {nameof(JsonPropertyNameTestData)};")]
+  [TestCase(Keywords, ExpectedResult = $"SELECT sub AS Prop FROM {nameof(JsonPropertyNameTestData)};")]
+  [TestCase(Always, ExpectedResult = $"SELECT `sub` AS `Prop` FROM `{nameof(JsonPropertyNameTestData)}`;")]
+  public string SelectColumnsUsingPullQueryThatHaveJsonPropertyNameWithAlias(IdentifierEscaping escaping)
+  {
+    //Arrange
+    var dbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
+      { IdentifierEscaping = escaping });
+
+    //Act
+    var ksql = dbContext.CreatePullQuery<JsonPropertyNameTestData>()
+      .Select(c => new { Prop = c.SubProperty })
+      .ToQueryString();
+
+    //Assert
+    return ksql.ReplaceLineEndings();
+  }
+
+  [TestCase(Never, ExpectedResult = $"SELECT RowTime, sub FROM {nameof(JsonPropertyNameTestData)};")]
+  [TestCase(Keywords, ExpectedResult = $"SELECT RowTime, sub FROM {nameof(JsonPropertyNameTestData)};")]
+  [TestCase(Always, ExpectedResult = $"SELECT RowTime, `sub` FROM `{nameof(JsonPropertyNameTestData)}`;")]
+  public string SelectColumnsUsingPullQueryThatHaveJsonPropertyNameWithPseudoColumn(IdentifierEscaping escaping)
+  {
+    //Arrange
+    var dbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
+      { IdentifierEscaping = escaping });
+
+    //Act
+    var ksql = dbContext.CreatePullQuery<JsonPropertyNameTestData>()
+      .Select(c => new { c.RowTime, c.SubProperty })
+      .ToQueryString();
+
+    //Assert
+    return ksql.ReplaceLineEndings();
+  }
+
+  [TestCase(Never, ExpectedResult = $"SELECT RowTime, sub AS Prop FROM {nameof(JsonPropertyNameTestData)};")]
+  [TestCase(Keywords, ExpectedResult = $"SELECT RowTime, sub AS Prop FROM {nameof(JsonPropertyNameTestData)};")]
+  [TestCase(Always, ExpectedResult = $"SELECT RowTime, `sub` AS `Prop` FROM `{nameof(JsonPropertyNameTestData)}`;")]
+  public string SelectColumnsUsingPullQueryThatHaveJsonPropertyNameWithAliasWithPseudoColum(IdentifierEscaping escaping)
+  {
+    //Arrange
+    var dbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
+      { IdentifierEscaping = escaping });
+
+    //Act
+    var ksql = dbContext.CreatePullQuery<JsonPropertyNameTestData>()
+      .Select(c => new { c.RowTime, Prop = c.SubProperty })
+      .ToQueryString();
+
+    //Assert
+    return ksql.ReplaceLineEndings();
   }
 }
