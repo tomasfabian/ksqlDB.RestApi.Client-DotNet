@@ -175,7 +175,7 @@ var context = contextFactory.Create();
 ### Logging info and ConfigureKSqlDb
 **v1.2.0**
 
-Bellow code demonstrates two new concepts. Logging and registration of services.
+Below code demonstrates two new concepts. Logging and registration of services.
 
 In this example, we use the `Microsoft.Extensions.Logging` library to add **console and debug logging providers**. You can also add additional providers like file-based logging or third-party providers.
 

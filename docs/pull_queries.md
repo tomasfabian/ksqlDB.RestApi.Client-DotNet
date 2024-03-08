@@ -95,7 +95,7 @@ async Task<HttpResponseMessage> InsertAsync(IoTSensor sensor)
 }
 ```
 
-The bellow provided C# code defines an asynchronous method called `ExecuteAsync` that takes a string parameter `statement` and returns a `Task<HttpResponseMessage>`.
+The below provided C# code defines an asynchronous method called `ExecuteAsync` that takes a string parameter `statement` and returns a `Task<HttpResponseMessage>`.
 
 Inside the method, it creates a `KSqlDbStatement` object using the provided statement. It then calls an asynchronous method `ExecuteStatementAsync` on the `restApiClient` object, passing the `ksqlDbStatement` as a parameter.
 The method awaits the execution of the statement and stores the resulting `HttpResponseMessage` in the httpResponseMessage variable.

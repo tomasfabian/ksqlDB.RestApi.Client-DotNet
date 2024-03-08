@@ -319,5 +319,5 @@ SELECT m.Id Id, m.Title Title, m.Release_Year Release_Year, RPAD(LPAD(UCASE(l.Ac
   EMIT CHANGES;
 ```
 
-> ⚠ There is a known limitation in the early access versions (bellow 1.0). 
+> ⚠ There is a known limitation in the early access versions (below 1.0). 
 The Key column, in this case movie.Title, has to be aliased Title = movie.Title, otherwise the deserialization won't be able to map the unknown column name M_TITLE. 
