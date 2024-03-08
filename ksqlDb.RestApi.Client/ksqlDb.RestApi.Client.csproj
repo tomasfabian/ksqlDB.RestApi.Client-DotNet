@@ -15,9 +15,9 @@
             Documentation for the library can be found at https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/README.md.
         </Description>
         <PackageTags>ksql ksqlDB LINQ .NET csharp push query</PackageTags>
-        <Version>3.6.1</Version>
-        <AssemblyVersion>3.6.1.0</AssemblyVersion>
-        <LangVersion>10.0</LangVersion>
+        <Version>3.7.0</Version>
+        <AssemblyVersion>3.7.0.0</AssemblyVersion>
+        <LangVersion>12.0</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
         <PackageReleaseNotes>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/ksqlDb.RestApi.Client/ChangeLog.md</PackageReleaseNotes>

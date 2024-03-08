@@ -1,5 +1,9 @@
 # ksqlDB.RestApi.Client
 
+# 3.7.0
+- introduced new overloads for dropping entities: `DropTableAsync`, `DropTypeAsync`, and `DropStreamAsync` in `KSqlDbRestApiClient`. These overloads now accept an argument `DropFromItemProperties`, providing more flexibility in configuring the drop operations.
+- extracted `IKSqlDbDropRestApiClient` interface from `IKSqlDbRestApiClient`
+
 # 3.6.1
 - fix usage of `JsonPropertyName` when creating insert statements (since 3.6.0) #59 (contributed by @mrt181)
 
