@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using NUnit.Framework;
 
@@ -113,6 +113,19 @@ public class StatementTemplatesTests
 
     //Assert
     statement.Should().Be($"DROP CONNECTOR {connectorName};");
+  }
+
+  [Test]
+  public void DropConnectorIfExists()
+  {
+    //Arrange
+    string connectorName = "CONNECTOR_NAME";
+
+    //Act
+    var statement = StatementTemplates.DropConnectorIfExists(connectorName);
+
+    //Assert
+    statement.Should().Be($"DROP CONNECTOR IF EXISTS {connectorName};");
   }
 
   [Test]
