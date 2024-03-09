@@ -2,10 +2,12 @@ using System.Collections;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDb.RestApi.Client.KSql.Entities;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using DateTime = System.DateTime;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
@@ -120,7 +122,7 @@ internal class KSqlVisitor : ExpressionVisitor
         break;
 
       case ExpressionType.Conditional:
-        VisitConditional((ConditionalExpression) expression);
+        VisitConditional((ConditionalExpression)expression);
         break;
     }
 
@@ -135,7 +137,7 @@ internal class KSqlVisitor : ExpressionVisitor
     Append(" THEN ");
     Visit(node.IfTrue);
 
-    if(node.IfFalse.NodeType != ExpressionType.Conditional)
+    if (node.IfFalse.NodeType != ExpressionType.Conditional)
       Append(" ELSE ");
 
     Visit(node.IfFalse);
@@ -219,7 +221,8 @@ internal class KSqlVisitor : ExpressionVisitor
       }
     }
 
-    if (methodCallExpression.Method.DeclaringType == typeof(Enumerable) && methodCallExpression.Method.Name == nameof(Enumerable.Contains))
+    if (methodCallExpression.Method.DeclaringType == typeof(Enumerable) &&
+        methodCallExpression.Method.Name == nameof(Enumerable.Contains))
     {
       PrintArrayContainsForEnumerable(methodCallExpression.Arguments);
     }
@@ -355,7 +358,8 @@ internal class KSqlVisitor : ExpressionVisitor
       return;
     }
 
-    if (expression is MemberExpression { Expression: MemberExpression {Expression: not null} me3 } && me3.Expression.Type.IsKsqlGrouping())
+    if (expression is MemberExpression { Expression: MemberExpression { Expression: not null } me1 } &&
+        me1.Expression.Type.IsKsqlGrouping())
     {
       Append(memberInfo.Format(QueryMetadata.IdentifierEscaping));
       return;
@@ -367,12 +371,22 @@ internal class KSqlVisitor : ExpressionVisitor
       Append(" ");
     }
 
-    if (expression is MemberExpression { Expression.NodeType: ExpressionType.MemberAccess} me)
-      Destructure(me);
-    else if (expression is MemberExpression {Expression.NodeType: ExpressionType.Constant})
-      Visit(expression);
-    else
-      Append(memberInfo.Format(QueryMetadata.IdentifierEscaping));
+    switch (expression)
+    {
+      case MemberExpression { Expression.NodeType: ExpressionType.MemberAccess } me:
+        Destructure(me);
+        break;
+      case MemberExpression me2 when me2.Member.GetCustomAttribute<JsonPropertyNameAttribute>() != null ||
+                                     me2.Member.GetCustomAttribute<PseudoColumnAttribute>() != null:
+        Append(me2.Member.Format(QueryMetadata.IdentifierEscaping));
+        break;
+      case MemberExpression { Expression.NodeType: ExpressionType.Constant }:
+        Visit(expression);
+        break;
+      default:
+        Append(memberInfo.Format(QueryMetadata.IdentifierEscaping));
+        break;
+    }
   }
 
   protected override Expression VisitMember(MemberExpression memberExpression)
@@ -387,7 +401,8 @@ internal class KSqlVisitor : ExpressionVisitor
 
         var memberName = memberExpression.Member.Format(QueryMetadata.IdentifierEscaping);
 
-        var alias = IdentifierUtil.Format(((ParameterExpression)memberExpression.Expression).Name, QueryMetadata.IdentifierEscaping);
+        var alias = IdentifierUtil.Format(((ParameterExpression)memberExpression.Expression).Name,
+          QueryMetadata.IdentifierEscaping);
 
         Append(foundFromItem?.Alias ?? alias);
         Append(".");
@@ -493,7 +508,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
     if (type != fromItem?.Type)
     {
-        Append(memberExpression.Member.Format(QueryMetadata.IdentifierEscaping));
+      Append(memberExpression.Member.Format(QueryMetadata.IdentifierEscaping));
     }
   }
 
@@ -601,7 +616,7 @@ internal class KSqlVisitor : ExpressionVisitor
       else
         Append(ColumnsSeparator);
 
-      if(value is ConstantExpression constantExpression)
+      if (value is ConstantExpression constantExpression)
         Visit(constantExpression);
       else
         Visit(Expression.Constant(value));

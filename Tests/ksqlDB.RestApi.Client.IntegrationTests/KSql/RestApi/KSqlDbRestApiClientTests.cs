@@ -142,14 +142,13 @@ public class KSqlDbRestApiClientTests
   public async Task CreateTypeAsync()
   {
     //Arrange
-    var httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@"
-Drop type Person;
-Drop type Address;
+    await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@$"
+Drop type {nameof(Person)};
+Drop type {nameof(Address)};
 "));
-    httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
 
     //Act
-    httpResponseMessage = await restApiClient.CreateTypeAsync<Address>();
+    var httpResponseMessage = await restApiClient.CreateTypeAsync<Address>();
     httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
     httpResponseMessage = await restApiClient.CreateTypeAsync<Person>();
     httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -251,7 +250,7 @@ Drop type Address;
     //Assert
     tablesResponses[0].StatementText.Should().Be(StatementTemplates.ShowTables);
 
-    tablesResponses[0].Tables.Select(c => c.Name).Contains(nameof(MyMoviesTable).ToUpper() + "S").Should().BeTrue();
+    tablesResponses[0].Tables.Select(c => c.Name).Contains(nameof(MyMoviesTable).ToUpper()).Should().BeTrue();
   }
 
   [Test]
@@ -302,7 +301,7 @@ Drop type Address;
     statementResponse = await restApiClient.TerminatePersistentQueryAsync(query.Id);
 
     //Assert
-    query.QueryType.Should().Be("PERSISTENT");
+    query.QueryType.Should().Be(QueryType.Persistent);
     query.SinkKafkaTopics.Should().Contain(topicName);
 
     response.IsSuccessStatusCode.Should().BeTrue();
@@ -315,7 +314,10 @@ Drop type Address;
   public async Task TerminatePushQueryAsync()
   {
     //Arrange
-    var contextOptions = new KSqlDBContextOptions(Helpers.TestConfig.KSqlDbUrl);
+    var contextOptions = new KSqlDBContextOptions(Helpers.TestConfig.KSqlDbUrl)
+    {
+      ShouldPluralizeFromItemName = false
+    };
     await using var context = new KSqlDBContext(contextOptions);
     var cts = new CancellationTokenSource();
       
@@ -324,25 +326,20 @@ Drop type Address;
       .SubscribeOn(ThreadPoolScheduler.Instance)
       .SubscribeAsync(_ => {}, e => { }, () => { }, cts.Token);
       
-    int queriesCount = await GetPersistentQueriesCountAsync(cts.Token);
+    int queriesCount = await GetPersistentQueriesCountAsync(QueryType.Push, cts.Token);
 
     //Act
     var response = await restApiClient.TerminatePushQueryAsync(subscription.QueryId, cts.Token);
 
     //Assert
-      
-    //https://github.com/confluentinc/ksql/issues/7559
-    //"{"@type":"generic_error","error_code":50000,"message":"On wrong context or worker"}"
-    //response.IsSuccessStatusCode.Should().BeTrue();
-
     await Task.Delay(TimeSpan.FromSeconds(10), cts.Token);
-    (await GetPersistentQueriesCountAsync(cts.Token)).Should().Be(queriesCount - 1);
+    (await GetPersistentQueriesCountAsync(QueryType.Push, cts.Token)).Should().Be(queriesCount - 1);
     await cts.CancelAsync();
   }
 
-  private async Task<int> GetPersistentQueriesCountAsync(CancellationToken token)
+  private async Task<int> GetPersistentQueriesCountAsync(string queryType, CancellationToken token)
   {
-    return (await restApiClient.GetQueriesAsync(token)).SelectMany(c => c.Queries).Count(c => c.QueryType == "PERSISTENT");
+    return (await restApiClient.GetQueriesAsync(token)).SelectMany(c => c.Queries).Count(c => c.QueryType == queryType);
   }
 
   [Test]

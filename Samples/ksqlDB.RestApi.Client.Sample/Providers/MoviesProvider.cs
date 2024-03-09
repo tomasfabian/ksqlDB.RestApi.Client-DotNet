@@ -1,11 +1,12 @@
-﻿using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using ksqlDB.RestApi.Client.Samples.Models.Movies;
 
 namespace ksqlDB.RestApi.Client.Samples.Providers;
 
-public class MoviesProvider
+public class MoviesProvider(IKSqlDbRestApiProvider restApiProvider)
 {
   public static readonly string MoviesTableName = "movies";
   public static readonly string ActorsTableName = "lead_actor";
@@ -30,28 +31,24 @@ public class MoviesProvider
     Title = "Aliens"
   };
 
-  private readonly IKSqlDbRestApiProvider restApiProvider;
+  private readonly IKSqlDbRestApiProvider restApiProvider = restApiProvider ?? throw new ArgumentNullException(nameof(restApiProvider));
 
-  public MoviesProvider(IKSqlDbRestApiProvider restApiProvider)
+  public async Task<bool> CreateTablesAsync(CancellationToken cancellationToken = default)
   {
-    this.restApiProvider = restApiProvider ?? throw new ArgumentNullException(nameof(restApiProvider));
-  }
+    EntityCreationMetadata metadata = new()
+    {
+      KafkaTopic = MoviesTableName,
+      Partitions = 1,
+      Replicas = 1,
+      ValueFormat = SerializationFormats.Json
+    };
 
-  public async Task<bool> CreateTablesAsync()
-  {
-    var createMoviesTable = $@"CREATE OR REPLACE TABLE {MoviesTableName} (
-        title VARCHAR PRIMARY KEY,
-        id INT,
-        release_year INT
-      ) WITH (
-        KAFKA_TOPIC='{MoviesTableName}',
-        PARTITIONS=1,
-        VALUE_FORMAT = 'JSON'
-      );";
-
-    KSqlDbStatement ksqlDbStatement = new(createMoviesTable);
-
-    var result = await restApiProvider.ExecuteStatementAsync(ksqlDbStatement);
+    var result = await restApiProvider.CreateOrReplaceTableAsync<Movie>(metadata, cancellationToken);
+    if (!result.IsSuccessStatusCode)
+    {
+      var content = await result.Content.ReadAsStringAsync(cancellationToken);
+      Console.WriteLine(content);
+    }
 
     var createActorsTable = $@"CREATE OR REPLACE TABLE {ActorsTableName} (
         title VARCHAR PRIMARY KEY,
@@ -62,9 +59,8 @@ public class MoviesProvider
         VALUE_FORMAT='JSON'
       );";
 
-    ksqlDbStatement = new KSqlDbStatement(createActorsTable);
-
-    result = await restApiProvider.ExecuteStatementAsync(ksqlDbStatement);
+    var ksqlDbStatement = new KSqlDbStatement(createActorsTable);
+    await restApiProvider.ExecuteStatementAsync(ksqlDbStatement, cancellationToken);
 
     return true;
   }

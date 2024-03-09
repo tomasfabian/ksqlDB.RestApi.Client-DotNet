@@ -37,7 +37,7 @@ SELECT Id, COUNT(*) Count
   EMIT CHANGES;
 ```
 
-> ⚠ There is a known limitation in the early access versions (bellow version 1.10). The aggregation functions have to be named/aliased COUNT(*) Count, otherwise the deserialization won't be able to map the unknown column name KSQL_COL_0. 
+> ⚠ There is a known limitation in the early access versions (below version 1.10). The aggregation functions have to be named/aliased COUNT(*) Count, otherwise the deserialization won't be able to map the unknown column name KSQL_COL_0. 
 The Key should be mapped back to the respective column too Id = g.Key. See IKSqlGrouping.Source (v1.10.0).
 
 Or without the new expression:
