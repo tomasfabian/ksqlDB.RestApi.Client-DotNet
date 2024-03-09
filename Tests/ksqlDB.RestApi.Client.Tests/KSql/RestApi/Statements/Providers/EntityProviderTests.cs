@@ -21,7 +21,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements.Providers
     }
 
     [TestCaseSource(nameof(GetEntityNameTestCases))]
-    public void GetName_ShouldNotPluralizeEntityName((IdentifierEscaping escaping, string expected) testCase)
+    public void GetFormattedName_ShouldNotPluralizeEntityName((IdentifierEscaping escaping, string expected) testCase)
     {
       //Arrange
       var (escaping, expected) = testCase;
@@ -32,7 +32,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements.Providers
       };
 
       //Act
-      var entityName = entityProvider.GetName<TestType>(properties);
+      var entityName = entityProvider.GetFormattedName<TestType>(properties);
 
       //Assert
       entityName.Should().Be(expected);
@@ -46,7 +46,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements.Providers
     }
 
     [TestCaseSource(nameof(GetPluralizedEntityNameTestCases))]
-    public void GetName_ShouldPluralizeEntityName((IdentifierEscaping escaping, string expected) testCase)
+    public void GetFormattedName_ShouldPluralizeEntityName((IdentifierEscaping escaping, string expected) testCase)
     {
       //Arrange
       var (escaping, expected) = testCase;
@@ -57,7 +57,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements.Providers
       };
 
       //Act
-      var entityName = entityProvider.GetName<TestType>(properties);
+      var entityName = entityProvider.GetFormattedName<TestType>(properties);
 
       //Assert
       entityName.Should().Be(expected);
@@ -71,7 +71,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements.Providers
     }
 
     [TestCaseSource(nameof(GetOverridenEntityNameTestCases))]
-    public void GetName_GetOverridenEntityName((IdentifierEscaping escaping, string expected) testCase)
+    public void GetFormattedName_GetOverridenEntityName((IdentifierEscaping escaping, string expected) testCase)
     {
       //Arrange
       var (escaping, expected) = testCase;
@@ -82,10 +82,50 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements.Providers
       };
 
       //Act
-      var entityName = entityProvider.GetName<TestType>(properties);
+      var entityName = entityProvider.GetFormattedName<TestType>(properties);
 
       //Assert
       entityName.Should().Be(expected);
+    }
+
+    internal record TestType<T>
+    {
+      internal T Foo { get; init; } = default!;
+    }
+
+    [TestCaseSource(nameof(GetEntityNameTestCases))]
+    public void GetFormattedName_FromGenericType((IdentifierEscaping escaping, string expected) testCase)
+    {
+      //Arrange
+      var (escaping, expected) = testCase;
+      var properties = new EntityProperties
+      {
+        ShouldPluralizeEntityName = false,
+        IdentifierEscaping = escaping
+      };
+
+      //Act
+      var entityName = entityProvider.GetFormattedName<TestType<string>>(properties);
+
+      //Assert
+      entityName.Should().Be(expected);
+    }
+
+    [Test]
+    public void GetFormattedName_WithFormatter()
+    {
+      //Arrange
+      var properties = new EntityProperties
+      {
+        ShouldPluralizeEntityName = false,
+        IdentifierEscaping = Always
+      };
+
+      //Act
+      var entityName = entityProvider.GetFormattedName<TestType<string>>(properties, (_, identifierEscaping) => "formatted");
+
+      //Assert
+      entityName.Should().Be("formatted");
     }
   }
 }
