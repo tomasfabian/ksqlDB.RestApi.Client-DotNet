@@ -6,12 +6,12 @@ namespace ksqlDb.RestApi.Client.Tests.Models
 {
   public class JsonPropertyNameTestData : Record
   {
-    [JsonPropertyName("sub")] public SubProperty SubProperty { get; set; }
+    [JsonPropertyName("sub")] public SubProperty SubProperty { get; set; } = null!;
   }
 
   [Struct]
   public class SubProperty
   {
-    [JsonPropertyName("prop")] public string Property { get; set; }
+    [JsonPropertyName("prop")] public string Property { get; set; } = null!;
   }
 }
