@@ -7,6 +7,7 @@ using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDb.RestApi.Client.KSql.Entities;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using DateTime = System.DateTime;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;

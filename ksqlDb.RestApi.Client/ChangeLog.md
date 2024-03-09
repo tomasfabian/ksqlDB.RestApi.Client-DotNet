@@ -1,5 +1,8 @@
 # ksqlDB.RestApi.Client
 
+# 3.6.2
+- `JsonPropertyName` and `PseudoColumn` attributes are taken into account when setting column names in LINQ column selection syntax #61 (contributed by @mrt181)
+
 # 3.6.1
 - fix usage of `JsonPropertyName` when creating insert statements (since 3.6.0) #59 (contributed by @mrt181)
 
