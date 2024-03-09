@@ -43,11 +43,11 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
       ShouldPluralizeEntityName = options.ShouldPluralizeFromItemName,
       IdentifierEscaping = queryMetadata.IdentifierEscaping
     };
-    var fromItemName = entityProvider.GetFormattedName(fromTableType, entityProperties);
+    var fromItemName = entityProvider.GetFormattedName(fromItemType, entityProperties);
 
     queryContext.AutoOffsetReset = autoOffsetReset;
 
-    queryMetadata.FromItemType = fromTableType;
+    queryMetadata.FromItemType = fromItemType;
 
     if (joins.Count > 0)
     {
@@ -169,7 +169,7 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
     return expression;
   }
 
-  private Type fromTableType;
+  private Type fromItemType;
 
   protected override Expression VisitConstant(ConstantExpression constantExpression)
   {
@@ -181,7 +181,7 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
 
     if (kStreamSetType != null)
     {
-      fromTableType = ((KSet)constantExpression.Value)?.ElementType;
+      fromItemType = ((KSet)constantExpression.Value)?.ElementType;
     }
 
     return constantExpression;
