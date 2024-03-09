@@ -63,7 +63,7 @@ internal sealed class CreateInsert : CreateEntityStatement
     var hasValue = insertValues.PropertyValues.ContainsKey(memberInfo.Format(insertProperties.IdentifierEscaping));
 
     object value;
-
+    
     if (hasValue)
       value = insertValues.PropertyValues[memberInfo.Format(insertProperties.IdentifierEscaping)];
     else

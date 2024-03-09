@@ -27,9 +27,9 @@ internal class CreateEntityStatement
     return properties.Where(c => !c.GetCustomAttributes().OfType<IgnoreByInsertsAttribute>().Any());
   }
 
-  protected static string GetEntityName<T>(IEntityCreationProperties metadata)
+  protected static string GetEntityName<T>(IEntityProperties metadata)
   {
-    return EntityProvider.GetName<T>(metadata);
+    return EntityProvider.GetFormattedName<T>(metadata);
   }
 
   protected static Type GetMemberType(MemberInfo memberInfo)

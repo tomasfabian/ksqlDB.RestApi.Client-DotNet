@@ -3,7 +3,8 @@
 # 3.7.0
 - introduced new overloads for dropping entities: `DropTableAsync`, `DropTypeAsync`, and `DropStreamAsync` in `KSqlDbRestApiClient`. These overloads now accept an argument `DropFromItemProperties`, providing more flexibility in configuring the drop operations.
 - extracted `IKSqlDbDropRestApiClient` interface from `IKSqlDbRestApiClient`
-
+- see also [breakingchanges.md](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/breaking_changes.md#v400)
+- 
 # 3.6.2
 - JsonPropertyName and PseudoColumn attributes are taken into account when setting column names in LINQ column selection syntax #61 (contributed by @mrt181)
 

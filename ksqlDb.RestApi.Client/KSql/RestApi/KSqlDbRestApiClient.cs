@@ -305,7 +305,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> CreateTypeAsync<T>(CancellationToken cancellationToken = default)
   {
-    var properties = new TypeProperties<T>();
+    var properties = new TypeProperties();
     return CreateTypeAsync<T>(properties, cancellationToken);
   }
 
@@ -320,7 +320,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> CreateTypeAsync<T>(string typeName, CancellationToken cancellationToken = default)
   {
-    var properties = new TypeProperties<T> { EntityName = typeName };
+    var properties = new TypeProperties { EntityName = typeName };
     return CreateTypeAsync<T>(properties, cancellationToken);
   }
 
@@ -333,7 +333,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <param name="properties">Type configuration</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Http response object.</returns>
-  public Task<HttpResponseMessage> CreateTypeAsync<T>(TypeProperties<T> properties, CancellationToken cancellationToken = default)
+  public Task<HttpResponseMessage> CreateTypeAsync<T>(TypeProperties properties, CancellationToken cancellationToken = default)
   {
     var ksql = new TypeGenerator().Print<T>(properties);
 
@@ -348,7 +348,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> DropTypeAsync<T>(DropTypeProperties dropTypeProperties, CancellationToken cancellationToken = default)
   {
-    var typeName = entityProvider.GetName<T>(dropTypeProperties);
+    var typeName = entityProvider.GetFormattedName<T>(dropTypeProperties);
     string dropStatement = StatementTemplates.DropType(typeName);
 
     KSqlDbStatement ksqlDbStatement = new(dropStatement);
@@ -679,7 +679,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns></returns>
   public Task<HttpResponseMessage> DropStreamAsync<T>(DropFromItemProperties dropFromItemProperties, CancellationToken cancellationToken = default)
   {
-    var streamName = entityProvider.GetName<T>(dropFromItemProperties);
+    var streamName = entityProvider.GetFormattedName<T>(dropFromItemProperties);
     string dropStatement = StatementTemplates.DropStream(streamName, dropFromItemProperties.UseIfExistsClause, dropFromItemProperties.DeleteTopic);
 
     KSqlDbStatement ksqlDbStatement = new(dropStatement);
@@ -732,7 +732,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns></returns>
   public Task<HttpResponseMessage> DropTableAsync<T>(DropFromItemProperties dropFromItemProperties, CancellationToken cancellationToken = default)
   {
-    var tableName = entityProvider.GetName<T>(dropFromItemProperties);
+    var tableName = entityProvider.GetFormattedName<T>(dropFromItemProperties);
     string dropStatement = StatementTemplates.DropTable(tableName, dropFromItemProperties.UseIfExistsClause, dropFromItemProperties.DeleteTopic);
 
     KSqlDbStatement ksqlDbStatement = new(dropStatement);

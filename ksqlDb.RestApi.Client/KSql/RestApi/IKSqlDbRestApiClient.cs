@@ -253,5 +253,5 @@ public interface IKSqlDbRestApiClient : IKSqlDbAssertionsRestApiClient, IKSqlDbD
   /// <param name="properties">Type configuration</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Http response object.</returns>
-  Task<HttpResponseMessage> CreateTypeAsync<T>(TypeProperties<T> properties, CancellationToken cancellationToken = default);
+  Task<HttpResponseMessage> CreateTypeAsync<T>(TypeProperties properties, CancellationToken cancellationToken = default);
 }
