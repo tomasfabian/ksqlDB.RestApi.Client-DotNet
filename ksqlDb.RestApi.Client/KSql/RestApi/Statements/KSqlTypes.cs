@@ -1,4 +1,4 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 {
   internal static class KSqlTypes
   {
@@ -12,5 +12,8 @@
     internal static string Date => "DATE";
     internal static string Time => "TIME";
     internal static string Timestamp => "TIMESTAMP";
+    internal static string Array => "ARRAY";
+    internal static string Struct => "STRUCT";
+    internal static string Map => "MAP";
   }
 }

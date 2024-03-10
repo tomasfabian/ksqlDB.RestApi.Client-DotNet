@@ -152,8 +152,6 @@ public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
         yield return message;
       }
     }
-
-    Console.WriteLine("huhuuu");
   }
 
   private IEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopic(TimeSpan? timeout, CancellationToken cancellationToken = default)

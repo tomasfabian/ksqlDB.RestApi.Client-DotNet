@@ -9,7 +9,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-internal sealed class CreateKSqlValue : CreateEntityStatement
+internal sealed class CreateKSqlValue : EntityInfo
 {
   public object ExtractValue<T>(T inputValue, IValueFormatters valueFormatters, MemberInfo memberInfo, Type type, Func<MemberInfo, string> formatter)
   {
@@ -82,7 +82,7 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
     }
     else if (!type.IsGenericType && (type.IsClass || type.IsStruct()))
     {
-      GenerateStruct<T>(valueFormatters, type, formatter, ref value);
+      GenerateStruct(valueFormatters, type, formatter, ref value);
     }
     else
     {
@@ -100,7 +100,7 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
 
     var sb = new StringBuilder();
 
-    sb.Append("MAP(");
+    sb.Append($"{KSqlTypes.Map}(");
 
     bool isFirst = true;
 
@@ -127,12 +127,12 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
     value = sb.ToString();
   }
 
-  private void GenerateStruct<T>(IValueFormatters valueFormatters, Type type, Func<MemberInfo, string> formatter,
+  private void GenerateStruct(IValueFormatters valueFormatters, Type type, Func<MemberInfo, string> formatter,
     ref object value)
   {
     var sb = new StringBuilder();
 
-    sb.Append("STRUCT(");
+    sb.Append($"{KSqlTypes.Struct}(");
 
     bool isFirst = true;
 
@@ -181,9 +181,9 @@ internal sealed class CreateKSqlValue : CreateEntityStatement
   private static string PrintArray(object[] array)
   {
     var sb = new StringBuilder();
-    sb.Append("ARRAY[");
+    sb.Append($"{KSqlTypes.Array}[");
 #if NETSTANDARD
-      var value = string.Join(", ", array);
+    var value = string.Join(", ", array);
 #else
     var value = string.Join(", ", array);
 #endif

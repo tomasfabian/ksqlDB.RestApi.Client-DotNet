@@ -7,7 +7,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-internal sealed class CreateInsert : CreateEntityStatement
+internal sealed class CreateInsert : EntityInfo
 {
   internal string Generate<T>(T entity, InsertProperties insertProperties = null)
   {
@@ -20,15 +20,15 @@ internal sealed class CreateInsert : CreateEntityStatement
 
     insertProperties ??= new InsertProperties();
 
-    var entityName = GetEntityName<T>(insertProperties);
-
-    bool isFirst = true;
+    var entityName = EntityProvider.GetFormattedName<T>(insertProperties);
 
     var columnsStringBuilder = new StringBuilder();
     var valuesStringBuilder = new StringBuilder();
 
-    var useEntityType = insertProperties is {UseInstanceType: true};
-    var entityType = useEntityType ? insertValues.Entity.GetType() : typeof(T);
+    var useInstanceType = insertProperties is {UseInstanceType: true};
+    var entityType = useInstanceType ? insertValues.Entity.GetType() : typeof(T);
+
+    bool isFirst = true;
 
     foreach (var memberInfo in Members(entityType, insertProperties.IncludeReadOnlyProperties))
     {
@@ -46,7 +46,7 @@ internal sealed class CreateInsert : CreateEntityStatement
 
       var type = GetMemberType(memberInfo);
 
-      var value = GetValue(insertValues, insertProperties, memberInfo, type, memberInfo => IdentifierUtil.Format(memberInfo, insertProperties.IdentifierEscaping));
+      var value = GetValue(insertValues, insertProperties, memberInfo, type, mi => IdentifierUtil.Format(mi, insertProperties.IdentifierEscaping));
 
       valuesStringBuilder.Append(value);
     }
@@ -63,7 +63,7 @@ internal sealed class CreateInsert : CreateEntityStatement
     var hasValue = insertValues.PropertyValues.ContainsKey(memberInfo.Format(insertProperties.IdentifierEscaping));
 
     object value;
-
+    
     if (hasValue)
       value = insertValues.PropertyValues[memberInfo.Format(insertProperties.IdentifierEscaping)];
     else

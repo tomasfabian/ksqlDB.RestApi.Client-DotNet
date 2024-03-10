@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
@@ -7,12 +7,12 @@ using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 
-internal class TypeGenerator : CreateEntityStatement
+internal sealed class TypeGenerator : EntityInfo
 {
-  internal string Print<T>(TypeProperties<T> properties)
+  internal string Print<T>(TypeProperties properties)
   {
     StringBuilder stringBuilder = new();
-    var typeName = EscapeName(properties.IdentifierEscaping, properties.EntityName);
+    var typeName = EntityProvider.GetFormattedName<T>(properties, EscapeName);
     stringBuilder.Append($"CREATE TYPE {typeName} AS STRUCT<");
 
     PrintProperties<T>(stringBuilder, properties.IdentifierEscaping);
@@ -30,16 +30,16 @@ internal class TypeGenerator : CreateEntityStatement
     {
       var type = GetMemberType(memberInfo);
 
-      var ksqlType = CreateEntity.KSqlTypeTranslator(type, escaping);
+      var ksqlType = KSqlTypeTranslator.Translate(type, escaping);
 
-      var columnDefinition = $"{EscapeName(escaping, memberInfo.Name)} {ksqlType}{CreateEntity.ExploreAttributes(memberInfo, type)}";
+      var columnDefinition = $"{EscapeName(memberInfo.Name, escaping)} {ksqlType}{KSqlTypeTranslator.ExploreAttributes(memberInfo, type)}";
       ksqlProperties.Add(columnDefinition);
     }
 
     stringBuilder.Append(string.Join(", ", ksqlProperties));
   }
-
-  private static string EscapeName(IdentifierEscaping escaping, string name) =>
+  
+  private static string EscapeName(string name, IdentifierEscaping escaping) =>
     (escaping, IdentifierUtil.IsValid(name)) switch
     {
       (Never, _) => name,

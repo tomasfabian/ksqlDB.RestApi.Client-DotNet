@@ -1,4 +1,3 @@
-using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using NUnit.Framework;
 

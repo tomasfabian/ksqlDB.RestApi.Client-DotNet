@@ -13,7 +13,7 @@ namespace ksqlDb.RestApi.Client.KSql.RestApi.Parsers
     /// Check if a string is a reserved word.
     /// </summary>
     /// <param name="identifier">the identifier</param>
-    /// <returns>whether or not <c>identifier</c> is a valid identifier without quotes</returns>
+    /// <returns>whether <c>identifier</c> is a valid identifier without quotes</returns>
     public static bool IsValid(string identifier)
     {
       var sqlBaseLexer = new SqlBaseLexer(

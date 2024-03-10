@@ -8,7 +8,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 /// <summary>
 /// Configuration for creating entities e.g. streams and tables.
 /// </summary>
-public record EntityCreationMetadata : CreationMetadata, IEntityCreationProperties
+public record EntityCreationMetadata : CreationMetadata, IEntityProperties
 {
   /// <summary>
   /// Initializes a new instance of the <see cref="T:EntityCreationMetadata"></see> class, specifying the backing Kafka topic for the entity.

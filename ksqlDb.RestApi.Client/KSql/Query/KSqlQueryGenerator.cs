@@ -12,24 +12,20 @@ using ksqlDB.RestApi.Client.KSql.Query.Visitors;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
-using Pluralize.NET;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers;
 
 namespace ksqlDB.RestApi.Client.KSql.Query;
 
-internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
+internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisitor, IKSqlQueryGenerator
 {
-  private readonly KSqlDBContextOptions options;
-  private static readonly Pluralizer EnglishPluralizationService = new();
+  private readonly KSqlDBContextOptions options = options ?? throw new ArgumentNullException(nameof(options));
+  private readonly EntityProvider entityProvider = new();
 
   private KSqlVisitor kSqlVisitor;
   private KSqlQueryMetadata queryMetadata;
 
   public bool ShouldEmitChanges { get; set; } = true;
-
-  public KSqlQueryGenerator(KSqlDBContextOptions options)
-  {
-    this.options = options ?? throw new ArgumentNullException(nameof(options));
-  }
 
   public string BuildKSql(Expression expression, QueryContext queryContext)
   {
@@ -41,17 +37,23 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
 
     Visit(expression);
 
-    var finalFromItemName = IdentifierUtil.Format(InterceptFromItemName(queryContext.FromItemName ?? fromItemName), queryMetadata.IdentifierEscaping);
+    var entityProperties = new EntityProperties
+    {
+      EntityName = queryContext.FromItemName,
+      ShouldPluralizeEntityName = options.ShouldPluralizeFromItemName,
+      IdentifierEscaping = queryMetadata.IdentifierEscaping
+    };
+    var fromItemName = entityProvider.GetFormattedName(fromItemType, entityProperties);
 
     queryContext.AutoOffsetReset = autoOffsetReset;
 
-    queryMetadata.FromItemType = fromTableType;
+    queryMetadata.FromItemType = fromItemType;
 
     if (joins.Count > 0)
     {
       var fromItem = joins.Last();
 
-      var lambdaExpression = StripQuotes(fromItem.Item2.ToArray()[1]) as LambdaExpression;
+      var lambdaExpression = (LambdaExpression)StripQuotes(fromItem.Item2.ToArray()[1]);
       var alias = lambdaExpression.Parameters[0].Name;
 
       var fromTable = new FromItem
@@ -62,7 +64,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
 
       queryMetadata.Joins = GetFromItems(joins, fromTable, queryMetadata.IdentifierEscaping);
 
-      var joinsVisitor = new KSqlJoinsVisitor(kSqlVisitor.StringBuilder, options, new QueryContext { FromItemName = finalFromItemName }, queryMetadata);
+      var joinsVisitor = new KSqlJoinsVisitor(kSqlVisitor.StringBuilder, options, new QueryContext { FromItemName = fromItemName }, queryMetadata);
 
       joinsVisitor.VisitJoinTable(joins);
     }
@@ -75,7 +77,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
       else
         kSqlVisitor.Append("*");
 
-      kSqlVisitor.Append($" FROM {finalFromItemName}");
+      kSqlVisitor.Append($" FROM {fromItemName}");
     }
 
     bool isFirst = true;
@@ -149,14 +151,6 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
     return (TimeWindows)constantExpression.Value;
   }
 
-  protected virtual string InterceptFromItemName(string value)
-  {
-    if (options.ShouldPluralizeFromItemName)
-      return EnglishPluralizationService.Pluralize(value);
-
-    return value;
-  }
-
   public override Expression Visit(Expression expression)
   {
     if (expression == null)
@@ -175,9 +169,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
     return expression;
   }
 
-  private string fromItemName;
-
-  private Type fromTableType;
+  private Type fromItemType;
 
   protected override Expression VisitConstant(ConstantExpression constantExpression)
   {
@@ -189,9 +181,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
 
     if (kStreamSetType != null)
     {
-      fromTableType = ((KSet)constantExpression.Value)?.ElementType;
-
-      fromItemName = fromTableType.ExtractTypeName();
+      fromItemType = ((KSet)constantExpression.Value)?.ElementType;
     }
 
     return constantExpression;
@@ -336,7 +326,7 @@ internal class KSqlQueryGenerator : ExpressionVisitor, IKSqlQueryGenerator
     return joins.Select(c =>
       {
         var items = c.Item2.ToArray();
-        var lambdaExpression = StripQuotes(items[2]) as LambdaExpression;
+        var lambdaExpression = (LambdaExpression)StripQuotes(items[2]);
         var alias = lambdaExpression.Parameters[0].Name;
 
         var type = items[0].Type.GenericTypeArguments[0];
