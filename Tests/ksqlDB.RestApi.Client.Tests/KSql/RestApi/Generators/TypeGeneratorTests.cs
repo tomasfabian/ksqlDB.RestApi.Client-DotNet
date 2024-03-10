@@ -19,7 +19,7 @@ public class TypeGeneratorTests
 
     //Assert
     statement.Should()
-      .Be($"CREATE TYPE {nameof(Address).ToUpper()} AS STRUCT<Number INT, Street VARCHAR, City VARCHAR>;");
+      .Be($"CREATE TYPE {nameof(Address)} AS STRUCT<Number INT, Street VARCHAR, City VARCHAR>;");
   }
 
   [Test]
@@ -44,7 +44,7 @@ public class TypeGeneratorTests
     var statement = new TypeGenerator().Print<Person>(new TypeProperties());
 
     //Assert
-    statement.Should().Be($"CREATE TYPE {nameof(Person).ToUpper()} AS STRUCT<Name VARCHAR, Address ADDRESS>;");
+    statement.Should().Be($"CREATE TYPE {nameof(Person)} AS STRUCT<Name VARCHAR, Address ADDRESS>;");
   }
 
   [Test]
@@ -56,7 +56,7 @@ public class TypeGeneratorTests
     var statement = new TypeGenerator().Print<Thumbnail>(new TypeProperties());
 
     //Assert
-    statement.Should().Be($"CREATE TYPE {nameof(Thumbnail).ToUpper()} AS STRUCT<Image BYTES>;");
+    statement.Should().Be($"CREATE TYPE {nameof(Thumbnail)} AS STRUCT<Image BYTES>;");
   }
 
   [Test]
@@ -68,30 +68,30 @@ public class TypeGeneratorTests
     var statement = new TypeGenerator().Print<Container>(new TypeProperties());
 
     //Assert
-    statement.Should().Be($"CREATE TYPE {nameof(Container).ToUpper()} AS STRUCT<Values2 MAP<VARCHAR, INT>>;");
+    statement.Should().Be($"CREATE TYPE {nameof(Container)} AS STRUCT<Values2 MAP<VARCHAR, INT>>;");
   }
 
-  [TestCase(IdentifierEscaping.Never, ExpectedResult = "CREATE TYPE ROWTIME AS STRUCT<Value VARCHAR>;")]
-  [TestCase(IdentifierEscaping.Keywords, ExpectedResult = "CREATE TYPE ROWTIME AS STRUCT<Value VARCHAR>;")]
-  [TestCase(IdentifierEscaping.Always, ExpectedResult = "CREATE TYPE `ROWTIME` AS STRUCT<`Value` VARCHAR>;")]
+  [TestCase(IdentifierEscaping.Never, ExpectedResult = "CREATE TYPE RowTime AS STRUCT<Value VARCHAR>;")]
+  [TestCase(IdentifierEscaping.Keywords, ExpectedResult = "CREATE TYPE RowTime AS STRUCT<Value VARCHAR>;")]
+  [TestCase(IdentifierEscaping.Always, ExpectedResult = "CREATE TYPE `RowTime` AS STRUCT<`Value` VARCHAR>;")]
   public string CreateType_WithSystemColumName(IdentifierEscaping escaping) =>
     new TypeGenerator().Print<RowTime>(new TypeProperties { IdentifierEscaping = escaping });
 
-  [TestCase(IdentifierEscaping.Never, ExpectedResult = "CREATE TYPE VALUES AS STRUCT<Value VARCHAR>;")]
-  [TestCase(IdentifierEscaping.Keywords, ExpectedResult = "CREATE TYPE `VALUES` AS STRUCT<Value VARCHAR>;")]
-  [TestCase(IdentifierEscaping.Always, ExpectedResult = "CREATE TYPE `VALUES` AS STRUCT<`Value` VARCHAR>;")]
+  [TestCase(IdentifierEscaping.Never, ExpectedResult = "CREATE TYPE Values AS STRUCT<Value VARCHAR>;")]
+  [TestCase(IdentifierEscaping.Keywords, ExpectedResult = "CREATE TYPE `Values` AS STRUCT<Value VARCHAR>;")]
+  [TestCase(IdentifierEscaping.Always, ExpectedResult = "CREATE TYPE `Values` AS STRUCT<`Value` VARCHAR>;")]
   public string CreateType_WithReservedWord(IdentifierEscaping escaping) =>
     new TypeGenerator().Print<Values>(new TypeProperties { IdentifierEscaping = escaping });
 
   [TestCase(IdentifierEscaping.Never,
     ExpectedResult =
-      "CREATE TYPE SYSTEMCOLUMN AS STRUCT<RowTime VARCHAR, RowOffset VARCHAR, RowPartition VARCHAR, WindowStart VARCHAR, WindowEnd VARCHAR>;")]
+      "CREATE TYPE SystemColumn AS STRUCT<RowTime VARCHAR, RowOffset VARCHAR, RowPartition VARCHAR, WindowStart VARCHAR, WindowEnd VARCHAR>;")]
   [TestCase(IdentifierEscaping.Keywords,
     ExpectedResult =
-      "CREATE TYPE SYSTEMCOLUMN AS STRUCT<RowTime VARCHAR, RowOffset VARCHAR, RowPartition VARCHAR, WindowStart VARCHAR, WindowEnd VARCHAR>;")]
+      "CREATE TYPE SystemColumn AS STRUCT<RowTime VARCHAR, RowOffset VARCHAR, RowPartition VARCHAR, WindowStart VARCHAR, WindowEnd VARCHAR>;")]
   [TestCase(IdentifierEscaping.Always,
     ExpectedResult =
-      "CREATE TYPE `SYSTEMCOLUMN` AS STRUCT<`RowTime` VARCHAR, `RowOffset` VARCHAR, `RowPartition` VARCHAR, `WindowStart` VARCHAR, `WindowEnd` VARCHAR>;")]
+      "CREATE TYPE `SystemColumn` AS STRUCT<`RowTime` VARCHAR, `RowOffset` VARCHAR, `RowPartition` VARCHAR, `WindowStart` VARCHAR, `WindowEnd` VARCHAR>;")]
   public string CreateType_WithSystemColumnNameField(IdentifierEscaping escaping) =>
     new TypeGenerator().Print<SystemColumn>(new TypeProperties { IdentifierEscaping = escaping });
 
@@ -180,7 +180,7 @@ public class TypeGeneratorTests
 
     //Assert
     statement.Should()
-      .Be("CREATE TYPE DATABASECHANGEOBJECT AS STRUCT<Before IOTSENSOR, After IOTSENSOR, Source SOURCE, Op VARCHAR, TsMs BIGINT>;"); //, Transaction OBJECT
+      .Be($"CREATE TYPE {nameof(DatabaseChangeObject)} AS STRUCT<Before IOTSENSOR, After IOTSENSOR, Source SOURCE, Op VARCHAR, TsMs BIGINT>;"); //, Transaction OBJECT
   }
 
   #endregion
