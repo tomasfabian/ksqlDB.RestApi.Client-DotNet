@@ -4,7 +4,7 @@ using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-internal class CreateEntityStatement
+internal class EntityInfo
 {
   protected static readonly EntityProvider EntityProvider = new();
 

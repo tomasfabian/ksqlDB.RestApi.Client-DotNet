@@ -7,7 +7,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-internal sealed class CreateInsert : CreateEntityStatement
+internal sealed class CreateInsert : EntityInfo
 {
   internal string Generate<T>(T entity, InsertProperties insertProperties = null)
   {
@@ -22,13 +22,13 @@ internal sealed class CreateInsert : CreateEntityStatement
 
     var entityName = EntityProvider.GetFormattedName<T>(insertProperties);
 
-    bool isFirst = true;
-
     var columnsStringBuilder = new StringBuilder();
     var valuesStringBuilder = new StringBuilder();
 
-    var useEntityType = insertProperties is {UseInstanceType: true};
-    var entityType = useEntityType ? insertValues.Entity.GetType() : typeof(T);
+    var useInstanceType = insertProperties is {UseInstanceType: true};
+    var entityType = useInstanceType ? insertValues.Entity.GetType() : typeof(T);
+
+    bool isFirst = true;
 
     foreach (var memberInfo in Members(entityType, insertProperties.IncludeReadOnlyProperties))
     {

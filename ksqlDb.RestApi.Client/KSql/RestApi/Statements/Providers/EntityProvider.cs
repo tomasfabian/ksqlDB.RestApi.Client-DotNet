@@ -6,7 +6,7 @@ using Pluralize.NET;
 
 namespace ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers
 {
-  internal class EntityProvider
+  internal sealed class EntityProvider
   {
     private readonly Pluralizer englishPluralizationService = new();
 
