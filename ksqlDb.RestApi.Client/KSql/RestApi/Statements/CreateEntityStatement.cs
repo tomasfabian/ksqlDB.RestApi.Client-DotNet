@@ -1,13 +1,12 @@
 using System.Reflection;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 internal class CreateEntityStatement
 {
-  private static readonly EntityProvider EntityProvider = new();
+  protected static readonly EntityProvider EntityProvider = new();
 
   protected static IEnumerable<MemberInfo> Members<T>(bool? includeReadOnly = null)
   {
@@ -25,11 +24,6 @@ internal class CreateEntityStatement
       .Concat(fields);
       
     return properties.Where(c => !c.GetCustomAttributes().OfType<IgnoreByInsertsAttribute>().Any());
-  }
-
-  protected static string GetEntityName<T>(IEntityProperties metadata)
-  {
-    return EntityProvider.GetFormattedName<T>(metadata);
   }
 
   protected static Type GetMemberType(MemberInfo memberInfo)

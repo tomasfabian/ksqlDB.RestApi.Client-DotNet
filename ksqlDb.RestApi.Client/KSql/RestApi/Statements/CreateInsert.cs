@@ -20,7 +20,7 @@ internal sealed class CreateInsert : CreateEntityStatement
 
     insertProperties ??= new InsertProperties();
 
-    var entityName = GetEntityName<T>(insertProperties);
+    var entityName = EntityProvider.GetFormattedName<T>(insertProperties);
 
     bool isFirst = true;
 
@@ -46,7 +46,7 @@ internal sealed class CreateInsert : CreateEntityStatement
 
       var type = GetMemberType(memberInfo);
 
-      var value = GetValue(insertValues, insertProperties, memberInfo, type, memberInfo => IdentifierUtil.Format(memberInfo, insertProperties.IdentifierEscaping));
+      var value = GetValue(insertValues, insertProperties, memberInfo, type, mi => IdentifierUtil.Format(mi, insertProperties.IdentifierEscaping));
 
       valuesStringBuilder.Append(value);
     }

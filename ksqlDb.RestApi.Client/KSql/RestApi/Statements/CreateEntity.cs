@@ -6,6 +6,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using static System.String;
 using DateTime = System.DateTime;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
@@ -14,7 +15,7 @@ internal sealed class CreateEntity : CreateEntityStatement
 {
   internal static string KSqlTypeTranslator(Type type, IdentifierEscaping escaping = IdentifierEscaping.Never)
   {
-    var ksqlType = string.Empty;
+    var ksqlType = Empty;
 
     if (type == typeof(byte[]))
       ksqlType = KSqlTypes.Bytes;
@@ -57,7 +58,7 @@ internal sealed class CreateEntity : CreateEntityStatement
     {
       var ksqlProperties = GetProperties(type, escaping);
 
-      ksqlType = $"STRUCT<{string.Join(", ", ksqlProperties)}>";
+      ksqlType = $"STRUCT<{Join(", ", ksqlProperties)}>";
     }
     else if (!type.IsGenericType && (type.IsClass || type.IsStruct()))
     {
@@ -136,14 +137,14 @@ internal sealed class CreateEntity : CreateEntityStatement
       {
         const string header = " HEADER";
 
-        if (string.IsNullOrEmpty(headersAttribute.Key))
+        if (IsNullOrEmpty(headersAttribute.Key))
           return $"{header}S";
 
         return $"{header}('{headersAttribute.Key}')";
       }
     }
 
-    return string.Empty;
+    return Empty;
   }
 
   private void PrintProperties<T>(StatementContext statementContext, EntityCreationMetadata metadata)
@@ -164,7 +165,7 @@ internal sealed class CreateEntity : CreateEntityStatement
       ksqlProperties.Add(columnDefinition);
     }
 
-    stringBuilder.AppendLine(string.Join($",{Environment.NewLine}", ksqlProperties));
+    stringBuilder.AppendLine(Join($",{Environment.NewLine}", ksqlProperties));
   }
 
   internal static IEnumerable<string> GetProperties(Type type, IdentifierEscaping escaping)
@@ -201,9 +202,9 @@ internal sealed class CreateEntity : CreateEntityStatement
       _ => throw new ArgumentOutOfRangeException(nameof(statementContext), $"Unknown '{nameof(KSqlEntityType)}' value {statementContext.KSqlEntityType}.")
     };
 
-    statementContext.EntityName = GetEntityName<T>(metadata);
+    statementContext.EntityName = EntityProvider.GetFormattedName<T>(metadata);
 
-    string source = metadata.IsReadOnly ? " SOURCE" : String.Empty;
+    string source = metadata.IsReadOnly ? " SOURCE" : Empty;
 
     stringBuilder.Append($"{creationTypeText}{source} {entityTypeText}");
   }
@@ -211,7 +212,7 @@ internal sealed class CreateEntity : CreateEntityStatement
   private static string TryAttachKey(KSqlEntityType entityType, MemberInfo memberInfo)
   {
     if (!memberInfo.HasKey())
-      return string.Empty;
+      return Empty;
 
     string key = entityType switch
     {

@@ -3,15 +3,12 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
-using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers;
 using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 
 internal class TypeGenerator : CreateEntityStatement
 {
-  private static readonly EntityProvider EntityProvider = new();
-
   internal string Print<T>(TypeProperties properties)
   {
     StringBuilder stringBuilder = new();
