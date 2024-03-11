@@ -2,6 +2,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
 namespace ksqlDB.RestApi.Client.KSql.Query;
 
+#nullable enable
 /// <summary>
 /// Represents a Kafka record with pseudo-columns.
 /// </summary>
@@ -12,7 +13,7 @@ public class Record
   /// </summary>
   [IgnoreByInserts]
   [PseudoColumn]
-  public string Headers { get; set; }
+  public string? Headers { get; set; }
 
   /// <summary>
   /// The offset of the source record.

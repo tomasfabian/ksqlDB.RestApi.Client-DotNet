@@ -1,8 +1,9 @@
-﻿using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
+using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using ksqlDb.RestApi.Client.KSql.RestApi.Responses.Asserts;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi;
 
+#nullable enable
 public interface IKSqlDbAssertionsRestApiClient
 {
   /// <summary>

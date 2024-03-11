@@ -1,21 +1,22 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses;
 
+#nullable enable
 public class ErrorResponse
 {
   [JsonPropertyName("type")]
-  public string Type { get; set; }
+  public string? Type { get; set; }
 
   [JsonPropertyName("error_code")]
   public int ErrorCode { get; set; }
 
   [JsonPropertyName("message")]
-  public string Message { get; set; }
+  public string? Message { get; set; }
 
   [JsonPropertyName("statementText")]
-  public string StatementText { get; set; }
+  public string? StatementText { get; set; }
 
   [JsonPropertyName("entities")]
-  public object[] Entities { get; set; }
+  public object[]? Entities { get; set; }
 }

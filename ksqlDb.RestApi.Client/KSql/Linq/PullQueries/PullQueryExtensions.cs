@@ -4,11 +4,12 @@ using ksqlDB.RestApi.Client.KSql.Query.PullQueries;
 
 namespace ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 
+#nullable enable
 public static class PullQueryExtensions
 {
   #region Select
 
-  private static MethodInfo selectTSourceTResult;
+  private static MethodInfo? selectTSourceTResult;
 
   private static MethodInfo SelectTSourceTResult(Type source, Type result) =>
     (selectTSourceTResult ??= new Func<IPullable<object>, Expression<Func<object, object>>, IPullable<object>>(Select).GetMethodInfo().GetGenericMethodDefinition())
@@ -42,7 +43,7 @@ public static class PullQueryExtensions
 
   #region Where
 
-  private static MethodInfo whereTSource;
+  private static MethodInfo? whereTSource;
 
   private static MethodInfo WhereTSource(Type source) =>
     (whereTSource ??= new Func<IPullable<object>, Expression<Func<object, bool>>, IPullable<object>>(Where).GetMethodInfo().GetGenericMethodDefinition())
@@ -75,7 +76,7 @@ public static class PullQueryExtensions
 
   #region Take
 
-  private static MethodInfo takeTSource;
+  private static MethodInfo? takeTSource;
 
   private static MethodInfo TakeTSource(Type source) =>
     (takeTSource ??= new Func<IPullable<object>, int, IPullable<object>>(Take).GetMethodInfo().GetGenericMethodDefinition())
@@ -116,7 +117,7 @@ public static class PullQueryExtensions
 
     var dependencies = pullSet?.GetDependencies();
 
-    return dependencies?.QueryStreamParameters.Sql;
+    return dependencies?.QueryStreamParameters?.Sql ?? string.Empty;
   }
 
   #endregion

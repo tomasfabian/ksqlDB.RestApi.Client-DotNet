@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context;
 
+#nullable enable
 /// <summary>
 /// Options class for ksqlDB context configuration.
 /// </summary>
@@ -58,7 +59,7 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   /// </summary>
   public IKSqlDbParameters QueryParameters { get; internal set; }
 
-  public static NumberFormatInfo NumberFormatInfo { get; set; }
+  public static NumberFormatInfo? NumberFormatInfo { get; set; }
 
   /// <summary>
   /// Enable exactly-once or at_least_once semantics.
@@ -92,9 +93,7 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   /// <returns>The original ksqlDB context options builder</returns>
   public void SetJsonSerializerOptions(Action<JsonSerializerOptions> optionsAction)
   {
-    JsonSerializerOptions ??= KSqlDbJsonSerializerOptions.CreateInstance();
-
-    optionsAction?.Invoke(JsonSerializerOptions);
+    optionsAction.Invoke(JsonSerializerOptions);
   }
 
   internal KSqlDBContextOptions Clone()
@@ -103,7 +102,7 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
     {
       ShouldPluralizeFromItemName = ShouldPluralizeFromItemName,
       QueryParameters = ((QueryParameters) QueryParameters).Clone(),
-      QueryStreamParameters = QueryStreamParameters.Clone() as QueryStreamParameters
+      QueryStreamParameters = (QueryStreamParameters)QueryStreamParameters.Clone()
     };
 
     return options;
@@ -111,11 +110,11 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
 
   public bool UseBasicAuth => userName != null || password != null;
 
-  private string userName;
-  internal string BasicAuthUserName => string.IsNullOrEmpty(userName) ? "" : userName;
+  private string? userName;
+  internal string? BasicAuthUserName => string.IsNullOrEmpty(userName) ? string.Empty : userName;
 
-  private string password;
-  internal string BasicAuthPassword => string.IsNullOrEmpty(password) ? "" : password;
+  private string? password;
+  internal string? BasicAuthPassword => string.IsNullOrEmpty(password) ? string.Empty : password;
 
   /// <summary>
   /// Gets or sets the identifier escaping type.

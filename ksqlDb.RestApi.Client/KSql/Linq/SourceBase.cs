@@ -1,9 +1,10 @@
-﻿using ksqlDB.RestApi.Client.KSql.Query.Windows;
+using ksqlDB.RestApi.Client.KSql.Query.Windows;
 
 namespace ksqlDB.RestApi.Client.KSql.Linq;
 
+#nullable enable
 public class SourceBase
 {
-  internal Duration DurationBefore { get; set; }
-  internal Duration DurationAfter { get; set; }
+  internal Duration? DurationBefore { get; set; }
+  internal Duration? DurationAfter { get; set; }
 }

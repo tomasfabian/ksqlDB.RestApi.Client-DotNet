@@ -4,13 +4,14 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
+#nullable enable
 public class QueryParameters : IKSqlDbParameters
 {
   /// <summary>
   /// A semicolon-delimited sequence of SQL statements to run.
   /// </summary>
   [JsonPropertyName("ksql")]
-  public string Sql { get; set; }
+  public string Sql { get; set; } = null!;
 
   /// <summary>
   /// Property overrides to run the statements with.

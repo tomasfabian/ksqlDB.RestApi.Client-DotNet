@@ -4,6 +4,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Responses;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Query;
 
+#nullable enable
 internal class KSqlDbProviderValueReader
 {
   internal static string ExtractRow(string rawData)

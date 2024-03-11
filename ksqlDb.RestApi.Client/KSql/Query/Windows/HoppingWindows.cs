@@ -2,6 +2,7 @@ using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Windows;
 
+#nullable enable
 /// <summary>
 /// Represents hopping windows for time-based operations.
 /// </summary>
@@ -43,7 +44,7 @@ public class HoppingWindows : TimeWindows
   /// <summary>
   /// Gets the retention duration for the hopping window.
   /// </summary>
-  public Duration Retention { get; private set; }
+  public Duration? Retention { get; private set; }
 
   /// <summary>
   /// Sets the retention duration for the hopping window.

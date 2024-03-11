@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Clauses;
 
+#nullable enable
 internal sealed class WithOrAsClause : IWithOrAsClause
 {
   private readonly IServiceScopeFactory serviceScopeFactory;
@@ -44,7 +45,7 @@ internal sealed class WithOrAsClause : IWithOrAsClause
     return this;
   }
 
-  public ICreateStatement<T> As<T>(string entityName = null)
+  public ICreateStatement<T> As<T>(string? entityName = null)
   {
     if (entityName == String.Empty)
       entityName = null;

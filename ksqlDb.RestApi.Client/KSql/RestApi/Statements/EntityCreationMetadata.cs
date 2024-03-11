@@ -26,7 +26,7 @@ public record EntityCreationMetadata : CreationMetadata, IEntityProperties
   /// <summary>
   /// Initializes a new instance of the <see cref="T:EntityCreationMetadata"></see> class with default configuration values.
   /// </summary>
-  public EntityCreationMetadata()
+  internal EntityCreationMetadata()
   {
     ValueFormat = SerializationFormats.Json;
   }
@@ -34,7 +34,7 @@ public record EntityCreationMetadata : CreationMetadata, IEntityProperties
   /// <summary>
   /// Name of the entity e.g. stream or table.
   /// </summary>
-  public string EntityName { get; set; }
+  public string? EntityName { get; set; }
 
   /// <summary>
   /// By setting the value of this field to "true" the entity name will be automatically pluralized during code generation. 
@@ -49,7 +49,7 @@ public record EntityCreationMetadata : CreationMetadata, IEntityProperties
   /// <summary>
   /// By default, the topic is assumed to contain non-windowed data. If the data is windowed, i.e., was created using ksqlDB using a query that contains a WINDOW clause, and the WINDOW_TYPE property is TUMBLING or HOPPING, then the WINDOW_SIZE property should be set. The property is a string with two literals, window size (a number) and window size unit (a time unit). For example: 10 SECONDS.
   /// </summary>
-  public string WindowSize { get; set; }
+  public string? WindowSize { get; set; }
 
   /// <summary>
   /// If read-only is true the SOURCE clause is provided.

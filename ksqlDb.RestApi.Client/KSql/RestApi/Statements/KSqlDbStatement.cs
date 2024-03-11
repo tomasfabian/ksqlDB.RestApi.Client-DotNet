@@ -4,6 +4,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
+#nullable enable
 /// <summary>
 /// Defines a sequence of SQL statements.
 /// </summary>
@@ -24,7 +25,7 @@ public sealed class KSqlDbStatement : QueryParameters
   /// </summary>
   [JsonPropertyName("sessionVariables")]
   [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-  public Dictionary<string, object> SessionVariables { get; set; }
+  public Dictionary<string, object>? SessionVariables { get; set; }
 
   [JsonIgnore]
   public Encoding ContentEncoding { get; set; } = Encoding.UTF8;

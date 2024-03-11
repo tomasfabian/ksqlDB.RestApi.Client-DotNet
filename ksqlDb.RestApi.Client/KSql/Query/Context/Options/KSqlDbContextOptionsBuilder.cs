@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context.Options;
 
+#nullable enable
 /// <summary>
 /// KSqlDbContextOptionsBuilder provides a fluent API that allows you to configure various aspects of the `ksqlDB` context, such as the connection string, processing guarantee, and other options.
 /// </summary>
@@ -24,7 +25,7 @@ public class KSqlDbContextOptionsBuilder : ISetupParameters
     return this;
   }
 
-  private string Url { get; set; }
+  private string? Url { get; set; }
 
   /// <summary>
   /// Adds the <see cref="IHttpClientFactory"/> and related services to the <see cref="IServiceCollection"/> and configures
@@ -34,14 +35,14 @@ public class KSqlDbContextOptionsBuilder : ISetupParameters
   /// <typeparam name="TImplementation">
   /// The implementation type of the typed client.</typeparam>
   /// <param name="configureClient">A delegate that intercepts the creation of an instance of <typeparamref name="TClient"/>.</param>
-  /// <returns>An <see cref="IHttpClientBuilder"/> that can be utilized to configure the client.</returns>
+  /// <returns>A <see cref="IHttpClientBuilder"/> that can be utilized to configure the client.</returns>
   public IHttpClientBuilder ReplaceHttpClient<TClient, TImplementation>(Action<HttpClient> configureClient)
     where TClient : class
     where TImplementation : class, TClient
   {
     void OuterConfigureClient(HttpClient httpClient)
     {
-      httpClient.BaseAddress = new Uri(Url);
+      httpClient.BaseAddress = new Uri(Url ?? throw new InvalidOperationException());
 
 #if !NETSTANDARD
       httpClient.DefaultRequestVersion = new Version(2, 0);
@@ -50,7 +51,7 @@ public class KSqlDbContextOptionsBuilder : ISetupParameters
       configureClient(httpClient);
     }
 
-    return serviceCollection.AddHttpClient<TClient, TImplementation>(OuterConfigureClient);
+    return serviceCollection.AddHttpClient<TClient, TImplementation>(OuterConfigureClient!);
   }
 
 #if !NETSTANDARD
@@ -116,7 +117,7 @@ public class KSqlDbContextOptionsBuilder : ISetupParameters
   }
 
   /// <summary>
-  /// Allows you to configure the processing.guarantee streams property.
+  /// Allows you to configure the 'processing.guarantee' streams property.
   /// </summary>
   /// <param name="processingGuarantee">Type of processing guarantee. exactly_once_v2 or at_least_once semantics</param>
   /// <returns>Returns this instance.</returns>
@@ -139,7 +140,7 @@ public class KSqlDbContextOptionsBuilder : ISetupParameters
     return this;
   }
 
-  private KSqlDBContextOptions contextOptions;
+  private KSqlDBContextOptions? contextOptions;
 
   KSqlDBContextOptions ICreateOptions.Options => InternalOptions;
 
@@ -147,7 +148,7 @@ public class KSqlDbContextOptionsBuilder : ISetupParameters
   {
     get
     {
-      return contextOptions ??= new KSqlDBContextOptions(Url)
+      return contextOptions ??= new KSqlDBContextOptions(Url ?? throw new InvalidOperationException())
       {
         JsonSerializerOptions = jsonSerializerOptions,
         ServiceCollection = serviceCollection

@@ -1,5 +1,6 @@
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Http;
 
+#nullable enable
 /// <summary>
 /// Represents basic authentication credentials.
 /// </summary>
@@ -15,14 +16,6 @@ public record BasicAuthCredentials
     UserName = userName;
     Password = password;
   }
-
-  /// <summary>
-  /// Initializes a new instance of the <see cref="BasicAuthCredentials"/> class.
-  /// </summary>
-  internal BasicAuthCredentials()
-  {
-  }
-
 
   /// <summary>
   /// Gets the username.

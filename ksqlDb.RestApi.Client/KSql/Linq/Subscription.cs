@@ -1,6 +1,7 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.Linq;
+namespace ksqlDB.RestApi.Client.KSql.Linq;
 
+#nullable enable
 public record Subscription
 {
-  public string QueryId { get; internal set; }
+  public string? QueryId { get; internal set; }
 }

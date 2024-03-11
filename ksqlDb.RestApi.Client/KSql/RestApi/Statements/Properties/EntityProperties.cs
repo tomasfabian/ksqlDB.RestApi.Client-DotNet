@@ -2,6 +2,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties
 {
+#nullable enable
   /// <summary>
   /// Represents a configuration for a ksqlDB entity.
   /// </summary>
@@ -10,7 +11,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties
     /// <summary>
     /// Gets or sets the entity name that overrides the automatically inferred name.
     /// </summary>
-    public string EntityName { get; init; }
+    public string? EntityName { get; init; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the entity name should be pluralized.

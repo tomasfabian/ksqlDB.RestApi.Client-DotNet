@@ -1,8 +1,9 @@
-﻿namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query.Descriptors;
+namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query.Descriptors;
 
+#nullable enable
 public record Field
 {
-  public string Name { get; set; }
-  public Schema Schema { get; set; }
-  public string Type { get; set; }
+  public string? Name { get; set; }
+  public Schema? Schema { get; set; }
+  public string? Type { get; set; }
 }

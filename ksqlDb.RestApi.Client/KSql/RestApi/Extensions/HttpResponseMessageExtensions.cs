@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Connectors;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Queries;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Streams;
@@ -8,6 +8,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 
+#nullable enable
 public static class HttpResponseMessageExtensions
 {
   public static StatementResponse[] ToStatementResponses(this HttpResponseMessage httpResponseMessage)
@@ -16,10 +17,10 @@ public static class HttpResponseMessageExtensions
       
     var responseObjects = JsonSerializer.Deserialize<StatementResponse[]>(responseContent);
 
-    return responseObjects;
+    return responseObjects ?? [];
   }
 
-  public static StatementResponse ToStatementResponse(this HttpResponseMessage httpResponseMessage)
+  public static StatementResponse? ToStatementResponse(this HttpResponseMessage httpResponseMessage)
   {
     string responseContent = httpResponseMessage.Content.ReadAsStringAsync().Result;
       
@@ -65,14 +66,17 @@ public static class HttpResponseMessageExtensions
 
   internal static async Task<TResponse[]> ToStatementResponsesAsync<TResponse>(this HttpResponseMessage httpResponseMessage)
   {
-    TResponse[] statementResponses;
+    TResponse[]? statementResponses;
 
     if (httpResponseMessage.IsSuccessStatusCode)
       statementResponses = await httpResponseMessage.ToStatementResponseAsync<TResponse[]>().ConfigureAwait(false);
     else
-      statementResponses = new[] { await httpResponseMessage.ToStatementResponseAsync<TResponse>().ConfigureAwait(false) };
+    {
+      var statementResponse = await httpResponseMessage.ToStatementResponseAsync<TResponse>().ConfigureAwait(false);
+      statementResponses = statementResponse != null ? [statementResponse] : [];
+    }
 
-    return statementResponses;
+    return statementResponses ?? [];
   }
 
   private static readonly JsonSerializerOptions JsonSerializerOptions = new()
@@ -80,7 +84,7 @@ public static class HttpResponseMessageExtensions
     PropertyNameCaseInsensitive = true
   };
     
-  private static async Task<TResponse> ToStatementResponseAsync<TResponse>(this HttpResponseMessage httpResponseMessage)
+  private static async Task<TResponse?> ToStatementResponseAsync<TResponse>(this HttpResponseMessage httpResponseMessage)
   {
     string responseContent = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
       

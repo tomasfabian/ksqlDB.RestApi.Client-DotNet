@@ -25,7 +25,7 @@ internal abstract class KStreamSet : KSet, Linq.IQbservable
 internal abstract class KStreamSet<TEntity> : KStreamSet, Linq.IQbservable<TEntity>
 {
   private readonly IServiceScopeFactory serviceScopeFactory;
-  private IServiceScope serviceScope;
+  //private IServiceScope serviceScope;
 
   protected KStreamSet(IServiceScopeFactory serviceScopeFactory, QueryContext queryContext = null)
   {

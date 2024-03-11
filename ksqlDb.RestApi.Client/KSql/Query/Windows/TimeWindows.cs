@@ -2,6 +2,7 @@ using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Windows;
 
+#nullable enable
 /// <summary>
 /// Represents time windows for time-based operations.
 /// </summary>
@@ -27,7 +28,7 @@ public class TimeWindows
   /// <summary>
   /// Gets the grace period for the time window.
   /// </summary>
-  public Duration GracePeriod { get; private set; }
+  public Duration? GracePeriod { get; private set; }
 
   /// <summary>
   /// Gets the output refinement mode of the time window.

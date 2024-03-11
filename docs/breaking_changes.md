@@ -5,6 +5,7 @@
 - the above change affected the argument for the `IKSqlDbRestApiClient.CreateTypeAsync<T>(TypeProperties typeProperties)`
 - `IEntityCreationProperties` was replaced with `IEntityProperties`
 - ksqlDB types are no longer **automatically capitalized**
+- enabled nullable reference types in csproj.
 
 Updated package references:
 ```xml

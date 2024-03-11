@@ -7,21 +7,23 @@ using Microsoft.Extensions.Logging;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context;
 
+#nullable enable
 /// <summary>
 /// Dependencies provider for ksqlDB context queries using REST API.
 /// </summary>
 public abstract class KSqlDBContextDependenciesProvider : AsyncDisposableObject, IDisposable
 {
-  private readonly ILoggerFactory loggerFactory;
+  private readonly KSqlDBContextOptions kSqlDbContextOptions;
+  private readonly ILoggerFactory? loggerFactory;
 
   /// <summary>
   /// Initializes a new instance of <see cref="KSqlDBContextDependenciesProvider"/> with the specified <see cref="KSqlDBContextOptions"/>. 
   /// </summary>
   /// <param name="kSqlDbContextOptions">The options for ksqlDB context.</param>
   /// <param name="loggerFactory">The logger factory.</param>
-  protected KSqlDBContextDependenciesProvider(KSqlDBContextOptions kSqlDbContextOptions, ILoggerFactory loggerFactory = null)
+  protected KSqlDBContextDependenciesProvider(KSqlDBContextOptions kSqlDbContextOptions, ILoggerFactory? loggerFactory = null)
   {
-    if (kSqlDbContextOptions == null) throw new ArgumentNullException(nameof(kSqlDbContextOptions));
+    this.kSqlDbContextOptions = kSqlDbContextOptions ?? throw new ArgumentNullException(nameof(kSqlDbContextOptions));
     this.loggerFactory = loggerFactory;
 
     ServiceCollection = new ServiceCollection();
@@ -30,22 +32,20 @@ public abstract class KSqlDBContextDependenciesProvider : AsyncDisposableObject,
 
   internal IServiceCollection ServiceCollection { get; }
 
-  protected ServiceProvider ServiceProvider { get; private set; }
+  protected ServiceProvider? ServiceProvider { get; private set; }
 
-  private bool wasConfigured;
+  private IServiceScopeFactory? serviceScopeFactory;
 
-  internal IServiceScopeFactory Initialize(KSqlDBContextOptions contextOptions)
+  internal IServiceScopeFactory ServiceScopeFactory()
   {
-    if (!wasConfigured)
-    {
-      wasConfigured = true;
+    if (serviceScopeFactory != null)
+      return serviceScopeFactory;
 
-      RegisterDependencies(contextOptions);
+    RegisterDependencies(kSqlDbContextOptions);
 
-      ServiceProvider = ServiceCollection.BuildServiceProvider(new ServiceProviderOptions {ValidateScopes = true});
-    }
+    ServiceProvider = ServiceCollection.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
 
-    var serviceScopeFactory = ServiceProvider.GetService<IServiceScopeFactory>();
+    serviceScopeFactory = ServiceProvider.GetRequiredService<IServiceScopeFactory>();
 
     return serviceScopeFactory;
   }
@@ -57,10 +57,10 @@ public abstract class KSqlDBContextDependenciesProvider : AsyncDisposableObject,
 
   internal void Configure(Action<IServiceCollection> receive)
   {
-    receive?.Invoke(ServiceCollection);
+    receive.Invoke(ServiceCollection);
   }
 
-  protected ILogger Logger { get; private set; }
+  protected ILogger? Logger { get; private set; }
 
   protected virtual void OnConfigureServices(IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
   {
