@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Statements;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +10,7 @@ internal class CreateStatementProvider : ICreateStatementProvider
   private readonly IServiceScopeFactory serviceScopeFactory;
   private readonly StatementContext statementContext;
 
-  public CreateStatementProvider(IServiceScopeFactory serviceScopeFactory, StatementContext statementContext = null)
+  public CreateStatementProvider(IServiceScopeFactory serviceScopeFactory, StatementContext statementContext)
   {
     this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
     this.statementContext = statementContext;
