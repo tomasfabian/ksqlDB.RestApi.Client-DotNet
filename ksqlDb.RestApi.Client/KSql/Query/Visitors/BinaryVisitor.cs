@@ -12,12 +12,13 @@ internal class BinaryVisitor : KSqlVisitor
 
   protected override Expression VisitParameter(ParameterExpression node)
   {
-    Append(node.Name);
+    if (node.Name != null)
+      Append(node.Name);
 
     return node;
   }
 
-  public override Expression Visit(Expression expression)
+  public override Expression? Visit(Expression? expression)
   {
     if (expression == null)
       return null;
@@ -51,8 +52,8 @@ internal class BinaryVisitor : KSqlVisitor
     return expression;
   }
 
-  private static readonly HashSet<ExpressionType> SupportedBinaryOperators = new()
-  {
+  private static readonly HashSet<ExpressionType> SupportedBinaryOperators =
+  [
     ExpressionType.Add,
     ExpressionType.Subtract,
     ExpressionType.Divide,
@@ -65,8 +66,8 @@ internal class BinaryVisitor : KSqlVisitor
     ExpressionType.GreaterThan,
     ExpressionType.GreaterThanOrEqual,
     ExpressionType.LessThan,
-    ExpressionType.LessThanOrEqual,
-  };
+    ExpressionType.LessThanOrEqual
+  ];
 
   protected override Expression VisitBinary(BinaryExpression binaryExpression)
   {

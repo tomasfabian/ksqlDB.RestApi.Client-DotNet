@@ -10,7 +10,7 @@ internal class KSqlFunctionLambdaVisitor : KSqlFunctionVisitor
   {
   }
     
-  public override Expression Visit(Expression expression)
+  public override Expression? Visit(Expression? expression)
   {
     if (expression == null)
       return null;
@@ -30,7 +30,8 @@ internal class KSqlFunctionLambdaVisitor : KSqlFunctionVisitor
 
   protected override Expression VisitParameter(ParameterExpression node)
   {
-    Append(node.Name);
+    if (node.Name != null)
+      Append(node.Name);
 
     return node;
   }

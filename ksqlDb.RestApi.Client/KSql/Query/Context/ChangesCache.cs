@@ -31,7 +31,8 @@ internal sealed class ChangesCache : ConcurrentQueue<KSqlDbStatement>
     {
       TryDequeue(out var statement);
 
-      stringBuilder.AppendLine(statement.Sql);
+      if (statement != null)
+        stringBuilder.AppendLine(statement.Sql);
     }
 
     var ksqlDbStatement = new KSqlDbStatement(stringBuilder.ToString());

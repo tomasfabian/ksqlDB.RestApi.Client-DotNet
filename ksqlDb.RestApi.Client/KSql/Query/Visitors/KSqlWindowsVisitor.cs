@@ -14,14 +14,14 @@ internal class KSqlWindowsVisitor : KSqlVisitor
   protected override Expression VisitConstant(ConstantExpression constantExpression)
   {
     if (constantExpression == null) throw new ArgumentNullException(nameof(constantExpression));
-    var windowedBy = (TimeWindows)constantExpression.Value;
+    var windowedBy = constantExpression.Value as TimeWindows;
 
     TryGenerateWindowAggregation(windowedBy);
 
     return constantExpression;
   }
 
-  private void TryGenerateWindowAggregation(TimeWindows windowedBy)
+  private void TryGenerateWindowAggregation(TimeWindows? windowedBy)
   {
     if (windowedBy == null)
       return;
@@ -33,11 +33,11 @@ internal class KSqlWindowsVisitor : KSqlVisitor
       _ => "TUMBLING"
     };
 
-    string size = windowType == "SESSION" ? String.Empty : "SIZE ";
+    string size = windowType == "SESSION" ? string.Empty : "SIZE ";
 
     Append($" WINDOW {windowType} ({size}{windowedBy.Duration.Value} {windowedBy.Duration.TimeUnit}");
 
-    if(windowedBy is HoppingWindows {AdvanceBy: { }} hoppingWindows)
+    if(windowedBy is HoppingWindows hoppingWindows)
       Append($", ADVANCE BY {hoppingWindows.AdvanceBy.Value} {hoppingWindows.AdvanceBy.TimeUnit}");
 
     if(windowedBy is HoppingWindows {Retention: { }} hoppingWindows2)

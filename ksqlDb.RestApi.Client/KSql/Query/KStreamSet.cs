@@ -1,4 +1,4 @@
-﻿using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
@@ -13,36 +13,34 @@ namespace ksqlDB.RestApi.Client.KSql.Query;
 
 internal abstract class KStreamSet : KSet, Linq.IQbservable
 {
-  public IKSqlQbservableProvider Provider { get; internal set; }
+  public IKSqlQbservableProvider Provider { get; internal set; } = null!;
+
+  internal QueryContext QueryContext { get; set; } = null!;
     
-  internal QueryContext QueryContext { get; set; }
+  internal IScheduler? ObserveOnScheduler { get; set; }
     
-  internal IScheduler ObserveOnScheduler { get; set; }
-    
-  internal IScheduler SubscribeOnScheduler { get; set; }
+  internal IScheduler? SubscribeOnScheduler { get; set; }
 }
 
 internal abstract class KStreamSet<TEntity> : KStreamSet, Linq.IQbservable<TEntity>
 {
   private readonly IServiceScopeFactory serviceScopeFactory;
-  //private IServiceScope serviceScope;
-
-  protected KStreamSet(IServiceScopeFactory serviceScopeFactory, QueryContext queryContext = null)
+  protected KStreamSet(IServiceScopeFactory serviceScopeFactory, QueryContext? queryContext = null)
   {
     this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
       
-    QueryContext = queryContext;
+    QueryContext = queryContext ?? new QueryContext();
 
     Provider = new QbservableProvider(serviceScopeFactory, queryContext);
       
     Expression = Expression.Constant(this);
   }
 
-  protected KStreamSet(IServiceScopeFactory serviceScopeFactory, Expression expression, QueryContext queryContext = null)
+  protected KStreamSet(IServiceScopeFactory serviceScopeFactory, Expression expression, QueryContext? queryContext = null)
   {
     this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
       
-    QueryContext = queryContext;
+    QueryContext = queryContext ?? new QueryContext();
 
     Provider = new QbservableProvider(serviceScopeFactory, queryContext);
 
@@ -148,7 +146,7 @@ internal abstract class KStreamSet<TEntity> : KStreamSet, Linq.IQbservable<TEnti
     return observableStream;
   }
     
-  internal async Task<(string QueryId, IObservable<TEntity> Source)> RunStreamAsObservableAsync(CancellationToken cancellationTokenSource = default)
+  internal async Task<(string? QueryId, IObservable<TEntity> Source)> RunStreamAsObservableAsync(CancellationToken cancellationTokenSource = default)
   {
     var query = await RunStreamAsAsyncEnumerableAsync(cancellationTokenSource).ConfigureAwait(false);
 
@@ -159,21 +157,21 @@ internal abstract class KStreamSet<TEntity> : KStreamSet, Linq.IQbservable<TEnti
 
   internal string BuildKsql()
   {
-    serviceScope = serviceScopeFactory.CreateScope();
+    var serviceScope = serviceScopeFactory.CreateScope();
       
     var dependencies = serviceScope.ServiceProvider.GetService<IKStreamSetDependencies>();
       
-    var ksqlQuery = dependencies.KSqlQueryGenerator?.BuildKSql(Expression, QueryContext);
+    var ksqlQuery = dependencies?.KSqlQueryGenerator.BuildKSql(Expression, QueryContext);
       
     serviceScope.Dispose();
 
-    return ksqlQuery;
+    return ksqlQuery ?? string.Empty;
   }
 
   internal IHttpClientFactory GetHttpClientFactory()
   {
     using var scope = serviceScopeFactory.CreateScope();
-    var httpClientFactory = scope.ServiceProvider.GetService<IHttpClientFactory>();
+    var httpClientFactory = scope.ServiceProvider.GetRequiredService<IHttpClientFactory>();
 
     return httpClientFactory;
   }
