@@ -18,7 +18,7 @@ internal static class ServiceCollectionExtensions
     return serviceCollection.Any(x => x.ServiceType == typeof(TType));
   }
 
-  internal static ServiceDescriptor TryGetRegistration<TType>(this IServiceCollection serviceCollection)
+  internal static ServiceDescriptor? TryGetRegistration<TType>(this IServiceCollection serviceCollection)
   {
     return serviceCollection.FirstOrDefault(x => x.ServiceType == typeof(TType));
   }
@@ -34,10 +34,10 @@ internal static class ServiceCollectionExtensions
         httpClient.BaseAddress = uri;
       });
 
-      if (contextOptions.UseBasicAuth)
+      if (contextOptions.UseBasicAuth && !string.IsNullOrEmpty(contextOptions.BasicAuthUserName) && !string.IsNullOrEmpty(contextOptions.BasicAuthPassword))
       {
         var basicAuthCredentials =
-          new BasicAuthCredentials(contextOptions.BasicAuthUserName, contextOptions.BasicAuthPassword);
+          new BasicAuthCredentials(contextOptions.BasicAuthUserName!, contextOptions.BasicAuthPassword!);
 
         httpClientV1Builder.AddHttpMessageHandler(_ => new BasicAuthHandler(basicAuthCredentials));
       }
@@ -53,10 +53,10 @@ internal static class ServiceCollectionExtensions
 #endif
       });
 
-      if (contextOptions.UseBasicAuth)
+      if (contextOptions.UseBasicAuth && !string.IsNullOrEmpty(contextOptions.BasicAuthUserName) && !string.IsNullOrEmpty(contextOptions.BasicAuthPassword))
       {
         var basicAuthCredentials =
-          new BasicAuthCredentials(contextOptions.BasicAuthUserName, contextOptions.BasicAuthPassword);
+          new BasicAuthCredentials(contextOptions.BasicAuthUserName!, contextOptions.BasicAuthPassword!);
 
         httpClientBuilder.AddHttpMessageHandler(_ => new BasicAuthHandler(basicAuthCredentials));
       }

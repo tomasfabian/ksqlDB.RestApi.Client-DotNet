@@ -19,7 +19,7 @@
         <AssemblyVersion>4.0.0.0</AssemblyVersion>
         <LangVersion>12.0</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>disable</Nullable>
+        <!--<Nullable>disable</Nullable>-->
         <PackageReleaseNotes>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/ksqlDb.RestApi.Client/ChangeLog.md</PackageReleaseNotes>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
