@@ -11,8 +11,8 @@ public record StatementResponseBase
   public string? Message { get; set; }
 
   [JsonPropertyName("@type")]
-  public string? Type { get; set; }
-    
+  public string Type { get; set; } = null!;
+
   public string? StatementText { get; set; }
     
   public string[]? Warnings { get; set; }

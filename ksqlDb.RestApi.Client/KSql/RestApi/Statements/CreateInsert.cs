@@ -9,12 +9,12 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 internal sealed class CreateInsert : EntityInfo
 {
-  internal string Generate<T>(T entity, InsertProperties insertProperties = null)
+  internal string Generate<T>(T entity, InsertProperties? insertProperties = null)
   {
     return Generate(new InsertValues<T>(entity), insertProperties);
   }
 
-  internal string Generate<T>(InsertValues<T> insertValues, InsertProperties insertProperties = null)
+  internal string Generate<T>(InsertValues<T> insertValues, InsertProperties? insertProperties = null)
   {
     if (insertValues == null) throw new ArgumentNullException(nameof(insertValues));
 
@@ -26,7 +26,7 @@ internal sealed class CreateInsert : EntityInfo
     var valuesStringBuilder = new StringBuilder();
 
     var useInstanceType = insertProperties is {UseInstanceType: true};
-    var entityType = useInstanceType ? insertValues.Entity.GetType() : typeof(T);
+    var entityType = useInstanceType && insertValues.Entity != null ? insertValues.Entity.GetType() : typeof(T);
 
     bool isFirst = true;
 

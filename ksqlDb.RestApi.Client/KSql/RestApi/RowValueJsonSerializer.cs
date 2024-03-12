@@ -29,7 +29,7 @@ internal class RowValueJsonSerializer
   private readonly string anonymousColumnRegex = "^KSQL_COL_\\d+";
   private readonly string structRegex = "^MAP<";
 
-  internal RowValue<T> Deserialize<T>(string rawJson, JsonSerializerOptions jsonSerializerOptions)
+  internal RowValue<T>? Deserialize<T>(string rawJson, JsonSerializerOptions jsonSerializerOptions)
   {
 #if NETSTANDARD
     var result = rawJson.Substring(1, rawJson.Length - 2);
@@ -43,13 +43,15 @@ internal class RowValueJsonSerializer
       var isAllowedType = type.IsPrimitive || type.IsArray || type.IsEnum;
 
       if (isSingleAnonymousColumn || isMapColumn || isAllowedType)
-        return new RowValue<T>(JsonSerializer.Deserialize<T>(result, jsonSerializerOptions));
+      {
+        var value = JsonSerializer.Deserialize<T>(result, jsonSerializerOptions);
+        return value == null ? null : new RowValue<T>(value);
+      }
     }
 
     var jsonRecord = new JsonArrayParser().CreateJson(queryStreamHeader.ColumnNames, result);
 
     var record = JsonSerializer.Deserialize<T>(jsonRecord, jsonSerializerOptions);
-
-    return new RowValue<T>(record);
+    return record == null ? null : new RowValue<T>(record);
   }
 }

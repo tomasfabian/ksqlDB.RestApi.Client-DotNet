@@ -23,7 +23,7 @@ internal static class CreateStatements
     return GenerateWithClause(metadata, properties);
   }
 
-  internal static string GenerateWithClause(CreationMetadata metadata, IList<string> properties = null) {
+  internal static string GenerateWithClause(CreationMetadata metadata, IList<string>? properties = null) {
 #if NETSTANDARD
     if (metadata == null) throw new ArgumentNullException(nameof(metadata));
 #else

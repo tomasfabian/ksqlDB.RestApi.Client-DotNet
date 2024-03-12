@@ -16,9 +16,12 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
         ksqlType = KSqlTypes.Bytes;
       else if (type.IsArray)
       {
-        var elementType = Translate(type.GetElementType(), escaping);
+        var elementType = type.GetElementType();
+        if (elementType == null)
+          throw new InvalidOperationException(nameof(elementType));
+        var elementTypeName = Translate(elementType, escaping);
 
-        ksqlType = $"{KSqlTypes.Array}<{elementType}>";
+        ksqlType = $"{KSqlTypes.Array}<{elementTypeName}>";
       }
       else if (type.IsDictionary())
       {
@@ -63,7 +66,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
         ksqlType = KSqlTypes.Varchar;
       else
       {
-        Type elementType = null;
+        Type? elementType = null;
 
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
           elementType = type.GetGenericArguments()[0];

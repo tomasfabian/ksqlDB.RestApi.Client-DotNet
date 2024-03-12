@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Query;
 
+#nullable disable
 internal class KSqlDbQueryProvider : KSqlDbProvider
 {
   public KSqlDbQueryProvider(IHttpV1ClientFactory httpClientFactory, KSqlDbProviderOptions options, ILogger logger = null)
