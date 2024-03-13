@@ -35,10 +35,8 @@ public class MoviesProvider(IKSqlDbRestApiProvider restApiProvider)
 
   public async Task<bool> CreateTablesAsync(CancellationToken cancellationToken = default)
   {
-    EntityCreationMetadata metadata = new()
+    EntityCreationMetadata metadata = new(MoviesTableName, 1)
     {
-      KafkaTopic = MoviesTableName,
-      Partitions = 1,
       Replicas = 1,
       ValueFormat = SerializationFormats.Json
     };
