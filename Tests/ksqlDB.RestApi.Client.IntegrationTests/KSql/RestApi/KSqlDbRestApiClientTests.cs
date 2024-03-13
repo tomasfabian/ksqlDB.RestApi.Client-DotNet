@@ -47,8 +47,8 @@ public class KSqlDbRestApiClientTests
     string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
     var responseObject = JsonSerializer.Deserialize<StatementResponse[]>(responseContent);
 
-    responseObject?[0].CommandStatus.Status.Should().Be(CommandStatus.Success);
-    responseObject?[0].CommandStatus.Message.Should().Be("Table created");
+    responseObject?[0].CommandStatus!.Status.Should().Be(CommandStatus.Success);
+    responseObject?[0].CommandStatus!.Message.Should().Be("Table created");
   }
 
   [Test]
@@ -134,8 +134,8 @@ public class KSqlDbRestApiClientTests
     string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
     var responseObject = JsonSerializer.Deserialize<StatementResponse[]>(responseContent);
 
-    responseObject?[0].CommandStatus.Status.Should().Be(CommandStatus.Success);
-    responseObject?[0].CommandStatus.Message.Should().Be("Stream created");
+    responseObject?[0].CommandStatus!.Status.Should().Be(CommandStatus.Success);
+    responseObject?[0].CommandStatus!.Message.Should().Be("Stream created");
   }
 
   [Test]
@@ -209,7 +209,7 @@ Drop type {nameof(Address)};
 
     //Assert
     connectorsResponse[0].Connectors.Should().NotBeNull();
-    connectorsResponse[0].Connectors.Any(c => c.Name == SourceConnectorName).Should().BeTrue();
+    connectorsResponse[0].Connectors!.Any(c => c.Name == SourceConnectorName).Should().BeTrue();
     connectorsResponse[0].Type.Should().Be("connector_list");
 
     httpResponseMessage = await restApiClient.DropConnectorAsync($"`{SourceConnectorName}`");
@@ -221,7 +221,7 @@ Drop type {nameof(Address)};
     var content2 = await httpResponseMessage.ToStatementResponsesAsync();
 
     connectorsResponse = await restApiClient.GetConnectorsAsync();
-    connectorsResponse[0].Connectors.Any(c => c.Name == SourceConnectorName).Should().BeFalse();
+    connectorsResponse[0].Connectors!.Any(c => c.Name == SourceConnectorName).Should().BeFalse();
   }
 
   #endregion
@@ -236,7 +236,7 @@ Drop type {nameof(Address)};
 
     //Assert
     streamResponses[0].StatementText.Should().Be(StatementTemplates.ShowStreams);
-    streamResponses[0].Streams.Select(c => c.Name).Contains(nameof(MyMoviesStreamTest).ToUpper() + "S").Should().BeTrue();
+    streamResponses[0].Streams!.Select(c => c.Name).Contains(nameof(MyMoviesStreamTest).ToUpper() + "S").Should().BeTrue();
   }
 
   [Test]
@@ -250,7 +250,7 @@ Drop type {nameof(Address)};
     //Assert
     tablesResponses[0].StatementText.Should().Be(StatementTemplates.ShowTables);
 
-    tablesResponses[0].Tables.Select(c => c.Name).Contains(nameof(MyMoviesTable).ToUpper()).Should().BeTrue();
+    tablesResponses[0].Tables!.Select(c => c.Name).Contains(nameof(MyMoviesTable).ToUpper()).Should().BeTrue();
   }
 
   [Test]
@@ -263,7 +263,7 @@ Drop type {nameof(Address)};
 
     //Assert
     topicsResponses[0].StatementText.Should().Be(StatementTemplates.ShowAllTopics);
-    topicsResponses[0].Topics.Select(c => c.Name).Contains(nameof(MyMoviesTable)).Should().BeTrue();
+    topicsResponses[0].Topics!.Select(c => c.Name).Contains(nameof(MyMoviesTable)).Should().BeTrue();
   }
 
   [Test]
@@ -295,10 +295,10 @@ Drop type {nameof(Address)};
 
     var queries = await restApiClient.GetQueriesAsync();
 
-    var query = queries.SelectMany(c => c.Queries).First(c => c.SinkKafkaTopics.Contains(topicName));
+    var query = queries.SelectMany(c => c.Queries!).First(c => c.SinkKafkaTopics!.Contains(topicName));
 
     //Act
-    statementResponse = await restApiClient.TerminatePersistentQueryAsync(query.Id);
+    statementResponse = await restApiClient.TerminatePersistentQueryAsync(query.Id!);
 
     //Assert
     query.QueryType.Should().Be(QueryType.Persistent);
@@ -306,8 +306,8 @@ Drop type {nameof(Address)};
 
     response.IsSuccessStatusCode.Should().BeTrue();
 
-    statementResponse[0].CommandStatus.Status.Should().BeOneOf(CommandStatus.Executing, CommandStatus.Success);
-    statementResponse[0].CommandStatus.Message.Should().BeOneOf("Executing statement", "Query terminated.");
+    statementResponse[0].CommandStatus!.Status.Should().BeOneOf(CommandStatus.Executing, CommandStatus.Success);
+    statementResponse[0].CommandStatus!.Message.Should().BeOneOf("Executing statement", "Query terminated.");
   }
 
   [Test]
@@ -329,7 +329,7 @@ Drop type {nameof(Address)};
     int queriesCount = await GetPersistentQueriesCountAsync(QueryType.Push, cts.Token);
 
     //Act
-    var response = await restApiClient.TerminatePushQueryAsync(subscription.QueryId, cts.Token);
+    var response = await restApiClient.TerminatePushQueryAsync(subscription.QueryId!, cts.Token);
 
     //Assert
     await Task.Delay(TimeSpan.FromSeconds(10), cts.Token);
@@ -339,7 +339,7 @@ Drop type {nameof(Address)};
 
   private async Task<int> GetPersistentQueriesCountAsync(string queryType, CancellationToken token)
   {
-    return (await restApiClient.GetQueriesAsync(token)).SelectMany(c => c.Queries).Count(c => c.QueryType == queryType);
+    return (await restApiClient.GetQueriesAsync(token)).SelectMany(c => c.Queries!).Count(c => c.QueryType == queryType);
   }
 
   [Test]
@@ -351,7 +351,7 @@ Drop type {nameof(Address)};
     var queriesResponses = await restApiClient.GetQueriesAsync();
 
     //Assert
-    Console.WriteLine(string.Join(',', queriesResponses[0].Queries.Select(c => c.Id)));
+    Console.WriteLine(string.Join(',', queriesResponses[0].Queries!.Select(c => c.Id)));
     queriesResponses[0].StatementText.Should().Be(StatementTemplates.ShowQueries);
   }
 

@@ -55,7 +55,7 @@ public class PullQueryExtensionsTests
       
     //Assert
     result.Should().NotBeNull();
-    result.SensorId.Should().Be(sensorId);
+    result!.SensorId.Should().Be(sensorId);
     result.WindowStart.Should().NotBe(null);
     result.WindowEnd.Should().NotBe(null);
   }
@@ -110,7 +110,7 @@ public class PullQueryExtensionsTests
       .FirstOrDefaultAsync();
 
     //Assert
-    result.Start.Should().NotBe(null);
+    result!.Start.Should().NotBe(null);
     result.SensorId.Should().Be(sensorId);
   }
 
@@ -130,9 +130,9 @@ public class PullQueryExtensionsTests
       
     //Assert
     result.Should().NotBeNull();
-    result.SensorId.Should().Be(sensorId);
-    // result.WindowStart.Should().NotBe(null);
-    // result.WindowEnd.Should().NotBe(null);
+    result!.SensorId.Should().Be(sensorId);
+    result.WindowStart.Should().NotBe(null);
+    result.WindowEnd.Should().NotBe(null);
   }
 
   [Test]
@@ -147,6 +147,6 @@ public class PullQueryExtensionsTests
       
     //Assert
     result.Should().NotBeNull();
-    result.SensorId.Should().Be(sensorId);
+    result!.SensorId.Should().Be(sensorId);
   }
 }
