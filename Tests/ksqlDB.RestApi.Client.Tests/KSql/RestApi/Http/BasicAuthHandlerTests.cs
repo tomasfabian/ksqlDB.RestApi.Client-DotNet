@@ -11,11 +11,7 @@ public class BasicAuthHandlerTests : TestBase
   public async Task SendAsync()
   {
     //Arrange
-    var credentials = new BasicAuthCredentials
-    {
-      UserName = "fred",
-      Password = "letmein"
-    };
+    var credentials = new BasicAuthCredentials("fred", "letmein");
 
     var handler = new BasicAuthHandler(credentials);
     handler.InnerHandler = new HttpClientHandler();

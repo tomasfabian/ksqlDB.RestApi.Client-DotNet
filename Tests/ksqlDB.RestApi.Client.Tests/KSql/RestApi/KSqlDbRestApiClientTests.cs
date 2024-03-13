@@ -232,8 +232,8 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     queriesResponses[0].StatementText.Should().Be(StatementTemplates.ShowQueries);
 
     queriesResponses[0].Type.Should().Be("queries");
-    queriesResponses[0].Queries.Length.Should().Be(1);
-    queriesResponses[0].Queries[0].QueryType.Should().Be("PUSH");
+    queriesResponses[0].Queries!.Length.Should().Be(1);
+    queriesResponses[0].Queries![0].QueryType.Should().Be("PUSH");
   }
 
   private static string GetTopicsResponse => @"[{""@type"":""kafka_topics"",""statementText"":""SHOW TOPICS;"",""topics"":[{""name"":""AVG_SENSOR_VALUES"",""replicaInfo"":[1,1]},{""name"":""sensor_values"",""replicaInfo"":[1,1]}],""warnings"":[]}]";
@@ -256,7 +256,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     topicsResponses[0].StatementText.Should().Be(StatementTemplates.ShowTopics);
 
     topicsResponses[0].Type.Should().Be("kafka_topics");
-    topicsResponses[0].Topics.Length.Should().Be(2);
+    topicsResponses[0].Topics!.Length.Should().Be(2);
   }
 
   [Test]
@@ -275,7 +275,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
     topicsResponses[0].StatementText.Should().Be(StatementTemplates.ShowAllTopics);
 
-    topicsResponses[0].Topics.Length.Should().Be(2);
+    topicsResponses[0].Topics!.Length.Should().Be(2);
   }
 
   [Test]
@@ -393,7 +393,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
     streamsResponses[0].StatementText.Should().Be(StatementTemplates.ShowStreams);
 
-    streamsResponses[0].Streams.Length.Should().Be(2);
+    streamsResponses[0].Streams!.Length.Should().Be(2);
   }
 
   private static string GetAllTablesResponse => @"[{""@type"":""tables"",""statementText"":""SHOW TABLES;"",""tables"":[{""type"":""TABLE"",""name"":""AVG_SENSOR_VALUES"",""topic"":""AVG_SENSOR_VALUES"",""keyFormat"":""KAFKA"",""valueFormat"":""JSON"",""isWindowed"":true},{""type"":""TABLE"",""name"":""MYMOVIESTABLES"",""topic"":""MyMoviesTable"",""keyFormat"":""JSON"",""valueFormat"":""JSON"",""isWindowed"":true}],""warnings"":[]}]";
@@ -414,7 +414,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
     tablesResponses[0].StatementText.Should().Be(StatementTemplates.ShowTables);
 
-    tablesResponses[0].Tables.Length.Should().Be(2);
+    tablesResponses[0].Tables!.Length.Should().Be(2);
   }
 
   [Test]

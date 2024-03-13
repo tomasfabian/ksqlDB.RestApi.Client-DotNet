@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using NUnit.Framework;
@@ -7,7 +7,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators.Asserts;
 
 public class AssertSchemaTests
 {
-  string subjectName = "Kafka-key";
+  private readonly string subjectName = "Kafka-key";
 
   [Test]
   public void CreateStatement_SubjectExists()
@@ -19,22 +19,22 @@ public class AssertSchemaTests
     string statement = AssertSchema.CreateStatement(exists: true, options);
 
     //Assert
-    statement.Should().Be($@"ASSERT SCHEMA SUBJECT '{subjectName}';");
+    statement.Should().Be($"ASSERT SCHEMA SUBJECT '{subjectName}';");
   }
 
-  int schemaId = 21;
+  private readonly int schemaId = 21;
 
   [Test]
   public void CreateStatement_SubjectIdExists()
   {
     //Arrange
-    var options = new AssertSchemaOptions(null, schemaId);
+    var options = new AssertSchemaOptions("", schemaId);
 
     //Act
     string statement = AssertSchema.CreateStatement(exists: true, options);
 
     //Assert
-    statement.Should().Be($@"ASSERT SCHEMA ID {schemaId};");
+    statement.Should().Be($"ASSERT SCHEMA ID {schemaId};");
   }
 
   [Test]
@@ -47,7 +47,7 @@ public class AssertSchemaTests
     string statement = AssertSchema.CreateStatement(exists: true, options);
 
     //Assert
-    statement.Should().Be($@"ASSERT SCHEMA SUBJECT '{subjectName}' ID {schemaId};");
+    statement.Should().Be($"ASSERT SCHEMA SUBJECT '{subjectName}' ID {schemaId};");
   }
 
   [Test]
@@ -64,6 +64,6 @@ public class AssertSchemaTests
     string statement = AssertSchema.CreateStatement(exists: true, options);
 
     //Assert
-    statement.Should().Be($@"ASSERT SCHEMA SUBJECT '{subjectName}' TIMEOUT {timeout.TotalSeconds.Value} SECONDS;");
+    statement.Should().Be($"ASSERT SCHEMA SUBJECT '{subjectName}' TIMEOUT {timeout.TotalSeconds.Value} SECONDS;");
   }
 }

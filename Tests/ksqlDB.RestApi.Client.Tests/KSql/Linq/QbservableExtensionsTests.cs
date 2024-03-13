@@ -206,7 +206,8 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
 
     public IQbservable<Tweet> CreateTweetsStreamSet(string? streamName = null)
     {
-      var serviceScopeFactory = Initialize(new KSqlDBContextOptions(ksqlDbUrl));
+      //var serviceScopeFactory = Initialize(new KSqlDBContextOptions(ksqlDbUrl));
+      var serviceScopeFactory = ServiceScopeFactory();
 
       var queryStreamContext = new QueryContext
       {

@@ -154,7 +154,7 @@ public class TypeExtensionsTests
     var type = typeof(Test).GetProperty(nameof(Test.Value));
 
     //Act
-    var hasKey = type.HasKey();
+    var hasKey = type!.HasKey();
 
     //Assert
     hasKey.Should().BeFalse();
@@ -175,7 +175,7 @@ public class TypeExtensionsTests
     var type = typeof(Test).GetProperty(nameof(Test.Key));
 
     //Act
-    var hasKey = type.HasKey();
+    var hasKey = type!.HasKey();
 
     //Assert
     hasKey.Should().BeTrue();
@@ -222,9 +222,7 @@ public class TypeExtensionsTests
     typeDefinition.Should().Contain(typeof(IEnumerable<string>));
   }
 
-  class TestList : List<string>
-  {
-  }
+  class TestList : List<string>;
 
   [Test]
   public void GetEnumerableTypeDefinition_ListBaseType_FindsEnumerableType()
@@ -352,7 +350,7 @@ public class TypeExtensionsTests
     var type = typeof(Test);
 
     //Act
-    var attribute = type.GetProperty(nameof(Test.Key)).TryGetAttribute<KeyAttribute>();
+    var attribute = type.GetProperty(nameof(Test.Key))!.TryGetAttribute<KeyAttribute>();
 
     //Assert
     attribute.Should().NotBeNull();
@@ -375,7 +373,7 @@ public class TypeExtensionsTests
     var member = type.GetProperty(nameof(MySensor.Title));
 
     //Act
-    var memberName = member.GetMemberName();
+    var memberName = member!.GetMemberName();
 
     //Assert
     memberName.Should().Be(nameof(MySensor.Title));
@@ -390,7 +388,7 @@ public class TypeExtensionsTests
     //Act
     var member = type.GetProperty(nameof(MySensor.SensorId2));
 
-    var memberName = member.GetMemberName();
+    var memberName = member!.GetMemberName();
 
     //Assert
     memberName.Should().Be("SensorId");

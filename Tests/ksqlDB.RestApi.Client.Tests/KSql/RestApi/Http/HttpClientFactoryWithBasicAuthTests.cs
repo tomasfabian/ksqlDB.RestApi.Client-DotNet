@@ -12,11 +12,7 @@ public class HttpClientFactoryWithBasicAuthTests : TestBase
   public void CreateClient_BaseAddressWasSet()
   {
     //Arrange
-    var credentials = new BasicAuthCredentials
-    {
-      UserName = "fred",
-      Password = "letmein"
-    };
+    var credentials = new BasicAuthCredentials("fred", "letmein");
 
     var httpClientFactory = new HttpClientFactoryWithBasicAuth(new Uri(TestParameters.KsqlDbUrl), credentials);
 

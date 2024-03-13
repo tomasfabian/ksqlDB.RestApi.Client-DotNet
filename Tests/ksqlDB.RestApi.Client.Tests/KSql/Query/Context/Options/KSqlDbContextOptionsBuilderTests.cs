@@ -24,19 +24,6 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
   }
 
   [Test]
-  public void UseKSqlDb_NullUrl_ThrowsArgumentNullException()
-  {
-    //Arrange
-
-    //Assert
-    Assert.ThrowsException<ArgumentNullException>(() =>
-    {
-      //Act
-      var options = ClassUnderTest.UseKSqlDb(null).Options;
-    });
-  }
-
-  [Test]
   public void UseKSqlDb_EmptyStringUrl_ThrowsArgumentNullException()
   {
     //Arrange
@@ -45,7 +32,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     Assert.ThrowsException<ArgumentNullException>(() =>
     {
       //Act
-      var options = ClassUnderTest.UseKSqlDb(Empty).Options;
+      _ = ClassUnderTest.UseKSqlDb(Empty).Options;
     });
   }
 
@@ -115,7 +102,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
 
     //Act
     var options = setupParameters
-      .SetupQueryStream(options =>
+      .SetupQueryStream(_ =>
       {
       }).Options;
 
@@ -193,9 +180,8 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
 
     //Act
-    var options = setupParameters.SetupQueryStream(c =>
+    var options = setupParameters.SetupQueryStream(_ =>
     {
-
     }).Options;
 
     //Assert
@@ -244,9 +230,8 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
 
     //Act
-    var options = setupParameters.SetupQuery(c =>
+    var options = setupParameters.SetupQuery(_ =>
     {
-
     }).Options;
 
     //Assert

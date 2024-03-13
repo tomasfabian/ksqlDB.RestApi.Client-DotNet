@@ -504,8 +504,6 @@ class TestableDbProvider : TestableDbProvider<QbservableGroupByExtensionsTests.C
 
       sc.AddHttpClient<IHttpClientFactory, HttpClientFactory>(c => c.BaseAddress = new Uri(ksqlDbUrl))
         .AddHttpMessageHandler(_ => FakeHttpClient.CreateDelegatingHandler(httpResponse).Object);
-
-      // sc.AddSingleton(httpClientFactory);
     });
   }
 
