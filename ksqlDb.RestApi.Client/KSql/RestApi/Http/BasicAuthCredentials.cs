@@ -1,6 +1,5 @@
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Http;
 
-#nullable enable
 /// <summary>
 /// Represents basic authentication credentials.
 /// </summary>

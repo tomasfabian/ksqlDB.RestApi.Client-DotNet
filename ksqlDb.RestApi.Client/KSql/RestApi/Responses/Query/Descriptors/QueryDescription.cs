@@ -1,6 +1,5 @@
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query.Descriptors;
 
-#nullable enable
 public record QueryDescription
 {
   public string? Id { get; set; }

@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-#nullable enable
 public class StatementResponse
 {
   [JsonPropertyName("@type")]

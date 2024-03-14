@@ -3,7 +3,6 @@ using ksqlDB.RestApi.Client.KSql.Query.Context;
 
 namespace ksqlDB.RestApi.Client.KSql.Linq;
 
-#nullable enable
 public class Source<T> : SourceBase, ISource<T>
 {
   public QueryContext QueryContext { get; set; }

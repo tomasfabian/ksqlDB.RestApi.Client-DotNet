@@ -2,7 +2,6 @@ using ksqlDB.RestApi.Client.KSql.Query.Windows;
 
 namespace ksqlDB.RestApi.Client.KSql.Linq;
 
-#nullable enable
 public class SourceBase
 {
   internal Duration? DurationBefore { get; set; }

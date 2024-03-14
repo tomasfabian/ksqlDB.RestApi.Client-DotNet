@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Tables;
 
-#nullable enable
 public record Table
 {
   [JsonPropertyName("type")]

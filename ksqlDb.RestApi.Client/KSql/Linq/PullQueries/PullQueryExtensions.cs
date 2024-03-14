@@ -4,7 +4,6 @@ using ksqlDB.RestApi.Client.KSql.Query.PullQueries;
 
 namespace ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 
-#nullable enable
 public static class PullQueryExtensions
 {
   #region Select

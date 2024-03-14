@@ -2,7 +2,6 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties
 {
-#nullable enable
   public interface IEntityProperties
   {
     /// <summary>

@@ -10,7 +10,6 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi;
 
-#nullable enable
 public interface IKSqlDbRestApiClient : IKSqlDbCreateRestApiClient, IKSqlDbAssertionsRestApiClient, IKSqlDbDropRestApiClient
 {
   /// <summary>

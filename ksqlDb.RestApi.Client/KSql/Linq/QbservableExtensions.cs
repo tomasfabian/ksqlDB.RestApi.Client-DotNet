@@ -13,7 +13,6 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 namespace ksqlDB.RestApi.Client.KSql.Linq;
 
-#nullable enable
 public static class QbservableExtensions
 {
   #region Select

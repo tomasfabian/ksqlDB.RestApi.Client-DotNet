@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context;
 
-#nullable enable
 /// <summary>
 /// Dependencies provider for ksqlDB context queries using REST API.
 /// </summary>

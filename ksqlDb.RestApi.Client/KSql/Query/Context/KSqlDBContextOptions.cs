@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context;
 
-#nullable enable
 /// <summary>
 /// Options class for ksqlDB context configuration.
 /// </summary>

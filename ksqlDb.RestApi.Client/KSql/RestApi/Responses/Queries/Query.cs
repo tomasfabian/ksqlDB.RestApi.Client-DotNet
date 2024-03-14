@@ -1,6 +1,5 @@
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Queries;
 
-#nullable enable
 public record Query
 {
   public string? QueryString { get; set; }

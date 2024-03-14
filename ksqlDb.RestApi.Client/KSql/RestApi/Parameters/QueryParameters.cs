@@ -4,7 +4,6 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
-#nullable enable
 public class QueryParameters : IKSqlDbParameters
 {
   /// <summary>

@@ -4,7 +4,6 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-#nullable enable
 /// <summary>
 /// Defines a sequence of SQL statements.
 /// </summary>

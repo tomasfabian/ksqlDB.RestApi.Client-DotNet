@@ -8,7 +8,6 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 
-#nullable enable
 public static class HttpResponseMessageExtensions
 {
   public static StatementResponse[] ToStatementResponses(this HttpResponseMessage httpResponseMessage)

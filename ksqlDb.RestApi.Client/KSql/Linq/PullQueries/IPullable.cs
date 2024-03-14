@@ -2,7 +2,6 @@ using System.Linq.Expressions;
 
 namespace ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 
-#nullable enable
 /// <summary>
 /// Execute a pull query by sending an HTTP request to the ksqlDB REST API, and the API responds with a single response.
 /// </summary>

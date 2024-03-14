@@ -24,7 +24,6 @@ using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi;
 
-#nullable enable
 public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 {
   private readonly EntityProvider entityProvider = new();

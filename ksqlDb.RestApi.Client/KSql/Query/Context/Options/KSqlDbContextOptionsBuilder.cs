@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context.Options;
 
-#nullable enable
 /// <summary>
 /// KSqlDbContextOptionsBuilder provides a fluent API that allows you to configure various aspects of the `ksqlDB` context, such as the connection string, processing guarantee, and other options.
 /// </summary>

@@ -2,7 +2,6 @@ using ksqlDB.RestApi.Client.KSql.Query.Windows;
 
 namespace ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 
-#nullable enable
 public record AssertTopicOptions
 {
   public AssertTopicOptions(string topicName)

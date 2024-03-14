@@ -3,7 +3,6 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Statements;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Topics;
 
-#nullable enable
 public record TopicsExtendedResponse : StatementResponseBase
 {
   [JsonPropertyName("topics")]

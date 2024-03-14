@@ -5,7 +5,6 @@ using ksqlDB.RestApi.Client.KSql.Query.Windows;
 
 namespace ksqlDB.RestApi.Client.KSql.Linq.Statements;
 
-#nullable enable
 public static class CreateStatementExtensions
 {
   #region Select

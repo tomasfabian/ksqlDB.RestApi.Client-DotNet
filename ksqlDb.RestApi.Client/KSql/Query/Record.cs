@@ -2,7 +2,6 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
 namespace ksqlDB.RestApi.Client.KSql.Query;
 
-#nullable enable
 /// <summary>
 /// Represents a Kafka record with pseudo-columns.
 /// </summary>

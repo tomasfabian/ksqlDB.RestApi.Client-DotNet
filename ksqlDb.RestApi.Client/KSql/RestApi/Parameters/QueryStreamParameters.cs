@@ -3,7 +3,6 @@ using ksqlDB.RestApi.Client.KSql.Query.Options;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
-#nullable enable
 public sealed class QueryStreamParameters : IKSqlDbParameters
 {
   [JsonPropertyName("sql")]

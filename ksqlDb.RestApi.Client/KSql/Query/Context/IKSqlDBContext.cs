@@ -6,7 +6,6 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context;
 
-#nullable enable
 public interface IKSqlDBContext : IKSqlDBStatementsContext, IAsyncDisposable, IDisposable
 {
 #if !NETSTANDARD

@@ -3,7 +3,6 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Statements;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Connectors;
 
-#nullable enable
 public record ConnectorsResponse : StatementResponseBase
 {
   [JsonPropertyName("connectors")]

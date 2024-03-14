@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Statements;
 
-#nullable enable
 public record StatementResponseBase
 {
   [JsonPropertyName("error_code")]

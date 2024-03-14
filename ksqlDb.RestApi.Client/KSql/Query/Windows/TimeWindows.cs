@@ -2,7 +2,6 @@ using ksqlDb.RestApi.Client.KSql.Query.PushQueries;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Windows;
 
-#nullable enable
 /// <summary>
 /// Represents time windows for time-based operations.
 /// </summary>

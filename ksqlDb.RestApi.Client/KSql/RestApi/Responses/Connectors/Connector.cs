@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Connectors;
 
-#nullable enable
 public record Connector
 {
   [JsonPropertyName("name")]

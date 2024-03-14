@@ -1,6 +1,5 @@
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 
-#nullable enable
 public class KSqlQueryException : Exception
 {        
   public KSqlQueryException(string? message)

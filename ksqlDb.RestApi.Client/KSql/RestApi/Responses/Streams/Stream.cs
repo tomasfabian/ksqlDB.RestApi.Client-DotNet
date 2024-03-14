@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Streams;
 
-#nullable enable
 public record Stream
 {
   [JsonPropertyName("type")]

@@ -15,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context;
 
-#nullable enable
 /// <summary>
 /// KSqlDBContext enables the creation of push and pull queries.
 /// </summary>
