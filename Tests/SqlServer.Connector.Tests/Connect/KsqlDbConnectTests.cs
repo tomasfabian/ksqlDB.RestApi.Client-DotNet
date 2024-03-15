@@ -33,7 +33,7 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
       
     await ApplicationDbContext.Database.MigrateAsync();
 
-    string connectionString = Configuration.GetConnectionString("DefaultConnection");
+    var connectionString = Configuration.GetConnectionString("DefaultConnection");
 
     var cdcClient = new CdcClient(connectionString);
     await cdcClient.CdcEnableDbAsync();
@@ -55,7 +55,7 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
       
     var httpClient = new HttpClient
     {
-      BaseAddress = new Uri(ksqlDbUrl)
+      BaseAddress = new Uri(ksqlDbUrl!)
     };
 
     var httpClientFactory = new HttpClientFactory(httpClient);
@@ -84,7 +84,7 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
 
     var httpClient = new HttpClient
     {
-      BaseAddress = new Uri(ksqlDbUrl)
+      BaseAddress = new Uri(ksqlDbUrl!)
     };
 
     var httpClientFactory = new HttpClientFactory(httpClient);
@@ -216,7 +216,7 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
 
     var httpClient = new HttpClient
     {
-      BaseAddress = new Uri(ksqlDbUrl)
+      BaseAddress = new Uri(ksqlDbUrl!)
     };
 
     var httpClientFactory = new HttpClientFactory(httpClient);
