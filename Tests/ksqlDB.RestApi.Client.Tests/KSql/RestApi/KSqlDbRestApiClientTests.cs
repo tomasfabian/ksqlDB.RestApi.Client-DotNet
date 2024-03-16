@@ -4,12 +4,14 @@ using FluentAssertions;
 using ksqlDb.RestApi.Client.Infrastructure.Logging;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using ksqlDb.RestApi.Client.Tests.Fakes.Logging;
 using ksqlDb.RestApi.Client.Tests.Models.Movies;
 using Microsoft.Extensions.Logging;
@@ -365,10 +367,10 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     return parameters;
   }
 
-  private void VerifySendAsync(string content, string requestUri = @"/ksql")
+  private void VerifySendAsync(string content, string requestUri = "/ksql")
   {
     var request = ItExpr.Is<HttpRequestMessage>(c => c.Method == HttpMethod.Post && c.RequestUri!.PathAndQuery == requestUri && c.Content!.ReadAsStringAsync().Result == content);
-      
+
     HttpMessageHandlerMock.Protected()
       .Verify(nameof(HttpClient.SendAsync), Times.Once(), exactParameterMatch: true, request, ItExpr.IsAny<CancellationToken>());
   }
@@ -419,9 +421,9 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
   public async Task DropStreamAsync()
   {
     //Arrange
-    CreateHttpMocks(@"[]");
+    CreateHttpMocks("[]");
 
-    string streamName = "TEST_STREAM";
+    string streamName = nameof(TestStream);
 
     //Act
     var response = await ClassUnderTest.DropStreamAsync(streamName);
@@ -433,14 +435,40 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     VerifySendAsync(expectedContent);
   }
 
+  private class TestStream;
+
+  [Test]
+  public async Task DropStreamAsync_WithDropEntityProperties()
+  {
+    //Arrange
+    CreateHttpMocks("[]");
+
+    var properties = new DropFromItemProperties
+    {
+      UseIfExistsClause = true,
+      DeleteTopic = true,
+      ShouldPluralizeEntityName = false,
+      IdentifierEscaping = IdentifierEscaping.Never
+    };
+    string streamName = $"{nameof(TestStream)}";
+
+    //Act
+    var response = await ClassUnderTest.DropStreamAsync<TestStream>(properties);
+
+    //Assert
+    response.Should().NotBeNull();
+    var expectedContent = GetExpectedContent(StatementTemplates.DropStream(streamName, properties.UseIfExistsClause, properties.DeleteTopic));
+      
+    VerifySendAsync(expectedContent);
+  }
+
   [Test]
   public async Task DropStreamAsync_IfExistsAndDeleteTopic()
   {
     //Arrange
-    CreateHttpMocks(@"[]");
+    CreateHttpMocks("[]");
 
-    string streamName = "TEST_STREAM";
-
+    string streamName = nameof(TestStream);
     bool useIfExistsClause = true;
     bool deleteTopic = true;
       
@@ -458,9 +486,9 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
   public async Task DropTableAsync()
   {
     //Arrange
-    CreateHttpMocks(@"[]");
+    CreateHttpMocks("[]");
 
-    string tableName = "TEST_TABLE";
+    string tableName = nameof(TestTable);
 
     //Act
     var response = await ClassUnderTest.DropTableAsync(tableName);
@@ -478,8 +506,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     //Arrange
     CreateHttpMocks("[]");
 
-    string tableName = "TEST_TABLE";
-
+    string tableName = nameof(TestTable);
     bool useIfExistsClause = true;
     bool deleteTopic = true;
 
@@ -490,6 +517,56 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     response.Should().NotBeNull();
     var expectedContent = GetExpectedContent(StatementTemplates.DropTable(tableName, useIfExistsClause, deleteTopic));
       
+    VerifySendAsync(expectedContent);
+  }
+
+  private class TestTable;
+
+  [Test]
+  public async Task DropTableAsync_WithDropEntityProperties()
+  {
+    //Arrange
+    CreateHttpMocks("[]");
+
+    var properties = new DropFromItemProperties
+    {
+      UseIfExistsClause = true,
+      DeleteTopic = true,
+      ShouldPluralizeEntityName = false
+    };
+    string tableName = nameof(TestTable);
+
+    //Act
+    var response = await ClassUnderTest.DropTableAsync<TestTable>(properties);
+
+    //Assert
+    response.Should().NotBeNull();
+    var expectedContent = GetExpectedContent(StatementTemplates.DropTable(tableName, properties.UseIfExistsClause, properties.DeleteTopic));
+      
+    VerifySendAsync(expectedContent);
+  }
+
+  private class TestType;
+
+  [Test]
+  public async Task DropTypeAsync_WithDropEntityProperties()
+  {
+    //Arrange
+    CreateHttpMocks("[]");
+
+    var properties = new DropTypeProperties
+    {
+      ShouldPluralizeEntityName = false
+    };
+    string typeName = nameof(TestType);
+
+    //Act
+    var response = await ClassUnderTest.DropTypeAsync<TestType>(properties);
+
+    //Assert
+    response.Should().NotBeNull();
+    var expectedContent = GetExpectedContent(StatementTemplates.DropType(typeName));
+
     VerifySendAsync(expectedContent);
   }
 

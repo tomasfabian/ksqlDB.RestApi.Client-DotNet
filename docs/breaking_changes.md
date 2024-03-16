@@ -1,5 +1,19 @@
 # Breaking changes
 
+# v4.0.0
+- `TypeProperties` - removed generic type argument and added a base type `EntityProperties`. Additionally, changed from a class to a record type.
+- the above change affected the argument for the `IKSqlDbRestApiClient.CreateTypeAsync<T>(TypeProperties typeProperties)`
+- `IEntityCreationProperties` was replaced with `IEntityProperties`
+- ksqlDB types are no longer **automatically capitalized**
+
+Updated package references:
+```xml
+<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+<PackageReference Include="System.Text.Json" Version="8.0.2" />
+```
+
 # v3.0.0
 - The **accessibility modifier** of the `IsDisposed` property in `AsyncDisposableObject` was modified from public to internal.
 

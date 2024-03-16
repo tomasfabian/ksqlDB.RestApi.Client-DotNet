@@ -1,4 +1,4 @@
-﻿using static System.String;
+using static System.String;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
@@ -15,6 +15,7 @@ internal static class StatementTemplates
 
   public static string ShowConnectors => "SHOW CONNECTORS;";
   public static string DropConnector(string connectorName) => $"DROP CONNECTOR {connectorName};";
+  public static string DropConnectorIfExists(string connectorName) => $"DROP CONNECTOR IF EXISTS {connectorName};";
 
   public static string DropType(string typeName) => $"DROP TYPE {typeName};";
   public static string DropTypeIfExists(string typeName) => $"DROP TYPE IF EXISTS {typeName};";

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Text.Json.Serialization;
 using FluentAssertions;
 using Joker.Extensions;
@@ -70,207 +69,7 @@ public class CreateEntityTests
     };
   }
 
-  #region KSqlTypeTranslator
-
-  [Test]
-  public void KSqlTypeTranslator_StringType()
-  {
-    //Arrange
-    var type = typeof(string);
-
-    //Act
-    string ksqlType = CreateEntity.KSqlTypeTranslator(type);
-
-    //Assert
-    ksqlType.Should().Be("VARCHAR");
-  }
-
-  [Test]
-  public void KSqlTypeTranslator_IntType()
-  {
-    //Arrange
-    var type = typeof(int);
-
-    //Act
-    string ksqlType = CreateEntity.KSqlTypeTranslator(type);
-
-    //Assert
-    ksqlType.Should().Be("INT");
-  }
-
-  [Test]
-  public void KSqlTypeTranslator_LongType()
-  {
-    //Arrange
-    var type = typeof(long);
-
-    //Act
-    string ksqlType = CreateEntity.KSqlTypeTranslator(type);
-
-    //Assert
-    ksqlType.Should().Be("BIGINT");
-  }
-
-  [Test]
-  public void KSqlTypeTranslator_DoubleType()
-  {
-    //Arrange
-    var type = typeof(double);
-
-    //Act
-    string ksqlType = CreateEntity.KSqlTypeTranslator(type);
-
-    //Assert
-    ksqlType.Should().Be("DOUBLE");
-  }
-
-  [Test]
-  public void KSqlTypeTranslator_DecimalType()
-  {
-    //Arrange
-    var type = typeof(decimal);
-
-    //Act
-    string ksqlType = CreateEntity.KSqlTypeTranslator(type);
-
-    //Assert
-    ksqlType.Should().Be("DECIMAL");
-  }
-
-  [Test]
-  public void KSqlTypeTranslator_BoolType()
-  {
-    //Arrange
-    var type = typeof(bool);
-
-    //Act
-    string ksqlType = CreateEntity.KSqlTypeTranslator(type);
-
-    //Assert
-    ksqlType.Should().Be("BOOLEAN");
-  }
-
-  [Test]
-  public void KSqlTypeTranslator_DictionaryType()
-  {
-    //Arrange
-    var type = typeof(Dictionary<string, int>);
-
-    //Act
-    string ksqlType = CreateEntity.KSqlTypeTranslator(type);
-
-    //Assert
-    ksqlType.Should().Be("MAP<VARCHAR, INT>");
-  }
-
-  [Test]
-  public void KSqlTypeTranslator_DictionaryInterface()
-  {
-    //Arrange
-    var type = typeof(IDictionary<string, long>);
-
-    //Act
-    string ksqlType = CreateEntity.KSqlTypeTranslator(type);
-
-    //Assert
-    ksqlType.Should().Be("MAP<VARCHAR, BIGINT>");
-  }
-
-  [Test]
-  public void KSqlTypeTranslator_ArrayType()
-  {
-    //Arrange
-    var type = typeof(double[]);
-
-    //Act
-    string ksqlType = CreateEntity.KSqlTypeTranslator(type);
-
-    //Assert
-    ksqlType.Should().Be("ARRAY<DOUBLE>");
-  }
-
-  [Test]
-  public void KSqlTypeTranslator_ListType()
-  {
-    //Arrange
-    var type = typeof(List<string>);
-
-    //Act
-    string ksqlType = CreateEntity.KSqlTypeTranslator(type);
-
-    //Assert
-    ksqlType.Should().Be("ARRAY<VARCHAR>");
-  }
-
-  [Test]
-  public void KSqlTypeTranslator_IListInterface()
-  {
-    //Arrange
-    var type = typeof(IList<string>);
-
-    //Act
-    string ksqlType = CreateEntity.KSqlTypeTranslator(type);
-
-    //Assert
-    ksqlType.Should().Be("ARRAY<VARCHAR>");
-  }
-
-  [Test]
-  public void KSqlTypeTranslator_IEnumerable()
-  {
-    //Arrange
-    var type = typeof(IEnumerable<string>);
-
-    //Act
-    string ksqlType = CreateEntity.KSqlTypeTranslator(type);
-
-    //Assert
-    ksqlType.Should().Be("ARRAY<VARCHAR>");
-  }
-
-  [Test]
-  public void KSqlTypeTranslator_NestedMapInArray()
-  {
-    //Arrange
-    var type = typeof(IDictionary<string, int>[]);
-
-    //Act
-    string ksqlType = CreateEntity.KSqlTypeTranslator(type);
-
-    //Assert
-    ksqlType.Should().Be("ARRAY<MAP<VARCHAR, INT>>");
-  }
-
-  [Test]
-  public void KSqlTypeTranslator_NestedArrayInMap()
-  {
-    //Arrange
-    var type = typeof(IDictionary<string, int[]>);
-
-    //Act
-    string ksqlType = CreateEntity.KSqlTypeTranslator(type);
-
-    //Assert
-    ksqlType.Should().Be("MAP<VARCHAR, ARRAY<INT>>");
-  }
-
-  [Test]
-  public void KSqlTypeTranslator_BytesType()
-  {
-    //Arrange
-    var type = typeof(byte[]);
-
-    //Act
-    string ksqlType = CreateEntity.KSqlTypeTranslator(type);
-
-    //Assert
-    ksqlType.Should().Be("BYTES");
-  }
-
-  #endregion
-
-
-  public static IEnumerable<(IdentifierEscaping, string)> PrintCreateStreamTestCases()
+  internal static IEnumerable<(IdentifierEscaping, string)> PrintCreateStreamTestCases()
   {
     yield return (Never, CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false, escaping: Never));
     yield return (Keywords, CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false, escaping: Keywords));
@@ -301,7 +100,7 @@ public class CreateEntityTests
     public decimal Amount { get; set; }
   }
 
-  public static IEnumerable<(IdentifierEscaping, string)> DecimalWithPrecisionTestCases()
+  internal static IEnumerable<(IdentifierEscaping, string)> DecimalWithPrecisionTestCases()
   {
     yield return (Never, $@"CREATE STREAM Transactions (
 {"\t"}Amount DECIMAL(3,2)
@@ -333,7 +132,7 @@ public class CreateEntityTests
     statement.Should().Be(expected);
   }
 
-  public static IEnumerable<(IdentifierEscaping, string)> PrintCreatStreamOverrideEntityNameTestCases()
+  internal static IEnumerable<(IdentifierEscaping, string)> PrintCreatStreamOverrideEntityNameTestCases()
   {
     yield return (Never,
       CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false,
@@ -367,7 +166,7 @@ public class CreateEntityTests
     statement.Should().Be(expected);
   }
 
-  public static IEnumerable<(IdentifierEscaping, string)> PrintCreateStreamOverrideEntityNameDoNotPluralizeTestCases()
+  internal static IEnumerable<(IdentifierEscaping, string)> PrintCreateStreamOverrideEntityNameDoNotPluralizeTestCases()
   {
     yield return (Never, CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false, entityName: "TestName"));
     yield return (Keywords,
@@ -500,7 +299,7 @@ public class CreateEntityTests
     statement.Should().Be(CreateExpectedStatement("CREATE OR REPLACE TABLE", hasPrimaryKey: true));
   }
 
-  public static IEnumerable<(IdentifierEscaping, string)> PrintCreateOrReplaceTableIncludeReadOnlyPropertiesTestCases()
+  internal static IEnumerable<(IdentifierEscaping, string)> PrintCreateOrReplaceTableIncludeReadOnlyPropertiesTestCases()
   {
     yield return (Never, $@"CREATE OR REPLACE TABLE MyItems (
 {"\t"}Id INT PRIMARY KEY,
@@ -767,7 +566,7 @@ public class CreateEntityTests
 
     //Assert
     statement.Should().Be(@$"CREATE STREAM {nameof(GuidKey)} (
-	DataId VARCHAR
+	{nameof(GuidKey.DataId)} VARCHAR
 ) WITH ( KAFKA_TOPIC='{streamCreationMetadata.KafkaTopic}', VALUE_FORMAT='Json', PARTITIONS='1' );".ReplaceLineEndings());
   }
 }
