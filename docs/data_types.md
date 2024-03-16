@@ -5,20 +5,21 @@
 In `ksqlDB`, there are several built-in data types that can be used to define the structure of streams and tables.
 These data types represent the type of data stored in each column of a stream or table. Here is a list of supported data types:
 
-|     ksql     |             c#             |
-|:------------:|:--------------------------:|
-|   VARCHAR    |    string or System.Enum   |
-|   INTEGER    |            int             |
-|    BIGINT    |            long            |
-|    DOUBLE    |           double           |
-|   BOOLEAN    |            bool            |
-|    BYTES     |           byte[]           |
-| ```ARRAY```  |  C#Type[] or IEnumerable   |
-|  ```MAP```   |        IDictionary         |
-| ```STRUCT``` |           struct           |
-|     DATE     |      System.DateTime       |
-|     TIME     |      System.TimeSpan       |
-|  TIMESTAMP   |   System.DateTimeOffset    |
+|           ksql            |             c#             |
+|:-------------------------:|:--------------------------:|
+|          VARCHAR          |    string or System.Enum   |
+|          INTEGER          |            int             |
+|          BIGINT           |            long            |
+|          DOUBLE           |           double           |
+|          BOOLEAN          |            bool            |
+|           BYTES           |           byte[]           |
+| DECIMAL(precision, scale) |           decimal          |
+|        ```ARRAY```        |  C#Type[] or IEnumerable   |
+|         ```MAP```         |        IDictionary         |
+|       ```STRUCT```        |           struct           |
+|           DATE            |      System.DateTime       |
+|           TIME            |      System.TimeSpan       |
+|         TIMESTAMP         |   System.DateTimeOffset    |
 
 Array type mapping example:
 All of the elements in the array must be of the same type. The element type can be any valid SQL type.
