@@ -27,7 +27,7 @@ internal class KSqlFunctionVisitor : KSqlVisitor
           else
           {
             var value = ExtractMemberValue((MemberExpression)methodCallExpression.Arguments[1]);
-            Append(value.ToString());
+            Append(value.ToString()!);
           }
           break;          
         case nameof(KSqlFunctionsExtensions.Random):

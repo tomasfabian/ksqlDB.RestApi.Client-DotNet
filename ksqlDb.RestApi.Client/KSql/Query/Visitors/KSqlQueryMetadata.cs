@@ -7,11 +7,11 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
 
 internal sealed record KSqlQueryMetadata
 {
-  public Type FromItemType { get; set; }
+  public Type? FromItemType { get; set; }
 
-  public FromItem[] Joins { get; set; }
+  public FromItem[]? Joins { get; set; }
 
-  internal LambdaExpression Select { get; set; }
+  internal LambdaExpression? Select { get; set; }
 
   internal bool IsInNestedFunctionScope { get; set; }
 
@@ -19,15 +19,19 @@ internal sealed record KSqlQueryMetadata
 
   public IdentifierEscaping IdentifierEscaping { get; init; } = IdentifierEscaping.Never;
 
-  internal FromItem TrySetAlias(MemberExpression memberExpression, Func<FromItem, string, bool> predicate)
+  internal FromItem? TrySetAlias(MemberExpression memberExpression, Func<FromItem, string, bool> predicate)
   {
-    var parameterName = IdentifierUtil.Format(((ParameterExpression)memberExpression.Expression)?.Name, IdentifierEscaping);
+    var name = (memberExpression.Expression as ParameterExpression)?.Name;
+    if (name == null)
+      return null;
 
-    var joinsOfType = Joins.Where(c => c.Type == memberExpression.Expression.Type).ToArray();
+    var parameterName = IdentifierUtil.Format(name, IdentifierEscaping);
 
-    var fromItem = joinsOfType.FirstOrDefault();
+    var joinsOfType = Joins?.Where(c => c.Type == memberExpression.Expression?.Type).ToArray();
 
-    if (joinsOfType.Length > 1)
+    var fromItem = joinsOfType?.FirstOrDefault();
+
+    if (joinsOfType is {Length: > 1})
       fromItem = joinsOfType.FirstOrDefault(c => predicate(c, parameterName));
 
     if (fromItem != null)

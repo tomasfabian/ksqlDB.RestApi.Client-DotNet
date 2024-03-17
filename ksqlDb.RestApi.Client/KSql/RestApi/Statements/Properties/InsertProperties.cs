@@ -15,7 +15,7 @@ public record InsertProperties : EntityProperties, IValueFormatters
   /// </summary>
   public bool IncludeReadOnlyProperties { get; set; } = false;
 
-  public Func<decimal, string> FormatDecimalValue { get; set; }
+  public Func<decimal, string>? FormatDecimalValue { get; set; }
 
-  public Func<double, string> FormatDoubleValue { get; set; }
+  public Func<double, string>? FormatDoubleValue { get; set; }
 }

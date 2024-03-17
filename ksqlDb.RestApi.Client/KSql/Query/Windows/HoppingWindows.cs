@@ -43,7 +43,7 @@ public class HoppingWindows : TimeWindows
   /// <summary>
   /// Gets the retention duration for the hopping window.
   /// </summary>
-  public Duration Retention { get; private set; }
+  public Duration? Retention { get; private set; }
 
   /// <summary>
   /// Sets the retention duration for the hopping window.

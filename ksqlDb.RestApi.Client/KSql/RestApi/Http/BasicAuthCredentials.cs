@@ -17,14 +17,6 @@ public record BasicAuthCredentials
   }
 
   /// <summary>
-  /// Initializes a new instance of the <see cref="BasicAuthCredentials"/> class.
-  /// </summary>
-  internal BasicAuthCredentials()
-  {
-  }
-
-
-  /// <summary>
   /// Gets the username.
   /// </summary>
   public string UserName { get; internal set; }

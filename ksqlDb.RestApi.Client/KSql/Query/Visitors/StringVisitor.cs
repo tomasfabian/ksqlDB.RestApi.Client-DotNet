@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Text;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 
@@ -49,7 +49,7 @@ internal class StringVisitor : KSqlVisitor
     Append(" LIKE ");
   }
 
-  private string likeMethodName;
+  private string? likeMethodName;
 
   private void VisitLike(MethodCallExpression methodCallExpression, string methodName)
   {
@@ -66,7 +66,8 @@ internal class StringVisitor : KSqlVisitor
 
   protected override Expression VisitParameter(ParameterExpression node)
   {
-    Append(node.Name);
+    if (node.Name != null)
+      Append(node.Name);
 
     return base.VisitParameter(node);
   }
@@ -76,7 +77,7 @@ internal class StringVisitor : KSqlVisitor
 
   protected override Expression VisitConstant(ConstantExpression constantExpression)
   {
-    if (likeMethodName.IsNotNullOrEmpty() && constantExpression.Value is string value)
+    if (likeMethodName != null && likeMethodName.IsNotNullOrEmpty() && constantExpression.Value is string value)
     {
       Append(StringLiteralDelimiter);
 

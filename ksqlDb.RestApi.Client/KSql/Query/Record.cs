@@ -12,7 +12,7 @@ public class Record
   /// </summary>
   [IgnoreByInserts]
   [PseudoColumn]
-  public string Headers { get; set; }
+  public string? Headers { get; set; }
 
   /// <summary>
   /// The offset of the source record.

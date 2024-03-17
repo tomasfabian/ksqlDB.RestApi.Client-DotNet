@@ -34,7 +34,7 @@ public class CdcClientTests : TestBase<CdcClient>
     await dbContext.Database.EnsureDeletedAsync();
   }
     
-  static string ConnectionString => Configuration.GetConnectionString("DefaultConnection");
+  static string? ConnectionString => Configuration.GetConnectionString("DefaultConnection");
 
   readonly SqlConnectionStringBuilder connectionStringBuilder = new(ConnectionString);
 

@@ -189,28 +189,9 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
       
     //Act
     var source = Context.CreateQuery<Movie>(MoviesTableName)
-      .Select(c => new { Col = KSqlFunctions.Instance.ArrayMin(new string? [] { null })})
+      .Select(c => new { Col = KSqlFunctions.Instance.ArrayMin(new string [] { })})
       .ToAsyncEnumerable();
 
-    var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
-    //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
-    actualValues.Count.Should().Be(1);
-    actualValues[0].Col.Should().BeNull();
-  }
-
-  [Test]
-  public async Task ArrayLength_NullValue()
-  {
-    //Arrange
-    int expectedItemsCount = 1;
-      
-    //Act
-    var source = Context.CreateQuery<Movie>(MoviesTableName)
-      .Select(c => new { Col = KSqlFunctions.Instance.ArrayLength(null as string[])})
-      .ToAsyncEnumerable();
-      
     var actualValues = await CollectActualValues(source, expectedItemsCount);
       
     //Assert

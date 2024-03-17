@@ -9,7 +9,7 @@ public static class CreateStatementExtensions
 {
   #region Select
 
-  private static MethodInfo selectTSourceTResult;
+  private static MethodInfo? selectTSourceTResult;
 
   private static MethodInfo SelectTSourceTResult(Type source, Type result) =>
     (selectTSourceTResult ??= new Func<ICreateStatement<object>, Expression<Func<object, object>>, ICreateStatement<object>>(Select).GetMethodInfo().GetGenericMethodDefinition())
@@ -35,7 +35,7 @@ public static class CreateStatementExtensions
 
   #region Where
 
-  private static MethodInfo whereTSource;
+  private static MethodInfo? whereTSource;
 
   private static MethodInfo WhereTSource(Type source) =>
     (whereTSource ??= new Func<ICreateStatement<object>, Expression<Func<object, bool>>, ICreateStatement<object>>(Where).GetMethodInfo().GetGenericMethodDefinition())
@@ -61,7 +61,7 @@ public static class CreateStatementExtensions
 
   #region Take
 
-  private static MethodInfo takeTSource;
+  private static MethodInfo? takeTSource;
 
   private static MethodInfo TakeTSource(Type source) =>
     (takeTSource ??= new Func<ICreateStatement<object>, int, ICreateStatement<object>>(Take).GetMethodInfo().GetGenericMethodDefinition())
@@ -81,7 +81,7 @@ public static class CreateStatementExtensions
 
   #region GroupBy
 
-  private static MethodInfo groupByTSourceTKey;
+  private static MethodInfo? groupByTSourceTKey;
 
   private static MethodInfo GroupByTSourceTKey(Type source, Type key) =>
     (groupByTSourceTKey ??= new Func<ICreateStatement<object>, Expression<Func<object, object>>, ICreateStatement<IKSqlGrouping<object, object>>>(GroupBy).GetMethodInfo().GetGenericMethodDefinition())
@@ -104,7 +104,7 @@ public static class CreateStatementExtensions
 
   #region Having
 
-  private static MethodInfo havingTSource;
+  private static MethodInfo? havingTSource;
 
   private static MethodInfo HavingTSource(Type source, Type key) =>
     (havingTSource ??= new Func<ICreateStatement<IKSqlGrouping<object, object>>, Expression<Func<IKSqlGrouping<object, object>, bool>>, ICreateStatement<IKSqlGrouping<object, object>>>(Having).GetMethodInfo().GetGenericMethodDefinition())
@@ -130,7 +130,7 @@ public static class CreateStatementExtensions
 
   #region WindowedBy
 
-  private static MethodInfo windowedByTSourceTKey;
+  private static MethodInfo? windowedByTSourceTKey;
 
   private static MethodInfo WindowedByTSourceTKey(Type source, Type key) =>
     (windowedByTSourceTKey ??= new Func<ICreateStatement<IKSqlGrouping<object, object>>, TimeWindows, ICreateStatement<IWindowedKSql<object, object>>>(WindowedBy).GetMethodInfo().GetGenericMethodDefinition())
@@ -151,7 +151,7 @@ public static class CreateStatementExtensions
 
   #region Join
 
-  private static MethodInfo joinTOuterTInnerTKeyTResult;
+  private static MethodInfo? joinTOuterTInnerTKeyTResult;
 
   private static MethodInfo JoinTOuterTInnerTKeyTResult(Type outer, Type inner, Type key, Type result) =>
     (joinTOuterTInnerTKeyTResult ??= new Func<ICreateStatement<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, ICreateStatement<object>>(Join).GetMethodInfo().GetGenericMethodDefinition())
@@ -175,7 +175,7 @@ public static class CreateStatementExtensions
 
   #region LeftJoin
 
-  private static MethodInfo leftJoinTOuterTInnerTKeyTResult;
+  private static MethodInfo? leftJoinTOuterTInnerTKeyTResult;
 
   private static MethodInfo LeftJoinTOuterTInnerTKeyTResult(Type outer, Type inner, Type key, Type result) =>
     (leftJoinTOuterTInnerTKeyTResult ??= new Func<ICreateStatement<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, ICreateStatement<object>>(LeftJoin).GetMethodInfo().GetGenericMethodDefinition())
@@ -199,7 +199,7 @@ public static class CreateStatementExtensions
 
   #region FullOuterJoin
 
-  private static MethodInfo fullOuterJoinTOuterTInnerTKeyTResult;
+  private static MethodInfo? fullOuterJoinTOuterTInnerTKeyTResult;
 
   private static MethodInfo FullOuterJoinTOuterTInnerTKeyTResult(Type outer, Type inner, Type key, Type result) =>
     (fullOuterJoinTOuterTInnerTKeyTResult ??= new Func<ICreateStatement<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, ICreateStatement<object>>(FullOuterJoin).GetMethodInfo().GetGenericMethodDefinition())
@@ -223,7 +223,7 @@ public static class CreateStatementExtensions
 
   #region PartitionBy
 
-  private static MethodInfo partitionByTSourceTResult;
+  private static MethodInfo? partitionByTSourceTResult;
 
   private static MethodInfo PartitionByTSourceTResult(Type source, Type result) =>
     (partitionByTSourceTResult ??= new Func<ICreateStatement<object>, Expression<Func<object, object>>, ICreateStatement<object>>(PartitionBy).GetMethodInfo().GetGenericMethodDefinition())
@@ -265,7 +265,7 @@ public static class CreateStatementExtensions
 
     var ksqlQuery = createStatement?.BuildKsql();
 
-    return ksqlQuery;
+    return ksqlQuery ?? string.Empty;
   }
 
   #endregion

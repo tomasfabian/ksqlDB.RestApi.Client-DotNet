@@ -10,14 +10,14 @@ namespace ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers
   {
     private readonly Pluralizer englishPluralizationService = new();
 
-    internal string GetFormattedName<T>(IEntityProperties entityProperties, Func<string, IdentifierEscaping, string> formatter = null)
+    internal string GetFormattedName<T>(IEntityProperties entityProperties, Func<string, IdentifierEscaping, string>? formatter = null)
     {
       return GetFormattedName(typeof(T), entityProperties, formatter);
     }
 
-    internal string GetFormattedName(Type type, IEntityProperties entityProperties, Func<string, IdentifierEscaping, string> formatter = null)
+    internal string GetFormattedName(Type type, IEntityProperties entityProperties, Func<string, IdentifierEscaping, string>? formatter = null)
     {
-      string entityName = entityProperties.EntityName;
+      string? entityName = entityProperties.EntityName;
 
       if (string.IsNullOrEmpty(entityName))
         entityName = type.ExtractTypeName();
@@ -26,8 +26,8 @@ namespace ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers
         entityName = englishPluralizationService.Pluralize(entityName);
 
       return formatter != null
-        ? formatter(entityName, entityProperties.IdentifierEscaping)
-        : IdentifierUtil.Format(entityName, entityProperties.IdentifierEscaping);
+        ? formatter(entityName!, entityProperties.IdentifierEscaping)
+        : IdentifierUtil.Format(entityName!, entityProperties.IdentifierEscaping);
     }
   }
 }

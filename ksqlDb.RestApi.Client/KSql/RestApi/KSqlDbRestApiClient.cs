@@ -28,9 +28,9 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 {
   private readonly EntityProvider entityProvider = new();
   private readonly IHttpClientFactory httpClientFactory;
-  private readonly ILogger logger;
+  private readonly ILogger? logger;
 
-  public KSqlDbRestApiClient(IHttpClientFactory httpClientFactory, ILoggerFactory loggerFactory = null)
+  public KSqlDbRestApiClient(IHttpClientFactory httpClientFactory, ILoggerFactory? loggerFactory = null)
   {
     this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
 
@@ -44,7 +44,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 
   private static string NullOrWhiteSpaceErrorMessage => "Can't be null, empty, or contain only whitespace.";
 
-  private BasicAuthCredentials credentials;
+  private BasicAuthCredentials? basicAuthCredentials;
 
   /// <summary>
   /// Sets Basic HTTP authentication mechanism.
@@ -53,7 +53,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>This instance.</returns>
   public IKSqlDbRestApiClient SetCredentials(BasicAuthCredentials credentials)
   {
-    this.credentials = credentials;
+    basicAuthCredentials = credentials;
 
     return this;
   }
@@ -116,11 +116,11 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
       Content = data
     };
 
-    if (credentials != null)
+    if (basicAuthCredentials != null)
     {
-      string basicAuthHeader = credentials.CreateToken();
+      string basicAuthHeader = basicAuthCredentials.CreateToken();
 
-      httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue(credentials.Schema, basicAuthHeader);
+      httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue(basicAuthCredentials.Schema, basicAuthHeader);
     }
 
     return httpRequestMessage;
@@ -396,7 +396,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <param name="insertProperties">Overrides conventions.</param>
   /// <param name="cancellationToken">Optional cancellation token to cancel the operation</param>
   /// <returns>Http response object.</returns>
-  public Task<HttpResponseMessage> InsertIntoAsync<T>(T entity, InsertProperties insertProperties = null, CancellationToken cancellationToken = default)
+  public Task<HttpResponseMessage> InsertIntoAsync<T>(T entity, InsertProperties? insertProperties = null, CancellationToken cancellationToken = default)
   {
     var insertStatement = ToInsertStatement(entity, insertProperties);
 
@@ -412,7 +412,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <param name="insertValues">Insert values</param>
   /// <param name="insertProperties">Insert configuration</param>
   /// <returns>A <see cref="KSqlDbStatement"/></returns>
-  public KSqlDbStatement ToInsertStatement<T>(InsertValues<T> insertValues, InsertProperties insertProperties = null)
+  public KSqlDbStatement ToInsertStatement<T>(InsertValues<T> insertValues, InsertProperties? insertProperties = null)
   {
     var insertStatement = new CreateInsert().Generate(insertValues, insertProperties);
 
@@ -426,7 +426,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <param name="entity">Entity for insertion.</param>
   /// <param name="insertProperties">Overrides conventions.</param>
   /// <returns>A <see cref="KSqlDbStatement"/></returns>
-  public KSqlDbStatement ToInsertStatement<T>(T entity, InsertProperties insertProperties = null)
+  public KSqlDbStatement ToInsertStatement<T>(T entity, InsertProperties? insertProperties = null)
   {
     var insertStatement = new CreateInsert().Generate(entity, insertProperties);
 
@@ -691,7 +691,6 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// Drops an existing stream.
   /// DROP STREAM [IF EXISTS] stream_name [DELETE TOPIC];
   /// </summary>
-  /// <typeparam name="T">The type that represents the stream.</typeparam>
   /// <param name="streamName">Name of the stream to delete.</param>
   /// <param name="useIfExistsClause">If the IF EXISTS clause is present, the statement doesn't fail if the stream doesn't exist.</param>
   /// <param name="deleteTopic">If the DELETE TOPIC clause is present, the stream's source topic is marked for deletion.</param>

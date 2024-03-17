@@ -25,8 +25,8 @@ public class HttpResponseMessageExtensionsTests : KSqlDbRestApiClientTestsBase
     var responses = await httpResponseMessage.ToStatementResponsesAsync();
       
     //Assert
-    responses[0].CommandStatus.Message.Should().Be("Table created");
-    responses[0].CommandStatus.Status.Should().Be("SUCCESS");
+    responses[0].CommandStatus!.Message.Should().Be("Table created");
+    responses[0].CommandStatus!.Status.Should().Be("SUCCESS");
     responses[0].CommandId.Should().Be("table/`MOVIES`/create");
     responses[0].CommandSequenceNumber.Should().Be(328);
   }

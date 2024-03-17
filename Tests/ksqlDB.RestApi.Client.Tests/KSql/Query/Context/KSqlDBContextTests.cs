@@ -307,7 +307,7 @@ public class KSqlDBContextTests : TestBase
 
     //Act
     var serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
-    var queryDbProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IKSqlDbProvider>();
+    var queryDbProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<IKSqlDbProvider>();
 
     //Assert
     queryDbProvider.Should().BeOfType<KSqlDbQueryProvider>();

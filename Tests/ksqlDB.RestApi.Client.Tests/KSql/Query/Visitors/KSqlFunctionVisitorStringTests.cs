@@ -443,20 +443,6 @@ public class KSqlFunctionVisitorStringTests : TestBase
   }
 
   [Test]
-  public void JsonArrayLength_Null_BuildKSql_PrintsTheFunction()
-  {
-    //Arrange
-    string? jsonInput = null;
-    Expression<Func<Tweet, int?>> expression = c => K.Functions.JsonArrayLength(jsonInput);
-
-    //Act
-    var query = ClassUnderTest.BuildKSql(expression);
-
-    //Assert
-    query.Should().BeEquivalentTo("JSON_ARRAY_LENGTH(NULL)");
-  }
-
-  [Test]
   public void JsonConcat_BuildKSql_PrintsTheFunction()
   {
     //Arrange

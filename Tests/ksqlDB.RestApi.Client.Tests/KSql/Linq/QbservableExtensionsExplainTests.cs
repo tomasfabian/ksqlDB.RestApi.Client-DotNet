@@ -42,7 +42,7 @@ public class QbservableExtensionsExplainTests : TestBase
 
     //Assert
     description[0].StatementText.Should().Be("EXPLAIN SELECT * FROM Movies EMIT CHANGES;");
-    description[0].QueryDescription.QueryType.Should().Be("PUSH");
+    description[0].QueryDescription!.QueryType.Should().Be("PUSH");
   }
 
   [Test]
@@ -65,7 +65,7 @@ public class QbservableExtensionsExplainTests : TestBase
     var query = dbProvider.CreateQueryStream<string>().Where(c => c == "ET");
 
     //Act
-    var explainStatement = QbservableExtensions.CreateExplainStatement(query as KStreamSet<string>);
+    var explainStatement = QbservableExtensions.CreateExplainStatement((KStreamSet<string>)query);
 
     //Assert
     explainStatement.Should().Be(@"EXPLAIN SELECT * FROM Strings

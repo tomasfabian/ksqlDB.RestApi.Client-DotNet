@@ -14,7 +14,7 @@ internal static class HttpResponseMessageExtensions
       {
         var responsesObject = httpResponseMessage.ToStatementResponses();
 
-        var isSuccess = responsesObject != null && responsesObject.All(c => c.CommandStatus.Status == CommandStatus.Success);
+        var isSuccess = responsesObject.All(c => c.CommandStatus!.Status == CommandStatus.Success);
 
         return isSuccess;
       }

@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Responses.Statements;
 
@@ -7,12 +7,12 @@ public record StatementResponseBase
   [JsonPropertyName("error_code")]
   public int ErrorCode { get; set; }
 
-  public string Message { get; set; }
+  public string? Message { get; set; }
 
   [JsonPropertyName("@type")]
-  public string Type { get; set; }
+  public string Type { get; set; } = null!;
+
+  public string? StatementText { get; set; }
     
-  public string StatementText { get; set; }
-    
-  public string[] Warnings { get; set; }
+  public string[]? Warnings { get; set; }
 }

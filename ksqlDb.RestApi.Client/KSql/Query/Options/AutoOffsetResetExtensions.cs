@@ -23,7 +23,7 @@ public static class AutoOffsetResetExtensions
   }
 
   /// <summary>
-  /// Converts an <see cref="AutoOffsetReset"/> value to its corresponding string representation for KSql.
+  /// Converts a <see cref="AutoOffsetReset"/> value to its corresponding string representation for KSql.
   /// </summary>
   /// <param name="value">The <see cref="AutoOffsetReset"/> value.</param>
   /// <returns>The string representation of the <see cref="AutoOffsetReset"/> value for KSql.</returns>

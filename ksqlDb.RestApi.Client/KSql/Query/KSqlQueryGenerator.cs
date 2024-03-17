@@ -22,8 +22,8 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
   private readonly KSqlDBContextOptions options = options ?? throw new ArgumentNullException(nameof(options));
   private readonly EntityProvider entityProvider = new();
 
-  private KSqlVisitor kSqlVisitor;
-  private KSqlQueryMetadata queryMetadata;
+  private KSqlVisitor kSqlVisitor = null!;
+  private KSqlQueryMetadata queryMetadata = null!;
 
   public bool ShouldEmitChanges { get; set; } = true;
 
@@ -33,7 +33,7 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
 
     kSqlVisitor = new KSqlVisitor(queryMetadata);
     whereClauses = new Queue<Expression>();
-    joins = new List<(MethodInfo, IEnumerable<Expression>, LambdaExpression)>();
+    joins = new List<(MethodInfo, IEnumerable<Expression>, LambdaExpression?)>();
 
     Visit(expression);
 
@@ -49,7 +49,7 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
 
     queryMetadata.FromItemType = fromItemType;
 
-    if (joins.Count > 0)
+    if (joins is {Count: > 0})
     {
       var fromItem = joins.Last();
 
@@ -59,7 +59,7 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
       var fromTable = new FromItem
       {
         Type = queryMetadata.FromItemType,
-        Alias = IdentifierUtil.Format(alias, queryMetadata.IdentifierEscaping)
+        Alias = IdentifierUtil.Format(alias!, queryMetadata.IdentifierEscaping)
       };
 
       queryMetadata.Joins = GetFromItems(joins, fromTable, queryMetadata.IdentifierEscaping);
@@ -139,7 +139,7 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
 
   private bool HasJoins => joins is {Count: > 0};
 
-  private TimeWindows TryGenerateWindowAggregation()
+  private TimeWindows? TryGenerateWindowAggregation()
   {
     if (windowedBy == null)
       return null;
@@ -148,10 +148,10 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
 
     var constantExpression = windowedBy;
 
-    return (TimeWindows)constantExpression.Value;
+    return constantExpression.Value as TimeWindows;
   }
 
-  public override Expression Visit(Expression expression)
+  public override Expression? Visit(Expression? expression)
   {
     if (expression == null)
       return null;
@@ -169,7 +169,7 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
     return expression;
   }
 
-  private Type fromItemType;
+  private Type fromItemType = null!;
 
   protected override Expression VisitConstant(ConstantExpression constantExpression)
   {
@@ -181,7 +181,7 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
 
     if (kStreamSetType != null)
     {
-      fromItemType = ((KSet)constantExpression.Value)?.ElementType;
+      fromItemType = ((KSet)constantExpression.Value!).ElementType;
     }
 
     return constantExpression;
@@ -217,13 +217,13 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
       VisitChained(methodCallExpression);
 
       LambdaExpression lambda = (LambdaExpression)StripQuotes(methodCallExpression.Arguments[1]);
-      whereClauses.Enqueue(lambda.Body);
+      whereClauses?.Enqueue(lambda.Body);
     }
 
     if (methodInfo.Name.IsOneOfFollowing(nameof(QbservableExtensions.Take), nameof(CreateStatementExtensions.Take)))
     {
       var arg = (ConstantExpression)methodCallExpression.Arguments[1];
-      limit = (int)arg.Value;
+      limit = (int)arg.Value!;
 
       VisitChained(methodCallExpression);
     }
@@ -231,7 +231,7 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
     if (methodInfo.Name.IsOneOfFollowing(nameof(QbservableExtensions.WithOffsetResetPolicy)))
     {
       var arg = (ConstantExpression)methodCallExpression.Arguments[1];
-      autoOffsetReset = (AutoOffsetReset)arg.Value;
+      autoOffsetReset = (AutoOffsetReset)arg.Value!;
 
       VisitChained(methodCallExpression);
     }
@@ -261,7 +261,7 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
     {
       var joinTable = methodCallExpression.Arguments.Skip(1);
 
-      joins.Add((methodInfo, joinTable, selectManyGroupJoin));
+      joins?.Add((methodInfo, joinTable, selectManyGroupJoin));
 
       selectManyGroupJoin = null;
 
@@ -283,7 +283,7 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
       case nameof(QbservableExtensions.FullOuterJoin):
         var joinTable = methodCallExpression.Arguments.Skip(1);
 
-        joins.Add((methodInfo, joinTable, null));
+        joins?.Add((methodInfo, joinTable, null));
 
         VisitChained(methodCallExpression);
         break;
@@ -300,15 +300,15 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
       Visit(firstPart);
   }
 
-  private Queue<Expression> whereClauses;
-  private LambdaExpression partitionBy;
+  private Queue<Expression>? whereClauses;
+  private LambdaExpression? partitionBy;
   private AutoOffsetReset? autoOffsetReset;
   private int? limit;
-  private ConstantExpression windowedBy;
-  private LambdaExpression groupBy;
-  private LambdaExpression selectManyGroupJoin;
-  private LambdaExpression having;
-  private List<(MethodInfo, IEnumerable<Expression>, LambdaExpression)> joins;
+  private ConstantExpression? windowedBy;
+  private LambdaExpression? groupBy;
+  private LambdaExpression? selectManyGroupJoin;
+  private LambdaExpression? having;
+  private List<(MethodInfo, IEnumerable<Expression>, LambdaExpression?)>? joins;
 
   private static Expression StripQuotes(Expression expression)
   {
@@ -320,7 +320,7 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
     return expression;
   }
 
-  private static FromItem[] GetFromItems(List<(MethodInfo, IEnumerable<Expression>, LambdaExpression)> joins,
+  private static FromItem[] GetFromItems(List<(MethodInfo, IEnumerable<Expression>, LambdaExpression?)> joins,
     FromItem fromItem, IdentifierEscaping escaping)
   {
     return joins.Select(c =>
@@ -331,7 +331,7 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
 
         var type = items[0].Type.GenericTypeArguments[0];
 
-        return new FromItem {Type = type, Alias = IdentifierUtil.Format(alias, escaping)};
+        return new FromItem {Type = type, Alias = IdentifierUtil.Format(alias!, escaping)};
       }).Append(fromItem)
       .ToArray();
   }

@@ -3,8 +3,10 @@ using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDb.RestApi.Client.Tests.Models;
 using ksqlDb.RestApi.Client.Tests.Models.Sensors;
+using Moq;
 using NUnit.Framework;
 using UnitTests;
 using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
@@ -38,7 +40,7 @@ public class PullQueryExtensionsTests : TestBase
       
     //Assert
     result.Should().NotBeNull();
-    result.SensorId.Should().Be(sensorId);
+    result!.SensorId.Should().Be(sensorId);
   }
 
   [Test]

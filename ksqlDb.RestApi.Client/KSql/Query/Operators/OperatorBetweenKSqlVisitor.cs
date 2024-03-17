@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Text;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
 
@@ -16,7 +16,7 @@ internal class OperatorBetweenKSqlVisitor : KSqlVisitor
     var methodInfo = methodCallExpression.Method;
 
     if (methodCallExpression.Object == null
-        && methodInfo.DeclaringType.Name == nameof(KSqlOperatorExtensions))
+        && methodInfo.DeclaringType?.Name == nameof(KSqlOperatorExtensions))
     {
       switch (methodInfo.Name)
       {

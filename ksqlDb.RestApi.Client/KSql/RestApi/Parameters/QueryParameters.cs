@@ -10,7 +10,7 @@ public class QueryParameters : IKSqlDbParameters
   /// A semicolon-delimited sequence of SQL statements to run.
   /// </summary>
   [JsonPropertyName("ksql")]
-  public string Sql { get; set; }
+  public string Sql { get; set; } = null!;
 
   /// <summary>
   /// Property overrides to run the statements with.

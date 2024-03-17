@@ -122,7 +122,7 @@ public static class KSqlDbServiceCollectionExtensions
   /// <returns>The original IServiceCollection.</returns>
   public static IServiceCollection ConfigureKSqlDb(this IServiceCollection services,
     string ksqlDbUrl,
-    Action<ISetupParameters> setupAction = null,
+    Action<ISetupParameters>? setupAction = null,
     ServiceLifetime contextLifetime = ServiceLifetime.Scoped,
     ServiceLifetime restApiLifetime = ServiceLifetime.Scoped)
   {
@@ -142,7 +142,7 @@ public static class KSqlDbServiceCollectionExtensions
   /// <returns>The original IServiceCollection.</returns>
   public static IServiceCollection ConfigureKSqlDb<TContextService, TContextImplementation>(this IServiceCollection services, 
     string ksqlDbUrl,
-    Action<ISetupParameters> setupAction = null,
+    Action<ISetupParameters>? setupAction = null,
     ServiceLifetime contextLifetime = ServiceLifetime.Scoped,
     ServiceLifetime restApiLifetime = ServiceLifetime.Scoped)
     where TContextService : IKSqlDBContext

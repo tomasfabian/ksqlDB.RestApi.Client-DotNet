@@ -22,7 +22,7 @@ internal class KSqlCustomFunctionVisitor : KSqlVisitor
     {
       string functionName = string.IsNullOrEmpty(functionAttribute.FunctionName)
         ? methodInfo.Name.ToKSqlFunctionName()
-        : functionAttribute.FunctionName;
+        : functionAttribute.FunctionName!;
 
       if (string.IsNullOrEmpty(functionName))
       {

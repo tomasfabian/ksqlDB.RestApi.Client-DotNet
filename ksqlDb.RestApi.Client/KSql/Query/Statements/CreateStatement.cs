@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
@@ -10,11 +10,10 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Statements;
 internal class CreateStatement<TEntity> : KSet, ICreateStatement<TEntity>
 {
   private readonly IServiceScopeFactory serviceScopeFactory;
-  private IServiceScope serviceScope;
     
   internal StatementContext StatementContext { get; set; }
 
-  internal CreateStatement(IServiceScopeFactory serviceScopeFactory, StatementContext statementContext = null)
+  internal CreateStatement(IServiceScopeFactory serviceScopeFactory, StatementContext statementContext)
   {
     this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
       
@@ -25,7 +24,7 @@ internal class CreateStatement<TEntity> : KSet, ICreateStatement<TEntity>
     Expression = Expression.Constant(this);
   }
 
-  internal CreateStatement(IServiceScopeFactory serviceScopeFactory, Expression expression, StatementContext statementContext = null)
+  internal CreateStatement(IServiceScopeFactory serviceScopeFactory, Expression expression, StatementContext statementContext)
   {
     this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
       
@@ -42,11 +41,11 @@ internal class CreateStatement<TEntity> : KSet, ICreateStatement<TEntity>
     
   internal string BuildKsql()
   {
-    serviceScope = serviceScopeFactory.CreateScope();
+    var serviceScope = serviceScopeFactory.CreateScope();
       
-    var dependencies = serviceScope.ServiceProvider.GetService<IKStreamSetDependencies>();
+    var dependencies = serviceScope.ServiceProvider.GetRequiredService<IKStreamSetDependencies>();
 
-    var ksqlQuery = dependencies.KSqlQueryGenerator?.BuildKSql(Expression, StatementContext);
+    var ksqlQuery = dependencies.KSqlQueryGenerator.BuildKSql(Expression, StatementContext);
       
     ksqlQuery = @$"{StatementContext.Statement}
 AS {ksqlQuery}";
@@ -58,9 +57,9 @@ AS {ksqlQuery}";
 
   public Task<HttpResponseMessage> ExecuteStatementAsync(CancellationToken cancellationToken = default)
   {
-    serviceScope = serviceScopeFactory.CreateScope();
+    var serviceScope = serviceScopeFactory.CreateScope();
       
-    cancellationToken.Register(() => serviceScope?.Dispose());
+    cancellationToken.Register(() => serviceScope.Dispose());
       
     var restApiClient = serviceScope.ServiceProvider.GetRequiredService<IKSqlDbRestApiClient>();
 
@@ -70,6 +69,6 @@ AS {ksqlQuery}";
 
     var dBStatement = new KSqlDbStatement(ksqlQuery);
 
-    return restApiClient?.ExecuteStatementAsync(dBStatement, cancellationToken);
+    return restApiClient.ExecuteStatementAsync(dBStatement, cancellationToken);
   }
 }

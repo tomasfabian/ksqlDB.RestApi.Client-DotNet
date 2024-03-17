@@ -24,7 +24,7 @@ public sealed class KSqlDbStatement : QueryParameters
   /// </summary>
   [JsonPropertyName("sessionVariables")]
   [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-  public Dictionary<string, object> SessionVariables { get; set; }
+  public Dictionary<string, object>? SessionVariables { get; set; }
 
   [JsonIgnore]
   public Encoding ContentEncoding { get; set; } = Encoding.UTF8;

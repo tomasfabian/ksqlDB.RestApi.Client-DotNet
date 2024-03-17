@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 
 namespace ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 
@@ -34,7 +34,7 @@ public interface IPullable<T> : IPullable
   /// </summary>
   /// <param name="cancellationToken">A token that can be used to request cancellation of the asynchronous operation.</param>
   /// <returns></returns>
-  ValueTask<T> FirstOrDefaultAsync(CancellationToken cancellationToken = default);
+  ValueTask<T?> FirstOrDefaultAsync(CancellationToken cancellationToken = default);
     
   /// <summary>
   /// Pulls all values from the materialized view asynchronously and terminates. 

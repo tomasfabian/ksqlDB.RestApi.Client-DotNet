@@ -35,7 +35,7 @@ public interface IKSqlDbRestApiClient : IKSqlDbCreateRestApiClient, IKSqlDbAsser
   /// <param name="insertProperties">Overrides conventions.</param>
   /// <param name="cancellationToken"></param>
   /// <returns>Http response object.</returns>
-  Task<HttpResponseMessage> InsertIntoAsync<T>(T entity, InsertProperties insertProperties = null, CancellationToken cancellationToken = default);
+  Task<HttpResponseMessage> InsertIntoAsync<T>(T entity, InsertProperties? insertProperties = null, CancellationToken cancellationToken = default);
 
   /// <summary>
   /// Generates raw 'Insert Into' string, but does not execute it.
@@ -44,7 +44,7 @@ public interface IKSqlDbRestApiClient : IKSqlDbCreateRestApiClient, IKSqlDbAsser
   /// <param name="insertValues">Insert values</param>
   /// <param name="insertProperties">Insert configuration</param>
   /// <returns>A <see cref="KSqlDbStatement"/></returns>
-  KSqlDbStatement ToInsertStatement<T>(InsertValues<T> insertValues, InsertProperties insertProperties = null);
+  KSqlDbStatement ToInsertStatement<T>(InsertValues<T> insertValues, InsertProperties? insertProperties = null);
 
   /// <summary>
   /// Generates raw 'Insert Into' string, but does not execute it.
@@ -53,7 +53,7 @@ public interface IKSqlDbRestApiClient : IKSqlDbCreateRestApiClient, IKSqlDbAsser
   /// <param name="entity">Entity for insertion.</param>
   /// <param name="insertProperties">Overrides conventions.</param>
   /// <returns>A <see cref="KSqlDbStatement"/></returns>
-  KSqlDbStatement ToInsertStatement<T>(T entity, InsertProperties insertProperties = null);
+  KSqlDbStatement ToInsertStatement<T>(T entity, InsertProperties? insertProperties = null);
 
   /// <summary>
   /// List the defined streams.

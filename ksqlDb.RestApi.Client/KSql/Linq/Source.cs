@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 
 namespace ksqlDB.RestApi.Client.KSql.Linq;
@@ -19,7 +19,7 @@ public class Source<T> : SourceBase, ISource<T>
 
 public static class Source
 {
-  public static ISource<T> Of<T>(string fromItemName = null)
+  public static ISource<T> Of<T>(string? fromItemName = null)
   {      
     var queryStreamContext = new QueryContext
     {

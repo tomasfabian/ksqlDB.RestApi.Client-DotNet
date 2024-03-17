@@ -32,6 +32,18 @@ public class StringExtensionsTests
   }
 
   [Test]
+  public void IsNotNullOrEmpty_Null_ReturnsTrue()
+  {
+    //Arrange
+
+    //Act
+    var isNotNullOrEmpty = (null as string).IsNotNullOrEmpty();
+
+    //Assert
+    isNotNullOrEmpty.Should().BeFalse();
+  }
+
+  [Test]
   public void IsNotNullOrEmpty_TextString_ReturnsTrue()
   {
     //Arrange

@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,33 +7,33 @@ namespace ksqlDB.RestApi.Client.KSql.Query.PullQueries;
 
 internal abstract class KPullSet : KSet, IPullable
 {
-  public IPullQueryProvider Provider { get; internal set; }
-    
-  internal QueryContext QueryContext { get; set; }
+  public IPullQueryProvider Provider { get; internal set; } = null!;
+
+  internal QueryContext QueryContext { get; set; } = null!;
 }
 
 internal sealed class KPullSet<TEntity> : KPullSet, IPullable<TEntity>
 {
   private readonly IServiceScopeFactory serviceScopeFactory;
 
-  internal KPullSet(IServiceScopeFactory serviceScopeFactory, QueryContext queryContext = null)
+  internal KPullSet(IServiceScopeFactory serviceScopeFactory, QueryContext? queryContext = null)
   {
     this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
 
-    QueryContext = queryContext;
+    QueryContext = queryContext ?? new QueryContext();
 
-    Provider = new PullQueryProvider(serviceScopeFactory, queryContext);
+    Provider = new PullQueryProvider(serviceScopeFactory, QueryContext);
 
     Expression = Expression.Constant(this);
   }
 
-  internal KPullSet(IServiceScopeFactory serviceScopeFactory, Expression expression, QueryContext queryContext = null)
+  internal KPullSet(IServiceScopeFactory serviceScopeFactory, Expression expression, QueryContext? queryContext = null)
   {
     this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
 
-    QueryContext = queryContext;
+    QueryContext = queryContext ?? new QueryContext();
 
-    Provider = new PullQueryProvider(serviceScopeFactory, queryContext);
+    Provider = new PullQueryProvider(serviceScopeFactory, QueryContext);
 
     Expression = expression ?? throw new ArgumentNullException(nameof(expression));
   }
@@ -43,7 +43,7 @@ internal sealed class KPullSet<TEntity> : KPullSet, IPullable<TEntity>
   /// <summary>
   /// Pulls the first value or returns NULL from the materialized view and terminates. 
   /// </summary>
-  public ValueTask<TEntity> FirstOrDefaultAsync(CancellationToken cancellationToken = default)
+  public ValueTask<TEntity?> FirstOrDefaultAsync(CancellationToken cancellationToken = default)
   {
     var dependencies = GetDependencies();
 

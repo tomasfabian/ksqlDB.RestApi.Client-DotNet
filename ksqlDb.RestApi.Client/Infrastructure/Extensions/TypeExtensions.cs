@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
@@ -15,16 +15,17 @@ internal static class TypeExtensions
        && type.GetCustomAttributes(typeof(CompilerGeneratedAttribute), inherit: false).Length > 0
        && type.Name.Contains("AnonymousType");
 
-  internal static Type TryFindProviderAncestor(this Type type)
+  internal static Type? TryFindProviderAncestor(this Type type)
   {
-    while (type != null)
+    var rootType = type;
+    while (rootType != null)
     {
-      if (type.Name == nameof(KSet))
+      if (rootType.Name == nameof(KSet))
       {
-        return type;
+        return rootType;
       }
 
-      type = type.BaseType;
+      rootType = rootType.BaseType;
     }
 
     return null;
@@ -91,7 +92,7 @@ internal static class TypeExtensions
     return name;
   }
     
-  internal static TAttribute TryGetAttribute<TAttribute>(this MemberInfo memberInfo)
+  internal static TAttribute? TryGetAttribute<TAttribute>(this MemberInfo memberInfo)
     where TAttribute : Attribute
   {
     var attribute = memberInfo.GetCustomAttributes()

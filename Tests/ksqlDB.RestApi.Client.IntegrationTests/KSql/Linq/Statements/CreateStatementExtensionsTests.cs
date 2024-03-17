@@ -79,7 +79,7 @@ AS SELECT Id, Title, Release_Year AS ReleaseYear FROM {StreamEntityName}
 WHERE Id < 3 PARTITION BY Id EMIT CHANGES;");
 
     var responses = await httpResponseMessage.ToStatementResponsesAsync();
-    responses[0].CommandStatus.Status.Should().BeOneOf("SUCCESS", "EXECUTING");
+    responses[0].CommandStatus!.Status.Should().BeOneOf("SUCCESS", "EXECUTING");
   }
 
   private const string TableName = "IntegrationTestTable";
@@ -97,7 +97,7 @@ WHERE Id < 3 PARTITION BY Id EMIT CHANGES;");
     var response = await restApiClient.ExecuteStatementAsync(statement);
 
     int retryCount = 0;
-    while ((await KSqlDbRestApiProvider.Create().GetTablesAsync()).SelectMany(c => c.Tables).Any(c => c.Name == TableName.ToUpper()))
+    while ((await KSqlDbRestApiProvider.Create().GetTablesAsync()).SelectMany(c => c.Tables!).Any(c => c.Name == TableName.ToUpper()))
     {
       if(retryCount++ > 5)
         return;
@@ -119,6 +119,6 @@ WHERE Id < 3 PARTITION BY Id EMIT CHANGES;");
 
     var responses = await httpResponseMessage.ToStatementResponsesAsync();
 
-    responses[0].CommandStatus.Status.Should().Be("SUCCESS");
+    responses[0].CommandStatus!.Status.Should().Be("SUCCESS");
   }
 }

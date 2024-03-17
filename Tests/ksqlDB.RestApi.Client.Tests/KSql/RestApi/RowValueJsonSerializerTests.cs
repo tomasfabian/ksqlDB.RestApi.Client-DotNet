@@ -53,7 +53,7 @@ public class RowValueJsonSerializerTests : TestBase
     var rowValue = ClassUnderTest.Deserialize<SingleLady>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value.Name.Should().Be("f03c278c-61ea-4f69-b153-5647d2eec72e");
+    rowValue!.Value.Name.Should().Be("f03c278c-61ea-4f69-b153-5647d2eec72e");
   }
 
   [Test]
@@ -75,7 +75,7 @@ public class RowValueJsonSerializerTests : TestBase
     var rowValue = ClassUnderTest.Deserialize<string>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value.Should().Be("f03c278c-61ea-4f69-b153-5647d2eec72e");
+    rowValue!.Value.Should().Be("f03c278c-61ea-4f69-b153-5647d2eec72e");
   }
 
   [Test]
@@ -100,7 +100,7 @@ public class RowValueJsonSerializerTests : TestBase
     var rowValue = ClassUnderTest.Deserialize<DateTimeOffset>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value.Should().Be(dateTime);
+    rowValue!.Value.Should().Be(dateTime);
   }
 
   [Test]
@@ -124,7 +124,7 @@ public class RowValueJsonSerializerTests : TestBase
     var rowValue = ClassUnderTest.Deserialize<Dictionary<string, int>>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value["a"].Should().Be(1);
+    rowValue!.Value["a"].Should().Be(1);
   }
 
   [Test]
@@ -148,7 +148,7 @@ public class RowValueJsonSerializerTests : TestBase
     var rowValue = ClassUnderTest.Deserialize<int>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value.Should().Be(value);
+    rowValue!.Value.Should().Be(value);
   }
 
   private record MyStruct
@@ -176,7 +176,7 @@ public class RowValueJsonSerializerTests : TestBase
     var rowValue = ClassUnderTest.Deserialize<MyStruct>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value.Name.Should().Be(value);
+    rowValue!.Value.Name.Should().Be(value);
   }
 
   public class Movie : Record
@@ -205,7 +205,7 @@ public class RowValueJsonSerializerTests : TestBase
     var rowValue = ClassUnderTest.Deserialize<Movie>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value.Id.Should().Be(2);
+    rowValue!.Value.Id.Should().Be(2);
   }
 
   private enum MyEnum
@@ -227,7 +227,7 @@ public class RowValueJsonSerializerTests : TestBase
     var rowValue = ClassUnderTest.Deserialize<MyEnum>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value.Should().Be(MyEnum.All);
+    rowValue!.Value.Should().Be(MyEnum.All);
   }
 
   [Test]
@@ -250,7 +250,7 @@ public class RowValueJsonSerializerTests : TestBase
     var rowValue = ClassUnderTest.Deserialize<Guid>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value.Should().Be(guid);
+    rowValue!.Value.Should().Be(guid);
   }
 
   class Foo : Dictionary<string, int>
@@ -275,7 +275,7 @@ public class RowValueJsonSerializerTests : TestBase
     var rowValue = ClassUnderTest.Deserialize<Foo>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value["A"].Should().Be(2);
+    rowValue!.Value["A"].Should().Be(2);
   }
 
   [Test]
@@ -297,7 +297,7 @@ public class RowValueJsonSerializerTests : TestBase
     var rowValue = ClassUnderTest.Deserialize<byte[]>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value.Should().BeOfType<byte[]>();
+    rowValue!.Value.Should().BeOfType<byte[]>();
     rowValue.Value[0].Should().Be(0x7b);
     rowValue.Value[1].Should().Be(0x7d);
   }
@@ -321,7 +321,7 @@ public class RowValueJsonSerializerTests : TestBase
     var rowValue = ClassUnderTest.Deserialize<int>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value.Should().Be(1);
+    rowValue!.Value.Should().Be(1);
   }
 
   [Test]
@@ -363,7 +363,7 @@ public class RowValueJsonSerializerTests : TestBase
     var rowValue = ClassUnderTest.Deserialize<PortType>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value.Should().Be(PortType.Snowflake);
+    rowValue!.Value.Should().Be(PortType.Snowflake);
   }
 
   [Test]
@@ -387,6 +387,6 @@ public class RowValueJsonSerializerTests : TestBase
     var rowValue = ClassUnderTest.Deserialize<Port>(rawJson, jsonSerializationOptions);
 
     //Assert
-    rowValue.Value.PortType.Should().Be(PortType.Snowflake);
+    rowValue!.Value.PortType.Should().Be(PortType.Snowflake);
   }
 }

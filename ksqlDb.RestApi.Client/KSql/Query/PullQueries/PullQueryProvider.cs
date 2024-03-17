@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +10,7 @@ internal class PullQueryProvider : IPullQueryProvider
   private readonly IServiceScopeFactory serviceScopeFactory;
   private readonly QueryContext queryContext;
 
-  public PullQueryProvider(IServiceScopeFactory serviceScopeFactory, QueryContext queryContext = null)
+  public PullQueryProvider(IServiceScopeFactory serviceScopeFactory, QueryContext queryContext)
   {
     this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
     this.queryContext = queryContext;

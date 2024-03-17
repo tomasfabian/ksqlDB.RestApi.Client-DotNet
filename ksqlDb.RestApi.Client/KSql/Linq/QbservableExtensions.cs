@@ -17,7 +17,7 @@ public static class QbservableExtensions
 {
   #region Select
 
-  private static MethodInfo selectTSourceTResult;
+  private static MethodInfo? selectTSourceTResult;
 
   private static MethodInfo SelectTSourceTResult(Type source, Type result) =>
     (selectTSourceTResult ??= new Func<IQbservable<object>, Expression<Func<object, object>>, IQbservable<object>>(Select).GetMethodInfo().GetGenericMethodDefinition())
@@ -51,7 +51,7 @@ public static class QbservableExtensions
 
   #region WithOffsetResetPolicy
 
-  private static MethodInfo withOffsetResetPolicyTResult;
+  private static MethodInfo? withOffsetResetPolicyTResult;
 
   private static MethodInfo WithOffsetResetPolicyTResult(Type source) =>
     (withOffsetResetPolicyTResult ??= new Func<IQbservable<object>, AutoOffsetReset, IQbservable<object>>(WithOffsetResetPolicy).GetMethodInfo().GetGenericMethodDefinition())
@@ -78,7 +78,7 @@ public static class QbservableExtensions
 
   #region Where
 
-  private static MethodInfo whereTSource;
+  private static MethodInfo? whereTSource;
 
   private static MethodInfo WhereTSource(Type source) =>
     (whereTSource ??= new Func<IQbservable<object>, Expression<Func<object, bool>>, IQbservable<object>>(Where).GetMethodInfo().GetGenericMethodDefinition())
@@ -111,7 +111,7 @@ public static class QbservableExtensions
 
   #region Take
 
-  private static MethodInfo takeTSource;
+  private static MethodInfo? takeTSource;
 
   private static MethodInfo TakeTSource(Type source) =>
     (takeTSource ??= new Func<IQbservable<object>, int, IQbservable<object>>(Take).GetMethodInfo().GetGenericMethodDefinition())
@@ -148,9 +148,9 @@ public static class QbservableExtensions
   {
     if (source == null) throw new ArgumentNullException(nameof(source));
 
-    var kStreamSet = source as KStreamSet<TSource>;
+    var kStreamSet = (KStreamSet<TSource>)source;
 
-    var ksqlQuery = kStreamSet?.BuildKsql();
+    var ksqlQuery = kStreamSet.BuildKsql();
 
     return ksqlQuery;
   }
@@ -163,11 +163,11 @@ public static class QbservableExtensions
   {
     if (source == null) throw new ArgumentNullException(nameof(source));
 
-    var kStreamSet = source as KStreamSet<TSource>;
+    var kStreamSet = (KStreamSet<TSource>)source;
 
     var explainStatement = CreateExplainStatement(kStreamSet);
 
-    var httpClientFactory = kStreamSet?.GetHttpClientFactory();
+    var httpClientFactory = kStreamSet.GetHttpClientFactory();
 
     var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
@@ -178,7 +178,7 @@ public static class QbservableExtensions
 
   internal static string CreateExplainStatement<TSource>(KStreamSet<TSource> kStreamSet)
   {
-    var ksqlQuery = kStreamSet?.BuildKsql();
+    var ksqlQuery = kStreamSet.BuildKsql();
 
     string explainStatement = StatementTemplates.Explain($"{ksqlQuery}");
 
@@ -237,13 +237,13 @@ public static class QbservableExtensions
 
     return Observable.Defer(() =>
     {
-      var streamSet = source as KStreamSet<TSource>;
+      var streamSet = (KStreamSet<TSource>)source;
 
       var cancellationTokenSource = new CancellationTokenSource();
 
-      var observable = streamSet?.RunStreamAsObservable(cancellationTokenSource);
+      var observable = streamSet.RunStreamAsObservable(cancellationTokenSource);
 
-      return observable?.Finally(() => cancellationTokenSource.Cancel());
+      return observable.Finally(() => cancellationTokenSource.Cancel());
     });
   }
 
@@ -262,9 +262,9 @@ public static class QbservableExtensions
   {
     if (source == null) throw new ArgumentNullException(nameof(source));
 
-    var streamSet = source as KStreamSet<TSource>;
+    var streamSet = (KStreamSet<TSource>)source;
 
-    return streamSet?.RunStreamAsAsyncEnumerable();
+    return streamSet.RunStreamAsAsyncEnumerable();
   }
 
   #endregion
@@ -420,7 +420,7 @@ public static class QbservableExtensions
 
   #region GroupBy
 
-  private static MethodInfo groupByTSourceTKey;
+  private static MethodInfo? groupByTSourceTKey;
 
   private static MethodInfo GroupByTSourceTKey(Type source, Type key) =>
     (groupByTSourceTKey ??= new Func<IQbservable<object>, Expression<Func<object, object>>, IQbservable<IKSqlGrouping<object, object>>>(GroupBy).GetMethodInfo().GetGenericMethodDefinition())
@@ -447,7 +447,7 @@ public static class QbservableExtensions
     );
   }
     
-  private static MethodInfo groupByTSourceTKeyTElement3;
+  private static MethodInfo? groupByTSourceTKeyTElement3;
 
   private static MethodInfo GroupBy_TSource_TKey_TElement_3(Type source, Type key, Type element) =>
     (groupByTSourceTKeyTElement3 ??= new Func<IQbservable<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, IQbservable<IKSqlGrouping<object, object>>>(GroupBy).GetMethodInfo().GetGenericMethodDefinition())
@@ -471,10 +471,14 @@ public static class QbservableExtensions
 
   #region GroupJoin
 
+#pragma warning disable IDE0060
+  // ReSharper disable UnusedParameter.Local
   private static MethodInfo GetGroupJoinMethodInfo<T1, T2, T3, T4, T5, T6>(Func<T1, T2, T3, T4, T5, T6> f, T1 unused1, T2 unused2, T3 unused3, T4 unused4, T5 unused5)
   {
     return f.Method;
   }
+  // ReSharper enable UnusedParameter.Local
+#pragma warning restore IDE0060
 
   /// <summary>
   /// Correlates the elements of two sequences based on equality of keys and groups the results.
@@ -519,7 +523,7 @@ public static class QbservableExtensions
 
   #region DefaultIfEmpty
 
-  private static MethodInfo defaultIfEmptyTSource1;
+  private static MethodInfo? defaultIfEmptyTSource1;
 
   private static MethodInfo DefaultIfEmptyTSource1(Type source) =>
     (defaultIfEmptyTSource1 ??= new Func<IQbservable<object>, IQbservable<object>>(DefaultIfEmpty).GetMethodInfo().GetGenericMethodDefinition())
@@ -545,7 +549,7 @@ public static class QbservableExtensions
 
   #region SelectMany
 
-  private static MethodInfo selectManyTSourceTCollectionTResult3;
+  private static MethodInfo? selectManyTSourceTCollectionTResult3;
 
   private static MethodInfo SelectManyTSourceTCollectionTResult3(Type source, Type collection, Type result) =>
     (selectManyTSourceTCollectionTResult3 ??= new Func<IQbservable<object>, Expression<Func<object, IQbservable<object>>>, Expression<Func<object, object, object>>, IQbservable<object>>(SelectMany).GetMethodInfo().GetGenericMethodDefinition())
@@ -583,7 +587,7 @@ public static class QbservableExtensions
 
   #region Having
 
-  private static MethodInfo havingTSource;
+  private static MethodInfo? havingTSource;
 
   private static MethodInfo HavingTSource(Type source, Type key) =>
     (havingTSource ??= new Func<IQbservable<IKSqlGrouping<object, object>>, Expression<Func<IKSqlGrouping<object, object>, bool>>, IQbservable<IKSqlGrouping<object, object>>>(Having).GetMethodInfo().GetGenericMethodDefinition())
@@ -617,7 +621,7 @@ public static class QbservableExtensions
 
   #region WindowedBy
 
-  private static MethodInfo windowedByTSourceTKey;
+  private static MethodInfo? windowedByTSourceTKey;
 
   private static MethodInfo WindowedByTSourceTKey(Type source, Type key) =>
     (windowedByTSourceTKey ??= new Func<IQbservable<IKSqlGrouping<object, object>>, TimeWindows, IQbservable<IWindowedKSql<object, object>>>(WindowedBy).GetMethodInfo().GetGenericMethodDefinition())
@@ -646,7 +650,7 @@ public static class QbservableExtensions
 
   #region Join
 
-  private static MethodInfo joinTOuterTInnerTKeyTResult;
+  private static MethodInfo? joinTOuterTInnerTKeyTResult;
 
   private static MethodInfo JoinTOuterTInnerTKeyTResult(Type outer, Type inner, Type key, Type result) =>
     (joinTOuterTInnerTKeyTResult ??= new Func<IQbservable<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, IQbservable<object>>(Join).GetMethodInfo().GetGenericMethodDefinition())
@@ -683,7 +687,7 @@ public static class QbservableExtensions
 
   #region LeftJoin
 
-  private static MethodInfo leftJoinTOuterTInnerTKeyTResult;
+  private static MethodInfo? leftJoinTOuterTInnerTKeyTResult;
 
   private static MethodInfo LeftJoinTOuterTInnerTKeyTResult(Type outer, Type inner, Type key, Type result) =>
     (leftJoinTOuterTInnerTKeyTResult ??= new Func<IQbservable<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, IQbservable<object>>(LeftJoin).GetMethodInfo().GetGenericMethodDefinition())
@@ -720,7 +724,7 @@ public static class QbservableExtensions
 
   #region RightJoin
 
-  private static MethodInfo rightJoinTOuterTInnerTKeyTResult;
+  private static MethodInfo? rightJoinTOuterTInnerTKeyTResult;
 
   private static MethodInfo RightJoinTOuterTInnerTKeyTResult(Type outer, Type inner, Type key, Type result) =>
     (rightJoinTOuterTInnerTKeyTResult ??= new Func<IQbservable<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, IQbservable<object>>(RightJoin).GetMethodInfo().GetGenericMethodDefinition())
@@ -757,7 +761,7 @@ public static class QbservableExtensions
 
   #region FullOuterJoin
 
-  private static MethodInfo fullOuterJoinTOuterTInnerTKeyTResult;
+  private static MethodInfo? fullOuterJoinTOuterTInnerTKeyTResult;
 
   private static MethodInfo FullOuterJoinTOuterTInnerTKeyTResult(Type outer, Type inner, Type key, Type result) =>
     (fullOuterJoinTOuterTInnerTKeyTResult ??= new Func<IQbservable<object>, ISource<object>, Expression<Func<object, object>>, Expression<Func<object, object>>, Expression<Func<object, object, object>>, IQbservable<object>>(FullOuterJoin).GetMethodInfo().GetGenericMethodDefinition())

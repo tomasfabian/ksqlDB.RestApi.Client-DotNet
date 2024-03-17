@@ -1,4 +1,4 @@
-﻿using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
+using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using NUnit.Framework;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators.Asserts;
@@ -11,6 +11,6 @@ public class AssertSchemaOptionsTests
     //Arrange
 
     //Assert
-    Assert.Throws<ArgumentException>(() => new AssertSchemaOptions(null));
+    Assert.Throws<ArgumentException>(() => new AssertSchemaOptions(""));
   }
 }

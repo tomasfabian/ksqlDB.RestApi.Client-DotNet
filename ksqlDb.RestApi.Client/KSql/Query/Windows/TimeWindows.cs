@@ -27,7 +27,7 @@ public class TimeWindows
   /// <summary>
   /// Gets the grace period for the time window.
   /// </summary>
-  public Duration GracePeriod { get; private set; }
+  public Duration? GracePeriod { get; private set; }
 
   /// <summary>
   /// Gets the output refinement mode of the time window.

@@ -21,7 +21,6 @@ internal class KSqlJoinsVisitor : KSqlVisitor
   {
     this.contextOptions = contextOptions ?? throw new ArgumentNullException(nameof(contextOptions));
     this.queryContext = queryContext ?? throw new ArgumentNullException(nameof(queryContext));
-    this.QueryMetadata = queryMetadata ?? throw new ArgumentNullException(nameof(queryMetadata));
   }
 
   private readonly JoinAliasGenerator joinAliasGenerator = new();
@@ -38,7 +37,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
     return propertyInfo;
   }
 
-  internal void VisitJoinTable(IEnumerable<(MethodInfo, IEnumerable<Expression>, LambdaExpression)> joins)
+  internal void VisitJoinTable(IEnumerable<(MethodInfo, IEnumerable<Expression>, LambdaExpression?)> joins)
   {
     int i = 0;
 
@@ -52,7 +51,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
       Visit(expressions[0]);
 
-      var outerItemAlias = IdentifierUtil.Format(joinAliasGenerator.GenerateAlias(queryContext.FromItemName), QueryMetadata.IdentifierEscaping);
+      var outerItemAlias = IdentifierUtil.Format(joinAliasGenerator.GenerateAlias(queryContext.FromItemName!), QueryMetadata.IdentifierEscaping);
 
       var itemAlias = IdentifierUtil.Format(joinAliasGenerator.GenerateAlias(fromItemName), QueryMetadata.IdentifierEscaping);
 
@@ -62,7 +61,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
         outerItemAlias = IdentifierUtil.Format(prop.Name, QueryMetadata.IdentifierEscaping);
 
-        itemAlias = IdentifierUtil.Format(groupJoin.Parameters[1].Name, QueryMetadata.IdentifierEscaping);
+        itemAlias = IdentifierUtil.Format(groupJoin.Parameters[1].Name!, QueryMetadata.IdentifierEscaping);
       }
 
       var lambdaExpression = expressions[3] as LambdaExpression;
@@ -79,7 +78,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
         new KSqlVisitor(StringBuilder, QueryMetadata).Visit(body);
 
-        var fromItemAlias = QueryMetadata.Joins.Skip(i).Where(c => c.Type == QueryMetadata.FromItemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).LastOrDefault();
+        var fromItemAlias = QueryMetadata.Joins?.Skip(i).Where(c => c.Type == QueryMetadata.FromItemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).LastOrDefault();
 
         outerItemAlias = fromItemAlias ?? outerItemAlias;
 
@@ -98,7 +97,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
       var itemType = join.Item2.First().Type.GetGenericArguments()[0];
 
-      var joinItemAlias = QueryMetadata.Joins.Where(c => c.Type == itemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).FirstOrDefault();
+      var joinItemAlias = QueryMetadata.Joins?.Where(c => c.Type == itemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).FirstOrDefault();
 
       itemAlias = joinItemAlias ?? itemAlias;
 
@@ -150,9 +149,9 @@ internal class KSqlJoinsVisitor : KSqlVisitor
     return false;
   }
 
-  private void TryAppendWithin((MethodInfo, IEnumerable<Expression>, LambdaExpression) @join)
+  private void TryAppendWithin((MethodInfo, IEnumerable<Expression>, LambdaExpression?) join)
   {
-    var sourceExpression = @join.Item2.First() as ConstantExpression;
+    var sourceExpression = join.Item2.First() as ConstantExpression;
 
     if (sourceExpression?.Value is SourceBase source && (source.DurationBefore != null || source.DurationAfter != null))
     {
@@ -166,13 +165,15 @@ internal class KSqlJoinsVisitor : KSqlVisitor
       else
       {
         var duration = source.DurationBefore ?? source.DurationAfter;
-
-        Append($"{duration.Value} {duration.TimeUnit} ");
+        if (duration != null)
+        {
+          Append($"{duration.Value} {duration.TimeUnit} ");
+        }
       }
     }
   }
 
-  private string fromItemName;
+  private string fromItemName = null!;
 
   private static readonly IPluralize EnglishPluralizationService = new Pluralizer();
 
@@ -223,7 +224,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
   {
     var name = constantExpression.Type.GenericTypeArguments[0].Name;
 
-    name = source?.QueryContext?.FromItemName ?? name;
+    name = source.QueryContext.FromItemName ?? name;
 
     name = InterceptFromItemName(name);
 

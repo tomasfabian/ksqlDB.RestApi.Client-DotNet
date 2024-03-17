@@ -9,6 +9,7 @@ using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFa
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi;
 
+#nullable disable
 internal abstract class KSqlDbProvider : IKSqlDbProvider
 {
   private readonly IHttpClientFactory httpClientFactory;

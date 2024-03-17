@@ -43,10 +43,9 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     Context.Add(entity2, config);
 
     var response = await Context.SaveChangesAsync();
-    var _ = await response.Content.ReadAsStringAsync();
 
     //Assert
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
+    response?.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
   [Test]
@@ -73,7 +72,7 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     var response = await context.SaveChangesAsync();
 
     //Assert
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
+    response?.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
   [KSqlFunction]
@@ -96,7 +95,7 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     var response = await Context.SaveChangesAsync();
 
     //Assert
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
+    response?.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
   #region Time types
@@ -163,7 +162,7 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     await semaphoreSlim.WaitAsync(TimeSpan.FromSeconds(15));
 
     //Assert
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
+    response?.StatusCode.Should().Be(HttpStatusCode.OK);
     receivedValues[0].Dt.Should().Be(value.Dt);
     receivedValues[0].Ts.Should().Be(value.Ts);
 

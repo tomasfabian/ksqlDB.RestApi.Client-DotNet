@@ -7,6 +7,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Responses;
 using Microsoft.Extensions.Logging;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
+#nullable disable
 namespace ksqlDB.RestApi.Client.KSql.RestApi
 {
   internal class KSqlDbQueryStreamProvider : KSqlDbProvider

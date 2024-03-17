@@ -49,7 +49,7 @@ internal class KSqlVisitor : ExpressionVisitor
     return stringBuilder.ToString();
   }
 
-  public override Expression Visit(Expression expression)
+  public override Expression? Visit(Expression? expression)
   {
     if (expression == null)
       return null;
@@ -334,7 +334,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
   private protected bool ShouldAppendAlias(MemberInfo memberInfo, Expression expression)
   {
-    if (expression is MemberExpression me2 && me2.Member.DeclaringType.IsKsqlGrouping())
+    if (expression is MemberExpression me2 && me2.Member.DeclaringType != null && me2.Member.DeclaringType.IsKsqlGrouping())
       return false;
 
     return expression.NodeType == ExpressionType.MemberAccess && expression is MemberExpression me &&
@@ -401,7 +401,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
         var memberName = memberExpression.Member.Format(QueryMetadata.IdentifierEscaping);
 
-        var alias = IdentifierUtil.Format(((ParameterExpression)memberExpression.Expression).Name,
+        var alias = IdentifierUtil.Format(((ParameterExpression)memberExpression.Expression).Name!,
           QueryMetadata.IdentifierEscaping);
 
         Append(foundFromItem?.Alias ?? alias);
@@ -488,9 +488,9 @@ internal class KSqlVisitor : ExpressionVisitor
 
   private void AppendVisitMemberParameter(MemberExpression memberExpression)
   {
-    FromItem fromItem = null;
+    FromItem? fromItem = null;
 
-    Type type = default;
+    Type type = null!;
 
     if (memberExpression.Member is PropertyInfo propertyInfo)
       type = propertyInfo.PropertyType;
@@ -501,7 +501,7 @@ internal class KSqlVisitor : ExpressionVisitor
     {
       fromItem = TrySetFromItemAlias(memberExpression, type);
 
-      string alias = fromItem?.Alias ?? ((ParameterExpression)memberExpression.Expression)?.Name;
+      string alias = (fromItem.Alias ?? ((ParameterExpression)memberExpression.Expression!).Name)!;
       Append(alias);
       Append(".");
     }
@@ -514,7 +514,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
   private FromItem TrySetFromItemAlias(MemberExpression memberExpression, Type propertyInfo)
   {
-    var fromItem = QueryMetadata.Joins.FirstOrDefault(c => c.Type == propertyInfo);
+    var fromItem = QueryMetadata.Joins?.FirstOrDefault(c => c.Type == propertyInfo);
 
     if (fromItem != null)
       fromItem.Alias = memberExpression.Member.Name;
@@ -523,7 +523,7 @@ internal class KSqlVisitor : ExpressionVisitor
       fromItem = QueryMetadata.TrySetAlias(memberExpression, (fi, alias) => fi.Alias == alias);
     }
 
-    return fromItem;
+    return fromItem!;
   }
 
   protected void Destructure(MemberExpression memberExpression)
@@ -542,15 +542,15 @@ internal class KSqlVisitor : ExpressionVisitor
 
   internal static object ExtractMemberValue(MemberExpression memberExpression)
   {
-    var innerMember = (ConstantExpression)memberExpression.Expression;
-    var innerField = innerMember!.Value;
+    var innerMember = (ConstantExpression)memberExpression.Expression!;
+    var innerField = innerMember.Value;
 
-    object outerObj = memberExpression.Member switch
+    object outerObj = (memberExpression.Member switch
     {
       PropertyInfo propertyInfo => propertyInfo.GetValue(innerField),
       FieldInfo fieldInfo => fieldInfo.GetValue(innerField),
       _ => throw new InvalidOperationException($"Unsupported member type: {memberExpression.Member.GetType()}")
-    };
+    })!;
 
     return outerObj;
   }

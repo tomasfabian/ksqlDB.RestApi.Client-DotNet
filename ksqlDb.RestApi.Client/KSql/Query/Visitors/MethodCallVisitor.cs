@@ -21,7 +21,7 @@ internal class MethodCallVisitor : KSqlVisitor
     return new KSqlFunctionLambdaVisitor(StringBuilder, QueryMetadata);
   }
 
-  public override Expression Visit(Expression expression)
+  public override Expression? Visit(Expression? expression)
   {
     if (expression == null)
       return null;
@@ -42,7 +42,7 @@ internal class MethodCallVisitor : KSqlVisitor
 
   protected override Expression VisitParameter(ParameterExpression node)
   {
-    if(QueryMetadata.IsInNestedFunctionScope)
+    if(node.Name != null && QueryMetadata.IsInNestedFunctionScope)
       Append(node.Name);
   
     return node;

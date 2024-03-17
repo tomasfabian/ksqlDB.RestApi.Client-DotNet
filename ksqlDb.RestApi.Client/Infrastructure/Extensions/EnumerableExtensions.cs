@@ -1,10 +1,10 @@
-﻿namespace ksqlDB.RestApi.Client.Infrastructure.Extensions;
+namespace ksqlDB.RestApi.Client.Infrastructure.Extensions;
 
 internal static class EnumerableExtensions
 {
   public static bool IsOneOfFollowing<TItem>(this TItem item, params TItem[] allowedValues)
   {
-    return allowedValues.Any(c => c.Equals(item));
+    return allowedValues.Any(c => c != null && c.Equals(item));
   }
 
   public static bool IsNotOneOfFollowing<TItem>(this TItem item, params TItem[] allowedValues)

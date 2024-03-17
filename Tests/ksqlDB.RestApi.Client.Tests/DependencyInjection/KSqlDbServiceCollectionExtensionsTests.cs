@@ -36,7 +36,7 @@ public class KSqlDbServiceCollectionExtensionsTests
     var descriptor = ClassUnderTest.TryGetRegistration<IKSqlDBContext>();
         
     descriptor.Should().NotBeNull();
-    descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
+    descriptor!.Lifetime.Should().Be(ServiceLifetime.Scoped);
   }
 
   [Test]
@@ -54,7 +54,7 @@ public class KSqlDbServiceCollectionExtensionsTests
     var descriptor = ClassUnderTest.TryGetRegistration<IKSqlDBContext>();
         
     descriptor.Should().NotBeNull();
-    descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
+    descriptor!.Lifetime.Should().Be(ServiceLifetime.Scoped);
   }
 
   [Test]
@@ -86,7 +86,7 @@ public class KSqlDbServiceCollectionExtensionsTests
     var descriptor = ClassUnderTest.TryGetRegistration<IKSqlDbRestApiClient>();
         
     descriptor.Should().NotBeNull();
-    descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
+    descriptor!.Lifetime.Should().Be(ServiceLifetime.Scoped);
   }
 
   [Test]
@@ -114,7 +114,7 @@ public class KSqlDbServiceCollectionExtensionsTests
     var descriptor = ClassUnderTest.TryGetRegistration<IHttpClientFactory>();
         
     descriptor.Should().NotBeNull();
-    descriptor.Lifetime.Should().Be(ServiceLifetime.Transient);
+    descriptor!.Lifetime.Should().Be(ServiceLifetime.Transient);
   }
 
   [Test]
@@ -129,7 +129,7 @@ public class KSqlDbServiceCollectionExtensionsTests
     var descriptor = ClassUnderTest.TryGetRegistration<KSqlDBContextOptions>();
         
     descriptor.Should().NotBeNull();
-    descriptor.Lifetime.Should().Be(ServiceLifetime.Singleton);
+    descriptor!.Lifetime.Should().Be(ServiceLifetime.Singleton);
   }
 
   [Test]
@@ -185,7 +185,7 @@ public class KSqlDbServiceCollectionExtensionsTests
 
     //Assert
     descriptor.Should().NotBeNull();
-    descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
+    descriptor!.Lifetime.Should().Be(ServiceLifetime.Scoped);
   }
     
   [Test]
@@ -203,7 +203,7 @@ public class KSqlDbServiceCollectionExtensionsTests
     var descriptor = ClassUnderTest.TryGetRegistration<KSqlDBContext>();
 
     descriptor.Should().NotBeNull();
-    descriptor.Lifetime.Should().Be(ServiceLifetime.Transient);
+    descriptor!.Lifetime.Should().Be(ServiceLifetime.Transient);
   }
 
 
@@ -218,7 +218,7 @@ public class KSqlDbServiceCollectionExtensionsTests
 
     //Assert
     descriptor.Should().NotBeNull();
-    descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
+    descriptor!.Lifetime.Should().Be(ServiceLifetime.Scoped);
   }
 
   [Test]
@@ -236,7 +236,7 @@ public class KSqlDbServiceCollectionExtensionsTests
     var descriptor = ClassUnderTest.TryGetRegistration<IKSqlDbRestApiClient>();
 
     descriptor.Should().NotBeNull();
-    descriptor.Lifetime.Should().Be(ServiceLifetime.Transient);
+    descriptor!.Lifetime.Should().Be(ServiceLifetime.Transient);
   }
     
   #endregion
@@ -253,7 +253,7 @@ public class KSqlDbServiceCollectionExtensionsTests
     Assert.Throws<InvalidOperationException>(() =>
     {
       //Act
-      var context = ClassUnderTest.BuildServiceProvider().GetRequiredService<IKSqlDBContext>();
+      ClassUnderTest.BuildServiceProvider().GetRequiredService<IKSqlDBContext>();
     });
   }
 
@@ -315,7 +315,7 @@ public class KSqlDbServiceCollectionExtensionsTests
 
     //Assert
     descriptor.Should().NotBeNull();
-    descriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
+    descriptor!.Lifetime.Should().Be(ServiceLifetime.Scoped);
   }
 
   #endregion

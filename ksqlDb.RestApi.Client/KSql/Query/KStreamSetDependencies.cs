@@ -1,4 +1,4 @@
-﻿using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
@@ -7,10 +7,10 @@ namespace ksqlDB.RestApi.Client.KSql.Query;
 
 internal class KStreamSetDependencies : IKStreamSetDependencies
 {
-  public KStreamSetDependencies(IKSqlQbservableProvider provider, IKSqlDbProvider ksqlDBProvider, IKSqlQueryGenerator queryGenerator, IKSqlDbParameters queryStreamParameters)
+  public KStreamSetDependencies(IKSqlQbservableProvider provider, IKSqlDbProvider ksqlDbProvider, IKSqlQueryGenerator queryGenerator, IKSqlDbParameters queryStreamParameters)
   {
     Provider = provider;
-    KsqlDBProvider = ksqlDBProvider;
+    KsqlDBProvider = ksqlDbProvider;
     KSqlQueryGenerator = queryGenerator;
     QueryStreamParameters = queryStreamParameters;
 

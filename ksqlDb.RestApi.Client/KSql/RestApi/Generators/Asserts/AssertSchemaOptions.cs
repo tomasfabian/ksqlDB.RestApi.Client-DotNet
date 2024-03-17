@@ -1,4 +1,4 @@
-﻿using ksqlDB.RestApi.Client.KSql.Query.Windows;
+using ksqlDB.RestApi.Client.KSql.Query.Windows;
 
 namespace ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 
@@ -17,5 +17,5 @@ public record AssertSchemaOptions
   
   public int? Id { get; }
 
-  public Duration Timeout { get; set; }
+  public Duration? Timeout { get; set; }
 }

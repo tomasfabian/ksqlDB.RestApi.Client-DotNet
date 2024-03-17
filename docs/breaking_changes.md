@@ -4,7 +4,8 @@
 - `TypeProperties` - removed generic type argument and added a base type `EntityProperties`. Additionally, changed from a class to a record type.
 - the above change affected the argument for the `IKSqlDbRestApiClient.CreateTypeAsync<T>(TypeProperties typeProperties)`
 - `IEntityCreationProperties` was replaced with `IEntityProperties`
-- ksqlDB types are no longer **automatically capitalized**
+- `ksqlDB` types are no longer **automatically capitalized** in `CREATE TYPE` statements
+- enabled nullable reference types in `ksqlDb.RestApi.Client` project
 
 Updated package references:
 ```xml

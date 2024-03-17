@@ -64,7 +64,7 @@ public class KSqlDbTests
     var elasticSearchEvent = await classUnderTest.GetByIdAsync(42);
 
     //Assert
-    elasticSearchEvent.Key.Should().Be(42);
+    elasticSearchEvent?.Key.Should().Be(42);
   }
 
   internal static async IAsyncEnumerable<ElasticSearchEvent> ElasticSearchEventsSource()
@@ -113,7 +113,7 @@ public class KSqlDbTests
 
 public interface IKSqlDb
 {
-  Task<ElasticSearchEvent> GetByIdAsync(int id);
+  Task<ElasticSearchEvent?> GetByIdAsync(int id);
   IQbservable<ElasticSearchEvent> CreateElasticSearchEventQuery();
 }
 
@@ -126,7 +126,7 @@ class KSqlDb : IKSqlDb
     this.context = context;
   }
 
-  public async Task<ElasticSearchEvent> GetByIdAsync(int id)
+  public async Task<ElasticSearchEvent?> GetByIdAsync(int id)
   {
     var response = await context.CreatePullQuery<ElasticSearchEvent>("EventTopic")
       .Where(c => c.Key == id)

@@ -16,7 +16,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
     {
     }
 
-    public override Expression Visit(Expression expression)
+    public override Expression? Visit(Expression? expression)
     {
       if (expression == null)
         return null;
@@ -49,7 +49,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
       {
         Append(enumerable);
       }
-      else if (value != null && (type.IsClass || type.IsStruct() || type.IsDictionary()))
+      else if (value != null && type != null && (type.IsClass || type.IsStruct() || type.IsDictionary()))
       {
         var ksqlValue = new CreateKSqlValue().ExtractValue(value, null, null, type, str => IdentifierUtil.Format(str, QueryMetadata.IdentifierEscaping));
 

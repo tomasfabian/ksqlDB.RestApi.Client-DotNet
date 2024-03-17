@@ -15,7 +15,7 @@ internal class LambdaVisitor : KSqlVisitor
     return new KSqlFunctionLambdaVisitor(StringBuilder, QueryMetadata);
   }
 
-  public override Expression Visit(Expression expression)
+  public override Expression? Visit(Expression? expression)
   {
     if (expression == null)
       return null;
@@ -44,7 +44,8 @@ internal class LambdaVisitor : KSqlVisitor
 
   protected override Expression VisitParameter(ParameterExpression node)
   {
-    Append(node.Name);
+    if (node.Name != null)
+      Append(node.Name);
 
     return base.VisitParameter(node);
   }
@@ -102,7 +103,7 @@ internal class LambdaVisitor : KSqlVisitor
       else
         Append(", ");
 
-      Append(parameterExpression.Name);
+      Append(parameterExpression.Name!);
     }
       
     Append(") => ");
