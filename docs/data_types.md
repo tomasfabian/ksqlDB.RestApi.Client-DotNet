@@ -222,9 +222,8 @@ public record LinkCreated
 }
 ```
 ```C#
-EntityCreationMetadata metadata = new()
+EntityCreationMetadata metadata = new(kafkaTopic: "MyGuids")
 {
-  KafkaTopic = "MyGuids",
   ValueFormat = SerializationFormats.Json,
   Partitions = 1,
   Replicas = 1

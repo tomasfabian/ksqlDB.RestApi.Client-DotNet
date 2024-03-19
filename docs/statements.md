@@ -294,10 +294,8 @@ Both streams and tables in `ksqlDB` are treated as **entities** that can be crea
 **VALUE_SCHEMA_ID** - The schema ID of the value schema in Schema Registry. The schema is used for schema inference and data serialization.
 
 ```C#
-EntityCreationMetadata metadata = new()
+EntityCreationMetadata metadata = new(kafkaTopic: "tweets", partitions: 3)
 {
-  KafkaTopic = "tweets",
-  Partitions = 1,
   Replicas = 3,
   KeySchemaId = 1,
   ValueSchemaId = 2
@@ -307,7 +305,7 @@ EntityCreationMetadata metadata = new()
 Generated KSQL statement:
 
 ```
- WITH ( KAFKA_TOPIC='tweets', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='3', KEY_SCHEMA_ID=1, VALUE_SCHEMA_ID=2 )
+ WITH ( KAFKA_TOPIC='tweets', VALUE_FORMAT='Json', PARTITIONS='3', REPLICAS='3', KEY_SCHEMA_ID=1, VALUE_SCHEMA_ID=2 )
 ```
 
 **Schema Registry** is a centralized service that provides a repository for storing and managing schemas for data **serialized** in Apache Kafka. It ensures data compatibility and consistency by enforcing schema evolution rules. When data is **produced** or **consumed** from Kafka topics, the Schema Registry is used to validate and ensure that the data adheres to the defined schema. It allows for schema evolution, versioning, and compatibility checks between producers and consumers.
@@ -352,9 +350,8 @@ internal record Data
 ```
 
 ```C#
-var creationMetadata = new EntityCreationMetadata()
+var creationMetadata = new EntityCreationMetadata(kafkaTopic: "data_values")
 {
-  KafkaTopic = "data_values",
   Partitions = 1,
   Replicas = 1,
 };
@@ -605,7 +602,7 @@ Drop table {nameof(Event)};
 "));
 
   httpResponseMessage = await restApiClient.CreateTypeAsync<EventCategory>();
-  var metadata = new EntityCreationMetadata { KafkaTopic = "Events", Partitions = 1 };
+  var metadata = new EntityCreationMetadata(kafkaTopic: "Events") { Partitions = 1 };
   httpResponseMessage = await restApiClient.CreateTableAsync<Event>(metadata);
       
   await using var ksqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(ksqlDbUrl));
@@ -1120,9 +1117,8 @@ SELECT Title, Release_Year AS ReleaseYear
 - [CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/) - fluent API
 
 ```C#
-EntityCreationMetadata metadata = new()
+EntityCreationMetadata metadata = new(kafkaTopic: nameof(MyMovies))
 {
-  KafkaTopic = nameof(MyMovies),
   Partitions = 1,
   Replicas = 1
 };
@@ -1169,9 +1165,8 @@ var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MyMovie
 - [CREATE TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table/) - fluent API
 
 ```C#
-EntityCreationMetadata metadata = new()
+EntityCreationMetadata metadata = new(kafkaTopic: nameof(MyMovies))
 {
-  KafkaTopic = nameof(MyMovies),
   Partitions = 2,
   Replicas = 3
 };

@@ -43,9 +43,8 @@ private static async Task CreateUsersStreamAsync()
 
   var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
-  var metadata = new EntityCreationMetadata
+  var metadata = new EntityCreationMetadata(kafkaTopic: "my_topic")
   {
-    KafkaTopic = "my_topic",
     ValueFormat = SerializationFormats.Json
   };
 
@@ -112,9 +111,8 @@ private static async Task CreateMessagesTableAsync()
 
   var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
-  var metadata = new EntityCreationMetadata
+  var metadata = new EntityCreationMetadata(kafkaTopic: "my_topic")
   {
-    KafkaTopic = "my_topic",
     ValueFormat = SerializationFormats.Json
   };
 

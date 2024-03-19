@@ -68,9 +68,8 @@ SELECT o.OrderId AS orderId, s.Id AS shipmentId, p.Id AS paymentId
 Creation of entities for the above mentioned query:
 
 ```C#
-var entityCreationMetadata = new EntityCreationMetadata
+var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Order) + "-Join")
                              {
-                               KafkaTopic = nameof(Order) + "-Join",
                                Partitions = 1
                              };
 

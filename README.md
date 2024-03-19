@@ -84,9 +84,8 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.Api.Client.Samples.Models;
 
-EntityCreationMetadata metadata = new()
+EntityCreationMetadata metadata = new(kafkaTopic: nameof(Tweet))
 {
-  KafkaTopic = nameof(Tweet),
   Partitions = 3,
   Replicas = 3
 };
