@@ -8,7 +8,7 @@ using Sensors;
 
 var schemaRegistryConfig = new SchemaRegistryConfig
 {
-  Url = @"http://localhost:8081"
+  Url = "http://localhost:8081"
 };
 
 using var schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryConfig);
@@ -23,7 +23,7 @@ var latestSchema = await schemaRegistry.GetLatestSchemaAsync(subject);
 
 Console.WriteLine($"Latest schema: {latestSchema}");
 
-var ksqlDbUrl = @"http://localhost:8088";
+var ksqlDbUrl = "http://localhost:8088";
 
 var httpClient = new HttpClient()
 {
@@ -33,10 +33,9 @@ var httpClient = new HttpClient()
 var httpClientFactory = new ksqlDB.RestApi.Client.KSql.RestApi.Http.HttpClientFactory(httpClient);
 var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
-EntityCreationMetadata metadata = new()
+EntityCreationMetadata metadata = new("IoTSensors")
 {
   EntityName = "avroSensors",
-  KafkaTopic = "IoTSensors",
   ValueFormat = SerializationFormats.Avro,
   Partitions = 1,
   Replicas = 1

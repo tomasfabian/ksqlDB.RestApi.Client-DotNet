@@ -8,7 +8,7 @@ It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/
 
 Install with **NuGet** package manager:
 ```
-Install-Package ksqlDB.RestApi.Client
+Install-Package ksqlDb.RestApi.Client
 ```
 or with .NET CLI
 ```

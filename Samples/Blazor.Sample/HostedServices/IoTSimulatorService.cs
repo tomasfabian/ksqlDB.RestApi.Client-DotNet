@@ -50,9 +50,8 @@ public class IoTSimulatorService : IHostedService
 
   private async Task<HttpResponseMessage> TryCreateStreamAsync(CancellationToken cancellationToken)
   {
-    EntityCreationMetadata metadata = new()
+    EntityCreationMetadata metadata = new(TopicNames.IotSensors)
     {
-      KafkaTopic = TopicNames.IotSensors,
       Partitions = 1,
       Replicas = 1
     };

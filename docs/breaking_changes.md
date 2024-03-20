@@ -5,6 +5,7 @@
 - the above change affected the argument for the `IKSqlDbRestApiClient.CreateTypeAsync<T>(TypeProperties typeProperties)`
 - `IEntityCreationProperties` was replaced with `IEntityProperties`
 - `ksqlDB` types are no longer **automatically capitalized** in `CREATE TYPE` statements
+- removed parameterless constructor for `EntityCreationMetadata`. The Kafka topic is a mandatory field.
 - enabled nullable reference types in `ksqlDb.RestApi.Client` project
 
 Updated package references:

@@ -100,17 +100,16 @@ public partial class SqlServerComponent : IDisposable
     }
   }
 
-  private bool useKsqlDbTypes = true;
+  private readonly bool useKsqlDbTypes = true;
 
   private async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationToken = default)
   {
     string fromName = "sqlserversensors";
     string kafkaTopic = "sqlserver2019.dbo.Sensors";
 
-    EntityCreationMetadata metadata = new()
+    EntityCreationMetadata metadata = new(kafkaTopic)
     {
       EntityName = fromName,
-      KafkaTopic = kafkaTopic,
       ValueFormat = SerializationFormats.Json,
       Partitions = 1,
       Replicas = 1
@@ -371,5 +370,6 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
   public void Dispose()
   {
     cdcSubscription?.Dispose();
+    GC.SuppressFinalize(this);
   }
 }

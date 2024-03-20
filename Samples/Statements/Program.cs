@@ -35,7 +35,7 @@ Drop table {nameof(Event)};
 "));
 
   httpResponseMessage = await restApiClient.CreateTypeAsync<EventCategory>();
-  httpResponseMessage = await restApiClient.CreateTableAsync<Event>(new EntityCreationMetadata { KafkaTopic = "Events", Partitions = 1 });
+  httpResponseMessage = await restApiClient.CreateTableAsync<Event>(new EntityCreationMetadata("Events") { Partitions = 1 });
 
   var eventCategory = new EventCategory
   {
@@ -105,9 +105,8 @@ static async Task CreateTypeWithSessionVariableAsync(IKSqlDbRestApiClient restAp
 
 static async Task CreateStreamAsync(IKSqlDbRestApiClient restApiClient)
 {
-  EntityCreationMetadata metadata = new()
+  EntityCreationMetadata metadata = new(kafkaTopic: nameof(Event))
   {
-    KafkaTopic = nameof(Event),
     Partitions = 1,
     Replicas = 1
   };

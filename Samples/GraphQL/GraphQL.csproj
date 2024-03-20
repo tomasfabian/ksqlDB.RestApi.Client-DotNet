@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="HotChocolate.AspNetCore" Version="13.8.1" />
     <PackageReference Include="HotChocolate.Data" Version="13.8.1" />
-    <PackageReference Include="ksqlDb.RestApi.Client" Version="3.5.0" />
+    <PackageReference Include="ksqlDb.RestApi.Client" Version="4.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
   </ItemGroup>
 </Project>

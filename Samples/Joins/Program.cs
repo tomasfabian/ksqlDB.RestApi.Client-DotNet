@@ -9,7 +9,7 @@ using ksqlDb.RestApi.Client.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Joins.Model.Orders;
 
-const string ksqlDbUrl = @"http://localhost:8088";
+const string ksqlDbUrl = "http://localhost:8088";
 
 await using var context = new KSqlDBContext(ksqlDbUrl);
 
@@ -26,9 +26,8 @@ const string postfix = "-Join";
 
 async Task SubscribeAsync(IKSqlDbRestApiClient restApiClient)
 {
-  var entityCreationMetadata = new EntityCreationMetadata
+  var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Order) + postfix)
   {
-    KafkaTopic = nameof(Order) + postfix,
     Partitions = 1
   };
 

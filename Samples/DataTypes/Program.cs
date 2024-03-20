@@ -128,9 +128,8 @@ static async Task DeeplyNestedTypes(KSqlDBContext context)
 
 static async Task TimeTypes(IKSqlDbRestApiClient restApiClient, IKSqlDBContext context)
 {
-  EntityCreationMetadata metadata = new EntityCreationMetadata
+  EntityCreationMetadata metadata = new EntityCreationMetadata(nameof(Dates))
   {
-    KafkaTopic = nameof(Dates),
     Partitions = 1,
     Replicas = 1,
     ValueFormat = SerializationFormats.Json
@@ -185,7 +184,7 @@ Drop table {nameof(Event)};
 "));
 
   httpResponseMessage = await restApiClient.CreateTypeAsync<EventCategory>();
-  httpResponseMessage = await restApiClient.CreateTableAsync<Event>(new EntityCreationMetadata { KafkaTopic = "Events", Partitions = 1 });
+  httpResponseMessage = await restApiClient.CreateTableAsync<Event>(new EntityCreationMetadata("Events") { Partitions = 1 });
 
   var subscription = ksqlDbContext.CreateQueryStream<Event>()
     .Subscribe(value =>

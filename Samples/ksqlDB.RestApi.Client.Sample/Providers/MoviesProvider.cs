@@ -35,8 +35,9 @@ public class MoviesProvider(IKSqlDbRestApiProvider restApiProvider)
 
   public async Task<bool> CreateTablesAsync(CancellationToken cancellationToken = default)
   {
-    EntityCreationMetadata metadata = new(MoviesTableName, 1)
+    EntityCreationMetadata metadata = new (MoviesTableName)
     {
+      Partitions = 1,
       Replicas = 1,
       ValueFormat = SerializationFormats.Json
     };

@@ -93,7 +93,7 @@ public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     return ConnectToTopic(timeout, cancellationTokenSource.Token);
   }
 
-  private CancellationTokenSource? linkedCts;
+  private CancellationTokenSource linkedCts;
 
   public async IAsyncEnumerable<ConsumeResult<TKey, TValue>> ConnectToTopicAsync(TimeSpan? timeout, [EnumeratorCancellation] CancellationToken cancellationToken = default)
   {

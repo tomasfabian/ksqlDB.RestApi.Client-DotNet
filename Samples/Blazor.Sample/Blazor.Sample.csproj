@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ksqlDb.RestApi.Client" Version="3.4.0" />
+		<PackageReference Include="ksqlDb.RestApi.Client" Version="4.0.0" />
 		<PackageReference Include="SqlServer.Connector" Version="1.0.0" />
 	</ItemGroup>
 
