@@ -3,10 +3,8 @@ using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
-using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDb.RestApi.Client.Tests.Models;
 using ksqlDb.RestApi.Client.Tests.Models.Sensors;
-using Moq;
 using NUnit.Framework;
 using UnitTests;
 using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
@@ -216,6 +214,28 @@ WHERE SensorId = '{sensorId}' AND (WINDOWSTART > '{windowStart}') AND (WINDOWEND
     //Act
     var ksql = dbContext.CreatePullQuery<JsonPropertyNameTestData>()
       .Select(c => new { c.RowTime, Prop = c.SubProperty })
+      .ToQueryString();
+
+    //Assert
+    return ksql.ReplaceLineEndings();
+  }
+
+  [TestCase(Never, ExpectedResult = @$"SELECT prop FROM {nameof(SubProperty)}
+WHERE prop = 'test';")]
+  [TestCase(Keywords, ExpectedResult = @$"SELECT prop FROM {nameof(SubProperty)}
+WHERE prop = 'test';")]
+  [TestCase(Always, ExpectedResult = @$"SELECT `prop` FROM `{nameof(SubProperty)}`
+WHERE `prop` = 'test';")]
+  public string SelectColumnsUsingPullQueryThatHaveJsonPropertyNameAndWhere(IdentifierEscaping escaping)
+  {
+    //Arrange
+    var dbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
+      {IdentifierEscaping = escaping, ShouldPluralizeFromItemName = false});
+
+    //Act
+    var ksql = dbContext.CreatePullQuery<SubProperty>()
+      .Select(c => new {c.Property})
+      .Where(c => c.Property == "test")
       .ToQueryString();
 
     //Assert
