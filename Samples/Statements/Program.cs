@@ -11,7 +11,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Topics;
 using Statements.Model;
 using Statements.Model.Events;
 
-const string ksqlDbUrl = @"http://localhost:8088";
+const string ksqlDbUrl = "http://localhost:8088";
 
 var servicesCollection = new ServiceCollection();
 servicesCollection.ConfigureKSqlDb(ksqlDbUrl);
@@ -45,7 +45,7 @@ Drop table {nameof(Event)};
   var testEvent = new Event
   {
     Id = 42,
-    Places = new[] { "Place1", "Place2", "Place3" },
+    Places = ["Place1", "Place2", "Place3"],
   };
 
   httpResponseMessage = await restApiClient.InsertIntoAsync(testEvent);
@@ -96,9 +96,9 @@ Drop type Address;
 static async Task CreateTypeWithSessionVariableAsync(IKSqlDbRestApiClient restApiClient)
 {
   var statement = new KSqlDbStatement("CREATE TYPE ${typeName} AS STRUCT<name VARCHAR, address ADDRESS>;")
-  {
-    SessionVariables = { { "typeName", "FromSessionValue" } }
-  };
+    {
+      SessionVariables = new Dictionary<string, object> {{"typeName", "FromSessionValue"}}
+    };
 
   var httpResponseMessage = await restApiClient.ExecuteStatementAsync(statement);
 }
@@ -125,7 +125,7 @@ static async Task GetKsqlDbInformationAsync(IKSqlDbRestApiClient restApiProvider
 {
   Console.WriteLine($"{Environment.NewLine}Available topics:");
   var topicsResponses = await restApiProvider.GetTopicsAsync();
-  Console.WriteLine(string.Join(',', topicsResponses[0].Topics.Select(c => c.Name)));
+  Console.WriteLine(string.Join(',', topicsResponses[0].Topics!.Select(c => c.Name)));
 
   TopicsResponse[] allTopicsResponses = await restApiProvider.GetAllTopicsAsync();
   TopicsExtendedResponse[] topicsExtendedResponses = await restApiProvider.GetTopicsExtendedAsync();
@@ -133,15 +133,15 @@ static async Task GetKsqlDbInformationAsync(IKSqlDbRestApiClient restApiProvider
 
   Console.WriteLine($"{Environment.NewLine}Available tables:");
   var tablesResponse = await restApiProvider.GetTablesAsync();
-  Console.WriteLine(string.Join(',', tablesResponse[0].Tables.Select(c => c.Name)));
+  Console.WriteLine(string.Join(',', tablesResponse[0].Tables!.Select(c => c.Name)));
 
   Console.WriteLine($"{Environment.NewLine}Available streams:");
   var streamsResponse = await restApiProvider.GetStreamsAsync();
-  Console.WriteLine(string.Join(',', streamsResponse[0].Streams.Select(c => c.Name)));
+  Console.WriteLine(string.Join(',', streamsResponse[0].Streams!.Select(c => c.Name)));
 
   Console.WriteLine($"{Environment.NewLine}Available connectors:");
   var connectorsResponse = await restApiProvider.GetConnectorsAsync();
-  Console.WriteLine(string.Join(',', connectorsResponse[0].Connectors.Select(c => c.Name)));
+  Console.WriteLine(string.Join(',', connectorsResponse[0].Connectors!.Select(c => c.Name)));
 }
 
 static async Task TerminatePushQueryAsync(IKSqlDBContext context, IKSqlDbRestApiClient restApiClient)
@@ -150,6 +150,9 @@ static async Task TerminatePushQueryAsync(IKSqlDBContext context, IKSqlDbRestApi
     .SubscribeOn(ThreadPoolScheduler.Instance)
     .SubscribeAsync(onNext: _ => { }, onError: e => { }, onCompleted: () => { });
 
+  if(subscription.QueryId == null)
+    return;
+
   var response = await restApiClient.TerminatePushQueryAsync(subscription.QueryId);
 }
 
@@ -157,9 +160,11 @@ static async Task TerminatePersistentQueryAsync(IKSqlDbRestApiClient restApiClie
 {
   string topicName = "moviesByTitle";
 
-  var queries = await restApiClient.GetQueriesAsync();
+  var queriesResponses = await restApiClient.GetQueriesAsync();
 
-  var query = queries.SelectMany(c => c.Queries).FirstOrDefault(c => c.SinkKafkaTopics.Contains(topicName));
+  var query = queriesResponses.Where(c => c.Queries != null)
+    .SelectMany(c => c.Queries!)
+    .FirstOrDefault(c => c.SinkKafkaTopics.Contains(topicName));
 
   if (query == null)
     return;

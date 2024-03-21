@@ -47,7 +47,7 @@ app.UseWebSockets();
 
 app.Run();
 
-IConfiguration Configuration()
+static IConfiguration Configuration()
 {
   return new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)

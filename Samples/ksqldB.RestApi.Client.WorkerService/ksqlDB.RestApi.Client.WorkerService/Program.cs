@@ -24,7 +24,7 @@ IHost host = Host.CreateDefaultBuilder(args)
 
 await host.RunAsync();
 
-IConfiguration Configuration()
+static IConfiguration Configuration()
 {
   return new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
