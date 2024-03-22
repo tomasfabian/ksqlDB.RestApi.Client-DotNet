@@ -1,5 +1,8 @@
 # ksqlDB.RestApi.Client
 
+# 4.0.1
+- fixes LINQ Where ignores `JsonPropertyNameAttribute` when using new for column selection, causing failing ksqldb request. #68
+
 # 4.0.0
 - introduced new overloads for dropping entities: `DropTableAsync`, `DropTypeAsync`, and `DropStreamAsync` in `KSqlDbRestApiClient`. These overloads now accept an argument `DropFromItemProperties`, providing more flexibility in configuring the drop operations.
 - extracted `IKSqlDbDropRestApiClient` and `IKSqlDbCreateRestApiClient` interfaces from `IKSqlDbRestApiClient`

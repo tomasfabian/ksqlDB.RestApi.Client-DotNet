@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using ksqlDb.RestApi.Client.KSql.Entities;
+using ksqlDb.RestApi.Client.KSql.Metadata;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 
@@ -7,7 +8,9 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
 
 internal sealed record KSqlQueryMetadata
 {
-  public Type? FromItemType { get; set; }
+  internal EntityMetadata EntityMetadata { get; } = new();
+
+  public Type FromItemType => EntityMetadata.Type;
 
   public FromItem[]? Joins { get; set; }
 

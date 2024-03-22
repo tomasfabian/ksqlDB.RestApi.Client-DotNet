@@ -378,6 +378,7 @@ internal class KSqlVisitor : ExpressionVisitor
         break;
       case MemberExpression me2 when me2.Member.GetCustomAttribute<JsonPropertyNameAttribute>() != null ||
                                      me2.Member.GetCustomAttribute<PseudoColumnAttribute>() != null:
+        QueryMetadata.EntityMetadata.Add(me2.Member);
         Append(me2.Member.Format(QueryMetadata.IdentifierEscaping));
         break;
       case MemberExpression { Expression.NodeType: ExpressionType.Constant }:
@@ -508,7 +509,8 @@ internal class KSqlVisitor : ExpressionVisitor
 
     if (type != fromItem?.Type)
     {
-      Append(memberExpression.Member.Format(QueryMetadata.IdentifierEscaping));
+      var memberInfo = QueryMetadata.EntityMetadata.TryGetMemberInfo(memberExpression.Member.Name) ?? memberExpression.Member;
+      Append(memberInfo.Format(QueryMetadata.IdentifierEscaping));
     }
   }
 

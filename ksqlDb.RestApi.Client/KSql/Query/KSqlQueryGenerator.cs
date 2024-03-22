@@ -47,7 +47,7 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
 
     queryContext.AutoOffsetReset = autoOffsetReset;
 
-    queryMetadata.FromItemType = fromItemType;
+    queryMetadata.EntityMetadata.Type = fromItemType;
 
     if (joins is {Count: > 0})
     {
