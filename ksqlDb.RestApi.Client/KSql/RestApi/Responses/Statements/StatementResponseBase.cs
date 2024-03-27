@@ -12,7 +12,13 @@ public record StatementResponseBase
   [JsonPropertyName("@type")]
   public string Type { get; set; } = null!;
 
+  /// <summary>
+  /// The SQL statement whose result is being returned.
+  /// </summary>
   public string? StatementText { get; set; }
-    
+
+  /// <summary>
+  /// A list of warnings about conditions that may be unexpected by the user, but don't result in failure to execute the statement.
+  /// </summary>
   public string[]? Warnings { get; set; }
 }
