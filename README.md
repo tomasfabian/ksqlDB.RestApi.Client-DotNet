@@ -223,15 +223,39 @@ IHost host = Host.CreateDefaultBuilder(args)
 await host.RunAsync();
 ```
 
-# Setting query parameters
-Default settings:
-'auto.offset.reset' is set to 'earliest' by default.
-New parameters could be added or existing ones changed in the following manner:
-```C#
-var contextOptions = new KSqlDBContextOptions(@"http://localhost:8088");
+# KSqlDbContextOptions builder
+To modify parameters or introduce new ones, utilize the following approach:
 
-contextOptions.QueryStreamParameters["auto.offset.reset"] = "latest";
+```C#
+var contextOptions = new KSqlDbContextOptionsBuilder()
+  .UseKSqlDb("http://localhost:8088)
+  .SetBasicAuthCredentials("fred", "flinstone")
+  .SetJsonSerializerOptions(jsonOptions =>
+  {
+    jsonOptions.IgnoreReadOnlyFields = true;
+  })
+  .SetAutoOffsetReset(AutoOffsetReset.Latest)
+  .SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce)
+  .SetIdentifierEscaping(IdentifierEscaping.Keywords)
+  .SetupQueryStream(options =>
+  {
+    //SetupQueryStream affects only IKSqlDBContext.CreateQueryStream<T>
+    options.Properties["ksql.query.push.v2.enabled"] = "true";
+  })
+  .Options;
 ```
+
+This code initializes a `KSqlDbContextOptionsBuilder` to configure settings for a `ksqlDB` context. Here's a breakdown of the configurations:
+
+- `UseKSqlDb("http://localhost:8088")`: Specifies the **URL** of the `ksqlDB` server.
+- `SetBasicAuthCredentials("fred", "flinstone")`: Sets the basic authentication credentials (username and password) for accessing the `ksqlDB` server.
+- `SetJsonSerializerOptions(jsonOptions => { ... })`: Configures JSON serialization options, such as ignoring read-only fields.
+- `SetAutoOffsetReset(AutoOffsetReset.Latest)`: Sets the offset reset behavior to start consuming messages from the **latest** available when no committed offset is found. By default, 'auto.offset.reset' is configured to 'earliest'.
+- `SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce)`: Specifies the processing guarantee as **exactly-once** semantics.
+- `SetIdentifierEscaping(IdentifierEscaping.Keywords)`: Escapes identifiers such as table and column names that are SQL keywords.
+- `SetupQueryStream(options => { ... })`: Configures query stream options, specifically enabling KSQL query push version 2.
+
+Finally, `.Options` returns the configured options for the `ksqlDB` context.
 
 ### Overriding stream names
 Stream names are generated based on the generic record types. They are pluralized with Pluralize.NET package.
