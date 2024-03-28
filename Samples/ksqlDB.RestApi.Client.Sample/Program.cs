@@ -32,6 +32,8 @@ using HttpClientFactory = ksqlDB.RestApi.Client.Samples.Http.HttpClientFactory;
 
 namespace ksqlDB.RestApi.Client.Samples;
 
+// ReSharper disable UnusedMember.Local
+// ReSharper disable UnusedVariable
 public static class Program
 {
   public static KSqlDBContextOptions CreateQueryStreamOptions(string ksqlDbUrl)
@@ -44,13 +46,13 @@ public static class Program
         jsonOptions.IgnoreReadOnlyFields = true;
         jsonOptions.TypeInfoResolver = SourceGenerationContext.Default;
       })
-      //.SetAutoOffsetReset(AutoOffsetReset.Earliest) // global setting
+      .SetAutoOffsetReset(AutoOffsetReset.Earliest) // global setting
       .SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce) // global setting
       .SetIdentifierEscaping(IdentifierEscaping.Keywords)
       .SetupQueryStream(options =>
       {
         //SetupQueryStream affects only IKSqlDBContext.CreateQueryStream<T>
-        options.AutoOffsetReset = AutoOffsetReset.Earliest;
+        options.Properties[KSqlDbConfigs.KsqlQueryPushV2Enabled] = "true";
       })
       .SetupQuery(options =>
       {
@@ -124,6 +126,8 @@ public static class Program
     }
 
     string explain = await query.ExplainAsStringAsync();
+    Console.WriteLine("Explain: ");
+    Console.WriteLine(explain);
     ExplainResponse[] explainResponses = await query.ExplainAsync();
     Console.WriteLine($"{Environment.NewLine} Explain => ExecutionPlan:");
     Console.WriteLine(explainResponses[0].QueryDescription?.ExecutionPlan);
@@ -228,7 +232,7 @@ public static class Program
     var saveResponse = await context.SaveChangesAsync();
   }
 
-  private static async Task SubscribeAsync(IKSqlDBContext context, IKSqlDbRestApiClient restApiProvider)
+  private static async Task SubscribeAsync(IKSqlDBContext context)
   {
     var cts = new CancellationTokenSource();
 
@@ -253,7 +257,7 @@ public static class Program
 
     await Task.Delay(9000, cts.Token);
 
-    cts.Cancel();
+    await cts.CancelAsync();
   }
 
   private static IDisposable ClientSideBatching(KSqlDBContext context)
