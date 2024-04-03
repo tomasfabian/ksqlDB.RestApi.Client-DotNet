@@ -289,6 +289,55 @@ context.CreateQueryStream<Tweet>("custom_topic_name");
 FROM custom_topic_name
 ```
 
+# KSqlDbRestApiClient
+The `KSqlDbRestApiClient` supports various operations such as executing KSQL statements, inserting data into streams asynchronously, creating, listing or dropping entities, and managing KSQL connectors.
+
+```C#
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+using ksqlDB.RestApi.Client.Samples.Models.Movies;
+
+public async Task InspectAsync(CancellationToken cancellationToken = default)
+{
+  var httpClient = new HttpClient()
+  {
+    BaseAddress = new Uri("http://localhost:8088")
+  };
+  var httpClientFactory = new HttpClientFactory(httpClient);
+  var kSqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+  EntityCreationMetadata entityCreationMetadata = new(kafkaTopic: "companyname.movies")
+  {
+    Partitions = 3,
+    Replicas = 3,
+    ValueFormat = SerializationFormats.Json,
+    IdentifierEscaping = IdentifierEscaping.Keywords
+  };
+
+  var httpResponseMessage = await kSqlDbRestApiClient.CreateOrReplaceTableAsync<Movie2>(entityCreationMetadata, cancellationToken);
+  var responses = await httpResponseMessage.ToStatementResponsesAsync();
+  Console.WriteLine($"Create or replace table response: {responses[0].CommandStatus!.Message}");
+
+  Console.WriteLine($"{Environment.NewLine}Available tables:");
+  var tablesResponses = await kSqlDbRestApiClient.GetTablesAsync(cancellationToken);
+  Console.WriteLine(string.Join(',', tablesResponses[0].Tables!.Select(c => c.Name)));
+
+  var dropProperties = new DropFromItemProperties
+  {
+    UseIfExistsClause = true,
+    DeleteTopic = true,
+    IdentifierEscaping = IdentifierEscaping.Keywords
+  };
+  httpResponseMessage = await kSqlDbRestApiClient.DropTableAsync<Movie2>(dropProperties, cancellationToken: cancellationToken);
+  tablesResponses = await kSqlDbRestApiClient.GetTablesAsync(cancellationToken);
+}
+```
+
 ### Aggregation functions
 List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/aggregations.md):
 - [GROUP BY](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/aggregations.md#groupby)
