@@ -302,7 +302,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using ksqlDB.RestApi.Client.Samples.Models.Movies;
 
-public async Task InspectAsync(CancellationToken cancellationToken = default)
+public static async Task ExecuteAsync(CancellationToken cancellationToken = default)
 {
   var httpClient = new HttpClient()
   {
@@ -319,13 +319,13 @@ public async Task InspectAsync(CancellationToken cancellationToken = default)
     IdentifierEscaping = IdentifierEscaping.Keywords
   };
 
-  var httpResponseMessage = await kSqlDbRestApiClient.CreateOrReplaceTableAsync<Movie2>(entityCreationMetadata, cancellationToken);
+  var httpResponseMessage = await kSqlDbRestApiClient.CreateOrReplaceTableAsync<Movie>(entityCreationMetadata, cancellationToken);
   var responses = await httpResponseMessage.ToStatementResponsesAsync();
   Console.WriteLine($"Create or replace table response: {responses[0].CommandStatus!.Message}");
 
   Console.WriteLine($"{Environment.NewLine}Available tables:");
   var tablesResponses = await kSqlDbRestApiClient.GetTablesAsync(cancellationToken);
-  Console.WriteLine(string.Join(',', tablesResponses[0].Tables!.Select(c => c.Name)));
+  Console.WriteLine(string.Join(', ', tablesResponses[0].Tables!.Select(c => c.Name)));
 
   var dropProperties = new DropFromItemProperties
   {
@@ -333,8 +333,20 @@ public async Task InspectAsync(CancellationToken cancellationToken = default)
     DeleteTopic = true,
     IdentifierEscaping = IdentifierEscaping.Keywords
   };
-  httpResponseMessage = await kSqlDbRestApiClient.DropTableAsync<Movie2>(dropProperties, cancellationToken: cancellationToken);
+  httpResponseMessage = await kSqlDbRestApiClient.DropTableAsync<Movie>(dropProperties, cancellationToken: cancellationToken);
   tablesResponses = await kSqlDbRestApiClient.GetTablesAsync(cancellationToken);
+}
+```
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Query;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+
+public class Movie : Record
+{
+  [Key]
+  public int Id { get; set; }
+  public string Title { get; set; } = null!;
 }
 ```
 
