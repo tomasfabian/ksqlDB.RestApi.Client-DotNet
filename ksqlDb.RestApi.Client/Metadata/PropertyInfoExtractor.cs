@@ -5,7 +5,7 @@ namespace ksqlDb.RestApi.Client.Metadata
 {
   internal static class PropertyInfoExtractor
   {
-    public static IEnumerable<(string, MemberInfo)> GetMembers<TEntity, TProperty>(this Expression<Func<TEntity, TProperty>> propertyExpression)
+    internal static IEnumerable<(string, MemberInfo)> GetMembers<TEntity, TProperty>(this Expression<Func<TEntity, TProperty>> propertyExpression)
     {
       if (propertyExpression.Body is not MemberExpression memberExpression)
         throw new ArgumentException("Expression is not a member access expression.", nameof(propertyExpression));
@@ -19,7 +19,7 @@ namespace ksqlDb.RestApi.Client.Metadata
       }
     }
 
-    public static MemberInfo GetMemberInfo<TEntity, TProperty>(this Expression<Func<TEntity, TProperty>> getProperty)
+    internal static MemberInfo GetMemberInfo<TEntity, TProperty>(this Expression<Func<TEntity, TProperty>> getProperty)
     {
       if (getProperty.Body is not MemberExpression memberExpression)
         throw new ArgumentException("Expression is not a member expression.");

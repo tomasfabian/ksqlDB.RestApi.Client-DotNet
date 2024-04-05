@@ -1,10 +1,10 @@
 using System.Reflection;
 using System.Text;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
-using ksqlDb.RestApi.Client.Metadata;
 using static System.String;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;

@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using FluentAssertions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDb.RestApi.Client.Metadata;
 using NUnit.Framework;
 
@@ -107,6 +108,30 @@ namespace ksqlDb.RestApi.Client.Tests.Metadata
       entityMetadata.Should().NotBeNull();
       var memberInfo = GetTitleMemberInfo();
       entityMetadata!.FieldsMetadata.First(c => c.MemberInfo == memberInfo).Ignore.Should().BeTrue();
+    }
+
+    private class PaymentConfiguration : IFromItemTypeConfiguration<Payment>
+    {
+      public void Configure(IEntityTypeBuilder<Payment> builder)
+      {
+        builder.Property(b => b.Description)
+          .Ignore();
+      }
+    }
+
+    [Test]
+    public void FromItemTypeConfiguration()
+    {
+      //Arrange
+      var configuration = new PaymentConfiguration();
+
+      //Act
+      builder.Apply(configuration);
+
+      //Assert
+      var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      entityMetadata.Should().NotBeNull();
+      entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description)).Ignore.Should().BeTrue();
     }
 
     private static MemberInfo GetTitleMemberInfo()

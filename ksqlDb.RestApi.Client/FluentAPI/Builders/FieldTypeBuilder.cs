@@ -1,4 +1,6 @@
-namespace ksqlDb.RestApi.Client.Metadata
+using ksqlDb.RestApi.Client.Metadata;
+
+namespace ksqlDb.RestApi.Client.FluentAPI.Builders
 {
   public interface IFieldTypeBuilder<TProperty>
   {

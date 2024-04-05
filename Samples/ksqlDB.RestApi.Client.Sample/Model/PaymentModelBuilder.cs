@@ -1,6 +1,6 @@
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
-using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDB.RestApi.Client.Samples.Model
 {
@@ -27,6 +27,7 @@ namespace ksqlDB.RestApi.Client.Samples.Model
         .Property(b => b.Balance);
 
       builder.Entity<Payment>()
+        .HasKey(c => c.Id)
         .Property(b => b.Amount)
         .Decimal(precision: 10, scale: 2);
 

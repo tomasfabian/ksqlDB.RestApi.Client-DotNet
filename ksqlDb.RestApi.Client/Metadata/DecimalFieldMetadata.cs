@@ -1,6 +1,6 @@
 namespace ksqlDb.RestApi.Client.Metadata
 {
-  internal record DecimalFieldMetadata : FieldMetadata
+  internal sealed record DecimalFieldMetadata : FieldMetadata
   {
     public DecimalFieldMetadata(FieldMetadata fieldMetadata)
     {

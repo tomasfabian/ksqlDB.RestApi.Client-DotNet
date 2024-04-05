@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
+using ksqlDb.RestApi.Client.Metadata;
 
-namespace ksqlDb.RestApi.Client.Metadata
+namespace ksqlDb.RestApi.Client.FluentAPI.Builders
 {
   public interface IEntityTypeBuilder<TEntity>
   {
@@ -10,10 +11,10 @@ namespace ksqlDb.RestApi.Client.Metadata
 
   internal class EntityTypeBuilder
   {
-    public EntityMetadata Metadata { get; } = new();
+    internal EntityMetadata Metadata { get; } = new();
   }
 
-  internal class EntityTypeBuilder<TEntity> : EntityTypeBuilder, IEntityTypeBuilder<TEntity>
+  internal sealed class EntityTypeBuilder<TEntity> : EntityTypeBuilder, IEntityTypeBuilder<TEntity>
     where TEntity : class
   {
     public EntityTypeBuilder()

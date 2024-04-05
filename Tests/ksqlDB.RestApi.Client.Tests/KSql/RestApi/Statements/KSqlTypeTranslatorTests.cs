@@ -1,9 +1,9 @@
 using System.Drawing;
 using System.Text;
 using FluentAssertions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
-using ksqlDb.RestApi.Client.Metadata;
 using NUnit.Framework;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements

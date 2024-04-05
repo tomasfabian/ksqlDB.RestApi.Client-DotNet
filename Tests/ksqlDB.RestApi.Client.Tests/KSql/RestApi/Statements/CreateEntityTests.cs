@@ -1,11 +1,11 @@
 using System.Text.Json.Serialization;
 using FluentAssertions;
 using Joker.Extensions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
-using ksqlDb.RestApi.Client.Metadata;
 using NUnit.Framework;
 using Pluralize.NET;
 using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;

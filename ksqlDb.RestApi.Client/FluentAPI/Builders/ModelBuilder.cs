@@ -1,6 +1,6 @@
-using System.Linq.Expressions;
+using ksqlDb.RestApi.Client.Metadata;
 
-namespace ksqlDb.RestApi.Client.Metadata
+namespace ksqlDb.RestApi.Client.FluentAPI.Builders
 {
   public class ModelBuilder
   {
@@ -9,6 +9,14 @@ namespace ksqlDb.RestApi.Client.Metadata
     internal IEnumerable<EntityMetadata> GetEntities()
     {
       return builders.Values.Select(c => c.Metadata);
+    }
+
+    public ModelBuilder Apply<TEntity>(IFromItemTypeConfiguration<TEntity> configuration)
+      where TEntity : class
+    {
+      configuration.Configure(Entity<TEntity>());
+
+      return this;
     }
 
     public IEntityTypeBuilder<TEntity> Entity<TEntity>()
