@@ -1,7 +1,11 @@
+using ksqlDb.RestApi.Client.FluentAPI.Builders.Configuration;
 using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDb.RestApi.Client.FluentAPI.Builders
 {
+  /// <summary>
+  /// Represents a builder for configuring the model.
+  /// </summary>
   public class ModelBuilder
   {
     private readonly IDictionary<Type, EntityTypeBuilder> builders = new Dictionary<Type, EntityTypeBuilder>();
@@ -11,6 +15,12 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
       return builders.Values.Select(c => c.Metadata);
     }
 
+    /// <summary>
+    /// Applies configuration for a specific entity type to the model.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of entity to configure.</typeparam>
+    /// <param name="configuration">The configuration to apply.</param>
+    /// <returns>The current <see cref="ModelBuilder"/> instance.</returns>
     public ModelBuilder Apply<TEntity>(IFromItemTypeConfiguration<TEntity> configuration)
       where TEntity : class
     {
@@ -19,6 +29,11 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
       return this;
     }
 
+    /// <summary>
+    /// Configures an entity type in the model.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of entity to configure.</typeparam>
+    /// <returns>The <see cref="ModelBuilder"/> for further configuration.</returns>
     public IEntityTypeBuilder<TEntity> Entity<TEntity>()
       where TEntity : class
     {

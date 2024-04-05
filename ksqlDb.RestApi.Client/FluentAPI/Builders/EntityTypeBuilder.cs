@@ -3,9 +3,26 @@ using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDb.RestApi.Client.FluentAPI.Builders
 {
+  /// <summary>
+  /// Represents a builder for configuring entity types.
+  /// </summary>
+  /// <typeparam name="TEntity">The type of entity being configured.</typeparam>
   public interface IEntityTypeBuilder<TEntity>
   {
+    /// <summary>
+    /// Configures a property of the entity.
+    /// </summary>
+    /// <typeparam name="TProperty">The type of the property being configured.</typeparam>
+    /// <param name="getProperty">An expression representing the property to configure.</param>
+    /// <returns>The field type builder for further configuration.</returns>
     IFieldTypeBuilder<TProperty> Property<TProperty>(Expression<Func<TEntity, TProperty>> getProperty);
+
+    /// <summary>
+    /// Specifies the key property for the entity.
+    /// </summary>
+    /// <typeparam name="TProperty">The type of the key property.</typeparam>
+    /// <param name="getProperty">An expression representing the key property.</param>
+    /// <returns>The entity type builder for further configuration.</returns>
     IEntityTypeBuilder<TEntity> HasKey<TProperty>(Expression<Func<TEntity, TProperty>> getProperty);
   }
 

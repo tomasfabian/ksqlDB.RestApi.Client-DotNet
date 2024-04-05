@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using FluentAssertions;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDb.RestApi.Client.FluentAPI.Builders.Configuration;
 using ksqlDb.RestApi.Client.Metadata;
 using NUnit.Framework;
 
