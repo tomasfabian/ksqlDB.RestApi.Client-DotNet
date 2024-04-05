@@ -5,6 +5,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using ksqlDb.RestApi.Client.Metadata;
 using NUnit.Framework;
 using Pluralize.NET;
 using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
@@ -15,6 +16,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements;
 public class CreateEntityTests
 {
   private EntityCreationMetadata creationMetadata = null!;
+  private readonly ModelBuilder modelBuilder = new();
 
   [SetUp]
   public void Init()
@@ -88,7 +90,7 @@ public class CreateEntityTests
     };
     creationMetadata.IdentifierEscaping = escaping;
     //Act
-    var statement = new CreateEntity().Print<MyMovie>(statementContext, creationMetadata, null);
+    var statement = new CreateEntity(modelBuilder).Print<MyMovie>(statementContext, creationMetadata, null);
 
     //Assert
     statement.Should().Be(expected);
@@ -126,7 +128,7 @@ public class CreateEntityTests
     creationMetadata.IdentifierEscaping = escaping;
 
     //Act
-    var statement = new CreateEntity().Print<Transaction>(statementContext, creationMetadata, null);
+    var statement = new CreateEntity(modelBuilder).Print<Transaction>(statementContext, creationMetadata, null);
 
     //Assert
     statement.Should().Be(expected);
@@ -160,7 +162,7 @@ public class CreateEntityTests
     creationMetadata.IdentifierEscaping = escaping;
 
     //Act
-    var statement = new CreateEntity().Print<MyMovie>(statementContext, creationMetadata, null);
+    var statement = new CreateEntity(modelBuilder).Print<MyMovie>(statementContext, creationMetadata, null);
 
     //Assert
     statement.Should().Be(expected);
@@ -191,7 +193,7 @@ public class CreateEntityTests
     creationMetadata.IdentifierEscaping = escaping;
 
     //Act
-    var statement = new CreateEntity().Print<MyMovie>(statementContext, creationMetadata, null);
+    var statement = new CreateEntity(modelBuilder).Print<MyMovie>(statementContext, creationMetadata, null);
 
     //Assert
     statement.Should().Be(expected);
@@ -208,7 +210,7 @@ public class CreateEntityTests
     };
 
     //Act
-    string statement = new CreateEntity().Print<MyMovie>(statementContext, creationMetadata, null);
+    string statement = new CreateEntity(modelBuilder).Print<MyMovie>(statementContext, creationMetadata, null);
 
     //Assert
     statement.Should().Be(CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false));
@@ -225,7 +227,7 @@ public class CreateEntityTests
     };
 
     //Act
-    string statement = new CreateEntity().Print<MyMovie>(statementContext, creationMetadata, ifNotExists: true);
+    string statement = new CreateEntity(modelBuilder).Print<MyMovie>(statementContext, creationMetadata, ifNotExists: true);
 
     //Assert
     statement.Should().Be(CreateExpectedStatement("CREATE STREAM IF NOT EXISTS", hasPrimaryKey: false));
@@ -242,7 +244,7 @@ public class CreateEntityTests
     };
 
     //Act
-    string statement = new CreateEntity().Print<MyMovie>(statementContext, creationMetadata, null);
+    string statement = new CreateEntity(modelBuilder).Print<MyMovie>(statementContext, creationMetadata, null);
 
     //Assert
     statement.Should().Be(CreateExpectedStatement("CREATE OR REPLACE STREAM", hasPrimaryKey: false));
@@ -259,7 +261,7 @@ public class CreateEntityTests
     };
 
     //Act
-    string statement = new CreateEntity().Print<MyMovie>(statementContext, creationMetadata, null);
+    string statement = new CreateEntity(modelBuilder).Print<MyMovie>(statementContext, creationMetadata, null);
 
     //Assert
     statement.Should().Be(CreateExpectedStatement("CREATE TABLE", hasPrimaryKey: true));
@@ -276,7 +278,7 @@ public class CreateEntityTests
     };
 
     //Act
-    string statement = new CreateEntity().Print<MyMovie>(statementContext, creationMetadata, ifNotExists: true);
+    string statement = new CreateEntity(modelBuilder).Print<MyMovie>(statementContext, creationMetadata, ifNotExists: true);
 
     //Assert
     statement.Should().Be(CreateExpectedStatement("CREATE TABLE IF NOT EXISTS", hasPrimaryKey: true));
@@ -293,7 +295,7 @@ public class CreateEntityTests
     };
 
     //Act
-    string statement = new CreateEntity().Print<MyMovie>(statementContext, creationMetadata, null);
+    string statement = new CreateEntity(modelBuilder).Print<MyMovie>(statementContext, creationMetadata, null);
 
     //Assert
     statement.Should().Be(CreateExpectedStatement("CREATE OR REPLACE TABLE", hasPrimaryKey: true));
@@ -330,7 +332,7 @@ public class CreateEntityTests
     creationMetadata.IdentifierEscaping = escaping;
 
     //Act
-    var statement = new CreateEntity().Print<MyItems>(statementContext, creationMetadata, null);
+    var statement = new CreateEntity(modelBuilder).Print<MyItems>(statementContext, creationMetadata, null);
 
     //Assert
     statement.Should().Be(expected);
@@ -401,7 +403,7 @@ public class CreateEntityTests
     public string Name { get; set; } = null!;
   }
 
-  private static void TestCreateEntityWithEnumerable<TEntity>(string arrayElementType = "EVENTCATEGORY", IdentifierEscaping escaping = Never)
+  private void TestCreateEntityWithEnumerable<TEntity>(string arrayElementType = "EVENTCATEGORY", IdentifierEscaping escaping = Never)
   {
     //Arrange
     var statementContext = new StatementContext
@@ -419,7 +421,7 @@ public class CreateEntityTests
     };
 
     //Act
-    var statement = new CreateEntity().Print<TEntity>(statementContext, creationMetadata, true);
+    var statement = new CreateEntity(modelBuilder).Print<TEntity>(statementContext, creationMetadata, true);
 
     //Assert
     switch (escaping)
@@ -495,7 +497,7 @@ public class CreateEntityTests
     };
 
     //Act
-    string statement = new CreateEntity().Print<TimeTypes>(statementContext, streamCreationMetadata, false);
+    string statement = new CreateEntity(modelBuilder).Print<TimeTypes>(statementContext, streamCreationMetadata, false);
 
     //Assert
     statement.Should().Be(@$"CREATE STREAM {nameof(TimeTypes)} (
@@ -530,7 +532,7 @@ public class CreateEntityTests
     };
 
     //Act
-    string statement = new CreateEntity().Print<Renamed>(statementContext, streamCreationMetadata, false);
+    string statement = new CreateEntity(modelBuilder).Print<Renamed>(statementContext, streamCreationMetadata, false);
 
     //Assert
     statement.Should().Be(@$"CREATE STREAM {nameof(Renamed)} (
@@ -562,11 +564,38 @@ public class CreateEntityTests
     };
 
     //Act
-    string statement = new CreateEntity().Print<GuidKey>(statementContext, streamCreationMetadata, false);
+    string statement = new CreateEntity(modelBuilder).Print<GuidKey>(statementContext, streamCreationMetadata, false);
 
     //Assert
     statement.Should().Be(@$"CREATE STREAM {nameof(GuidKey)} (
 	{nameof(GuidKey.DataId)} VARCHAR
 ) WITH ( KAFKA_TOPIC='{streamCreationMetadata.KafkaTopic}', VALUE_FORMAT='Json', PARTITIONS='1' );".ReplaceLineEndings());
+  }
+
+  internal class Poco
+  {
+    public int Id { get; set; }
+  }
+
+  [Test]
+  public void ModelBuilder_EntityHasKey()
+  {
+    //Arrange
+    modelBuilder.Entity<Poco>()
+      .HasKey(x => x.Id);
+
+    var statementContext = new StatementContext
+    {
+      CreationType = CreationType.CreateOrReplace,
+      KSqlEntityType = KSqlEntityType.Table
+    };
+
+    //Act
+    string statement = new CreateEntity(modelBuilder).Print<Poco>(statementContext, creationMetadata, null);
+
+    //Assert
+    statement.Should().Be(@"CREATE OR REPLACE TABLE Pocos (
+	Id INT PRIMARY KEY
+) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
   }
 }
