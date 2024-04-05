@@ -4,11 +4,12 @@ using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
+using ksqlDb.RestApi.Client.Metadata;
 using static System.String;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-internal sealed class CreateEntity : EntityInfo
+internal sealed class CreateEntity(ModelBuilder modelBuilder) : EntityInfo
 {
   private readonly StringBuilder stringBuilder = new();
 
@@ -39,7 +40,7 @@ internal sealed class CreateEntity : EntityInfo
   private void PrintProperties<T>(StatementContext statementContext, EntityCreationMetadata metadata)
   {
     var ksqlProperties = new List<string>();
-    metadata??= new EntityCreationMetadata();
+    metadata ??= new EntityCreationMetadata();
     foreach (var memberInfo in Members<T>(metadata.IncludeReadOnlyProperties))
     {
       var type = GetMemberType(memberInfo);
@@ -49,7 +50,7 @@ internal sealed class CreateEntity : EntityInfo
       var columnName = IdentifierUtil.Format(memberInfo, metadata.IdentifierEscaping);
       string columnDefinition = $"\t{columnName} {ksqlType}{KSqlTypeTranslator.ExploreAttributes(memberInfo, type)}";
 
-      columnDefinition += TryAttachKey(statementContext.KSqlEntityType, memberInfo);
+      columnDefinition += TryAttachKey<T>(statementContext.KSqlEntityType, memberInfo);
 
       ksqlProperties.Add(columnDefinition);
     }
@@ -80,9 +81,13 @@ internal sealed class CreateEntity : EntityInfo
     stringBuilder.Append($"{creationTypeText}{source} {entityTypeText}");
   }
 
-  private static string TryAttachKey(KSqlEntityType entityType, MemberInfo memberInfo)
+  private string TryAttachKey<T>(KSqlEntityType entityType, MemberInfo memberInfo)
   {
-    if (!memberInfo.HasKey())
+    var entityMetadata = modelBuilder.GetEntities().FirstOrDefault(c => c.Type == typeof(T));
+
+    var primaryKey = entityMetadata?.PrimaryKeyMemberInfo;
+
+    if (primaryKey == null && !memberInfo.HasKey())
       return Empty;
 
     string key = entityType switch

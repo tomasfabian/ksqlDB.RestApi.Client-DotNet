@@ -21,6 +21,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.Extensions.Logging;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers;
+using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi;
 
@@ -28,14 +29,22 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 {
   private readonly EntityProvider entityProvider = new();
   private readonly IHttpClientFactory httpClientFactory;
+  private readonly StatementGenerator statementGenerator;
   private readonly ILogger? logger;
 
   public KSqlDbRestApiClient(IHttpClientFactory httpClientFactory, ILoggerFactory? loggerFactory = null)
+    : this(httpClientFactory, new ModelBuilder(), loggerFactory)
+  {
+  }
+
+  public KSqlDbRestApiClient(IHttpClientFactory httpClientFactory, ModelBuilder modelBuilder, ILoggerFactory? loggerFactory = null)
   {
     this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
 
     if (loggerFactory != null)
       logger = loggerFactory.CreateLogger(LoggingCategory.Name);
+
+    statementGenerator = new StatementGenerator(modelBuilder);
   }
 
   public bool DisposeHttpClient { get; set; }
@@ -176,7 +185,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     ArgumentNullException.ThrowIfNull(creationMetadata);
 #endif
 
-    var ksql = StatementGenerator.CreateStream<T>(creationMetadata, ifNotExists);
+    var ksql = statementGenerator.CreateStream<T>(creationMetadata, ifNotExists);
 
     return ExecuteAsync(ksql, cancellationToken);
   }
@@ -196,7 +205,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     ArgumentNullException.ThrowIfNull(creationMetadata);
 #endif
 
-    var ksql = StatementGenerator.CreateOrReplaceStream<T>(creationMetadata);
+    var ksql = statementGenerator.CreateOrReplaceStream<T>(creationMetadata);
 
     return ExecuteAsync(ksql, cancellationToken);
   }
@@ -219,7 +228,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 
     creationMetadata.IsReadOnly = true;
 
-    var ksql = StatementGenerator.CreateStream<T>(creationMetadata, ifNotExists);
+    var ksql = statementGenerator.CreateStream<T>(creationMetadata, ifNotExists);
 
     return ExecuteAsync(ksql, cancellationToken);
   }
@@ -240,7 +249,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     ArgumentNullException.ThrowIfNull(creationMetadata);
 #endif
 
-    var ksql = StatementGenerator.CreateTable<T>(creationMetadata, ifNotExists);
+    var ksql = statementGenerator.CreateTable<T>(creationMetadata, ifNotExists);
 
     return ExecuteAsync(ksql, cancellationToken);
   }
@@ -263,7 +272,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 
     creationMetadata.IsReadOnly = true;
 
-    var ksql = StatementGenerator.CreateTable<T>(creationMetadata, ifNotExists);
+    var ksql = statementGenerator.CreateTable<T>(creationMetadata, ifNotExists);
 
     return ExecuteAsync(ksql, cancellationToken);
   }
@@ -283,7 +292,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     ArgumentNullException.ThrowIfNull(creationMetadata);
 #endif
 
-    var ksql = StatementGenerator.CreateOrReplaceTable<T>(creationMetadata);
+    var ksql = statementGenerator.CreateOrReplaceTable<T>(creationMetadata);
 
     return ExecuteAsync(ksql, cancellationToken);
   }
