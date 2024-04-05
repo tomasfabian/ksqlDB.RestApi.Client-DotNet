@@ -89,7 +89,7 @@ internal sealed class CreateEntity(ModelBuilder modelBuilder) : EntityInfo
 
     var primaryKey = entityMetadata?.PrimaryKeyMemberInfo;
 
-    if (primaryKey == null && !memberInfo.HasKey())
+    if ((primaryKey == null || primaryKey.Name != memberInfo.Name) && !memberInfo.HasKey())
       return Empty;
 
     string key = entityType switch

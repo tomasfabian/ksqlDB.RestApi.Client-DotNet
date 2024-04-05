@@ -575,6 +575,7 @@ public class CreateEntityTests
   internal class Poco
   {
     public int Id { get; set; }
+    public string Description { get; set; } = null!;
   }
 
   [Test]
@@ -595,7 +596,8 @@ public class CreateEntityTests
 
     //Assert
     statement.Should().Be(@"CREATE OR REPLACE TABLE Pocos (
-	Id INT PRIMARY KEY
+	Id INT PRIMARY KEY,
+	Description VARCHAR
 ) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
   }
 }
