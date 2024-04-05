@@ -3,12 +3,21 @@ using System.Text;
 using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using ksqlDb.RestApi.Client.Metadata;
 using NUnit.Framework;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
 {
   public class KSqlTypeTranslatorTests
   {
+    private readonly ModelBuilder modelBuilder = new();
+    private readonly KSqlTypeTranslator kSqlTypeTranslator;
+
+    public KSqlTypeTranslatorTests()
+    {
+      kSqlTypeTranslator = new(modelBuilder);
+    }
+
     [Test]
     public void Translate_StringType()
     {
@@ -16,7 +25,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(string);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be(KSqlTypes.Varchar);
@@ -29,7 +38,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(int);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be(KSqlTypes.Int);
@@ -42,7 +51,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(long);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be(KSqlTypes.BigInt);
@@ -55,7 +64,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(double);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be(KSqlTypes.Double);
@@ -68,7 +77,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(decimal);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be(KSqlTypes.Decimal);
@@ -81,7 +90,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(bool);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be(KSqlTypes.Boolean);
@@ -94,7 +103,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(Dictionary<string, int>);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be($"{KSqlTypes.Map}<{KSqlTypes.Varchar}, {KSqlTypes.Int}>");
@@ -107,7 +116,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(IDictionary<string, long>);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be($"{KSqlTypes.Map}<{KSqlTypes.Varchar}, {KSqlTypes.BigInt}>");
@@ -120,7 +129,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(double[]);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be($"{KSqlTypes.Array}<{KSqlTypes.Double}>");
@@ -133,7 +142,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(IEnumerable<string>);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be($"{KSqlTypes.Array}<{KSqlTypes.Varchar}>");
@@ -146,7 +155,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(List<string>);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be($"{KSqlTypes.Array}<{KSqlTypes.Varchar}>");
@@ -159,7 +168,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(IList<string>);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be($"{KSqlTypes.Array}<{KSqlTypes.Varchar}>");
@@ -172,7 +181,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(IEnumerable<string>);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be($"{KSqlTypes.Array}<{KSqlTypes.Varchar}>");
@@ -185,7 +194,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(IDictionary<string, int>[]);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be($"{KSqlTypes.Array}<{KSqlTypes.Map}<{KSqlTypes.Varchar}, {KSqlTypes.Int}>>");
@@ -198,7 +207,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(IDictionary<string, int[]>);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be($"{KSqlTypes.Map}<{KSqlTypes.Varchar}, {KSqlTypes.Array}<{KSqlTypes.Int}>>");
@@ -211,7 +220,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(byte[]);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be(KSqlTypes.Bytes);
@@ -224,7 +233,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(Guid);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be(KSqlTypes.Varchar);
@@ -237,7 +246,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(DateTime);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be(KSqlTypes.Date);
@@ -250,7 +259,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(TimeSpan);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be(KSqlTypes.Time);
@@ -263,7 +272,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(DateTimeOffset);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be(KSqlTypes.Timestamp);
@@ -276,7 +285,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(ConsoleColor);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be(KSqlTypes.Varchar);
@@ -289,7 +298,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(StringBuilder);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be(nameof(StringBuilder).ToUpper());
@@ -302,7 +311,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(Point);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be(nameof(Point).ToUpper());
@@ -322,7 +331,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(Decorated);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be($"{KSqlTypes.Struct}<{nameof(Decorated.Foo)} {KSqlTypes.Int}, {nameof(Decorated.Bzr)} {KSqlTypes.Varchar}>");
@@ -342,7 +351,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(IoTSensor);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
       ksqlType.Should().Be($"{KSqlTypes.Struct}<{nameof(IoTSensor.Header)} {KSqlTypes.Bytes} HEADER('abc')>");
@@ -351,7 +360,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
     [Struct]
     private record Account
     {
-      [Decimal(1,1)]
+      [Decimal(10,4)]
       public decimal Amount { get; set; }
     }
 
@@ -362,10 +371,32 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       var type = typeof(Account);
 
       //Act
-      string ksqlType = KSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type);
 
       //Assert
-      ksqlType.Should().Be($"{KSqlTypes.Struct}<{nameof(Account.Amount)} {KSqlTypes.Decimal}(1,1)>");
+      ksqlType.Should().Be($"{KSqlTypes.Struct}<{nameof(Account.Amount)} {KSqlTypes.Decimal}(10,4)>");
+    }
+
+    [Struct]
+    private record Poco
+    {
+      public decimal Amount { get; set; }
+    }
+
+    [Test]
+    public void Translate_UseModelBuilder_DecimalAttributeType()
+    {
+      //Arrange
+      var type = typeof(Poco);
+      modelBuilder.Entity<Poco>()
+        .Property(c => c.Amount)
+        .Decimal(10, 2);
+
+      //Act
+      string ksqlType = kSqlTypeTranslator.Translate(type);
+
+      //Assert
+      ksqlType.Should().Be($"{KSqlTypes.Struct}<{nameof(Poco.Amount)} {KSqlTypes.Decimal}(10,2)>");
     }
   }
 }

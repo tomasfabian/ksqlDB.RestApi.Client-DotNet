@@ -11,11 +11,6 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
   {
     private readonly ModelBuilder modelBuilder;
 
-    //public KSqlTypeTranslator()
-    //:this(new ModelBuilder())
-    //{
-      
-    //}
     public KSqlTypeTranslator(ModelBuilder modelBuilder)
     {
       this.modelBuilder = modelBuilder;

@@ -12,7 +12,6 @@ internal sealed class TypeGenerator : EntityInfo
 {
   private readonly KSqlTypeTranslator typeTranslator;
 
-
   public TypeGenerator(ModelBuilder modelBuilder)
   {
     typeTranslator = new KSqlTypeTranslator(modelBuilder);

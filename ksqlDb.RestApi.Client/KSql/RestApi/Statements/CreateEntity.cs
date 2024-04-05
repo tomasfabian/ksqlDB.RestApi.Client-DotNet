@@ -6,7 +6,6 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDb.RestApi.Client.Metadata;
 using static System.String;
-using System.Reflection.Emit;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
@@ -14,7 +13,7 @@ internal sealed class CreateEntity(ModelBuilder modelBuilder) : EntityInfo
 {
   private readonly StringBuilder stringBuilder = new();
 
-  private KSqlTypeTranslator typeTranslator = new(modelBuilder);
+  private readonly KSqlTypeTranslator typeTranslator = new(modelBuilder);
 
   internal string Print<T>(StatementContext statementContext, EntityCreationMetadata metadata, bool? ifNotExists)
   {
