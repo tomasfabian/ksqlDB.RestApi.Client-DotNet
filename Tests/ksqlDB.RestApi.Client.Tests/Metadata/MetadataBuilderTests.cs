@@ -17,7 +17,7 @@ namespace ksqlDb.RestApi.Client.Tests.Metadata
       //Arrange
 
       //Act
-      var entityBuilder = builder.Entity<Foo>();
+      var entityBuilder = builder.Entity<Payment>();
 
       //Assert
       entityBuilder.Should().NotBeNull();
@@ -29,7 +29,7 @@ namespace ksqlDb.RestApi.Client.Tests.Metadata
       //Arrange
 
       //Act
-      var fieldTypeBuilder = builder.Entity<Foo>().HasKey(c => c.Id);
+      var fieldTypeBuilder = builder.Entity<Payment>().HasKey(c => c.Id);
 
       //Assert
       fieldTypeBuilder.Should().NotBeNull();
@@ -53,16 +53,38 @@ namespace ksqlDb.RestApi.Client.Tests.Metadata
       //Arrange
 
       //Act
-      var fieldTypeBuilder = builder.Entity<Foo>()
-        .Property(b => b.Title)
+      var fieldTypeBuilder = builder.Entity<Payment>()
+        .Property(b => b.Description)
         .Ignore()
         .Ignore();
 
       //Assert
       fieldTypeBuilder.Should().NotBeNull();
-      var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Foo));
+      var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
       entityMetadata.Should().NotBeNull();
-      entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Foo.Title)).Ignore.Should().BeTrue();
+      entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description)).Ignore.Should().BeTrue();
+    }
+
+    [Test]
+    public void MultiplePropertiesForSameType()
+    {
+      //Arrange
+
+      //Act
+      var fieldTypeBuilder = builder.Entity<Payment>()
+        .Property(b => b.Description)
+        .Ignore();
+
+      builder.Entity<Payment>()
+        .Property(b => b.Amount)
+        .Ignore();
+
+      //Assert
+      fieldTypeBuilder.Should().NotBeNull();
+      var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      entityMetadata.Should().NotBeNull();
+      entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description)).Ignore.Should().BeTrue();
+      entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Amount)).Ignore.Should().BeTrue();
     }
 
     [Test]
@@ -96,33 +118,33 @@ namespace ksqlDb.RestApi.Client.Tests.Metadata
     }
 
     [Test]
-    public void Decimal_Precision()
+    public void Decimal_ConfigurePrecisionAndScale()
     {
       //Arrange
       short precision = 2;
       short scale = 3;
 
       //Act
-      var fieldTypeBuilder = builder.Entity<Foo>()
+      var fieldTypeBuilder = builder.Entity<Payment>()
         .Property(b => b.Amount)
-        .Precision(precision, scale);
+        .Decimal(precision, scale);
 
       //Assert
       fieldTypeBuilder.Should().NotBeNull();
-      var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Foo));
+      var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
       entityMetadata.Should().NotBeNull();
-      var metadata = (DecimalFieldMetadata) entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Foo.Amount));
+      var metadata = (DecimalFieldMetadata) entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Amount));
 
       metadata.Precision.Should().Be(precision);
       metadata.Scale.Should().Be(scale);
     }
   }
 
-  internal record Foo
+  internal record Payment
   {
     public string Id { get; set; } = null!;
     public decimal Amount { get; set; }
-    public string Title { get; set; } = null!;
+    public string Description { get; set; } = null!;
   }
 
   internal class Bar
