@@ -163,8 +163,8 @@ public static class Program
     /*
   CREATE OR REPLACE TABLE MoviesByTitle
   WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS = '1', REPLICAS='1' )
-  AS SELECT Title, Release_Year AS ReleaseYear FROM Movies
-  WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
+  AS SELECT Description, Release_Year AS ReleaseYear FROM Movies
+  WHERE Id < 3 PARTITION BY Description EMIT CHANGES;
      */
 
     string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
@@ -433,7 +433,7 @@ public static class Program
   private static IDisposable QueryRawKSql(IKSqlDBContext context)
   {
     string ksql = @"SELECT * FROM Movies
-WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
+WHERE Description != 'E.T.' EMIT CHANGES LIMIT 2;";
 
     QueryParameters queryParameters = new QueryParameters
     {
