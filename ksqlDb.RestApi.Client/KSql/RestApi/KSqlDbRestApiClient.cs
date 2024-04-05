@@ -29,6 +29,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 {
   private readonly EntityProvider entityProvider = new();
   private readonly IHttpClientFactory httpClientFactory;
+  private readonly ModelBuilder modelBuilder;
   private readonly StatementGenerator statementGenerator;
   private readonly ILogger? logger;
 
@@ -40,6 +41,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   public KSqlDbRestApiClient(IHttpClientFactory httpClientFactory, ModelBuilder modelBuilder, ILoggerFactory? loggerFactory = null)
   {
     this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+    this.modelBuilder = modelBuilder;
 
     if (loggerFactory != null)
       logger = loggerFactory.CreateLogger(LoggingCategory.Name);
@@ -344,7 +346,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> CreateTypeAsync<T>(TypeProperties properties, CancellationToken cancellationToken = default)
   {
-    var ksql = new TypeGenerator().Print<T>(properties);
+    var ksql = new TypeGenerator(modelBuilder).Print<T>(properties);
 
     return ExecuteAsync(ksql, cancellationToken);
   }

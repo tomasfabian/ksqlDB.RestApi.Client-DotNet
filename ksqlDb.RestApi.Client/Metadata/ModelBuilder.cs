@@ -5,7 +5,7 @@ namespace ksqlDb.RestApi.Client.Metadata
 {
   public class ModelBuilder
   {
-    private readonly IDictionary<Type, EntityTypeBuilder> builders = new Dictionary<Type, EntityTypeBuilder>(); //TODO: concurrent
+    private readonly IDictionary<Type, EntityTypeBuilder> builders = new Dictionary<Type, EntityTypeBuilder>();
 
     internal IEnumerable<EntityMetadata> GetEntities()
     {
@@ -168,10 +168,10 @@ namespace ksqlDb.RestApi.Client.Metadata
 
   public interface IFieldTypeBuilder<TProperty>
   {
-    IFieldTypeBuilder<TProperty> Ignore();
+    internal IFieldTypeBuilder<TProperty> Ignore();
   }
 
-  public static class Ext
+  public static class FieldTypeBuilderExtensions
   {
     public static IFieldTypeBuilder<decimal> Decimal(this IFieldTypeBuilder<decimal> builder, short precision, short scale)
     {

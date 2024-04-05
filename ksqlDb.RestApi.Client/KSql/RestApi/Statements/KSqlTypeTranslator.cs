@@ -3,12 +3,25 @@ using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 {
   internal sealed class KSqlTypeTranslator : EntityInfo
   {
-    internal static string Translate(Type type, IdentifierEscaping escaping = IdentifierEscaping.Never)
+    private readonly ModelBuilder modelBuilder;
+
+    //public KSqlTypeTranslator()
+    //:this(new ModelBuilder())
+    //{
+      
+    //}
+    public KSqlTypeTranslator(ModelBuilder modelBuilder)
+    {
+      this.modelBuilder = modelBuilder;
+    }
+
+    internal string Translate(Type type, IdentifierEscaping escaping = IdentifierEscaping.Never)
     {
       var ksqlType = string.Empty;
 
@@ -91,7 +104,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       return ksqlType;
     }
 
-    internal static IEnumerable<string> GetProperties(Type type, IdentifierEscaping escaping)
+    internal IEnumerable<string> GetProperties(Type type, IdentifierEscaping escaping)
     {
       var ksqlProperties = new List<string>();
 
@@ -101,7 +114,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 
         var ksqlType = Translate(memberType, escaping);
 
-        string columnDefinition = $"{memberInfo.Format(escaping)} {ksqlType}{ExploreAttributes(memberInfo, memberType)}";
+        string columnDefinition = $"{memberInfo.Format(escaping)} {ksqlType}{ExploreAttributes(type, memberInfo, memberType)}";
 
         ksqlProperties.Add(columnDefinition);
       }
@@ -109,10 +122,19 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       return ksqlProperties;
     }
 
-    internal static string ExploreAttributes(MemberInfo memberInfo, Type type)
+    internal string ExploreAttributes(Type? parentType, MemberInfo memberInfo, Type type)
     {
       if (type == typeof(decimal))
       {
+        if (parentType != null)
+        {
+          var entityMetadata = modelBuilder.GetEntities().FirstOrDefault(c => c.Type == parentType);
+          if (entityMetadata?.FieldsMetadata.FirstOrDefault(c => c.MemberInfo == memberInfo) is DecimalFieldMetadata fieldMetadata)
+          {
+            return $"({fieldMetadata.Precision},{fieldMetadata.Scale})";//TODO:format
+          }
+        }
+
         var decimalMember = memberInfo.TryGetAttribute<DecimalAttribute>();
 
         if (decimalMember != null)

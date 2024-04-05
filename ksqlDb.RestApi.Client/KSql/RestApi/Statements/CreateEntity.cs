@@ -6,12 +6,15 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDb.RestApi.Client.Metadata;
 using static System.String;
+using System.Reflection.Emit;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 internal sealed class CreateEntity(ModelBuilder modelBuilder) : EntityInfo
 {
   private readonly StringBuilder stringBuilder = new();
+
+  private KSqlTypeTranslator typeTranslator = new(modelBuilder);
 
   internal string Print<T>(StatementContext statementContext, EntityCreationMetadata metadata, bool? ifNotExists)
   {
@@ -45,10 +48,10 @@ internal sealed class CreateEntity(ModelBuilder modelBuilder) : EntityInfo
     {
       var type = GetMemberType(memberInfo);
 
-      var ksqlType = KSqlTypeTranslator.Translate(type, metadata.IdentifierEscaping);
+      var ksqlType = typeTranslator.Translate(type, metadata.IdentifierEscaping);
 
       var columnName = IdentifierUtil.Format(memberInfo, metadata.IdentifierEscaping);
-      string columnDefinition = $"\t{columnName} {ksqlType}{KSqlTypeTranslator.ExploreAttributes(memberInfo, type)}";
+      string columnDefinition = $"\t{columnName} {ksqlType}{typeTranslator.ExploreAttributes(typeof(T), memberInfo, type)}";
 
       columnDefinition += TryAttachKey<T>(statementContext.KSqlEntityType, memberInfo);
 
