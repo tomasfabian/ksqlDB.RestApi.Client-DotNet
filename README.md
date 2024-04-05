@@ -223,15 +223,39 @@ IHost host = Host.CreateDefaultBuilder(args)
 await host.RunAsync();
 ```
 
-# Setting query parameters
-Default settings:
-'auto.offset.reset' is set to 'earliest' by default.
-New parameters could be added or existing ones changed in the following manner:
-```C#
-var contextOptions = new KSqlDBContextOptions(@"http://localhost:8088");
+# KSqlDbContextOptions builder
+To modify parameters or introduce new ones, utilize the following approach:
 
-contextOptions.QueryStreamParameters["auto.offset.reset"] = "latest";
+```C#
+var contextOptions = new KSqlDbContextOptionsBuilder()
+  .UseKSqlDb("http://localhost:8088)
+  .SetBasicAuthCredentials("fred", "flinstone")
+  .SetJsonSerializerOptions(jsonOptions =>
+  {
+    jsonOptions.IgnoreReadOnlyFields = true;
+  })
+  .SetAutoOffsetReset(AutoOffsetReset.Latest)
+  .SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce)
+  .SetIdentifierEscaping(IdentifierEscaping.Keywords)
+  .SetupQueryStream(options =>
+  {
+    //SetupQueryStream affects only IKSqlDBContext.CreateQueryStream<T>
+    options.Properties["ksql.query.push.v2.enabled"] = "true";
+  })
+  .Options;
 ```
+
+This code initializes a `KSqlDbContextOptionsBuilder` to configure settings for a `ksqlDB` context. Here's a breakdown of the configurations:
+
+- `UseKSqlDb("http://localhost:8088")`: Specifies the **URL** of the `ksqlDB` server.
+- `SetBasicAuthCredentials("fred", "flinstone")`: Sets the basic authentication credentials (username and password) for accessing the `ksqlDB` server.
+- `SetJsonSerializerOptions(jsonOptions => { ... })`: Configures JSON serialization options, such as ignoring read-only fields.
+- `SetAutoOffsetReset(AutoOffsetReset.Latest)`: Sets the offset reset behavior to start consuming messages from the **latest** available when no committed offset is found. By default, 'auto.offset.reset' is configured to 'earliest'.
+- `SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce)`: Specifies the processing guarantee as **exactly-once** semantics.
+- `SetIdentifierEscaping(IdentifierEscaping.Keywords)`: Escapes identifiers such as table and column names that are SQL keywords.
+- `SetupQueryStream(options => { ... })`: Configures query stream options, specifically enabling KSQL query push version 2.
+
+Finally, `.Options` returns the configured options for the `ksqlDB` context.
 
 ### Overriding stream names
 Stream names are generated based on the generic record types. They are pluralized with Pluralize.NET package.
@@ -263,6 +287,67 @@ context.CreateQueryStream<Tweet>("custom_topic_name");
 ```
 ```SQL
 FROM custom_topic_name
+```
+
+# KSqlDbRestApiClient
+The `KSqlDbRestApiClient` supports various operations such as executing KSQL statements, inserting data into streams asynchronously, creating, listing or dropping entities, and managing KSQL connectors.
+
+```C#
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+using ksqlDB.RestApi.Client.Samples.Models.Movies;
+
+public static async Task ExecuteAsync(CancellationToken cancellationToken = default)
+{
+  var httpClient = new HttpClient()
+  {
+    BaseAddress = new Uri("http://localhost:8088")
+  };
+  var httpClientFactory = new HttpClientFactory(httpClient);
+  var kSqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+  EntityCreationMetadata entityCreationMetadata = new(kafkaTopic: "companyname.movies")
+  {
+    Partitions = 3,
+    Replicas = 3,
+    ValueFormat = SerializationFormats.Json,
+    IdentifierEscaping = IdentifierEscaping.Keywords
+  };
+
+  var httpResponseMessage = await kSqlDbRestApiClient.CreateOrReplaceTableAsync<Movie>(entityCreationMetadata, cancellationToken);
+  var responses = await httpResponseMessage.ToStatementResponsesAsync();
+  Console.WriteLine($"Create or replace table response: {responses[0].CommandStatus!.Message}");
+
+  Console.WriteLine($"{Environment.NewLine}Available tables:");
+  var tablesResponses = await kSqlDbRestApiClient.GetTablesAsync(cancellationToken);
+  Console.WriteLine(string.Join(', ', tablesResponses[0].Tables!.Select(c => c.Name)));
+
+  var dropProperties = new DropFromItemProperties
+  {
+    UseIfExistsClause = true,
+    DeleteTopic = true,
+    IdentifierEscaping = IdentifierEscaping.Keywords
+  };
+  httpResponseMessage = await kSqlDbRestApiClient.DropTableAsync<Movie>(dropProperties, cancellationToken: cancellationToken);
+  tablesResponses = await kSqlDbRestApiClient.GetTablesAsync(cancellationToken);
+}
+```
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Query;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+
+public class Movie : Record
+{
+  [Key]
+  public int Id { get; set; }
+  public string Title { get; set; } = null!;
+}
 ```
 
 ### Aggregation functions

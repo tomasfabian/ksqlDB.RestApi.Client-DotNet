@@ -29,14 +29,13 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
 		<PackageReference Include="ksqlDb.RestApi.Client" Version="3.6.0" />
-        <PackageReference Include="Microsoft.IdentityModel.Abstractions" Version="7.4.0" />
-        <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.4.0" />
-        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.4.0" />
-        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.4.0" />
+        <PackageReference Include="Microsoft.IdentityModel.Abstractions" Version="7.5.0" />
+        <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.5.0" />
+        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.5.0" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.0" />
 	</ItemGroup>
 
-	<ItemGroup
-        ><!--<ProjectReference Include="..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />-->
+	<ItemGroup><!--<ProjectReference Include="..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />-->
 	</ItemGroup>
 
 </Project>

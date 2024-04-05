@@ -26,6 +26,8 @@ Console.WriteLine("Press any key to stop the subscription");
 Console.ReadKey();
 
 #pragma warning disable CS8321 // Local function is declared but never used
+// ReSharper disable UnusedMember.Local
+// ReSharper disable UnusedVariable
 
 static async Task InsertAComplexTypeAsync(IKSqlDbRestApiClient restApiClient)
 {
@@ -88,9 +90,8 @@ Drop type Person;
 Drop type Address;
 "));
 
-  //Act
-  httpResponseMessage = await restApiClient.CreateTypeAsync<Address>();
-  httpResponseMessage = await restApiClient.CreateTypeAsync<Person>();
+  await restApiClient.CreateTypeAsync<Address>();
+  await restApiClient.CreateTypeAsync<Person>();
 }
 
 static async Task CreateTypeWithSessionVariableAsync(IKSqlDbRestApiClient restApiClient)
@@ -103,7 +104,7 @@ static async Task CreateTypeWithSessionVariableAsync(IKSqlDbRestApiClient restAp
   var httpResponseMessage = await restApiClient.ExecuteStatementAsync(statement);
 }
 
-static async Task CreateStreamAsync(IKSqlDbRestApiClient restApiClient)
+static async Task CreateStreamAsync(IKSqlDbRestApiClient restApiClient, CancellationToken cancellationToken = default)
 {
   EntityCreationMetadata metadata = new(kafkaTopic: nameof(Event))
   {
@@ -111,36 +112,36 @@ static async Task CreateStreamAsync(IKSqlDbRestApiClient restApiClient)
     Replicas = 1
   };
 
-  var httpResponseMessage = await restApiClient.CreateStreamAsync<Event>(metadata, ifNotExists: true);
+  var httpResponseMessage = await restApiClient.CreateStreamAsync<Event>(metadata, ifNotExists: true, cancellationToken);
 
   //OR
   //httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<MovieNullableFields>(metadata);
 
-  httpResponseMessage = await restApiClient.CreateSourceStreamAsync<Event>(metadata, ifNotExists: true);
+  httpResponseMessage = await restApiClient.CreateSourceStreamAsync<Event>(metadata, ifNotExists: true, cancellationToken);
 
-  string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
+  string responseContent = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
 }
 
-static async Task GetKsqlDbInformationAsync(IKSqlDbRestApiClient restApiProvider)
+static async Task GetKsqlDbInformationAsync(IKSqlDbRestApiClient restApiProvider, CancellationToken cancellationToken = default)
 {
   Console.WriteLine($"{Environment.NewLine}Available topics:");
-  var topicsResponses = await restApiProvider.GetTopicsAsync();
+  var topicsResponses = await restApiProvider.GetTopicsAsync(cancellationToken);
   Console.WriteLine(string.Join(',', topicsResponses[0].Topics!.Select(c => c.Name)));
 
-  TopicsResponse[] allTopicsResponses = await restApiProvider.GetAllTopicsAsync();
-  TopicsExtendedResponse[] topicsExtendedResponses = await restApiProvider.GetTopicsExtendedAsync();
-  var allTopicsExtendedResponses = await restApiProvider.GetAllTopicsExtendedAsync();
+  TopicsResponse[] allTopicsResponses = await restApiProvider.GetAllTopicsAsync(cancellationToken);
+  TopicsExtendedResponse[] topicsExtendedResponses = await restApiProvider.GetTopicsExtendedAsync(cancellationToken);
+  var allTopicsExtendedResponses = await restApiProvider.GetAllTopicsExtendedAsync(cancellationToken);
 
   Console.WriteLine($"{Environment.NewLine}Available tables:");
-  var tablesResponse = await restApiProvider.GetTablesAsync();
+  var tablesResponse = await restApiProvider.GetTablesAsync(cancellationToken);
   Console.WriteLine(string.Join(',', tablesResponse[0].Tables!.Select(c => c.Name)));
 
   Console.WriteLine($"{Environment.NewLine}Available streams:");
-  var streamsResponse = await restApiProvider.GetStreamsAsync();
+  var streamsResponse = await restApiProvider.GetStreamsAsync(cancellationToken);
   Console.WriteLine(string.Join(',', streamsResponse[0].Streams!.Select(c => c.Name)));
 
   Console.WriteLine($"{Environment.NewLine}Available connectors:");
-  var connectorsResponse = await restApiProvider.GetConnectorsAsync();
+  var connectorsResponse = await restApiProvider.GetConnectorsAsync(cancellationToken);
   Console.WriteLine(string.Join(',', connectorsResponse[0].Connectors!.Select(c => c.Name)));
 }
 

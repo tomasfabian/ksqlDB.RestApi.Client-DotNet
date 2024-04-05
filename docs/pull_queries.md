@@ -19,6 +19,17 @@ var result = await context.ExecutePullQuery<IoTSensorStats>(ksql);
 See also [GetManyAsync](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet#ipullable---getmanyasync-v170).
 
 ```C#
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+
+public record IoTSensor
+{
+  [Key]
+  public string SensorId { get; set; } = null!;
+  public int Value { get; set; }
+}
+```
+
+```C#
 using System.Net.Http;
 using System.Threading.Tasks;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
@@ -33,7 +44,7 @@ IKSqlDbRestApiClient restApiClient;
 
 async Task Main()
 {
-  string ksqlDbUrl = @"http://localhost:8088";
+  string ksqlDbUrl = "http://localhost:8088";
   await using var context = new KSqlDBContext(ksqlDbUrl);
 
   var httpClient = new HttpClient
@@ -238,5 +249,7 @@ Generated KSQL:
 ```SQL
 SELECT *
   FROM avg_sensor_values
- WHERE SensorId = 'sensor-1' AND (WINDOWSTART > '2019-10-03T21:31:16') AND (WINDOWEND <= '2020-10-03T21:31:16');
+ WHERE SensorId = 'sensor-1'
+   AND (WINDOWSTART > '2019-10-03T21:31:16')
+   AND (WINDOWEND <= '2020-10-03T21:31:16');
 ```
