@@ -13,18 +13,6 @@ namespace ksqlDB.RestApi.Client.Samples.Model
 {
   public class PaymentModelBuilder
   {
-    private record Payment
-    {
-      public string Id { get; set; } = null!;
-      public decimal Amount { get; set; }
-      public string Description { get; set; } = null!;
-    }
-    private record Account
-    {
-      public string Id { get; set; } = null!;
-      public decimal Balance { get; set; }
-    }
-
     private static void InitModel()
     {
       ModelBuilder builder = new();
@@ -47,12 +35,29 @@ namespace ksqlDB.RestApi.Client.Samples.Model
     }
   }
 }
+
+private record Payment
+{
+  public string Id { get; set; } = null!;
+  public decimal Amount { get; set; }
+  public string Description { get; set; } = null!;
+}
+
+private record Account
+{
+  public string Id { get; set; } = null!;
+  public decimal Balance { get; set; }
+}
 ```
 
 `builder`: An instance of `ModelBuilder` used to configure the model.
+
 `Entity<T>`: A method that configures an entity of type T.
-`HasKey(expression)`: A method used to specify the **primary key** for the entity. It takes a lambda expression that specifies the property or properties that make up the primary key.
+
+`HasKey(expression)`: A method used to specify the **primary key** for the entity. It takes a lambda expression that specifies the property that make up the primary key.
+
 `Property(expression)`: A method used to specify a property of the entity. It takes a lambda expression that specifies the property.
+
 `Decimal(precision, scale)`: A method used to specify **precision** and **scale** for a **decimal** property. Precision specifies the maximum number of digits, and scale specifies the number of digits to the right of the decimal point.
 
 ## IFromItemTypeConfiguration
