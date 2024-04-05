@@ -7,15 +7,8 @@ using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 {
-  internal sealed class KSqlTypeTranslator : EntityInfo
+  internal sealed class KSqlTypeTranslator(ModelBuilder modelBuilder) : EntityInfo
   {
-    private readonly ModelBuilder modelBuilder;
-
-    public KSqlTypeTranslator(ModelBuilder modelBuilder)
-    {
-      this.modelBuilder = modelBuilder;
-    }
-
     internal string Translate(Type type, IdentifierEscaping escaping = IdentifierEscaping.Never)
     {
       var ksqlType = string.Empty;

@@ -1,5 +1,6 @@
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDb.RestApi.Client.Metadata;
-using ksqlDB.RestApi.Client.Samples.Models.Movies;
 
 namespace ksqlDB.RestApi.Client.Samples.Model
 {
@@ -28,6 +29,14 @@ namespace ksqlDB.RestApi.Client.Samples.Model
       builder.Entity<Payment>()
         .Property(b => b.Amount)
         .Decimal(precision: 10, scale: 2);
+
+      var httpClient = new HttpClient
+      {
+        BaseAddress = new Uri("http://localhost:8088")
+      };
+      var httpClientFactory = new HttpClientFactory(httpClient);
+
+      var restApiProvider = new KSqlDbRestApiClient(httpClientFactory);
     }
   }
 }
