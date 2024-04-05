@@ -13,29 +13,35 @@ namespace ksqlDB.RestApi.Client.Samples.Model
 {
   public class PaymentModelBuilder
   {
-    private static void InitModel()
+    public static async Task InitModelAndCreateStreamAsync(CancellationToken cancellationToken = default)
     {
       ModelBuilder builder = new();
-
+    
       builder.Entity<Account>()
-        .HasKey(c => c.Id);
-
+        .HasKey(c => c.Id)
+        .Property(b => b.Balance);
+    
       builder.Entity<Payment>()
         .HasKey(c => c.Id)
         .Property(b => b.Amount)
         .Decimal(precision: 10, scale: 2);
-
+    
       var httpClient = new HttpClient
       {
         BaseAddress = new Uri("http://localhost:8088")
       };
       var httpClientFactory = new HttpClientFactory(httpClient);
-
-      var restApiProvider = new KSqlDbRestApiClient(httpClientFactory);
+      var restApiProvider = new KSqlDbRestApiClient(httpClientFactory, builder);
+    
+      var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Payment));
+    
+      var responseMessage = await restApiProvider.CreateStreamAsync<Payment>(entityCreationMetadata, true, cancellationToken);
     }
   }
 }
+```
 
+```C#
 private record Payment
 {
   public string Id { get; set; } = null!;
@@ -74,7 +80,6 @@ This class contains configuration logic for the `Payment` entity.
 Here's the code snippet demonstrating the application of configurations:
 
 ```C#
-using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDb.RestApi.Client.FluentAPI.Builders.Configuration;
 
 public class PaymentConfiguration : IFromItemTypeConfiguration<Payment>
@@ -88,6 +93,8 @@ public class PaymentConfiguration : IFromItemTypeConfiguration<Payment>
 ```
 
 ```C#
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
+
 ModelBuilder builder = new();
 builder.Apply(new PaymentConfiguration());
 ```
