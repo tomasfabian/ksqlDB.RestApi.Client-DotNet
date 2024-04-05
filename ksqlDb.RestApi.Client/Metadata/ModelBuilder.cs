@@ -3,16 +3,16 @@ using System.Reflection;
 
 namespace ksqlDb.RestApi.Client.Metadata
 {
-  internal class ModelBuilder
+  public class ModelBuilder
   {
     private readonly IDictionary<Type, EntityTypeBuilder> builders = new Dictionary<Type, EntityTypeBuilder>(); //TODO: concurrent
 
-    public IEnumerable<EntityMetadata> GetEntities()
+    internal IEnumerable<EntityMetadata> GetEntities()
     {
       return builders.Values.Select(c => c.Metadata);
     }
 
-    public EntityTypeBuilder<TEntity> Entity<TEntity>()
+    public IEntityTypeBuilder<TEntity> Entity<TEntity>()
       where TEntity : class
     {
       if (builders.ContainsKey(typeof(TEntity)))
@@ -30,7 +30,7 @@ namespace ksqlDb.RestApi.Client.Metadata
     public EntityMetadata Metadata { get; } = new();
   }
 
-  internal class EntityTypeBuilder<TEntity> : EntityTypeBuilder
+  internal class EntityTypeBuilder<TEntity> : EntityTypeBuilder, IEntityTypeBuilder<TEntity>
     where TEntity : class
   {
     public EntityTypeBuilder()
@@ -38,13 +38,13 @@ namespace ksqlDb.RestApi.Client.Metadata
       Metadata.Type = typeof(TEntity);
     }
 
-    public EntityTypeBuilder<TEntity> HasKey<TProperty>(Expression<Func<TEntity, TProperty>> getProperty)
+    public IEntityTypeBuilder<TEntity> HasKey<TProperty>(Expression<Func<TEntity, TProperty>> getProperty)
     {
       Metadata.PrimaryKeyMemberInfo = getProperty.GetMemberInfo();
       return this;
     }
 
-    public FieldTypeBuilder<TProperty> Property<TProperty>(Expression<Func<TEntity, TProperty>> getProperty)
+    public IFieldTypeBuilder<TProperty> Property<TProperty>(Expression<Func<TEntity, TProperty>> getProperty)
     {
       var members = getProperty.GetMembers().Reverse();
 
@@ -87,7 +87,7 @@ namespace ksqlDb.RestApi.Client.Metadata
     public IEnumerable<FieldMetadata> FieldsMetadata => FieldsMetadataDict.Values;
   }
 
-  public record FieldMetadata
+  internal record FieldMetadata
   {
     public MemberInfo MemberInfo { get; init; } = null!;
     public bool Ignore { get; internal set; }
@@ -95,7 +95,7 @@ namespace ksqlDb.RestApi.Client.Metadata
     internal string FullPath { get; init; } = null!;
   }
 
-  public record DecimalFieldMetadata : FieldMetadata
+  internal record DecimalFieldMetadata : FieldMetadata
   {
     public DecimalFieldMetadata(FieldMetadata fieldMetadata)
     {
@@ -106,13 +106,14 @@ namespace ksqlDb.RestApi.Client.Metadata
     }
 
     public short Precision { get; internal set; }
+
     public short Scale { get; internal set; }
   }
 
-  public class DecimalFieldTypeBuilder<TProperty>(DecimalFieldMetadata fieldMetadata)
+  internal class DecimalFieldTypeBuilder<TProperty>(DecimalFieldMetadata fieldMetadata)
     : FieldTypeBuilder<TProperty>(fieldMetadata)
   {
-    internal FieldTypeBuilder PrecisionInt(short precision, short scale)
+    internal FieldTypeBuilder<TProperty> PrecisionInt(short precision, short scale)
     {
       fieldMetadata.Precision = precision;
       fieldMetadata.Scale = scale;
@@ -120,13 +121,10 @@ namespace ksqlDb.RestApi.Client.Metadata
     }
   }
 
-  public class FieldTypeBuilder<TProperty>(FieldMetadata fieldMetadata) : FieldTypeBuilder(fieldMetadata)
+  internal class FieldTypeBuilder<TProperty>(FieldMetadata fieldMetadata)
+    : IFieldTypeBuilder<TProperty>
   {
-  }
-
-  public class FieldTypeBuilder(FieldMetadata fieldMetadata)
-  {
-    public FieldTypeBuilder Ignore()
+    public IFieldTypeBuilder<TProperty> Ignore()
     {
       fieldMetadata.Ignore = true;
       return this;
@@ -162,9 +160,20 @@ namespace ksqlDb.RestApi.Client.Metadata
     }
   }
 
+  public interface IEntityTypeBuilder<TEntity>
+  {
+    IFieldTypeBuilder<TProperty> Property<TProperty>(Expression<Func<TEntity, TProperty>> getProperty);
+    IEntityTypeBuilder<TEntity> HasKey<TProperty>(Expression<Func<TEntity, TProperty>> getProperty);
+  }
+
+  public interface IFieldTypeBuilder<TProperty>
+  {
+    IFieldTypeBuilder<TProperty> Ignore();
+  }
+
   public static class Ext
   {
-    public static FieldTypeBuilder<decimal> Precision(this FieldTypeBuilder<decimal> builder, short precision, short scale)
+    public static IFieldTypeBuilder<decimal> Decimal(this IFieldTypeBuilder<decimal> builder, short precision, short scale)
     {
       ((DecimalFieldTypeBuilder<decimal>)builder).PrecisionInt(precision, scale);
       return builder;
