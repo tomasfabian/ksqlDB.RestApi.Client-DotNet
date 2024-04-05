@@ -1,5 +1,8 @@
 # Breaking changes
 
+# v5.0.0
+- removed static modifier from `StatementGenerator` class
+
 # v4.0.0
 - `TypeProperties` - removed generic type argument and added a base type `EntityProperties`. Additionally, changed from a class to a record type.
 - the above change affected the argument for the `IKSqlDbRestApiClient.CreateTypeAsync<T>(TypeProperties typeProperties)`

@@ -428,6 +428,7 @@ List of supported [pull query](https://github.com/tomasfabian/ksqlDB.RestApi.Cli
 - [KSqlDbContextOptionsBuilder](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/ksqldbcontext.md#ksqldbcontextoptionsbuilder)
 
 **Config**
+- [Fluent API - Model builder](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/modelbuilder.md)
 - [Bearer token authentication](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/config.md#bearer-token-authentication)
 - [Replacing HttpClient](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/config.md#ksqldbcontextoptionsbuilderreplacehttpclient)
 - [Processing guarantees](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/config.md#processingguarantee-enum)

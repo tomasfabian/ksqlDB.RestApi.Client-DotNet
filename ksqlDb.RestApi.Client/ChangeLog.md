@@ -1,5 +1,11 @@
 # ksqlDB.RestApi.Client
 
+# 5.0.0-rc.1
+- added `ModelBuilder` to **configure the model**, allowing the customization of **keys**
+- added `FieldTypeBuilderExtensions` for configuring **decimal types** #66  (requested by @mrt181)
+- added `IFromItemTypeConfiguration` to apply model-related configurations using the provided `ModelBuilder`
+- see also [breakingchanges.md](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/breaking_changes.md#v500)
+ 
 # 4.0.1
 - fixes LINQ Where ignores `JsonPropertyNameAttribute` when using new for column selection, causing failing ksqldb request. #68
 
