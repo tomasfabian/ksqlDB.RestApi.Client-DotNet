@@ -2,6 +2,7 @@ using System.Drawing;
 using System.Text;
 using FluentAssertions;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDb.RestApi.Client.FluentAPI.Builders.Configuration;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using NUnit.Framework;
@@ -10,11 +11,13 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
 {
   public class KSqlTypeTranslatorTests
   {
-    private readonly ModelBuilder modelBuilder = new();
-    private readonly KSqlTypeTranslator kSqlTypeTranslator;
+    private ModelBuilder modelBuilder = null!;
+    private KSqlTypeTranslator kSqlTypeTranslator = null!;
 
-    public KSqlTypeTranslatorTests()
+    [SetUp]
+    public void Init()
     {
+      modelBuilder = new();
       kSqlTypeTranslator = new(modelBuilder);
     }
 
@@ -384,7 +387,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
     }
 
     [Test]
-    public void Translate_UseModelBuilder_DecimalAttributeType()
+    public void Translate_UseModelBuilderConfiguration()
     {
       //Arrange
       var type = typeof(Poco);
@@ -397,6 +400,20 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
 
       //Assert
       ksqlType.Should().Be($"{KSqlTypes.Struct}<{nameof(Poco.Amount)} {KSqlTypes.Decimal}(10,2)>");
+    }
+
+    [Test]
+    public void Translate_UseModelBuilderConvention()
+    {
+      //Arrange
+      var type = typeof(Poco);
+      modelBuilder.AddConvention(new DecimalTypeConvention(10, 3));
+
+      //Act
+      string ksqlType = kSqlTypeTranslator.Translate(type);
+
+      //Assert
+      ksqlType.Should().Be($"{KSqlTypes.Struct}<{nameof(Poco.Amount)} {KSqlTypes.Decimal}(10,3)>");
     }
   }
 }

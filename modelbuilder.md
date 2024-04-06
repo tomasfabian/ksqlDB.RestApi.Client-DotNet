@@ -99,3 +99,15 @@ using ksqlDb.RestApi.Client.FluentAPI.Builders;
 ModelBuilder builder = new();
 builder.Apply(new PaymentConfiguration());
 ```
+
+## ModelBuilder conventions
+You can add a global convention to the model builder for the **decimal** type in the following way.
+
+```C#
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDb.RestApi.Client.FluentAPI.Builders.Configuration;
+
+var modelBuilder = new ModelBuilder();
+var decimalTypeConvention = new DecimalTypeConvention(14, 14);
+modelBuilder.AddConvention(decimalTypeConvention);
+```

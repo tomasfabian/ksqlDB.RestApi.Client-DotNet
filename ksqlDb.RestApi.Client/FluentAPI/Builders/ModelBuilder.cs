@@ -9,6 +9,7 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
   public class ModelBuilder
   {
     private readonly IDictionary<Type, EntityTypeBuilder> builders = new Dictionary<Type, EntityTypeBuilder>();
+    internal readonly IDictionary<Type, IConventionConfiguration> Conventions = new Dictionary<Type, IConventionConfiguration>();
 
     internal IEnumerable<EntityMetadata> GetEntities()
     {
@@ -25,6 +26,18 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
       where TEntity : class
     {
       configuration.Configure(Entity<TEntity>());
+
+      return this;
+    }
+
+    /// <summary>
+    /// Adds a convention to the model builder.
+    /// </summary>
+    /// <param name="configuration">The configuration for the convention to add.</param>
+    /// <returns>The current <see cref="ModelBuilder"/> instance.</returns>
+    public ModelBuilder AddConvention(IConventionConfiguration configuration)
+    {
+      Conventions.Add(configuration.Type, configuration);
 
       return this;
     }

@@ -1,5 +1,6 @@
 using System.Reflection;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDb.RestApi.Client.FluentAPI.Builders.Configuration;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
@@ -115,19 +116,10 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
     {
       if (type == typeof(decimal))
       {
-        if (parentType != null)
+        if (TryGetDecimal(parentType, memberInfo, out var @decimal))
         {
-          var entityMetadata = modelBuilder.GetEntities().FirstOrDefault(c => c.Type == parentType);
-          if (entityMetadata?.FieldsMetadata.FirstOrDefault(c => c.MemberInfo == memberInfo) is DecimalFieldMetadata fieldMetadata)
-          {
-            return $"({fieldMetadata.Precision},{fieldMetadata.Scale})";//TODO:format
-          }
+          return @decimal!;
         }
-
-        var decimalMember = memberInfo.TryGetAttribute<DecimalAttribute>();
-
-        if (decimalMember != null)
-          return $"({decimalMember.Precision},{decimalMember.Scale})";
       }
 
       if (type.IsArray)
@@ -146,6 +138,46 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       }
 
       return string.Empty;
+    }
+
+    private bool TryGetDecimal(Type? parentType, MemberInfo memberInfo, out string? @decimal)
+    {
+      if (parentType != null)
+      {
+        var entityMetadata = modelBuilder.GetEntities().FirstOrDefault(c => c.Type == parentType);
+        if (entityMetadata?.FieldsMetadata.FirstOrDefault(c => c.MemberInfo == memberInfo) is DecimalFieldMetadata fieldMetadata)
+        {
+          {
+            @decimal = GetDecimal(fieldMetadata.Precision, fieldMetadata.Scale);
+            return true;
+          }
+        }
+      }
+
+      var decimalMember = memberInfo.TryGetAttribute<DecimalAttribute>();
+
+      if (decimalMember != null)
+      {
+        @decimal = GetDecimal(decimalMember.Precision,decimalMember.Scale);
+        return true;
+      }
+
+      if (modelBuilder.Conventions.TryGetValue(typeof(decimal), out var conversion))
+      {
+        if (conversion is DecimalTypeConvention decimalConversion)
+        {
+          @decimal = GetDecimal(decimalConversion.Precision, decimalConversion.Scale);
+          return true;
+        }
+      }
+
+      @decimal = null;
+      return false;
+    }
+
+    private string GetDecimal(short precision, short scale)
+    {
+      return $"({precision},{scale})";
     }
   }
 }

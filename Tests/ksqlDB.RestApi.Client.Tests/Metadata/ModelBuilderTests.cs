@@ -111,6 +111,19 @@ namespace ksqlDb.RestApi.Client.Tests.Metadata
       entityMetadata!.FieldsMetadata.First(c => c.MemberInfo == memberInfo).Ignore.Should().BeTrue();
     }
 
+    [Test]
+    public void AddConventionForDecimal()
+    {
+      //Arrange
+      var decimalTypeConvention = new DecimalTypeConvention(14, 14);
+
+      //Act
+      builder.AddConvention(decimalTypeConvention);
+
+      //Assert
+      builder.Conventions[typeof(decimal)].Should().BeEquivalentTo(decimalTypeConvention);
+    }
+
     private class PaymentConfiguration : IFromItemTypeConfiguration<Payment>
     {
       public void Configure(IEntityTypeBuilder<Payment> builder)
