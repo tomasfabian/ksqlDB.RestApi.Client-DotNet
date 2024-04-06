@@ -1,5 +1,7 @@
 # Model builder
 
+Using the **fluent API** with **POCO**s for generated classes that cannot be changed due to code regeneration offers a structured and maintainable approach to configuring your domain model, while keeping your codebase clean and flexible.
+
 The `ModelBuilder` class provides functionalities to define mappings for entities.
 The configurations made using the fluent API will override any attributes defined on the entity or its properties.
 Use the `Entity<T>()` method of `ModelBuilder` to configure entities and define their properties.

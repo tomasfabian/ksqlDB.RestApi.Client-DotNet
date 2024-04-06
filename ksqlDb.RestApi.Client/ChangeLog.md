@@ -4,7 +4,7 @@
 - added `ModelBuilder` to **configure the model**, allowing the customization of **keys**
 - added `FieldTypeBuilderExtensions` for configuring **decimal types** #66  (requested by @mrt181)
 - added `IFromItemTypeConfiguration` to apply model-related configurations using the provided `ModelBuilder`
-- added `IConventionConfiguration` to apply model-related conventions
+- added `IConventionConfiguration` to apply model-related conventions. `DecimalTypeConvention` represents a decimal type convention for configuring precision and scale.
 - see also [breakingchanges.md](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/breaking_changes.md#v500)
  
 # 4.0.1
