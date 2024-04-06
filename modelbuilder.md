@@ -25,17 +25,18 @@ namespace ksqlDB.RestApi.Client.Samples.Model
         .HasKey(c => c.Id)
         .Property(b => b.Amount)
         .Decimal(precision: 10, scale: 2);
-    
+
       var httpClient = new HttpClient
       {
         BaseAddress = new Uri("http://localhost:8088")
       };
       var httpClientFactory = new HttpClientFactory(httpClient);
       var restApiProvider = new KSqlDbRestApiClient(httpClientFactory, builder);
-    
-      var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Payment));
-    
-      var responseMessage = await restApiProvider.CreateStreamAsync<Payment>(entityCreationMetadata, true, cancellationToken);
+      
+      var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Payment), partitions: 1);
+      
+      var responseMessage = await restApiProvider.CreateTableAsync<Payment>(entityCreationMetadata, true, cancellationToken);
+      var content = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
     }
   }
 }

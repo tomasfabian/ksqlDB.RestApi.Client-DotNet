@@ -461,7 +461,6 @@ public class CreateEntityTests
     public double Field;
 //#pragma warning restore CS0649
     public int DontFindMe { get; }
-
   }
 
   internal class MyItems
@@ -588,16 +587,18 @@ public class CreateEntityTests
     var statementContext = new StatementContext
     {
       CreationType = CreationType.CreateOrReplace,
-      KSqlEntityType = KSqlEntityType.Table
+      KSqlEntityType = KSqlEntityType.Table,
     };
+
+    creationMetadata.KafkaTopic = nameof(Poco);
 
     //Act
     string statement = new CreateEntity(modelBuilder).Print<Poco>(statementContext, creationMetadata, null);
 
     //Assert
-    statement.Should().Be(@"CREATE OR REPLACE TABLE Pocos (
-	Id INT PRIMARY KEY,
-	Description VARCHAR
-) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+    statement.Should().Be($@"CREATE OR REPLACE TABLE {nameof(Poco)}s (
+	{nameof(Poco.Id)} INT PRIMARY KEY,
+	{nameof(Poco.Description)} VARCHAR
+) WITH ( KAFKA_TOPIC='{nameof(Poco)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
   }
 }

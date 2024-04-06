@@ -27,15 +27,12 @@ public class PaymentModelBuilder
     var httpClientFactory = new HttpClientFactory(httpClient);
     var restApiProvider = new KSqlDbRestApiClient(httpClientFactory, builder);
 
-    var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Payment))
-    {
-    };
+    var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Payment), partitions: 1);
 
-    var responseMessage = await restApiProvider.CreateStreamAsync<Payment>(entityCreationMetadata, true, cancellationToken);
-    var content = await responseMessage.Content.ReadAsStreamAsync(cancellationToken);
+    var responseMessage = await restApiProvider.CreateTableAsync<Payment>(entityCreationMetadata, true, cancellationToken);
+    var content = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
   }
 }
-
 
 record Payment
 {
