@@ -1,13 +1,18 @@
+using ksqlDb.RestApi.Client.DependencyInjection;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace ksqlDB.RestApi.Client.Samples.Model;
+namespace ksqlDB.RestApi.Client.Samples.ModelBuilders;
 
 public class PaymentModelBuilder
 {
-  public static async Task InitModelAndCreateStreamAsync(CancellationToken cancellationToken = default)
+  private readonly string ksqlDbUrl = "http://localhost:8088";
+
+  public async Task InitModelAndCreateStreamAsync(CancellationToken cancellationToken = default)
   {
     ModelBuilder builder = new();
 
@@ -22,15 +27,35 @@ public class PaymentModelBuilder
 
     var httpClient = new HttpClient
     {
-      BaseAddress = new Uri("http://localhost:8088")
+      BaseAddress = new Uri(ksqlDbUrl)
     };
     var httpClientFactory = new HttpClientFactory(httpClient);
-    var restApiProvider = new KSqlDbRestApiClient(httpClientFactory, builder);
+    IKSqlDbRestApiClient restApiProvider = new KSqlDbRestApiClient(httpClientFactory, builder);
+    restApiProvider = ConfigureRestApiClientWithServicesCollection(new ServiceCollection(), builder);
 
     var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Payment), partitions: 1);
 
     var responseMessage = await restApiProvider.CreateTableAsync<Payment>(entityCreationMetadata, true, cancellationToken);
     var content = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
+  }
+
+  private IKSqlDbRestApiClient ConfigureRestApiClientWithServicesCollection(ServiceCollection serviceCollection, ModelBuilder builder)
+  {
+    serviceCollection
+      .AddDbContext<IKSqlDBContext, KSqlDBContext>(c =>
+      {
+        c.UseKSqlDb(ksqlDbUrl);
+
+        c.ReplaceHttpClient<ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory, ksqlDB.RestApi.Client.KSql.RestApi.Http.HttpClientFactory>(_ => { })
+        .AddHttpMessageHandler(_ => new Program.DebugHandler());
+      })
+      .AddSingleton(builder);
+
+    var provider = serviceCollection.BuildServiceProvider();
+
+    var restApiClient = provider.GetRequiredService<IKSqlDbRestApiClient>();
+
+    return restApiClient;
   }
 }
 
