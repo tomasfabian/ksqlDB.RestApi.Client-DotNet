@@ -2,7 +2,6 @@ using ksqlDb.RestApi.Client.DependencyInjection;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,13 +24,7 @@ public class PaymentModelBuilder
       .Property(b => b.Amount)
       .Decimal(precision: 10, scale: 2);
 
-    var httpClient = new HttpClient
-    {
-      BaseAddress = new Uri(ksqlDbUrl)
-    };
-    var httpClientFactory = new HttpClientFactory(httpClient);
-    IKSqlDbRestApiClient restApiProvider = new KSqlDbRestApiClient(httpClientFactory, builder);
-    restApiProvider = ConfigureRestApiClientWithServicesCollection(new ServiceCollection(), builder);
+    var restApiProvider = ConfigureRestApiClientWithServicesCollection(new ServiceCollection(), builder);
 
     var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Payment), partitions: 1);
 

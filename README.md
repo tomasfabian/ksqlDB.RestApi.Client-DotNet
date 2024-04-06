@@ -350,6 +350,40 @@ public class Movie : Record
 }
 ```
 
+# Model builder
+By leveraging the `ksqlDb.RestApi.Client` fluent API model builder, you can streamline the configuration process, improve code readability, and mitigate issues related to code regeneration by keeping configuration logic separate from generated POCOs.
+
+```C#
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDb.RestApi.Client.FluentAPI.Builders.Configuration;
+
+ModelBuilder builder = new();
+
+var decimalTypeConvention = new DecimalTypeConvention(14, 14);
+
+builder.AddConvention(decimalTypeConvention);
+
+builder.Entity<Payment>()
+  .HasKey(c => c.Id)
+  .Property(b => b.Amount)
+  .Decimal(precision: 10, scale: 2);
+```
+
+```C#
+record Payment
+{
+  public string Id { get; set; } = null!;
+  public decimal Amount { get; set; }
+  public string Description { get; set; } = null!;
+}
+
+record Account
+{
+  public string Id { get; set; } = null!;
+  public decimal Balance { get; set; }
+}
+```
+
 ### Aggregation functions
 List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/aggregations.md):
 - [GROUP BY](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/aggregations.md#groupby)
