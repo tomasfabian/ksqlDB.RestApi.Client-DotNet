@@ -7,7 +7,7 @@ using ksqlDb.RestApi.Client.FluentAPI.Builders.Configuration;
 using ksqlDb.RestApi.Client.Metadata;
 using NUnit.Framework;
 
-namespace ksqlDb.RestApi.Client.Tests.Metadata
+namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
 {
   public class ModelBuilderTests
   {
@@ -172,7 +172,7 @@ namespace ksqlDb.RestApi.Client.Tests.Metadata
       fieldTypeBuilder.Should().NotBeNull();
       var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
       entityMetadata.Should().NotBeNull();
-      var metadata = (DecimalFieldMetadata) entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Amount));
+      var metadata = (DecimalFieldMetadata)entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Amount));
 
       metadata.Precision.Should().Be(precision);
       metadata.Scale.Should().Be(scale);
