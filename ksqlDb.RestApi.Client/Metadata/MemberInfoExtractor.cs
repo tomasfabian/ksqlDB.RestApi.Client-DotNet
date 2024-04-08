@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace ksqlDb.RestApi.Client.Metadata
 {
-  internal static class PropertyInfoExtractor
+  internal static class MemberInfoExtractor
   {
     internal static IEnumerable<(string, MemberInfo)> GetMembers<TEntity, TProperty>(this Expression<Func<TEntity, TProperty>> propertyExpression)
     {
