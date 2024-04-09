@@ -7,12 +7,14 @@ namespace ksqlDB.RestApi.Client.KSql.Query;
 
 internal class KStreamSetDependencies : IKStreamSetDependencies
 {
+  private readonly IKSqlDbParameters queryStreamParameters;
+
   public KStreamSetDependencies(IKSqlQbservableProvider provider, IKSqlDbProvider ksqlDbProvider, IKSqlQueryGenerator queryGenerator, IKSqlDbParameters queryStreamParameters)
   {
     Provider = provider;
     KsqlDBProvider = ksqlDbProvider;
     KSqlQueryGenerator = queryGenerator;
-    QueryStreamParameters = queryStreamParameters;
+    this.queryStreamParameters = queryStreamParameters;
 
     QueryContext = new QueryContext();
   }
@@ -23,7 +25,10 @@ internal class KStreamSetDependencies : IKStreamSetDependencies
 
   public IKSqlQueryGenerator KSqlQueryGenerator { get; }
 
-  public IKSqlDbParameters QueryStreamParameters { get; }
+  public IKSqlDbParameters QueryStreamParameters
+  {
+    get { return queryStreamParameters.Clone(); }
+  }
 
   public QueryContext QueryContext { get; }
 }

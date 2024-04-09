@@ -112,11 +112,11 @@ public static class PullQueryExtensions
   {
     if (source == null) throw new ArgumentNullException(nameof(source));
 
-    var pullSet = source as KPullSet<TSource>;
+    var pullSet = (KPullSet<TSource>)source;
 
-    var dependencies = pullSet?.GetDependencies();
+    var dependencies = pullSet.GetDependencies();
 
-    return dependencies?.QueryStreamParameters?.Sql ?? string.Empty;
+    return pullSet.GetQueryStreamParameters(dependencies).Sql;
   }
 
   #endregion

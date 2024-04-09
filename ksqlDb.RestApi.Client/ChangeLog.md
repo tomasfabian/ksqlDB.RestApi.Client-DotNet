@@ -1,5 +1,8 @@
 # ksqlDB.RestApi.Client
 
+# 4.0.2
+- fixes Identified an issue where multiple push queries sharing the same `QueryStreamParameters` SQL were encountered within the same asynchronous context #72 
+
 # 4.0.1
 - fixes LINQ Where ignores `JsonPropertyNameAttribute` when using new for column selection, causing failing ksqldb request. #68
 
