@@ -33,6 +33,38 @@ public class QbservableExtensionsTests : TestBase
     ksql.Should().BeEquivalentTo("SELECT 'Hello world' FROM Locations EMIT CHANGES;");
   }
 
+  [Test]
+  public void RunInParallel_BuildKSql_PrintsConstant()
+  {
+    //Arrange
+    var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
+
+    var query1 = context.CreateQueryStream<Location>();
+    var query2 = context.CreateQueryStream<Location>("Place");
+
+    var providedParameters = new IKSqlDbParameters[2];
+    int i = 0;
+
+    context.KSqlDbProviderMock.Setup(c => c.Run<Location>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+      .Callback<object, CancellationToken>((par, ct) => { providedParameters[i++] = (IKSqlDbParameters)par; })
+      .Returns(new List<Location>().ToAsyncEnumerable());
+
+    //Act
+    var task1 = Task.Run(() =>
+    {
+      query1.ToAsyncEnumerable().ToListAsync();
+    });
+    var task2 = Task.Run(() =>
+    {
+      query2.ToAsyncEnumerable().ToListAsync();
+    });
+
+    //Assert
+    Task.WaitAll(task1, task2);
+    providedParameters[0].Sql.Should().NotBeEquivalentTo(providedParameters[1].Sql);
+    providedParameters[0].Sql.Should().ContainAny("Locations", "Places");
+  }
+
   #region OperatorPrecedence
 
   [Test]
