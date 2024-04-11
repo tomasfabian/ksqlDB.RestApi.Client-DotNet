@@ -364,10 +364,18 @@ var decimalTypeConvention = new DecimalTypeConvention(14, 14);
 builder.AddConvention(decimalTypeConvention);
 
 builder.Entity<Payment>()
-  .HasKey(c => c.Id)
   .Property(b => b.Amount)
   .Decimal(precision: 10, scale: 2);
+
+builder.Entity<Payment>()
+  .Property(b => b.Description)
+  .Ignore();
+
+builder.Entity<Account>()
+  .HasKey(c => c.Id);
 ```
+
+C# entity definitions:
 
 ```C#
 record Payment
@@ -383,6 +391,31 @@ record Account
   public decimal Balance { get; set; }
 }
 ```
+
+Usage with ksqlDB REST API Client:
+
+```C#
+await kSqlDbRestApiClient.CreateTypeAsync<Payment>(cancellationToken);
+
+var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Account), partitions: 3)
+{
+  Replicas = 3
+};
+responseMessage = await restApiProvider.CreateTableAsync<Account>(entityCreationMetadata, true, cancellationToken);
+```
+
+Generated KSQL:
+
+```SQL
+CREATE TYPE Payment AS STRUCT<Id VARCHAR, Amount DECIMAL(10,2)>;
+
+CREATE TABLE IF NOT EXISTS Accounts (
+	Id VARCHAR PRIMARY KEY,
+	Balance DECIMAL(14,14)
+) WITH ( KAFKA_TOPIC='Account', VALUE_FORMAT='Json', PARTITIONS='3', REPLICAS='3' );
+```
+
+The `Description` field in the `Payment` entity is ignored during code generation, and the `Id` field in the `Account` entity is marked as the **primary key**.
 
 ### Aggregation functions
 List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/aggregations.md):

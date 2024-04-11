@@ -31,6 +31,13 @@ public class PaymentModelBuilder
 
     var responseMessage = await restApiProvider.CreateTableAsync<Payment>(entityCreationMetadata, true, cancellationToken);
     var content = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
+
+    entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Account), partitions: 1)
+    {
+      Replicas = 1
+    };
+    responseMessage = await restApiProvider.CreateTableAsync<Account>(entityCreationMetadata, true, cancellationToken);
+    content = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
   }
 
   private IKSqlDbRestApiClient ConfigureRestApiClientWithServicesCollection(ServiceCollection serviceCollection, ModelBuilder builder)
