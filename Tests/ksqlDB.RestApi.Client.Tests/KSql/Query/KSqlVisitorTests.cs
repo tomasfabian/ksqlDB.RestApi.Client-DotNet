@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using FluentAssertions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
@@ -13,6 +14,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.Query;
 
 public class KSqlVisitorTests : TestBase
 {
+  private ModelBuilder modelBuilder = null!;
   private KSqlVisitor ClassUnderTest { get; set; } = null!;
 
   [SetUp]
@@ -20,7 +22,8 @@ public class KSqlVisitorTests : TestBase
   {
     base.TestInitialize();
 
-    ClassUnderTest = new KSqlVisitor(new KSqlQueryMetadata());
+    modelBuilder = new();
+    ClassUnderTest = new KSqlVisitor(new KSqlQueryMetadata { ModelBuilder = modelBuilder });
   }
 
   #region Constants

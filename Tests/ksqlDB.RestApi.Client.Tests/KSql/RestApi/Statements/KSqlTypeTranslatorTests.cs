@@ -415,5 +415,43 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       //Assert
       ksqlType.Should().Be($"{KSqlTypes.Struct}<{nameof(Poco.Amount)} {KSqlTypes.Decimal}(10,3)>");
     }
+
+    [Struct]
+    private record PocoEx : Poco
+    {
+      public string Description { get; set; } = null!;
+    }
+
+    [Test]
+    public void Translate_UseModelBuilderConfiguration_Ignore()
+    {
+      //Arrange
+      var type = typeof(PocoEx);
+      modelBuilder.Entity<PocoEx>()
+        .Property(c => c.Description)
+        .Ignore();
+
+      //Act
+      string ksqlType = kSqlTypeTranslator.Translate(type);
+
+      //Assert
+      ksqlType.Should().Be($"{KSqlTypes.Struct}<{nameof(PocoEx.Amount)} {KSqlTypes.Decimal}>");
+    }
+
+    [Test]
+    public void Translate_UseModelBuilderConfiguration_IgnorePropertyFromBaseType()
+    {
+      //Arrange
+      var type = typeof(PocoEx);
+      modelBuilder.Entity<PocoEx>()
+        .Property(c => c.Amount)
+        .Ignore();
+
+      //Act
+      string ksqlType = kSqlTypeTranslator.Translate(type);
+
+      //Assert
+      ksqlType.Should().Be($"{KSqlTypes.Struct}<{nameof(PocoEx.Description)} {KSqlTypes.Varchar}>");
+    }
   }
 }

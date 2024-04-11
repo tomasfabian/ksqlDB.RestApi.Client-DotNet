@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json.Serialization;
 using FluentAssertions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
@@ -15,6 +16,14 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements;
 
 public class CreateInsertTests
 {
+  private ModelBuilder modelBuilder = null!;
+
+  [SetUp]
+  public void Init()
+  {
+    modelBuilder = new();
+  }
+
   public static IEnumerable<(IdentifierEscaping, string)> GenerateTestCases()
   {
     yield return (Never, "INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
@@ -30,7 +39,7 @@ public class CreateInsertTests
     var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title" };
 
     //Act
-    var statement = new CreateInsert().Generate(movie, new InsertProperties { IdentifierEscaping = escaping });
+    var statement = new CreateInsert(modelBuilder).Generate(movie, new InsertProperties { IdentifierEscaping = escaping });
 
     //Assert
     statement.Should().Be(expected);
@@ -56,7 +65,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(movie, insertProperties);
+    string statement = new CreateInsert(modelBuilder).Generate(movie, insertProperties);
 
     //Assert
     statement.Should().Be(expected);
@@ -74,10 +83,30 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(movie, insertProperties);
+    string statement = new CreateInsert(modelBuilder).Generate(movie, insertProperties);
 
     //Assert
     statement.Should().Be($"INSERT INTO {insertProperties.EntityName} (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
+  }
+
+  [Test]
+  public void Generate_UseModelBuilder_Ignore()
+  {
+    //Arrange
+    modelBuilder.Entity<Movie>().Property(c => c.Release_Year).Ignore();
+
+    var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title" };
+    var insertProperties = new InsertProperties
+    {
+      EntityName = "TestName",
+      ShouldPluralizeEntityName = false
+    };
+
+    //Act
+    string statement = new CreateInsert(modelBuilder).Generate(movie, insertProperties);
+
+    //Assert
+    statement.Should().Be($"INSERT INTO {insertProperties.EntityName} (Title, Id) VALUES ('Title', 1);");
   }
 
   [Test]
@@ -91,7 +120,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(movie, insertProperties);
+    string statement = new CreateInsert(modelBuilder).Generate(movie, insertProperties);
 
     //Assert
     statement.Should().Be($"INSERT INTO {nameof(Movie)} (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
@@ -111,7 +140,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(book, insertProperties);
+    string statement = new CreateInsert(modelBuilder).Generate(book, insertProperties);
 
     //Assert
     statement.Should().Be($"INSERT INTO {nameof(Book)} (Title, Author) VALUES ('Title', 'Author');");
@@ -137,7 +166,7 @@ public class CreateInsertTests
     };
 
     //Act
-    var statement = new CreateInsert().Generate(pen, insertProperties);
+    var statement = new CreateInsert(modelBuilder).Generate(pen, insertProperties);
 
     //Assert
     return statement;
@@ -176,7 +205,7 @@ public class CreateInsertTests
     };
 
     //Act
-    var statement = new CreateInsert().Generate(binaryStar, insertProperties);
+    var statement = new CreateInsert(modelBuilder).Generate(binaryStar, insertProperties);
 
     //Assert
     return statement;
@@ -207,7 +236,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(testEvent);
+    string statement = new CreateInsert(modelBuilder).Generate(testEvent);
 
     //Assert
     statement.Should().Be("INSERT INTO Events (Id, Places) VALUES (1, ARRAY['Place1', 'Place2', 'Place3']);");
@@ -232,7 +261,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(testEvent, new InsertProperties { EntityName = "Events" });
+    string statement = new CreateInsert(modelBuilder).Generate(testEvent, new InsertProperties { EntityName = "Events" });
 
     //Assert
     statement.Should().Be("INSERT INTO Events (Id, Places) VALUES ('1', ARRAY[1, 2, 3]);");
@@ -257,7 +286,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(testEvent, new InsertProperties { EntityName = "Events" });
+    string statement = new CreateInsert(modelBuilder).Generate(testEvent, new InsertProperties { EntityName = "Events" });
 
     //Assert
     statement.Should().Be("INSERT INTO Events (Id, Places) VALUES ('1', ARRAY[1, 2, 3]);");
@@ -305,7 +334,7 @@ public class CreateInsertTests
     var insertProperties = new InsertProperties { EntityName = "Events", IdentifierEscaping = escaping };
 
     //Act
-    string statement = new CreateInsert().Generate(testEvent, insertProperties);
+    string statement = new CreateInsert(modelBuilder).Generate(testEvent, insertProperties);
 
     //Assert
     statement.Should().Be(expected);
@@ -332,7 +361,7 @@ public class CreateInsertTests
     var insertProperties = new InsertProperties { EntityName = "Events", IdentifierEscaping = escaping };
 
     //Act
-    var statement = new CreateInsert().Generate(testEvent, insertProperties);
+    var statement = new CreateInsert(modelBuilder).Generate(testEvent, insertProperties);
 
     //Assert
     statement.Should().Be(expected);
@@ -365,7 +394,7 @@ public class CreateInsertTests
     };
 
     //Act
-    var statement = new CreateInsert().Generate(order, insertProperties);
+    var statement = new CreateInsert(modelBuilder).Generate(order, insertProperties);
 
     //Assert
     statement.Should().Be(expected);
@@ -387,7 +416,7 @@ public class CreateInsertTests
     var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
 
     //Act
-    string statement = new CreateInsert().Generate(order, insertProperties);
+    string statement = new CreateInsert(modelBuilder).Generate(order, insertProperties);
 
     //Assert
     statement.Should().Be(expected);
@@ -405,7 +434,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(order, insertProperties);
+    string statement = new CreateInsert(modelBuilder).Generate(order, insertProperties);
 
     //Assert
     statement.Should().Be($"INSERT INTO Kafka_table_orders ({nameof(Kafka_table_order.Id)}, {nameof(Kafka_table_order.Items)}) VALUES (1, ARRAY[1.1, 2]);");
@@ -431,7 +460,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(order, config);
+    string statement = new CreateInsert(modelBuilder).Generate(order, config);
 
     //Assert
     statement.Should().Be("INSERT INTO `my_order` (Id, ItemsList) VALUES (1, ARRAY[1.1, 2]);");
@@ -444,7 +473,7 @@ public class CreateInsertTests
     var order = new Kafka_table_order2 { Id = 1, ItemsList = [] };
 
     //Act
-    string statement = new CreateInsert().Generate(order);
+    string statement = new CreateInsert(modelBuilder).Generate(order);
 
     //Assert
     statement.Should().Be("INSERT INTO Kafka_table_order2s (Id, ItemsList) VALUES (1, ARRAY_REMOVE(ARRAY[0], 0));"); //ARRAY[] is not supported
@@ -457,7 +486,7 @@ public class CreateInsertTests
     var order = new Kafka_table_order2 { Id = 1, ItemsList = null };
 
     //Act
-    string statement = new CreateInsert().Generate(order);
+    string statement = new CreateInsert(modelBuilder).Generate(order);
 
     //Assert
     statement.Should().Be("INSERT INTO Kafka_table_order2s (Id, ItemsList) VALUES (1, NULL);");
@@ -476,7 +505,7 @@ public class CreateInsertTests
     var order = new Kafka_table_order3 { Id = 1, ItemsList = [1, 2] };
 
     //Act
-    string statement = new CreateInsert().Generate(order, new InsertProperties { ShouldPluralizeEntityName = false, EntityName = nameof(Kafka_table_order) });
+    string statement = new CreateInsert(modelBuilder).Generate(order, new InsertProperties { ShouldPluralizeEntityName = false, EntityName = nameof(Kafka_table_order) });
 
     //Assert
     statement.Should().Be("INSERT INTO Kafka_table_order (Id, ItemsList) VALUES (1, ARRAY[1, 2]);");
@@ -510,7 +539,7 @@ public class CreateInsertTests
 
     var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
     //Act
-    var statement = new CreateInsert().Generate(order, insertProperties);
+    var statement = new CreateInsert(modelBuilder).Generate(order, insertProperties);
 
     //Assert
     statement.Should().Be(expected);
@@ -548,7 +577,7 @@ public class CreateInsertTests
     var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
 
     //Act
-    var statement = new CreateInsert().Generate(value, insertProperties);
+    var statement = new CreateInsert(modelBuilder).Generate(value, insertProperties);
 
     //Assert
     statement.Should().Be(expected);
@@ -607,7 +636,7 @@ public class CreateInsertTests
     var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
 
     //Act
-    var statement = new CreateInsert().Generate(value, insertProperties);
+    var statement = new CreateInsert(modelBuilder).Generate(value, insertProperties);
 
     //Assert
     statement.Should().Be(expected);
@@ -653,7 +682,7 @@ public class CreateInsertTests
 
     var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
     //Act
-    var statement = new CreateInsert().Generate(value, insertProperties);
+    var statement = new CreateInsert(modelBuilder).Generate(value, insertProperties);
 
     //Assert
     statement.Should().Be(expected);
@@ -691,7 +720,7 @@ public class CreateInsertTests
     var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
 
     //Act
-    string statement = new CreateInsert().Generate(value, insertProperties);
+    string statement = new CreateInsert(modelBuilder).Generate(value, insertProperties);
 
     //Assert
     statement.Should().Be(expected);
@@ -726,7 +755,7 @@ public class CreateInsertTests
     var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
 
     //Act
-    var statement = new CreateInsert().Generate(value, insertProperties);
+    var statement = new CreateInsert(modelBuilder).Generate(value, insertProperties);
 
     //Assert
     statement.Should().Be(expected);
@@ -771,7 +800,7 @@ public class CreateInsertTests
     var insertProperties = new InsertProperties { IdentifierEscaping = escaping };
 
     //Act
-    var statement = new CreateInsert().Generate(value, insertProperties);
+    var statement = new CreateInsert(modelBuilder).Generate(value, insertProperties);
 
     //Assert
     statement.Should().Be(expected);
@@ -788,7 +817,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(value);
+    string statement = new CreateInsert(modelBuilder).Generate(value);
 
     //Assert
     statement.Should().Be("INSERT INTO TimeTypes (Dt, Ts, DtOffset) VALUES ('2021-02-03', '02:03:04', '0001-01-01T00:00:00.000+00:00');");
@@ -809,7 +838,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(value);
+    string statement = new CreateInsert(modelBuilder).Generate(value);
 
     //Assert
     statement.Should().Be("INSERT INTO TimeTypes (DtOffset) VALUES ('2021-07-04T13:29:45.447+04:00');");
@@ -830,7 +859,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(value, new InsertProperties { EntityName = "GuidKeys" });
+    string statement = new CreateInsert(modelBuilder).Generate(value, new InsertProperties { EntityName = "GuidKeys" });
 
     //Assert
     statement.Should().Be($"INSERT INTO GuidKeys (DataId) VALUES ('{value.DataId}');");
@@ -848,7 +877,7 @@ public class CreateInsertTests
     var value = new Update();
 
     //Act
-    string statement = new CreateInsert().Generate(value);
+    string statement = new CreateInsert(modelBuilder).Generate(value);
 
     //Assert
     statement.Should().Be($"INSERT INTO Updates ({nameof(Update.ExtraField)}) VALUES ('{value.ExtraField}');");
@@ -884,7 +913,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(value, insertProperties);
+    string statement = new CreateInsert(modelBuilder).Generate(value, insertProperties);
 
     //Assert
     var myUpdate = (MyUpdate)value;
@@ -908,7 +937,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(value, insertProperties);
+    string statement = new CreateInsert(modelBuilder).Generate(value, insertProperties);
 
     //Assert
     statement.Should().Be($"INSERT INTO {nameof(MyUpdate)} ({nameof(IMyUpdate.Field)}) VALUES ('{value.Field}');");
@@ -925,7 +954,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(value, insertProperties: null);
+    string statement = new CreateInsert(modelBuilder).Generate(value, insertProperties: null);
 
     //Assert
     statement.Should().Be($"INSERT INTO {nameof(IMyUpdate)}s ({nameof(IMyUpdate.Field)}) VALUES ('{value.Field}');");
@@ -942,7 +971,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(value, insertProperties: null);
+    string statement = new CreateInsert(modelBuilder).Generate(value, insertProperties: null);
 
     //Assert
     statement.Should().Be($"INSERT INTO {nameof(Port)}s ({nameof(Port.Id)}, {nameof(Port.PortType)}) VALUES (42, '{value.PortType}');");
@@ -967,7 +996,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(movie, new InsertProperties { EntityName = "Movies" });
+    string statement = new CreateInsert(modelBuilder).Generate(movie, new InsertProperties { EntityName = "Movies" });
 
     //Assert
     statement.Should().Be("INSERT INTO Movies (Title) VALUES (TO_BYTES('Alien', 'utf8'));");
@@ -991,7 +1020,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert().Generate(movie, new InsertProperties { EntityName = "Movies" });
+    string statement = new CreateInsert(modelBuilder).Generate(movie, new InsertProperties { EntityName = "Movies" });
 
     //Assert
     statement.Should().Be("INSERT INTO Movies (Title) VALUES (CONCAT('Alien', '_new'));");

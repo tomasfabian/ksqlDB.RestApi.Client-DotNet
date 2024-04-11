@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Visitors;
 using ksqlDb.RestApi.Client.Tests.Models;
@@ -11,6 +12,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Visitors;
 
 public class KSqlFunctionVisitorStringTests : TestBase
 {
+  private ModelBuilder modelBuilder = null!;
   private KSqlFunctionVisitor ClassUnderTest { get; set; } = null!;
 
   private StringBuilder StringBuilder { get; set; } = null!;
@@ -20,8 +22,9 @@ public class KSqlFunctionVisitorStringTests : TestBase
   {
     base.TestInitialize();
 
+    modelBuilder = new();
     StringBuilder = new StringBuilder();
-    ClassUnderTest = new KSqlFunctionVisitor(StringBuilder, new KSqlQueryMetadata());
+    ClassUnderTest = new KSqlFunctionVisitor(StringBuilder, new KSqlQueryMetadata { ModelBuilder = modelBuilder });
   }
     
   #region String functions

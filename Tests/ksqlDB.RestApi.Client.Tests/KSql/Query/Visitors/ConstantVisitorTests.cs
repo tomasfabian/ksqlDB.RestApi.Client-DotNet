@@ -20,7 +20,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Visitors
     public void Setup()
     {
       stringBuilder = new StringBuilder();
-      queryMetadata = new KSqlQueryMetadata();
+      queryMetadata = new KSqlQueryMetadata { ModelBuilder = new() };
       constantVisitor = new ConstantVisitor(stringBuilder, queryMetadata);
     }
 
