@@ -8,7 +8,7 @@ using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Translators;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 {
-  internal sealed class KSqlTypeTranslator(ModelBuilder modelBuilder) : EntityInfo
+  internal sealed class KSqlTypeTranslator(ModelBuilder modelBuilder) : EntityInfo(modelBuilder)
   {
     private readonly DecimalTypeTranslator decimalTypeTranslator = new(modelBuilder);
 

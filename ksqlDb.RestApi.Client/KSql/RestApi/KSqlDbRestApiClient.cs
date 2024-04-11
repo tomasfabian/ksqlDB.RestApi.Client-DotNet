@@ -425,7 +425,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>A <see cref="KSqlDbStatement"/></returns>
   public KSqlDbStatement ToInsertStatement<T>(InsertValues<T> insertValues, InsertProperties? insertProperties = null)
   {
-    var insertStatement = new CreateInsert().Generate(insertValues, insertProperties);
+    var insertStatement = new CreateInsert(modelBuilder).Generate(insertValues, insertProperties);
 
     return new KSqlDbStatement(insertStatement);
   }
@@ -439,7 +439,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>A <see cref="KSqlDbStatement"/></returns>
   public KSqlDbStatement ToInsertStatement<T>(T entity, InsertProperties? insertProperties = null)
   {
-    var insertStatement = new CreateInsert().Generate(entity, insertProperties);
+    var insertStatement = new CreateInsert(modelBuilder).Generate(entity, insertProperties);
 
     return new KSqlDbStatement(insertStatement);
   }

@@ -11,5 +11,11 @@ namespace ksqlDb.RestApi.Client.Metadata
     internal readonly IDictionary<MemberInfo, FieldMetadata> FieldsMetadataDict = new Dictionary<MemberInfo, FieldMetadata>();
 
     public IEnumerable<FieldMetadata> FieldsMetadata => FieldsMetadataDict.Values;
+
+    public FieldMetadata? GetFieldMetadataBy(MemberInfo memberInfo)
+    {
+      return FieldsMetadataDict.Values.FirstOrDefault(c =>
+        c.MemberInfo.DeclaringType == memberInfo.DeclaringType && c.MemberInfo.Name == memberInfo.Name);
+    }
   }
 }

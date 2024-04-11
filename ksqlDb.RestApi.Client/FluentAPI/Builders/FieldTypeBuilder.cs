@@ -12,7 +12,7 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
     /// Marks the field as ignored, excluding it from the entity's schema.
     /// </summary>
     /// <returns>The field type builder for chaining additional configuration.</returns>
-    internal IFieldTypeBuilder<TProperty> Ignore();
+    public IFieldTypeBuilder<TProperty> Ignore();
   }
 
   internal class FieldTypeBuilder<TProperty>(FieldMetadata fieldMetadata)

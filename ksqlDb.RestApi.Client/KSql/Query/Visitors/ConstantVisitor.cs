@@ -51,7 +51,7 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors
       }
       else if (value != null && type != null && (type.IsClass || type.IsStruct() || type.IsDictionary()))
       {
-        var ksqlValue = new CreateKSqlValue().ExtractValue(value, null, null, type, str => IdentifierUtil.Format(str, QueryMetadata.IdentifierEscaping));
+        var ksqlValue = new CreateKSqlValue(QueryMetadata.ModelBuilder).ExtractValue(value, null, null, type, str => IdentifierUtil.Format(str, QueryMetadata.IdentifierEscaping));
 
         StringBuilder.Append(ksqlValue);
       }

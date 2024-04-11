@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Formats;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
@@ -10,7 +11,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 #nullable disable
-internal sealed class CreateKSqlValue : EntityInfo
+internal sealed class CreateKSqlValue(ModelBuilder modelBuilder) : EntityInfo(modelBuilder)
 {
   public object ExtractValue<T>(T inputValue, IValueFormatters valueFormatters, MemberInfo memberInfo, Type type, Func<MemberInfo, string> formatter)
   {
