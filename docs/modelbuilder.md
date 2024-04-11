@@ -27,6 +27,10 @@ namespace ksqlDB.RestApi.Client.Samples.Model
         .HasKey(c => c.Id)
         .Property(b => b.Amount)
         .Decimal(precision: 10, scale: 2);
+    
+      builder.Entity<Payment>()
+        .Property(b => b.Secret)
+        .Ignore();
 
       var httpClient = new HttpClient
       {
@@ -50,6 +54,7 @@ private record Payment
   public string Id { get; set; } = null!;
   public decimal Amount { get; set; }
   public string Description { get; set; } = null!;
+  public string Secret { get; set; } = null!;
 }
 
 private record Account
@@ -68,6 +73,8 @@ private record Account
 `Property(expression)`: A method used to specify a property of the entity. It takes a lambda expression that specifies the property.
 
 `Decimal(precision, scale)`: A method used to specify **precision** and **scale** for a **decimal** property. Precision specifies the maximum number of digits, and scale specifies the number of digits to the right of the decimal point.
+
+`Ignore()`: A method used to specify that a particular property of an entity should be ignored during code generation.
 
 ## IFromItemTypeConfiguration
 

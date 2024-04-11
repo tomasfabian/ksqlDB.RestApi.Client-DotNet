@@ -17,7 +17,8 @@ public class PaymentModelBuilder
 
     builder.Entity<Account>()
       .HasKey(c => c.Id)
-      .Property(b => b.Balance);
+      .Property(b => b.Secret)
+      .Ignore();
 
     builder.Entity<Payment>()
       .HasKey(c => c.Id)
@@ -63,4 +64,5 @@ record Account
 {
   public string Id { get; set; } = null!;
   public decimal Balance { get; set; }
+  public string Secret { get; set; } = null!;
 }
