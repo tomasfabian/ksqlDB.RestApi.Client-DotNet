@@ -602,6 +602,38 @@ public class CreateEntityTests
 ) WITH ( KAFKA_TOPIC='{nameof(Poco)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
   }
 
+  private class PocoEx : Poco
+  {
+    public int IdEx { get; init; }
+  }
+
+  [Test]
+  public void ModelBuilder_DerivedTypeHasKey()
+  {
+    //Arrange
+    modelBuilder.Entity<PocoEx>()
+      .HasKey(x => x.IdEx)
+      .Property(c => c.Id)
+      .Ignore();
+
+    var statementContext = new StatementContext
+    {
+      CreationType = CreationType.CreateOrReplace,
+      KSqlEntityType = KSqlEntityType.Table,
+    };
+
+    creationMetadata.KafkaTopic = nameof(PocoEx);
+
+    //Act
+    string statement = new CreateEntity(modelBuilder).Print<PocoEx>(statementContext, creationMetadata, null);
+
+    //Assert
+    statement.Should().Be($@"CREATE OR REPLACE TABLE {nameof(PocoEx)}es (
+	{nameof(PocoEx.IdEx)} INT PRIMARY KEY,
+	{nameof(Poco.Description)} VARCHAR
+) WITH ( KAFKA_TOPIC='{nameof(PocoEx)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+  }
+
   [Test]
   public void ModelBuilder_IgnoreProperty()
   {

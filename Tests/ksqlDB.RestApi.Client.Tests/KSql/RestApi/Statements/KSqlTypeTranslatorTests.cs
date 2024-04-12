@@ -419,7 +419,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
     [Struct]
     private record PocoEx : Poco
     {
-      public string Description { get; set; } = null!;
+      public string Description { get; init; } = null!;
     }
 
     [Test]
