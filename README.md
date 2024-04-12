@@ -357,21 +357,21 @@ By leveraging the `ksqlDb.RestApi.Client` fluent API model builder, you can stre
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDb.RestApi.Client.FluentAPI.Builders.Configuration;
 
-ModelBuilder builder = new();
+ModelBuilder modelBuilder = new();
 
 var decimalTypeConvention = new DecimalTypeConvention(14, 14);
 
-builder.AddConvention(decimalTypeConvention);
+modelBuilder.AddConvention(decimalTypeConvention);
 
-builder.Entity<Payment>()
+modelBuilder.Entity<Payment>()
   .Property(b => b.Amount)
   .Decimal(precision: 10, scale: 2);
 
-builder.Entity<Payment>()
+modelBuilder.Entity<Payment>()
   .Property(b => b.Description)
   .Ignore();
 
-builder.Entity<Account>()
+modelBuilder.Entity<Account>()
   .HasKey(c => c.Id);
 ```
 
@@ -395,6 +395,7 @@ record Account
 Usage with ksqlDB REST API Client:
 
 ```C#
+var kSqlDbRestApiClient = new KSqlDbRestApiClient(httpClientFactory, modelBuilder);
 await kSqlDbRestApiClient.CreateTypeAsync<Payment>(cancellationToken);
 
 var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Account), partitions: 3)
@@ -415,7 +416,7 @@ CREATE TABLE IF NOT EXISTS Accounts (
 ) WITH ( KAFKA_TOPIC='Account', VALUE_FORMAT='Json', PARTITIONS='3', REPLICAS='3' );
 ```
 
-The `Description` field in the `Payment` entity is ignored during code generation, and the `Id` field in the `Account` entity is marked as the **primary key**.
+The `Description` field in the `Payment` type is ignored during code generation, and the `Id` field in the `Account` table is marked as the **primary key**.
 
 ### Aggregation functions
 List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/aggregations.md):

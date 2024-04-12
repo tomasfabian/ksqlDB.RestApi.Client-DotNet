@@ -13,19 +13,19 @@ public class PaymentModelBuilder
 
   public async Task InitModelAndCreateStreamAsync(CancellationToken cancellationToken = default)
   {
-    ModelBuilder builder = new();
+    ModelBuilder modelBuilder = new();
 
-    builder.Entity<Account>()
+    modelBuilder.Entity<Account>()
       .HasKey(c => c.Id)
       .Property(b => b.Secret)
       .Ignore();
 
-    builder.Entity<Payment>()
+    modelBuilder.Entity<Payment>()
       .HasKey(c => c.Id)
       .Property(b => b.Amount)
       .Decimal(precision: 10, scale: 2);
 
-    var restApiProvider = ConfigureRestApiClientWithServicesCollection(new ServiceCollection(), builder);
+    var restApiProvider = ConfigureRestApiClientWithServicesCollection(new ServiceCollection(), modelBuilder);
 
     var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Payment), partitions: 1);
 
