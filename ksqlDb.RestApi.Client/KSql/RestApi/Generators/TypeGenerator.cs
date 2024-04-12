@@ -8,14 +8,9 @@ using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 
-internal sealed class TypeGenerator : EntityInfo
+internal sealed class TypeGenerator(ModelBuilder modelBuilder) : EntityInfo(modelBuilder)
 {
-  private readonly KSqlTypeTranslator typeTranslator;
-
-  public TypeGenerator(ModelBuilder modelBuilder)
-  {
-    typeTranslator = new KSqlTypeTranslator(modelBuilder);
-  }
+  private readonly KSqlTypeTranslator typeTranslator = new(modelBuilder);
 
   internal string Print<T>(TypeProperties properties)
   {

@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDb.RestApi.Client.KSql.Entities;
 using ksqlDb.RestApi.Client.KSql.Metadata;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
@@ -8,6 +9,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
 
 internal sealed record KSqlQueryMetadata
 {
+  internal ModelBuilder ModelBuilder { get; init; } = null!;
+
   internal EntityMetadata EntityMetadata { get; } = new();
 
   public Type FromItemType => EntityMetadata.Type;

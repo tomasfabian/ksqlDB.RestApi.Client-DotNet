@@ -23,6 +23,10 @@ namespace ksqlDB.RestApi.Client.Samples.Model
         .HasKey(c => c.Id)
         .Property(b => b.Balance);
     
+      builder.Entity<Account>()
+        .Property(b => b.Secret)
+        .Ignore();
+    
       builder.Entity<Payment>()
         .HasKey(c => c.Id)
         .Property(b => b.Amount)
@@ -35,10 +39,16 @@ namespace ksqlDB.RestApi.Client.Samples.Model
       var httpClientFactory = new HttpClientFactory(httpClient);
       var restApiProvider = new KSqlDbRestApiClient(httpClientFactory, builder);
       
-      var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Payment), partitions: 1);
+      var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Payment), partitions: 3);
       
       var responseMessage = await restApiProvider.CreateTableAsync<Payment>(entityCreationMetadata, true, cancellationToken);
       var content = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
+
+      entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Account), partitions: 1)
+      {
+        Replicas = 3
+      };
+      responseMessage = await restApiProvider.CreateTableAsync<Account>(entityCreationMetadata, true, cancellationToken);
     }
   }
 }
@@ -56,6 +66,7 @@ private record Account
 {
   public string Id { get; set; } = null!;
   public decimal Balance { get; set; }
+  public string Secret { get; set; } = null!;
 }
 ```
 
@@ -68,6 +79,27 @@ private record Account
 `Property(expression)`: A method used to specify a property of the entity. It takes a lambda expression that specifies the property.
 
 `Decimal(precision, scale)`: A method used to specify **precision** and **scale** for a **decimal** property. Precision specifies the maximum number of digits, and scale specifies the number of digits to the right of the decimal point.
+
+`Ignore()`: A method used to specify that a particular property of an entity should be ignored during code generation.
+
+The `Id` column was designated as the **primary key** for the `Payments` table, reflecting its configuration through the model builder's `HasKey` method for the entity:
+
+```SQL
+CREATE TABLE IF NOT EXISTS Payments (
+	Id VARCHAR PRIMARY KEY,
+	Amount DECIMAL(10,2),
+	Description VARCHAR
+) WITH ( KAFKA_TOPIC='Payment', VALUE_FORMAT='Json', PARTITIONS='3' );
+```
+
+The `Secret` column was excluded from the generated DDL statement due to its configuration using the model builder's 'Ignore' method:
+
+```SQL
+CREATE TABLE IF NOT EXISTS Accounts (
+	Id VARCHAR PRIMARY KEY,
+	Balance DECIMAL
+) WITH ( KAFKA_TOPIC='Account', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='3' );
+```
 
 ## IFromItemTypeConfiguration
 

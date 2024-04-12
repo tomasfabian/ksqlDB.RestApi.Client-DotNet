@@ -29,7 +29,11 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
 
   public string BuildKSql(Expression expression, QueryContext queryContext)
   {
-    queryMetadata = new KSqlQueryMetadata { IdentifierEscaping = options.IdentifierEscaping };
+    queryMetadata = new KSqlQueryMetadata
+    {
+      ModelBuilder = queryContext.ModelBuilder,
+      IdentifierEscaping = options.IdentifierEscaping
+    };
 
     kSqlVisitor = new KSqlVisitor(queryMetadata);
     whereClauses = new Queue<Expression>();

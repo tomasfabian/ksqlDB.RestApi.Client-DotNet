@@ -1,3 +1,4 @@
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.PullQueries;
@@ -20,6 +21,8 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context;
 /// </summary>
 public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 {
+  private readonly ModelBuilder modelBuilder;
+
   /// <summary>
   /// Initializes a new instance of the KSqlDBContext class with the specified ksqlDB server URL.
   /// </summary>
@@ -31,18 +34,41 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
   }
 
   /// <summary>
+  /// Initializes a new instance of the KSqlDBContext class with the specified ksqlDB server URL.
+  /// </summary>
+  /// <param name="ksqlDbUrl">The URL of the ksqlDB server.</param>
+  /// <param name="modelBuilder">The model builder.</param>
+  /// <param name="loggerFactory">An optional logger factory to use for logging (defaults to null).</param>
+  public KSqlDBContext(string ksqlDbUrl, ModelBuilder modelBuilder, ILoggerFactory? loggerFactory = null)
+    : this(new KSqlDBContextOptions(ksqlDbUrl), modelBuilder, loggerFactory)
+  {
+  }
+
+  /// <summary>
   /// Initializes a new instance of the KSqlDBContext class with the specified context options.
   /// </summary>
   /// <param name="contextOptions">The options for configuring the KSqlDBContext.</param>
   /// <param name="loggerFactory">An optional logger factory to use for logging (defaults to null).</param>
   public KSqlDBContext(KSqlDBContextOptions contextOptions, ILoggerFactory? loggerFactory = null)
+    : this(contextOptions, new ModelBuilder(), loggerFactory)
+  {
+  }
+
+  /// <summary>
+  /// Initializes a new instance of the KSqlDBContext class with the specified context options.
+  /// </summary>
+  /// <param name="contextOptions">The options for configuring the KSqlDBContext.</param>
+  /// <param name="modelBuilder">The model builder.</param>
+  /// <param name="loggerFactory">An optional logger factory to use for logging (defaults to null).</param>
+  public KSqlDBContext(KSqlDBContextOptions contextOptions, ModelBuilder modelBuilder, ILoggerFactory? loggerFactory = null)
     : base(contextOptions, loggerFactory)
   {
+    this.modelBuilder = modelBuilder;
     ContextOptions = contextOptions ?? throw new ArgumentNullException(nameof(contextOptions));
 
     KSqlDBQueryContext = new KSqlDBContextQueryDependenciesProvider(contextOptions);
   }
-
+  
   internal KSqlDBContextOptions ContextOptions { get; }
 
   internal KSqlDBContextQueryDependenciesProvider KSqlDBQueryContext { get; set; }
@@ -89,6 +115,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 
     var queryStreamContext = new QueryContext
     {
+      ModelBuilder = modelBuilder,
       FromItemName = fromItemName
     };
 
@@ -128,6 +155,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 
     var queryStreamContext = new QueryContext
     {
+      ModelBuilder = modelBuilder,
       FromItemName = fromItemName
     };
 
@@ -182,6 +210,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 
     var statementContext = new StatementContext
     {
+      ModelBuilder = modelBuilder,
       EntityName = fromItemName,
       CreationType = creationType,
       KSqlEntityType = entityType
@@ -209,6 +238,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 
     var queryContext = new QueryContext
     {
+      ModelBuilder = modelBuilder,
       FromItemName = tableName
     };
 

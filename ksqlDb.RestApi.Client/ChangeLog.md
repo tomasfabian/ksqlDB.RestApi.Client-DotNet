@@ -1,7 +1,7 @@
 # ksqlDB.RestApi.Client
 
 # 5.0.0-rc.2
-- added `ModelBuilder` to **configure the model**, allowing the customization of **keys**
+- added `ModelBuilder` to **configure the model**, allowing the customization of **keys** and ignoring properties during code generation
 - added `FieldTypeBuilderExtensions` for configuring **decimal types** #66  (requested by @mrt181)
 - added `IFromItemTypeConfiguration` to apply model-related configurations using the provided `ModelBuilder`
 - added `IConventionConfiguration` to apply model-related conventions. `DecimalTypeConvention` represents a decimal type convention for configuring precision and scale.

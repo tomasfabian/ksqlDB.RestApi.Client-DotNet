@@ -9,7 +9,7 @@ using static System.String;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-internal sealed class CreateEntity(ModelBuilder modelBuilder) : EntityInfo
+internal sealed class CreateEntity(ModelBuilder modelBuilder) : EntityInfo(modelBuilder)
 {
   private readonly StringBuilder stringBuilder = new();
 

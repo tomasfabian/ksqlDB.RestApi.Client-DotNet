@@ -1,19 +1,20 @@
 using System.Reflection;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-internal class EntityInfo
+internal class EntityInfo(ModelBuilder modelBuilder)
 {
   protected static readonly EntityProvider EntityProvider = new();
 
-  protected static IEnumerable<MemberInfo> Members<T>(bool? includeReadOnly = null)
+  protected IEnumerable<MemberInfo> Members<T>(bool? includeReadOnly = null)
   {
     return Members(typeof(T), includeReadOnly);
   }
 
-  protected static IEnumerable<MemberInfo> Members(Type type, bool? includeReadOnly = null)
+  protected IEnumerable<MemberInfo> Members(Type type, bool? includeReadOnly = null)
   {
     var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
 
@@ -22,8 +23,16 @@ internal class EntityInfo
       .Where(c => c.CanWrite || (includeReadOnly.HasValue && includeReadOnly.Value))
       .OfType<MemberInfo>()
       .Concat(fields);
-      
-    return properties.Where(c => !c.GetCustomAttributes().OfType<IgnoreByInsertsAttribute>().Any());
+
+    var entityMetadata = modelBuilder.GetEntities().FirstOrDefault(c => c.Type == type);
+    
+    return properties.Where(c =>
+    {
+      var fieldMetadata = entityMetadata?.GetFieldMetadataBy(c);
+      if (fieldMetadata is {Ignore: true}) return false;
+
+      return !c.GetCustomAttributes().OfType<IgnoreByInsertsAttribute>().Any();
+    });
   }
 
   protected static Type GetMemberType(MemberInfo memberInfo)

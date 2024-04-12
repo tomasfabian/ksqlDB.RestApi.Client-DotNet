@@ -17,7 +17,8 @@ public class PaymentModelBuilder
 
     builder.Entity<Account>()
       .HasKey(c => c.Id)
-      .Property(b => b.Balance);
+      .Property(b => b.Secret)
+      .Ignore();
 
     builder.Entity<Payment>()
       .HasKey(c => c.Id)
@@ -30,6 +31,13 @@ public class PaymentModelBuilder
 
     var responseMessage = await restApiProvider.CreateTableAsync<Payment>(entityCreationMetadata, true, cancellationToken);
     var content = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
+
+    entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Account), partitions: 1)
+    {
+      Replicas = 1
+    };
+    responseMessage = await restApiProvider.CreateTableAsync<Account>(entityCreationMetadata, true, cancellationToken);
+    content = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
   }
 
   private IKSqlDbRestApiClient ConfigureRestApiClientWithServicesCollection(ServiceCollection serviceCollection, ModelBuilder builder)
@@ -63,4 +71,5 @@ record Account
 {
   public string Id { get; set; } = null!;
   public decimal Balance { get; set; }
+  public string Secret { get; set; } = null!;
 }
