@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
@@ -8,9 +9,11 @@ using static System.String;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-internal sealed class CreateEntity : EntityInfo
+internal sealed class CreateEntity(ModelBuilder modelBuilder) : EntityInfo
 {
   private readonly StringBuilder stringBuilder = new();
+
+  private readonly KSqlTypeTranslator typeTranslator = new(modelBuilder);
 
   internal string Print<T>(StatementContext statementContext, EntityCreationMetadata metadata, bool? ifNotExists)
   {
@@ -39,17 +42,17 @@ internal sealed class CreateEntity : EntityInfo
   private void PrintProperties<T>(StatementContext statementContext, EntityCreationMetadata metadata)
   {
     var ksqlProperties = new List<string>();
-    metadata??= new EntityCreationMetadata();
+    metadata ??= new EntityCreationMetadata();
     foreach (var memberInfo in Members<T>(metadata.IncludeReadOnlyProperties))
     {
       var type = GetMemberType(memberInfo);
 
-      var ksqlType = KSqlTypeTranslator.Translate(type, metadata.IdentifierEscaping);
+      var ksqlType = typeTranslator.Translate(type, metadata.IdentifierEscaping);
 
       var columnName = IdentifierUtil.Format(memberInfo, metadata.IdentifierEscaping);
-      string columnDefinition = $"\t{columnName} {ksqlType}{KSqlTypeTranslator.ExploreAttributes(memberInfo, type)}";
+      string columnDefinition = $"\t{columnName} {ksqlType}{typeTranslator.ExploreAttributes(typeof(T), memberInfo, type)}";
 
-      columnDefinition += TryAttachKey(statementContext.KSqlEntityType, memberInfo);
+      columnDefinition += TryAttachKey<T>(statementContext.KSqlEntityType, memberInfo);
 
       ksqlProperties.Add(columnDefinition);
     }
@@ -80,9 +83,13 @@ internal sealed class CreateEntity : EntityInfo
     stringBuilder.Append($"{creationTypeText}{source} {entityTypeText}");
   }
 
-  private static string TryAttachKey(KSqlEntityType entityType, MemberInfo memberInfo)
+  private string TryAttachKey<T>(KSqlEntityType entityType, MemberInfo memberInfo)
   {
-    if (!memberInfo.HasKey())
+    var entityMetadata = modelBuilder.GetEntities().FirstOrDefault(c => c.Type == typeof(T));
+
+    var primaryKey = entityMetadata?.PrimaryKeyMemberInfo;
+
+    if ((primaryKey == null || primaryKey.Name != memberInfo.Name) && !memberInfo.HasKey())
       return Empty;
 
     string key = entityType switch

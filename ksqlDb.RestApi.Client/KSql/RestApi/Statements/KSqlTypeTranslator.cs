@@ -1,14 +1,18 @@
 using System.Reflection;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Translators;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 {
-  internal sealed class KSqlTypeTranslator : EntityInfo
+  internal sealed class KSqlTypeTranslator(ModelBuilder modelBuilder) : EntityInfo
   {
-    internal static string Translate(Type type, IdentifierEscaping escaping = IdentifierEscaping.Never)
+    private readonly DecimalTypeTranslator decimalTypeTranslator = new(modelBuilder);
+
+    internal string Translate(Type type, IdentifierEscaping escaping = IdentifierEscaping.Never)
     {
       var ksqlType = string.Empty;
 
@@ -91,7 +95,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       return ksqlType;
     }
 
-    internal static IEnumerable<string> GetProperties(Type type, IdentifierEscaping escaping)
+    internal IEnumerable<string> GetProperties(Type type, IdentifierEscaping escaping)
     {
       var ksqlProperties = new List<string>();
 
@@ -101,7 +105,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 
         var ksqlType = Translate(memberType, escaping);
 
-        string columnDefinition = $"{memberInfo.Format(escaping)} {ksqlType}{ExploreAttributes(memberInfo, memberType)}";
+        string columnDefinition = $"{memberInfo.Format(escaping)} {ksqlType}{ExploreAttributes(type, memberInfo, memberType)}";
 
         ksqlProperties.Add(columnDefinition);
       }
@@ -109,14 +113,11 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       return ksqlProperties;
     }
 
-    internal static string ExploreAttributes(MemberInfo memberInfo, Type type)
+    internal string ExploreAttributes(Type? parentType, MemberInfo memberInfo, Type type)
     {
-      if (type == typeof(decimal))
+      if (type == typeof(decimal) && decimalTypeTranslator.TryGetDecimal(parentType, memberInfo, out var @decimal))
       {
-        var decimalMember = memberInfo.TryGetAttribute<DecimalAttribute>();
-
-        if (decimalMember != null)
-          return $"({decimalMember.Precision},{decimalMember.Scale})";
+        return @decimal!;
       }
 
       if (type.IsArray)

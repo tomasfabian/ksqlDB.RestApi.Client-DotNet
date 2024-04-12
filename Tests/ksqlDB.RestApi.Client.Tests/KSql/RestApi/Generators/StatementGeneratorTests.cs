@@ -10,7 +10,9 @@ using NUnit.Framework;
 namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators;
 
 public class StatementGeneratorTests
-{    
+{
+  private readonly StatementGenerator statementGenerator = new();
+
   private static EntityCreationMetadata GetEntityCreationMetadata(string topicName)
   {
     EntityCreationMetadata metadata = new EntityCreationMetadata()
@@ -49,7 +51,7 @@ public class StatementGeneratorTests
     var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
 
     //Act
-    string statement = StatementGenerator.CreateTable<CreateEntityTests.MyMovie>(creationMetadata);
+    string statement = statementGenerator.CreateTable<CreateEntityTests.MyMovie>(creationMetadata);
 
     //Assert
     statement.Should().Be($"CREATE TABLE{GetExpectedClauses(isTable: true)}".ReplaceLineEndings());
@@ -62,7 +64,7 @@ public class StatementGeneratorTests
     var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
 
     //Act
-    string statement = StatementGenerator.CreateTable<CreateEntityTests.MyMovie>(creationMetadata, ifNotExists: true);
+    string statement = statementGenerator.CreateTable<CreateEntityTests.MyMovie>(creationMetadata, ifNotExists: true);
 
     //Assert
     statement.Should().Be($"CREATE TABLE IF NOT EXISTS{GetExpectedClauses(isTable: true)}".ReplaceLineEndings());
@@ -75,7 +77,7 @@ public class StatementGeneratorTests
     var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
 
     //Act
-    string statement = StatementGenerator.CreateOrReplaceTable<CreateEntityTests.MyMovie>(creationMetadata);
+    string statement = statementGenerator.CreateOrReplaceTable<CreateEntityTests.MyMovie>(creationMetadata);
 
     //Assert
     statement.Should().Be($"CREATE OR REPLACE TABLE{GetExpectedClauses(isTable: true)}".ReplaceLineEndings());
@@ -89,7 +91,7 @@ public class StatementGeneratorTests
     creationMetadata.IsReadOnly = true;
 
     //Act
-    string statement = StatementGenerator.CreateTable<CreateEntityTests.MyMovie>(creationMetadata);
+    string statement = statementGenerator.CreateTable<CreateEntityTests.MyMovie>(creationMetadata);
 
     //Assert
     statement.Should().Be($"CREATE SOURCE TABLE{GetExpectedClauses(isTable: true)}".ReplaceLineEndings());
@@ -102,7 +104,7 @@ public class StatementGeneratorTests
     var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
 
     //Act
-    string statement = StatementGenerator.CreateStream<CreateEntityTests.MyMovie>(creationMetadata);
+    string statement = statementGenerator.CreateStream<CreateEntityTests.MyMovie>(creationMetadata);
 
     //Assert
     statement.Should().Be($"CREATE STREAM{GetExpectedClauses(isTable: false)}".ReplaceLineEndings());
@@ -115,7 +117,7 @@ public class StatementGeneratorTests
     var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
 
     //Act
-    string statement = StatementGenerator.CreateStream<CreateEntityTests.MyMovie>(creationMetadata, ifNotExists: true);
+    string statement = statementGenerator.CreateStream<CreateEntityTests.MyMovie>(creationMetadata, ifNotExists: true);
 
     //Assert
     statement.Should().Be($"CREATE STREAM IF NOT EXISTS{GetExpectedClauses(isTable: false)}".ReplaceLineEndings());
@@ -128,7 +130,7 @@ public class StatementGeneratorTests
     var creationMetadata = GetEntityCreationMetadata(topicName: "my_movie");
 
     //Act
-    string statement = StatementGenerator.CreateOrReplaceStream<CreateEntityTests.MyMovie>(creationMetadata);
+    string statement = statementGenerator.CreateOrReplaceStream<CreateEntityTests.MyMovie>(creationMetadata);
 
     //Assert
     statement.Should().Be($"CREATE OR REPLACE STREAM{GetExpectedClauses(isTable: false)}".ReplaceLineEndings());
@@ -142,7 +144,7 @@ public class StatementGeneratorTests
     creationMetadata.IsReadOnly = true;
 
     //Act
-    string statement = StatementGenerator.CreateStream<CreateEntityTests.MyMovie>(creationMetadata);
+    string statement = statementGenerator.CreateStream<CreateEntityTests.MyMovie>(creationMetadata);
 
     //Assert
     statement.Should().Be($"CREATE SOURCE STREAM{GetExpectedClauses(isTable: false)}".ReplaceLineEndings());
@@ -155,7 +157,7 @@ public class StatementGeneratorTests
     var creationMetadata = GetEntityCreationMetadata(topicName: nameof(Port).ToLower());
 
     //Act
-    string statement = StatementGenerator.CreateOrReplaceTable<Port>(creationMetadata);
+    string statement = statementGenerator.CreateOrReplaceTable<Port>(creationMetadata);
 
     //Assert
     statement.Should().Contain($"{nameof(PortType)} VARCHAR");

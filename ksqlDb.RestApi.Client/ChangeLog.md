@@ -1,7 +1,14 @@
 # ksqlDB.RestApi.Client
 
+# 5.0.0-rc.2
+- added `ModelBuilder` to **configure the model**, allowing the customization of **keys**
+- added `FieldTypeBuilderExtensions` for configuring **decimal types** #66  (requested by @mrt181)
+- added `IFromItemTypeConfiguration` to apply model-related configurations using the provided `ModelBuilder`
+- added `IConventionConfiguration` to apply model-related conventions. `DecimalTypeConvention` represents a decimal type convention for configuring precision and scale.
+- see also [breakingchanges.md](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/breaking_changes.md#v500)
+
 # 4.0.2
-- fixes Identified an issue where multiple push queries sharing the same `QueryStreamParameters` SQL were encountered within the same asynchronous context #72 
+- fixes Identified an issue where multiple push queries sharing the same QueryStreamParameters SQL were encountered within the same asynchronous context #72
 
 # 4.0.1
 - fixes LINQ Where ignores `JsonPropertyNameAttribute` when using new for column selection, causing failing ksqldb request. #68

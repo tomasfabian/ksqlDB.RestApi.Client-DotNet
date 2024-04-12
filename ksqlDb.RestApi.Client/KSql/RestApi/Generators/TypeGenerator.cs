@@ -1,4 +1,5 @@
 using System.Text;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
@@ -9,6 +10,13 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 
 internal sealed class TypeGenerator : EntityInfo
 {
+  private readonly KSqlTypeTranslator typeTranslator;
+
+  public TypeGenerator(ModelBuilder modelBuilder)
+  {
+    typeTranslator = new KSqlTypeTranslator(modelBuilder);
+  }
+
   internal string Print<T>(TypeProperties properties)
   {
     StringBuilder stringBuilder = new();
@@ -30,9 +38,9 @@ internal sealed class TypeGenerator : EntityInfo
     {
       var type = GetMemberType(memberInfo);
 
-      var ksqlType = KSqlTypeTranslator.Translate(type, escaping);
+      var ksqlType = typeTranslator.Translate(type, escaping);
 
-      var columnDefinition = $"{EscapeName(memberInfo.Name, escaping)} {ksqlType}{KSqlTypeTranslator.ExploreAttributes(memberInfo, type)}";
+      var columnDefinition = $"{EscapeName(memberInfo.Name, escaping)} {ksqlType}{typeTranslator.ExploreAttributes(typeof(T), memberInfo, type)}";
       ksqlProperties.Add(columnDefinition);
     }
 

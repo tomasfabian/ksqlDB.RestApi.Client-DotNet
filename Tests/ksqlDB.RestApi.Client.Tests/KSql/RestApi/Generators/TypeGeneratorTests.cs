@@ -1,4 +1,5 @@
 using FluentAssertions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
@@ -9,13 +10,15 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators;
 
 public class TypeGeneratorTests
 {
+  private readonly ModelBuilder modelBuilder = new();
+
   [Test]
   public void CreateType()
   {
     //Arrange
 
     //Act
-    var statement = new TypeGenerator().Print<Address>(new TypeProperties());
+    var statement = new TypeGenerator(modelBuilder).Print<Address>(new TypeProperties());
 
     //Assert
     statement.Should()
@@ -29,7 +32,7 @@ public class TypeGeneratorTests
     var typeName = "MYTYPE";
 
     //Act
-    var statement = new TypeGenerator().Print<Address>(new TypeProperties { EntityName = typeName });
+    var statement = new TypeGenerator(modelBuilder).Print<Address>(new TypeProperties { EntityName = typeName });
 
     //Assert
     statement.Should().Be($"CREATE TYPE {typeName} AS STRUCT<Number INT, Street VARCHAR, City VARCHAR>;");
@@ -41,7 +44,7 @@ public class TypeGeneratorTests
     //Arrange
 
     //Act
-    var statement = new TypeGenerator().Print<Person>(new TypeProperties());
+    var statement = new TypeGenerator(modelBuilder).Print<Person>(new TypeProperties());
 
     //Assert
     statement.Should().Be($"CREATE TYPE {nameof(Person)} AS STRUCT<Name VARCHAR, Address ADDRESS>;");
@@ -53,7 +56,7 @@ public class TypeGeneratorTests
     //Arrange
 
     //Act
-    var statement = new TypeGenerator().Print<Thumbnail>(new TypeProperties());
+    var statement = new TypeGenerator(modelBuilder).Print<Thumbnail>(new TypeProperties());
 
     //Assert
     statement.Should().Be($"CREATE TYPE {nameof(Thumbnail)} AS STRUCT<Image BYTES>;");
@@ -65,7 +68,7 @@ public class TypeGeneratorTests
     //Arrange
 
     //Act
-    var statement = new TypeGenerator().Print<Container>(new TypeProperties());
+    var statement = new TypeGenerator(modelBuilder).Print<Container>(new TypeProperties());
 
     //Assert
     statement.Should().Be($"CREATE TYPE {nameof(Container)} AS STRUCT<Values2 MAP<VARCHAR, INT>>;");
@@ -75,13 +78,13 @@ public class TypeGeneratorTests
   [TestCase(IdentifierEscaping.Keywords, ExpectedResult = "CREATE TYPE RowTime AS STRUCT<Value VARCHAR>;")]
   [TestCase(IdentifierEscaping.Always, ExpectedResult = "CREATE TYPE `RowTime` AS STRUCT<`Value` VARCHAR>;")]
   public string CreateType_WithSystemColumName(IdentifierEscaping escaping) =>
-    new TypeGenerator().Print<RowTime>(new TypeProperties { IdentifierEscaping = escaping });
+    new TypeGenerator(modelBuilder).Print<RowTime>(new TypeProperties { IdentifierEscaping = escaping });
 
   [TestCase(IdentifierEscaping.Never, ExpectedResult = "CREATE TYPE Values AS STRUCT<Value VARCHAR>;")]
   [TestCase(IdentifierEscaping.Keywords, ExpectedResult = "CREATE TYPE `Values` AS STRUCT<Value VARCHAR>;")]
   [TestCase(IdentifierEscaping.Always, ExpectedResult = "CREATE TYPE `Values` AS STRUCT<`Value` VARCHAR>;")]
   public string CreateType_WithReservedWord(IdentifierEscaping escaping) =>
-    new TypeGenerator().Print<Values>(new TypeProperties { IdentifierEscaping = escaping });
+    new TypeGenerator(modelBuilder).Print<Values>(new TypeProperties { IdentifierEscaping = escaping });
 
   [TestCase(IdentifierEscaping.Never,
     ExpectedResult =
@@ -93,7 +96,7 @@ public class TypeGeneratorTests
     ExpectedResult =
       "CREATE TYPE `SystemColumn` AS STRUCT<`RowTime` VARCHAR, `RowOffset` VARCHAR, `RowPartition` VARCHAR, `WindowStart` VARCHAR, `WindowEnd` VARCHAR>;")]
   public string CreateType_WithSystemColumnNameField(IdentifierEscaping escaping) =>
-    new TypeGenerator().Print<SystemColumn>(new TypeProperties { IdentifierEscaping = escaping });
+    new TypeGenerator(modelBuilder).Print<SystemColumn>(new TypeProperties { IdentifierEscaping = escaping });
 
   public record Address
   {
@@ -176,7 +179,7 @@ public class TypeGeneratorTests
 
     //Act
     var statement =
-      new TypeGenerator().Print<DatabaseChangeObject<IoTSensor>>(new TypeProperties());
+      new TypeGenerator(modelBuilder).Print<DatabaseChangeObject<IoTSensor>>(new TypeProperties());
 
     //Assert
     statement.Should()
