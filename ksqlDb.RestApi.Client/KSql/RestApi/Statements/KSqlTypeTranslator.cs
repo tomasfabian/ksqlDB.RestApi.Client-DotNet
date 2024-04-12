@@ -88,7 +88,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
         {
           string ksqlElementType = Translate(elementType, escaping);
 
-          ksqlType = $"ARRAY<{ksqlElementType}>";
+          ksqlType = $"{KSqlTypes.Array}<{ksqlElementType}>";
         }
       }
 

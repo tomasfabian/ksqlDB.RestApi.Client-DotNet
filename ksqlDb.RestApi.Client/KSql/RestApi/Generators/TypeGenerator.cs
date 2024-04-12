@@ -16,7 +16,7 @@ internal sealed class TypeGenerator(ModelBuilder modelBuilder) : EntityInfo(mode
   {
     StringBuilder stringBuilder = new();
     var typeName = EntityProvider.GetFormattedName<T>(properties, EscapeName);
-    stringBuilder.Append($"CREATE TYPE {typeName} AS STRUCT<");
+    stringBuilder.Append($"CREATE TYPE {typeName} AS {KSqlTypes.Struct}<");
 
     PrintProperties<T>(stringBuilder, properties.IdentifierEscaping);
 

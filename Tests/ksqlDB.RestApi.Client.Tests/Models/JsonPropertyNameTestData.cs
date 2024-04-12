@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using ksqlDB.RestApi.Client.KSql.Query;
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
 namespace ksqlDb.RestApi.Client.Tests.Models
 {
@@ -9,7 +8,6 @@ namespace ksqlDb.RestApi.Client.Tests.Models
     [JsonPropertyName("sub")] public SubProperty SubProperty { get; set; } = null!;
   }
 
-  [Struct]
   public class SubProperty
   {
     [JsonPropertyName("prop")] public string Property { get; set; } = null!;

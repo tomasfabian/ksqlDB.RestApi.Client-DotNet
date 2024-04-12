@@ -7,6 +7,7 @@ using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDb.RestApi.Client.KSql.Entities;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using DateTime = System.DateTime;
 
@@ -147,7 +148,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
   protected override Expression VisitMemberInit(MemberInitExpression node)
   {
-    Append("STRUCT(");
+    Append($"{KSqlTypes.Struct}(");
 
     var memberAssignments = node.Bindings
       .Where(c => c.BindingType == MemberBindingType.Assignment)
@@ -194,7 +195,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
   private protected void PrintArray(IEnumerable<Expression> expressions)
   {
-    Append("ARRAY[");
+    Append($"{KSqlTypes.Array}[");
     PrintCommaSeparated(expressions);
     Append("]");
   }
