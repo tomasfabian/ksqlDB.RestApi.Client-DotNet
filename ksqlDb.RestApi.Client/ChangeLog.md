@@ -1,6 +1,6 @@
 # ksqlDB.RestApi.Client
 
-# 5.0.0-rc.2
+# 5.0.0
 - added `ModelBuilder` to **configure the model**, allowing the customization of **keys** and ignoring properties during code generation
 - added `FieldTypeBuilderExtensions` for configuring **decimal types** #66  (requested by @mrt181)
 - added `IFromItemTypeConfiguration` to apply model-related configurations using the provided `ModelBuilder`
