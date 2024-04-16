@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="MSTest.Sdk/3.3.1">
 
 	<PropertyGroup>
 		<ImplicitUsings>enable</ImplicitUsings>
