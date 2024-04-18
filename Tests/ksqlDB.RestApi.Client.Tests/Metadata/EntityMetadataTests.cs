@@ -2,10 +2,10 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using FluentAssertions;
-using ksqlDb.RestApi.Client.KSql.Metadata;
+using ksqlDb.RestApi.Client.Metadata;
 using NUnit.Framework;
 
-namespace ksqlDb.RestApi.Client.Tests.KSql.Metadata
+namespace ksqlDb.RestApi.Client.Tests.Metadata
 {
   public class EntityMetadataTests
   {

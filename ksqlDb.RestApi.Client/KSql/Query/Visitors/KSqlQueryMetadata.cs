@@ -1,9 +1,9 @@
 using System.Linq.Expressions;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDb.RestApi.Client.KSql.Entities;
-using ksqlDb.RestApi.Client.KSql.Metadata;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
+using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
 
