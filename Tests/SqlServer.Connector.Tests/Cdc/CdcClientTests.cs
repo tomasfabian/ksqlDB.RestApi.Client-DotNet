@@ -2,7 +2,7 @@ using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using SqlServer.Connector.Cdc;
 using SqlServer.Connector.Tests.Data;
 using UnitTests;
@@ -10,12 +10,11 @@ using ConfigurationProvider = SqlServer.Connector.Tests.Config.ConfigurationProv
 
 namespace SqlServer.Connector.Tests.Cdc;
 
-[TestClass]
-[TestCategory("Integration")]
+[Category("Integration")]
 public class CdcClientTests : TestBase<CdcClient>
 {
-  [ClassInitialize]
-  public static async Task ClassInitialize(TestContext context)
+  [OneTimeSetUp]
+  public static async Task ClassInitialize()
   {
     var dbContext = new ApplicationDbContext();
 
@@ -26,7 +25,7 @@ public class CdcClientTests : TestBase<CdcClient>
 
   private static readonly IConfiguration Configuration = ConfigurationProvider.CreateConfiguration();
 
-  [ClassCleanup]
+  [OneTimeTearDown]
   public static async Task ClassCleanup()
   {
     var dbContext = new ApplicationDbContext();
@@ -38,7 +37,7 @@ public class CdcClientTests : TestBase<CdcClient>
 
   readonly SqlConnectionStringBuilder connectionStringBuilder = new(ConnectionString);
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -46,7 +45,7 @@ public class CdcClientTests : TestBase<CdcClient>
     ClassUnderTest = new CdcClient(ConnectionString);
   }
 
-  [TestMethod]
+  [Test, Order(1)]
   public async Task CdcEnableDbAsync()
   {
     //Arrange
@@ -61,7 +60,7 @@ public class CdcClientTests : TestBase<CdcClient>
     isEnabled.Should().Be(true);
   }
 
-  [TestMethod]
+  [Test, Order(2)]
   public async Task CdcEnableTableAsync()
   {
     //Arrange
@@ -74,10 +73,10 @@ public class CdcClientTests : TestBase<CdcClient>
     //Assert
     isEnabled.Should().Be(true);
   }
-    
-  string tableName = "Sensors";
 
-  [TestMethod]
+  private readonly string tableName = "Sensors";
+
+  [Test, Order(3)]
   public async Task CdcEnableTableAsync_CdcEnableTableInput()
   {
     //Arrange
@@ -97,7 +96,7 @@ public class CdcClientTests : TestBase<CdcClient>
     isEnabled.Should().Be(true);
   }
     
-  [TestMethod]
+  [Test, Order(4)]
   public async Task CdcDisableTableAsync_CaptureInstance()
   {
     //Arrange
@@ -112,7 +111,7 @@ public class CdcClientTests : TestBase<CdcClient>
     isEnabled.Should().Be(false);
   }
 
-  [TestMethod]
+  [Test, Order(5)]
   public async Task CdcDisableTableAsync()
   {
     //Arrange
@@ -126,7 +125,7 @@ public class CdcClientTests : TestBase<CdcClient>
     isEnabled.Should().Be(false);
   }
 
-  [TestMethod]
+  [Test, Order(6)]
   public async Task CdcDisableDbAsync()
   {
     //Arrange
@@ -136,10 +135,7 @@ public class CdcClientTests : TestBase<CdcClient>
     await ClassUnderTest.CdcDisableDbAsync();
 
     //Assert
-
     var isEnabled = await ClassUnderTest.IsCdcDbEnabledAsync(databaseName);
-
-    //Assert
     isEnabled.Should().Be(false);
   }
 }
