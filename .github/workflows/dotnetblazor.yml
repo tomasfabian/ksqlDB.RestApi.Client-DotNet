@@ -38,4 +38,4 @@ jobs:
 
     # Test
     - name: Execute SqlServer Connector Unit Tests
-      run: dotnet test --filter “TestCategory!=Integration” $env:SqlServer_Test_Project_Path
+      run: dotnet test --filter “TestCategory!=Integration” Tests/SqlServer.Connector.Tests/SqlServer.Connector.Tests.csproj
