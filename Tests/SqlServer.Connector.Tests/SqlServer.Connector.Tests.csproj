@@ -20,8 +20,6 @@
 		<PackageReference Include="FluentAssertions" />
 		<PackageReference Include="Microsoft.Reactive.Testing" />
 		<PackageReference Include="Moq" />
-		<PackageReference Include="NUnit" />
-		<PackageReference Include="NUnit3TestAdapter" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -8,7 +8,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using SqlServer.Connector.Cdc;
 using SqlServer.Connector.Cdc.Connectors;
 using SqlServer.Connector.Connect;
@@ -18,14 +18,13 @@ using ConfigurationProvider = SqlServer.Connector.Tests.Config.ConfigurationProv
 
 namespace SqlServer.Connector.Tests.Connect;
 
-[TestClass]
-[TestCategory("Integration")]
+[Category("Integration")]
 public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
 {
   private static ApplicationDbContext ApplicationDbContext { get; set; } = null!;
 
-  [ClassInitialize]
-  public static async Task ClassInitialize(TestContext context)
+  [OneTimeSetUp]
+  public static async Task ClassInitialize()
   {
     ApplicationDbContext = new ApplicationDbContext();
 
@@ -43,7 +42,7 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
   private static readonly IConfiguration Configuration = ConfigurationProvider.CreateConfiguration();
   private static readonly string ConnectorName = "test_connector";
     
-  [ClassCleanup]
+  [OneTimeTearDown]
   public static async Task ClassCleanup()
   {
     await DropDependenciesAsync(ApplicationDbContext.Database);
@@ -75,7 +74,7 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
     await ApplicationDbContext.Database.EnsureDeletedAsync();
   }
     
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -94,7 +93,7 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
 
   private static readonly string TableName = "Sensors";
     
-  [TestMethod]
+  [Test]
   public async Task CreateConnectorAsync_AndReceivesDatabaseChangeObjects()
   {
     //Arrange
@@ -209,7 +208,7 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
     deleteOperation.After.Should().BeNull();
   }
 
-  [TestMethod]
+  [Test]
   public async Task GetConnectorsAsync()
   {
     var ksqlDbUrl = Configuration["ksqlDb:Url"];
