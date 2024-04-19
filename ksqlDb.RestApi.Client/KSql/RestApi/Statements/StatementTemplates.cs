@@ -45,4 +45,15 @@ internal static class StatementTemplates
   public static string Explain(string sqlExpression) => $"EXPLAIN {sqlExpression}";
 
   public static string ExplainBy(string queryId) => $"{Explain(queryId)};";
+
+  public static string InsertInto(string streamName, string ksqlQuery, string? queryId = null)
+  {
+    string statement = $"INSERT INTO {streamName}";
+    if (!IsNullOrEmpty(queryId))
+    {
+      string properties = $"WITH( QUERY_ID = '{queryId}' )";
+      statement = $"{statement}{Environment.NewLine}{properties}";
+    }
+    return $"{statement}{Environment.NewLine}{ksqlQuery}";
+  }
 }

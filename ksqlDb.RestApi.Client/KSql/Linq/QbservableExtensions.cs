@@ -795,4 +795,30 @@ public static class QbservableExtensions
   }
 
   #endregion
+
+  #region InsertIntoAsync
+
+  /// <summary>
+  /// Generates and executes an INSERT INTO streamName SELECT statement.
+  /// Stream the result of the SELECT query into an existing stream and its underlying topic.
+  /// </summary>
+  /// <typeparam name="TSource">The type of the elements in the source query.</typeparam>
+  /// <param name="source">The query to create the select from.</param>
+  /// <param name="streamName">The name of the stream to insert values into.</param>
+  /// <param name="queryId">This query ID will be displayed by SHOW QUERIES, and will also be used to terminate the query.</param>
+  /// <param name="cancellationToken">The cancellation token.</param>
+  /// <returns>Statement response.</returns>
+  public static Task<HttpResponseMessage> InsertIntoAsync<TSource>(this IQbservable<TSource> source, string streamName, string? queryId = null, CancellationToken cancellationToken = default)
+  {
+    if (source == null) throw new ArgumentNullException(nameof(source));
+
+    var kStreamSet = (KStreamSet<TSource>)source;
+
+    var ksqlQuery = kStreamSet.BuildKsql();
+    ksqlQuery = StatementTemplates.InsertInto(streamName, ksqlQuery, queryId);
+
+    return kStreamSet.ExecuteAsync(ksqlQuery, cancellationToken);
+  }
+
+  #endregion
 }

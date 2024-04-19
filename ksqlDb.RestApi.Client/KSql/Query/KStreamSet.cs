@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using ksqlDB.RestApi.Client.KSql.RestApi;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
 namespace ksqlDB.RestApi.Client.KSql.Query;
@@ -174,5 +175,13 @@ internal abstract class KStreamSet<TEntity> : KStreamSet, Linq.IQbservable<TEnti
     var httpClientFactory = scope.ServiceProvider.GetRequiredService<IHttpClientFactory>();
 
     return httpClientFactory;
+  }
+
+  internal Task<HttpResponseMessage> ExecuteAsync(string ksql, CancellationToken cancellationToken = default)
+  {
+    using var scope = serviceScopeFactory.CreateScope();
+    var restApiClient = scope.ServiceProvider.GetRequiredService<IKSqlDbRestApiClient>();
+
+    return restApiClient.ExecuteStatementAsync(new(ksql), cancellationToken);
   }
 }
