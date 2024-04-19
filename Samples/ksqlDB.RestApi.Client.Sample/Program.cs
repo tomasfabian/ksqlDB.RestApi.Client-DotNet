@@ -29,6 +29,7 @@ using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
 using K = ksqlDB.RestApi.Client.KSql.Query.Functions.KSql;
 using HttpClientFactory = ksqlDB.RestApi.Client.Samples.Http.HttpClientFactory;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
 namespace ksqlDB.RestApi.Client.Samples;
 
@@ -428,6 +429,42 @@ public static class Program
         onCompleted: () => Console.WriteLine("Completed"));
 
     return disposable;
+  }
+
+  private class Book
+  {
+    [Key]
+    public int Id { get; set; }
+    public string Title { get; set; } = null!;
+    public int ReleaseYear { get; set; }
+  }
+
+  private static async Task InsertIntoSelectAsync(KSqlDbRestApiProvider restApiProvider, KSqlDBContext context)
+  {
+    string streamName = "book";
+    EntityCreationMetadata metadata = new(streamName)
+    {
+      EntityName = streamName,
+      Partitions = 1,
+      Replicas = 1,
+      ValueFormat = SerializationFormats.Json,
+      ShouldPluralizeEntityName = false
+    };
+    await restApiProvider.CreateOrReplaceStreamAsync<Book>(metadata);
+   
+    string streamNameFrom = "book_from";
+    metadata.EntityName = streamNameFrom;
+    metadata.KafkaTopic = streamNameFrom;
+    await restApiProvider.CreateOrReplaceStreamAsync<Book>(metadata);
+
+    string queryId = "insert_query_book";
+
+    var response = await context.CreateQuery<Book>(streamNameFrom)
+      .Where(c => c.Title != "Apocalypse now")
+      .InsertIntoAsync(streamName, queryId);
+
+    var responses = await response.ToStatementResponsesAsync();
+    Console.WriteLine($"QueryId: {responses[0].CommandStatus?.QueryId}");
   }
 
   private static IDisposable QueryRawKSql(IKSqlDBContext context)
