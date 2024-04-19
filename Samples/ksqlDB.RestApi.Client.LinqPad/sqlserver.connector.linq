@@ -140,16 +140,15 @@ private async Task CreateSensorsCdcStreamAsync(CancellationToken cancellationTok
 	var httpClientFactory = CreateHttpClientFactory();
 	var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
 
-	EntityCreationMetadata metadata = new()
+	EntityCreationMetadata metadata = new(kafkaTopic: kafkaTopic)
 	{
 		EntityName = fromName,
-		KafkaTopic = kafkaTopic,
 		ValueFormat = SerializationFormats.Json,
 		Partitions = 1,
 		Replicas = 1
 	};
 
-	var ksql = StatementGenerator.CreateStream<DatabaseChangeObject<IoTSensor>>(metadata, ifNotExists: true);
+	var ksql = new StatementGenerator().CreateStream<DatabaseChangeObject<IoTSensor>>(metadata, ifNotExists: true);
 
 	var httpResponseMessage = await restApiClient.CreateStreamAsync<DatabaseChangeObject<IoTSensor>>(metadata, ifNotExists: true, cancellationToken: cancellationToken)
 		.ConfigureAwait(false);

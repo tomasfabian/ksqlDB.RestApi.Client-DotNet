@@ -86,9 +86,8 @@ string MoviesStreamName = "my_movies_stream";
 
 async Task CreateOrReplaceStreamAsync()
 {
-	EntityCreationMetadata metadata = new()
+	EntityCreationMetadata metadata = new(kafkaTopic: nameof(Movie))
 	{
-		KafkaTopic = nameof(Movie),
 		Partitions = 1,
 		Replicas = 1,
 		EntityName = MoviesStreamName

@@ -84,9 +84,8 @@ private string KsqlDbUrl => "http://localhost:8088";
 
 private async Task<HttpResponseMessage> TryCreateStreamAsync()
 {
-	EntityCreationMetadata metadata = new()
+	EntityCreationMetadata metadata = new(kafkaTopic: TopicNames.IotSensors)
 	{
-		KafkaTopic = TopicNames.IotSensors,
 		Partitions = 1,
 		Replicas = 1
 	};
