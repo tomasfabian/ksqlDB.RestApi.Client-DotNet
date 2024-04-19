@@ -461,3 +461,44 @@ SELECT MESSAGE, ID, `Values`
 
 INSERT INTO Message (Message, Id, `Values`) VALUES ('Hello', 42, '123, abc');
 ```
+
+### InsertIntoAsync
+**v5.1.0**
+
+Stream the result of the SELECT query into an existing stream and its underlying topic.
+
+```C#
+var response = await context.CreateQuery<Movie>("from_stream")
+  .Where(c => c.Title != "Apocalypse now")
+  .InsertIntoAsync("stream_name");
+
+var responses = await response.ToStatementResponsesAsync();
+Console.WriteLine($"QueryId: {responses[0].CommandStatus?.QueryId}");
+```
+
+```SQL
+INSERT INTO stream_name
+SELECT *
+  FROM from_stream
+ WHERE Title != 'Apocalypse now'
+  EMIT CHANGES;
+```
+
+Alternatively an optional query ID can be used for INSERT INTO queries:
+
+```C#
+string queryId = "insert_query_123";
+
+var response = await context.CreateQuery<Movie>("from_stream")
+  .Where(c => c.Title != "Apocalypse now")
+  .InsertIntoAsync("stream_name", queryId);
+```
+
+```SQL
+INSERT INTO stream_name
+  WITH( QUERY_ID = 'insert_query_123' )
+SELECT *
+  FROM from_stream
+ WHERE Title != 'Apocalypse now'
+  EMIT CHANGES;
+```
