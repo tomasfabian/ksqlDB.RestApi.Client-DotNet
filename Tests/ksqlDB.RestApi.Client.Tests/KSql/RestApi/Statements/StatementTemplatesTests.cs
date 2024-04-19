@@ -298,6 +298,35 @@ public class StatementTemplatesTests
   }
 
   [Test]
+  public void InsertInto()
+  {
+    //Arrange
+    string sqlExpression = "SELECT * FROM My EMIT CHANGES;";
+    string streamName = "my_stream";
+
+    //Act
+    var statement = StatementTemplates.InsertInto(streamName, sqlExpression);
+
+    //Assert
+    statement.Should().Be($"INSERT INTO {streamName}{Environment.NewLine}{sqlExpression}");
+  }
+
+  [Test]
+  public void InsertInto_WithQueryId()
+  {
+    //Arrange
+    string sqlExpression = "SELECT * FROM My EMIT CHANGES;";
+    string streamName = "my_stream";
+    string queryId = "insert_query_123";
+
+    //Act
+    var statement = StatementTemplates.InsertInto(streamName, sqlExpression, queryId);
+
+    //Assert
+    statement.Should().Be($"INSERT INTO {streamName}{Environment.NewLine}WITH( QUERY_ID = '{queryId}' ){Environment.NewLine}{sqlExpression}");
+  }
+
+  [Test]
   public void DropType()
   {
     //Arrange

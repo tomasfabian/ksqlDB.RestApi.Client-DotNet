@@ -5,6 +5,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDb.RestApi.Client.Tests.KSql.Query.Context;
 using ksqlDb.RestApi.Client.Tests.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -450,6 +451,9 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
 
     context.KSqlDbProviderMock.Setup(c => c.RunAsync<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
       .ReturnsAsync(query);
+
+    context.KSqlDbRestApiClientMock.Setup(c => c.ExecuteStatementAsync(It.IsAny<KSqlDbStatement>(), It.IsAny<CancellationToken>()))
+      .ReturnsAsync(new HttpResponseMessage());
       
     return context.CreateQueryStream<string>();
   }
@@ -536,5 +540,18 @@ WHERE Id = '{uniqueId}' EMIT CHANGES;".ReplaceLineEndings();
     where T : IIdentifiable
   {
     return context.CreateQueryStream<T>(tableName).Where(l => l.Id == uniqueId);
+  }
+  
+  [Test]
+  public async Task InsertIntoAsync()
+  {
+    //Arrange
+    var query = CreateTestableKStreamSet();
+
+    //Act
+    var responseMessage = await query.InsertIntoAsync("stream_name");
+
+    //Assert
+    responseMessage.Should().NotBeNull();
   }
 }
