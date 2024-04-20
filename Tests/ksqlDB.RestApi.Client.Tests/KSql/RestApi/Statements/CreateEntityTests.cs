@@ -134,7 +134,36 @@ public class CreateEntityTests
     statement.Should().Be(expected);
   }
 
-  internal static IEnumerable<(IdentifierEscaping, string)> PrintCreatStreamOverrideEntityNameTestCases()
+  private record PocoWithHeader
+  {
+    public byte[] Header { get; init; } = null!;
+  }
+
+  [Test]
+  public void Header()
+  {
+    //Arrange
+    string header = "abc";
+    modelBuilder.Entity<PocoWithHeader>()
+      .Property(c => c.Header)
+      .WithHeader(header);
+
+    var statementContext = new StatementContext
+    {
+      CreationType = CreationType.Create,
+      KSqlEntityType = KSqlEntityType.Stream
+    };
+
+    //Act
+    var statement = new CreateEntity(modelBuilder).Print<PocoWithHeader>(statementContext, creationMetadata, null);
+
+    //Assert
+    statement.Should().Be(@$"CREATE STREAM PocoWithHeaders (
+{"\t"}Header {KSqlTypes.Bytes} HEADER('{header}')
+) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+  }
+
+  internal static IEnumerable<(IdentifierEscaping, string)> PrintCreateStreamOverrideEntityNameTestCases()
   {
     yield return (Never,
       CreateExpectedStatement("CREATE STREAM", hasPrimaryKey: false,
@@ -147,7 +176,7 @@ public class CreateEntityTests
         entityName: EnglishPluralizationService.Pluralize("TestName"), Always));
   }
 
-  [TestCaseSource(nameof(PrintCreatStreamOverrideEntityNameTestCases))]
+  [TestCaseSource(nameof(PrintCreateStreamOverrideEntityNameTestCases))]
   public void Print_CreateStream_OverrideEntityName((IdentifierEscaping escaping, string expected)  testCase)
   {
     //Arrange

@@ -86,7 +86,7 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
       var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
       entityMetadata.Should().NotBeNull();
       entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description)).Ignore.Should().BeTrue();
-      entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Amount)).Ignore.Should().BeTrue();
+      entityMetadata.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Amount)).Ignore.Should().BeTrue();
     }
 
     [Test]
@@ -177,6 +177,26 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
       metadata.Precision.Should().Be(precision);
       metadata.Scale.Should().Be(scale);
     }
+
+    [Test]
+    public void Header()
+    {
+      //Arrange
+      string header = "abc";
+
+      //Act
+      var fieldTypeBuilder = builder.Entity<Payment>()
+        .Property(b => b.Header)
+        .WithHeader(header);
+
+      //Assert
+      fieldTypeBuilder.Should().NotBeNull();
+      var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      entityMetadata.Should().NotBeNull();
+      var metadata = (BytesArrayFieldMetadata)entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Header));
+
+      metadata.Header.Should().Be(header);
+    }
   }
 
   internal record Payment
@@ -184,6 +204,7 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
     public string Id { get; set; } = null!;
     public decimal Amount { get; set; }
     public string Description { get; set; } = null!;
+    public byte[] Header { get; set; } = null!;
   }
 
   internal class Bar
