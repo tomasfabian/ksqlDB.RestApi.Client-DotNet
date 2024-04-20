@@ -5,6 +5,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Translators;
+using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 {
@@ -113,6 +114,9 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       return ksqlProperties;
     }
 
+    private const string HeaderKeyWord = "HEADER";
+    private readonly string headerFieldFormat = $" {HeaderKeyWord}('{{0}}')";
+
     internal string ExploreAttributes(Type? parentType, MemberInfo memberInfo, Type type)
     {
       if (type == typeof(decimal) && decimalTypeTranslator.TryGetDecimal(parentType, memberInfo, out var @decimal))
@@ -122,16 +126,18 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 
       if (type.IsArray)
       {
+        var entityMetadata = modelBuilder.GetEntities().FirstOrDefault(c => c.Type == parentType);
+        if (entityMetadata?.GetFieldMetadataBy(memberInfo) is BytesArrayFieldMetadata fieldMetadata)
+          return string.Format(headerFieldFormat, fieldMetadata.Header);
+
         var headersAttribute = memberInfo.TryGetAttribute<HeadersAttribute>();
 
         if (headersAttribute != null)
         {
-          const string header = " HEADER";
-
           if (string.IsNullOrEmpty(headersAttribute.Key))
-            return $"{header}S";
+            return $"{HeaderKeyWord}S";
 
-          return $"{header}('{headersAttribute.Key}')";
+          return string.Format(headerFieldFormat, headersAttribute.Key);
         }
       }
 

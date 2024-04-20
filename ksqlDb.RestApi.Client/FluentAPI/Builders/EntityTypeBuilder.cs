@@ -60,17 +60,24 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
           Path = memberName,
           FullPath = path,
         };
-        switch (Type.GetTypeCode(typeof(TProperty)))
+
+        switch (typeof(TProperty))
         {
-          case TypeCode.Decimal:
+          case { } type when type == typeof(decimal):
             var decimalFieldMetadata = new DecimalFieldMetadata(fieldMetadata);
             builder = new DecimalFieldTypeBuilder<TProperty>(decimalFieldMetadata);
             fieldMetadata = decimalFieldMetadata;
+            break;
+          case { } type when type == typeof(byte[]):
+            var bytesArrayFieldMetadata = new BytesArrayFieldMetadata(fieldMetadata);
+            builder = new BytesArrayFieldTypeBuilder<TProperty>(bytesArrayFieldMetadata);
+            fieldMetadata = bytesArrayFieldMetadata;
             break;
           default:
             builder = new(fieldMetadata);
             break;
         }
+
         Metadata.FieldsMetadataDict[memberInfo] = fieldMetadata;
         path += ".";
       }

@@ -17,5 +17,17 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
       ((DecimalFieldTypeBuilder<decimal>)builder).Configure(precision, scale);
       return builder;
     }
+
+    /// <summary>
+    /// Adds a header to the field type builder configuration.
+    /// </summary>
+    /// <param name="builder">The field type builder for byte array value.</param>
+    /// <param name="header">The header.</param>
+    /// <returns>The field type builder for chaining additional configuration.</returns>
+    public static IFieldTypeBuilder<byte[]> WithHeader(this IFieldTypeBuilder<byte[]> builder, string header)
+    {
+      ((BytesArrayFieldTypeBuilder<byte[]>)builder).Configure(header);
+      return builder;
+    }
   }
 }
