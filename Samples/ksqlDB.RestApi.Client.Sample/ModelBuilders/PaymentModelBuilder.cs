@@ -15,6 +15,11 @@ public class PaymentModelBuilder
   {
     ModelBuilder modelBuilder = new();
 
+    string header = "abc";
+    modelBuilder.Entity<PocoWithHeader>()
+      .Property(c => c.Header)
+      .WithHeader(header);
+
     modelBuilder.Entity<Account>()
       .HasKey(c => c.Id)
       .Property(b => b.Secret)
@@ -31,13 +36,20 @@ public class PaymentModelBuilder
 
     var responseMessage = await restApiProvider.CreateTableAsync<Payment>(entityCreationMetadata, true, cancellationToken);
     var content = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
+    Console.WriteLine(content);
 
     entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Account), partitions: 1)
     {
       Replicas = 1
     };
-    responseMessage = await restApiProvider.CreateTableAsync<Account>(entityCreationMetadata, true, cancellationToken);
-    content = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
+    await restApiProvider.CreateTableAsync<Account>(entityCreationMetadata, true, cancellationToken);
+    await responseMessage.Content.ReadAsStringAsync(cancellationToken);
+
+    var entityCreationMetadata2 = new EntityCreationMetadata(kafkaTopic: nameof(PocoWithHeader), partitions: 1)
+    {
+      Replicas = 1
+    };
+    await restApiProvider.CreateStreamAsync<PocoWithHeader>(entityCreationMetadata2, true, cancellationToken);
   }
 
   private IKSqlDbRestApiClient ConfigureRestApiClientWithServicesCollection(ServiceCollection serviceCollection, ModelBuilder builder)
@@ -71,5 +83,10 @@ record Account
 {
   public string Id { get; set; } = null!;
   public decimal Balance { get; set; }
-  public string Secret { get; set; } = null!;
+  public byte[] Secret { get; set; } = null!;
+}
+
+record PocoWithHeader
+{
+  public byte[] Header { get; init; } = null!;
 }
