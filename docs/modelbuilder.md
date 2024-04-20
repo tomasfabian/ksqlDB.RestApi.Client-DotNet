@@ -1,4 +1,5 @@
 # Model builder
+**v5.0.0**
 
 Using the **fluent API** with **POCO**s for generated classes that cannot be changed due to code regeneration offers a structured and maintainable approach to configuring your domain model, while keeping your codebase clean and flexible.
 
@@ -15,7 +16,7 @@ namespace ksqlDB.RestApi.Client.Samples.Model
 {
   public class PaymentModelBuilder
   {
-    public static async Task InitModelAndCreateStreamAsync(CancellationToken cancellationToken = default)
+    public static async Task InitModelAndCreateTableAsync(CancellationToken cancellationToken = default)
     {
       ModelBuilder builder = new();
     
@@ -102,6 +103,7 @@ CREATE TABLE IF NOT EXISTS Accounts (
 ```
 
 ## IFromItemTypeConfiguration
+**v5.0.0**
 
 To apply configurations using the provided `ModelBuilder`, follow these steps:
 
@@ -135,6 +137,8 @@ builder.Apply(new PaymentConfiguration());
 ```
 
 ## ModelBuilder conventions
+**v5.0.0**
+
 You can add a global convention to the model builder for the **decimal** type in the following way.
 
 ```C#
@@ -144,4 +148,35 @@ using ksqlDb.RestApi.Client.FluentAPI.Builders.Configuration;
 var modelBuilder = new ModelBuilder();
 var decimalTypeConvention = new DecimalTypeConvention(14, 14);
 modelBuilder.AddConvention(decimalTypeConvention);
+```
+
+### WithHeader
+**v5.1.0**
+
+Properties of en entity can be marked as a [HEADER](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#headers) with the model builder's FLUENT API as demonstrated below:
+
+```C#
+string header = "abc";
+modelBuilder.Entity<PocoWithHeader>()
+  .Property(c => c.Header)
+  .WithHeader(header);
+
+
+var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(PocoWithHeader), partitions: 1)
+{
+  Replicas = 3
+};
+var responseMessage = await restApiProvider.CreateStreamAsync<PocoWithHeader>(entityCreationMetadata, true);
+    
+private record PocoWithHeader
+{
+  public byte[] Header { get; init; } = null!;
+}
+```
+
+Here's the equivalent KSQL statement for the described scenario:
+```SQL
+CREATE STREAM IF NOT EXISTS PocoWithHeaders (
+	Header BYTES HEADER('abc')
+) WITH ( KAFKA_TOPIC='PocoWithHeader', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='3' );
 ```
