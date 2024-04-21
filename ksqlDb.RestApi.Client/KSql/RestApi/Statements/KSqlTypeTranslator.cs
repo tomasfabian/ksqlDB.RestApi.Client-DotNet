@@ -127,17 +127,16 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
     }
 
     private const string HeaderKeyWord = "HEADER";
+    private const string HeadersKeyWord = "HEADERS";
     private readonly string headerFieldFormat = $" {HeaderKeyWord}('{{0}}')";
 
     private string TryGetHeaderMarker(Type? parentType, MemberInfo memberInfo)
     {
       var entityMetadata = modelBuilder.GetEntities().FirstOrDefault(c => c.Type == parentType);
       var fieldMetadata = entityMetadata?.GetFieldMetadataBy(memberInfo);
-      if (fieldMetadata == null)
-        return string.Empty;
 
-      if (fieldMetadata.HasHeaders)
-        return $" {HeaderKeyWord}S";
+      if (fieldMetadata?.HasHeaders ?? false)
+        return $" {HeadersKeyWord}";
 
       if (fieldMetadata is BytesArrayFieldMetadata bytesArrayFieldMetadata)
         return string.Format(headerFieldFormat, bytesArrayFieldMetadata.Header);
@@ -146,7 +145,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       if (headersAttribute != null)
       {
         if (string.IsNullOrEmpty(headersAttribute.Key))
-          return $" {HeaderKeyWord}S";
+          return $" {HeadersKeyWord}";
 
         return string.Format(headerFieldFormat, headersAttribute.Key);
       }
