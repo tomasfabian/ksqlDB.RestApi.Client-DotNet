@@ -148,6 +148,8 @@ public class CreateEntityTests
       .Property(c => c.Header)
       .WithHeader(header);
 
+    creationMetadata.ShouldPluralizeEntityName = false;
+
     var statementContext = new StatementContext
     {
       CreationType = CreationType.Create,
@@ -158,8 +160,68 @@ public class CreateEntityTests
     var statement = new CreateEntity(modelBuilder).Print<PocoWithHeader>(statementContext, creationMetadata, null);
 
     //Assert
-    statement.Should().Be(@$"CREATE STREAM PocoWithHeaders (
+    statement.Should().Be(@$"CREATE STREAM {nameof(PocoWithHeader)} (
 {"\t"}Header {KSqlTypes.Bytes} HEADER('{header}')
+) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+  }
+
+  [Struct]
+  private record KeyValuePair
+  {
+    public string Key { get; set; } = null!;
+    public byte[] Value { get; set; } = null!;
+  }
+
+  private record PocoWithHeaders
+  {
+    public KeyValuePair[] Headers { get; init; } = null!;
+  }
+
+  [Test]
+  public void Headers()
+  {
+    //Arrange
+    modelBuilder.Entity<PocoWithHeaders>()
+      .Property(c => c.Headers)
+      .WithHeaders();
+
+    var statementContext = new StatementContext
+    {
+      CreationType = CreationType.Create,
+      KSqlEntityType = KSqlEntityType.Stream
+    };
+
+    //Act
+    var statement = new CreateEntity(modelBuilder).Print<PocoWithHeaders>(statementContext, creationMetadata, null);
+
+    //Assert
+    statement.Should().Be(@$"CREATE STREAM {nameof(PocoWithHeaders)} (
+{"\t"}Headers {KSqlTypes.Array}<{KSqlTypes.Struct}<{nameof(KeyValuePair.Key)} {KSqlTypes.Varchar}, {nameof(KeyValuePair.Value)} {KSqlTypes.Bytes}>> HEADERS
+) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+  }
+
+  private record IoTSensorWithHeaders
+  {
+    [Headers]
+    public KeyValuePair[] Headers { get; init; } = null!;
+  }
+
+  [Test]
+  public void HeadersAttribute()
+  {
+    //Arrange
+    var statementContext = new StatementContext
+    {
+      CreationType = CreationType.Create,
+      KSqlEntityType = KSqlEntityType.Stream
+    };
+
+    //Act
+    var statement = new CreateEntity(modelBuilder).Print<IoTSensorWithHeaders>(statementContext, creationMetadata, null);
+
+    //Assert
+    statement.Should().Be(@$"CREATE STREAM {nameof(IoTSensorWithHeaders)} (
+{"\t"}Headers {KSqlTypes.Array}<{KSqlTypes.Struct}<{nameof(KeyValuePair.Key)} {KSqlTypes.Varchar}, {nameof(KeyValuePair.Value)} {KSqlTypes.Bytes}>> HEADERS
 ) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
   }
 

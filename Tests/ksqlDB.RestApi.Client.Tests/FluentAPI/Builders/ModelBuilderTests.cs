@@ -197,6 +197,25 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
 
       metadata.Header.Should().Be(header);
     }
+
+    [Test]
+    public void Headers()
+    {
+      //Arrange
+
+      //Act
+      var fieldTypeBuilder = builder.Entity<Payment>()
+        .Property(b => b.Header)
+        .WithHeaders();
+
+      //Assert
+      fieldTypeBuilder.Should().NotBeNull();
+      var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      entityMetadata.Should().NotBeNull();
+      var metadata = entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Header));
+
+      metadata.HasHeaders.Should().BeTrue();
+    }
   }
 
   internal record Payment
