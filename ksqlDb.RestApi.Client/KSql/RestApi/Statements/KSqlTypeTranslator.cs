@@ -11,6 +11,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 {
   internal sealed class KSqlTypeTranslator(ModelBuilder modelBuilder) : EntityInfo(modelBuilder)
   {
+    private readonly ModelBuilder modelBuilder = modelBuilder;
     private readonly DecimalTypeTranslator decimalTypeTranslator = new(modelBuilder);
 
     internal string Translate(Type type, IdentifierEscaping escaping = IdentifierEscaping.Never)
@@ -114,31 +115,40 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       return ksqlProperties;
     }
 
-    private const string HeaderKeyWord = "HEADER";
-    private readonly string headerFieldFormat = $" {HeaderKeyWord}('{{0}}')";
-
     internal string ExploreAttributes(Type? parentType, MemberInfo memberInfo, Type type)
     {
       if (type == typeof(decimal) && decimalTypeTranslator.TryGetDecimal(parentType, memberInfo, out var @decimal))
-      {
         return @decimal!;
-      }
 
       if (type.IsArray)
+        return TryGetHeaderMarker(parentType, memberInfo);
+
+      return string.Empty;
+    }
+
+    private const string HeaderKeyWord = "HEADER";
+    private readonly string headerFieldFormat = $" {HeaderKeyWord}('{{0}}')";
+
+    private string TryGetHeaderMarker(Type? parentType, MemberInfo memberInfo)
+    {
+      var entityMetadata = modelBuilder.GetEntities().FirstOrDefault(c => c.Type == parentType);
+      var fieldMetadata = entityMetadata?.GetFieldMetadataBy(memberInfo);
+      if (fieldMetadata == null)
+        return string.Empty;
+
+      if (fieldMetadata.HasHeaders)
+        return $" {HeaderKeyWord}S";
+
+      if (fieldMetadata is BytesArrayFieldMetadata bytesArrayFieldMetadata)
+        return string.Format(headerFieldFormat, bytesArrayFieldMetadata.Header);
+
+      var headersAttribute = memberInfo.TryGetAttribute<HeadersAttribute>();
+      if (headersAttribute != null)
       {
-        var entityMetadata = modelBuilder.GetEntities().FirstOrDefault(c => c.Type == parentType);
-        if (entityMetadata?.GetFieldMetadataBy(memberInfo) is BytesArrayFieldMetadata fieldMetadata)
-          return string.Format(headerFieldFormat, fieldMetadata.Header);
+        if (string.IsNullOrEmpty(headersAttribute.Key))
+          return $" {HeaderKeyWord}S";
 
-        var headersAttribute = memberInfo.TryGetAttribute<HeadersAttribute>();
-
-        if (headersAttribute != null)
-        {
-          if (string.IsNullOrEmpty(headersAttribute.Key))
-            return $"{HeaderKeyWord}S";
-
-          return string.Format(headerFieldFormat, headersAttribute.Key);
-        }
+        return string.Format(headerFieldFormat, headersAttribute.Key);
       }
 
       return string.Empty;

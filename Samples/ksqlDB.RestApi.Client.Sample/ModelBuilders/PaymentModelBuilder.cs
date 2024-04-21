@@ -15,11 +15,6 @@ public class PaymentModelBuilder
   {
     ModelBuilder modelBuilder = new();
 
-    string header = "abc";
-    modelBuilder.Entity<PocoWithHeader>()
-      .Property(c => c.Header)
-      .WithHeader(header);
-
     modelBuilder.Entity<Account>()
       .HasKey(c => c.Id)
       .Property(b => b.Secret)
@@ -29,6 +24,11 @@ public class PaymentModelBuilder
       .HasKey(c => c.Id)
       .Property(b => b.Amount)
       .Decimal(precision: 10, scale: 2);
+
+    string header = "abc";
+    modelBuilder.Entity<PocoWithHeader>()
+      .Property(c => c.Header)
+      .WithHeader(header);
 
     var restApiProvider = ConfigureRestApiClientWithServicesCollection(new ServiceCollection(), modelBuilder);
 

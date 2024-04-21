@@ -13,6 +13,12 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
     /// </summary>
     /// <returns>The field type builder for chaining additional configuration.</returns>
     public IFieldTypeBuilder<TProperty> Ignore();
+
+    /// <summary>
+    /// Marks the field as HEADERS.
+    /// </summary>
+    /// <returns>The field type builder for chaining additional configuration.</returns>
+    public IFieldTypeBuilder<TProperty> WithHeaders();
   }
 
   internal class FieldTypeBuilder<TProperty>(FieldMetadata fieldMetadata)
@@ -21,6 +27,12 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
     public IFieldTypeBuilder<TProperty> Ignore()
     {
       fieldMetadata.Ignore = true;
+      return this;
+    }
+
+    public IFieldTypeBuilder<TProperty> WithHeaders()
+    {
+      fieldMetadata.HasHeaders = true;
       return this;
     }
   }
