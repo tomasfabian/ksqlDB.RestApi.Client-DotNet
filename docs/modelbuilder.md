@@ -12,46 +12,40 @@ using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 
-namespace ksqlDB.RestApi.Client.Samples.Model
+public static async Task InitModelAndCreateTableAsync(CancellationToken cancellationToken = default)
 {
-  public class PaymentModelBuilder
+  ModelBuilder builder = new();
+
+  builder.Entity<Account>()
+    .HasKey(c => c.Id)
+    .Property(b => b.Balance);
+
+  builder.Entity<Account>()
+    .Property(b => b.Secret)
+    .Ignore();
+
+  builder.Entity<Payment>()
+    .HasKey(c => c.Id)
+    .Property(b => b.Amount)
+    .Decimal(precision: 10, scale: 2);
+
+  var httpClient = new HttpClient
   {
-    public static async Task InitModelAndCreateTableAsync(CancellationToken cancellationToken = default)
-    {
-      ModelBuilder builder = new();
-    
-      builder.Entity<Account>()
-        .HasKey(c => c.Id)
-        .Property(b => b.Balance);
-    
-      builder.Entity<Account>()
-        .Property(b => b.Secret)
-        .Ignore();
-    
-      builder.Entity<Payment>()
-        .HasKey(c => c.Id)
-        .Property(b => b.Amount)
-        .Decimal(precision: 10, scale: 2);
+    BaseAddress = new Uri("http://localhost:8088")
+  };
+  var httpClientFactory = new HttpClientFactory(httpClient);
+  var restApiProvider = new KSqlDbRestApiClient(httpClientFactory, builder);
+  
+  var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Payment), partitions: 3);
+  
+  var responseMessage = await restApiProvider.CreateTableAsync<Payment>(entityCreationMetadata, true, cancellationToken);
+  var content = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
 
-      var httpClient = new HttpClient
-      {
-        BaseAddress = new Uri("http://localhost:8088")
-      };
-      var httpClientFactory = new HttpClientFactory(httpClient);
-      var restApiProvider = new KSqlDbRestApiClient(httpClientFactory, builder);
-      
-      var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Payment), partitions: 3);
-      
-      var responseMessage = await restApiProvider.CreateTableAsync<Payment>(entityCreationMetadata, true, cancellationToken);
-      var content = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
-
-      entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Account), partitions: 1)
-      {
-        Replicas = 3
-      };
-      responseMessage = await restApiProvider.CreateTableAsync<Account>(entityCreationMetadata, true, cancellationToken);
-    }
-  }
+  entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Account), partitions: 1)
+  {
+    Replicas = 3
+  };
+  responseMessage = await restApiProvider.CreateTableAsync<Account>(entityCreationMetadata, true, cancellationToken);
 }
 ```
 
@@ -156,11 +150,12 @@ modelBuilder.AddConvention(decimalTypeConvention);
 Properties of en entity can be marked as a [HEADER](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#headers) with the model builder's FLUENT API as demonstrated below:
 
 ```C#
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
+
 string header = "abc";
 modelBuilder.Entity<PocoWithHeader>()
   .Property(c => c.Header)
   .WithHeader(header);
-
 
 var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(PocoWithHeader), partitions: 1)
 {
@@ -180,3 +175,51 @@ CREATE STREAM IF NOT EXISTS PocoWithHeaders (
 	Header BYTES HEADER('abc')
 ) WITH ( KAFKA_TOPIC='PocoWithHeader', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='3' );
 ```
+
+The `WithHeader` function within the FLUENT API takes precedence over the `HeadersAttribute`.
+
+### WithHeaders
+**v5.1.0**
+
+Properties of en entity can be marked as a [HEADERS](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#headers) with the model builder's FLUENT API as demonstrated below:
+
+```C#
+using ksqlDb.RestApi.Client.Metadata;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+
+modelBuilder.Entity<Movie>()
+  .Property(c => c.Headers)
+  .WithHeaders();
+
+var statementContext = new StatementContext
+{
+  CreationType = CreationType.Create,
+  KSqlEntityType = KSqlEntityType.Stream
+};
+
+var statement = new CreateEntity(modelBuilder).Print<PocoWithHeaders>(statementContext, creationMetadata, null);
+
+[Struct]
+private record KeyValuePair
+{
+  public string Key { get; set; }
+  public byte[] Value { get; set; }
+}
+
+private record Movie
+{
+  public KeyValuePair[] Headers { get; init; } = null!;
+}
+```
+
+The `StructAttribute` in `ksqlDb.RestApi.Client` marks a class as a [STRUCT type](https://docs.ksqldb.io/en/latest/reference/sql/data-types/#struct) in ksqlDB 	a strongly typed structured data type `org.apache.kafka.connect.data.Struct`.
+Without the annotation, the type's name, `KeyValuePair`, would be used in code generation.
+
+The value in the above `statement` variable is equivalent to:
+```SQL
+CREATE STREAM Movie (
+	Headers ARRAY<STRUCT<Key VARCHAR, Value BYTES>> HEADERS
+) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );
+```
+
+The `WithHeaders` function within the FLUENT API takes precedence over the `HeadersAttribute`.
