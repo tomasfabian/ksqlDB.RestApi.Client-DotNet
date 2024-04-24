@@ -3,15 +3,17 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Options;
 /// <summary>
 /// Specifies KSQL query endpoints when using the ksqlDB REST API.
 /// </summary>
-public enum QueryType
+public enum EndpointType
 {
   /// <summary>
-  /// Represents the "/ksql" endpoint in the ksqlDB REST API.
+  /// Represents the "/query" endpoint in the ksqlDB REST API.
   /// </summary>
-  Query,
+  Query = 0,
 
+#if !NETSTANDARD
   /// <summary>
   /// Represents the "/query-stream" endpoint in the ksqlDB REST API.
   /// </summary>
-  QueryStream
+  QueryStream = 1
+#endif
 }

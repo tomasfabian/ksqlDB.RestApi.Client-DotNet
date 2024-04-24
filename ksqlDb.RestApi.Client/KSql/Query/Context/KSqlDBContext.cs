@@ -1,6 +1,7 @@
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.Query.PullQueries;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
@@ -10,9 +11,8 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-#if !NETSTANDARD
+using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-#endif
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context;
 
@@ -65,23 +65,29 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
   {
     this.modelBuilder = modelBuilder;
     ContextOptions = contextOptions ?? throw new ArgumentNullException(nameof(contextOptions));
-
-    KSqlDBQueryContext = new KSqlDBContextQueryDependenciesProvider(contextOptions);
   }
   
   internal KSqlDBContextOptions ContextOptions { get; }
-
-  internal KSqlDBContextQueryDependenciesProvider KSqlDBQueryContext { get; set; }
-
-#if !NETSTANDARD
 
   protected override void OnConfigureServices(IServiceCollection serviceCollection, KSqlDBContextOptions contextOptions)
   {
     base.OnConfigureServices(serviceCollection, contextOptions);
 
-    serviceCollection.TryAddScoped<IKSqlDbProvider, KSqlDbQueryStreamProvider>();
-
-    serviceCollection.TryAddSingleton<IKSqlDbParameters>(contextOptions.QueryStreamParameters);
+    switch (contextOptions.EndpointType)
+    {
+      case EndpointType.Query:
+        serviceCollection.TryAddScoped<IKSqlDbProvider, KSqlDbQueryProvider>();
+        serviceCollection.TryAddSingleton(contextOptions.QueryParameters);
+        break;
+#if !NETSTANDARD
+      case EndpointType.QueryStream:
+        serviceCollection.TryAddScoped<IKSqlDbProvider, KSqlDbQueryStreamProvider>();
+        serviceCollection.TryAddSingleton<IKSqlDbParameters>(contextOptions.QueryStreamParameters);
+        break;
+#endif
+      default:
+        throw new ArgumentOutOfRangeException();
+    }
   }
 
   /// <summary>
@@ -91,8 +97,15 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
   /// <param name="queryStreamParameters">The parameters for the query stream.</param>
   /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation (optional).</param>
   /// <returns>An asynchronous enumerable of entities representing the query stream.</returns>
-  public IAsyncEnumerable<TEntity> CreateQueryStream<TEntity>(QueryStreamParameters queryStreamParameters, CancellationToken cancellationToken = default)
+  public IAsyncEnumerable<TEntity> CreateQueryStream<TEntity>(IKSqlDbParameters queryStreamParameters, CancellationToken cancellationToken = default)
   {
+    if (ContextOptions.EndpointType == EndpointType.Query && queryStreamParameters is not QueryParameters)
+      throw new InvalidOperationException($"Invalid {nameof(IKSqlDbParameters)} for endpoint {EndpointType.Query}");
+#if !NETSTANDARD
+    if (ContextOptions.EndpointType == EndpointType.QueryStream && queryStreamParameters is not QueryStreamParameters)
+      throw new InvalidOperationException($"Invalid {nameof(IKSqlDbParameters)} for endpoint {EndpointType.QueryStream}");
+#endif
+
     var serviceScopeFactory = ServiceScopeFactory();
 
     var ksqlDbProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<IKSqlDbProvider>();
@@ -109,46 +122,6 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
   public IQbservable<TEntity> CreateQueryStream<TEntity>(string? fromItemName = null)
   {
     var serviceScopeFactory = ServiceScopeFactory();
-
-    if (fromItemName == String.Empty)
-      fromItemName = null;
-
-    var queryStreamContext = new QueryContext
-    {
-      ModelBuilder = modelBuilder,
-      FromItemName = fromItemName
-    };
-
-    return new KQueryStreamSet<TEntity>(serviceScopeFactory, queryStreamContext);
-  }
-
-#endif
-
-  /// <summary>
-  /// Creates a query for retrieving entities asynchronously.
-  /// </summary>
-  /// <typeparam name="TEntity">The type of the entities to retrieve.</typeparam>
-  /// <param name="queryParameters">The parameters for the query.</param>
-  /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation (optional).</param>
-  /// <returns>An asynchronous enumerable of entities.</returns>
-  public IAsyncEnumerable<TEntity> CreateQuery<TEntity>(QueryParameters queryParameters, CancellationToken cancellationToken = default)
-  {
-    var serviceScopeFactory = KSqlDBQueryContext.ServiceScopeFactory();
-
-    var ksqlDbProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<IKSqlDbProvider>();
-
-    return ksqlDbProvider.Run<TEntity>(queryParameters, cancellationToken);
-  }
-
-  /// <summary>
-  /// Creates a push query for the query endpoint.
-  /// </summary>
-  /// <typeparam name="TEntity">The type of the data in the data source.</typeparam>
-  /// <param name="fromItemName">Overrides the name of the stream or table which by default is derived from TEntity</param>
-  /// <returns>A Qbservable for query composition and execution.</returns>
-  public IQbservable<TEntity> CreateQuery<TEntity>(string? fromItemName = null)
-  {
-    var serviceScopeFactory = KSqlDBQueryContext.ServiceScopeFactory();
 
     if (fromItemName == String.Empty)
       fromItemName = null;
@@ -206,7 +179,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 
   private WithOrAsClause CreateStatement(string fromItemName, CreationType creationType, KSqlEntityType entityType)
   {
-    var serviceScopeFactory = KSqlDBQueryContext.ServiceScopeFactory();
+    var serviceScopeFactory = ServiceScopeFactory();
 
     var statementContext = new StatementContext
     {
@@ -231,7 +204,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
   /// <returns>An IPullable for query composition and execution.</returns>
   public IPullable<TEntity> CreatePullQuery<TEntity>(string? tableName = null)
   {
-    var serviceScopeFactory = KSqlDBQueryContext.ServiceScopeFactory();
+    var serviceScopeFactory = ServiceScopeFactory();
 
     if (tableName == String.Empty)
       tableName = null;
@@ -257,7 +230,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
     if (string.IsNullOrEmpty(ksql))
       throw new ArgumentException($"The {nameof(ksql)} statement cannot be null or empty.", nameof(ksql));
 
-    var serviceScopeFactory = KSqlDBQueryContext.ServiceScopeFactory();
+    var serviceScopeFactory = ServiceScopeFactory();
 
     using var scope = serviceScopeFactory.CreateScope();
 
@@ -266,7 +239,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
     var queryParameters = dependencies.QueryStreamParameters;
     queryParameters.Sql = ksql;
 
-    return dependencies.KsqlDBProvider
+    return dependencies.KSqlDbProvider
       .Run<TEntity>(queryParameters, cancellationToken)
       .FirstOrDefaultAsync(cancellationToken: cancellationToken);
   }
@@ -337,14 +310,12 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 #if !NETSTANDARD
     await base.OnDisposeAsync();
 #endif
-    await KSqlDBQueryContext.DisposeAsync().ConfigureAwait(false);
     Dispose(false);
   }
 
   protected override void Dispose(bool disposing)
   {
     if (!disposing) return;
-    KSqlDBQueryContext.Dispose();
     base.Dispose(true);
   }
 }

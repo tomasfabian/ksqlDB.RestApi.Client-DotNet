@@ -1,4 +1,4 @@
-﻿using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 

@@ -101,7 +101,7 @@ internal abstract class KStreamSet<TEntity> : KStreamSet, Linq.IQbservable<TEnti
       
     var queryParameters = GetQueryParameters(dependencies);
 
-    return dependencies.KsqlDBProvider
+    return dependencies.KSqlDbProvider
       .Run<TEntity>(queryParameters, cancellationToken);
   }
 
@@ -113,7 +113,7 @@ internal abstract class KStreamSet<TEntity> : KStreamSet, Linq.IQbservable<TEnti
 
     var queryParameters = GetQueryParameters(dependencies);
 
-    return dependencies.KsqlDBProvider
+    return dependencies.KSqlDbProvider
       .RunAsync<TEntity>(queryParameters, cancellationToken);
   }
 
