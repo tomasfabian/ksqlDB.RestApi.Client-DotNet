@@ -1,5 +1,3 @@
-version: '3.8'
-
 networks:
   ksqldbnetwork:
     driver: bridge
@@ -22,28 +20,16 @@ services:
       - ksqldbnetwork
     environment:
       - KAFKA_BROKER_ID=1
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=CLIENT://broker01:9092,EXTERNAL://broker01:29092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://broker01:9092,EXTERNAL://localhost:29092
-      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://broker01:9092,PLAINTEXT_HOST://broker01:29092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://broker01:9092,PLAINTEXT_HOST://localhost:29092
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
-  #    - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
     depends_on:
       - zookeeper
-
-  kafdrop:
-    image: obsidiandynamics/kafdrop:3.30.0
-    depends_on:
-      - broker01
-    ports:
-      - "9000:9000"
-    networks: 
-      - ksqldbnetwork
-    environment:
-      - KAFKA_BROKERCONNECT=broker01:9092
-      - JVM_OPTS=-Xms32M -Xms64M
-      - SERVER_SERVLET_CONTEXTPATH=/
             
   connect:
     image: debezium/connect:2.0
@@ -79,7 +65,6 @@ services:
       KSQL_LISTENERS: "http://0.0.0.0:8088"
       KSQL_CACHE_MAX_BYTES_BUFFERING: 0
 
-
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:${KSQLDB_VERSION}
     depends_on:
@@ -89,3 +74,29 @@ services:
       - ksqldbnetwork
     entrypoint: /bin/sh
     tty: true
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:6.0.0
+    networks: 
+      - ksqldbnetwork
+    depends_on:
+      - zookeeper
+      - broker01
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    networks: 
+      - ksqldbnetwork
+    ports:
+      - 8080:8080
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "broker01:9092"
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: "http://schema-registry:8081"
+      DYNAMIC_CONFIG_ENABLED: 'true'
