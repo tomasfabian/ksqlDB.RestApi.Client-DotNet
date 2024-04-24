@@ -4,14 +4,11 @@ using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
-using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
-using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using ksqlDb.RestApi.Client.Tests.Models;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using UnitTests;
@@ -28,11 +25,12 @@ public class KSqlDBContextTests : TestBase
     var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
     //Act
-    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => {});
+    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => { });
 
     //Assert
     subscription.Should().NotBeNull();
-    context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()), Times.Once);
+    context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()),
+      Times.Once);
   }
 
   [Test]
@@ -50,10 +48,12 @@ public class KSqlDBContextTests : TestBase
     var context = new TestableDbProvider<string>(contextOptions);
 
     //Act
-    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => {});
+    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => { });
 
     //Assert
-    context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.Is<QueryStreamParameters>(c => c[QueryParameters.AutoOffsetResetPropertyName] == "Latest"), It.IsAny<CancellationToken>()), Times.Once);
+    context.KSqlDbProviderMock.Verify(
+      c => c.Run<string>(It.Is<QueryStreamParameters>(c => c[QueryParameters.AutoOffsetResetPropertyName] == "Latest"),
+        It.IsAny<CancellationToken>()), Times.Once);
   }
 
   [Test]
@@ -68,10 +68,13 @@ public class KSqlDBContextTests : TestBase
     };
 
     //Act
-    var subscription = context.CreateQueryStream<string>().WithOffsetResetPolicy(AutoOffsetReset.Latest).Subscribe(_ => {});
+    var subscription = context.CreateQueryStream<string>().WithOffsetResetPolicy(AutoOffsetReset.Latest)
+      .Subscribe(_ => { });
 
     //Assert
-    context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.Is<QueryStreamParameters>(c => c.AutoOffsetReset == AutoOffsetReset.Latest), It.IsAny<CancellationToken>()), Times.Once);
+    context.KSqlDbProviderMock.Verify(
+      c => c.Run<string>(It.Is<QueryStreamParameters>(c => c.AutoOffsetReset == AutoOffsetReset.Latest),
+        It.IsAny<CancellationToken>()), Times.Once);
 
     subscription.Dispose();
   }
@@ -81,15 +84,17 @@ public class KSqlDBContextTests : TestBase
   {
     //Arrange
     var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDbUrl);
-    contextOptions.SetAutoOffsetReset(AutoOffsetReset.Latest); 
+    contextOptions.SetAutoOffsetReset(AutoOffsetReset.Latest);
 
     var context = new TestableDbProvider<string>(contextOptions);
 
     //Act
-    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => {});
+    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => { });
 
     //Assert
-    context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.Is<QueryStreamParameters>(c => c["auto.offset.reset"] == "latest"), It.IsAny<CancellationToken>()), Times.Once);
+    context.KSqlDbProviderMock.Verify(
+      c => c.Run<string>(It.Is<QueryStreamParameters>(c => c["auto.offset.reset"] == "latest"),
+        It.IsAny<CancellationToken>()), Times.Once);
   }
 
   [Test]
@@ -97,15 +102,17 @@ public class KSqlDBContextTests : TestBase
   {
     //Arrange
     var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDbUrl);
-    contextOptions.SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce); 
+    contextOptions.SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce);
 
     var context = new TestableDbProvider<string>(contextOptions);
 
     //Act
-    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => {});
+    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => { });
 
     //Assert
-    context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.Is<QueryStreamParameters>(c => c[KSqlDbConfigs.ProcessingGuarantee] == "exactly_once"), It.IsAny<CancellationToken>()), Times.Once);
+    context.KSqlDbProviderMock.Verify(
+      c => c.Run<string>(It.Is<QueryStreamParameters>(c => c[KSqlDbConfigs.ProcessingGuarantee] == "exactly_once"),
+        It.IsAny<CancellationToken>()), Times.Once);
   }
 
   [Test]
@@ -115,7 +122,7 @@ public class KSqlDBContextTests : TestBase
     var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
     //Act
-    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => {});
+    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => { });
 
     //Assert
     context.KSqlQueryGenerator.Verify(c => c.BuildKSql(It.IsAny<Expression>(), It.IsAny<QueryContext>()), Times.Once);
@@ -136,10 +143,12 @@ public class KSqlDBContextTests : TestBase
     var context = new TestableDbProvider<string>(contextOptions);
 
     //Act
-    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => {}, e => {});
+    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => { }, e => { });
 
     //Assert
-    context.KSqlDbProviderMock.Verify(c => c.Run<string>(It.Is<QueryStreamParameters>(parameters => parameters["auto.offset.reset"] == "latest"), It.IsAny<CancellationToken>()), Times.Once);
+    context.KSqlDbProviderMock.Verify(
+      c => c.Run<string>(It.Is<QueryStreamParameters>(parameters => parameters["auto.offset.reset"] == "latest"),
+        It.IsAny<CancellationToken>()), Times.Once);
   }
 
   [Test]
@@ -190,13 +199,14 @@ public class KSqlDBContextTests : TestBase
     source.Should().NotBeNull();
   }
 
+
   [Test]
-  public void CreateQuery_RawKSQL_ReturnAsyncEnumerable()
+  public void CreateQueryStream_InvalidQueryParameterTypeThrows()
   {
     //Arrange
     string ksql = "SELECT * FROM tweetsTest EMIT CHANGES LIMIT 2;";
 
-    QueryParameters queryParameters = new QueryParameters
+    var queryParameters = new QueryParameters
     {
       Sql = ksql,
       [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
@@ -204,8 +214,30 @@ public class KSqlDBContextTests : TestBase
 
     var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
+    //Assert
+    Assert.Throws<InvalidOperationException>(() =>
+    {
+      //Act
+      context.CreateQueryStream<string>(queryParameters);
+    });
+  }
+
+  [Test]
+  public void CreateQuery_RawKSQL_ReturnAsyncEnumerable()
+  {
+    //Arrange
+    string ksql = "SELECT * FROM tweetsTest EMIT CHANGES LIMIT 2;";
+
+    QueryStreamParameters queryParameters = new QueryStreamParameters
+    {
+      Sql = ksql,
+      [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
+    };
+
+    var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
+
     //Act
-    var source = context.CreateQuery<string>(queryParameters);
+    var source = context.CreateQueryStream<string>(queryParameters);
 
     //Assert
     source.Should().NotBeNull();
@@ -216,17 +248,20 @@ public class KSqlDBContextTests : TestBase
   {
     //Arrange
     var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
-      
+
     var entity = new Tweet();
-    context.KSqlDbRestApiClientMock.Setup(c => c.ToInsertStatement(It.IsAny<InsertValues<Tweet>>(), null)).Returns(new KSqlDbStatement("Insert Into"));
-      
+    context.KSqlDbRestApiClientMock.Setup(c => c.ToInsertStatement(It.IsAny<InsertValues<Tweet>>(), null))
+      .Returns(new KSqlDbStatement("Insert Into"));
+
     //Act
     context.Add(entity);
     await context.SaveChangesAsync();
 
     //Assert
-    context.KSqlDbRestApiClientMock.Verify(c => c.ToInsertStatement(It.Is<InsertValues<Tweet>>(c => c.Entity == entity), null), Times.Once);
-    context.KSqlDbRestApiClientMock.Verify(c => c.ExecuteStatementAsync(It.IsAny<KSqlDbStatement>(), It.IsAny<CancellationToken>()), Times.Once);
+    context.KSqlDbRestApiClientMock.Verify(
+      c => c.ToInsertStatement(It.Is<InsertValues<Tweet>>(c => c.Entity == entity), null), Times.Once);
+    context.KSqlDbRestApiClientMock.Verify(
+      c => c.ExecuteStatementAsync(It.IsAny<KSqlDbStatement>(), It.IsAny<CancellationToken>()), Times.Once);
   }
 
   [Test]
@@ -235,8 +270,9 @@ public class KSqlDBContextTests : TestBase
     //Arrange
     var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
     var entity = new Tweet();
-    context.KSqlDbRestApiClientMock.Setup(c => c.ToInsertStatement(It.IsAny<InsertValues<Tweet>>(), null)).Returns(new KSqlDbStatement("Insert Into"));
-      
+    context.KSqlDbRestApiClientMock.Setup(c => c.ToInsertStatement(It.IsAny<InsertValues<Tweet>>(), null))
+      .Returns(new KSqlDbStatement("Insert Into"));
+
     //Act
     context.Add(entity);
     context.Add(entity);
@@ -244,8 +280,10 @@ public class KSqlDBContextTests : TestBase
     //Assert
     context.ChangesCache.Count.Should().Be(2);
 
-    context.KSqlDbRestApiClientMock.Verify(c => c.ToInsertStatement(It.Is<InsertValues<Tweet>>(c => c.Entity == entity), null), Times.Exactly(2));
-    context.KSqlDbRestApiClientMock.Verify(c => c.ExecuteStatementAsync(It.IsAny<KSqlDbStatement>(), It.IsAny<CancellationToken>()), Times.Never);
+    context.KSqlDbRestApiClientMock.Verify(
+      c => c.ToInsertStatement(It.Is<InsertValues<Tweet>>(c => c.Entity == entity), null), Times.Exactly(2));
+    context.KSqlDbRestApiClientMock.Verify(
+      c => c.ExecuteStatementAsync(It.IsAny<KSqlDbStatement>(), It.IsAny<CancellationToken>()), Times.Never);
   }
 
   [Test]
@@ -256,7 +294,8 @@ public class KSqlDBContextTests : TestBase
 
     var entity = new Tweet();
     var insertValues = new InsertValues<Tweet>(entity);
-    context.KSqlDbRestApiClientMock.Setup(c => c.ToInsertStatement(insertValues, null)).Returns(new KSqlDbStatement("Insert Into"));
+    context.KSqlDbRestApiClientMock.Setup(c => c.ToInsertStatement(insertValues, null))
+      .Returns(new KSqlDbStatement("Insert Into"));
 
     //Act
     context.Add(insertValues);
@@ -269,7 +308,7 @@ public class KSqlDBContextTests : TestBase
   public void AddWithInsertProperties()
   {
     //Arrange
-    var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl); 
+    var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
     var entity = new Tweet();
     var insertProperties = new InsertProperties();
 
@@ -277,7 +316,8 @@ public class KSqlDBContextTests : TestBase
     context.Add(entity, insertProperties);
 
     //Assert
-    context.KSqlDbRestApiClientMock.Verify(c => c.ToInsertStatement(It.IsAny<InsertValues<Tweet>>(), insertProperties), Times.Once);
+    context.KSqlDbRestApiClientMock.Verify(c => c.ToInsertStatement(It.IsAny<InsertValues<Tweet>>(), insertProperties),
+      Times.Once);
   }
 
   [Test]
@@ -285,51 +325,11 @@ public class KSqlDBContextTests : TestBase
   {
     //Arrange
     var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
-      
+
     //Act
     var response = await context.SaveChangesAsync();
 
     //Assert
     response.Should().BeNull();
-  }
-
-  [Test]
-  public void CreateQueryAndCreateQueryStreamShouldNotInfluenceEachOther()
-  {
-    //Arrange
-    var context = new KSqlDBContext(TestParameters.KsqlDbUrl);
-
-    _ = context.CreateQuery<int>();
-    _ = context.CreateQueryStream<int>();
-
-    var serviceProvider = context.KSqlDBQueryContext.ServiceCollection
-      .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
-
-    //Act
-    var serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
-    var queryDbProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<IKSqlDbProvider>();
-
-    //Assert
-    queryDbProvider.Should().BeOfType<KSqlDbQueryProvider>();
-  }
-
-  [Test]
-  public void CreateQueryStreamAndCreateQueryShouldNotInfluenceEachOther()
-  {
-    //Arrange
-    var context = new KSqlDBContext(TestParameters.KsqlDbUrl);
-
-    _ = context.CreateQueryStream<int>();
-    _ = context.CreateQuery<int>();
-
-    var serviceProvider = context.ServiceCollection
-      .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
-
-    //Act
-    var serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
-    var queryDbProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IKSqlDbProvider>();
-
-    //Assert
-    queryDbProvider.Should().BeOfType<KSqlDbQueryStreamProvider>();
   }
 }

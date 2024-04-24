@@ -5,6 +5,7 @@ using ksqlDb.RestApi.Client.IntegrationTests.Models.Sensors;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
 using NUnit.Framework;
 
 namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq.PullQueries;
@@ -19,8 +20,11 @@ public class PullQueryExtensionsTests
   [OneTimeSetUp]
   public static async Task ClassInitialize()
   {
-    contextOptions = new KSqlDBContextOptions(KSqlDbRestApiProvider.KsqlDbUrl);
-      
+    contextOptions = new KSqlDBContextOptions(KSqlDbRestApiProvider.KsqlDbUrl)
+    {
+      EndpointType = EndpointType.Query //TODO: test QueryStream end point
+    };
+
     context = new KSqlDBContext(contextOptions);
 
     pullQueryProvider = new SensorsPullQueryProvider();

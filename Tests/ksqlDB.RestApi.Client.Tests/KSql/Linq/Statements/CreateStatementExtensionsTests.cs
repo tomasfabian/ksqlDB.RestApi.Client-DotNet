@@ -84,6 +84,7 @@ WHERE Id < 3 PARTITION BY Title EMIT CHANGES;".ReplaceLineEndings());
   public async Task CreateOrReplaceTableStatement_ExecuteStatementAsync_ResponseWasReceived()
   {
     //Arrange
+    DbProvider.RegisterKSqlDbRestApiClient = false;
     var query = DbProvider.CreateOrReplaceTableStatement(TableName)
       .As<Location>();
 
