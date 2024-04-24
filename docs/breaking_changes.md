@@ -1,5 +1,9 @@
 # Breaking changes
 
+# v6.0.0
+- `QueryType` enum was renamed to `EndpointType`
+- removed `CreateQuery` from `IKSqlDBContext` interface in the netstandard version. It was replaced with `CreateQueryStream`.
+ 
 # v5.0.0
 - removed static modifier from `StatementGenerator` class
 

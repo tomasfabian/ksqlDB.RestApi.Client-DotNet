@@ -1,5 +1,36 @@
 # Config
 
+### KSqlDbContextOptionsBuilder.SetEndpointType
+**v6.0.0**
+
+`SetEndpointType` can be utilized to configure the `KSqlDbProvider` to either use `/query` or `/query-stream` endpoint.
+The deprecation of the `/query` endpoint was proposed as part of [KLIP-15](https://github.com/confluentinc/ksql/blob/master/design-proposals/klip-15-new-api-and-client.md) in favor of the new **HTTP/2-based** [/query-stream](https://docs.ksqldb.io/developer-guide/ksqldb-rest-api/streaming-endpoint).
+However, the deprecation itself has not been scheduled yet.
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+
+new KSqlDbContextOptionsBuilder()
+  .UseKSqlDb(url)
+  .SetEndpointType(EndpointType.Query)
+  .Options;
+```
+
+The preceding example is analogous to this one:
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+
+var contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
+{
+  EndpointType = EndpointType.Query
+};
+```
+
+`QuertStream` isn't accessible in the netstandard version because it lacks support for HTTP/2.
+`SetEndpointType.QueryStream` is set by default.
+
 ### KSqlDbContextOptionsBuilder.ReplaceHttpClient
 The function `Configure` is an extension method for `IServiceCollection` whose purpose is to set up a `ksqlDB` context.
 The code provided here is for integrating custom or third-party HttpMessageHandlers within your application.
