@@ -29,6 +29,7 @@ var contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
 ```
 
 `QuertStream` isn't accessible in the netstandard version because it lacks support for HTTP/2.
+
 `SetEndpointType.QueryStream` is set by default.
 
 ### KSqlDbContextOptionsBuilder.ReplaceHttpClient

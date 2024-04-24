@@ -30,6 +30,7 @@ using Microsoft.Extensions.Options;
 using K = ksqlDB.RestApi.Client.KSql.Query.Functions.KSql;
 using HttpClientFactory = ksqlDB.RestApi.Client.Samples.Http.HttpClientFactory;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using EndpointType = ksqlDB.RestApi.Client.KSql.Query.Options.EndpointType;
 
 namespace ksqlDB.RestApi.Client.Samples;
 
@@ -47,17 +48,19 @@ public static class Program
         jsonOptions.IgnoreReadOnlyFields = true;
         jsonOptions.TypeInfoResolver = SourceGenerationContext.Default;
       })
-      .SetAutoOffsetReset(AutoOffsetReset.Earliest) // global setting
+      //.SetAutoOffsetReset(AutoOffsetReset.Earliest) // global setting
       .SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce) // global setting
       .SetIdentifierEscaping(IdentifierEscaping.Keywords)
+      .SetEndpointType(EndpointType.QueryStream) // uses HTTP/2.0
+      //.SetEndpointType(EndpointType.Query) // uses HTTP/1.0
       .SetupQueryStream(options =>
       {
-        //SetupQueryStream affects only IKSqlDBContext.CreateQueryStream<T>
+        //SetupQueryStream affects only EndpointType.QueryStream
         options.Properties[KSqlDbConfigs.KsqlQueryPushV2Enabled] = "true";
       })
       .SetupQuery(options =>
       {
-        //SetupQuery affects only IKSqlDBContext.CreateQuery<T>
+        //SetupQuery affects only EndpointType.Query
         options.Properties[KSqlDbConfigs.ProcessingGuarantee] = ProcessingGuarantee.ExactlyOnce.ToKSqlValue();
       })
       .Options;
@@ -88,8 +91,7 @@ public static class Program
 
     await using var context = new KSqlDBContext(contextOptions, loggerFactory);
 
-    var query = context.CreateQueryStream<Movie>() // Http 2.0
-      // var query = context.CreateQuery<Movie>() // Http 1.0
+    var query = context.CreateQueryStream<Movie>()
       .Where(p => p.Title != "E.T.")
       .Where(c => c.Title.ToLower().Contains("hard".ToLower()) || c.Id == 1)
       .Where(p => p.RowTime >= 1510923225000)
@@ -459,7 +461,7 @@ public static class Program
 
     string queryId = "insert_query_book";
 
-    var response = await context.CreateQuery<Book>(streamNameFrom)
+    var response = await context.CreateQueryStream<Book>(streamNameFrom)
       .Where(c => c.Title != "Apocalypse now")
       .InsertIntoAsync(streamName, queryId);
 
@@ -472,13 +474,13 @@ public static class Program
     string ksql = @"SELECT * FROM Movies
 WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
 
-    QueryParameters queryParameters = new QueryParameters
+    var queryParameters = new QueryStreamParameters
     {
       Sql = ksql,
-      [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
+      [QueryStreamParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToKSqlValue(),
     };
 
-    var disposable = context.CreateQuery<Movie>(queryParameters)
+    var disposable = context.CreateQueryStream<Movie>(queryParameters)
       .ToObservable()
       .Subscribe(onNext: movie =>
         {
