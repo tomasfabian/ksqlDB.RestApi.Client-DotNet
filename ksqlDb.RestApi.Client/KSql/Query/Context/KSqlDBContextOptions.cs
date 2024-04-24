@@ -34,6 +34,10 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
     {
       [QueryStreamParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToString().ToLower(),
     };
+
+#if !NETSTANDARD
+    EndpointType = EndpointType.QueryStream;
+#endif
   }
 
   internal IServiceCollection ServiceCollection { get; set; } = new ServiceCollection();
@@ -120,6 +124,8 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   /// As ksqlDB automatically converts all identifiers to uppercase by default, it's crucial to enclose them within backticks to maintain the desired casing.
   /// </summary>
   public IdentifierEscaping IdentifierEscaping { get; set; }
+
+  public EndpointType EndpointType { get; set; }
 
   /// <summary>
   /// Sets the basic authentication credentials.
