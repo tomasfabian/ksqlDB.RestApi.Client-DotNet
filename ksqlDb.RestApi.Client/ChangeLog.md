@@ -1,5 +1,10 @@
 # ksqlDB.RestApi.Client
 
+# 6.0.0-rc.1
+- added `SetEndpointType` to `KSqlDbContextOptionsBuilder` for configuring to use either "/query" or "/query-stream" endpoint
+- `CreateQuery` and `CreateQueryStream` were merged. `CreatePullQuery` by default uses http/2 now. 
+- see also [breakingchanges.md](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/breaking_changes.md#v600)
+
 # 5.1.0
 - added `InsertIntoAsync` Qbservable extension for executing `INSERT INTO <stream-name> SELECT` statements.
 - added `FieldTypeBuilderExtensions` `WithHeader` for configuring **byte[] types** as **HEADER**
