@@ -375,7 +375,7 @@ QueryParameters queryParameters = new QueryParameters
 
 await using var context = new KSqlDBContext(@"http://localhost:8088");
 
-var moviesSource = context.CreateQuery<Movie>(queryParameters)
+var moviesSource = context.CreateQueryStream<Movie>(queryParameters)
   .ToObservable();
 ```
 
