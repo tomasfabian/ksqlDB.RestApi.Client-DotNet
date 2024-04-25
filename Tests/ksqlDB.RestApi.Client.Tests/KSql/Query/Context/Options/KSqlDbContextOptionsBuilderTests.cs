@@ -219,6 +219,35 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     options.QueryStreamParameters.Properties[QueryStreamParameters.AutoOffsetResetPropertyName].Should().BeEquivalentTo(latestAtoOffsetReset);
   }
 
+  [Test]
+  public void SetEndpointType_DefaultQueryStreamWasSet()
+  {
+    //Arrange
+    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
+
+    //Act
+    var options = setupParameters.Options;
+
+    //Assert
+    options.EndpointType.Should().Be(EndpointType.QueryStream);
+  }
+
+  public static EndpointType[] SetEndpointTypeTestCases() => Enum.GetValues<EndpointType>();
+
+  [TestCaseSource(nameof(SetEndpointTypeTestCases))]
+  public void SetEndpointType_QueryWasSet(EndpointType endpointType)
+  {
+    //Arrange
+    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl)
+      .SetEndpointType(endpointType);
+
+    //Act
+    var options = setupParameters.Options;
+
+    //Assert
+    options.EndpointType.Should().Be(endpointType);
+  }
+
   #endregion
 
   #region Query
