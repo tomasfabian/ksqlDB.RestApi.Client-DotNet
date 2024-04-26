@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -25,7 +24,7 @@ namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
     {
       var contextOptions = new KSqlDbContextOptionsBuilder()
         .UseKSqlDb(ksqlDbUrl)
-        .SetupQuery(options =>
+        .SetupQueryStream(options =>
         {
           options.Properties[QueryParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToString().ToLower(); // "latest"
         })
@@ -53,7 +52,7 @@ namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
 
       var context = new KSqlDBContext(contextOptions);
 
-      var subscription = context.CreateQuery<Movie>()
+      var subscription = context.CreateQueryStream<Movie>()
         .Where(p => p.Title != "E.T.")
         .Where(c => K.Functions.Like(c.Title.ToLower(), "%hard%".ToLower()) || c.Id == 1)
         .Where(p => p.RowTime >= 1510923225000) //AND RowTime >= 1510923225000
@@ -95,7 +94,7 @@ namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
 
     private static IDisposable CountDistinct(KSqlDBContext context)
     {
-      var subscription = context.CreateQuery<Tweet>()
+      var subscription = context.CreateQueryStream<Tweet>()
         .GroupBy(c => c.Id)
         .Select(g => new { Id = g.Key, Count = g.LongCountDistinct(c => c.Message) })
         .Subscribe(c =>
@@ -110,7 +109,7 @@ namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
     {
       bool sorted = true;
 
-      var subscription = context.CreateQuery<Movie>()
+      var subscription = context.CreateQueryStream<Movie>()
         .Select(c => new
         {
           Entries = KSqlFunctions.Instance.Entries(new Dictionary<string, string>()
@@ -145,7 +144,7 @@ namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
     
     private static async Task DeeplyNestedTypes(KSqlDBContext context)
     {
-      var moviesStream = context.CreateQuery<Movie>();
+      var moviesStream = context.CreateQueryStream<Movie>();
 
       var source = moviesStream.Select(c => new
       {
