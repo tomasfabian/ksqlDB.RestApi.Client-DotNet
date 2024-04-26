@@ -391,6 +391,21 @@ public static KSqlDBContextOptions CreateQueryStreamOptions(string ksqlDbUrl)
 }
 ```
 
+> ⚠ In version 6.0.0 `SetupQuery` was unified with `SetupQueryStream`.
+
+### SetupPullQuery
+**v6.0.0**
+
+- configures the parameters for setting up a pull query
+
+```C#
+contextOptions
+  .SetupPullQuery(options =>
+  {
+    options[KSqlDbConfigs.KsqlQueryPullTableScanEnabled] = "true";
+  })
+```
+
 ### Setting processing guarantee with KSqlDbContextOptionsBuilder
 **v1.0.0**
 

@@ -2,8 +2,10 @@
 
 # v6.0.0
 - `QueryType` enum was renamed to `EndpointType`
-- removed `CreateQuery` from `IKSqlDBContext` interface in the netstandard version. It was replaced with `CreateQueryStream`.
- 
+- removed `CreateQuery` from `IKSqlDBContext` interface, it was merged with `CreateQueryStream`.
+- removed `SetupQuery` from `KSqlDbContextOptionsBuilder`, it was merged with `SetupQueryStream`.
+- introduced distinct parameters designed specifically for pull queries. Before this update, the parameters sent to both the 'query' and 'query-stream' endpoints were shared between pull and push queries.
+
 # v5.0.0
 - removed static modifier from `StatementGenerator` class
 
