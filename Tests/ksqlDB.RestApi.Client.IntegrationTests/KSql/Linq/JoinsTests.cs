@@ -141,6 +141,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
   [Test]
   public async Task FullOuterJoin_QueryEndPoint()
   {
+    Context = CreateKSqlDbContext(ksqlDB.RestApi.Client.KSql.Query.Options.EndpointType.Query);
     await FullOuterJoinTest(Context.CreateQueryStream<Movie2>(MoviesTableName));
   }
 

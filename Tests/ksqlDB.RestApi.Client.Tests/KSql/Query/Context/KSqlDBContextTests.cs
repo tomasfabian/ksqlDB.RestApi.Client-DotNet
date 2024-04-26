@@ -4,14 +4,18 @@ using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using ksqlDb.RestApi.Client.Tests.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using UnitTests;
+using EndpointType = ksqlDB.RestApi.Client.KSql.Query.Options.EndpointType;
 using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Context;
@@ -331,5 +335,59 @@ public class KSqlDBContextTests : TestBase
 
     //Assert
     response.Should().BeNull();
+  }
+
+  [Test]
+  public void DependenciesForQueryEndpointTypeWereConfigured()
+  {
+    //Arrange
+    KSqlDBContextOptions contextOptions = new(TestParameters.KsqlDbUrl)
+    {
+      EndpointType = EndpointType.Query
+    };
+    var context = new KSqlDBContext(contextOptions);
+
+    _ = context.CreateQueryStream<int>();
+
+    var serviceProvider = context.ServiceCollection
+      .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+
+    //Act
+    var serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
+    var queryDbProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<IKSqlDbProvider>();
+    var pushQueryParameters = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IKSqlDbParameters>();
+    var pullQueryParameters = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IPullQueryParameters>();
+
+    //Assert
+    queryDbProvider.Should().BeOfType<KSqlDbQueryProvider>();
+    pushQueryParameters.Should().BeOfType<QueryParameters>();
+    pullQueryParameters.Should().BeOfType<PullQueryParameters>();
+  }
+
+  [Test]
+  public void DependenciesForQueryStreamEndpointTypeWereConfigured()
+  {
+    //Arrange
+    KSqlDBContextOptions contextOptions = new(TestParameters.KsqlDbUrl)
+    {
+      EndpointType = EndpointType.QueryStream
+    };
+    var context = new KSqlDBContext(contextOptions);
+
+    _ = context.CreateQueryStream<int>();
+
+    var serviceProvider = context.ServiceCollection
+      .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+
+    //Act
+    var serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
+    var queryDbProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IKSqlDbProvider>();
+    var pushQueryParameters = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IKSqlDbParameters>();
+    var pullQueryParameters = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IPullQueryParameters>();
+
+    //Assert
+    queryDbProvider.Should().BeOfType<KSqlDbQueryStreamProvider>();
+    pushQueryParameters.Should().BeOfType<QueryStreamParameters>();
+    pullQueryParameters.Should().BeOfType<PullQueryStreamParameters>();
   }
 }

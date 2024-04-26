@@ -7,6 +7,7 @@ using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
 using ksqlDb.RestApi.Client.IntegrationTests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
@@ -45,6 +46,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
   [Test]
   public async Task DateToString_QueryEndPoint()
   {
+    Context = CreateKSqlDbContext(EndpointType.Query);
     await DateToStringTest(Context.CreateQueryStream<Movie>(MoviesTableName));
   }
 
@@ -78,6 +80,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
   [Test]
   public async Task Entries_QueryEndPoint()
   {
+    Context = CreateKSqlDbContext(EndpointType.Query);
     await EntriesTest(Context.CreateQueryStream<Movie>(MoviesTableName));
   }
     

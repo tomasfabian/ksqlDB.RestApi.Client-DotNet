@@ -73,7 +73,7 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
 
     //Assert
     Assert.ThrowsException<KeyNotFoundException>(() =>
-      ClassUnderTest.QueryParameters[parameterName].Should().BeEmpty());
+      ClassUnderTest.QueryStreamParameters[parameterName].Should().BeEmpty());
   }
 
   [Test]
@@ -89,7 +89,6 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
     //Assert
     string expectedValue = "at_least_once";
 
-    ClassUnderTest.QueryParameters[parameterName].Should().Be(expectedValue);
     ClassUnderTest.QueryStreamParameters[parameterName].Should().Be(expectedValue);
   }
 
@@ -106,7 +105,6 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
     //Assert
     string expectedValue = "exactly_once";
 
-    ClassUnderTest.QueryParameters[parameterName].Should().Be(expectedValue);
     ClassUnderTest.QueryStreamParameters[parameterName].Should().Be(expectedValue);
   }
 
@@ -123,7 +121,6 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
     //Assert
     string expectedValue = "exactly_once_v2";
 
-    ClassUnderTest.QueryParameters[parameterName].Should().Be(expectedValue);
     ClassUnderTest.QueryStreamParameters[parameterName].Should().Be(expectedValue);
   }
 
@@ -139,29 +136,9 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
     //Assert
     string expectedValue = autoOffsetReset.ToString().ToLower();
 
-    ClassUnderTest.QueryParameters[QueryParameters.AutoOffsetResetPropertyName].Should().Be(expectedValue);
     ClassUnderTest.QueryStreamParameters[QueryStreamParameters.AutoOffsetResetPropertyName].Should().Be(expectedValue);
   }
-    
-  [Test]
-  public void Clone()
-  {
-    //Arrange
-    var processingGuarantee = ProcessingGuarantee.AtLeastOnce;
-    string parameterName = KSqlDbConfigs.ProcessingGuarantee;
-    ClassUnderTest.SetProcessingGuarantee(processingGuarantee);
 
-    //Act
-    var clone = ClassUnderTest.Clone();
-
-    //Assert
-    string expectedValue = "at_least_once";
-      
-    ClassUnderTest.Url.Should().Be(TestParameters.KsqlDbUrl);
-
-    clone.QueryParameters[parameterName].Should().Be(expectedValue);
-    clone.QueryStreamParameters[parameterName].Should().Be(expectedValue);
-  }
     
   [Test]
   public void JsonSerializerOptions()
