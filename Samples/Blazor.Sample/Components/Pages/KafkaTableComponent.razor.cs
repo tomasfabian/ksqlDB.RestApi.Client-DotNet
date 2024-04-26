@@ -37,7 +37,7 @@ public partial class KafkaTableComponent : IDisposable
       
     await using var context = new KSqlDBContext(options);
 
-    subscription = context.CreateQuery<IoTSensorStats>(TopicNames.SensorsTable)
+    subscription = context.CreateQueryStream<IoTSensorStats>(TopicNames.SensorsTable)
       .ToObservable()
       .ObserveOn(synchronizationContext)
       .Subscribe(c =>

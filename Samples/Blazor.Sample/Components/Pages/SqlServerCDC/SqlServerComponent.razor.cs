@@ -213,7 +213,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
 
     await using var context = new KSqlDBContext(options);
 
-    cdcSubscription = context.CreateQuery<IoTSensorChange>("sqlserversensors")
+    cdcSubscription = context.CreateQueryStream<IoTSensorChange>("sqlserversensors")
       .WithOffsetResetPolicy(AutoOffsetReset.Latest)
       .Where(c => c.Op != "r" && (c.After == null || c.After.SensorId != "d542a2b3-c"))
       .ToObservable()
@@ -237,7 +237,7 @@ CREATE STREAM IF NOT EXISTS sqlserversensors (
 
     await using var context = new KSqlDBContext(options);
 
-    cdcSubscription = context.CreateQuery<IoTSensorRawChange>("sqlserversensors")
+    cdcSubscription = context.CreateQueryStream<IoTSensorRawChange>("sqlserversensors")
       .WithOffsetResetPolicy(AutoOffsetReset.Latest)
       .ToObservable()
       .ObserveOn(synchronizationContext)
