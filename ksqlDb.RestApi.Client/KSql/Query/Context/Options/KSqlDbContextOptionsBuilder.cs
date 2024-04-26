@@ -67,20 +67,6 @@ public class KSqlDbContextOptionsBuilder : ISetupParameters
   /// Configures the parameters for setting up a push query for the 'query-stream' endpoint.
   /// Allows you to configure ksqlDB query parameters such as processing guarantee or 'auto.offset.reset'.
   /// </summary>
-  /// <param name="configure">A delegate that intercepts the creation of an instance of <see cref="IPushQueryParameters"/>.</param>
-  /// <returns>Setup parameters</returns>
-  ISetupParameters ISetupParameters.SetupQuery(Action<IPushQueryParameters> configure)
-  {
-    configure(InternalOptions.QueryParameters);
-
-    return this;
-  }
-
-#if !NETSTANDARD
-  /// <summary>
-  /// Configures the parameters for setting up a push query for the 'query-stream' endpoint.
-  /// Allows you to configure ksqlDB query parameters such as processing guarantee or 'auto.offset.reset'.
-  /// </summary>
   /// <param name="configure">An action to configure the parameters using <see cref="IPushQueryParameters"/>.</param>
   /// <returns>Returns this instance.</returns>
   ISetupParameters ISetupParameters.SetupQueryStream(Action<IPushQueryParameters> configure)
@@ -89,7 +75,6 @@ public class KSqlDbContextOptionsBuilder : ISetupParameters
 
     return this;
   }
-#endif
 
   /// <summary>
   /// Configures the parameters for setting up a pull query.

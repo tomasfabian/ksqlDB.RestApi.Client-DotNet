@@ -28,7 +28,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters
 
     public void FillFrom(IKSqlDbParameters parameters)
     {
-      this.FillFromInternal(parameters);
+      this.FillQueryParametersFrom(parameters);
     }
 
     public IKSqlDbParameters Clone()

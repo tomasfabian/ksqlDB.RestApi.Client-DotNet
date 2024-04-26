@@ -25,11 +25,6 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
 
     Url = url;
 
-    QueryParameters = new QueryParameters
-    {
-      [RestApi.Parameters.QueryParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToString().ToLower()
-    };
-
     QueryStreamParameters = new QueryStreamParameters
     {
       [QueryStreamParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToString().ToLower(),
@@ -64,11 +59,6 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   /// </summary>
   public IPullQueryParameters PullQueryParameters { get; internal set; }
 
-  /// <summary>
-  /// Gets or sets the IKSqlDb query parameters.
-  /// </summary>
-  public IPushQueryParameters QueryParameters { get; internal set; }
-
   public static NumberFormatInfo? NumberFormatInfo { get; set; }
 
   /// <summary>
@@ -80,7 +70,6 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
     string guarantee = processingGuarantee.ToKSqlValue();
 
     QueryStreamParameters[KSqlDbConfigs.ProcessingGuarantee] = guarantee; 
-    QueryParameters[KSqlDbConfigs.ProcessingGuarantee] = guarantee;
   }
 
   /// <summary>
@@ -89,9 +78,6 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   /// <param name="autoOffsetReset">The type of auto offset reset.</param>
   public void SetAutoOffsetReset(AutoOffsetReset autoOffsetReset)
   {
-    QueryParameters[RestApi.Parameters.QueryParameters.AutoOffsetResetPropertyName] =
-      autoOffsetReset.ToKSqlValue();
-
     QueryStreamParameters[QueryStreamParameters.AutoOffsetResetPropertyName] =
       autoOffsetReset.ToKSqlValue();
   }

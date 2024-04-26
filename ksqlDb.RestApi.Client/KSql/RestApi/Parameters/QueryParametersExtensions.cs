@@ -4,7 +4,14 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
 internal static class QueryParametersExtensions
 {
-  internal static void FillFromInternal(this IQueryParameters destination, IQueryParameters source)
+  internal static void FillPushQueryParametersFrom(this IPushQueryParameters destination, IPushQueryParameters source)
+  {
+    destination.FillQueryParametersFrom(source);
+
+    destination.AutoOffsetReset = source.AutoOffsetReset;
+  }
+
+  internal static void FillQueryParametersFrom(this IQueryParameters destination, IQueryParameters source)
   {
     destination.Sql = source.Sql;
 

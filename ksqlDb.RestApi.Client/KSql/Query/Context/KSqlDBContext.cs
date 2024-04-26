@@ -77,11 +77,14 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
     {
       case EndpointType.Query:
         serviceCollection.TryAddScoped<IKSqlDbProvider, KSqlDbQueryProvider>();
-        serviceCollection.TryAddSingleton<IKSqlDbParameters>(contextOptions.QueryParameters);
 
-        var queryParameters = new PullQueryParameters();
-        queryParameters.FillFrom(contextOptions.PullQueryParameters);
-        serviceCollection.TryAddSingleton<IPullQueryParameters>(queryParameters);
+        var queryParameters = new QueryParameters();
+        queryParameters.FillPushQueryParametersFrom(contextOptions.QueryStreamParameters);
+        serviceCollection.TryAddSingleton<IKSqlDbParameters>(queryParameters);
+
+        var pullQueryParameters = new PullQueryParameters();
+        pullQueryParameters.FillFrom(contextOptions.PullQueryParameters);
+        serviceCollection.TryAddSingleton<IPullQueryParameters>(pullQueryParameters);
         break;
 #if !NETSTANDARD
       case EndpointType.QueryStream:
