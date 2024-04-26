@@ -63,7 +63,7 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
 
     //Act
-    var source = Context.CreateQuery<Lambda>(StreamName)
+    var source = Context.CreateQueryStream<Lambda>(StreamName)
       .Select(c => new { Col = KSqlFunctions.Instance.Transform(c.Arr, x => x + 1) })
       .ToAsyncEnumerable();
       
@@ -90,7 +90,7 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;      
       
     //Act
-    var source = Context.CreateQuery<LambdaMap>(streamNameWithMap)
+    var source = Context.CreateQueryStream<LambdaMap>(streamNameWithMap)
       .Select(c => new { Col = K.Functions.Transform(c.Map, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v, x => x * x)) })
       .ToAsyncEnumerable();
       
@@ -110,7 +110,7 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
 
     //Act
-    var source = Context.CreateQuery<Lambda>(StreamName)
+    var source = Context.CreateQueryStream<Lambda>(StreamName)
       .Select(c => new { Col = KSqlFunctions.Instance.Filter(c.Arr, x => x > 1) })
       .ToAsyncEnumerable();
       
@@ -128,7 +128,7 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;      
       
     //Act
-    var source = Context.CreateQuery<LambdaMap>(streamNameWithMap)
+    var source = Context.CreateQueryStream<LambdaMap>(streamNameWithMap)
       .Select(c => new { Col = K.Functions.Filter(c.Map, (k, v) => k != "E.T" && v[1] > 0) })
       .ToAsyncEnumerable();
       
@@ -147,7 +147,7 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
 
     //Act
-    var source = Context.CreateQuery<Lambda>(StreamName)
+    var source = Context.CreateQueryStream<Lambda>(StreamName)
       .Select(c => new { Acc = K.Functions.Reduce(c.Arr, 0, (x,y) => x + y) })
       .ToAsyncEnumerable();
       
@@ -165,7 +165,7 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;      
       
     //Act
-    var source = Context.CreateQuery<LambdaMap>(streamNameWithMap)
+    var source = Context.CreateQueryStream<LambdaMap>(streamNameWithMap)
       .Select(c => new { Col = K.Functions.Reduce(c.Map, 2, (s, k, v) => K.Functions.Ceil(s / v[1])) })
       .ToAsyncEnumerable();
       

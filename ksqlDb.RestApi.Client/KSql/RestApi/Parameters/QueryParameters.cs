@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using EndpointType = ksqlDB.RestApi.Client.KSql.RestApi.Statements.EndpointType;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 

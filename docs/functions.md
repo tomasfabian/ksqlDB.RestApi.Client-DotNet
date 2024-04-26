@@ -276,7 +276,7 @@ Subscribe to the unbounded stream of events:
 ```C#
 public IDisposable Invoke(IKSqlDBContext ksqlDbContext)
 {
-  var subscription = ksqlDbContext.CreateQuery<Lambda>(fromItemName: "stream2")
+  var subscription = ksqlDbContext.CreateQueryStream<Lambda>(fromItemName: "stream2")
     .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
     .Select(c => new
     {

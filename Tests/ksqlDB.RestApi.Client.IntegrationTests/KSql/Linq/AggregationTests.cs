@@ -70,7 +70,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
   [Test]
   public async Task Histogram_QueryEndPoint()
   {
-    await TestHistogram(Context.CreateQuery<Movie>(MoviesProvider.MoviesTableName));
+    await TestHistogram(Context.CreateQueryStream<Movie>(MoviesProvider.MoviesTableName));
   }
     
   [Test]

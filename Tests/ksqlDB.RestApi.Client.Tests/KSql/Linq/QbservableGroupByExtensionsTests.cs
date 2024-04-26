@@ -497,7 +497,7 @@ class TestableDbProvider : TestableDbProvider<QbservableGroupByExtensionsTests.C
   {
     RegisterKSqlQueryGenerator = false;    
       
-    KSqlDBQueryContext.Configure(sc =>
+    Configure(sc =>
     {
       sc.AddHttpClient<IHttpV1ClientFactory, HttpClientFactory>(c => c.BaseAddress = new Uri(ksqlDbUrl))
         .AddHttpMessageHandler(_ => FakeHttpClient.CreateDelegatingHandler(httpResponse).Object);

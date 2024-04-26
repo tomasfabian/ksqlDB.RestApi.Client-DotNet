@@ -78,6 +78,7 @@ internal static class ServiceCollectionExtensions
     serviceCollection.ConfigureHttpClients(contextOptions);
 
     serviceCollection.TryAddSingleton(contextOptions);
+    serviceCollection.TryAddScoped<IKPullSetDependencies, KPullSetDependencies>();
     serviceCollection.TryAddScoped<IKStreamSetDependencies, KStreamSetDependencies>();
     serviceCollection.TryAddScoped<IKSqlDbRestApiClient, KSqlDbRestApiClient>();
   }

@@ -53,6 +53,16 @@ public class KSqlDbContextOptionsBuilder : ISetupParameters
     return serviceCollection.AddHttpClient<TClient, TImplementation>(OuterConfigureClient!);
   }
 
+  /// <summary>
+  /// Sets the KSQL query endpoints when using pull and push queries.
+  /// </summary>
+  ISetupParameters ISetupParameters.SetEndpointType(EndpointType endpointType)
+  {
+    InternalOptions.EndpointType = endpointType;
+
+    return this;
+  }
+
 #if !NETSTANDARD
   ISetupParameters ISetupParameters.SetupQueryStream(Action<IKSqlDbParameters> configure)
   {

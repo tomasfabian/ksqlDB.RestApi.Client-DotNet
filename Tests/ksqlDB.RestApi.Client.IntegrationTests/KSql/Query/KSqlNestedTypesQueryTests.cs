@@ -18,5 +18,5 @@ public class KSqlNestedTypesQueryTests : KSqlNestedTypesTests
     await MoviesProvider.DropTablesAsync();
   }
 
-  protected override IQbservable<Movie> MoviesStream => Context.CreateQuery<Movie>(MoviesTableName);
+  protected override IQbservable<Movie> MoviesStream => Context.CreateQueryStream<Movie>(MoviesTableName);
 }

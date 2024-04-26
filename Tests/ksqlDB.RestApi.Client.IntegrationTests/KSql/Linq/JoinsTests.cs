@@ -141,7 +141,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
   [Test]
   public async Task FullOuterJoin_QueryEndPoint()
   {
-    await FullOuterJoinTest(Context.CreateQuery<Movie2>(MoviesTableName));
+    await FullOuterJoinTest(Context.CreateQueryStream<Movie2>(MoviesTableName));
   }
 
   public static async Task FullOuterJoinTest(IQbservable<Movie2> querySource)

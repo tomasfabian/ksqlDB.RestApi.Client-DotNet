@@ -48,7 +48,7 @@ internal sealed class KPullSet<TEntity> : KPullSet, IPullable<TEntity>
   {
     var dependencies = GetDependencies();
 
-    return dependencies.KsqlDBProvider.Run<TEntity>(GetQueryStreamParameters(dependencies), cancellationToken)
+    return dependencies.KSqlDbProvider.Run<TEntity>(GetQueryStreamParameters(dependencies), cancellationToken)
       .FirstOrDefaultAsync(cancellationToken);
   }
 
@@ -59,21 +59,21 @@ internal sealed class KPullSet<TEntity> : KPullSet, IPullable<TEntity>
   {
     var dependencies = GetDependencies();
 
-    return dependencies.KsqlDBProvider.Run<TEntity>(GetQueryStreamParameters(dependencies), cancellationToken);
+    return dependencies.KSqlDbProvider.Run<TEntity>(GetQueryStreamParameters(dependencies), cancellationToken);
   }
 
-  internal IKStreamSetDependencies GetDependencies()
+  internal IKPullSetDependencies GetDependencies()
   {
     using var serviceScope = serviceScopeFactory.CreateScope();
 
-    var dependencies = serviceScope.ServiceProvider.GetRequiredService<IKStreamSetDependencies>();
+    var dependencies = serviceScope.ServiceProvider.GetRequiredService<IKPullSetDependencies>();
 
     dependencies.KSqlQueryGenerator.ShouldEmitChanges = false;
 
     return dependencies;
   }
 
-  internal IKSqlDbParameters GetQueryStreamParameters(IKStreamSetDependencies dependencies)
+  internal IKSqlDbParameters GetQueryStreamParameters(IKPullSetDependencies dependencies)
   {
     var ksqlQuery = dependencies.KSqlQueryGenerator.BuildKSql(Expression, QueryContext);
 

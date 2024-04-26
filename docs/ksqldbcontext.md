@@ -80,6 +80,8 @@ using var disposable = context.CreateQuery<Movie>()
   }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
 ```
 
+⚠️ In version 6.0.0, CreateQuery has been merged into CreateQueryStream.
+
 # TFM netstandard 2.0 (.Net Framework, NetCoreApp 2.0 etc.)
 The lack of support for **HTTP 2.0** in netstandard 2.0 prevents the exposure of `IKSqlDBContext.CreateQueryStream<TEntity>` in the current version. To address this limitation, `IKSqlDBContext.CreateQuery<TEntity>` was introduced as an alternative solution utilizing **HTTP 1.1** to provide the same functionality.
 
@@ -468,7 +470,7 @@ INSERT INTO Message (Message, Id, `Values`) VALUES ('Hello', 42, '123, abc');
 Stream the result of the SELECT query into an existing stream and its underlying topic.
 
 ```C#
-var response = await context.CreateQuery<Movie>("from_stream")
+var response = await context.CreateQueryStream<Movie>("from_stream")
   .Where(c => c.Title != "Apocalypse now")
   .InsertIntoAsync("stream_name");
 
@@ -489,7 +491,7 @@ Alternatively an optional query ID can be used for INSERT INTO queries:
 ```C#
 string queryId = "insert_query_123";
 
-var response = await context.CreateQuery<Movie>("from_stream")
+var response = await context.CreateQueryStream<Movie>("from_stream")
   .Where(c => c.Title != "Apocalypse now")
   .InsertIntoAsync("stream_name", queryId);
 ```

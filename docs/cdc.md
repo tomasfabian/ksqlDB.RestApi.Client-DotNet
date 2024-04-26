@@ -55,7 +55,7 @@ class Program
 
     var semaphoreSlim = new SemaphoreSlim(0, 1);
 
-    var cdcSubscription = context.CreateQuery<IoTSensorChange>("sqlserversensors")
+    var cdcSubscription = context.CreateQueryStream<IoTSensorChange>("sqlserversensors")
       .WithOffsetResetPolicy(AutoOffsetReset.Latest)
       .Where(c => c.Op != "r" && (c.After == null || c.After.SensorId != "d542a2b3-c"))
       .Take(5)

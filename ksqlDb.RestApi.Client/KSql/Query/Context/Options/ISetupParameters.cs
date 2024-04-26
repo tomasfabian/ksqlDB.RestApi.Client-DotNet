@@ -29,6 +29,11 @@ public interface ISetupParameters : ICreateOptions
   ISetupParameters SetJsonSerializerOptions(Action<JsonSerializerOptions> optionsAction);
 
   /// <summary>
+  /// Sets the KSQL query endpoints when using pull and push queries.
+  /// </summary>
+  ISetupParameters SetEndpointType(EndpointType endpointType);
+
+  /// <summary>
   /// Sets the identifier escaping type.
   /// As ksqlDB automatically converts all identifiers to uppercase by default, it's crucial to enclose them within backticks to maintain the desired casing.
   /// </summary>

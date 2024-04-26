@@ -442,13 +442,13 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
 
     string ksql = "SELECT * FROM tweetsTest EMIT CHANGES LIMIT 2;";
 
-    QueryParameters queryParameters = new()
+    QueryStreamParameters queryParameters = new()
     {
       Sql = ksql,
-      [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
+      [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
     };
 
-    var source = Context.CreateQuery<Tweet>(queryParameters);
+    var source = Context.CreateQueryStream<Tweet>(queryParameters);
 
     //Act
     var actualValues = await CollectActualValues(source, expectedItemsCount);

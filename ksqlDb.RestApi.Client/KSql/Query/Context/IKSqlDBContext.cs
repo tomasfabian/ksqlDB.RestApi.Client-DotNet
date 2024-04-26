@@ -8,7 +8,6 @@ namespace ksqlDB.RestApi.Client.KSql.Query.Context;
 
 public interface IKSqlDBContext : IKSqlDBStatementsContext, IAsyncDisposable, IDisposable
 {
-#if !NETSTANDARD
   /// <summary>
   /// Creates a push query for the query-stream endpoint.
   /// </summary>
@@ -24,25 +23,7 @@ public interface IKSqlDBContext : IKSqlDBStatementsContext, IAsyncDisposable, ID
   /// <param name="queryStreamParameters">The parameters for the query stream.</param>
   /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation (optional).</param>
   /// <returns>An asynchronous enumerable of entities representing the query stream.</returns>
-  IAsyncEnumerable<TEntity> CreateQueryStream<TEntity>(QueryStreamParameters queryStreamParameters, CancellationToken cancellationToken = default);
-#endif
-
-  /// <summary>
-  /// Creates a push query for the query endpoint.
-  /// </summary>
-  /// <typeparam name="TEntity">The type of the data in the data source.</typeparam>
-  /// <param name="fromItemName">Overrides the name of the stream or table which by default is derived from TEntity</param>
-  /// <returns>A Qbservable for query composition and execution.</returns>
-  IQbservable<TEntity> CreateQuery<TEntity>(string? fromItemName = null);
-
-  /// <summary>
-  /// Creates a query for retrieving entities asynchronously.
-  /// </summary>
-  /// <typeparam name="TEntity">The type of the entities to retrieve.</typeparam>
-  /// <param name="queryParameters">The parameters for the query.</param>
-  /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation (optional).</param>
-  /// <returns>An asynchronous enumerable of entities.</returns>
-  IAsyncEnumerable<TEntity> CreateQuery<TEntity>(QueryParameters queryParameters, CancellationToken cancellationToken = default);
+  IAsyncEnumerable<TEntity> CreateQueryStream<TEntity>(IKSqlDbParameters queryStreamParameters, CancellationToken cancellationToken = default);
 
   /// <summary>
   /// Creates a pull query.

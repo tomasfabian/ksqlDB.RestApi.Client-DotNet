@@ -2,6 +2,7 @@ using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.Tests.Models;
 using ksqlDb.RestApi.Client.Tests.Models.Sensors;
@@ -23,6 +24,7 @@ public class PullQueryExtensionsTests : TestBase
   public void SetUp()
   {
     DbProvider = new TestableDbProvider(TestParameters.KsqlDbUrl, PullQueryResponse);
+    DbProvider.ContextOptions.EndpointType = EndpointType.Query;
   }
 
   [Test]
@@ -30,6 +32,8 @@ public class PullQueryExtensionsTests : TestBase
   {
     //Arrange
     string sensorId = "sensor-1";
+
+    DbProvider.RegisterKSqlDbProvider = false;
 
     //Act
     var result = await DbProvider.CreatePullQuery<IoTSensorStats>()

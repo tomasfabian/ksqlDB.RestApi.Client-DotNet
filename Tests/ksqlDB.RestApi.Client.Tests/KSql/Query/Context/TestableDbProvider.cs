@@ -1,4 +1,4 @@
-﻿using ksqlDB.RestApi.Client.KSql.Query;
+using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,13 +33,16 @@ public class TestableDbProvider<TValue> : KSqlDBContext
   public readonly Mock<IKSqlQueryGenerator> KSqlQueryGenerator = new();
   public readonly Mock<IKSqlDbRestApiClient> KSqlDbRestApiClientMock = new();
 
+  internal bool RegisterKSqlDbProvider { get; set; } = true;
   internal bool RegisterKSqlQueryGenerator { get; set; } = true;
+  internal bool RegisterKSqlDbRestApiClient { get; set; } = true;
 
   protected override void OnConfigureServices(IServiceCollection serviceCollection, KSqlDBContextOptions options)
   {
-    serviceCollection.AddSingleton(KSqlDbProviderMock.Object);
-    serviceCollection.AddSingleton(KSqlDbRestApiClientMock.Object);
-
+    if(RegisterKSqlDbProvider)
+      serviceCollection.AddSingleton(KSqlDbProviderMock.Object);
+    if(RegisterKSqlDbRestApiClient)
+      serviceCollection.AddSingleton(KSqlDbRestApiClientMock.Object);
     if(RegisterKSqlQueryGenerator)
       serviceCollection.AddSingleton(KSqlQueryGenerator.Object);
 

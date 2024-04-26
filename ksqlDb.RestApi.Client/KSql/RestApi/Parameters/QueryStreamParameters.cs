@@ -32,8 +32,6 @@ public sealed class QueryStreamParameters : IKSqlDbParameters
     set => this[AutoOffsetResetPropertyName] = value.ToKSqlValue();
   }
 
-  internal QueryType QueryType { get; } = QueryType.QueryStream;
-    
   public IKSqlDbParameters Clone()
   {
     var queryParams = new QueryStreamParameters
