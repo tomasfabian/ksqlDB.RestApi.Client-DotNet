@@ -58,10 +58,9 @@ public static class Program
         //SetupQueryStream affects only EndpointType.QueryStream
         options.Properties[KSqlDbConfigs.KsqlQueryPushV2Enabled] = "true";
       })
-      .SetupQuery(options =>
+      .SetupPullQuery(options =>
       {
-        //SetupQuery affects only EndpointType.Query
-        options.Properties[KSqlDbConfigs.ProcessingGuarantee] = ProcessingGuarantee.ExactlyOnce.ToKSqlValue();
+        options[KSqlDbConfigs.KsqlQueryPullTableScanEnabled] = "false";
       })
       .Options;
 
