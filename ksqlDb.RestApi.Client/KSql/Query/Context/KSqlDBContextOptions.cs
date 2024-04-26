@@ -35,6 +35,8 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
       [QueryStreamParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToString().ToLower(),
     };
 
+    PullQueryParameters = new PullQueryParameters();
+
 #if !NETSTANDARD
     EndpointType = EndpointType.QueryStream;
 #endif
@@ -58,9 +60,14 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   public QueryStreamParameters QueryStreamParameters { get; internal set; }
 
   /// <summary>
+  /// Gets or sets the pull query parameters.
+  /// </summary>
+  public IPullQueryParameters PullQueryParameters { get; internal set; }
+
+  /// <summary>
   /// Gets or sets the IKSqlDb query parameters.
   /// </summary>
-  public IKSqlDbParameters QueryParameters { get; internal set; }
+  public IPushQueryParameters QueryParameters { get; internal set; }
 
   public static NumberFormatInfo? NumberFormatInfo { get; set; }
 
@@ -97,18 +104,6 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   public void SetJsonSerializerOptions(Action<JsonSerializerOptions> optionsAction)
   {
     optionsAction.Invoke(JsonSerializerOptions);
-  }
-
-  internal KSqlDBContextOptions Clone()
-  {
-    var options = new KSqlDBContextOptions(Url)
-    {
-      ShouldPluralizeFromItemName = ShouldPluralizeFromItemName,
-      QueryParameters = ((QueryParameters) QueryParameters).Clone(),
-      QueryStreamParameters = (QueryStreamParameters)QueryStreamParameters.Clone()
-    };
-
-    return options;
   }
 
   public bool UseBasicAuth => userName != null || password != null;

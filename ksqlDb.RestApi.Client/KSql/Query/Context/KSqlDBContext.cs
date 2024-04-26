@@ -77,16 +77,24 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
     {
       case EndpointType.Query:
         serviceCollection.TryAddScoped<IKSqlDbProvider, KSqlDbQueryProvider>();
-        serviceCollection.TryAddSingleton(contextOptions.QueryParameters);
+        serviceCollection.TryAddSingleton<IKSqlDbParameters>(contextOptions.QueryParameters);
+
+        var queryParameters = new PullQueryParameters();
+        queryParameters.FillFrom(contextOptions.PullQueryParameters);
+        serviceCollection.TryAddSingleton<IPullQueryParameters>(queryParameters);
         break;
 #if !NETSTANDARD
       case EndpointType.QueryStream:
         serviceCollection.TryAddScoped<IKSqlDbProvider, KSqlDbQueryStreamProvider>();
         serviceCollection.TryAddSingleton<IKSqlDbParameters>(contextOptions.QueryStreamParameters);
+
+        var queryStreamParameters = new PullQueryStreamParameters();
+        queryStreamParameters.FillFrom(contextOptions.PullQueryParameters);
+        serviceCollection.TryAddSingleton<IPullQueryParameters>(queryStreamParameters);
         break;
 #endif
       default:
-        throw new ArgumentOutOfRangeException();
+        throw new ArgumentOutOfRangeException(nameof(contextOptions.EndpointType), contextOptions.EndpointType, "Non-exhaustive match");
     }
   }
 
@@ -234,7 +242,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 
     using var scope = serviceScopeFactory.CreateScope();
 
-    var dependencies = scope.ServiceProvider.GetRequiredService<IKStreamSetDependencies>();
+    var dependencies = scope.ServiceProvider.GetRequiredService<IKPullSetDependencies>();
 
     var queryParameters = dependencies.QueryStreamParameters;
     queryParameters.Sql = ksql;

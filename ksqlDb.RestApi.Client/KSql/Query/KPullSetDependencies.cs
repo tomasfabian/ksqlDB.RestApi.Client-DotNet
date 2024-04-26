@@ -8,6 +8,6 @@ namespace ksqlDB.RestApi.Client.KSql.Query
     IKSqlQbservableProvider provider,
     IKSqlDbProvider ksqlDbProvider,
     IKSqlQueryGenerator queryGenerator,
-    IKSqlDbParameters queryParameters)
+    IPullQueryParameters queryParameters)
     : KSetDependencies(provider, ksqlDbProvider, queryGenerator, queryParameters), IKPullSetDependencies;
 }

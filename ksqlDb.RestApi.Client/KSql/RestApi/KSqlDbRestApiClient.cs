@@ -162,6 +162,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     {
       EndpointType.KSql => "/ksql",
       EndpointType.Query => "/query",
+      EndpointType.QueryStream => "/query-stream",
       EndpointType.CloseQuery => "/close-query",
       _ => throw new ArgumentOutOfRangeException(nameof(endpointType), $"Unknown '{nameof(EndpointType)}' type {endpointType}.")
     };
