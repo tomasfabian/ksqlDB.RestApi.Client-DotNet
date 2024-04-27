@@ -1,4 +1,5 @@
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
@@ -11,8 +12,6 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using ksqlDB.RestApi.Client.KSql.RestApi.Query;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context;
 
@@ -73,32 +72,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
   {
     base.OnConfigureServices(serviceCollection, contextOptions);
 
-    switch (contextOptions.EndpointType)
-    {
-      case EndpointType.Query:
-        serviceCollection.TryAddScoped<IKSqlDbProvider, KSqlDbQueryProvider>();
-
-        var queryParameters = new QueryParameters();
-        queryParameters.FillPushQueryParametersFrom(contextOptions.QueryStreamParameters);
-        serviceCollection.TryAddSingleton<IKSqlDbParameters>(queryParameters);
-
-        var pullQueryParameters = new PullQueryParameters();
-        pullQueryParameters.FillFrom(contextOptions.PullQueryParameters);
-        serviceCollection.TryAddSingleton<IPullQueryParameters>(pullQueryParameters);
-        break;
-#if !NETSTANDARD
-      case EndpointType.QueryStream:
-        serviceCollection.TryAddScoped<IKSqlDbProvider, KSqlDbQueryStreamProvider>();
-        serviceCollection.TryAddSingleton<IKSqlDbParameters>(contextOptions.QueryStreamParameters);
-
-        var queryStreamParameters = new PullQueryStreamParameters();
-        queryStreamParameters.FillFrom(contextOptions.PullQueryParameters);
-        serviceCollection.TryAddSingleton<IPullQueryParameters>(queryStreamParameters);
-        break;
-#endif
-      default:
-        throw new ArgumentOutOfRangeException(nameof(contextOptions.EndpointType), contextOptions.EndpointType, "Non-exhaustive match");
-    }
+    serviceCollection.RegisterEndpointDependencies(contextOptions);
   }
 
   /// <summary>
