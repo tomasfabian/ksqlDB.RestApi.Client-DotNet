@@ -19,7 +19,7 @@ internal static class QueryParametersExtensions
       destination.Properties.Add(entry.Key, entry.Value);
   }
 
-  public static string ToLogInfo(this IQueryParameters queryParameters)
+  internal static string ToLogInfo(this IQueryParameters queryParameters)
   {
     var sb = new StringBuilder();
 
