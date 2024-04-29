@@ -76,18 +76,18 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
   }
 
   /// <summary>
-  /// Creates a query stream for retrieving entities asynchronously.
+  /// Creates a push stream for retrieving entities asynchronously.
   /// </summary>
   /// <typeparam name="TEntity">The type of the entities to retrieve.</typeparam>
-  /// <param name="queryStreamParameters">The parameters for the query stream.</param>
+  /// <param name="queryParameters">The parameters for the push query.</param>
   /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation (optional).</param>
-  /// <returns>An asynchronous enumerable of entities representing the query stream.</returns>
-  public IAsyncEnumerable<TEntity> CreateQueryStream<TEntity>(IKSqlDbParameters queryStreamParameters, CancellationToken cancellationToken = default)
+  /// <returns>An asynchronous enumerable of entities representing the push query.</returns>
+  public IAsyncEnumerable<TEntity> CreatePushQuery<TEntity>(IKSqlDbParameters queryParameters, CancellationToken cancellationToken = default)
   {
-    if (ContextOptions.EndpointType == EndpointType.Query && queryStreamParameters is not QueryParameters)
+    if (ContextOptions.EndpointType == EndpointType.Query && queryParameters is not QueryParameters)
       throw new InvalidOperationException($"Invalid {nameof(IKSqlDbParameters)} for endpoint {EndpointType.Query}");
 #if !NETSTANDARD
-    if (ContextOptions.EndpointType == EndpointType.QueryStream && queryStreamParameters is not QueryStreamParameters)
+    if (ContextOptions.EndpointType == EndpointType.QueryStream && queryParameters is not QueryStreamParameters)
       throw new InvalidOperationException($"Invalid {nameof(IKSqlDbParameters)} for endpoint {EndpointType.QueryStream}");
 #endif
 
@@ -95,16 +95,16 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
 
     var ksqlDbProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<IKSqlDbProvider>();
 
-    return ksqlDbProvider.Run<TEntity>(queryStreamParameters, cancellationToken);
+    return ksqlDbProvider.Run<TEntity>(queryParameters, cancellationToken);
   }
 
   /// <summary>
-  /// Creates a push query for the query-stream endpoint.
+  /// Creates a push query.
   /// </summary>
   /// <typeparam name="TEntity">The type of the data in the data source.</typeparam>
   /// <param name="fromItemName">Overrides the name of the stream or table which by default is derived from TEntity</param>
   /// <returns>A Qbservable for query composition and execution.</returns>
-  public IQbservable<TEntity> CreateQueryStream<TEntity>(string? fromItemName = null)
+  public IQbservable<TEntity> CreatePushQuery<TEntity>(string? fromItemName = null)
   {
     var serviceScopeFactory = ServiceScopeFactory();
 

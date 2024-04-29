@@ -89,7 +89,7 @@ public static class Program
 
     await using var context = new KSqlDBContext(contextOptions, loggerFactory);
 
-    var query = context.CreateQueryStream<Movie>()
+    var query = context.CreatePushQuery<Movie>()
       .Where(p => p.Title != "E.T.")
       .Where(c => c.Title.ToLower().Contains("hard".ToLower()) || c.Id == 1)
       .Where(p => p.RowTime >= 1510923225000)
@@ -201,7 +201,7 @@ public static class Program
 
     var semaphoreSlim = new SemaphoreSlim(0, 1);
 
-    using var d1 = context.CreateQueryStream<Movie>()
+    using var d1 = context.CreatePushQuery<Movie>()
       .Take(2)
       //Movies are deserialized with SourceGenerationContext (see SetJsonSerializerOptions above)
       .Subscribe(onNext: movie =>
@@ -239,7 +239,7 @@ public static class Program
 
     try
     {
-      var subscription = await context.CreateQueryStream<Movie>()
+      var subscription = await context.CreatePushQuery<Movie>()
         .SubscribeOn(ThreadPoolScheduler.Instance)
         .ObserveOn(TaskPoolScheduler.Default)
         .SubscribeAsync(onNext: movie =>
@@ -263,7 +263,7 @@ public static class Program
 
   private static IDisposable ClientSideBatching(KSqlDBContext context)
   {
-    var disposable = context.CreateQueryStream<Tweet>()
+    var disposable = context.CreatePushQuery<Tweet>()
       .ToObservable()
       .Buffer(TimeSpan.FromMilliseconds(250), 100)
       .Where(c => c.Count > 0)
@@ -282,7 +282,7 @@ public static class Program
   private static async Task AsyncEnumerable(KSqlDBContext context)
   {
     var cts = new CancellationTokenSource();
-    var asyncTweetsEnumerable = context.CreateQueryStream<Movie>().ToAsyncEnumerable();
+    var asyncTweetsEnumerable = context.CreatePushQuery<Movie>().ToAsyncEnumerable();
 
     await foreach (var movie in asyncTweetsEnumerable.WithCancellation(cts.Token))
     {
@@ -294,7 +294,7 @@ public static class Program
 
   private static void Between(IKSqlDBContext context)
   {
-    var ksql = context.CreateQueryStream<Tweet>().Where(c => c.Id.Between(1, 5))
+    var ksql = context.CreatePushQuery<Tweet>().Where(c => c.Id.Between(1, 5))
       .ToQueryString();
   }
 
@@ -303,7 +303,7 @@ public static class Program
     var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
     var context = new KSqlDBContext(contextOptions);
 
-    var subscription = context.CreateQueryStream<Tweet>()
+    var subscription = context.CreatePushQuery<Tweet>()
       .Where(p => p.Message != "Hello world" && p.Id != 1)
       .Take(2)
       .Subscribe(new TweetsObserver());
@@ -316,7 +316,7 @@ public static class Program
     var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
     var context = new KSqlDBContext(contextOptions);
 
-    var subscriptions = context.CreateQueryStream<Tweet>()
+    var subscriptions = context.CreatePushQuery<Tweet>()
       .ToObservable()
       .Delay(TimeSpan.FromSeconds(2)) // IObservable extensions
       .Subscribe(new TweetsObserver());
@@ -336,7 +336,7 @@ public static class Program
     var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
     await using var context = new KSqlDBContext(contextOptions);
 
-    var ksql = context.CreateQueryStream<Person>().ToQueryString();
+    var ksql = context.CreatePushQuery<Person>().ToQueryString();
 
     //prints SELECT * FROM People EMIT CHANGES;
     Console.WriteLine(ksql);
@@ -344,7 +344,7 @@ public static class Program
 
   private static IDisposable NotNull(KSqlDBContext context)
   {
-    return context.CreateQueryStream<Click>()
+    return context.CreatePushQuery<Click>()
       .Where(c => c.IP_ADDRESS != null)
       .Select(c => new { c.IP_ADDRESS, c.URL, c.TIMESTAMP })
       .Subscribe(Console.WriteLine, error => { Console.WriteLine($"Exception: {error.Message}"); });
@@ -352,11 +352,11 @@ public static class Program
 
   private static IDisposable DynamicFunctionCall(KSqlDBContext context)
   {
-    var ifNullQueryString = context.CreateQueryStream<Tweet>()
+    var ifNullQueryString = context.CreatePushQuery<Tweet>()
       .Select(c => new { c.Id, c.Amount, Col = K.F.Dynamic("IFNULL(Message, 'n/a')") as string })
       .ToQueryString();
 
-    return context.CreateQueryStream<Tweet>()
+    return context.CreatePushQuery<Tweet>()
       .Select(c => K.Functions.Dynamic("ARRAY_DISTINCT(ARRAY[1, 1, 2, 3, 1, 2])") as int[])
       .Subscribe(
         array => Console.WriteLine($"{array![0]} - {array[^1]}"),
@@ -365,7 +365,7 @@ public static class Program
 
   private static void ScalarFunctions(KSqlDBContext context)
   {
-    context.CreateQueryStream<Tweet>()
+    context.CreatePushQuery<Tweet>()
       .Select(c => new
       {
         Abs = K.Functions.Abs(c.Amount),
@@ -381,7 +381,7 @@ public static class Program
   {
     bool sorted = true;
 
-    var subscription = context.CreateQueryStream<Movie>()
+    var subscription = context.CreatePushQuery<Movie>()
       .Select(c => new
       {
         Entries = KSqlFunctions.Instance.Entries(new Dictionary<string, string>()
@@ -409,7 +409,7 @@ public static class Program
 
   private static IDisposable QueryStreamRawKSql(KSqlDBContext context)
   {
-    string ksql = context.CreateQueryStream<Movie>()
+    string ksql = context.CreatePushQuery<Movie>()
       .Where(p => p.Title != "E.T.").Take(2)
       .ToQueryString();
 
@@ -420,7 +420,7 @@ public static class Program
       [KSqlDbConfigs.KsqlQueryPushV2Enabled] = "true"
     };
 
-    var disposable = context.CreateQueryStream<Movie>(queryStreamParameters)
+    var disposable = context.CreatePushQuery<Movie>(queryStreamParameters)
       .ToObservable()
       .Subscribe(onNext: movie =>
         {
@@ -460,7 +460,7 @@ public static class Program
 
     string queryId = "insert_query_book";
 
-    var response = await context.CreateQueryStream<Book>(streamNameFrom)
+    var response = await context.CreatePushQuery<Book>(streamNameFrom)
       .Where(c => c.Title != "Apocalypse now")
       .InsertIntoAsync(streamName, queryId);
 
@@ -479,7 +479,7 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
       [QueryStreamParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToKSqlValue(),
     };
 
-    var disposable = context.CreateQueryStream<Movie>(queryParameters)
+    var disposable = context.CreatePushQuery<Movie>(queryParameters)
       .ToObservable()
       .Subscribe(onNext: movie =>
         {
@@ -494,7 +494,7 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
   private static void Cast(IKSqlDBContext context)
   {
     //SELECT Id, CAST(COUNT(*) AS VARCHAR) Count, CAST('42' AS INT) TheAnswer FROM Movies GROUP BY Id EMIT CHANGES;
-    var query = context.CreateQueryStream<Movie>()
+    var query = context.CreatePushQuery<Movie>()
       .GroupBy(c => c.Id)
       .Select(c => new { Id = c.Key, Count = c.Count().ToString(), TheAnswer = KSQLConvert.ToInt32("42") })
       .ToQueryString();
@@ -502,7 +502,7 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
 
   private static void WithOffsetResetPolicy(IKSqlDBContext context)
   {
-    var subscription = context.CreateQueryStream<Movie>()
+    var subscription = context.CreatePushQuery<Movie>()
       .WithOffsetResetPolicy(AutoOffsetReset.Latest)
       .Subscribe(movie =>
       {
@@ -512,7 +512,7 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
 
   private static void InvocationFunctions(IKSqlDBContext ksqlDbContext)
   {
-    var ksql = ksqlDbContext.CreateQueryStream<Lambda>()
+    var ksql = ksqlDbContext.CreatePushQuery<Lambda>()
       .Select(c => new
       {
         Transformed = c.Lambda_Arr.Transform(x => x + 1),
@@ -523,7 +523,7 @@ WHERE Title != 'E.T.' EMIT CHANGES LIMIT 2;";
 
     Console.WriteLine(ksql);
 
-    var ksqlMap = ksqlDbContext.CreateQueryStream<Lambda>()
+    var ksqlMap = ksqlDbContext.CreatePushQuery<Lambda>()
       .Select(c => new
       {
         Transformed = K.Functions.Transform(c.DictionaryArrayValues, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v, x => x * x)),

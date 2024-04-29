@@ -13,7 +13,7 @@ public class ProtoBufQueryStream
 
     await using var context = new ProtoBufKSqlDbContext(ksqlDbUrl);
 
-    var query = context.CreateQueryStream<MovieProto>("movie")
+    var query = context.CreatePushQuery<MovieProto>("movie")
     // var query = context.CreateQuery<MovieProto>("movie")
       .Where(p => p.Title != "E.T.")
       .Where(c => c.Title.ToLower().Contains("hard".ToLower()) || c.Id == 1)
