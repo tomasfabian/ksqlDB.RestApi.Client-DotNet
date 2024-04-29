@@ -119,7 +119,7 @@ MAP('c' := 2, 'd' := 4)['d']
 ```
 Deeply nested types:
 ```C#
-context.CreateQueryStream<Tweet>()
+context.CreatePushQuery<Tweet>()
   .Select(c => new
   {
     Map = new Dictionary<string, int[]>
@@ -186,7 +186,7 @@ INSERT INTO MyClasses (Dt, Ts, DtOffset) VALUES ('2021-04-01', '01:02:03', '2021
 ```
 
 ```C#
-using var subscription = context.CreateQueryStream<MyClass>()
+using var subscription = context.CreatePushQuery<MyClass>()
   .Subscribe(onNext: m =>
   {
     Console.WriteLine($"Time types: {m.Dt} : {m.Ts} : {m.DtOffset}");

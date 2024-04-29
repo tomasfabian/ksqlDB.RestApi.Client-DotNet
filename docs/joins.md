@@ -16,7 +16,7 @@ var ksqlDbUrl = @"http://localhost:8088";
 
 var context = new KSqlDBContext(ksqlDbUrl);
 
-var query = (from o in context.CreateQueryStream<Order>()
+var query = (from o in context.CreatePushQuery<Order>()
     join p1 in Source.Of<Payment>() on o.PaymentId equals p1.Id
     join s1 in Source.Of<Shipment>() on o.ShipmentId equals s1.Id into gj
     from sa in gj.DefaultIfEmpty()
@@ -112,7 +112,7 @@ response = await restApiClient.InsertIntoAsync(shipment);
 Left joins can be also constructed in the following (less readable) way:
 
 ```C#
-var query2 = KSqlDBContext.CreateQueryStream<Order>()
+var query2 = KSqlDBContext.CreatePushQuery<Order>()
   .GroupJoin(Source.Of<Payment>(), c => c.OrderId, c => c.Id, (order, gj) => new
                                                                              {
                                                                                order,
@@ -141,7 +141,7 @@ SELECT o.OrderId OrderId, p.Id AS shipmentId
 - specifies a time window for stream-stream joins
 
 ```C#
-var query = from o in KSqlDBContext.CreateQueryStream<Order>()
+var query = from o in KSqlDBContext.CreatePushQuery<Order>()
   join p in Source.Of<Payment>().Within(Duration.OfHours(1), Duration.OfDays(5)) on o.OrderId equals p.Id
   select new
          {
@@ -166,7 +166,7 @@ Define nullable primitive value types in POCOs:
 
 ```C#
 var source = new KSqlDBContext(@"http://localhost:8088")
-  .CreateQueryStream<Movie>()
+  .CreatePushQuery<Movie>()
   .FullOuterJoin(
     Source.Of<Lead_Actor>("Actors"),
     movie => movie.Title,
@@ -211,7 +211,7 @@ SELECT m.Id Id, m.Title Title, m.Release_Year Release_Year, l.Title ActorTitle
 
 **LEFT OUTER** joins will contain leftRecord-NULL records in the result stream, which means that the join contains NULL values for fields selected from the right-hand stream where no match is made.
 ```C#
-var query = new KSqlDBContext(@"http://localhost:8088").CreateQueryStream<Movie>()
+var query = new KSqlDBContext(@"http://localhost:8088").CreatePushQuery<Movie>()
   .LeftJoin(
     Source.Of<Lead_Actor>(),
     movie => movie.Title,
@@ -242,7 +242,7 @@ Select all records for the right side of the join and the matching records from 
 ```C#
 using ksqlDB.RestApi.Client.KSql.Linq;
 
-var query = KSqlDBContext.CreateQueryStream<Lead_Actor>(ActorsTableName)
+var query = KSqlDBContext.CreatePushQuery<Lead_Actor>(ActorsTableName)
   .RightJoin(
     Source.Of<Movie>(MoviesTableName),
     actor => actor.Title,
@@ -275,7 +275,7 @@ How to [join table and table](https://kafka-tutorials.confluent.io/join-a-table-
 ```C#
 using ksqlDB.RestApi.Client.KSql.Linq;
 
-var query = context.CreateQueryStream<Movie>()
+var query = context.CreatePushQuery<Movie>()
   .Join(
     Source.Of<Lead_Actor>(nameof(Lead_Actor)),
     movie => movie.Title,

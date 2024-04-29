@@ -41,7 +41,7 @@ var contextOptions = new KSqlDBContextOptions(ksqlDbUrl)
 
 await using var context = new KSqlDBContext(contextOptions);
 
-using var subscription = context.CreateQueryStream<Tweet>()
+using var subscription = context.CreatePushQuery<Tweet>()
   .WithOffsetResetPolicy(AutoOffsetReset.Latest)
   .Where(p => p.Message != "Hello world" || p.Id == 1)
   .Select(l => new { l.Message, l.Id })
@@ -263,7 +263,7 @@ Stream names are generated based on the generic record types. They are pluralize
 **By default the generated from item names such as stream and table names are pluralized**. This behavior could be switched off with the following `ShouldPluralizeStreamName` configuration.
 
 ```C#
-context.CreateQueryStream<Person>();
+context.CreatePushQuery<Person>();
 ```
 ```SQL
 FROM People
@@ -275,7 +275,7 @@ var contextOptions = new KSqlDBContextOptions(@"http://localhost:8088")
   ShouldPluralizeFromItemName = false
 };
 
-new KSqlDBContext(contextOptions).CreateQueryStream<Person>();
+new KSqlDBContext(contextOptions).CreatePushQuery<Person>();
 ```
 ```SQL
 FROM Person
@@ -283,7 +283,7 @@ FROM Person
 
 Setting an arbitrary stream name (from_item name):
 ```C#
-context.CreateQueryStream<Tweet>("custom_topic_name");
+context.CreatePushQuery<Tweet>("custom_topic_name");
 ```
 ```SQL
 FROM custom_topic_name

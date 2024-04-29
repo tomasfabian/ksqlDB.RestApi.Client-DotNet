@@ -147,7 +147,7 @@ DATETOSTRING(18672, 'yyyy-MM-dd')
 
 #### TIMESTAMPTOSTRING
 ```C#
-new KSqlDBContext(ksqlDbUrl).CreateQueryStream<Movie>()
+new KSqlDBContext(ksqlDbUrl).CreatePushQuery<Movie>()
   .Select(c => K.Functions.TimestampToString(c.RowTime, "yyyy-MM-dd''T''HH:mm:ssX"))
 ```
 
@@ -165,7 +165,7 @@ FROM tweets EMIT CHANGES;
 bool sorted = true;
       
 var subscription = new KSqlDBContext(@"http://localhost:8088")
-  .CreateQueryStream<Movie>()
+  .CreatePushQuery<Movie>()
   .Select(c => new
   {
     Entries = KSqlFunctions.Instance.Entries(new Dictionary<string, string>()
@@ -194,7 +194,7 @@ FROM movies_test EMIT CHANGES;
 Converts any type to its string representation.
 
 ```C#
-var query = context.CreateQueryStream<Movie>()
+var query = context.CreatePushQuery<Movie>()
   .GroupBy(c => c.Title)
   .Select(c => new { Title = c.Key, Concatenated = K.Functions.Concat(c.Count().ToString(), "_Hello") });
 ```
@@ -276,7 +276,7 @@ Subscribe to the unbounded stream of events:
 ```C#
 public IDisposable Invoke(IKSqlDBContext ksqlDbContext)
 {
-  var subscription = ksqlDbContext.CreateQueryStream<Lambda>(fromItemName: "stream2")
+  var subscription = ksqlDbContext.CreatePushQuery<Lambda>(fromItemName: "stream2")
     .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
     .Select(c => new
     {
@@ -424,7 +424,7 @@ REDUCE(DictionaryInValues, 2, (s, k, v) => CEIL(s / v))
 **v1.5.0**
 
 ```C#
-var ksql = ksqlDbContext.CreateQueryStream<Lambda>()
+var ksql = ksqlDbContext.CreatePushQuery<Lambda>()
   .Select(c => new
   {
     Transformed = c.Lambda_Arr.Transform(x => x + 1),
@@ -453,7 +453,7 @@ By constructing the appropriate function call and providing the necessary parame
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 
-context.CreateQueryStream<Tweet>()
+context.CreatePushQuery<Tweet>()
   .Select(c => new { Col = KSql.Functions.Dynamic("IFNULL(Message, 'n/a')") as string, c.Id, c.Amount, c.Message });
 ```
 The interesting part from the above query is:
@@ -477,7 +477,7 @@ You can achieve a dynamic function call in C# that returns an array by using the
 ```C#
 using K = ksqlDB.RestApi.Client.KSql.Query.Functions.KSql;
 
-context.CreateQueryStream<Tweet>()
+context.CreatePushQuery<Tweet>()
   .Select(c => K.F.Dynamic("ARRAY_DISTINCT(ARRAY[1, 1, 2, 3, 1, 2])") as int[])
   .Subscribe(
     message => Console.WriteLine($"{message[0]} - {message[^1]}"), 

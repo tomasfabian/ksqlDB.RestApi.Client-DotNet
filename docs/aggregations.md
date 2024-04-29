@@ -21,7 +21,7 @@ var ksqlDbUrl = @"http://localhost:8088";
 var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
 var context = new KSqlDBContext(contextOptions);
 
-context.CreateQueryStream<Tweet>()
+context.CreatePushQuery<Tweet>()
   .GroupBy(c => c.Id)
   .Select(g => new { Id = g.Key, Count = g.Count() })
   .Subscribe(count =>
@@ -42,7 +42,7 @@ The Key should be mapped back to the respective column too Id = g.Key. See IKSql
 
 Or without the new expression:
 ```C#
-context.CreateQueryStream<Tweet>()
+context.CreatePushQuery<Tweet>()
   .GroupBy(c => c.Id)
   .Select(g => g.Count()); 
 ```
@@ -59,7 +59,7 @@ SELECT COUNT(*)
 Extract records from an aggregation that fulfill a specified condition.
 
 ```C#
-var query = context.CreateQueryStream<Tweet>()
+var query = context.CreatePushQuery<Tweet>()
   .GroupBy(c => c.Id)
   .Having(c => c.Count() > 2)
   .Select(g => new { Id = g.Key, Count = g.Count()});
@@ -83,7 +83,7 @@ public class Click
   public string TIMESTAMP { get; set; }
 }
 
-var query = context.CreateQueryStream<Click>()
+var query = context.CreatePushQuery<Click>()
   .GroupBy(c => new { c.IP_ADDRESS, c.URL, c.TIMESTAMP })
   .WindowedBy(new TimeWindows(Duration.OfMinutes(2)))
   .Having(c => c.Count(g => c.Key.IP_ADDRESS) == 1)
@@ -105,7 +105,7 @@ HAVING COUNT(IP_ADDRESS) = 1
 Sums the column values.
 
 ```C#
-context.CreateQueryStream<Tweet>()
+context.CreatePushQuery<Tweet>()
         .GroupBy(c => c.Id)
         //.Select(g => g.Sum(c => c.Amount))
         .Select(g => new { Id = g.Key, Agg = g.Sum(c => c.Amount)})
@@ -157,7 +157,7 @@ MAX(col1)
 - **COLLECT_SET** - returns an array containing the distinct values of column from each input row (for the specified grouping and time window, if any).
 
 ```C#
-var subscription = context.CreateQueryStream<Tweet>()
+var subscription = context.CreatePushQuery<Tweet>()
   .GroupBy(c => c.Id)
   .Select(g => new { Id = g.Key, Array = g.CollectSet(c => c.Message) })
   //.Select(g => new { Id = g.Key, Array = g.CollectList(c => c.Message) })
@@ -193,7 +193,7 @@ var dict = new Dictionary<string, int>()
   ["Thomas"] = 42,
 };
 
-var source = Context.CreateQueryStream<Tweet>(TweetsStreamName)
+var source = Context.CreatePushQuery<Tweet>(TweetsStreamName)
   .GroupBy(c => c.Id)
   .Select(l => new { Id = l.Key, Maps = l.CollectList(c => dict) })
 ```
@@ -215,7 +215,7 @@ COUNT(Amount) Count
 ```
 
 ```C#
-new KSqlDBContext(@"http://localhost:8088").CreateQueryStream<Tweet>()
+new KSqlDBContext(@"http://localhost:8088").CreatePushQuery<Tweet>()
   .GroupBy(c => c.Id)
   .Select(g => new { Id = g.Key, TopK = g.TopKDistinct(c => c.Amount, 4) })
   .Subscribe(onNext: tweetMessage =>
@@ -254,7 +254,7 @@ in the partition have the lowest offsets.
 ```C#
 await using var context = new KSqlDBContext(@"http://localhost:8088");
 
-context.CreateQueryStream<Tweet>()
+context.CreatePushQuery<Tweet>()
   .GroupBy(c => c.Id)
   .Select(g => new { Id = g.Key, EarliestByOffset = g.EarliestByOffset(c => c.Amount, 2) })
   .Subscribe(earliest =>
@@ -279,7 +279,7 @@ SELECT Id, EARLIEST_BY_OFFSET(Amount, 2, True) EarliestByOffset
 CountDistinct, LongCountDistinct
 
 ```C#
-var subscription = context.CreateQueryStream<Tweet>()
+var subscription = context.CreatePushQuery<Tweet>()
   .GroupBy(c => c.Id)
   // .Select(g => new { Id = g.Key, Count = g.CountDistinct(c => c.Message) })
   .Select(g => new { Id = g.Key, Count = g.LongCountDistinct(c => c.Message) })
@@ -310,7 +310,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Windows;
 var tumblingWindow =
   new TimeWindows(Duration.OfSeconds(2), OutputRefinement.Final).WithGracePeriod(Duration.OfSeconds(2));
 
-var query = Context.CreateQueryStream<Tweet>()
+var query = Context.CreatePushQuery<Tweet>()
   .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
   .GroupBy(c => c.Id)
   .WindowedBy(tumblingWindow)
@@ -336,7 +336,7 @@ Creation of windowed aggregation
 ```C#
 var context = new TransactionsDbProvider(ksqlDbUrl);
 
-var windowedQuery = context.CreateQueryStream<Transaction>()
+var windowedQuery = context.CreatePushQuery<Transaction>()
   .WindowedBy(new TimeWindows(Duration.OfSeconds(5)).WithGracePeriod(Duration.OfHours(2)))
   .GroupBy(c => c.CardNumber)
   .Select(g => new { CardNumber = g.Key, Count = g.Count() });
@@ -354,7 +354,7 @@ WINDOW TUMBLING (SIZE 5 SECONDS, GRACE PERIOD 2 HOURS)
 
 [Hopping window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#hopping-window) is a time-based windowing mechanism used for aggregating and processing streaming data within **overlapping** time intervals.
 ```C#
-var subscription = context.CreateQueryStream<Tweet>()
+var subscription = context.CreatePushQuery<Tweet>()
   .GroupBy(c => c.Id)
   .WindowedBy(new HoppingWindows(Duration.OfSeconds(5)).WithAdvanceBy(Duration.OfSeconds(4)).WithRetention(Duration.OfDays(7)))
   .Select(g => new { g.WindowStart, g.WindowEnd, Id = g.Key, Count = g.Count() })
@@ -375,7 +375,7 @@ Window advancement interval should be more than zero and less than window durati
 
 A [session window](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/#session-window) aggregates records into a session, which represents a period of activity separated by a specified gap of inactivity, or "idleness". 
 ```C#
-var query = context.CreateQueryStream<Transaction>()
+var query = context.CreatePushQuery<Transaction>()
   .GroupBy(c => c.CardNumber)
   .WindowedBy(new SessionWindow(Duration.OfSeconds(5)))
   .Select(g => new { CardNumber = g.Key, Count = g.Count() });

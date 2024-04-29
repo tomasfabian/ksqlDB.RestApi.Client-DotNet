@@ -24,7 +24,7 @@ The **LIKE** operator is used in combination with the % (percent sign) wildcard 
 Match a string with a specified pattern:
 
 ```C#
-var query = context.CreateQueryStream<Movie>()
+var query = context.CreatePushQuery<Movie>()
   .Where(c => c.Title.ToLower().Contains("hard".ToLower());
 ```
 
@@ -36,7 +36,7 @@ SELECT *
 ```
 
 ```C#
-var query = context.CreateQueryStream<Movie>()
+var query = context.CreatePushQuery<Movie>()
   .Where(c => c.Title.StartsWith("Die");
 ```
 
@@ -54,7 +54,7 @@ The **IS NULL** and **IS NOT NULL** operators are used in the **WHERE** clause t
 
 ```C#
 using var subscription = new KSqlDBContext(@"http://localhost:8088")
-  .CreateQueryStream<Click>()
+  .CreatePushQuery<Click>()
   .Where(c => c.IP_ADDRESS != null || c.URL == null)
   .Select(c => new { c.IP_ADDRESS, c.URL, c.TIMESTAMP });
 ```
@@ -105,7 +105,7 @@ The **BETWEEN** operator provides a concise way to specify range conditions in K
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
 
-IQbservable<Tweet> query = context.CreateQueryStream<Tweet>()
+IQbservable<Tweet> query = context.CreatePushQuery<Tweet>()
   .Where(c => c.Id.Between(1, 5));
 ```
 
@@ -137,7 +137,7 @@ Ts BETWEEN '11:00:00' AND '15:00:00'
 var from = new TimeSpan(11, 0, 0);
 var to = new TimeSpan(15, 0, 0);
 
-var query = context.CreateQueryStream<MyClass>()
+var query = context.CreatePushQuery<MyClass>()
   .Where(c => c.Ts.Between(from, to))
   .Select(c => new { c.Ts, to, FromTime = from, DateTime.Now, New = new TimeSpan(1, 0, 0) }
   .ToQueryString();
@@ -149,7 +149,7 @@ var query = context.CreateQueryStream<MyClass>()
 - Select a condition from one or more expressions.
 ```C#
 var query = new KSqlDBContext(@"http://localhost:8088")
-  .CreateQueryStream<Tweet>()
+  .CreatePushQuery<Tweet>()
   .Select(c =>
     new
     {
@@ -187,7 +187,7 @@ You can use parentheses to change the order of evaluation:
 ```C#
 await using var context = new KSqlDBContext(@"http://localhost:8088");
 
-var query = context.CreateQueryStream<Location>()
+var query = context.CreatePushQuery<Location>()
   .Select(c => (c.Longitude + c.Longitude) * c.Longitude);
 ```
 
@@ -201,7 +201,7 @@ In Where clauses:
 ```C#
 await using var context = new KSqlDBContext(@"http://localhost:8088");
 
-var query = context.CreateQueryStream<Location>()
+var query = context.CreatePushQuery<Location>()
   .Where(c => (c.Latitude == "1" || c.Latitude != "2") && c.Latitude == "3");
 ```
 

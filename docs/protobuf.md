@@ -51,7 +51,7 @@ var ksqlDbUrl = @"http://localhost:8088";
 
 await using var context = new ProtoBufKSqlDbContext(ksqlDbUrl);
 
-var query = context.CreateQueryStream<MovieProto>("movie")
+var query = context.CreatePushQuery<MovieProto>("movie")
   .Where(p => p.Title != "E.T.")
   .Select(l => new { Id = l.Id, l.Title })
   .Take(2); // LIMIT 2    

@@ -2,7 +2,7 @@
 
 # v6.0.0
 - `QueryType` enum was renamed to `EndpointType`
-- removed `CreateQuery` from `IKSqlDBContext` interface, it was merged with `CreateQueryStream`.
+- removed `CreateQuery` from `IKSqlDBContext` interface, it was merged with `CreateQueryStream`.  Subsequently `CreateQueryStream` was renamed to `CreatePushQuery` to align with the nomenclature of `CreatePullQuery`.
 - removed `SetupQuery` from `KSqlDbContextOptionsBuilder`, it was merged with `SetupQueryStream`. Subsequently `SetupQueryStream` was renamed to `SetupPushQuery` to align with the nomenclature of `SetupPullQuery`.
 - introduced distinct parameters designed specifically for pull queries. Before this update, the parameters sent to both the 'query' and 'query-stream' endpoints were shared between pull and push queries.
 
