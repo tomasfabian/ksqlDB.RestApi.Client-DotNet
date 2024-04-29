@@ -44,14 +44,14 @@ public class KSqlQueryLanguageVisitorTests : TestBase
 
     var context = new TestableDbProvider(contextOptions);
 
-    return context.CreateQueryStream<Location>();
+    return context.CreatePushQuery<Location>();
   }
 
   private IQbservable<Tweet> CreateTweetsStreamSource()
   {
     var context = new TestableDbProvider(contextOptions);
 
-    return context.CreateQueryStream<Tweet>();
+    return context.CreatePushQuery<Tweet>();
   }
 
   #region Select
@@ -72,7 +72,7 @@ public class KSqlQueryLanguageVisitorTests : TestBase
   {
     //Arrange
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<MySensor>()
+      .CreatePushQuery<MySensor>()
       .Where(c => c.SensorId2 == "1")
       .Select(c => c.SensorId2);
 
@@ -96,7 +96,7 @@ WHERE SensorId = '1' EMIT CHANGES;";
     string stream2TableName = "stream2";
 
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<MySensor>(stream1TableName)
+      .CreatePushQuery<MySensor>(stream1TableName)
       .Join(Source.Of<MySensor>(stream2TableName).Within(Duration.OfDays(1)),
         endUsers => K.Functions.ExtractJsonField(endUsers.Data, "$.customer_id"),
         transactions => K.Functions.ExtractJsonField(transactions.Data, "$.customer_id"),
@@ -132,7 +132,7 @@ EMIT CHANGES;".ReplaceLineEndings();
     string stream1TableName = "stream1";
     string stream2TableName = "stream2";
 
-    var query = (from a in new TestableDbProvider(contextOptions).CreateQueryStream<MySensor>(stream1TableName)
+    var query = (from a in new TestableDbProvider(contextOptions).CreatePushQuery<MySensor>(stream1TableName)
       join b in Source.Of<MySensor>(stream2TableName) on a.DataId equals b.DataId
       select new
       {
@@ -165,7 +165,7 @@ EMIT CHANGES;".ReplaceLineEndings();
     string stream2TableName = "stream2";
     string stream3TableName = "stream3";
 
-    var query = (from a in new TestableDbProvider(contextOptions).CreateQueryStream<MySensor>(stream1TableName)
+    var query = (from a in new TestableDbProvider(contextOptions).CreatePushQuery<MySensor>(stream1TableName)
       join b in Source.Of<MySensor>(stream2TableName) on a.DataId equals b.DataId
       join c in Source.Of<MySensor>(stream3TableName) on a.DataId equals c.DataId
       select new
@@ -292,7 +292,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
   {
     //Arrange
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<OrderData>()
+      .CreatePushQuery<OrderData>()
       .Select(l => new List<int> { 1, 3 });
 
     //Act
@@ -311,7 +311,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     var orderTypes = new List<int> { 1, 3 };
 
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<OrderData>()
+      .CreatePushQuery<OrderData>()
       .Select(l => new { OrderTypes = orderTypes });
 
     //Act
@@ -330,7 +330,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     var orderTypes = new List<int> { 1, 3 };
 
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<OrderData>()
+      .CreatePushQuery<OrderData>()
       .Select(c => orderTypes.Contains(c.OrderType));
 
     //Act
@@ -347,7 +347,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     var orderTypes = new List<int> { 1, 3 };
 
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<OrderData>()
+      .CreatePushQuery<OrderData>()
       .Select(c => new { Contains = new List<int> { 1, 3 }.Contains(c.OrderType) });
 
     //Act
@@ -454,7 +454,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
   {
     //Arrange
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<TimeTypes>()
+      .CreatePushQuery<TimeTypes>()
       .Select(p => new DateTimeOffset(2021, 7, 4, 13, 29, 45, 447, TimeSpan.FromHours(4)));
 
     //Act
@@ -474,7 +474,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
     var dateTimeOffset = new DateTimeOffset(2021, 7, 4, 13, 29, 45, 447, TimeSpan.FromHours(4));
 
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<TimeTypes>()
+      .CreatePushQuery<TimeTypes>()
       .Select(p => dateTimeOffset);
 
     //Act
@@ -492,7 +492,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
   {
     //Arrange
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<TimeTypes>()
+      .CreatePushQuery<TimeTypes>()
       .Select(p => new { Time = new DateTime(2021, 4, 1) });
 
     //Act
@@ -510,7 +510,7 @@ WHERE {nameof(Location.Latitude)} = '1' AND {nameof(Location.Longitude)} = 0.1 E
   {
     //Arrange
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<TimeTypes>()
+      .CreatePushQuery<TimeTypes>()
       .Where(c => c.Dt.Between(DateTime.MinValue, DateTime.MaxValue));
 
     //Act
@@ -529,7 +529,7 @@ WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;".ReplaceLineEndings
   {
     //Arrange
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<TimeTypes>()
+      .CreatePushQuery<TimeTypes>()
       .Select(c => DateTime.Now);
 
     //Act
@@ -549,7 +549,7 @@ WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;".ReplaceLineEndings
     var from = new DateTime(2021, 10, 1);
 
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<TimeTypes>()
+      .CreatePushQuery<TimeTypes>()
       .Select(c => from);
 
     //Act
@@ -569,7 +569,7 @@ WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;".ReplaceLineEndings
     var from = new DateTime(2021, 10, 1);
 
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<TimeTypes>()
+      .CreatePushQuery<TimeTypes>()
       .Select(c => new { Ts = from, DateTime.MinValue });
 
     //Act
@@ -663,7 +663,7 @@ WHERE {nameof(Location.Latitude)} = '1' EMIT CHANGES;".ReplaceLineEndings();
   {
     //Arrange
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<OrderData>()
+      .CreatePushQuery<OrderData>()
       .Where(c => K.Functions.ArrayContains(new[] { 1, 3 }, c.OrderType));
 
     //Act
@@ -681,7 +681,7 @@ WHERE ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)}) EMIT CHANGES;".
     var orderTypes = new[] { 1, 3 };
 
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<OrderData>()
+      .CreatePushQuery<OrderData>()
       .Where(c => K.Functions.ArrayContains(orderTypes, c.OrderType));
 
     //Act
@@ -699,7 +699,7 @@ WHERE ARRAY_CONTAINS(ARRAY[1, 3], {nameof(OrderData.OrderType)}) EMIT CHANGES;".
     var orderTypes = new List<int> { 1, 3 };
 
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<OrderData>()
+      .CreatePushQuery<OrderData>()
       .Where(c => orderTypes.Contains(c.OrderType));
 
     //Act
@@ -717,7 +717,7 @@ WHERE {nameof(OrderData.OrderType)} IN (1, 3) EMIT CHANGES;".ReplaceLineEndings(
     var orderTypes = new List<string> { "1", "3" };
 
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<OrderData>()
+      .CreatePushQuery<OrderData>()
       .Where(c => orderTypes.Contains(c.Category));
 
     //Act
@@ -735,7 +735,7 @@ WHERE {nameof(OrderData.Category)} IN ('1', '3') EMIT CHANGES;".ReplaceLineEndin
     var orderTypes = new[] { 1, 3 };
 
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<OrderData>()
+      .CreatePushQuery<OrderData>()
       .Where(c => orderTypes.Contains(c.OrderType));
 
     //Act
@@ -893,7 +893,7 @@ WHERE {nameof(Tweet.Message)} NOT BETWEEN '1' AND '3' EMIT CHANGES;".ReplaceLine
     var to = new DateTime(2021, 10, 12);
 
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<TimeTypes>()
+      .CreatePushQuery<TimeTypes>()
       .Where(p => p.Dt.Between(from, to));
 
     //Act
@@ -912,7 +912,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
   {
     //Arrange
     var query = new TestableDbProvider(contextOptions)
-      .CreateQueryStream<TimeTypes>()
+      .CreatePushQuery<TimeTypes>()
       .Where(p => p.Dt.Between(new DateTime(2021, 10, 1), new DateTime(2021, 10, 12)));
 
     //Act
@@ -1368,7 +1368,7 @@ WHERE {nameof(CreateEntityTests.TimeTypes.Dt)} BETWEEN '2021-10-01' AND '2021-10
   {
     var context = new TestableDbProvider(contextOptions);
 
-    return context.CreateQueryStream<DatabaseChangeObject<Entity>>();
+    return context.CreatePushQuery<DatabaseChangeObject<Entity>>();
   }
 
   [Test]

@@ -47,7 +47,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
   [Test]
   public async Task Histogram()
   {
-    await TestHistogram(Context.CreateQueryStream<Movie>(MoviesProvider.MoviesTableName));
+    await TestHistogram(Context.CreatePushQuery<Movie>(MoviesProvider.MoviesTableName));
   }
 
   private static async Task TestHistogram(IQbservable<Movie> querySource)
@@ -72,13 +72,13 @@ public class AggregationTests : Infrastructure.IntegrationTests
   public async Task Histogram_QueryEndPoint()
   {
     Context = CreateKSqlDbContext(EndpointType.Query);
-    await TestHistogram(Context.CreateQueryStream<Movie>(MoviesProvider.MoviesTableName));
+    await TestHistogram(Context.CreatePushQuery<Movie>(MoviesProvider.MoviesTableName));
   }
     
   [Test]
   public async Task CollectListStructs()
   {
-    await CollectListStructs(Context.CreateQueryStream<Movie>(MoviesProvider.MoviesTableName));
+    await CollectListStructs(Context.CreatePushQuery<Movie>(MoviesProvider.MoviesTableName));
   }
 
   //Struct(Name :='Karen', Age := 55)
@@ -109,7 +109,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
   [Test]
   public async Task CollectListMaps()
   {
-    await CollectListMaps(Context.CreateQueryStream<Movie>(MoviesProvider.MoviesTableName));
+    await CollectListMaps(Context.CreatePushQuery<Movie>(MoviesProvider.MoviesTableName));
   }
 
   private static async Task CollectListMaps(IQbservable<Movie> querySource)
@@ -138,7 +138,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
   [Test]
   public async Task CollectListArray()
   {
-    await CollectListArray(Context.CreateQueryStream<Movie>(MoviesProvider.MoviesTableName));
+    await CollectListArray(Context.CreatePushQuery<Movie>(MoviesProvider.MoviesTableName));
   }
 
   private static async Task CollectListArray(IQbservable<Movie> querySource)
@@ -162,7 +162,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
   [Test]
   public async Task CollectSetMaps()
   {
-    await CollectSetMaps(Context.CreateQueryStream<Tweet>(TweetsStreamName));
+    await CollectSetMaps(Context.CreatePushQuery<Tweet>(TweetsStreamName));
   }
 
   private static async Task CollectSetMaps(IQbservable<Tweet> querySource)
@@ -193,7 +193,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
   [Test]
   public async Task EarliestByOffsetMaps()
   {
-    await EarliestByOffsetMaps(Context.CreateQueryStream<Tweet>(TweetsStreamName));
+    await EarliestByOffsetMaps(Context.CreatePushQuery<Tweet>(TweetsStreamName));
   }
 
   private static async Task EarliestByOffsetMaps(IQbservable<Tweet> querySource)
@@ -223,7 +223,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
   [Test]
   public async Task LatestByOffsetMaps()
   {
-    await LatestByOffsetMaps(Context.CreateQueryStream<Tweet>(TweetsStreamName));
+    await LatestByOffsetMaps(Context.CreatePushQuery<Tweet>(TweetsStreamName));
   }
 
   private static async Task LatestByOffsetMaps(IQbservable<Tweet> querySource)
@@ -252,7 +252,7 @@ public class AggregationTests : Infrastructure.IntegrationTests
   [Test]
   public async Task LatestByOffsetStructs()
   {
-    await LatestByOffsetStructs(Context.CreateQueryStream<Tweet>(TweetsStreamName));
+    await LatestByOffsetStructs(Context.CreatePushQuery<Tweet>(TweetsStreamName));
   }
 
   private static async Task LatestByOffsetStructs(IQbservable<Tweet> querySource)

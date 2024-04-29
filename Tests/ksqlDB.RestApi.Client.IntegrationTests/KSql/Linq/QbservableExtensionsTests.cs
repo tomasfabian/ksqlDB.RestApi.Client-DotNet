@@ -64,7 +64,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
   }
 
   protected virtual ksqlDB.RestApi.Client.KSql.Linq.IQbservable<Tweet> QuerySource =>
-    Context.CreateQueryStream<Tweet>(StreamName);
+    Context.CreatePushQuery<Tweet>(StreamName);
 
   private readonly TimeSpan timeOut = TimeSpan.FromSeconds(10);
 
@@ -193,7 +193,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
   public void SubscribeAsync_UnknownTopic()
   {
     //Arrange
-    var source = Context.CreateQueryStream<Tweet>(StreamName + "xyz");
+    var source = Context.CreatePushQuery<Tweet>(StreamName + "xyz");
 
     NUnit.Framework.Assert.ThrowsAsync<KSqlQueryException>(() =>
     {
@@ -208,7 +208,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
   public async Task SubscribeAsync_UnknownTopic_NullQueryId()
   {
     //Arrange
-    var source = Context.CreateQueryStream<Tweet>(StreamName + "xyz");
+    var source = Context.CreatePushQuery<Tweet>(StreamName + "xyz");
 
     Subscription? subscription = null;
 
@@ -448,7 +448,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
       [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
     };
 
-    var source = Context.CreateQueryStream<Tweet>(queryParameters);
+    var source = Context.CreatePushQuery<Tweet>(queryParameters);
 
     //Act
     var actualValues = await CollectActualValues(source, expectedItemsCount);
@@ -471,7 +471,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
       [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
     };
 
-    var source = Context.CreateQueryStream<Tweet>(queryStreamParameters);
+    var source = Context.CreatePushQuery<Tweet>(queryStreamParameters);
 
     //Act
     var actualValues = await CollectActualValues(source, expectedItemsCount);
@@ -615,7 +615,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     //Arrange
     int expectedItemsCount = 1;
 
-    var source = Context.CreateQueryStream<SingleLady>(SingleLadiesStreamName)
+    var source = Context.CreatePushQuery<SingleLady>(SingleLadiesStreamName)
       .ToAsyncEnumerable();
 
     //Act
@@ -660,7 +660,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
       [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
     };
 
-    var source = Context.CreateQueryStream<int>(queryStreamParameters);
+    var source = Context.CreatePushQuery<int>(queryStreamParameters);
 
     //Act
     var actualValues = await CollectActualValues(source, expectedItemsCount);
@@ -684,7 +684,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
       [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
     };
 
-    var source = Context.CreateQueryStream<int[]>(queryStreamParameters);
+    var source = Context.CreatePushQuery<int[]>(queryStreamParameters);
 
     //Act
     var actualValues = await CollectActualValues(source, expectedItemsCount);
@@ -713,7 +713,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
       [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
     };
 
-    var source = Context.CreateQueryStream<MyStruct>(queryStreamParameters);
+    var source = Context.CreatePushQuery<MyStruct>(queryStreamParameters);
 
     //Act
     var actualValues = await CollectActualValues(source, expectedItemsCount);

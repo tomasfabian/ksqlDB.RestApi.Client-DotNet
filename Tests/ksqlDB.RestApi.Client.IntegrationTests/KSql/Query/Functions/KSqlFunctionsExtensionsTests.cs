@@ -40,14 +40,14 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
   [Test]
   public async Task DateToString()
   {
-    await DateToStringTest(Context.CreateQueryStream<Movie>(MoviesTableName));
+    await DateToStringTest(Context.CreatePushQuery<Movie>(MoviesTableName));
   }
 
   [Test]
   public async Task DateToString_QueryEndPoint()
   {
     Context = CreateKSqlDbContext(EndpointType.Query);
-    await DateToStringTest(Context.CreateQueryStream<Movie>(MoviesTableName));
+    await DateToStringTest(Context.CreatePushQuery<Movie>(MoviesTableName));
   }
 
   public async Task DateToStringTest(IQbservable<Movie> querySource)
@@ -74,14 +74,14 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
   [Test]
   public async Task Entries()
   {
-    await EntriesTest(Context.CreateQueryStream<Movie>(MoviesTableName));
+    await EntriesTest(Context.CreatePushQuery<Movie>(MoviesTableName));
   }
 
   [Test]
   public async Task Entries_QueryEndPoint()
   {
     Context = CreateKSqlDbContext(EndpointType.Query);
-    await EntriesTest(Context.CreateQueryStream<Movie>(MoviesTableName));
+    await EntriesTest(Context.CreatePushQuery<Movie>(MoviesTableName));
   }
     
   public async Task EntriesTest(IQbservable<Movie> querySource)
@@ -114,7 +114,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
       
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = KSqlFunctions.Instance.ArrayIntersect(new [] { 1, 2 }, new []{ 1 } )})
       .ToAsyncEnumerable();
       
@@ -133,7 +133,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
       
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = KSqlFunctions.Instance.ArrayJoin(new [] { 1, 2 }, ";" )})
       .ToAsyncEnumerable();
       
@@ -152,7 +152,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
       
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = KSqlFunctions.Instance.ArrayLength(new [] { 1, 2 } )})
       .ToAsyncEnumerable();
       
@@ -171,7 +171,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
       
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = KSqlFunctions.Instance.ArrayMin(new [] { 1, 2 } )})
       .ToAsyncEnumerable();
       
@@ -191,7 +191,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
       
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = KSqlFunctions.Instance.ArrayMin(new string [] { })})
       .ToAsyncEnumerable();
 
@@ -210,7 +210,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
       
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = KSqlFunctions.Instance.ArrayRemove(new [] { 1, 2 }, 2)})
       .ToAsyncEnumerable();
       
@@ -229,7 +229,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
       
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.ArraySort(new int?[]{ 3, null, 1}, ListSortDirection.Ascending)})
       .ToAsyncEnumerable();
       
@@ -246,7 +246,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
       
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.ArrayUnion(new int?[]{ 3, null, 1}, new int?[]{ 4, null})})
       .ToAsyncEnumerable();
       
@@ -264,7 +264,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     string message = "_Hello";
 
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.Concat(c.Title, message), ColWS = K.Functions.ConcatWS(" - ", c.Title, message) })
       .ToAsyncEnumerable();
       
@@ -283,7 +283,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
 
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.ToBytes(c.Title, "utf8") })
       .ToAsyncEnumerable();
       
@@ -303,7 +303,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
 
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.FromBytes(K.Functions.ToBytes(c.Title, "utf8"), "utf8") })
       .ToAsyncEnumerable();
       
@@ -325,7 +325,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     //QWxpZW4=
 
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.FromBytes(bytes, "utf8") })
       .ToAsyncEnumerable();
       
@@ -344,7 +344,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
 
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.AsMap(new []{ "1", "2" }, new []{ 11, 22 }) })
       .ToAsyncEnumerable();
       
@@ -362,7 +362,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
 
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.JsonArrayContains("[1, 2, 3]", 2) })
       .ToAsyncEnumerable();
       
@@ -380,7 +380,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
 
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.MapKeys(new Dictionary<string, int>
       {
         {"apple", 10},
@@ -407,7 +407,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     Expression<Func<Movie, string>> expression = c => K.Functions.Encode(c.Title, inputEncoding, outputEncoding);
 
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(expression)
       .ToAsyncEnumerable();
       
@@ -430,7 +430,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     string jsonPath = "$.log.cloud";
 
     //Act
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Extracted = K.Functions.ExtractJsonField(json, jsonPath) })
       .ToAsyncEnumerable();
       

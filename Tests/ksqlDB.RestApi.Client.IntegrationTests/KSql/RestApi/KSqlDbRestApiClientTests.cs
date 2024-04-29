@@ -322,7 +322,7 @@ Drop type {nameof(Address)};
     var cts = new CancellationTokenSource();
       
     var subscription = await context
-      .CreateQueryStream<MyMoviesTable>()
+      .CreatePushQuery<MyMoviesTable>()
       .SubscribeOn(ThreadPoolScheduler.Instance)
       .SubscribeAsync(_ => {}, e => { }, () => { }, cts.Token);
       

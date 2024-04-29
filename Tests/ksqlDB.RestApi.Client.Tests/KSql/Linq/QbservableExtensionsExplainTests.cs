@@ -35,7 +35,7 @@ public class QbservableExtensionsExplainTests : TestBase
   public async Task ExplainAsync()
   {
     //Arrange
-    var query = dbProvider.CreateQueryStream<string>();
+    var query = dbProvider.CreatePushQuery<string>();
 
     //Act
     var description = await query.ExplainAsync();
@@ -49,7 +49,7 @@ public class QbservableExtensionsExplainTests : TestBase
   public async Task ExplainAsStringAsync()
   {
     //Arrange
-    var query = dbProvider.CreateQueryStream<string>();
+    var query = dbProvider.CreatePushQuery<string>();
 
     //Act
     var description = await query.ExplainAsStringAsync();
@@ -62,7 +62,7 @@ public class QbservableExtensionsExplainTests : TestBase
   public void CreateExplainStatement()
   {
     //Arrange
-    var query = dbProvider.CreateQueryStream<string>().Where(c => c == "ET");
+    var query = dbProvider.CreatePushQuery<string>().Where(c => c == "ET");
 
     //Act
     var explainStatement = QbservableExtensions.CreateExplainStatement((KStreamSet<string>)query);

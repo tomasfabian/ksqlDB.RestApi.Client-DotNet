@@ -30,7 +30,7 @@ public class GroupByTests : Infrastructure.IntegrationTests
 
   protected static string CitiesTableName => "test_cities";
 
-  private IQbservable<TestCity> CitiesStream => Context.CreateQueryStream<TestCity>(CitiesTableName);
+  private IQbservable<TestCity> CitiesStream => Context.CreatePushQuery<TestCity>(CitiesTableName);
 
   record TestCity
   {

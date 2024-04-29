@@ -58,7 +58,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = kSqlDbContext.CreateQueryStream<Movie>()
+    var query = kSqlDbContext.CreatePushQuery<Movie>()
       .Join(
         Source.Of<Lead_Actor>("LeadActor"),
         movie => movie.Title,
@@ -107,7 +107,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = kSqlDbContext.CreateQueryStream<Movie>()
+    var query = kSqlDbContext.CreatePushQuery<Movie>()
       .Join(
         Source.Of<Lead_Actor>(),
         movie => movie.Title,
@@ -156,7 +156,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = kSqlDbContext.CreateQueryStream<Movie>()
+    var query = kSqlDbContext.CreatePushQuery<Movie>()
       .Join(
         Source.Of<Lead_Actor>(),
         movie => movie.Title,
@@ -202,7 +202,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = kSqlDbContext.CreateQueryStream<Movie>()
+    var query = kSqlDbContext.CreatePushQuery<Movie>()
       .Join(
         Source.Of<MovieExt>(),
         movie => movie.Title,
@@ -243,7 +243,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = kSqlDbContext.CreateQueryStream<Movie>()
+    var query = kSqlDbContext.CreatePushQuery<Movie>()
       .Join(
         Source.Of<Lead_Actor>("Actors"),
         movie => movie.Title,
@@ -287,7 +287,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = kSqlDbContext.CreateQueryStream<Movie>()
+    var query = kSqlDbContext.CreatePushQuery<Movie>()
       .Join(
         Source.Of<Lead_Actor>("Actors"),
         movie => movie.Title,
@@ -329,7 +329,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = from movie in kSqlDbContext.CreateQueryStream<Movie>()
+    var query = from movie in kSqlDbContext.CreatePushQuery<Movie>()
       join actor in Source.Of<Lead_Actor>("Actors") on movie.Title equals actor.Title
       select new
       {
@@ -390,7 +390,7 @@ EMIT CHANGES;");
     var value = new Foo { Prop = 42 };
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = from o in kSqlDbContext.CreateQueryStream<Order>()
+    var query = from o in kSqlDbContext.CreatePushQuery<Order>()
       join p1 in Source.Of<Payment>() on o.OrderId equals p1.Id
       join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id
       select new
@@ -456,7 +456,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = from o in kSqlDbContext.CreateQueryStream<Order>()
+    var query = from o in kSqlDbContext.CreatePushQuery<Order>()
       join lm in Source.Of<LambdaMap>() on o.OrderId equals lm.Id
       join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id
       select new
@@ -478,7 +478,7 @@ EMIT CHANGES;");
   public void JoinWithSeveralOnConditions_BuildKSql_Prints()
   {
     //Arrange
-    var query = from o in KSqlDbContext.CreateQueryStream<Order>()
+    var query = from o in KSqlDbContext.CreatePushQuery<Order>()
       join lm in Source.Of<LambdaMap>() on new { OrderId = o.OrderId, NestedProp = "Nested" } equals new { OrderId = lm.Id, NestedProp = lm.Nested.Prop }
       select new
       {
@@ -516,7 +516,7 @@ WHERE `lm`.`Nested`->`Prop` = 'Nested' EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = from o in kSqlDbContext.CreateQueryStream<Order>()
+    var query = from o in kSqlDbContext.CreatePushQuery<Order>()
       join lm in Source.Of<LambdaMap>() on o.OrderId equals lm.Id
       where lm.Nested.Prop == "Nested"
       select new
@@ -558,7 +558,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = from o in kSqlDbContext.CreateQueryStream<Order>()
+    var query = from o in kSqlDbContext.CreatePushQuery<Order>()
       join lm in Source.Of<LambdaMap>() on o.OrderId equals lm.Id
       select new
       {
@@ -605,7 +605,7 @@ EMIT CHANGES LIMIT 2;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = from o in kSqlDbContext.CreateQueryStream<Order>()
+    var query = from o in kSqlDbContext.CreatePushQuery<Order>()
       join p1 in Source.Of<Payment>() on o.OrderId equals p1.Id
       join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id
       select new
@@ -653,7 +653,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = from o in kSqlDbContext.CreateQueryStream<Order>()
+    var query = from o in kSqlDbContext.CreatePushQuery<Order>()
       join p1 in Source.Of<Payment>() on o.OrderId equals p1.Id
       join s1 in Source.Of<Shipment>() on o.OrderId equals s1.Id into gj
       from sa in gj.DefaultIfEmpty()
@@ -703,7 +703,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = from o in kSqlDbContext.CreateQueryStream<Order>()
+    var query = from o in kSqlDbContext.CreatePushQuery<Order>()
       join p in Source.Of<Payment>().Within(Duration.OfHours(1)) on o.OrderId equals p.Id
       join s in Source.Of<Shipment>().Within(Duration.OfDays(5)) on o.OrderId equals s.Id
       select new
@@ -743,7 +743,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = from o in kSqlDbContext.CreateQueryStream<Order>()
+    var query = from o in kSqlDbContext.CreatePushQuery<Order>()
       join p in Source.Of<Payment>().Within(Duration.OfHours(1), Duration.OfDays(5)) on o.OrderId equals p.Id
       select new
       {
@@ -782,7 +782,7 @@ EMIT CHANGES;");
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
     var query = kSqlDbContext
-      .CreateQueryStream<Movie>("movies")
+      .CreatePushQuery<Movie>("movies")
       .Join(Source.Of<Lead_Actor>("actors").Within(Duration.OfDays(1)),
         movie => K.Functions.ExtractJsonField(movie!.Title, "$.movie_title"),
         actor => K.Functions.ExtractJsonField(actor!.Actor_Name, "$.actor_name"),
@@ -824,7 +824,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = kSqlDbContext.CreateQueryStream<Movie>()
+    var query = kSqlDbContext.CreatePushQuery<Movie>()
       .LeftJoin(
         Source.Of<Lead_Actor>(),
         movie => movie.Title,
@@ -874,7 +874,7 @@ EMIT CHANGES;");
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
     var query =
-      from movie in kSqlDbContext.CreateQueryStream<Movie>()
+      from movie in kSqlDbContext.CreatePushQuery<Movie>()
       join actor in Source.Of<Lead_Actor>("Actors")
         on movie.Title equals actor.Title into gj
       from a in gj.DefaultIfEmpty()
@@ -918,7 +918,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(
       new KSqlDBContextOptions(TestParameters.KsqlDbUrl) { IdentifierEscaping = escaping } );
-    var query = kSqlDbContext.CreateQueryStream<Movie>()
+    var query = kSqlDbContext.CreatePushQuery<Movie>()
       .GroupJoin(Source.Of<Lead_Actor>("Actors"), c => c.Title, d => d.Title, (movie, gj) => new
       {
         movie,
@@ -986,7 +986,7 @@ EMIT CHANGES;");
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
     var query =
-      from orders in kSqlDbContext.CreateQueryStream<Order>()
+      from orders in kSqlDbContext.CreatePushQuery<Order>()
       join customer in Source.Of<Customer>()
         on orders.CustomerId equals customer.CustomerId into gj
       from customers in gj.DefaultIfEmpty()
@@ -1034,7 +1034,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = kSqlDbContext.CreateQueryStream<Movie>()
+    var query = kSqlDbContext.CreatePushQuery<Movie>()
       .LeftJoin(
         Source.Of<Lead_Actor>("Actors"),
         movie => movie.Title,
@@ -1083,7 +1083,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = kSqlDbContext.CreateQueryStream<Movie>()
+    var query = kSqlDbContext.CreatePushQuery<Movie>()
       .FullOuterJoin(
         Source.Of<Lead_Actor>("Actors"),
         movie => movie.Title,
@@ -1132,7 +1132,7 @@ EMIT CHANGES;");
     var (escaping, expectedQuery) = testCase;
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       { IdentifierEscaping = escaping });
-    var query = kSqlDbContext.CreateQueryStream<Movie>()
+    var query = kSqlDbContext.CreatePushQuery<Movie>()
       .RightJoin(
         Source.Of<Lead_Actor>("Actors"),
         movie => movie.Title,

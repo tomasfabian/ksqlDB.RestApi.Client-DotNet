@@ -40,8 +40,8 @@ public class QbservableExtensionsTests : TestBase
     //Arrange
     var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
 
-    var query1 = context.CreateQueryStream<Location>();
-    var query2 = context.CreateQueryStream<Location>("Place");
+    var query1 = context.CreatePushQuery<Location>();
+    var query2 = context.CreatePushQuery<Location>("Place");
 
     var providedParameters = new IKSqlDbParameters[2];
     int i = 0;
@@ -271,7 +271,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
     context.KSqlDbProviderMock.Setup(c => c.Run<string>(It.IsAny<object>(), It.IsAny<CancellationToken>()))
       .Returns(GetTestValues);
-    var query = context.CreateQueryStream<string>();
+    var query = context.CreatePushQuery<string>();
 
     //Act
     var asyncEnumerable = query.ToAsyncEnumerable();
@@ -305,7 +305,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     //Arrange
     var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
       
-    var query = context.CreateQueryStream<string>();
+    var query = context.CreatePushQuery<string>();
 
     //Act
     var observable = query.ToObservable();
@@ -327,7 +327,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
       .Callback<object, CancellationToken>((par, ct) => { cancellationToken = ct; })
       .Returns(GetTestValues);
 
-    var query = context.CreateQueryStream<string>();
+    var query = context.CreatePushQuery<string>();
 
     //Act
     query.ToObservable().Subscribe().Dispose();
@@ -437,7 +437,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
   {
     var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
       
-    return context.CreateQueryStream<Location>();
+    return context.CreatePushQuery<Location>();
   }
 
   private static IQbservable<string> CreateTestableKStreamSet()
@@ -455,7 +455,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     context.KSqlDbRestApiClientMock.Setup(c => c.ExecuteStatementAsync(It.IsAny<KSqlDbStatement>(), It.IsAny<CancellationToken>()))
       .ReturnsAsync(new HttpResponseMessage());
       
-    return context.CreateQueryStream<string>();
+    return context.CreatePushQuery<string>();
   }
     
   [Test]
@@ -478,7 +478,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     //Arrange
     var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
 
-    var grouping = context.CreateQueryStream<Click>()
+    var grouping = context.CreatePushQuery<Click>()
       .Where(c => c.IP_ADDRESS != null)
       .Select(c => new { c.IP_ADDRESS, c.URL, c.TIMESTAMP });
 
@@ -498,7 +498,7 @@ WHERE IP_ADDRESS IS NOT NULL EMIT CHANGES;".ReplaceLineEndings();
     //Arrange
     var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
 
-    var grouping = context.CreateQueryStream<Click>()
+    var grouping = context.CreatePushQuery<Click>()
       .Where(c => c.IP_ADDRESS == null)
       .Select(c => new { c.IP_ADDRESS, c.URL, c.TIMESTAMP });
 
@@ -539,7 +539,7 @@ WHERE Id = '{uniqueId}' EMIT CHANGES;".ReplaceLineEndings();
   internal static IQbservable<T> GetQuery<T>(TestableDbProvider context, string tableName, Guid uniqueId)
     where T : IIdentifiable
   {
-    return context.CreateQueryStream<T>(tableName).Where(l => l.Id == uniqueId);
+    return context.CreatePushQuery<T>(tableName).Where(l => l.Id == uniqueId);
   }
   
   [Test]
