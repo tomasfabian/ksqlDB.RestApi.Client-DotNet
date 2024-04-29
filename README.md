@@ -16,7 +16,7 @@ dotnet add package ksqlDb.RestApi.Client
 ```
 This adds a `<PackageReference>` to your csproj file, similar to the following:
 ```XML
-<PackageReference Include="ksqlDb.RestApi.Client" Version="4.0.0" />
+<PackageReference Include="ksqlDb.RestApi.Client" Version="6.0.0" />
 ```
 
 Alternative option is to use [Protobuf content type](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/protobuf.md):
@@ -24,7 +24,7 @@ Alternative option is to use [Protobuf content type](https://github.com/tomasfab
 dotnet add package ksqlDb.RestApi.Client.ProtoBuf
 ```
 
-The following example can be tried out with a [.NET interactive Notebook](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/Notebooks):
+Feel free to experiment with the following example in a [.NET interactive Notebook](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/Notebooks):
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.Linq;
@@ -65,7 +65,8 @@ public class Tweet : Record
 }
 ```
 
-An entity class in **ksqlDB.RestApi.Client** represents the structure of a table or stream. An instance of the class represents a record in that stream while properties are mapped to columns respectively.
+An entity class in **ksqlDB.RestApi.Client** represents the structure of a table or stream.
+An instance of the class represents a record in that stream or table while properties are mapped to columns respectively.
 
 LINQ code written in C# from the sample is equivalent to this KSQL query:
 ```SQL
@@ -164,7 +165,7 @@ This ensures smooth integration with the `ksqlDB.RestApi.Client` library, allowi
 The **server-side Blazor** application communicates with ksqlDB using the `ksqlDB.RestApi.Client`.
 Whenever an event in `ksqlDB` occurs, the server-side Blazor app responds and signals the UI in the client's browser to update. This setup allows a smooth and continuous update flow, creating a real-time, reactive user interface.
 
-- set `docker-compose.csproj` as startup project in [InsideOut.sln](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/InsideOut) for an embedded Kafka connect integration and stream processing examples.
+- set `docker-compose.csproj` as startup project in [InsideOut.sln](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/InsideOut) for embedded Kafka connect integration and stream processing examples.
 
 # ```IQbservable<T>``` extension methods
 As depicted below `IObservable<T>` is the dual of `IEnumerable<T>` and `IQbservable<T>` is the dual of `IQueryable<T>`. In all four cases LINQ providers are using deferred execution.
@@ -237,9 +238,8 @@ var contextOptions = new KSqlDbContextOptionsBuilder()
   .SetAutoOffsetReset(AutoOffsetReset.Latest)
   .SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce)
   .SetIdentifierEscaping(IdentifierEscaping.Keywords)
-  .SetupQueryStream(options =>
+  .SetupPushQuery(options =>
   {
-    //SetupQueryStream affects only IKSqlDBContext.CreateQueryStream<T>
     options.Properties["ksql.query.push.v2.enabled"] = "true";
   })
   .Options;
@@ -253,7 +253,7 @@ This code initializes a `KSqlDbContextOptionsBuilder` to configure settings for 
 - `SetAutoOffsetReset(AutoOffsetReset.Latest)`: Sets the offset reset behavior to start consuming messages from the **latest** available when no committed offset is found. By default, 'auto.offset.reset' is configured to 'earliest'.
 - `SetProcessingGuarantee(ProcessingGuarantee.ExactlyOnce)`: Specifies the processing guarantee as **exactly-once** semantics.
 - `SetIdentifierEscaping(IdentifierEscaping.Keywords)`: Escapes identifiers such as table and column names that are SQL keywords.
-- `SetupQueryStream(options => { ... })`: Configures query stream options, specifically enabling KSQL query push version 2.
+- `SetupPushQuery(options => { ... })`: Configures push query options, specifically enabling KSQL query push version 2.
 
 Finally, `.Options` returns the configured options for the `ksqlDB` context.
 

@@ -378,12 +378,9 @@ public static KSqlDBContextOptions CreateQueryStreamOptions(string ksqlDbUrl)
 {
   var contextOptions = new KSqlDbContextOptionsBuilder()
     .UseKSqlDb(ksqlDbUrl)
-    .SetupQueryStream(options =>
+    .SetupPushQuery(options =>
     {
-    })
-    .SetupQuery(options =>
-    {
-      options.Properties[QueryParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Latest.ToString().ToLower();
+      options.AutoOffsetReset = AutoOffsetReset.Latest;
     })
     .Options;
 
@@ -391,7 +388,7 @@ public static KSqlDBContextOptions CreateQueryStreamOptions(string ksqlDbUrl)
 }
 ```
 
-> ⚠ In version 6.0.0 `SetupQuery` was unified with `SetupQueryStream`.
+> ⚠ In version 6.0.0 `SetupQuery` was unified with `SetupQueryStream`. Subsequently `SetupQueryStream` was renamed to `SetupPushQuery` to align with the nomenclature of `SetupPullQuery`.
 
 ### SetupPullQuery
 **v6.0.0**

@@ -93,7 +93,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
   }
 
   [Test]
-  public void SetProcessingGuarantee_ThenSetupQueryStream()
+  public void SetProcessingGuarantee_ThenSetupPushQuery()
   {
     //Arrange
     var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl)
@@ -101,7 +101,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
 
     //Act
     var options = setupParameters
-      .SetupQueryStream(_ =>
+      .SetupPushQuery(_ =>
       {
       }).Options;
 
@@ -168,16 +168,16 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     ((KSqlDbContextOptionsBuilder)setupParameters).InternalOptions.IdentifierEscaping.Should().Be(escaping);
   }
 
-  #region QueryStream
+  #region SetupPushQuery
 
   [Test]
-  public void SetupQueryStream_OptionsQueryStreamParameters_AutoOffsetResetIsSetToDefault()
+  public void SetupPushQuery_OptionsQueryStreamParameters_AutoOffsetResetIsSetToDefault()
   {
     //Arrange
     var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
 
     //Act
-    var options = setupParameters.SetupQueryStream(_ =>
+    var options = setupParameters.SetupPushQuery(_ =>
     {
     }).Options;
 
@@ -186,7 +186,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
   }
 
   [Test]
-  public void SetupQueryStreamNotCalled_OptionsQueryStreamParameters_AutoOffsetResetIsSetToDefault()
+  public void SetupPushQueryNotCalled_OptionsQueryStreamParameters_AutoOffsetResetIsSetToDefault()
   {
     //Arrange
     var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
@@ -200,14 +200,14 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
   }
 
   [Test]
-  public void SetupQueryStream_AmendOptionsQueryStreamParametersProperty_AutoOffsetResetWasChanged()
+  public void SetupPushQuery_AmendOptionsQueryStreamParametersProperty_AutoOffsetResetWasChanged()
   {
     //Arrange
     var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
     string latestAtoOffsetReset = AutoOffsetReset.Latest.ToString().ToLower();
 
     //Act
-    var options = setupParameters.SetupQueryStream(c =>
+    var options = setupParameters.SetupPushQuery(c =>
     {
       c.Properties[QueryStreamParameters.AutoOffsetResetPropertyName] = latestAtoOffsetReset;
     }).Options;

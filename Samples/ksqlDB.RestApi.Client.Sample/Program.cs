@@ -53,9 +53,8 @@ public static class Program
       .SetIdentifierEscaping(IdentifierEscaping.Keywords)
       .SetEndpointType(EndpointType.QueryStream) // uses HTTP/2.0
       //.SetEndpointType(EndpointType.Query) // uses HTTP/1.0
-      .SetupQueryStream(options =>
+      .SetupPushQuery(options =>
       {
-        //SetupQueryStream affects only EndpointType.QueryStream
         options.Properties[KSqlDbConfigs.KsqlQueryPushV2Enabled] = "true";
       })
       .SetupPullQuery(options =>
@@ -417,7 +416,8 @@ public static class Program
     QueryStreamParameters queryStreamParameters = new QueryStreamParameters
     {
       Sql = ksql,
-      [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
+      AutoOffsetReset = AutoOffsetReset.Earliest,
+      [KSqlDbConfigs.KsqlQueryPushV2Enabled] = "true"
     };
 
     var disposable = context.CreateQueryStream<Movie>(queryStreamParameters)

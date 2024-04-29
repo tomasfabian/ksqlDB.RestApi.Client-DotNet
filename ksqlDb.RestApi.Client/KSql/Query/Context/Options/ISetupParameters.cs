@@ -22,12 +22,12 @@ public interface ISetupParameters : ICreateOptions
   ISetupParameters SetAutoOffsetReset(AutoOffsetReset autoOffsetReset);
 
   /// <summary>
-  /// Configures the parameters for setting up a push query for the 'query-stream' endpoint.
+  /// Configures the parameters for setting up a push query.
   /// Allows you to configure ksqlDB query parameters such as processing guarantee or 'auto.offset.reset'.
   /// </summary>
   /// <param name="configure">An action to configure the parameters using <see cref="IPushQueryParameters"/>.</param>
   /// <returns>Returns this instance.</returns>
-  ISetupParameters SetupQueryStream(Action<IPushQueryParameters> configure);
+  ISetupParameters SetupPushQuery(Action<IPushQueryParameters> configure);
 
   /// <summary>
   /// Configures the parameters for setting up a pull query.
