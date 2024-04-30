@@ -22,7 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ksqlDb.RestApi.Client" Version="6.0.0-rc.2" />
+		<PackageReference Include="ksqlDb.RestApi.Client" Version="6.0.0" />
 		<PackageReference Include="SqlServer.Connector" Version="1.0.0" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.0" />
 	</ItemGroup>
