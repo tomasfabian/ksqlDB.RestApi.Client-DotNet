@@ -39,7 +39,7 @@ async Task Main()
 
 	var semaphoreSlim = new SemaphoreSlim(0, 1);
 
-	using var disposable = context.CreateQueryStream<Movie>(MoviesStreamName)
+	using var disposable = context.CreatePushQuery<Movie>(MoviesStreamName)
 		.Where(p => p.Title != "E.T.")
 		.Where(c => K.Functions.Like(c.Title.ToLower(), "%hard%".ToLower()) || c.Id == 1)
 		.Where(p => p.RowTime >= 1510923225000)
