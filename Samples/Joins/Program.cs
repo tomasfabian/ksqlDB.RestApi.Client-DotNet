@@ -40,7 +40,7 @@ async Task SubscribeAsync(IKSqlDbRestApiClient restApiClient)
 
   var value = new Foo { Prop = 42 };
 
-  var query = (from o in context.CreateQueryStream<Order>()
+  var query = (from o in context.CreatePushQuery<Order>()
                join p1 in Source.Of<Payment>() on o.PaymentId equals p1.Id
                join s1 in Source.Of<Shipment>() on o.ShipmentId equals s1.Id into gj
                from sa in gj.DefaultIfEmpty()
@@ -94,7 +94,7 @@ static IDisposable JoinTables(KSqlDBContext context)
 {
   var queryWithin = Source.Of<Lead_Actor>().Within(Duration.OfHours(1), Duration.OfDays(5));
 
-  var rightJoinQueryString = context.CreateQueryStream<Movie>()
+  var rightJoinQueryString = context.CreatePushQuery<Movie>()
     .RightJoin(
       Source.Of<Lead_Actor>(nameof(Lead_Actor)),
       movie => movie.Title,
@@ -106,7 +106,7 @@ static IDisposable JoinTables(KSqlDBContext context)
       }
     ).ToQueryString();
 
-  var query = context.CreateQueryStream<Movie>()
+  var query = context.CreatePushQuery<Movie>()
     .Join(
       Source.Of<Lead_Actor>(nameof(Lead_Actor)),
       movie => movie.Title,
@@ -130,7 +130,7 @@ static IDisposable JoinTables(KSqlDBContext context)
 
 static IQbservable<dynamic> LeftJoin()
 {
-  var query = new KSqlDBContext(@"http://localhost:8088").CreateQueryStream<Movie>()
+  var query = new KSqlDBContext(@"http://localhost:8088").CreatePushQuery<Movie>()
     .LeftJoin(
       Source.Of<Lead_Actor>(),
       movie => movie.Title,
@@ -147,7 +147,7 @@ static IQbservable<dynamic> LeftJoin()
 
 static IDisposable FullOuterJoinTables(KSqlDBContext context)
 {
-  var query = context.CreateQueryStream<MovieNullableFields>("Movies")
+  var query = context.CreatePushQuery<MovieNullableFields>("Movies")
     .FullOuterJoin(
       Source.Of<Lead_Actor>(nameof(Lead_Actor)),
       movie => movie.Title,

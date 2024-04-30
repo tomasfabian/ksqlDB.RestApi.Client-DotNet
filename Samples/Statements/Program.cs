@@ -147,7 +147,7 @@ static async Task GetKsqlDbInformationAsync(IKSqlDbRestApiClient restApiProvider
 
 static async Task TerminatePushQueryAsync(IKSqlDBContext context, IKSqlDbRestApiClient restApiClient)
 {
-  var subscription = await context.CreateQueryStream<Event>()
+  var subscription = await context.CreatePushQuery<Event>()
     .SubscribeOn(ThreadPoolScheduler.Instance)
     .SubscribeAsync(onNext: _ => { }, onError: e => { }, onCompleted: () => { });
 

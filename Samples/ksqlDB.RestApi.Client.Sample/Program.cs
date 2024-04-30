@@ -38,7 +38,7 @@ namespace ksqlDB.RestApi.Client.Samples;
 // ReSharper disable UnusedVariable
 public static class Program
 {
-  public static KSqlDBContextOptions CreateQueryStreamOptions(string ksqlDbUrl)
+  public static KSqlDBContextOptions CreateKSqlDbContextOptions(string ksqlDbUrl)
   {
     var contextOptions = new KSqlDbContextOptionsBuilder()
       .UseKSqlDb(ksqlDbUrl)
@@ -85,7 +85,7 @@ public static class Program
 
     await moviesProvider.CreateTablesAsync();
 
-    var contextOptions = CreateQueryStreamOptions(ksqlDbUrl);
+    var contextOptions = CreateKSqlDbContextOptions(ksqlDbUrl);
 
     await using var context = new KSqlDBContext(contextOptions, loggerFactory);
 

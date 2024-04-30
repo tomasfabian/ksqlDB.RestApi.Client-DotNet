@@ -15,7 +15,7 @@ internal class ApplicationKSqlDbContext : KSqlDBContext, IApplicationKSqlDbConte
   {
   }
 
-  public ksqlDB.RestApi.Client.KSql.Linq.IQbservable<Tweet> Tweets => CreateQueryStream<Tweet>();
+  public ksqlDB.RestApi.Client.KSql.Linq.IQbservable<Tweet> Tweets => CreatePushQuery<Tweet>();
 }
 
 public interface IApplicationKSqlDbContext : IKSqlDBContext
