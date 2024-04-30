@@ -22,7 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ksqlDb.RestApi.Client" Version="4.0.0" />
+		<PackageReference Include="ksqlDb.RestApi.Client" Version="6.0.0" />
 		<PackageReference Include="SqlServer.Connector" Version="1.0.0" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.0" />
 	</ItemGroup>
@@ -30,7 +30,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Samples\InsideOut\InsideOut.csproj" />
 		<!-- <ProjectReference Include="..\..\SqlServer.Connector\SqlServer.Connector.csproj" /> -->
-        <!-- <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />  -->
+        <!-- <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" /> -->
 	</ItemGroup>
 
 </Project>

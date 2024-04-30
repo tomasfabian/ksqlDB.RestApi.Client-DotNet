@@ -19,7 +19,7 @@ public class Worker(IMoviesKSqlDbContext context, ILogger<Worker> logger) : IHos
 
   private void SubscribeToMovies()
   {
-    subscription = context.CreateQueryStream<Movie>()
+    subscription = context.CreatePushQuery<Movie>()
       .Where( c => !c.Title.StartsWith("Star"))
       .Subscribe(onNext: movie =>
       {

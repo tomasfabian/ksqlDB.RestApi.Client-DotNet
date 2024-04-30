@@ -16,5 +16,5 @@ internal class MoviesKSqlDbContext : KSqlDBContext, IMoviesKSqlDbContext
   {
   }
 
-  public IQbservable<Movie> Movies => CreateQueryStream<Movie>();
+  public IQbservable<Movie> Movies => CreatePushQuery<Movie>();
 }

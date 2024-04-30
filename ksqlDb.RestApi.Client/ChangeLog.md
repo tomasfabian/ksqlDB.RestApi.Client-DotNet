@@ -1,9 +1,14 @@
 # ksqlDB.RestApi.Client
 
-# 6.0.0-rc.1
+# 6.0.0
 - added `SetEndpointType` to `KSqlDbContextOptionsBuilder` for configuring to use either "/query" or "/query-stream" endpoint
-- `CreateQuery` and `CreateQueryStream` were merged. `CreatePullQuery` by default uses http/2 now. 
+- `CreateQuery` and `CreateQueryStream` were merged. `CreatePullQuery` by default uses **http/2** now.  Subsequently `CreateQueryStream` was renamed to `CreatePushQuery` to align with the nomenclature of `CreatePullQuery`.
+- removed `SetupQuery` from `KSqlDbContextOptionsBuilder`, it was unified with `SetupQueryStream`. Subsequently `SetupQueryStream` was renamed to `SetupPushQuery` to align with the nomenclature of `SetupPullQuery`.
+- introduced distinct parameters specifically tailored for pull queries. This modification results in a breaking change. Before this update, the parameters sent to both the 'query' and 'query-stream' endpoints were shared between pull and push queries. #77
 - see also [breakingchanges.md](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/breaking_changes.md#v600)
+
+# BugFix
+- CreateQueryStream doesn't always use configured parameters. The PullQuery functionality was overriding the options configured for the PushQuery. #75 reported by @jbkuczma 
 
 # 5.1.0
 - added `InsertIntoAsync` Qbservable extension for executing `INSERT INTO <stream-name> SELECT` statements.
@@ -18,7 +23,7 @@
 - see also [breakingchanges.md](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/breaking_changes.md#v500)
 
 # 4.0.2
-- fixes Identified an issue where multiple push queries sharing the same QueryStreamParameters SQL were encountered within the same asynchronous context #72
+- fixes Identified an issue where multiple push queries sharing the same `QueryStreamParameters` SQL were encountered within the same asynchronous context #72
 
 # 4.0.1
 - fixes LINQ Where ignores `JsonPropertyNameAttribute` when using new for column selection, causing failing ksqldb request. #68

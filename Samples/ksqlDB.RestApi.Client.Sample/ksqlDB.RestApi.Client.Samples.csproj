@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- <PackageReference Include="ksqlDb.RestApi.Client" Version="5.1.0" /> -->
+        <!-- <PackageReference Include="ksqlDb.RestApi.Client" Version="6.0.0" /> -->
         <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />
         <PackageReference Include="ksqlDb.RestApi.Client.ProtoBuf" Version="3.0.0" />
         <!-- <ProjectReference Include="..\..\ksqlDb.RestApi.Client.ProtoBuf\ksqlDb.RestApi.Client.ProtoBuf.csproj" /> -->

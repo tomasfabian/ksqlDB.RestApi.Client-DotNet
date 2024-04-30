@@ -9,6 +9,42 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Parameters;
 public class QueryParametersExtensionsTests
 {
   [Test]
+  public void FillFrom_DestinationParametersAreSetFromSource()
+  {
+    //Arrange
+    var source = new QueryStreamParameters
+    {
+      Sql = "Select",
+      ["key"] = "value"
+    };
+    var destination = new QueryStreamParameters();
+
+    //Act
+    destination.FillFrom(source);
+
+    //Assert
+    destination.Sql.Should().BeEquivalentTo(source.Sql);
+    destination.Properties.Count.Should().Be(source.Properties.Count);
+  }
+
+  [Test]
+  public void FillPushQueryParametersFrom_DestinationParametersAreSetFromSource()
+  {
+    //Arrange
+    var source = new QueryStreamParameters()
+    {
+      AutoOffsetReset = AutoOffsetReset.Latest
+    };
+    var destination = new QueryStreamParameters();
+
+    //Act
+    destination.FillPushQueryParametersFrom(source);
+
+    //Assert
+    destination.AutoOffsetReset.Should().Be(source.AutoOffsetReset);
+  }
+
+  [Test]
   public void ToLogInfo_QueryStreamParameters_NoParameters()
   {
     //Arrange

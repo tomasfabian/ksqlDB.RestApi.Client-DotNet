@@ -36,7 +36,7 @@ public class KSqlLexicalPrecedenceTests : Infrastructure.IntegrationTests
 
   protected static string MoviesTableName => MoviesProvider.MoviesTableName;
 
-  protected virtual IQbservable<Movie> MoviesStream => Context.CreateQueryStream<Movie>(MoviesTableName);
+  protected virtual IQbservable<Movie> MoviesStream => Context.CreatePushQuery<Movie>(MoviesTableName);
 
   [Test]
   public async Task Select()

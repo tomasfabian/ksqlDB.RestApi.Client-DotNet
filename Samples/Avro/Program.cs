@@ -50,7 +50,7 @@ Console.WriteLine(httpResponse);
 
 await using var context = new KSqlDBContext(ksqlDbUrl);
 
-using var disposable = context.CreateQueryStream<IoTSensor>()
+using var disposable = context.CreatePushQuery<IoTSensor>()
   .ToObservable()
   .Subscribe(onNext: sensor =>
     {

@@ -40,7 +40,7 @@ internal class RowValueJsonSerializer
     if (queryStreamHeader.ColumnTypes.Length == 1 && !typeof(T).IsAnonymousType())
     {
       var type = typeof(T);
-      var isAllowedType = type.IsPrimitive || type.IsArray || type.IsEnum;
+      var isAllowedType = type.IsPrimitive || type == typeof(string) || type.IsArray || type.IsEnum;
 
       if (isSingleAnonymousColumn || isMapColumn || isAllowedType)
       {

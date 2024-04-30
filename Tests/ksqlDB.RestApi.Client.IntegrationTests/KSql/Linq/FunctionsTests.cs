@@ -38,7 +38,7 @@ namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq
     [Test]
     public async Task Explode()
     {
-      await Explode(Context.CreateQueryStream<Tweet>(TweetsStreamName));
+      await Explode(Context.CreatePushQuery<Tweet>(TweetsStreamName));
     }
 
     private static async Task Explode(IQbservable<Tweet> querySource)

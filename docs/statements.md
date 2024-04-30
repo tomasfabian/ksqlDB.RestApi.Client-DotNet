@@ -607,7 +607,7 @@ Drop table {nameof(Event)};
       
   await using var ksqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(ksqlDbUrl));
 
-  var subscription = ksqlDbContext.CreateQueryStream<Event>()
+  var subscription = ksqlDbContext.CreatePushQuery<Event>()
     .Take(1)
     .Subscribe(value =>
     {

@@ -13,12 +13,35 @@ public interface ISetupParameters : ICreateOptions
   /// <param name="processingGuarantee">Type of processing guarantee.</param>
   /// <returns>Returns this instance.</returns>
   ISetupParameters SetProcessingGuarantee(ProcessingGuarantee processingGuarantee);
+
+  /// <summary>
+  /// Allows you to configure the auto.offset.reset streams property. 
+  /// </summary>
+  /// <param name="autoOffsetReset">The auto offset reset value to set.</param>
+  /// <returns>Returns this instance.</returns>
   ISetupParameters SetAutoOffsetReset(AutoOffsetReset autoOffsetReset);
 
-  ISetupParameters SetupQuery(Action<IKSqlDbParameters> configure);
-#if !NETSTANDARD
-    ISetupParameters SetupQueryStream(Action<IKSqlDbParameters> configure);
-#endif
+  /// <summary>
+  /// Configures the parameters for setting up a push query.
+  /// Allows you to configure ksqlDB query parameters such as processing guarantee or 'auto.offset.reset'.
+  /// </summary>
+  /// <param name="configure">An action to configure the parameters using <see cref="IPushQueryParameters"/>.</param>
+  /// <returns>Returns this instance.</returns>
+  ISetupParameters SetupPushQuery(Action<IPushQueryParameters> configure);
+
+  /// <summary>
+  /// Configures the parameters for setting up a pull query.
+  /// </summary>
+  /// <param name="configure">An action to configure the parameters using <see cref="IPullQueryParameters"/>.</param>
+  /// <returns>Returns this instance.</returns>
+  ISetupParameters SetupPullQuery(Action<IPullQueryParameters> configure);
+
+  /// <summary>
+  /// Allows you to set basic authentication credentials for an HTTP client. 
+  /// </summary>
+  /// <param name="username">User name</param>
+  /// <param name="password">Password</param>
+  /// <returns>Returns this instance.</returns>
   ISetupParameters SetBasicAuthCredentials(string username, string password);
 
   /// <summary>

@@ -34,7 +34,7 @@ var contextOptions = new KSqlDBContextOptions(ksqlDbUrl);
 
 await using var context = new KSqlDBContext(contextOptions);
 
-using var disposable = context.CreateQueryStream<Movie>()
+using var disposable = context.CreatePushQuery<Movie>()
   .Subscribe(onNext: movie =>
   {
     Console.WriteLine($"{nameof(Movie)}: {movie.Id} - {movie.Title} - {movie.RowTime}");
@@ -80,10 +80,10 @@ using var disposable = context.CreateQuery<Movie>()
   }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
 ```
 
-⚠️ In version 6.0.0, CreateQuery has been merged into CreateQueryStream.
+⚠️ In version 6.0.0, CreateQuery has been merged into CreatePushQuery.
 
 # TFM netstandard 2.0 (.Net Framework, NetCoreApp 2.0 etc.)
-The lack of support for **HTTP 2.0** in netstandard 2.0 prevents the exposure of `IKSqlDBContext.CreateQueryStream<TEntity>` in the current version. To address this limitation, `IKSqlDBContext.CreateQuery<TEntity>` was introduced as an alternative solution utilizing **HTTP 1.1** to provide the same functionality.
+The lack of support for **HTTP 2.0** in netstandard 2.0 prevents the exposure of `IKSqlDBContext.CreatePushQuery<TEntity>` in the current version. To address this limitation, `IKSqlDBContext.CreateQuery<TEntity>` was introduced as an alternative solution utilizing **HTTP 1.1** to provide the same functionality.
 
 ## Basic auth
 **v1.0.0**
@@ -144,7 +144,7 @@ internal class ApplicationKSqlDbContext : KSqlDBContext, Program.IApplicationKSq
   {
   }
 
-  public ksqlDB.RestApi.Client.KSql.Linq.IQbservable<Movie> Movies => CreateQueryStream<Movie>();
+  public ksqlDB.RestApi.Client.KSql.Linq.IQbservable<Movie> Movies => CreatePushQuery<Movie>();
 }
 
 public interface IApplicationKSqlDbContext : IKSqlDBContext
@@ -290,7 +290,7 @@ public class Worker : IHostedService, IDisposable
   {
     logger.LogInformation("Starting");
 
-    subscription = await context.CreateQueryStream<Movie>()
+    subscription = await context.CreatePushQuery<Movie>()
       .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
       .SubscribeAsync(
         onNext: movie => { },
@@ -374,21 +374,33 @@ var responseMessage = await context.SaveChangesAsync();
 > ⚠When creating `KSqlDBContextOptions` using a constructor or through `KSqlDbContextOptionsBuilder`, the default behavior is to set the `auto.offset.reset` property to "earliest."
 
 ```C#
-public static KSqlDBContextOptions CreateQueryStreamOptions(string ksqlDbUrl)
+public static KSqlDBContextOptions CreatePushQueryOptions(string ksqlDbUrl)
 {
   var contextOptions = new KSqlDbContextOptionsBuilder()
     .UseKSqlDb(ksqlDbUrl)
-    .SetupQueryStream(options =>
+    .SetupPushQuery(options =>
     {
-    })
-    .SetupQuery(options =>
-    {
-      options.Properties[QueryParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Latest.ToString().ToLower();
+      options.AutoOffsetReset = AutoOffsetReset.Latest;
     })
     .Options;
 
   return contextOptions;
 }
+```
+
+> ⚠ In version 6.0.0 `SetupQuery` was unified with `SetupQueryStream`. Subsequently `SetupQueryStream` was renamed to `SetupPushQuery` to align with the nomenclature of `SetupPullQuery`.
+
+### SetupPullQuery
+**v6.0.0**
+
+- configures the parameters for setting up a pull query
+
+```C#
+contextOptions
+  .SetupPullQuery(options =>
+  {
+    options[KSqlDbConfigs.KsqlQueryPullTableScanEnabled] = "true";
+  })
 ```
 
 ### Setting processing guarantee with KSqlDbContextOptionsBuilder
@@ -470,7 +482,7 @@ INSERT INTO Message (Message, Id, `Values`) VALUES ('Hello', 42, '123, abc');
 Stream the result of the SELECT query into an existing stream and its underlying topic.
 
 ```C#
-var response = await context.CreateQueryStream<Movie>("from_stream")
+var response = await context.CreatePushQuery<Movie>("from_stream")
   .Where(c => c.Title != "Apocalypse now")
   .InsertIntoAsync("stream_name");
 
@@ -491,7 +503,7 @@ Alternatively an optional query ID can be used for INSERT INTO queries:
 ```C#
 string queryId = "insert_query_123";
 
-var response = await context.CreateQueryStream<Movie>("from_stream")
+var response = await context.CreatePushQuery<Movie>("from_stream")
   .Where(c => c.Title != "Apocalypse now")
   .InsertIntoAsync("stream_name", queryId);
 ```

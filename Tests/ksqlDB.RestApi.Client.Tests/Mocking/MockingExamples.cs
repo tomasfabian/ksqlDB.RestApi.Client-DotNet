@@ -137,7 +137,7 @@ class KSqlDb : IKSqlDb
 
   public IQbservable<ElasticSearchEvent> CreateElasticSearchEventQuery()
   {
-    var query = context.CreateQueryStream<ElasticSearchEvent>()
+    var query = context.CreatePushQuery<ElasticSearchEvent>()
       .Where(p => p.Key != 33);
 
     return query;

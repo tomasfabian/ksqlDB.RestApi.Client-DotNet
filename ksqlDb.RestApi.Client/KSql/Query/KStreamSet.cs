@@ -133,7 +133,7 @@ internal abstract class KStreamSet<TEntity> : KStreamSet, Linq.IQbservable<TEnti
     if (!QueryContext.AutoOffsetReset.HasValue) return queryParameters;
       
     var overridenParameters = queryParameters.Clone();
-    overridenParameters.AutoOffsetReset = QueryContext.AutoOffsetReset.Value;
+    ((IPushQueryParameters)overridenParameters).AutoOffsetReset = QueryContext.AutoOffsetReset.Value;
 
     return overridenParameters;
   }

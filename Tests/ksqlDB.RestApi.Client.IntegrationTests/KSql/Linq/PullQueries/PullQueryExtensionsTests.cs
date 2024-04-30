@@ -22,7 +22,7 @@ public class PullQueryExtensionsTests
   {
     contextOptions = new KSqlDBContextOptions(KSqlDbRestApiProvider.KsqlDbUrl)
     {
-      EndpointType = EndpointType.Query //TODO: test QueryStream end point
+      EndpointType = EndpointType.QueryStream
     };
 
     context = new KSqlDBContext(contextOptions);

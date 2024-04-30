@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -9,13 +8,13 @@ using ksqlDB.RestApi.Client.DotNetFramework.Sample.Models;
 using ksqlDB.RestApi.Client.DotNetFramework.Sample.Models.Movies;
 using ksqlDB.RestApi.Client.DotNetFramework.Sample.Providers;
 using ksqlDB.RestApi.Client.DotNetFramework.Sample.PullQuery;
+using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
-using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 
 namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
 {
@@ -25,9 +24,10 @@ namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
     {
       var contextOptions = new KSqlDbContextOptionsBuilder()
         .UseKSqlDb(ksqlDbUrl)
-        .SetupQuery(options =>
+        .SetupPushQuery(options =>
         {
-          options.Properties[QueryParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToString().ToLower(); // "latest"
+          options.AutoOffsetReset = AutoOffsetReset.Earliest;
+          options.Properties[KSqlDbConfigs.KsqlQueryPushV2Enabled] = "true";
         })
         .Options;
 
@@ -53,7 +53,7 @@ namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
 
       var context = new KSqlDBContext(contextOptions);
 
-      var subscription = context.CreateQuery<Movie>()
+      var subscription = context.CreatePushQuery<Movie>()
         .Where(p => p.Title != "E.T.")
         .Where(c => K.Functions.Like(c.Title.ToLower(), "%hard%".ToLower()) || c.Id == 1)
         .Where(p => p.RowTime >= 1510923225000) //AND RowTime >= 1510923225000
@@ -95,7 +95,7 @@ namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
 
     private static IDisposable CountDistinct(KSqlDBContext context)
     {
-      var subscription = context.CreateQuery<Tweet>()
+      var subscription = context.CreatePushQuery<Tweet>()
         .GroupBy(c => c.Id)
         .Select(g => new { Id = g.Key, Count = g.LongCountDistinct(c => c.Message) })
         .Subscribe(c =>
@@ -110,7 +110,7 @@ namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
     {
       bool sorted = true;
 
-      var subscription = context.CreateQuery<Movie>()
+      var subscription = context.CreatePushQuery<Movie>()
         .Select(c => new
         {
           Entries = KSqlFunctions.Instance.Entries(new Dictionary<string, string>()
@@ -145,7 +145,7 @@ namespace ksqlDB.RestApi.Client.DotNetFramework.Sample
     
     private static async Task DeeplyNestedTypes(KSqlDBContext context)
     {
-      var moviesStream = context.CreateQuery<Movie>();
+      var moviesStream = context.CreatePushQuery<Movie>();
 
       var source = moviesStream.Select(c => new
       {

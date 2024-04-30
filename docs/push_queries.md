@@ -5,13 +5,15 @@ They don't rely on batch processing or waiting for a predefined interval to prod
 
 It is important to note that `ksqlDB` does not support the **ORDER BY** clause. `ksqlDB` processes data in a streaming manner, and the order of events is based on their **arrival time** rather than explicit sorting.
 
+⚠️ In version 6.0.0, `CreateQueryStream` was renamed to `CreatePushQuery`.
+
 ### Take (LIMIT)
 **v1.0.0**
 
 Returns a specified number of contiguous elements from the start of a stream. Depends on the 'auto.topic.offset' parameter.
 
 ```C#
-context.CreateQueryStream<Tweet>()
+context.CreatePushQuery<Tweet>()
   .Take(2);
 ```
 
@@ -27,7 +29,7 @@ SELECT *
 
 Projects each element of a stream into a new form.
 ```C#
-context.CreateQueryStream<Tweet>()
+context.CreatePushQuery<Tweet>()
   .Select(l => new { l.RowTime, l.Message });
 ```
 Omitting select is equivalent to SELECT *
@@ -37,7 +39,7 @@ Omitting select is equivalent to SELECT *
 ```C#
 var value = new FooClass { Property = 42 };
 
-var query = context.CreateQueryStream<Location>()
+var query = context.CreatePushQuery<Location>()
     .Select(_ => new
     {
       Value = value
@@ -56,7 +58,7 @@ SELECT STRUCT(Property := 42) AS Value
 
 Filters a stream of values based on a predicate.
 ```C#
-context.CreateQueryStream<Tweet>()
+context.CreatePushQuery<Tweet>()
   .Where(p => p.Message != "Hello world" || p.Id == 1)
   .Where(p => p.RowTime >= 1510923225000);
 ```
@@ -81,7 +83,7 @@ Implementing the `IObserver<T>` interface:
 
 ```C#
 using var subscription = new KSqlDBContext(@"http://localhost:8088")
-  .CreateQueryStream<Tweet>()
+  .CreatePushQuery<Tweet>()
   .Subscribe(new TweetsObserver());
 
 public class TweetsObserver : System.IObserver<Tweet>
@@ -109,7 +111,7 @@ Observers can **react to changes** in the subject's state and perform actions ac
 Providing ```Action<T> onNext, Action<Exception> onError and Action onCompleted```:
 ```C#
 using var subscription = new KSqlDBContext(@"http://localhost:8088")
-    .CreateQueryStream<Tweet>()
+    .CreatePushQuery<Tweet>()
     .Subscribe(
       onNext: tweetMessage =>
       {
@@ -128,7 +130,7 @@ Moving to [Rx.NET](https://github.com/dotnet/reactive)...
 The following code snippet shows how to observe messages on the desired [IScheduler](http://introtorx.com/Content/v1.0.10621.0/15_SchedulingAndThreading.html): 
 
 ```C#
-using var disposable = context.CreateQueryStream<Tweet>()        
+using var disposable = context.CreatePushQuery<Tweet>()        
   .Take(2)     
   .ToObservable() //client side processing starts here lazily after subscription
   .ObserveOn(System.Reactive.Concurrency.DispatcherScheduler.Current)
@@ -139,7 +141,7 @@ The `IScheduler` interface is part of the Reactive Extensions (Rx) library, whic
 
 Be cautious regarding to server side and client side processings:
 ```C#
-KSql.Linq.IQbservable<Tweet> queryStream = context.CreateQueryStream<Tweet>().Take(2);
+KSql.Linq.IQbservable<Tweet> queryStream = context.CreatePushQuery<Tweet>().Take(2);
 
 System.IObservable<Tweet> observable = queryStream.ToObservable();
 
@@ -152,7 +154,7 @@ WPF client side batching example:
 ```C#
 private static IDisposable ClientSideBatching(KSqlDBContext context)
 {
-  var disposable = context.CreateQueryStream<Tweet>()
+  var disposable = context.CreatePushQuery<Tweet>()
     //Client side execution
     .ToObservable()
     .Buffer(TimeSpan.FromMilliseconds(250), 100)
@@ -180,7 +182,7 @@ It also **filters** the buffered events, allowing only those buffers with a coun
 
 `ToQueryString` is mainly helpful for debugging purposes. It returns the generated ksql query without executing it.
 ```C#
-var ksql = context.CreateQueryStream<Tweet>().ToQueryString();
+var ksql = context.CreatePushQuery<Tweet>().ToQueryString();
 
 //prints SELECT * FROM tweets EMIT CHANGES;
 Console.WriteLine(ksql);
@@ -193,7 +195,7 @@ However, it's worth noting that query comprehension syntax is just a different w
 
 ```C#
 var grouping = 
-  from city in context.CreateQueryStream<City>()
+  from city in context.CreatePushQuery<City>()
   where city.RegionCode != "xy"
   group city by city.State.Name into g
   select new
@@ -215,7 +217,7 @@ Renaming of stream or table column names with the `JsonPropertyNameAttribute` wa
 - grouping by nested properies. Can be used in the following way:
 
 ```C#
-var source = Context.CreateQueryStream<City>()
+var source = Context.CreatePushQuery<City>()
   .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
   .GroupBy(c => new { c.RegionCode, c.State.Name })
   .Select(g => new { g.Source.RegionCode, g.Source.State.Name, Count = g.Count()})
@@ -251,7 +253,7 @@ SELECT RegionCode, State->Name, COUNT(*) Count
 Creates an [async iterator](https://docs.microsoft.com/en-us/archive/msdn-magazine/2019/november/csharp-iterating-with-async-enumerables-in-csharp-8) from the query:
 ```C#
 var cts = new CancellationTokenSource();
-var asyncTweetsEnumerable = context.CreateQueryStream<Tweet>().ToAsyncEnumerable();
+var asyncTweetsEnumerable = context.CreatePushQuery<Tweet>().ToAsyncEnumerable();
 
 await foreach (var tweet in asyncTweetsEnumerable.WithCancellation(cts.Token))
   Console.WriteLine(tweet.Message);
@@ -289,7 +291,7 @@ private static async Task SubscribeAsync(IKSqlDBContext context)
 
   try
   {
-    var subscription = await context.CreateQueryStream<Movie>()
+    var subscription = await context.CreatePushQuery<Movie>()
       .SubscribeOn(ThreadPoolScheduler.Instance)
       .ObserveOn(TaskPoolScheduler.Default)
       .SubscribeAsync(onNext: movie =>
@@ -324,13 +326,13 @@ using ksqlDB.RestApi.Client.Sample.Models.Movies;
 
 public static async Task ExplainAsync(IKSqlDBContext context)
 {
-  var query = context.CreateQueryStream<Movie>()
+  var query = context.CreatePushQuery<Movie>()
     .Where(c => c.Title != "E.T.");
 
   string explain = await query
     .ExplainAsStringAsync();
 
-  ExplainResponse[] explainResponses = await context.CreateQueryStream<Movie>().ExplainAsync();
+  ExplainResponse[] explainResponses = await context.CreatePushQuery<Movie>().ExplainAsync();
       
   Console.WriteLine(explainResponses[0].QueryDescription.ExecutionPlan);
 }
@@ -375,7 +377,7 @@ QueryParameters queryParameters = new QueryParameters
 
 await using var context = new KSqlDBContext(@"http://localhost:8088");
 
-var moviesSource = context.CreateQueryStream<Movie>(queryParameters)
+var moviesSource = context.CreatePushQuery<Movie>(queryParameters)
   .ToObservable();
 ```
 
@@ -392,7 +394,7 @@ QueryStreamParameters queryStreamParameters = new QueryStreamParameters
 
 await using var context = new KSqlDBContext(@"http://localhost:8088");
 
-var source = context.CreateQueryStream<Movie>(queryStreamParameters)
+var source = context.CreatePushQuery<Movie>(queryStreamParameters)
   .ToObservable();
 ```
 
@@ -411,7 +413,7 @@ Overrides the AutoOffsetReset policy for the current query:
 ```C#
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 
-var subscription = context.CreateQueryStream<Movie>()
+var subscription = context.CreatePushQuery<Movie>()
   .WithOffsetResetPolicy(AutoOffsetReset.Latest)
   .Subscribe(movie =>
   {

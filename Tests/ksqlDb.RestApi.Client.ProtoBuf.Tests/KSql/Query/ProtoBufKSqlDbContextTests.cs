@@ -10,7 +10,7 @@ namespace ksqlDb.RestApi.Client.ProtoBuf.Tests.KSql.Query;
 public class ProtoBufKSqlDbContextTests : TestBase
 {
   [Test]
-  public void CreateQueryStream_Subscribe_KSqlDbProvidersRunWasCalled()
+  public void CreatePushQuery_Subscribe_KSqlDbProvidersRunWasCalled()
   {
     //Arrange
     var context = new TestableProtoBufKSqlDbContext<string>(TestParameters.KsqlDbUrl);

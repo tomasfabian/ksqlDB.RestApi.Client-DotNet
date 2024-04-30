@@ -25,15 +25,12 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
 
     Url = url;
 
-    QueryParameters = new QueryParameters
-    {
-      [RestApi.Parameters.QueryParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToString().ToLower()
-    };
-
     QueryStreamParameters = new QueryStreamParameters
     {
       [QueryStreamParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToString().ToLower(),
     };
+
+    PullQueryParameters = new PullQueryParameters();
 
 #if !NETSTANDARD
     EndpointType = EndpointType.QueryStream;
@@ -58,9 +55,9 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   public QueryStreamParameters QueryStreamParameters { get; internal set; }
 
   /// <summary>
-  /// Gets or sets the IKSqlDb query parameters.
+  /// Gets or sets the pull query parameters.
   /// </summary>
-  public IKSqlDbParameters QueryParameters { get; internal set; }
+  public IPullQueryParameters PullQueryParameters { get; internal set; }
 
   public static NumberFormatInfo? NumberFormatInfo { get; set; }
 
@@ -73,7 +70,6 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
     string guarantee = processingGuarantee.ToKSqlValue();
 
     QueryStreamParameters[KSqlDbConfigs.ProcessingGuarantee] = guarantee; 
-    QueryParameters[KSqlDbConfigs.ProcessingGuarantee] = guarantee;
   }
 
   /// <summary>
@@ -82,9 +78,6 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   /// <param name="autoOffsetReset">The type of auto offset reset.</param>
   public void SetAutoOffsetReset(AutoOffsetReset autoOffsetReset)
   {
-    QueryParameters[RestApi.Parameters.QueryParameters.AutoOffsetResetPropertyName] =
-      autoOffsetReset.ToKSqlValue();
-
     QueryStreamParameters[QueryStreamParameters.AutoOffsetResetPropertyName] =
       autoOffsetReset.ToKSqlValue();
   }
@@ -97,18 +90,6 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   public void SetJsonSerializerOptions(Action<JsonSerializerOptions> optionsAction)
   {
     optionsAction.Invoke(JsonSerializerOptions);
-  }
-
-  internal KSqlDBContextOptions Clone()
-  {
-    var options = new KSqlDBContextOptions(Url)
-    {
-      ShouldPluralizeFromItemName = ShouldPluralizeFromItemName,
-      QueryParameters = ((QueryParameters) QueryParameters).Clone(),
-      QueryStreamParameters = (QueryStreamParameters)QueryStreamParameters.Clone()
-    };
-
-    return options;
   }
 
   public bool UseBasicAuth => userName != null || password != null;

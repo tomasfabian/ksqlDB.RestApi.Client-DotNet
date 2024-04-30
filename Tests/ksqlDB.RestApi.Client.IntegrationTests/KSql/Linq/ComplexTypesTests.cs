@@ -63,7 +63,7 @@ Drop table Events;
     var semaphoreSlim = new SemaphoreSlim(0, 1);
 
     var receivedValues = new List<Event>();
-    var subscription = Context.CreateQueryStream<Event>().Take(1)
+    var subscription = Context.CreatePushQuery<Event>().Take(1)
       .Subscribe(value =>
         {
           receivedValues.Add(value);
@@ -101,7 +101,7 @@ Drop table Events;
       { { "A", new Dictionary<string, int>() { { "A", 1 } } } };
 
     string ksql =
-      Context.CreateQueryStream<object>(fromItemName: "Events")
+      Context.CreatePushQuery<object>(fromItemName: "Events")
         .Select(_ => new
         {
           Dict = K.Functions.Transform(value, (k, v) => k.ToUpper(), (k, v) => v["A"] + 1)
@@ -115,7 +115,7 @@ Drop table Events;
     };
 
     //Act
-    var source = Context.CreateQueryStream<Foo>(queryStreamParameters)
+    var source = Context.CreatePushQuery<Foo>(queryStreamParameters)
       .Take(1)
       .ToEnumerable()
       .First();
@@ -138,7 +138,7 @@ Drop table Events;
       { { "A", new MyType { A = 1, B = 2 } } };
 
     string ksql =
-      Context.CreateQueryStream<object>(fromItemName: "Events")
+      Context.CreatePushQuery<object>(fromItemName: "Events")
         .Select(_ => new
         {
           Dict = K.Functions.Transform(value, (k, v) => k.ToUpper(), (k, v) => v.A + 1)
@@ -152,7 +152,7 @@ Drop table Events;
     };
 
     //Act
-    var source = Context.CreateQueryStream<Foo>(queryStreamParameters)
+    var source = Context.CreatePushQuery<Foo>(queryStreamParameters)
       .Take(1)
       .ToEnumerable()
       .First();

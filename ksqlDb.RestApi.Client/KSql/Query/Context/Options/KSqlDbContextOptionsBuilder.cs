@@ -63,18 +63,33 @@ public class KSqlDbContextOptionsBuilder : ISetupParameters
     return this;
   }
 
-#if !NETSTANDARD
-  ISetupParameters ISetupParameters.SetupQueryStream(Action<IKSqlDbParameters> configure)
+  /// <summary>
+  /// Configures the parameters for setting up a push query.
+  /// Allows you to configure ksqlDB query parameters such as processing guarantee or 'auto.offset.reset'.
+  /// </summary>
+  /// <param name="configure">An action to configure the parameters using <see cref="IPushQueryParameters"/>.</param>
+  /// <returns>Returns this instance.</returns>
+  ISetupParameters ISetupParameters.SetupPushQuery(Action<IPushQueryParameters> configure)
   {
     configure(InternalOptions.QueryStreamParameters);
 
     return this;
   }
 
-#endif
+  /// <summary>
+  /// Configures the parameters for setting up a pull query.
+  /// </summary>
+  /// <param name="configure">An action to configure the parameters using <see cref="IPullQueryParameters"/>.</param>
+  /// <returns>Returns this instance.</returns>
+  ISetupParameters ISetupParameters.SetupPullQuery(Action<IPullQueryParameters> configure)
+  {
+    configure(InternalOptions.PullQueryParameters);
+
+    return this;
+  }
 
   /// <summary>
-  /// allows you to set basic authentication credentials for an HTTP client. 
+  /// Allows you to set basic authentication credentials for an HTTP client. 
   /// </summary>
   /// <param name="username">User name</param>
   /// <param name="password">Password</param>
@@ -114,18 +129,6 @@ public class KSqlDbContextOptionsBuilder : ISetupParameters
   }
 
   /// <summary>
-  /// Allows you to configure ksqlDB query parameters such as processing guarantee or 'auto.offset.reset'.
-  /// </summary>
-  /// <param name="configure">A delegate that intercepts the creation of an instance of <typeparamref name="IKSqlDbParameters"/>.</param>
-  /// <returns>Setup parameters</returns>
-  ISetupParameters ISetupParameters.SetupQuery(Action<IKSqlDbParameters> configure)
-  {
-    configure(InternalOptions.QueryParameters);
-
-    return this;
-  }
-
-  /// <summary>
   /// Allows you to configure the 'processing.guarantee' streams property.
   /// </summary>
   /// <param name="processingGuarantee">Type of processing guarantee. exactly_once_v2 or at_least_once semantics</param>
@@ -140,8 +143,8 @@ public class KSqlDbContextOptionsBuilder : ISetupParameters
   /// <summary>
   /// Allows you to configure the auto.offset.reset streams property. 
   /// </summary>
-  /// <param name="autoOffsetReset"></param>
-  /// <returns></returns>
+  /// <param name="autoOffsetReset">The auto offset reset value to set.</param>
+  /// <returns>Returns this instance.</returns>
   ISetupParameters ISetupParameters.SetAutoOffsetReset(AutoOffsetReset autoOffsetReset)
   {
     InternalOptions.SetAutoOffsetReset(autoOffsetReset);

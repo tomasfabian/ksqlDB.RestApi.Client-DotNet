@@ -40,7 +40,7 @@ async Task Main()
 
 	var semaphoreSlim = new SemaphoreSlim(0, 1);
 	
-	var cdcSubscription = context.CreateQuery<DatabaseChangeObject<IoTSensor>>("sqlserversensors")
+	var cdcSubscription = context.CreatePushQuery<DatabaseChangeObject<IoTSensor>>("sqlserversensors")
 		.WithOffsetResetPolicy(ksqlDB.RestApi.Client.KSql.Query.Options.AutoOffsetReset.Latest)
 		.Take(5)
 		.ToObservable()

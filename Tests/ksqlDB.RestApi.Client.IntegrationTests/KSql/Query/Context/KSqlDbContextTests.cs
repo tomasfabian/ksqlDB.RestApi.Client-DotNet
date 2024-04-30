@@ -134,7 +134,7 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     var receivedValues = new List<TimeTypes>();
 
     //Act
-    using var subscription = context.CreateQueryStream<TimeTypes>()
+    using var subscription = context.CreatePushQuery<TimeTypes>()
       .Take(1)
       .Subscribe(value =>
         {

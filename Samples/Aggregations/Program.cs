@@ -65,7 +65,7 @@ static IDisposable Having(IKSqlDBContext context)
 {
   return
     //https://kafka-tutorials.confluent.io/finding-distinct-events/ksql.html
-    context.CreateQueryStream<Click>()
+    context.CreatePushQuery<Click>()
       .GroupBy(c => new { c.IP_ADDRESS, c.URL, c.TIMESTAMP })
       .WindowedBy(new TimeWindows(Duration.OfMinutes(2)))
       .Having(c => c.Count(g => c.Key.IP_ADDRESS) == 1)
@@ -91,7 +91,7 @@ static async Task GroupBy()
 
   await using var context = new KSqlDBContext(contextOptions);
 
-  context.CreateQueryStream<Tweet>()
+  context.CreatePushQuery<Tweet>()
     .GroupBy(c => c.Id)
     .Select(g => new { Id = g.Key, Count = g.Count() })
     .Subscribe(count =>
@@ -101,7 +101,7 @@ static async Task GroupBy()
     }, error => { Console.WriteLine($"Exception: {error.Message}"); }, () => Console.WriteLine("Completed"));
 
 
-  context.CreateQueryStream<Tweet>()
+  context.CreatePushQuery<Tweet>()
     .GroupBy(c => c.Id)
     .Select(g => g.Count())
     .Subscribe(count =>
@@ -110,7 +110,7 @@ static async Task GroupBy()
       Console.WriteLine();
     }, error => { Console.WriteLine($"Exception: {error.Message}"); }, () => Console.WriteLine("Completed"));
 
-  context.CreateQueryStream<Tweet>()
+  context.CreatePushQuery<Tweet>()
     .GroupBy(c => c.Id)
     .Select(g => new { Count = g.Count() })
     .Subscribe(count =>
@@ -120,7 +120,7 @@ static async Task GroupBy()
     }, error => { Console.WriteLine($"Exception: {error.Message}"); }, () => Console.WriteLine("Completed"));
 
   //Sum
-  var subscription = context.CreateQueryStream<Tweet>()
+  var subscription = context.CreatePushQuery<Tweet>()
     .GroupBy(c => c.Id)
     //.Select(g => g.Sum(c => c.Id))
     .Select(g => new { Id = g.Key, MySum = g.Sum(c => c.Id) })
@@ -130,7 +130,7 @@ static async Task GroupBy()
       Console.WriteLine();
     }, error => { Console.WriteLine($"Exception: {error.Message}"); }, () => Console.WriteLine("Completed"));
 
-  var groupBySubscription = context.CreateQueryStream<IoTSensorChange>("sqlserversensors")
+  var groupBySubscription = context.CreatePushQuery<IoTSensorChange>("sqlserversensors")
     .GroupBy(c => new { c.Op, c.After!.Value })
     .Select(g => new { g.Source.Op, g.Source.After!.Value, num_times = g.Count() })
     .Subscribe(c =>
@@ -146,13 +146,13 @@ static IDisposable Window(IKSqlDBContext context)
 {
   new TimeWindows(Duration.OfSeconds(2), OutputRefinement.Final).WithGracePeriod(Duration.OfSeconds(2));
 
-  var subscription1 = context.CreateQueryStream<Tweet>()
+  var subscription1 = context.CreatePushQuery<Tweet>()
     .GroupBy(c => c.Id)
     .WindowedBy(new TimeWindows(Duration.OfSeconds(5)).WithGracePeriod(Duration.OfHours(2)))
     .Select(g => new { g.WindowStart, g.WindowEnd, Id = g.Key, Count = g.Count() })
     .Subscribe(c => { Console.WriteLine($"{c.Id}: {c.Count}: {c.WindowStart}: {c.WindowEnd}"); }, exception => { Console.WriteLine(exception.Message); });
 
-  var query = context.CreateQueryStream<Tweet>()
+  var query = context.CreatePushQuery<Tweet>()
     .GroupBy(c => c.Id)
     .WindowedBy(new HoppingWindows(Duration.OfSeconds(5)).WithAdvanceBy(Duration.OfSeconds(4))
       .WithRetention(Duration.OfDays(7)))
@@ -168,7 +168,7 @@ static IDisposable Window(IKSqlDBContext context)
 
 static IDisposable CountDistinct(IKSqlDBContext context)
 {
-  var subscription = context.CreateQueryStream<Tweet>()
+  var subscription = context.CreatePushQuery<Tweet>()
     .GroupBy(c => c.Id)
     // .Select(g => new { Id = g.Key, Count = g.CountDistinct(c => c.Message) })
     .Select(g => new { Id = g.Key, Count = g.LongCountDistinct(c => c.Message) })
@@ -182,7 +182,7 @@ static IDisposable CountDistinct(IKSqlDBContext context)
 
 static IDisposable CollectSet(IKSqlDBContext context)
 {
-  var subscription = context.CreateQueryStream<Tweet>()
+  var subscription = context.CreatePushQuery<Tweet>()
     .GroupBy(c => c.Id)
     .Select(g => new { Id = g.Key, Array = g.CollectSet(c => c.Message) })
     //.Select(g => new { Id = g.Key, Array = g.CollectList(c => c.Message) })
@@ -200,7 +200,7 @@ static IDisposable CollectSet(IKSqlDBContext context)
 
 static IDisposable TopKDistinct(IKSqlDBContext context)
 {
-  return context.CreateQueryStream<Tweet>()
+  return context.CreatePushQuery<Tweet>()
     .GroupBy(c => c.Id)
     .Select(g => new { Id = g.Key, TopK = g.TopKDistinct(c => c.Amount, 2) })
     // .Select(g => new { Id = g.Key, TopK = g.TopK(c => c.Amount, 2) })
@@ -221,7 +221,7 @@ static void EmitFinal(IKSqlDBContext ksqlDbContext)
   var tumblingWindow =
     new TimeWindows(Duration.OfSeconds(2), OutputRefinement.Final).WithGracePeriod(Duration.OfSeconds(2));
 
-  var query = ksqlDbContext.CreateQueryStream<Tweet>()
+  var query = ksqlDbContext.CreatePushQuery<Tweet>()
     .WithOffsetResetPolicy(AutoOffsetReset.Earliest)
     .GroupBy(c => c.Id)
     .WindowedBy(tumblingWindow)

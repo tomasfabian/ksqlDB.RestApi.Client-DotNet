@@ -62,7 +62,7 @@ public class AggregationTimeTests : Infrastructure.IntegrationTests
   [Test]
   public async Task MinDateTime()
   {
-    await MinDateTime(Context.CreateQueryStream<Times>(TimesStreamName));
+    await MinDateTime(Context.CreatePushQuery<Times>(TimesStreamName));
   }
 
   private static async Task MinDateTime(IQbservable<Times> querySource)
@@ -86,7 +86,7 @@ public class AggregationTimeTests : Infrastructure.IntegrationTests
   [Test]
   public async Task MaxTime()
   {
-    await MaxTime(Context.CreateQueryStream<Times>(TimesStreamName));
+    await MaxTime(Context.CreatePushQuery<Times>(TimesStreamName));
   }
 
   private static async Task MaxTime(IQbservable<Times> querySource)
@@ -110,7 +110,7 @@ public class AggregationTimeTests : Infrastructure.IntegrationTests
   [Test]
   public async Task MinDateTimeOffset()
   {
-    await MinDateTimeOffset(Context.CreateQueryStream<Times>(TimesStreamName));
+    await MinDateTimeOffset(Context.CreatePushQuery<Times>(TimesStreamName));
   }
 
   private static async Task MinDateTimeOffset(IQbservable<Times> querySource)

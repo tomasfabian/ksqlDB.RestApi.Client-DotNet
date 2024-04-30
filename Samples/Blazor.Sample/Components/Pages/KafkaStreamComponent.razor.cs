@@ -81,7 +81,7 @@ partial class KafkaStreamComponent : IDisposable
 
     await using var context = new KSqlDBContext(options);
 
-    context.CreateQuery<SensorsStream>("SensorsStream")
+    context.CreatePushQuery<SensorsStream>("SensorsStream")
       .ToObservable()
       .ObserveOn(synchronizationContext)
       .Subscribe(c =>

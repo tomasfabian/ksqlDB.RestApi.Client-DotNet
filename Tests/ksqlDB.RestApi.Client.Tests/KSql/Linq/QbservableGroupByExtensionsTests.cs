@@ -25,7 +25,7 @@ public class QbservableGroupByExtensionsTests : TestBase
     context.KSqlDbProviderMock.Setup(c => c.Run<int>(It.IsAny<object>(), It.IsAny<CancellationToken>())).Returns(GetTestValues);
     context.KSqlDbProviderMock.Setup(c => c.Run<long>(It.IsAny<object>(), It.IsAny<CancellationToken>())).Returns(GetDecimalTestValues);
 
-    return context.CreateQueryStream<City>();
+    return context.CreatePushQuery<City>();
   }
 
   private TestScheduler testScheduler = null!;
@@ -208,7 +208,7 @@ public class QbservableGroupByExtensionsTests : TestBase
     var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
 
     //https://kafka-tutorials.confluent.io/finding-distinct-events/ksql.html
-    var grouping = context.CreateQueryStream<Click>()
+    var grouping = context.CreatePushQuery<Click>()
       .GroupBy(c => new { c.IP_ADDRESS, c.URL, c.TIMESTAMP })
       .WindowedBy(new TimeWindows(Duration.OfMinutes(2)))
       .Having(c => c.Count(g => c.Key.IP_ADDRESS) == 1)

@@ -20,7 +20,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     //Arrange
     var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
-    var grouping = context.CreateQueryStream<Transaction>()
+    var grouping = context.CreatePushQuery<Transaction>()
       .GroupBy(c => c.CardNumber)
       .WindowedBy(new SessionWindow(Duration.OfSeconds(5)))
       .Select(g => new { CardNumber = g.Key, Count = g.Count() });
@@ -38,7 +38,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     //Arrange
     var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
-    var grouping = context.CreateQueryStream<Transaction>()
+    var grouping = context.CreatePushQuery<Transaction>()
       .GroupBy(c => c.CardNumber)
       .WindowedBy(new HoppingWindows(Duration.OfSeconds(5)))
       .Select(g => new { CardNumber = g.Key, Count = g.Count() });
@@ -56,7 +56,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     //Arrange
     var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
-    var grouping = context.CreateQueryStream<Transaction>()
+    var grouping = context.CreatePushQuery<Transaction>()
       .GroupBy(c => c.CardNumber)
       .WindowedBy(new HoppingWindows(Duration.OfSeconds(5)))
       .Select(g => new { g.WindowStart, g.WindowEnd, CardNumber = g.Key, Count = g.Count() });
@@ -74,7 +74,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     //Arrange
     var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
-    var grouping = context.CreateQueryStream<Transaction>()
+    var grouping = context.CreatePushQuery<Transaction>()
       .GroupBy(c => c.CardNumber)
       .WindowedBy(new HoppingWindows(Duration.OfMinutes(5)).WithAdvanceBy(Duration.OfMinutes(4)))
       .Select(g => new { CardNumber = g.Key, Count = g.Count() });
@@ -92,7 +92,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     //Arrange
     var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
-    var grouping = context.CreateQueryStream<Transaction>()
+    var grouping = context.CreatePushQuery<Transaction>()
       .GroupBy(c => c.CardNumber)
       .WindowedBy(new HoppingWindows(Duration.OfSeconds(5)).WithRetention(Duration.OfDays(7)))
       .Select(g => new { CardNumber = g.Key, Count = g.Count() });
@@ -114,7 +114,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     Assert.ThrowsException<InvalidOperationException>(() =>
     {
       //Act
-      var grouping = context.CreateQueryStream<Transaction>()
+      var grouping = context.CreatePushQuery<Transaction>()
         .GroupBy(c => c.CardNumber)
         .WindowedBy(new HoppingWindows(Duration.OfSeconds(5)).WithAdvanceBy(Duration.OfSeconds(7)))
         .Select(g => new { CardNumber = g.Key, Count = g.Count() });
@@ -127,7 +127,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     //Arrange
     var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
-    var grouping = context.CreateQueryStream<Transaction>()
+    var grouping = context.CreatePushQuery<Transaction>()
       .GroupBy(c => c.CardNumber)
       .WindowedBy(new TimeWindows(Duration.OfSeconds(5)))
       .Select(g => new { CardNumber = g.Key, Count = g.Count() });
@@ -145,7 +145,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     //Arrange
     var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
-    var grouping = context.CreateQueryStream<Transaction>()
+    var grouping = context.CreatePushQuery<Transaction>()
       .GroupBy(c => c.CardNumber)
       .WindowedBy(new TimeWindows(Duration.OfSeconds(5), OutputRefinement.Final))
       .Select(g => new { CardNumber = g.Key, Count = g.Count() });
@@ -163,7 +163,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     //Arrange
     var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
-    var grouping = context.CreateQueryStream<Transaction>()
+    var grouping = context.CreatePushQuery<Transaction>()
       .GroupBy(c => c.CardNumber)
       .WindowedBy(new TimeWindows(Duration.OfSeconds(5)).WithGracePeriod(Duration.OfHours(2)))
       .Select(g => new { CardNumber = g.Key, Count = g.Count() });
@@ -186,11 +186,11 @@ public class QbservableExtensionsWindowsTests : TestBase
 
     var context = new TransactionsDbProvider(options);
 
-    var grouping1 = context.CreateQueryStream<Transaction>("authorization_attempts_1")
+    var grouping1 = context.CreatePushQuery<Transaction>("authorization_attempts_1")
       .GroupBy(c => c.CardNumber)
       .Select(g => new { CardNumber = g.Key, Count = g.Count() });
 
-    var grouping2 = context.CreateQueryStream<Transaction>("authorization_attempts_2")
+    var grouping2 = context.CreatePushQuery<Transaction>("authorization_attempts_2")
       .GroupBy(c => c.CardNumber)
       .Select(g => new { CardNumber = g.Key, Count = g.Count() });
 

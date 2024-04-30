@@ -29,7 +29,7 @@ Console.ReadKey();
 
 static async Task StructType(KSqlDBContext context)
 {
-  var moviesStream = context.CreateQueryStream<Movie>();
+  var moviesStream = context.CreatePushQuery<Movie>();
 
   var source = moviesStream.Select(c => new
   {
@@ -46,12 +46,12 @@ static async Task StructType(KSqlDBContext context)
 static IDisposable Arrays(KSqlDBContext context)
 {
   var subscription =
-    context.CreateQueryStream<Movie>()
+    context.CreatePushQuery<Movie>()
       .Select(_ => new { FirstItem = new[] { 1, 2, 3 }[1] })
       .Subscribe(onNext: c => { Console.WriteLine($"Array first value: {c}"); },
         onError: error => { Console.WriteLine($"Exception: {error.Message}"); });
 
-  var arrayLengthQuery = context.CreateQueryStream<Movie>()
+  var arrayLengthQuery = context.CreatePushQuery<Movie>()
     .Select(_ => new[] { 1, 2, 3 }.Length)
     .ToQueryString();
 
@@ -61,7 +61,7 @@ static IDisposable Arrays(KSqlDBContext context)
 static IDisposable NestedTypes(KSqlDBContext context)
 {
   var disposable =
-    context.CreateQueryStream<Movie>()
+    context.CreatePushQuery<Movie>()
       .Select(c => new
       {
         MapValue = new Dictionary<string, Dictionary<string, int>>
@@ -86,7 +86,7 @@ static IDisposable NestedTypes(KSqlDBContext context)
 
 static async Task DeeplyNestedTypes(KSqlDBContext context)
 {
-  var moviesStream = context.CreateQueryStream<Movie>();
+  var moviesStream = context.CreatePushQuery<Movie>();
 
   var source = moviesStream.Select(c => new
   {
@@ -140,12 +140,12 @@ static async Task TimeTypes(IKSqlDbRestApiClient restApiClient, IKSqlDBContext c
   var from = new TimeSpan(1, 0, 0);
   var to = new TimeSpan(22, 0, 0);
 
-  var query = context.CreateQueryStream<Dates>()
+  var query = context.CreatePushQuery<Dates>()
     .Select(c => new { c.Ts, to, FromTime = from, DateTime.Now, New = new TimeSpan(1, 0, 0) })
     .ToQueryString();
 
   //.Select(c => new { c.Ts, to, FromTime = from, DateTime.Now, New = new TimeSpan(1, 0, 0) })
-  using var subscription = context.CreateQueryStream<Dates>()
+  using var subscription = context.CreatePushQuery<Dates>()
     .Where(c => c.Ts.Between(from, to))
     .Subscribe(onNext: m =>
     {
@@ -169,7 +169,7 @@ static async Task TimeTypes(IKSqlDbRestApiClient restApiClient, IKSqlDBContext c
 
 static void Bytes(IKSqlDBContext ksqlDbContext)
 {
-  var ksql = ksqlDbContext.CreateQuery<Thumbnail>()
+  var ksql = ksqlDbContext.CreatePushQuery<Thumbnail>()
     .Select(c => new { Col = K.Functions.FromBytes(c.Image, "hex") })
     .ToQueryString();
 }
@@ -186,7 +186,7 @@ Drop table {nameof(Event)};
   httpResponseMessage = await restApiClient.CreateTypeAsync<EventCategory>();
   httpResponseMessage = await restApiClient.CreateTableAsync<Event>(new EntityCreationMetadata("Events") { Partitions = 1 });
 
-  var subscription = ksqlDbContext.CreateQueryStream<Event>()
+  var subscription = ksqlDbContext.CreatePushQuery<Event>()
     .Subscribe(value =>
     {
       Console.WriteLine("Categories: ");

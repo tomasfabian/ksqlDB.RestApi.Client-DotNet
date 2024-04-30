@@ -4,14 +4,18 @@ using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
+using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using ksqlDb.RestApi.Client.Tests.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using UnitTests;
+using EndpointType = ksqlDB.RestApi.Client.KSql.Query.Options.EndpointType;
 using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Context;
@@ -19,13 +23,13 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Context;
 public class KSqlDBContextTests : TestBase
 {
   [Test]
-  public void CreateQueryStream_Subscribe_KSqlDbProvidersRunWasCalled()
+  public void CreatePushQuery_Subscribe_KSqlDbProvidersRunWasCalled()
   {
     //Arrange
     var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
     //Act
-    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => { });
+    using var subscription = context.CreatePushQuery<string>().Subscribe(_ => { });
 
     //Assert
     subscription.Should().NotBeNull();
@@ -48,7 +52,7 @@ public class KSqlDBContextTests : TestBase
     var context = new TestableDbProvider<string>(contextOptions);
 
     //Act
-    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => { });
+    using var subscription = context.CreatePushQuery<string>().Subscribe(_ => { });
 
     //Assert
     context.KSqlDbProviderMock.Verify(
@@ -68,7 +72,7 @@ public class KSqlDBContextTests : TestBase
     };
 
     //Act
-    var subscription = context.CreateQueryStream<string>().WithOffsetResetPolicy(AutoOffsetReset.Latest)
+    var subscription = context.CreatePushQuery<string>().WithOffsetResetPolicy(AutoOffsetReset.Latest)
       .Subscribe(_ => { });
 
     //Assert
@@ -89,7 +93,7 @@ public class KSqlDBContextTests : TestBase
     var context = new TestableDbProvider<string>(contextOptions);
 
     //Act
-    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => { });
+    using var subscription = context.CreatePushQuery<string>().Subscribe(_ => { });
 
     //Assert
     context.KSqlDbProviderMock.Verify(
@@ -107,7 +111,7 @@ public class KSqlDBContextTests : TestBase
     var context = new TestableDbProvider<string>(contextOptions);
 
     //Act
-    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => { });
+    using var subscription = context.CreatePushQuery<string>().Subscribe(_ => { });
 
     //Assert
     context.KSqlDbProviderMock.Verify(
@@ -122,7 +126,7 @@ public class KSqlDBContextTests : TestBase
     var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
     //Act
-    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => { });
+    using var subscription = context.CreatePushQuery<string>().Subscribe(_ => { });
 
     //Assert
     context.KSqlQueryGenerator.Verify(c => c.BuildKSql(It.IsAny<Expression>(), It.IsAny<QueryContext>()), Times.Once);
@@ -143,7 +147,7 @@ public class KSqlDBContextTests : TestBase
     var context = new TestableDbProvider<string>(contextOptions);
 
     //Act
-    using var subscription = context.CreateQueryStream<string>().Subscribe(_ => { }, e => { });
+    using var subscription = context.CreatePushQuery<string>().Subscribe(_ => { }, e => { });
 
     //Assert
     context.KSqlDbProviderMock.Verify(
@@ -169,7 +173,7 @@ public class KSqlDBContextTests : TestBase
   {
     //Arrange
     var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
-    context.CreateQueryStream<string>();
+    context.CreatePushQuery<string>();
 
     //Act
     await context.DisposeAsync().ConfigureAwait(false);
@@ -179,7 +183,7 @@ public class KSqlDBContextTests : TestBase
   }
 
   [Test]
-  public void CreateQueryStream_RawKSQL_ReturnAsyncEnumerable()
+  public void CreatePushQuery_RawKSQL_ReturnAsyncEnumerable()
   {
     //Arrange
     string ksql = "SELECT * FROM tweetsTest EMIT CHANGES LIMIT 2;";
@@ -193,7 +197,7 @@ public class KSqlDBContextTests : TestBase
     var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
     //Act
-    var source = context.CreateQueryStream<string>(queryStreamParameters);
+    var source = context.CreatePushQuery<string>(queryStreamParameters);
 
     //Assert
     source.Should().NotBeNull();
@@ -201,7 +205,7 @@ public class KSqlDBContextTests : TestBase
 
 
   [Test]
-  public void CreateQueryStream_InvalidQueryParameterTypeThrows()
+  public void CreatePushQuery_InvalidQueryParameterTypeThrows()
   {
     //Arrange
     string ksql = "SELECT * FROM tweetsTest EMIT CHANGES LIMIT 2;";
@@ -218,7 +222,7 @@ public class KSqlDBContextTests : TestBase
     Assert.Throws<InvalidOperationException>(() =>
     {
       //Act
-      context.CreateQueryStream<string>(queryParameters);
+      context.CreatePushQuery<string>(queryParameters);
     });
   }
 
@@ -237,7 +241,7 @@ public class KSqlDBContextTests : TestBase
     var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
     //Act
-    var source = context.CreateQueryStream<string>(queryParameters);
+    var source = context.CreatePushQuery<string>(queryParameters);
 
     //Assert
     source.Should().NotBeNull();
@@ -331,5 +335,59 @@ public class KSqlDBContextTests : TestBase
 
     //Assert
     response.Should().BeNull();
+  }
+
+  [Test]
+  public void DependenciesForQueryEndpointTypeWereConfigured()
+  {
+    //Arrange
+    KSqlDBContextOptions contextOptions = new(TestParameters.KsqlDbUrl)
+    {
+      EndpointType = EndpointType.Query
+    };
+    var context = new KSqlDBContext(contextOptions);
+
+    _ = context.CreatePushQuery<int>();
+
+    var serviceProvider = context.ServiceCollection
+      .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+
+    //Act
+    var serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
+    var queryDbProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<IKSqlDbProvider>();
+    var pushQueryParameters = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IKSqlDbParameters>();
+    var pullQueryParameters = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IPullQueryParameters>();
+
+    //Assert
+    queryDbProvider.Should().BeOfType<KSqlDbQueryProvider>();
+    pushQueryParameters.Should().BeOfType<QueryParameters>();
+    pullQueryParameters.Should().BeOfType<PullQueryParameters>();
+  }
+
+  [Test]
+  public void DependenciesForQueryStreamEndpointTypeWereConfigured()
+  {
+    //Arrange
+    KSqlDBContextOptions contextOptions = new(TestParameters.KsqlDbUrl)
+    {
+      EndpointType = EndpointType.QueryStream
+    };
+    var context = new KSqlDBContext(contextOptions);
+
+    _ = context.CreatePushQuery<int>();
+
+    var serviceProvider = context.ServiceCollection
+      .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+
+    //Act
+    var serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
+    var queryDbProvider = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IKSqlDbProvider>();
+    var pushQueryParameters = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IKSqlDbParameters>();
+    var pullQueryParameters = serviceScopeFactory.CreateScope().ServiceProvider.GetService<IPullQueryParameters>();
+
+    //Assert
+    queryDbProvider.Should().BeOfType<KSqlDbQueryStreamProvider>();
+    pushQueryParameters.Should().BeOfType<QueryStreamParameters>();
+    pullQueryParameters.Should().BeOfType<PullQueryStreamParameters>();
   }
 }

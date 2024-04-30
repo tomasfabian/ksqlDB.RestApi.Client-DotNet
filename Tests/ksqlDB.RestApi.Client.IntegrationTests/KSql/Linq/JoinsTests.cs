@@ -61,7 +61,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
     //Arrange
     int expectedItemsCount = 1;
 
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Join(
         Source.Of<Lead_Actor>(ActorsTableName),
         movie => movie.Title,
@@ -95,7 +95,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
     //Arrange
     int expectedItemsCount = 2;
 
-    var source = Context.CreateQueryStream<Movie>(MoviesTableName)
+    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .LeftJoin(
         Source.Of<Lead_Actor>(ActorsTableName),
         movie => movie.Title,
@@ -135,13 +135,14 @@ public class JoinsTests : Infrastructure.IntegrationTests
   [Test]
   public async Task FullOuterJoin()
   {
-    await FullOuterJoinTest(Context.CreateQueryStream<Movie2>(MoviesTableName));
+    await FullOuterJoinTest(Context.CreatePushQuery<Movie2>(MoviesTableName));
   }
 
   [Test]
   public async Task FullOuterJoin_QueryEndPoint()
   {
-    await FullOuterJoinTest(Context.CreateQueryStream<Movie2>(MoviesTableName));
+    Context = CreateKSqlDbContext(ksqlDB.RestApi.Client.KSql.Query.Options.EndpointType.Query);
+    await FullOuterJoinTest(Context.CreatePushQuery<Movie2>(MoviesTableName));
   }
 
   public static async Task FullOuterJoinTest(IQbservable<Movie2> querySource)
@@ -190,7 +191,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
     //Arrange
     int expectedItemsCount = 1;
 
-    var source = Context.CreateQueryStream<Lead_Actor>(ActorsTableName)
+    var source = Context.CreatePushQuery<Lead_Actor>(ActorsTableName)
       .RightJoin(
         Source.Of<Movie>(MoviesTableName),
         actor => actor.Title,
@@ -257,7 +258,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
 
     var value = new Foo { Prop = 42 };
 
-    var query = (from o in context.CreateQueryStream<Order>()
+    var query = (from o in context.CreatePushQuery<Order>()
         join p1 in Source.Of<Payment>() on o.PaymentId equals p1.Id
         join s1 in Source.Of<Shipment>() on o.ShipmentId equals s1.Id into gj
         from sa in gj.DefaultIfEmpty()
@@ -308,7 +309,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
 
     var context = new KSqlDBContext(TestConfig.KSqlDbUrl);
 
-    var query = from o in context.CreateQueryStream<Order>()
+    var query = from o in context.CreatePushQuery<Order>()
       join p in Source.Of<Payment>(nameof(Payment) + "Stream").Within(Duration.OfSeconds(0), Duration.OfSeconds(25)) on o.OrderId equals p.Id
       select new
       {
@@ -357,7 +358,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
       
     string prop = "Nested";
 
-    var query = from o in context.CreateQueryStream<Order>()
+    var query = from o in context.CreatePushQuery<Order>()
       join p in Source.Of<PaymentExt>() on o.OrderId equals p.Id
       where p.Nested.Prop == prop
       select new
