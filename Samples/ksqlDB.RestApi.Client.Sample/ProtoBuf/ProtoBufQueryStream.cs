@@ -9,15 +9,14 @@ public class ProtoBufQueryStream
 {
   public static async Task StartAsync()
   {
-    var ksqlDbUrl = @"http://localhost:8088";
+    var ksqlDbUrl = "http://localhost:8088";
 
     await using var context = new ProtoBufKSqlDbContext(ksqlDbUrl);
 
     var query = context.CreatePushQuery<MovieProto>("movie")
-    // var query = context.CreateQuery<MovieProto>("movie")
       .Where(p => p.Title != "E.T.")
       .Where(c => c.Title.ToLower().Contains("hard".ToLower()) || c.Id == 1)
-      .Select(l => new { Id = l.Id, l.Title, l.Release_Year })
+      .Select(l => new { l.Id, l.Title, ReleaseYear = l.Release_Year })
       .Take(2); // LIMIT 2    
 
     var ksql = query.ToQueryString();

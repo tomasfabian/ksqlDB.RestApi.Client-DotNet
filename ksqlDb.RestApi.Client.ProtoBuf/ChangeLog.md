@@ -1,8 +1,11 @@
 # ksqlDB.RestApi.Client.ProtoBuf
 
+# 4.0.0
+- ksqlDb.RestApi.Client upgraded to v6.0.0
+
 # 3.0.0
 - added **net8.0** TFM
-- ksqlDb.RestApi.Client upgraded to 3.3.0
+- ksqlDb.RestApi.Client upgraded to v3.3.0
 
 # v2.0.0
 Removed not supported **TFM**s:

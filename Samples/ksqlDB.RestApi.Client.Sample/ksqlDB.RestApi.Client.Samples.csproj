@@ -9,13 +9,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- <PackageReference Include="ksqlDb.RestApi.Client" Version="6.0.0" /> -->
-        <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />
-        <PackageReference Include="ksqlDb.RestApi.Client.ProtoBuf" Version="3.0.0" />
-        <!-- <ProjectReference Include="..\..\ksqlDb.RestApi.Client.ProtoBuf\ksqlDb.RestApi.Client.ProtoBuf.csproj" /> -->
+        <PackageReference Include="ksqlDb.RestApi.Client" Version="6.0.0" />
+        <!-- <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" /> -->
+        <!-- <PackageReference Include="ksqlDb.RestApi.Client.ProtoBuf" Version="4.0.0" /> -->
+        <ProjectReference Include="..\..\ksqlDb.RestApi.Client.ProtoBuf\ksqlDb.RestApi.Client.ProtoBuf.csproj" />
 
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
     </ItemGroup>

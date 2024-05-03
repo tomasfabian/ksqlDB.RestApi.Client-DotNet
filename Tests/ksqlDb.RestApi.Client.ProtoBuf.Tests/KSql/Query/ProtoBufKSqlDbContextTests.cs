@@ -16,7 +16,7 @@ public class ProtoBufKSqlDbContextTests : TestBase
     var context = new TestableProtoBufKSqlDbContext<string>(TestParameters.KsqlDbUrl);
 
     //Act
-    using var subscription = context.CreateQueryStream<string>()
+    using var subscription = context.CreatePushQuery<string>()
       .Subscribe(_ => { });
 
     //Assert
