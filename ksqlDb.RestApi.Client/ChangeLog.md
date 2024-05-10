@@ -1,5 +1,10 @@
 # ksqlDB.RestApi.Client
 
+# 6.0.1
+
+# BugFix
+- requests with `KSqlDbRestApiClient` can result in 431 error codes #80
+
 # 6.0.0
 - added `SetEndpointType` to `KSqlDbContextOptionsBuilder` for configuring to use either "/query" or "/query-stream" endpoint
 - `CreateQuery` and `CreateQueryStream` were merged. `CreatePullQuery` by default uses **http/2** now.  Subsequently `CreateQueryStream` was renamed to `CreatePushQuery` to align with the nomenclature of `CreatePullQuery`.

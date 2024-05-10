@@ -88,8 +88,11 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 
     var httpRequestMessage = CreateHttpRequestMessage(content, endPointType, encoding);
 
-    httpClient.DefaultRequestHeaders.Accept.Add(
-      new MediaTypeWithQualityHeaderValue(MediaType));
+    if (httpClient.DefaultRequestHeaders.Accept.All(h => h.MediaType != MediaType))
+    {
+      httpClient.DefaultRequestHeaders.Accept.Add(
+        new MediaTypeWithQualityHeaderValue(MediaType));
+    }
 
     var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage, cancellationToken)
       .ConfigureAwait(false);

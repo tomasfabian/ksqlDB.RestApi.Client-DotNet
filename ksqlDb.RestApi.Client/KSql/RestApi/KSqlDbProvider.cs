@@ -205,8 +205,11 @@ internal abstract class KSqlDbProvider : IKSqlDbProvider
 
     var data = new StringContent(json, Encoding.UTF8, "application/json");
 
-    httpClient.DefaultRequestHeaders.Accept.Add(
-      new MediaTypeWithQualityHeaderValue(ContentType));
+    if (httpClient.DefaultRequestHeaders.Accept.All(h => h.MediaType != ContentType))
+    {
+      httpClient.DefaultRequestHeaders.Accept.Add(
+        new MediaTypeWithQualityHeaderValue(ContentType));
+    }
 
     var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, QueryEndPointName)
     {
