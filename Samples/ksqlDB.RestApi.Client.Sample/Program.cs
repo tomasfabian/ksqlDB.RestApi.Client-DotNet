@@ -63,8 +63,6 @@ public static class Program
       })
       .Options;
 
-    contextOptions.DisposeHttpClient = false;
-
     return contextOptions;
   }
 
