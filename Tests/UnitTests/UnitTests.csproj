@@ -17,7 +17,6 @@
 	  <PackageReference Include="NUnit" />
 	  <PackageReference Include="NUnit3TestAdapter" />
 	  <PackageReference Include="Microsoft.Extensions.Logging" />
-	  <PackageReference Include="Ninject.MockingKernel.Moq" />
 	  <PackageReference Include="Joker" />
   </ItemGroup>
 
