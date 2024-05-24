@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
 
     <ItemGroup Label="EF and configuration Nugets for SqlServer.Connector tests">
         <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
