@@ -977,6 +977,29 @@ public class CreateInsertTests
     statement.Should().Be($"INSERT INTO {nameof(Port)}s ({nameof(Port.Id)}, {nameof(Port.PortType)}) VALUES (42, '{value.PortType}');");
   }
 
+  private record Amount
+  {
+    [JsonPropertyName("volume")]
+    [Decimal(20, 8)]
+    public decimal Volume { get; init; }
+  }
+
+  [Test]
+  public void Generate_Decimal_ShouldBePrinted()
+  {
+    //Arrange
+    var amount = new Amount
+    {
+      Volume = 1.12345678912345M,
+    };
+
+    //Act
+    string statement = new CreateInsert(modelBuilder).Generate(amount);
+
+    //Assert
+    statement.Should().Be($"INSERT INTO {nameof(Amount)}s ({nameof(Amount.Volume).ToLower()}) VALUES ({amount.Volume});");
+  }
+
   #region TODO insert with functions
 
   readonly struct MovieBytes
