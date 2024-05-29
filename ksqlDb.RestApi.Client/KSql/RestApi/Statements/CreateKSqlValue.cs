@@ -27,11 +27,12 @@ internal sealed class CreateKSqlValue(ModelBuilder modelBuilder) : EntityInfo(mo
     if (value == null)
       return "NULL";
 
-    if (type == typeof(decimal) && valueFormatters.FormatDecimalValue != null)
+    if (type == typeof(decimal))
     {
       Debug.Assert(value != null, nameof(value) + " != null");
 
-      value = valueFormatters.FormatDecimalValue((decimal)value);
+      if(valueFormatters.FormatDecimalValue != null)
+        value = valueFormatters.FormatDecimalValue((decimal)value);
     }
     else if (type == typeof(TimeSpan))
     {

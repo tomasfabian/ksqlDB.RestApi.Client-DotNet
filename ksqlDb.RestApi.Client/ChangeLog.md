@@ -1,5 +1,10 @@
 # ksqlDB.RestApi.Client
 
+# 6.0.2
+
+# BugFix
+- C# decimal is mapped to STRUCT type. #81
+
 # 6.0.1
 
 # BugFix
