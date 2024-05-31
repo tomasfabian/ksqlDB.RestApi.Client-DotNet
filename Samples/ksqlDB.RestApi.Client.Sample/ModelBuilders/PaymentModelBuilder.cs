@@ -25,6 +25,10 @@ public class PaymentModelBuilder
       .Property(b => b.Amount)
       .Decimal(precision: 10, scale: 2);
 
+    modelBuilder.Entity<Payment>()
+      .Property(b => b.Description)
+      .HasColumnName("desc");
+
     string header = "abc";
     modelBuilder.Entity<PocoWithHeader>()
       .Property(c => c.Header)
@@ -59,7 +63,7 @@ public class PaymentModelBuilder
       {
         c.UseKSqlDb(ksqlDbUrl);
 
-        c.ReplaceHttpClient<ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory, ksqlDB.RestApi.Client.KSql.RestApi.Http.HttpClientFactory>(_ => { })
+        c.ReplaceHttpClient<KSql.RestApi.Http.IHttpClientFactory, KSql.RestApi.Http.HttpClientFactory>(_ => { })
         .AddHttpMessageHandler(_ => new Program.DebugHandler());
       })
       .AddSingleton(builder);
