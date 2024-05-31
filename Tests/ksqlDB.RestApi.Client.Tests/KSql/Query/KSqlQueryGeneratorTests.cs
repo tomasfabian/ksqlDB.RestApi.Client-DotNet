@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using FluentAssertions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -19,7 +20,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.Query;
 
 #pragma warning disable CA1861
 
-public class KSqlQueryLanguageVisitorTests : TestBase
+public class KSqlQueryGeneratorTests : TestBase
 {
   private KSqlQueryGenerator ClassUnderTest { get; set; } = null!;
 
@@ -83,6 +84,77 @@ public class KSqlQueryLanguageVisitorTests : TestBase
     string expectedKsql =
       @$"SELECT SensorId FROM {nameof(MySensor)}s
 WHERE SensorId = '1' EMIT CHANGES;";
+
+    ksql.Should().BeEquivalentTo(expectedKsql.ReplaceLineEndings());
+  }
+
+  [Test]
+  public void BuildKSql_ModelBuilder_HasColumnNameOverride()
+  {
+    //Arrange
+    string idColumnName = "Id";
+    ModelBuilder modelBuilder = new ModelBuilder();
+    modelBuilder.Entity<MySensor>()
+      .Property(c => c.SensorId2)
+      .HasColumnName(idColumnName);
+
+    var query = new TestableDbProvider(contextOptions, modelBuilder)
+      .CreatePushQuery<MySensor>()
+      .Where(c => c.SensorId2 == "1")
+      .Select(c => c.SensorId2);
+
+    queryContext = new QueryContext()
+    {
+      ModelBuilder = modelBuilder
+    };
+
+    //Act
+    var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+    //Assert
+    string expectedKsql =
+      @$"SELECT {idColumnName} FROM {nameof(MySensor)}s
+WHERE {idColumnName} = '1' EMIT CHANGES;";
+
+    ksql.Should().BeEquivalentTo(expectedKsql.ReplaceLineEndings());
+  }
+
+  private class Base
+  {
+    public int Id { get; set; }
+  }
+  private class Derived : Base
+  {
+    public string Description { get; set; }
+  }
+  
+  [Test]
+  public void BuildKSql_ModelBuilder_HasColumnNameOverride_ForPropertyInBaseClass()
+  {
+    //Arrange
+    string idColumnName = "SensorId";
+    ModelBuilder modelBuilder = new ModelBuilder();
+    modelBuilder.Entity<Derived>()
+      .Property(c => c.Id)
+      .HasColumnName(idColumnName);
+
+    var query = new TestableDbProvider(contextOptions, modelBuilder)
+      .CreatePushQuery<Derived>()
+      .Where(c => c.Id == 1)
+      .Select(c => c.Id);
+
+    queryContext = new QueryContext()
+    {
+      ModelBuilder = modelBuilder
+    };
+
+    //Act
+    var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
+
+    //Assert
+    string expectedKsql =
+      @$"SELECT {idColumnName} FROM {nameof(Derived)}s
+WHERE {idColumnName} = 1 EMIT CHANGES;";
 
     ksql.Should().BeEquivalentTo(expectedKsql.ReplaceLineEndings());
   }

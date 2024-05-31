@@ -333,13 +333,13 @@ public class KSqlVisitorTests : TestBase
   public void Predicate_BuildKSql_PrintsOperatorAndOperands()
   {
     //Arrange
-    Expression<Func<Location, bool>> predicate = l => l.Latitude != "ahoj svet";
+    Expression<Func<Location, bool>> predicate = l => l.Latitude != "40.71427000";
 
     //Act
     var query = ClassUnderTest.BuildKSql(predicate);
 
     //Assert
-    query.Should().BeEquivalentTo($"{nameof(Location.Latitude)} != 'ahoj svet'");
+    query.Should().BeEquivalentTo($"{nameof(Location.Latitude)} != '40.71427000'");
   }
 
   private record Update
@@ -364,7 +364,7 @@ public class KSqlVisitorTests : TestBase
   public void PredicateCompareWithVariable_BuildKSql_PrintsOperatorAndOperands()
   {
     //Arrange
-    string value = "ahoj svet";
+    string value = "40.71427000";
 
     Expression<Func<Location, bool>> predicate = l => l.Latitude != value;
 
@@ -448,6 +448,37 @@ public class KSqlVisitorTests : TestBase
 
     //Assert
     query.Should().BeEquivalentTo("ARRAY_LENGTH(After->Model->Capabilities) > 0");
+  }
+
+  [Test]
+  public void MemberAccess_BuildKSql_JsonPropertyName()
+  {
+    //Arrange
+    Expression<Func<Tweet, string>> predicate = l => l.Message;
+
+    //Act
+    var query = ClassUnderTest.BuildKSql(predicate);
+
+    //Assert
+    query.Should().BeEquivalentTo($"{nameof(Tweet.Message).ToUpper()}");
+  }
+
+  [Test]
+  public void MemberAccess_BuildKSql_ModelBuilderHasColumnName()
+  {
+    //Arrange
+    var amountColumnName = "amount";
+    modelBuilder.Entity<Tweet>()
+      .Property(c => c.Amount)
+      .HasColumnName(amountColumnName);
+
+    Expression<Func<Tweet, double>> predicate = l => l.Amount;
+
+    //Act
+    var query = ClassUnderTest.BuildKSql(predicate);
+
+    //Assert
+    query.Should().BeEquivalentTo(amountColumnName);
   }
 
   #endregion

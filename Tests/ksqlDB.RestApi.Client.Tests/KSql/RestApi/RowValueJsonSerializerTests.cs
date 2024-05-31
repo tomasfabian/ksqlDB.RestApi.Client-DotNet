@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
@@ -8,12 +9,15 @@ using NUnit.Framework;
 using UnitTests;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 using ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators;
+using System.Text.Json.Serialization.Metadata;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 
 public class RowValueJsonSerializerTests : TestBase
 {
   private RowValueJsonSerializer ClassUnderTest { get; set; } = null!;
+  private readonly ModelBuilder modelBuilder = new();
 
   [SetUp]
   public override void TestInitialize()
@@ -193,7 +197,7 @@ public class RowValueJsonSerializerTests : TestBase
     var queryStreamHeader = new QueryStreamHeader()
     {
       ColumnTypes = [KSqlTypes.Int, KSqlTypes.Varchar, KSqlTypes.Int, KSqlTypes.BigInt],
-      ColumnNames = ["ID", "TITLE", "RELEASE_NAME", "ROWTIME"],
+      ColumnNames = ["ID", "TITLE", "RELEASE_YEAR", "ROWTIME"],
     };
 
     ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
@@ -206,6 +210,88 @@ public class RowValueJsonSerializerTests : TestBase
 
     //Assert
     rowValue!.Value.Id.Should().Be(2);
+    rowValue!.Value.Title.Should().Be("Die Hard");
+    rowValue!.Value.Release_Year.Should().Be(1988);
+  }
+
+  private class Movie2 : Record
+  {
+    public string Title { get; set; } = null!;
+    public int Id { get; set; }
+    [JsonPropertyName("RELEASE_YEAR")]
+    public int ReleaseYear { get; set; }
+  }
+
+  [Test]
+  public void Deserialize_RecordAsClass_JsonPropertyName()
+  {
+    //Arrange
+    var queryStreamHeader = new QueryStreamHeader()
+    {
+      ColumnTypes = [KSqlTypes.Int, KSqlTypes.Varchar, KSqlTypes.Int, KSqlTypes.BigInt],
+      ColumnNames = ["ID", "TITLE", "RELEASE_YEAR", "ROWTIME"],
+    };
+
+    ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
+
+    string rawJson = "[2,\"Die Hard\",1988,1670438716925]";
+    var jsonSerializerOptions = KSqlDbJsonSerializerOptions.CreateInstance();
+
+    //Act
+    var rowValue = ClassUnderTest.Deserialize<Movie2>(rawJson, jsonSerializerOptions);
+
+    //Assert
+    rowValue!.Value.Id.Should().Be(2);
+    rowValue!.Value.Title.Should().Be("Die Hard");
+    rowValue!.Value.ReleaseYear.Should().Be(1988);
+  }
+
+  private class Inner
+  {
+    public string Deep { get; init; }
+  }
+
+  private class Movie3 : Record
+  {
+    public Inner Inner { get; init; }
+    public string Title { get; set; } = null!;
+    public int Id { get; set; }
+    public int ReleaseYear { get; set; }
+  }
+
+  [Test]
+  public void Deserialize_RecordAsClass_ModelBuilderHasColumnName()
+  {
+    //Arrange
+    var queryStreamHeader = new QueryStreamHeader()
+    {
+      ColumnTypes = [KSqlTypes.Int, KSqlTypes.Varchar, KSqlTypes.Int, KSqlTypes.BigInt],
+      ColumnNames = ["ID", "TITLE", "RELEASE_YEAR", "ROWTIME"],
+    };
+
+    modelBuilder.Entity<Movie3>()
+      .Property(c => c.ReleaseYear)
+      .HasColumnName("RELEASE_YEAR");
+
+    ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);
+
+    string rawJson = "[2,\"Die Hard\",1988,1670438716925]";
+    var jsonSerializerOptions = KSqlDbJsonSerializerOptions.CreateInstance();
+    jsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+    {
+      Modifiers =
+      {
+        (jsonTypeInfo) => KSqlDbQueryStreamProvider.JsonPropertyNameModifier(jsonTypeInfo, modelBuilder)
+      }
+    };
+
+    //Act
+    var rowValue = ClassUnderTest.Deserialize<Movie2>(rawJson, jsonSerializerOptions);
+
+    //Assert
+    rowValue!.Value.Id.Should().Be(2);
+    rowValue!.Value.Title.Should().Be("Die Hard");
+    rowValue!.Value.ReleaseYear.Should().Be(1988);
   }
 
   private enum MyEnum

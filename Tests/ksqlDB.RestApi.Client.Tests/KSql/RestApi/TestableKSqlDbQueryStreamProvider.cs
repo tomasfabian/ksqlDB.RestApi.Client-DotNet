@@ -1,4 +1,5 @@
 using System.Net;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDb.RestApi.Client.Tests.Helpers;
 using ksqlDb.RestApi.Client.Tests.Helpers.Http;
@@ -12,7 +13,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 internal class TestableKSqlDbQueryStreamProvider : KSqlDbQueryStreamProvider
 {
   public TestableKSqlDbQueryStreamProvider(IHttpClientFactory httpClientFactory, ILogger? logger = null)
-    : base(httpClientFactory, TestKSqlDBContextOptions.Instance, logger)
+    : base(httpClientFactory, new ModelBuilder(), TestKSqlDBContextOptions.Instance, logger)
   {
   }
 

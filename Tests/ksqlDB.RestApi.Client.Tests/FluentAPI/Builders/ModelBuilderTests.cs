@@ -68,6 +68,24 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
     }
 
     [Test]
+    public void Property_HasColumnName()
+    {
+      //Arrange
+      var columnName = "desc";
+
+      //Act
+      var fieldTypeBuilder = builder.Entity<Payment>()
+        .Property(b => b.Description)
+        .HasColumnName(columnName);
+
+      //Assert
+      fieldTypeBuilder.Should().NotBeNull();
+      var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      entityMetadata.Should().NotBeNull();
+      entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description)).ColumnName.Should().Be(columnName);
+    }
+
+    [Test]
     public void MultiplePropertiesForSameType()
     {
       //Arrange

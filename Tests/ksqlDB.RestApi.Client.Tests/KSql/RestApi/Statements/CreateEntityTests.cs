@@ -18,6 +18,8 @@ public class CreateEntityTests
   private EntityCreationMetadata creationMetadata = null!;
   private readonly ModelBuilder modelBuilder = new();
 
+  private const string MovieIdColumnName = "MovieId";
+
   [SetUp]
   public void Init()
   {
@@ -27,6 +29,10 @@ public class CreateEntityTests
       Partitions = 1,
       Replicas = 1
     };
+
+    modelBuilder.Entity<MyMovie>()
+      .Property(c => c.Id)
+      .HasColumnName(MovieIdColumnName);
   }
 
   private static readonly Pluralizer EnglishPluralizationService = new();
@@ -41,27 +47,27 @@ public class CreateEntityTests
     return escaping switch
     {
       Never => @$"{creationClause} {entityName} (
-	Id INT {key},
+	{MovieIdColumnName} INT {key},
 	Title VARCHAR,
-	Release_Year INT,
+	ReleaseYear INT,
 	NumberOfDays ARRAY<INT>,
 	Dictionary MAP<VARCHAR, INT>,
 	Dictionary2 MAP<VARCHAR, INT>,
 	Field DOUBLE
 ) WITH ( KAFKA_TOPIC='{nameof(MyMovie)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings(),
       Keywords => @$"{creationClause} {entityName} (
-	Id INT {key},
+	{MovieIdColumnName} INT {key},
 	Title VARCHAR,
-	Release_Year INT,
+	ReleaseYear INT,
 	NumberOfDays ARRAY<INT>,
 	Dictionary MAP<VARCHAR, INT>,
 	Dictionary2 MAP<VARCHAR, INT>,
 	Field DOUBLE
 ) WITH ( KAFKA_TOPIC='{nameof(MyMovie)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings(),
       Always => @$"{creationClause} `{entityName}` (
-	`Id` INT {key},
+	`{MovieIdColumnName}` INT {key},
 	`Title` VARCHAR,
-	`Release_Year` INT,
+	`ReleaseYear` INT,
 	`NumberOfDays` ARRAY<INT>,
 	`Dictionary` MAP<VARCHAR, INT>,
 	`Dictionary2` MAP<VARCHAR, INT>,
@@ -542,6 +548,7 @@ public class CreateEntityTests
 
     public string Title { get; set; } = null!;
 
+    [JsonPropertyName("ReleaseYear")]
     public int Release_Year { get; set; }
 
     public int[] NumberOfDays { get; init; } = null!;

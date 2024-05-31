@@ -2,6 +2,7 @@ using System.Collections;
 using System.Text;
 using System.Text.Json.Serialization;
 using FluentAssertions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query;
@@ -373,7 +374,7 @@ public class TypeExtensionsTests
     var member = type.GetProperty(nameof(MySensor.Title));
 
     //Act
-    var memberName = member!.GetMemberName();
+    var memberName = member!.GetMemberName(new ModelBuilder());
 
     //Assert
     memberName.Should().Be(nameof(MySensor.Title));
@@ -388,9 +389,31 @@ public class TypeExtensionsTests
     //Act
     var member = type.GetProperty(nameof(MySensor.SensorId2));
 
-    var memberName = member!.GetMemberName();
+    var memberName = member!.GetMemberName(new ModelBuilder());
 
     //Assert
     memberName.Should().Be("SensorId");
+  }
+
+  [Test]
+  public void GetMemberName_ModelBuilderHasColumnName()
+  {
+    //Arrange
+    var columnName = "Id";
+
+    var modelBuilder = new ModelBuilder();
+    modelBuilder.Entity<MySensor>()
+      .Property(c => c.SensorId2)
+      .HasColumnName(columnName);
+
+    var type = typeof(MySensor);
+
+    //Act
+    var member = type.GetProperty(nameof(MySensor.SensorId2));
+
+    var memberName = member!.GetMemberName(modelBuilder);
+
+    //Assert
+    memberName.Should().Be(columnName);
   }
 }

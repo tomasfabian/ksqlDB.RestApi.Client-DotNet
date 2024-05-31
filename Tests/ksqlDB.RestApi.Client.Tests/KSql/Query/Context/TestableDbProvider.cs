@@ -1,3 +1,4 @@
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi;
@@ -8,12 +9,20 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Context;
 
 public class TestableDbProvider<TValue> : KSqlDBContext
 {
-  public TestableDbProvider(string ksqlDbUrl) : base(ksqlDbUrl)
+  public TestableDbProvider(string ksqlDbUrl)
+    : base(ksqlDbUrl)
   {
     InitMocks();
   }
 
-  public TestableDbProvider(KSqlDBContextOptions contextOptions) : base(contextOptions)
+  public TestableDbProvider(KSqlDBContextOptions contextOptions)
+    : base(contextOptions)
+  {
+    InitMocks();
+  }
+
+  public TestableDbProvider(KSqlDBContextOptions contextOptions, ModelBuilder modelBuilder)
+    : base(contextOptions, modelBuilder)
   {
     InitMocks();
   }
