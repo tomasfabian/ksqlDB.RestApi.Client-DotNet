@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace ksqlDb.RestApi.Client.Metadata
@@ -12,15 +13,14 @@ namespace ksqlDb.RestApi.Client.Metadata
 
     public IEnumerable<FieldMetadata> FieldsMetadata => FieldsMetadataDict.Values;
 
-    internal bool Add(MemberInfo memberInfo)
+
+    private readonly IList<MemberExpression> fieldMemberExpressions = new List<MemberExpression>();
+
+    internal bool Add(MemberExpression memberExpression)
     {
-      if (!FieldsMetadataDict.ContainsKey(memberInfo))
+      if (fieldMemberExpressions.All(c => c.Type != memberExpression.Type && c.Member != memberExpression.Member))
       {
-        var fieldMetadata = new FieldMetadata
-        {
-          MemberInfo = memberInfo
-        };
-        FieldsMetadataDict[memberInfo] = fieldMetadata;
+        fieldMemberExpressions.Add(memberExpression);
         return true;
       }
 
@@ -33,9 +33,9 @@ namespace ksqlDb.RestApi.Client.Metadata
         c.MemberInfo.DeclaringType == memberInfo.DeclaringType && c.MemberInfo.Name == memberInfo.Name);
     }
 
-    internal MemberInfo? TryGetMemberInfo(string memberInfoName)
+    internal MemberExpression? TryGetMemberExpression(string memberInfoName)
     {
-      return FieldsMetadata.Where(c => c.MemberInfo.Name == memberInfoName).Select(c => c.MemberInfo).FirstOrDefault();
+      return fieldMemberExpressions.Where(c => c.Member.Name == memberInfoName).Select(c => c).FirstOrDefault();
     }
   }
 }

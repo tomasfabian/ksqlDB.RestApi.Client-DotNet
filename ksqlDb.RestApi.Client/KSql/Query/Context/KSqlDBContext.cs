@@ -11,6 +11,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Clauses;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Context;
@@ -72,6 +73,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
   {
     base.OnConfigureServices(serviceCollection, contextOptions);
 
+    serviceCollection.TryAddSingleton(modelBuilder);
     serviceCollection.RegisterEndpointDependencies(contextOptions);
   }
 

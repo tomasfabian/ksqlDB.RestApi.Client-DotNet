@@ -162,7 +162,7 @@ internal class KSqlVisitor : ExpressionVisitor
       else
         Append(ColumnsSeparator);
 
-      var memberName = memberBinding.Member.Format(QueryMetadata.IdentifierEscaping);
+      var memberName = memberBinding.Member.Format(QueryMetadata.IdentifierEscaping, QueryMetadata.ModelBuilder);
 
       Append($"{memberName} := ");
 
@@ -346,7 +346,7 @@ internal class KSqlVisitor : ExpressionVisitor
   {
     Visit(expression);
     Append(" AS ");
-    Append(memberInfo.Format(QueryMetadata.IdentifierEscaping));
+    Append(memberInfo.Format(QueryMetadata.IdentifierEscaping, QueryMetadata.ModelBuilder));
   }
 
   protected virtual void ProcessVisitNewMember(MemberInfo memberInfo, Expression expression)
@@ -355,14 +355,14 @@ internal class KSqlVisitor : ExpressionVisitor
     {
       Visit(expression);
 
-      Append(" " + memberInfo.Format(QueryMetadata.IdentifierEscaping));
+      Append(" " + memberInfo.Format(QueryMetadata.IdentifierEscaping, QueryMetadata.ModelBuilder));
       return;
     }
 
     if (expression is MemberExpression { Expression: MemberExpression { Expression: not null } me1 } &&
         me1.Expression.Type.IsKsqlGrouping())
     {
-      Append(memberInfo.Format(QueryMetadata.IdentifierEscaping));
+      Append(memberInfo.Format(QueryMetadata.IdentifierEscaping, QueryMetadata.ModelBuilder));
       return;
     }
 
@@ -379,14 +379,14 @@ internal class KSqlVisitor : ExpressionVisitor
         break;
       case MemberExpression me2 when me2.Member.GetCustomAttribute<JsonPropertyNameAttribute>() != null ||
                                      me2.Member.GetCustomAttribute<PseudoColumnAttribute>() != null:
-        QueryMetadata.EntityMetadata.Add(me2.Member);
-        Append(me2.Member.Format(QueryMetadata.IdentifierEscaping));
+        QueryMetadata.EntityMetadata.Add(me2);
+        Append(me2.Member.Format(QueryMetadata.IdentifierEscaping, QueryMetadata.ModelBuilder));
         break;
       case MemberExpression { Expression.NodeType: ExpressionType.Constant }:
         Visit(expression);
         break;
       default:
-        Append(memberInfo.Format(QueryMetadata.IdentifierEscaping));
+        Append(memberInfo.Format(QueryMetadata.IdentifierEscaping, QueryMetadata.ModelBuilder));
         break;
     }
   }
@@ -401,7 +401,7 @@ internal class KSqlVisitor : ExpressionVisitor
       {
         var foundFromItem = QueryMetadata.TrySetAlias(memberExpression, (_, alias) => string.IsNullOrEmpty(alias));
 
-        var memberName = memberExpression.Member.Format(QueryMetadata.IdentifierEscaping);
+        var memberName = memberExpression.Member.Format(QueryMetadata.IdentifierEscaping, QueryMetadata.ModelBuilder);
 
         var alias = IdentifierUtil.Format(((ParameterExpression)memberExpression.Expression).Name!,
           QueryMetadata.IdentifierEscaping);
@@ -417,7 +417,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
       if (fromItem != null && memberExpression.Expression?.NodeType == ExpressionType.MemberAccess)
       {
-        string alias = ((MemberExpression)memberExpression.Expression).Member.Format(QueryMetadata.IdentifierEscaping);
+        string alias = ((MemberExpression)memberExpression.Expression).Member.Format(QueryMetadata.IdentifierEscaping, QueryMetadata.ModelBuilder);
 
         fromItem.Alias = alias;
 
@@ -425,7 +425,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
         Append(".");
 
-        var memberName = memberExpression.Member.Format(QueryMetadata.IdentifierEscaping);
+        var memberName = memberExpression.Member.Format(QueryMetadata.IdentifierEscaping, QueryMetadata.ModelBuilder);
         Append(memberName);
         return memberExpression;
       }
@@ -439,8 +439,8 @@ internal class KSqlVisitor : ExpressionVisitor
 
       return memberExpression;
     }
-
-    var memberName2 = memberExpression.Member.GetMemberName();
+    
+    var memberName2 = memberExpression.GetMemberName(QueryMetadata.ModelBuilder);
 
     switch (memberExpression.Expression.NodeType)
     {
@@ -510,8 +510,9 @@ internal class KSqlVisitor : ExpressionVisitor
 
     if (type != fromItem?.Type)
     {
-      var memberInfo = QueryMetadata.EntityMetadata.TryGetMemberInfo(memberExpression.Member.Name) ?? memberExpression.Member;
-      Append(memberInfo.Format(QueryMetadata.IdentifierEscaping));
+      memberExpression = QueryMetadata.EntityMetadata.TryGetMemberExpression(memberExpression.Member.Name) ?? memberExpression;
+
+      Append(IdentifierUtil.Format(memberExpression, QueryMetadata.IdentifierEscaping, QueryMetadata.ModelBuilder));
     }
   }
 
@@ -538,7 +539,7 @@ internal class KSqlVisitor : ExpressionVisitor
     if (fromItem == null)
       Append("->");
 
-    var memberName = memberExpression.Member.Format(QueryMetadata.IdentifierEscaping);
+    var memberName = memberExpression.Member.Format(QueryMetadata.IdentifierEscaping, QueryMetadata.ModelBuilder);
 
     Append(memberName);
   }

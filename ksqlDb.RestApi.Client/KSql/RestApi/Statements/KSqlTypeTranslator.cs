@@ -107,7 +107,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 
         var ksqlType = Translate(memberType, escaping);
 
-        string columnDefinition = $"{memberInfo.Format(escaping)} {ksqlType}{ExploreAttributes(type, memberInfo, memberType)}";
+        string columnDefinition = $"{memberInfo.Format(escaping, modelBuilder)} {ksqlType}{ExploreAttributes(type, memberInfo, memberType)}";
 
         ksqlProperties.Add(columnDefinition);
       }

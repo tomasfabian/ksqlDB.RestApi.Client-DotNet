@@ -49,7 +49,7 @@ internal sealed class CreateEntity(ModelBuilder modelBuilder) : EntityInfo(model
 
       var ksqlType = typeTranslator.Translate(type, metadata.IdentifierEscaping);
 
-      var columnName = IdentifierUtil.Format(memberInfo, metadata.IdentifierEscaping);
+      var columnName = IdentifierUtil.Format(memberInfo, metadata.IdentifierEscaping, modelBuilder);
       string columnDefinition = $"\t{columnName} {ksqlType}{typeTranslator.ExploreAttributes(typeof(T), memberInfo, type)}";
 
       columnDefinition += TryAttachKey<T>(statementContext.KSqlEntityType, memberInfo);

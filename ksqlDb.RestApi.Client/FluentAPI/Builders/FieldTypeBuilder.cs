@@ -19,11 +19,24 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
     /// </summary>
     /// <returns>The field type builder for chaining additional configuration.</returns>
     public IFieldTypeBuilder<TProperty> WithHeaders();
+
+    /// <summary>
+    /// Configures the column name that the property will be mapped to in the record schema.
+    /// </summary>
+    /// <param name="columnName">The name of the column in the record schema.</param>
+    /// <returns>The same <see cref="IFieldTypeBuilder{TProperty}"/> instance so that multiple calls can be chained.</returns>
+    IFieldTypeBuilder<TProperty> HasColumnName(string columnName);
   }
 
   internal class FieldTypeBuilder<TProperty>(FieldMetadata fieldMetadata)
     : IFieldTypeBuilder<TProperty>
   {
+    public IFieldTypeBuilder<TProperty> HasColumnName(string columnName)
+    {
+      fieldMetadata.ColumnName = columnName;
+      return this;
+    }
+
     public IFieldTypeBuilder<TProperty> Ignore()
     {
       fieldMetadata.Ignore = true;

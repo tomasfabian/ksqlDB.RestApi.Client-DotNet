@@ -9,5 +9,6 @@ namespace ksqlDb.RestApi.Client.Metadata
     public bool HasHeaders { get; internal set; }
     internal string Path { get; init; } = null!;
     internal string FullPath { get; init; } = null!;
+    public string? ColumnName { get; set; }
   }
 }

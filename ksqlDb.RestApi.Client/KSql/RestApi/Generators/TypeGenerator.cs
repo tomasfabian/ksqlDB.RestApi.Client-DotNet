@@ -1,5 +1,6 @@
 using System.Text;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
@@ -35,7 +36,8 @@ internal sealed class TypeGenerator(ModelBuilder modelBuilder) : EntityInfo(mode
 
       var ksqlType = typeTranslator.Translate(type, escaping);
 
-      var columnDefinition = $"{EscapeName(memberInfo.Name, escaping)} {ksqlType}{typeTranslator.ExploreAttributes(typeof(T), memberInfo, type)}";
+      var memberName = memberInfo.GetMemberName(modelBuilder);
+      var columnDefinition = $"{EscapeName(memberName, escaping)} {ksqlType}{typeTranslator.ExploreAttributes(typeof(T), memberInfo, type)}";
       ksqlProperties.Add(columnDefinition);
     }
 

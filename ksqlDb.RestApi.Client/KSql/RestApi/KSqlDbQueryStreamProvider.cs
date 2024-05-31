@@ -1,20 +1,26 @@
 #if !NETSTANDARD
 using System.Net;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses;
 using Microsoft.Extensions.Logging;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
+using JsonTypeInfoResolver = ksqlDb.RestApi.Client.KSql.RestApi.Json.JsonTypeInfoResolver;
 
 #nullable disable
 namespace ksqlDB.RestApi.Client.KSql.RestApi
 {
   internal class KSqlDbQueryStreamProvider : KSqlDbProvider
   {
-    public KSqlDbQueryStreamProvider(IHttpClientFactory httpClientFactory, KSqlDbProviderOptions options, ILogger logger = null)
+    private readonly ModelBuilder modelBuilder;
+
+    public KSqlDbQueryStreamProvider(IHttpClientFactory httpClientFactory, ModelBuilder modelBuilder, KSqlDbProviderOptions options, ILogger logger = null)
       : base(httpClientFactory, options, logger)
     {
+      this.modelBuilder = modelBuilder ?? throw new ArgumentNullException(nameof(modelBuilder));
 #if NETCOREAPP3_1
       AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 #endif
@@ -46,6 +52,51 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
       }
 
       return default;
+    }
+
+    protected override JsonSerializerOptions OnCreateJsonSerializerOptions()
+    {
+      var jsonSerializerOptions = base.OnCreateJsonSerializerOptions();
+
+      if (jsonSerializerOptions.TypeInfoResolver == null)
+      {
+        var defaultJsonTypeInfoResolver = new DefaultJsonTypeInfoResolver();
+        var resolver = new JsonTypeInfoResolver(defaultJsonTypeInfoResolver)
+        {
+          Modifiers = { JsonPropertyNameModifier }
+        };
+        jsonSerializerOptions.TypeInfoResolver = resolver;
+      }
+      else if(jsonSerializerOptions.TypeInfoResolver is not JsonTypeInfoResolver)
+      {
+        var resolver = new JsonTypeInfoResolver(jsonSerializerOptions.TypeInfoResolver)
+        {
+          Modifiers = { JsonPropertyNameModifier }
+        };
+
+        jsonSerializerOptions.TypeInfoResolver = resolver;
+      }
+
+      return jsonSerializerOptions;
+    }
+
+    internal void JsonPropertyNameModifier(JsonTypeInfo jsonTypeInfo)
+    {
+      JsonPropertyNameModifier(jsonTypeInfo, modelBuilder);
+    }
+
+    internal static void JsonPropertyNameModifier(JsonTypeInfo jsonTypeInfo, ModelBuilder modelBuilder)
+    {
+      var entityMetadata = modelBuilder.GetEntities().FirstOrDefault(c => c.Type == jsonTypeInfo.Type);
+
+      foreach (var typeInfoProperty in jsonTypeInfo.Properties)
+      {
+        var fieldMetadata =
+          entityMetadata?.FieldsMetadata.FirstOrDefault(c => c.MemberInfo.Name == typeInfoProperty.Name);
+
+        if (fieldMetadata != null && !string.IsNullOrEmpty(fieldMetadata.ColumnName))
+          typeInfoProperty.Name = fieldMetadata.ColumnName;
+      }
     }
 
     private static void OnError<T>(string rawJson)

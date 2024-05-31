@@ -1,5 +1,7 @@
+using System.Linq.Expressions;
 using System.Reflection;
 using Antlr4.Runtime;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
@@ -52,19 +54,41 @@ namespace ksqlDb.RestApi.Client.KSql.RestApi.Parsers
     /// <summary>
     /// Format the <c>identifier</c>, except when it is a <c>PseudoColumn</c>.
     /// </summary>
-    /// <param name="memberInfo">the memberInfo with the identifier</param>
+    /// <param name="memberExpression">the memberExpression with the identifier</param>
     /// <param name="escaping">the format</param>
+    /// <param name="modelBuilder">the model builder</param>
     /// <returns>the identifier modified based on the provided <c>format</c></returns>
-    public static string Format(MemberInfo memberInfo, IdentifierEscaping escaping)
+    public static string Format(MemberExpression memberExpression, IdentifierEscaping escaping, ModelBuilder? modelBuilder = null)
     {
       return escaping switch
       {
-        Never => memberInfo.GetMemberName(),
+        Never => memberExpression.GetMemberName(modelBuilder),
+        Keywords when memberExpression.Member.GetCustomAttribute<PseudoColumnAttribute>() != null => memberExpression.Member.Name,
+        Keywords when IsValid(memberExpression.GetMemberName(modelBuilder)) && SystemColumns.IsValid(memberExpression.GetMemberName(modelBuilder)) => memberExpression.GetMemberName(modelBuilder),
+        Keywords => string.Concat("`", memberExpression.GetMemberName(modelBuilder), "`"),
+        Always when memberExpression.Member.GetCustomAttribute<PseudoColumnAttribute>() != null => memberExpression.Member.Name,
+        Always => string.Concat("`", memberExpression.GetMemberName(modelBuilder), "`"),
+        _ => throw new ArgumentOutOfRangeException(nameof(escaping), escaping, "Non-exhaustive match.")
+      };
+    }
+
+    /// <summary>
+    /// Format the <c>identifier</c>, except when it is a <c>PseudoColumn</c>.
+    /// </summary>
+    /// <param name="memberInfo">the memberInfo with the identifier</param>
+    /// <param name="escaping">the format</param>
+    /// <param name="modelBuilder">the model builder</param>
+    /// <returns>the identifier modified based on the provided <c>format</c></returns>
+    public static string Format(MemberInfo memberInfo, IdentifierEscaping escaping, ModelBuilder? modelBuilder = null)
+    {
+      return escaping switch
+      {
+        Never => memberInfo.GetMemberName(modelBuilder),
         Keywords when memberInfo.GetCustomAttribute<PseudoColumnAttribute>() != null => memberInfo.Name,
-        Keywords when IsValid(memberInfo.GetMemberName()) && SystemColumns.IsValid(memberInfo.GetMemberName()) => memberInfo.GetMemberName(),
-        Keywords => string.Concat("`", memberInfo.GetMemberName(), "`"),
+        Keywords when IsValid(memberInfo.GetMemberName(modelBuilder)) && SystemColumns.IsValid(memberInfo.GetMemberName(modelBuilder)) => memberInfo.GetMemberName(modelBuilder),
+        Keywords => string.Concat("`", memberInfo.GetMemberName(modelBuilder), "`"),
         Always when memberInfo.GetCustomAttribute<PseudoColumnAttribute>() != null => memberInfo.Name,
-        Always => string.Concat("`", memberInfo.GetMemberName(), "`"),
+        Always => string.Concat("`", memberInfo.GetMemberName(modelBuilder), "`"),
         _ => throw new ArgumentOutOfRangeException(nameof(escaping), escaping, "Non-exhaustive match.")
       };
     }
