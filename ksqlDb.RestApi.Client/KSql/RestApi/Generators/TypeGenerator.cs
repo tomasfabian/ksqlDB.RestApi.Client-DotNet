@@ -9,7 +9,7 @@ using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 
-internal sealed class TypeGenerator(ModelBuilder metadataProvider) : EntityInfo(metadataProvider)
+internal sealed class TypeGenerator(IMetadataProvider metadataProvider) : EntityInfo(metadataProvider)
 {
   private readonly KSqlTypeTranslator typeTranslator = new(metadataProvider);
 

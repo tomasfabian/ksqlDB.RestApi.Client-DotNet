@@ -15,12 +15,12 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
 {
   internal class KSqlDbQueryStreamProvider : KSqlDbProvider
   {
-    private readonly ModelBuilder modelBuilder;
+    private readonly IMetadataProvider metadataProvider;
 
-    public KSqlDbQueryStreamProvider(IHttpClientFactory httpClientFactory, ModelBuilder modelBuilder, KSqlDbProviderOptions options, ILogger logger = null)
+    public KSqlDbQueryStreamProvider(IHttpClientFactory httpClientFactory, IMetadataProvider metadataProvider, KSqlDbProviderOptions options, ILogger logger = null)
       : base(httpClientFactory, options, logger)
     {
-      this.modelBuilder = modelBuilder ?? throw new ArgumentNullException(nameof(modelBuilder));
+      this.metadataProvider = metadataProvider ?? throw new ArgumentNullException(nameof(metadataProvider));
 #if NETCOREAPP3_1
       AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 #endif
@@ -82,7 +82,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
 
     internal void JsonPropertyNameModifier(JsonTypeInfo jsonTypeInfo)
     {
-      JsonPropertyNameModifier(jsonTypeInfo, modelBuilder);
+      JsonPropertyNameModifier(jsonTypeInfo, metadataProvider);
     }
 
     internal static void JsonPropertyNameModifier(JsonTypeInfo jsonTypeInfo, IMetadataProvider metadataProvider)
