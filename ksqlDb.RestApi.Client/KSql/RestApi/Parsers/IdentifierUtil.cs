@@ -51,25 +51,23 @@ namespace ksqlDb.RestApi.Client.KSql.RestApi.Parsers
       };
     }
 
-    /// <summary>
-    /// Format the <c>identifier</c>, except when it is a <c>PseudoColumn</c>.
-    /// </summary>
-    /// <param name="memberExpression">the memberExpression with the identifier</param>
-    /// <param name="escaping">the format</param>
-    /// <param name="modelBuilder">the model builder</param>
-    /// <returns>the identifier modified based on the provided <c>format</c></returns>
-    public static string Format(MemberExpression memberExpression, IdentifierEscaping escaping, ModelBuilder? modelBuilder = null)
+    internal static string Format(MemberExpression memberExpression, IdentifierEscaping escaping, IMetadataProvider? metadataProvider = null)
     {
       return escaping switch
       {
-        Never => memberExpression.GetMemberName(modelBuilder),
+        Never => memberExpression.GetMemberName(metadataProvider),
         Keywords when memberExpression.Member.GetCustomAttribute<PseudoColumnAttribute>() != null => memberExpression.Member.Name,
-        Keywords when IsValid(memberExpression.GetMemberName(modelBuilder)) && SystemColumns.IsValid(memberExpression.GetMemberName(modelBuilder)) => memberExpression.GetMemberName(modelBuilder),
-        Keywords => string.Concat("`", memberExpression.GetMemberName(modelBuilder), "`"),
+        Keywords when IsValid(memberExpression.GetMemberName(metadataProvider)) && SystemColumns.IsValid(memberExpression.GetMemberName(metadataProvider)) => memberExpression.GetMemberName(metadataProvider),
+        Keywords => string.Concat("`", memberExpression.GetMemberName(metadataProvider), "`"),
         Always when memberExpression.Member.GetCustomAttribute<PseudoColumnAttribute>() != null => memberExpression.Member.Name,
-        Always => string.Concat("`", memberExpression.GetMemberName(modelBuilder), "`"),
+        Always => string.Concat("`", memberExpression.GetMemberName(metadataProvider), "`"),
         _ => throw new ArgumentOutOfRangeException(nameof(escaping), escaping, "Non-exhaustive match.")
       };
+    }
+
+    internal static string Format(MemberInfo memberInfo, IdentifierEscaping escaping, IMetadataProvider? modelBuilder = null)
+    {
+      return Format(memberInfo, escaping, modelBuilder as ModelBuilder);
     }
 
     /// <summary>

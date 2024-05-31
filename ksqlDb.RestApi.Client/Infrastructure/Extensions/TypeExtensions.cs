@@ -105,16 +105,16 @@ internal static class TypeExtensions
     return attribute;
   }
 
-  internal static string GetMemberName(this MemberExpression memberExpression, ModelBuilder? modelBuilder)
+  internal static string GetMemberName(this MemberExpression memberExpression, IMetadataProvider? metadataProvider)
   {
-    var entityMetadata = modelBuilder?.GetEntities().FirstOrDefault(c => c.Type == memberExpression.Expression?.Type);
+    var entityMetadata = metadataProvider?.GetEntities().FirstOrDefault(c => c.Type == memberExpression.Expression?.Type);
 
     return memberExpression.Member.GetMemberName(entityMetadata);
   }
 
-  internal static string GetMemberName(this MemberInfo memberInfo, ModelBuilder? modelBuilder)
+  internal static string GetMemberName(this MemberInfo memberInfo, IMetadataProvider? metadataProvider)
   {
-    var entityMetadata = modelBuilder?.GetEntities().FirstOrDefault(c => c.Type == memberInfo.DeclaringType);
+    var entityMetadata = metadataProvider?.GetEntities().FirstOrDefault(c => c.Type == memberInfo.DeclaringType);
 
     return memberInfo.GetMemberName(entityMetadata);
   }

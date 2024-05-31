@@ -5,7 +5,7 @@ using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-internal class EntityInfo(ModelBuilder modelBuilder)
+internal class EntityInfo(IMetadataProvider metadataProvider)
 {
   protected static readonly EntityProvider EntityProvider = new();
 
@@ -24,7 +24,7 @@ internal class EntityInfo(ModelBuilder modelBuilder)
       .OfType<MemberInfo>()
       .Concat(fields);
 
-    var entityMetadata = modelBuilder.GetEntities().FirstOrDefault(c => c.Type == type);
+    var entityMetadata = metadataProvider.GetEntities().FirstOrDefault(c => c.Type == type);
     
     return properties.Where(c =>
     {

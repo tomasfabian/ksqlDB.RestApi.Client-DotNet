@@ -11,7 +11,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 #nullable disable
-internal sealed class CreateKSqlValue(ModelBuilder modelBuilder) : EntityInfo(modelBuilder)
+internal sealed class CreateKSqlValue(ModelBuilder metadataProvider) : EntityInfo(metadataProvider)
 {
   public object ExtractValue<T>(T inputValue, IValueFormatters valueFormatters, MemberInfo memberInfo, Type type, Func<MemberInfo, string> formatter)
   {

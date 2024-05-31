@@ -9,10 +9,10 @@ using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 {
-  internal sealed class KSqlTypeTranslator(ModelBuilder modelBuilder) : EntityInfo(modelBuilder)
+  internal sealed class KSqlTypeTranslator(IMetadataProvider metadataProvider) : EntityInfo(metadataProvider)
   {
-    private readonly ModelBuilder modelBuilder = modelBuilder;
-    private readonly DecimalTypeTranslator decimalTypeTranslator = new(modelBuilder);
+    private readonly IMetadataProvider metadataProvider = metadataProvider;
+    private readonly DecimalTypeTranslator decimalTypeTranslator = new(metadataProvider);
 
     internal string Translate(Type type, IdentifierEscaping escaping = IdentifierEscaping.Never)
     {
@@ -107,7 +107,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 
         var ksqlType = Translate(memberType, escaping);
 
-        string columnDefinition = $"{memberInfo.Format(escaping, modelBuilder)} {ksqlType}{ExploreAttributes(type, memberInfo, memberType)}";
+        string columnDefinition = $"{memberInfo.Format(escaping, metadataProvider as ModelBuilder)} {ksqlType}{ExploreAttributes(type, memberInfo, memberType)}";
 
         ksqlProperties.Add(columnDefinition);
       }
@@ -132,7 +132,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 
     private string TryGetHeaderMarker(Type? parentType, MemberInfo memberInfo)
     {
-      var entityMetadata = modelBuilder.GetEntities().FirstOrDefault(c => c.Type == parentType);
+      var entityMetadata = metadataProvider.GetEntities().FirstOrDefault(c => c.Type == parentType);
       var fieldMetadata = entityMetadata?.GetFieldMetadataBy(memberInfo);
 
       if (fieldMetadata?.HasHeaders ?? false)

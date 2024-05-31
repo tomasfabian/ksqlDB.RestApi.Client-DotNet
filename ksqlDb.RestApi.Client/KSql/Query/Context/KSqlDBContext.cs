@@ -74,6 +74,7 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
     base.OnConfigureServices(serviceCollection, contextOptions);
 
     serviceCollection.TryAddSingleton(modelBuilder);
+    serviceCollection.TryAddSingleton<IMetadataProvider>(modelBuilder);
     serviceCollection.RegisterEndpointDependencies(contextOptions);
   }
 

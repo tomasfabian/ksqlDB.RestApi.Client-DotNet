@@ -85,9 +85,9 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
       JsonPropertyNameModifier(jsonTypeInfo, modelBuilder);
     }
 
-    internal static void JsonPropertyNameModifier(JsonTypeInfo jsonTypeInfo, ModelBuilder modelBuilder)
+    internal static void JsonPropertyNameModifier(JsonTypeInfo jsonTypeInfo, IMetadataProvider metadataProvider)
     {
-      var entityMetadata = modelBuilder.GetEntities().FirstOrDefault(c => c.Type == jsonTypeInfo.Type);
+      var entityMetadata = metadataProvider.GetEntities().FirstOrDefault(c => c.Type == jsonTypeInfo.Type);
 
       foreach (var typeInfoProperty in jsonTypeInfo.Properties)
       {

@@ -9,11 +9,11 @@ using static System.String;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-internal sealed class CreateEntity(ModelBuilder modelBuilder) : EntityInfo(modelBuilder)
+internal sealed class CreateEntity(IMetadataProvider metadataProvider) : EntityInfo(metadataProvider)
 {
   private readonly StringBuilder stringBuilder = new();
 
-  private readonly KSqlTypeTranslator typeTranslator = new(modelBuilder);
+  private readonly KSqlTypeTranslator typeTranslator = new(metadataProvider);
 
   internal string Print<T>(StatementContext statementContext, EntityCreationMetadata metadata, bool? ifNotExists)
   {
@@ -49,7 +49,7 @@ internal sealed class CreateEntity(ModelBuilder modelBuilder) : EntityInfo(model
 
       var ksqlType = typeTranslator.Translate(type, metadata.IdentifierEscaping);
 
-      var columnName = IdentifierUtil.Format(memberInfo, metadata.IdentifierEscaping, modelBuilder);
+      var columnName = IdentifierUtil.Format(memberInfo, metadata.IdentifierEscaping, metadataProvider);
       string columnDefinition = $"\t{columnName} {ksqlType}{typeTranslator.ExploreAttributes(typeof(T), memberInfo, type)}";
 
       columnDefinition += TryAttachKey<T>(statementContext.KSqlEntityType, memberInfo);
@@ -85,7 +85,7 @@ internal sealed class CreateEntity(ModelBuilder modelBuilder) : EntityInfo(model
 
   private string TryAttachKey<T>(KSqlEntityType entityType, MemberInfo memberInfo)
   {
-    var entityMetadata = modelBuilder.GetEntities().FirstOrDefault(c => c.Type == typeof(T));
+    var entityMetadata = metadataProvider.GetEntities().FirstOrDefault(c => c.Type == typeof(T));
 
     var primaryKey = entityMetadata?.PrimaryKeyMemberInfo;
 
