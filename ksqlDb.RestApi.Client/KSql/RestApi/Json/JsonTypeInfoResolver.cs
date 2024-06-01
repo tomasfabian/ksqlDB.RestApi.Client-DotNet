@@ -13,13 +13,15 @@ namespace ksqlDb.RestApi.Client.KSql.RestApi.Json
     public virtual JsonTypeInfo? GetTypeInfo(Type type, JsonSerializerOptions options)
     {
       var typeInfo = typeInfoResolver.GetTypeInfo(type, options);
+      if (typeInfo == null)
+        return null;
 
-      if (modifiers != null)
+      if (modifiers == null)
+        return typeInfo;
+
+      foreach (var modifier in modifiers)
       {
-        foreach (Action<JsonTypeInfo> modifier in modifiers)
-        {
-          modifier(typeInfo);
-        }
+        modifier(typeInfo);
       }
 
       return typeInfo;
