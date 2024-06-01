@@ -92,7 +92,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi
       foreach (var typeInfoProperty in jsonTypeInfo.Properties)
       {
         var fieldMetadata =
-          entityMetadata?.FieldsMetadata.FirstOrDefault(c => c.MemberInfo.Name == typeInfoProperty.Name);
+          entityMetadata?.FieldsMetadata?.FirstOrDefault(c => c.MemberInfo.Name == typeInfoProperty.Name);
 
         if (fieldMetadata != null && !string.IsNullOrEmpty(fieldMetadata.ColumnName))
           typeInfoProperty.Name = fieldMetadata.ColumnName;
