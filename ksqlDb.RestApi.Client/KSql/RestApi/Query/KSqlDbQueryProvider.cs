@@ -5,14 +5,15 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query;
 using Microsoft.Extensions.Logging;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Query;
 
 #nullable disable
 internal class KSqlDbQueryProvider : KSqlDbProvider
 {
-  public KSqlDbQueryProvider(IHttpV1ClientFactory httpClientFactory, KSqlDbProviderOptions options, ILogger logger = null)
-    : base(httpClientFactory, options, logger)
+  public KSqlDbQueryProvider(IHttpV1ClientFactory httpClientFactory, IMetadataProvider metadataProvider, KSqlDbProviderOptions options, ILogger logger = null)
+    : base(httpClientFactory, metadataProvider, options, logger)
   {
   }
 
