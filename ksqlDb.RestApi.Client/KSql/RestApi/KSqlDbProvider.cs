@@ -5,10 +5,10 @@ using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
+using ksqlDb.RestApi.Client.KSql.RestApi.Json;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using Microsoft.Extensions.Logging;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
-using JsonTypeInfoResolver = ksqlDb.RestApi.Client.KSql.RestApi.Json.JsonTypeInfoResolver;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi;
 
@@ -201,28 +201,9 @@ internal abstract class KSqlDbProvider : IKSqlDbProvider
 
   protected virtual JsonSerializerOptions OnCreateJsonSerializerOptions()
   {
-    var jsonSerializerOptions = options.JsonSerializerOptions;
+    options.JsonSerializerOptions.WithModifier(JsonPropertyNameModifier);
 
-    if (jsonSerializerOptions.TypeInfoResolver == null)
-    {
-      var defaultJsonTypeInfoResolver = new DefaultJsonTypeInfoResolver();
-      var resolver = new JsonTypeInfoResolver(defaultJsonTypeInfoResolver)
-      {
-        Modifiers = { JsonPropertyNameModifier }
-      };
-      jsonSerializerOptions.TypeInfoResolver = resolver;
-    }
-    else if (jsonSerializerOptions.TypeInfoResolver is not JsonTypeInfoResolver)
-    {
-      var resolver = new JsonTypeInfoResolver(jsonSerializerOptions.TypeInfoResolver)
-      {
-        Modifiers = { JsonPropertyNameModifier }
-      };
-
-      jsonSerializerOptions.TypeInfoResolver = resolver;
-    }
-
-    return jsonSerializerOptions;
+    return options.JsonSerializerOptions;
   }
 
   internal void JsonPropertyNameModifier(JsonTypeInfo jsonTypeInfo)
