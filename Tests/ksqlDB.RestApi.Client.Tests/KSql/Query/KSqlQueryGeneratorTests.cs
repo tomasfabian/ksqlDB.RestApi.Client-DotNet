@@ -27,6 +27,7 @@ public class KSqlQueryGeneratorTests : TestBase
   readonly string streamName = nameof(Location) + "s";
 
   private KSqlDBContextOptions contextOptions = null!;
+  private ModelBuilder modelBuilder = null!;
   private QueryContext queryContext = null!;
 
   [SetUp]
@@ -35,7 +36,11 @@ public class KSqlQueryGeneratorTests : TestBase
     base.TestInitialize();
 
     contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDbUrl);
-    queryContext = new QueryContext();
+    modelBuilder = new ModelBuilder();
+    queryContext = new QueryContext()
+    {
+      ModelBuilder = modelBuilder
+    };
     ClassUnderTest = new KSqlQueryGenerator(contextOptions);
   }
 
@@ -93,7 +98,6 @@ WHERE SensorId = '1' EMIT CHANGES;";
   {
     //Arrange
     string idColumnName = "Id";
-    ModelBuilder modelBuilder = new ModelBuilder();
     modelBuilder.Entity<MySensor>()
       .Property(c => c.SensorId2)
       .HasColumnName(idColumnName);
@@ -102,11 +106,6 @@ WHERE SensorId = '1' EMIT CHANGES;";
       .CreatePushQuery<MySensor>()
       .Where(c => c.SensorId2 == "1")
       .Select(c => c.SensorId2);
-
-    queryContext = new QueryContext()
-    {
-      ModelBuilder = modelBuilder
-    };
 
     //Act
     var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
@@ -133,7 +132,6 @@ WHERE {idColumnName} = '1' EMIT CHANGES;";
   {
     //Arrange
     string idColumnName = "SensorId";
-    ModelBuilder modelBuilder = new ModelBuilder();
     modelBuilder.Entity<Derived>()
       .Property(c => c.Id)
       .HasColumnName(idColumnName);
@@ -142,12 +140,7 @@ WHERE {idColumnName} = '1' EMIT CHANGES;";
       .CreatePushQuery<Derived>()
       .Where(c => c.Id == 1)
       .Select(c => c.Id);
-
-    queryContext = new QueryContext()
-    {
-      ModelBuilder = modelBuilder
-    };
-
+    
     //Act
     var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
 

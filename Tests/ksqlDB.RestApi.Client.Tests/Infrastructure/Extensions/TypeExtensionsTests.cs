@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using FluentAssertions;
@@ -358,6 +360,8 @@ public class TypeExtensionsTests
     attribute.Should().BeOfType<KeyAttribute>();
   }
 
+  #region GetMemberName
+
   private record MySensor
   {
     [JsonPropertyName("SensorId")]
@@ -416,4 +420,64 @@ public class TypeExtensionsTests
     //Assert
     memberName.Should().Be(columnName);
   }
+
+  [Test]
+  public void GetMemberName_MemberExpression_ModelBuilderHasColumnName()
+  {
+    //Arrange
+    var columnName = "Id";
+    Expression<Func<MySensor, string>> expression = c => c.SensorId2;
+
+    var modelBuilder = new ModelBuilder();
+    modelBuilder.Entity<MySensor>()
+      .Property(expression)
+      .HasColumnName(columnName);
+
+    //Act
+    var memberName = ((MemberExpression)expression.Body).GetMemberName(modelBuilder);
+
+    //Assert
+    memberName.Should().Be(columnName);
+  }
+
+  [Test]
+  public void GetMemberName_FromMemberExpression_JsonPropertyNameAttributeWasUsed()
+  {
+    //Arrange
+    Expression<Func<MySensor, string>> expression = c => c.SensorId2;
+
+    var modelBuilder = new ModelBuilder();
+    modelBuilder.Entity<MySensor>()
+      .Property(expression)
+      .WithHeaders();
+    var memberExpression = (MemberExpression) expression.Body;
+
+    //Act
+    var memberName = memberExpression.GetMemberName(modelBuilder);
+
+    //Assert
+    var jsonPropertyNameAttribute = memberExpression.Member.GetCustomAttribute<JsonPropertyNameAttribute>();
+    memberName.Should().Be(jsonPropertyNameAttribute?.Name);
+  }
+
+  [Test]
+  public void GetMemberName_FromMemberExpression_PropertyNameWasUsed()
+  {
+    //Arrange
+    Expression<Func<MySensor, string>> expression = c => c.Title;
+
+    var modelBuilder = new ModelBuilder();
+    modelBuilder.Entity<MySensor>()
+      .Property(expression)
+      .WithHeaders();
+    var memberExpression = (MemberExpression)expression.Body;
+
+    //Act
+    var memberName = memberExpression.GetMemberName(modelBuilder);
+
+    //Assert
+    memberName.Should().Be(nameof(MySensor.Title));
+  }
+
+  #endregion
 }
