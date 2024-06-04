@@ -1,3 +1,4 @@
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
@@ -32,7 +33,7 @@ public abstract class IntegrationTests : TestBase
     Context = CreateKSqlDbContext(EndpointType.QueryStream);
   }
 
-  protected KSqlDBContext CreateKSqlDbContext(EndpointType endpointType)
+  protected KSqlDBContext CreateKSqlDbContext(EndpointType endpointType, ModelBuilder? modelBuilder = null)
   {
     ContextOptions = new KSqlDBContextOptions(KSqlDbRestApiProvider.KsqlDbUrl)
     {
@@ -40,7 +41,8 @@ public abstract class IntegrationTests : TestBase
       EndpointType = endpointType
     };
 
-    return new KSqlDBContext(ContextOptions);
+    modelBuilder ??= new ModelBuilder();
+    return new KSqlDBContext(ContextOptions, modelBuilder);
   }
 
   [TestCleanup]
