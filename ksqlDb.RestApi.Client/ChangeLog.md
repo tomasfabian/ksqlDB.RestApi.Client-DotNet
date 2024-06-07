@@ -1,6 +1,6 @@
 # ksqlDB.RestApi.Client
 
-# 6.1.0-rc.1
+# 6.1.0
 - added `HasColumnName` to the Fluent API to allow overriding property names during JSON deserialization and code generation.
 
 ## BugFix
