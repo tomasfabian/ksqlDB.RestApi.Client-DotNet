@@ -83,6 +83,7 @@ public static class Program
 
     await moviesProvider.CreateTablesAsync();
 
+    var cancellationTokenSource = new CancellationTokenSource();
     var contextOptions = CreateKSqlDbContextOptions(ksqlDbUrl);
 
     await using var context = new KSqlDBContext(contextOptions, loggerFactory);
@@ -124,10 +125,10 @@ public static class Program
       Console.WriteLine(e.Message);
     }
 
-    string explain = await query.ExplainAsStringAsync();
+    string explain = await query.ExplainAsStringAsync(cancellationTokenSource.Token);
     Console.WriteLine("Explain: ");
     Console.WriteLine(explain);
-    ExplainResponse[] explainResponses = await query.ExplainAsync();
+    ExplainResponse[] explainResponses = await query.ExplainAsync(cancellationTokenSource.Token);
     Console.WriteLine($"{Environment.NewLine} Explain => ExecutionPlan:");
     Console.WriteLine(explainResponses[0].QueryDescription?.ExecutionPlan);
 
@@ -140,7 +141,7 @@ public static class Program
     Console.WriteLine("Finished.");
   }
 
-  static async Task CreateOrReplaceTableStatement(IKSqlDBStatementsContext context)
+  static async Task CreateOrReplaceTableStatement(IKSqlDBStatementsContext context, CancellationToken cancellationToken = default)
   {
     var creationMetadata = new CreationMetadata
     {
@@ -157,7 +158,7 @@ public static class Program
       .Where(c => c.Id < 3)
       .Select(c => new { c.Title, ReleaseYear = c.Release_Year })
       .PartitionBy(c => c.Title)
-      .ExecuteStatementAsync();
+      .ExecuteStatementAsync(cancellationToken);
 
     /*
   CREATE OR REPLACE TABLE MoviesByTitle
@@ -166,7 +167,7 @@ public static class Program
   WHERE Id < 3 PARTITION BY Title EMIT CHANGES;
      */
 
-    string responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
+    string responseContent = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
 
     var statementResponse = await httpResponseMessage.ToStatementResponsesAsync();
   }
