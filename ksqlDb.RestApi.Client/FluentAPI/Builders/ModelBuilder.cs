@@ -6,12 +6,20 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
   /// <summary>
   /// Represents a builder for configuring the model.
   /// </summary>
-  public class ModelBuilder
+  public class ModelBuilder : IMetadataProvider
   {
     private readonly IDictionary<Type, EntityTypeBuilder> builders = new Dictionary<Type, EntityTypeBuilder>();
-    internal readonly IDictionary<Type, IConventionConfiguration> Conventions = new Dictionary<Type, IConventionConfiguration>();
+    private readonly IDictionary<Type, IConventionConfiguration> conventions = new Dictionary<Type, IConventionConfiguration>();
 
-    internal IEnumerable<EntityMetadata> GetEntities()
+    IDictionary<Type, IConventionConfiguration> IMetadataProvider.Conventions
+    {
+      get
+      {
+        return conventions;
+      }
+    }
+
+    IEnumerable<EntityMetadata> IMetadataProvider.GetEntities()
     {
       return builders.Values.Select(c => c.Metadata);
     }
@@ -37,7 +45,7 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
     /// <returns>The current <see cref="ModelBuilder"/> instance.</returns>
     public ModelBuilder AddConvention(IConventionConfiguration configuration)
     {
-      Conventions.Add(configuration.Type, configuration);
+      conventions.Add(configuration.Type, configuration);
 
       return this;
     }

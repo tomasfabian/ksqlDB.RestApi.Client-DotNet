@@ -1,10 +1,13 @@
 using System.Collections;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDB.RestApi.Client.Infrastructure.Extensions;
 
@@ -101,9 +104,29 @@ internal static class TypeExtensions
 
     return attribute;
   }
-  
-  internal static string GetMemberName(this MemberInfo memberInfo)
+
+  internal static string GetMemberName(this MemberExpression memberExpression, IMetadataProvider? metadataProvider)
   {
+    var entityMetadata = metadataProvider?.GetEntities().FirstOrDefault(c => c.Type == memberExpression.Expression?.Type);
+
+    return memberExpression.Member.GetMemberName(entityMetadata);
+  }
+
+  internal static string GetMemberName(this MemberInfo memberInfo, IMetadataProvider? metadataProvider)
+  {
+    var entityMetadata = metadataProvider?.GetEntities().FirstOrDefault(c => c.Type == memberInfo.DeclaringType);
+
+    return memberInfo.GetMemberName(entityMetadata);
+  }
+
+  internal static string GetMemberName(this MemberInfo memberInfo, EntityMetadata? entityMetadata)
+  {
+    var fieldMetadata =
+      entityMetadata?.FieldsMetadata.FirstOrDefault(c => c.MemberInfo.Name == memberInfo.Name);
+
+    if (fieldMetadata != null && !string.IsNullOrEmpty(fieldMetadata.ColumnName))
+      return fieldMetadata.ColumnName;
+
     var jsonPropertyNameAttribute = memberInfo.GetCustomAttribute<JsonPropertyNameAttribute>();
 
     var memberName = jsonPropertyNameAttribute?.Name ?? memberInfo.Name;

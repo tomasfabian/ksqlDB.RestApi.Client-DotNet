@@ -2,7 +2,10 @@ using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
+using ksqlDb.RestApi.Client.KSql.RestApi.Json;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using Microsoft.Extensions.Logging;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
@@ -13,12 +16,14 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi;
 internal abstract class KSqlDbProvider : IKSqlDbProvider
 {
   private readonly IHttpClientFactory httpClientFactory;
+  private readonly IMetadataProvider metadataProvider;
   private readonly KSqlDbProviderOptions options;
   private readonly ILogger logger;
 
-  protected KSqlDbProvider(IHttpClientFactory httpClientFactory, KSqlDbProviderOptions options, ILogger logger = null)
+  protected KSqlDbProvider(IHttpClientFactory httpClientFactory, IMetadataProvider metadataProvider, KSqlDbProviderOptions options, ILogger logger = null)
   {
     this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+    this.metadataProvider = metadataProvider ?? throw new ArgumentNullException(nameof(metadataProvider));
     this.options = options ?? throw new ArgumentNullException(nameof(options));
     this.logger = logger;
   }
@@ -155,7 +160,7 @@ internal abstract class KSqlDbProvider : IKSqlDbProvider
     {
       if (cancellationToken.IsCancellationRequested)
         yield break;
-        
+
       var rawData = await streamReader
 #if NET7_0_OR_GREATER
         .ReadLineAsync(cancellationToken)
@@ -196,7 +201,28 @@ internal abstract class KSqlDbProvider : IKSqlDbProvider
 
   protected virtual JsonSerializerOptions OnCreateJsonSerializerOptions()
   {
+    options.JsonSerializerOptions.WithModifier(JsonPropertyNameModifier);
+
     return options.JsonSerializerOptions;
+  }
+
+  internal void JsonPropertyNameModifier(JsonTypeInfo jsonTypeInfo)
+  {
+    JsonPropertyNameModifier(jsonTypeInfo, metadataProvider);
+  }
+
+  internal static void JsonPropertyNameModifier(JsonTypeInfo jsonTypeInfo, IMetadataProvider metadataProvider)
+  {
+    var entityMetadata = metadataProvider.GetEntities().FirstOrDefault(c => c.Type == jsonTypeInfo.Type);
+
+    foreach (var typeInfoProperty in jsonTypeInfo.Properties)
+    {
+      var fieldMetadata =
+        entityMetadata?.FieldsMetadata?.FirstOrDefault(c => c.MemberInfo.Name == typeInfoProperty.Name);
+
+      if (fieldMetadata != null && !string.IsNullOrEmpty(fieldMetadata.ColumnName))
+        typeInfoProperty.Name = fieldMetadata.ColumnName;
+    }
   }
 
   protected virtual HttpRequestMessage CreateQueryHttpRequestMessage(HttpClient httpClient, object parameters)

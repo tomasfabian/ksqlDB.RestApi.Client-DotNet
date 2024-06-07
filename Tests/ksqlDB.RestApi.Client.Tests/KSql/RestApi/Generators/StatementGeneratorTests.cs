@@ -36,7 +36,7 @@ public class StatementGeneratorTests
     return @$" MyMovies (
 	Id INT{keyClause} KEY,
 	Title VARCHAR,
-	Release_Year INT,
+	ReleaseYear INT,
 	NumberOfDays ARRAY<INT>,
 	Dictionary MAP<VARCHAR, INT>,
 	Dictionary2 MAP<VARCHAR, INT>,

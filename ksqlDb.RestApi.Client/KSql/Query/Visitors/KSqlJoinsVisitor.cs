@@ -191,7 +191,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
     if (memberExpression.Expression?.NodeType == ExpressionType.Parameter)
     {
-      var memberName = IdentifierUtil.Format(memberExpression.Member, QueryMetadata.IdentifierEscaping);
+      var memberName = IdentifierUtil.Format(memberExpression, QueryMetadata.IdentifierEscaping, QueryMetadata.ModelBuilder);
 
       Append(memberName);
 
@@ -200,7 +200,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
     if (QueryMetadata.Joins != null && memberExpression.Expression?.NodeType == ExpressionType.MemberAccess)
     {
-      Append(memberExpression.Member.Format(QueryMetadata.IdentifierEscaping));
+      Append(memberExpression.Member.Format(QueryMetadata.IdentifierEscaping, QueryMetadata.ModelBuilder));
     }
     else
       base.VisitMember(memberExpression);

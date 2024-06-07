@@ -369,10 +369,14 @@ modelBuilder.Entity<Payment>()
 
 modelBuilder.Entity<Payment>()
   .Property(b => b.Description)
-  .Ignore();
+  .HasColumnName("Desc");
 
 modelBuilder.Entity<Account>()
   .HasKey(c => c.Id);
+
+modelBuilder.Entity<Account>()
+  .Property(b => b.Secret)
+  .Ignore();
 ```
 
 C# entity definitions:
@@ -389,6 +393,7 @@ record Account
 {
   public string Id { get; set; } = null!;
   public decimal Balance { get; set; }
+  public string Secret { get; set; }
 }
 ```
 
@@ -408,7 +413,7 @@ responseMessage = await restApiProvider.CreateTableAsync<Account>(entityCreation
 Generated KSQL:
 
 ```SQL
-CREATE TYPE Payment AS STRUCT<Id VARCHAR, Amount DECIMAL(10,2)>;
+CREATE TYPE Payment AS STRUCT<Id VARCHAR, Amount DECIMAL(10,2), Desc VARCHAR>;
 
 CREATE TABLE IF NOT EXISTS Accounts (
 	Id VARCHAR PRIMARY KEY,
@@ -416,7 +421,8 @@ CREATE TABLE IF NOT EXISTS Accounts (
 ) WITH ( KAFKA_TOPIC='Account', VALUE_FORMAT='Json', PARTITIONS='3', REPLICAS='3' );
 ```
 
-The `Description` field in the `Payment` type is ignored during code generation, and the `Id` field in the `Account` table is marked as the **primary key**.
+The Description property within the `Payment` type has been customized to override the resulting column name as "Desc".
+Additionally, the `Id` property within the `Account` table has been designated as the **primary key**, while the `Secret` property is disregarded during code generation.
 
 ### Aggregation functions
 List of supported ksqldb [aggregation functions](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/aggregations.md):

@@ -8,7 +8,6 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators;
-using ksqlDb.RestApi.Client.Tests.Models.Movies;
 using NUnit.Framework;
 using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
 
@@ -24,11 +23,25 @@ public class CreateInsertTests
     modelBuilder = new();
   }
 
+  private class Movie
+  {
+    public string Title { get; set; } = null!;
+    [Key]
+    public int Id { get; set; }
+    [JsonPropertyName("ReleaseYear")]
+    public int ReleaseYear { get; set; }
+
+    [IgnoreByInserts]
+    public int IgnoreMe { get; set; }
+
+    public IEnumerable<int> ReadOnly { get; } = new[] { 1, 2 };
+  }
+
   public static IEnumerable<(IdentifierEscaping, string)> GenerateTestCases()
   {
-    yield return (Never, "INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
-    yield return (Keywords, "INSERT INTO Movies (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
-    yield return (Always, "INSERT INTO `Movies` (`Title`, `Id`, `Release_Year`) VALUES ('Title', 1, 1988);");
+    yield return (Never, "INSERT INTO Movies (Title, Id, ReleaseYear) VALUES ('Title', 1, 1988);");
+    yield return (Keywords, "INSERT INTO Movies (Title, Id, ReleaseYear) VALUES ('Title', 1, 1988);");
+    yield return (Always, "INSERT INTO `Movies` (`Title`, `Id`, `ReleaseYear`) VALUES ('Title', 1, 1988);");
   }
 
   [TestCaseSource(nameof(GenerateTestCases))]
@@ -36,7 +49,34 @@ public class CreateInsertTests
   {
     //Arrange
     var (escaping, expected) = testCase;
-    var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title" };
+    var movie = new Movie { Id = 1, ReleaseYear = 1988, Title = "Title" };
+
+    //Act
+    var statement = new CreateInsert(modelBuilder).Generate(movie, new InsertProperties { IdentifierEscaping = escaping });
+
+    //Assert
+    statement.Should().Be(expected);
+  }
+
+  private const string MovieIdColumnName = "MovieId";
+
+  public static IEnumerable<(IdentifierEscaping, string)> GenerateHasColumnNameTestCases()
+  {
+    yield return (Never, $"INSERT INTO Movies ({nameof(Movie.Title)}, {MovieIdColumnName}, ReleaseYear) VALUES ('Title', 1, 1988);");
+    yield return (Keywords, $"INSERT INTO Movies ({nameof(Movie.Title)}, {MovieIdColumnName}, ReleaseYear) VALUES ('Title', 1, 1988);");
+    yield return (Always, $"INSERT INTO `Movies` (`{nameof(Movie.Title)}`, `{MovieIdColumnName}`, `ReleaseYear`) VALUES ('Title', 1, 1988);");
+  }
+
+  [TestCaseSource(nameof(GenerateHasColumnNameTestCases))]
+  public void ModelBuilder_HasColumnName((IdentifierEscaping escaping, string expected) testCase)
+  {
+    //Arrange
+    modelBuilder.Entity<Movie>()
+      .Property(c => c.Id)
+      .HasColumnName(MovieIdColumnName);
+
+    var (escaping, expected) = testCase;
+    var movie = new Movie { Id = 1, ReleaseYear = 1988, Title = "Title" };
 
     //Act
     var statement = new CreateInsert(modelBuilder).Generate(movie, new InsertProperties { IdentifierEscaping = escaping });
@@ -47,9 +87,9 @@ public class CreateInsertTests
 
   public static IEnumerable<(IdentifierEscaping, string)> GenerateOverrideEntityNameTestCases()
   {
-    yield return (Never, "INSERT INTO TestNames (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
-    yield return (Keywords, "INSERT INTO TestNames (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
-    yield return (Always, "INSERT INTO `TestNames` (`Title`, `Id`, `Release_Year`) VALUES ('Title', 1, 1988);");
+    yield return (Never, "INSERT INTO TestNames (Title, Id, ReleaseYear) VALUES ('Title', 1, 1988);");
+    yield return (Keywords, "INSERT INTO TestNames (Title, Id, ReleaseYear) VALUES ('Title', 1, 1988);");
+    yield return (Always, "INSERT INTO `TestNames` (`Title`, `Id`, `ReleaseYear`) VALUES ('Title', 1, 1988);");
   }
 
   [TestCaseSource(nameof(GenerateOverrideEntityNameTestCases))]
@@ -57,7 +97,7 @@ public class CreateInsertTests
   {
     //Arrange
     var (escaping, expected) = testCase;
-    var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title" };
+    var movie = new Movie { Id = 1, ReleaseYear = 1988, Title = "Title" };
     var insertProperties = new InsertProperties
     {
       EntityName = "TestName",
@@ -75,7 +115,7 @@ public class CreateInsertTests
   public void Generate_OverrideEntityName_ShouldNotPluralize()
   {
     //Arrange
-    var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title" };
+    var movie = new Movie { Id = 1, ReleaseYear = 1988, Title = "Title" };
     var insertProperties = new InsertProperties
     {
       EntityName = "TestName",
@@ -86,16 +126,16 @@ public class CreateInsertTests
     string statement = new CreateInsert(modelBuilder).Generate(movie, insertProperties);
 
     //Assert
-    statement.Should().Be($"INSERT INTO {insertProperties.EntityName} (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
+    statement.Should().Be($"INSERT INTO {insertProperties.EntityName} (Title, Id, ReleaseYear) VALUES ('Title', 1, 1988);");
   }
 
   [Test]
   public void Generate_UseModelBuilder_Ignore()
   {
     //Arrange
-    modelBuilder.Entity<Movie>().Property(c => c.Release_Year).Ignore();
+    modelBuilder.Entity<Movie>().Property(c => c.ReleaseYear).Ignore();
 
-    var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title" };
+    var movie = new Movie { Id = 1, ReleaseYear = 1988, Title = "Title" };
     var insertProperties = new InsertProperties
     {
       EntityName = "TestName",
@@ -113,7 +153,7 @@ public class CreateInsertTests
   public void Generate_ShouldNotPluralizeEntityName()
   {
     //Arrange
-    var movie = new Movie { Id = 1, Release_Year = 1988, Title = "Title" };
+    var movie = new Movie { Id = 1, ReleaseYear = 1988, Title = "Title" };
     var insertProperties = new InsertProperties
     {
       ShouldPluralizeEntityName = false
@@ -123,7 +163,7 @@ public class CreateInsertTests
     string statement = new CreateInsert(modelBuilder).Generate(movie, insertProperties);
 
     //Assert
-    statement.Should().Be($"INSERT INTO {nameof(Movie)} (Title, Id, Release_Year) VALUES ('Title', 1, 1988);");
+    statement.Should().Be($"INSERT INTO {nameof(Movie)} (Title, Id, ReleaseYear) VALUES ('Title', 1, 1988);");
   }
 
   public record Book(string Title, string Author);
@@ -375,9 +415,9 @@ public class CreateInsertTests
 
   public static IEnumerable<(IdentifierEscaping, string)> IncludeReadOnlyPropertiedTestCases()
   {
-    yield return (Never, $"INSERT INTO {nameof(Movie)}s (Title, Id, Release_Year, ReadOnly) VALUES (NULL, 1, 0, ARRAY[1, 2]);");
-    yield return (Keywords, $"INSERT INTO {nameof(Movie)}s (Title, Id, Release_Year, ReadOnly) VALUES (NULL, 1, 0, ARRAY[1, 2]);");
-    yield return (Always, $"INSERT INTO `{nameof(Movie)}s` (`Title`, `Id`, `Release_Year`, `ReadOnly`) VALUES (NULL, 1, 0, ARRAY[1, 2]);");
+    yield return (Never, $"INSERT INTO {nameof(Movie)}s (Title, Id, ReleaseYear, ReadOnly) VALUES (NULL, 1, 0, ARRAY[1, 2]);");
+    yield return (Keywords, $"INSERT INTO {nameof(Movie)}s (Title, Id, ReleaseYear, ReadOnly) VALUES (NULL, 1, 0, ARRAY[1, 2]);");
+    yield return (Always, $"INSERT INTO `{nameof(Movie)}s` (`Title`, `Id`, `ReleaseYear`, `ReadOnly`) VALUES (NULL, 1, 0, ARRAY[1, 2]);");
   }
 
   [TestCaseSource(nameof(IncludeReadOnlyPropertiedTestCases))]

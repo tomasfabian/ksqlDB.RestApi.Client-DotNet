@@ -7,7 +7,7 @@ using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDb.RestApi.Client.KSql.RestApi.Statements.Translators
 {
-  internal class DecimalTypeTranslator(ModelBuilder modelBuilder)
+  internal class DecimalTypeTranslator(IMetadataProvider modelBuilder)
   {
     internal bool TryGetDecimal(Type? parentType, MemberInfo memberInfo, out string? @decimal)
     {

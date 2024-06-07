@@ -21,61 +21,60 @@ namespace ksqlDb.RestApi.Client.Tests.Metadata
     public void Add_MemberWasStored()
     {
       //Arrange
-      var memberInfo = GetTitleMemberInfo();
+      var memberExpression = GetTitleMemberExpression();
 
       //Act
-      var added = entityMetadata.Add(memberInfo);
+      var added = entityMetadata.Add(memberExpression);
 
       //Assert
       added.Should().BeTrue();
     }
 
-    private static MemberInfo GetTitleMemberInfo()
+    private static MemberExpression GetTitleMemberExpression()
     {
       Expression<Func<Foo, object>> expression = foo => new { foo.Title };
       var argument = ((NewExpression)expression.Body).Arguments[0];
-      var memberInfo = ((MemberExpression)argument).Member;
-      return memberInfo;
+      return (MemberExpression)argument;
     }
 
     [Test]
     public void Add_MemberWasNotStoredSecondTime()
     {
       //Arrange
-      var memberInfo = GetTitleMemberInfo();
-      entityMetadata.Add(memberInfo);
+      var memberExpression = GetTitleMemberExpression();
+      entityMetadata.Add(memberExpression);
 
       //Act
-      var added = entityMetadata.Add(GetTitleMemberInfo());
+      var added = entityMetadata.Add(GetTitleMemberExpression());
 
       //Assert
       added.Should().BeFalse();
     }
 
     [Test]
-    public void TryGetMemberInfo_UnknownMemberName_NullIsReturned()
+    public void TryGetMemberExpression_UnknownMemberName_NullIsReturned()
     {
       //Arrange
-      var memberInfo = GetTitleMemberInfo();
-      entityMetadata.Add(memberInfo);
+      var memberExpression = GetTitleMemberExpression();
+      entityMetadata.Add(memberExpression);
 
       //Act
-      var result = entityMetadata.TryGetMemberInfo(nameof(Foo.Title));
+      var result = entityMetadata.TryGetMemberExpression(nameof(Foo.Title));
 
       //Assert
       result.Should().NotBeNull();
-      result!.GetCustomAttribute<JsonPropertyNameAttribute>().Should().NotBeNull();
+      result!.Member.GetCustomAttribute<JsonPropertyNameAttribute>().Should().NotBeNull();
     }
 
     [Test]
-    public void TryGetMemberInfo_KnownMemberName_MemberInfoIsReturned()
+    public void TryGetMemberExpression_KnownMemberName_MemberExpressionIsReturned()
     {
       //Arrange
-      var memberInfo = GetTitleMemberInfo();
-      entityMetadata.Add(memberInfo);
+      var memberExpression = GetTitleMemberExpression();
+      entityMetadata.Add(memberExpression);
 
       //Act
-      var result = entityMetadata.TryGetMemberInfo(nameof(Foo.Id));
+      var result = entityMetadata.TryGetMemberExpression(nameof(Foo.Id));
 
       //Assert
       result.Should().BeNull();

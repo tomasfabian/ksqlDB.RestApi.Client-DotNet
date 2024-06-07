@@ -1,4 +1,5 @@
 using FluentAssertions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
@@ -505,6 +506,12 @@ class TestableDbProvider : TestableDbProvider<QbservableGroupByExtensionsTests.C
       sc.AddHttpClient<IHttpClientFactory, HttpClientFactory>(c => c.BaseAddress = new Uri(ksqlDbUrl))
         .AddHttpMessageHandler(_ => FakeHttpClient.CreateDelegatingHandler(httpResponse).Object);
     });
+  }
+
+  public TestableDbProvider(KSqlDBContextOptions contextOptions, ModelBuilder modelBuilder) 
+    : base(contextOptions, modelBuilder)
+  {
+    RegisterKSqlQueryGenerator = false;
   }
 
   public TestableDbProvider(KSqlDBContextOptions contextOptions) 

@@ -223,3 +223,25 @@ CREATE STREAM Movie (
 ```
 
 The `WithHeaders` function within the FLUENT API takes precedence over the `HeadersAttribute`.
+
+### HasColumnName
+**v6.1.0**
+The `HasColumnName` function is employed during JSON deserialization and code generation, particularly in tasks like crafting CREATE STREAM or INSERT INTO statements.
+
+The below code demonstrates how to use the `HasColumnName` method in the Fluent API to override the property name `Description` to `Desc` during code generation:
+
+```C#
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+
+modelBuilder.Entity<Payment>()
+  .Property(b => b.Description)
+  .HasColumnName("Desc");
+
+var statement = new CreateInsert(modelBuilder).Generate(movie, new InsertProperties { IdentifierEscaping = IdentifierEscaping.Keywords });
+```
+
+The KSQL snippet illustrates an example INSERT statement with the overridden column names, showing how it corresponds to the Fluent API configuration:
+
+```SQL
+INSERT INTO Payments (Id, Amount, Desc) VALUES ('1', 33, 'Purchase');
+```

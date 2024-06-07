@@ -51,11 +51,11 @@ internal sealed class CreateInsert : EntityInfo
         valuesStringBuilder.Append(", ");
       }
 
-      columnsStringBuilder.Append(memberInfo.Format(insertProperties.IdentifierEscaping));
+      columnsStringBuilder.Append(memberInfo.Format(insertProperties.IdentifierEscaping, modelBuilder));
 
       var type = GetMemberType(memberInfo);
 
-      var value = GetValue(insertValues, insertProperties, memberInfo, type, mi => IdentifierUtil.Format(mi, insertProperties.IdentifierEscaping));
+      var value = GetValue(insertValues, insertProperties, memberInfo, type, mi => IdentifierUtil.Format(mi, insertProperties.IdentifierEscaping, modelBuilder));
 
       valuesStringBuilder.Append(value);
     }
@@ -69,12 +69,12 @@ internal sealed class CreateInsert : EntityInfo
   private object GetValue<T>(InsertValues<T> insertValues, InsertProperties insertProperties,
     MemberInfo memberInfo, Type type, Func<MemberInfo, string> formatter)
   {
-    var hasValue = insertValues.PropertyValues.ContainsKey(memberInfo.Format(insertProperties.IdentifierEscaping));
+    var hasValue = insertValues.PropertyValues.ContainsKey(memberInfo.Format(insertProperties.IdentifierEscaping, modelBuilder));
 
     object value;
     
     if (hasValue)
-      value = insertValues.PropertyValues[memberInfo.Format(insertProperties.IdentifierEscaping)];
+      value = insertValues.PropertyValues[memberInfo.Format(insertProperties.IdentifierEscaping, modelBuilder)];
     else
       value = new CreateKSqlValue(modelBuilder).ExtractValue(insertValues.Entity, insertProperties, memberInfo, type, formatter);
 

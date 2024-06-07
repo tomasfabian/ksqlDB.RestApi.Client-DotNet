@@ -1,4 +1,5 @@
 using FluentAssertions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
@@ -24,7 +25,7 @@ public class JoinVisitorTests : TestBase
     base.TestInitialize();
 
     var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDbUrl);
-    KSqlDbContext = new KSqlDBContext(contextOptions);
+    KSqlDbContext = new KSqlDBContext(contextOptions, new ModelBuilder());
   }
 
   private static string MovieAlias => "movie";

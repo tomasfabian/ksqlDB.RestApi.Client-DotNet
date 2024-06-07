@@ -1,13 +1,19 @@
 # ksqlDB.RestApi.Client
 
+# 6.1.0
+- added `HasColumnName` to the Fluent API to allow overriding property names during JSON deserialization and code generation.
+
+## BugFix
+- fixed missing usage/evaluation of the `JsonPropertyNameAttribute` during the creation of types.
+
 # 6.0.2
 
 # BugFix
-- C# decimal is mapped to STRUCT type. #81
+- C# decimal is mapped to STRUCT type #81
 
 # 6.0.1
 
-# BugFix
+## BugFix
 - requests with `KSqlDbRestApiClient` can result in 431 error codes #80
 
 # 6.0.0
@@ -17,7 +23,7 @@
 - introduced distinct parameters specifically tailored for pull queries. This modification results in a breaking change. Before this update, the parameters sent to both the 'query' and 'query-stream' endpoints were shared between pull and push queries. #77
 - see also [breakingchanges.md](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/breaking_changes.md#v600)
 
-# BugFix
+## BugFix
 - CreateQueryStream doesn't always use configured parameters. The PullQuery functionality was overriding the options configured for the PushQuery. #75 reported by @jbkuczma 
 
 # 5.1.0

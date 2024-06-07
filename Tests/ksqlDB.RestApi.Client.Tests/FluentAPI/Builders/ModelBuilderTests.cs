@@ -62,9 +62,27 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
 
       //Assert
       fieldTypeBuilder.Should().NotBeNull();
-      var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
       entityMetadata.Should().NotBeNull();
       entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description)).Ignore.Should().BeTrue();
+    }
+
+    [Test]
+    public void Property_HasColumnName()
+    {
+      //Arrange
+      var columnName = "desc";
+
+      //Act
+      var fieldTypeBuilder = builder.Entity<Payment>()
+        .Property(b => b.Description)
+        .HasColumnName(columnName);
+
+      //Assert
+      fieldTypeBuilder.Should().NotBeNull();
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      entityMetadata.Should().NotBeNull();
+      entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description)).ColumnName.Should().Be(columnName);
     }
 
     [Test]
@@ -83,7 +101,7 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
 
       //Assert
       fieldTypeBuilder.Should().NotBeNull();
-      var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
       entityMetadata.Should().NotBeNull();
       entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description)).Ignore.Should().BeTrue();
       entityMetadata.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Amount)).Ignore.Should().BeTrue();
@@ -105,7 +123,7 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
 
       //Assert
       fieldTypeBuilder.Should().NotBeNull();
-      var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Composite));
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Composite));
       entityMetadata.Should().NotBeNull();
       var memberInfo = GetTitleMemberInfo();
       entityMetadata!.FieldsMetadata.First(c => c.MemberInfo == memberInfo).Ignore.Should().BeTrue();
@@ -121,7 +139,7 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
       builder.AddConvention(decimalTypeConvention);
 
       //Assert
-      builder.Conventions[typeof(decimal)].Should().BeEquivalentTo(decimalTypeConvention);
+      ((IMetadataProvider)builder).Conventions[typeof(decimal)].Should().BeEquivalentTo(decimalTypeConvention);
     }
 
     private class PaymentConfiguration : IFromItemTypeConfiguration<Payment>
@@ -143,7 +161,7 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
       builder.Apply(configuration);
 
       //Assert
-      var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
       entityMetadata.Should().NotBeNull();
       entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description)).Ignore.Should().BeTrue();
     }
@@ -170,7 +188,7 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
 
       //Assert
       fieldTypeBuilder.Should().NotBeNull();
-      var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
       entityMetadata.Should().NotBeNull();
       var metadata = (DecimalFieldMetadata)entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Amount));
 
@@ -191,7 +209,7 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
 
       //Assert
       fieldTypeBuilder.Should().NotBeNull();
-      var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
       entityMetadata.Should().NotBeNull();
       var metadata = (BytesArrayFieldMetadata)entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Header));
 
@@ -210,7 +228,7 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
 
       //Assert
       fieldTypeBuilder.Should().NotBeNull();
-      var entityMetadata = builder.GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
       entityMetadata.Should().NotBeNull();
       var metadata = entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Header));
 

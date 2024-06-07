@@ -1,4 +1,5 @@
-﻿using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using ksqlDb.RestApi.Client.Tests.Fakes.Http;
 
@@ -7,7 +8,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 internal class TestableKSqlDbQueryProvider : KSqlDbQueryProvider
 {
   public TestableKSqlDbQueryProvider(IHttpV1ClientFactory httpClientFactory)
-    : base(httpClientFactory, TestKSqlDBContextOptions.Instance)
+    : base(httpClientFactory, new ModelBuilder(), TestKSqlDBContextOptions.Instance)
   {
   }
 

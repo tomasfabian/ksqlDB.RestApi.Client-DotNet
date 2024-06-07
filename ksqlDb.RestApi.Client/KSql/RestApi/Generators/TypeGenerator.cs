@@ -1,5 +1,6 @@
 using System.Text;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
@@ -8,9 +9,9 @@ using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 
-internal sealed class TypeGenerator(ModelBuilder modelBuilder) : EntityInfo(modelBuilder)
+internal sealed class TypeGenerator(IMetadataProvider metadataProvider) : EntityInfo(metadataProvider)
 {
-  private readonly KSqlTypeTranslator typeTranslator = new(modelBuilder);
+  private readonly KSqlTypeTranslator typeTranslator = new(metadataProvider);
 
   internal string Print<T>(TypeProperties properties)
   {
@@ -35,7 +36,8 @@ internal sealed class TypeGenerator(ModelBuilder modelBuilder) : EntityInfo(mode
 
       var ksqlType = typeTranslator.Translate(type, escaping);
 
-      var columnDefinition = $"{EscapeName(memberInfo.Name, escaping)} {ksqlType}{typeTranslator.ExploreAttributes(typeof(T), memberInfo, type)}";
+      var memberName = memberInfo.GetMemberName(metadataProvider);
+      var columnDefinition = $"{EscapeName(memberName, escaping)} {ksqlType}{typeTranslator.ExploreAttributes(typeof(T), memberInfo, type)}";
       ksqlProperties.Add(columnDefinition);
     }
 

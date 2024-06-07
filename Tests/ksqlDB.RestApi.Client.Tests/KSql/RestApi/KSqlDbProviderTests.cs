@@ -1,4 +1,8 @@
+using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using FluentAssertions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDb.RestApi.Client.Tests.Fakes.Logging;
@@ -34,7 +38,7 @@ public class KSqlDbProviderTests : TestBase
     var queryParameters = new QueryStreamParameters();
 
     //Act
-    var tweets = await ClassUnderTest.Run<Tweet>(queryParameters).ToListAsync();
+    await ClassUnderTest.Run<Tweet>(queryParameters).ToListAsync();
 
     //Assert
     LoggerMock.VerifyLog(LogLevel.Information, Times.Once);
@@ -177,12 +181,11 @@ public class KSqlDbProviderTests : TestBase
     try
     {
       //Act
-      var tweets = await ClassUnderTest.Run<Tweet>(queryParameters).ToListAsync();
-
-      //Assert
+      await ClassUnderTest.Run<Tweet>(queryParameters).ToListAsync();
     }
     catch (Exception)
     {
+      //Assert
       LoggerMock.VerifyLog(LogLevel.Error, Times.Once);
     }
   }
@@ -196,7 +199,7 @@ public class KSqlDbProviderTests : TestBase
 
     //Act
     IAsyncEnumerable<Tweet> tweets = ClassUnderTest.Run<Tweet>(queryParameters, cts.Token);
-    cts.Cancel();
+    await cts.CancelAsync();
 
     //Assert
     var receivedTweets = new List<Tweet>();
@@ -237,4 +240,64 @@ public class KSqlDbProviderTests : TestBase
     //Assert
     ClassUnderTest.LastUsedHttpClient.IsDisposed.Should().BeTrue();
   }
+
+  private class DomainObject
+  {
+    public int Id { get; set; }
+  }
+
+  #region JsonPropertyNameModifier
+
+  [Test]
+  public void JsonPropertyNameModifier()
+  {
+    //Arrange
+    var modelBuilder = new ModelBuilder();
+    var jsonTypeInfo = new DefaultJsonTypeInfoResolver().GetTypeInfo(typeof(DomainObject), new JsonSerializerOptions());
+
+    //Act
+    KSqlDbProvider.JsonPropertyNameModifier(jsonTypeInfo, modelBuilder);
+
+    //Assert
+    jsonTypeInfo.Properties[0].Name.Should().Be(nameof(DomainObject.Id));
+  }
+
+  [Test]
+  public void JsonPropertyNameModifier_ModelBuilder_HasColumnNameOverride()
+  {
+    //Arrange
+    var idColumnName = "id";
+    var modelBuilder = new ModelBuilder();
+    modelBuilder.Entity<DomainObject>()
+      .Property(c => c.Id)
+      .HasColumnName(idColumnName);
+
+    var jsonTypeInfo = new DefaultJsonTypeInfoResolver().GetTypeInfo(typeof(DomainObject), new JsonSerializerOptions());
+
+    //Act
+    KSqlDbProvider.JsonPropertyNameModifier(jsonTypeInfo, modelBuilder);
+
+    //Assert
+    jsonTypeInfo.Properties[0].Name.Should().Be(idColumnName);
+  }
+
+  [Test]
+  public void JsonPropertyNameModifier_ModelBuilder_WithoutHasColumnNameOverride()
+  {
+    //Arrange
+    var modelBuilder = new ModelBuilder();
+    modelBuilder.Entity<DomainObject>()
+      .Property(c => c.Id)
+      .WithHeaders();
+
+    var jsonTypeInfo = new DefaultJsonTypeInfoResolver().GetTypeInfo(typeof(DomainObject), new JsonSerializerOptions());
+
+    //Act
+    KSqlDbProvider.JsonPropertyNameModifier(jsonTypeInfo, modelBuilder);
+
+    //Assert
+    jsonTypeInfo.Properties[0].Name.Should().Be(nameof(DomainObject.Id));
+  }
+
+  #endregion
 }

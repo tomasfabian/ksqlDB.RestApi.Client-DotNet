@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using FluentAssertions;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
@@ -10,7 +11,13 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators;
 
 public class TypeGeneratorTests
 {
-  private readonly ModelBuilder modelBuilder = new();
+  private ModelBuilder modelBuilder;
+
+  [SetUp]
+  public void TestInitialize()
+  {
+    modelBuilder = new();
+  }
 
   [Test]
   public void CreateType()
@@ -23,6 +30,42 @@ public class TypeGeneratorTests
     //Assert
     statement.Should()
       .Be($"CREATE TYPE {nameof(Address)} AS STRUCT<Number INT, Street VARCHAR, City VARCHAR>;");
+  }
+
+  private record Test
+  {
+    [JsonPropertyName("Id")]
+    public int Override { get; set; }
+  }
+
+  [Test]
+  public void CreateType_JsonPropertyName()
+  {
+    //Arrange
+
+    //Act
+    var statement = new TypeGenerator(modelBuilder).Print<Test>(new TypeProperties());
+
+    //Assert
+    statement.Should()
+      .Be($"CREATE TYPE {nameof(Test)} AS STRUCT<Id INT>;");
+  }
+
+  [Test]
+  public void CreateType_ModelBuilder_HasColumnName()
+  {
+    //Arrange
+    string columnName = "No";
+    modelBuilder.Entity<Address>()
+      .Property(b => b.Number)
+      .HasColumnName(columnName);
+
+    //Act
+    var statement = new TypeGenerator(modelBuilder).Print<Address>(new TypeProperties());
+
+    //Assert
+    statement.Should()
+      .Be($"CREATE TYPE {nameof(Address)} AS STRUCT<{columnName} INT, Street VARCHAR, City VARCHAR>;");
   }
 
   [Test]
