@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS Payments (
 ) WITH ( KAFKA_TOPIC='Payment', VALUE_FORMAT='Json', PARTITIONS='3' );
 ```
 
-The `Secret` column was excluded from the generated DDL statement due to its configuration using the model builder's 'Ignore' method:
+The `Secret` column was excluded from the generated DDL statement due to its configuration using the model builder's `Ignore` method:
 
 ```SQL
 CREATE TABLE IF NOT EXISTS Accounts (
@@ -147,7 +147,7 @@ modelBuilder.AddConvention(decimalTypeConvention);
 ### WithHeader
 **v5.1.0**
 
-Properties of en entity can be marked as a [HEADER](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#headers) with the model builder's FLUENT API as demonstrated below:
+Properties of en entity can be marked as a [HEADER](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#headers) with the model builder's fluent API as demonstrated below:
 
 ```C#
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
@@ -176,12 +176,12 @@ CREATE STREAM IF NOT EXISTS PocoWithHeaders (
 ) WITH ( KAFKA_TOPIC='PocoWithHeader', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='3' );
 ```
 
-The `WithHeader` function within the FLUENT API takes precedence over the `HeadersAttribute`.
+The `WithHeader` function within the fluent API takes precedence over the `HeadersAttribute`.
 
 ### WithHeaders
 **v5.1.0**
 
-Properties of en entity can be marked as a [HEADERS](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#headers) with the model builder's FLUENT API as demonstrated below:
+Properties of en entity can be marked as a [HEADERS](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#headers) with the model builder's fluent API as demonstrated below:
 
 ```C#
 using ksqlDb.RestApi.Client.Metadata;
@@ -222,13 +222,14 @@ CREATE STREAM Movie (
 ) WITH ( KAFKA_TOPIC='MyMovie', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );
 ```
 
-The `WithHeaders` function within the FLUENT API takes precedence over the `HeadersAttribute`.
+The `WithHeaders` function within the fluent API takes precedence over the `HeadersAttribute`.
 
 ### HasColumnName
 **v6.1.0**
+
 The `HasColumnName` function is employed during JSON deserialization and code generation, particularly in tasks like crafting CREATE STREAM or INSERT INTO statements.
 
-The below code demonstrates how to use the `HasColumnName` method in the Fluent API to override the property name `Description` to `Desc` during code generation:
+The below code demonstrates how to use the `HasColumnName` method in the fluent API to override the property name `Description` to `Desc` during code generation:
 
 ```C#
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
@@ -237,11 +238,13 @@ modelBuilder.Entity<Payment>()
   .Property(b => b.Description)
   .HasColumnName("Desc");
 
-var statement = new CreateInsert(modelBuilder).Generate(movie, new InsertProperties { IdentifierEscaping = IdentifierEscaping.Keywords });
+var statement = new CreateInsert(modelBuilder)
+    .Generate(movie, new InsertProperties { IdentifierEscaping = IdentifierEscaping.Keywords });
 ```
 
-The KSQL snippet illustrates an example INSERT statement with the overridden column names, showing how it corresponds to the Fluent API configuration:
+The KSQL snippet illustrates an example INSERT statement with the overridden column name, showing how it corresponds to the fluent API configuration:
 
 ```SQL
-INSERT INTO Payments (Id, Amount, Desc) VALUES ('1', 33, 'Purchase');
+INSERT INTO Payments (Id, Amount, Desc)
+VALUES ('1', 33, 'Purchase');
 ```
