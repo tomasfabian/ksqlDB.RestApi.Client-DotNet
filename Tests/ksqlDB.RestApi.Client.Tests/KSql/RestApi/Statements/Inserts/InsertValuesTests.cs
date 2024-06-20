@@ -3,6 +3,7 @@ using FluentAssertions;
 using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using NUnit.Framework;
+using Assert = NUnit.Framework.Assert;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements.Inserts;
 

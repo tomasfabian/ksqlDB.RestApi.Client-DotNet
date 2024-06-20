@@ -220,7 +220,7 @@ EMIT CHANGES;".ReplaceLineEndings();
   }
 
   [Test]
-  [Ignore("TODO")]
+  [NUnit.Framework.Ignore("TODO")]
   public void BuildKSql_SelectFrom3MultiJoinSameTypePropertyWithJsonPropertyNameAttribute()
   {
     //Arrange

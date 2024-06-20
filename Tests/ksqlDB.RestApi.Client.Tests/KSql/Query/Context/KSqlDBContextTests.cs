@@ -219,7 +219,7 @@ public class KSqlDBContextTests : TestBase
     var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
     //Assert
-    Assert.Throws<InvalidOperationException>(() =>
+    NUnit.Framework.Assert.Throws<InvalidOperationException>(() =>
     {
       //Act
       context.CreatePushQuery<string>(queryParameters);

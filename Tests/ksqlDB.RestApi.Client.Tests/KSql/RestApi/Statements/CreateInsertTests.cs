@@ -1049,7 +1049,7 @@ public class CreateInsertTests
   }
 
   [Test]
-  [Ignore("TODO")]
+  [NUnit.Framework.Ignore("TODO")]
   public void Bytes()
   {
     //Arrange
@@ -1073,7 +1073,7 @@ public class CreateInsertTests
   }
 
   [Test]
-  [Ignore("TODO")]
+  [NUnit.Framework.Ignore("TODO")]
   public void Concat()
   {
     //Arrange

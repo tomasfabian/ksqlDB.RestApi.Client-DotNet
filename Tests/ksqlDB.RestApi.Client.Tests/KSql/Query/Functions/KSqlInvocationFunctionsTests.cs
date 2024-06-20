@@ -78,7 +78,7 @@ public class KSqlInvocationFunctionsTests : TestBase
   }
 
   [Test]
-  [Ignore("TODO:")]
+  [NUnit.Framework.Ignore("TODO:")]
   public void TransformExtensionMethod_Dictionary_ToUpper()
   {
     //Arrange

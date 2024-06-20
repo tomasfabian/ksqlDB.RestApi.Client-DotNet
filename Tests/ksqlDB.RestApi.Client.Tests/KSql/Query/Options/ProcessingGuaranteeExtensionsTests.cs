@@ -1,6 +1,7 @@
 using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using NUnit.Framework;
+using Assert = NUnit.Framework.Assert;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Options;
 

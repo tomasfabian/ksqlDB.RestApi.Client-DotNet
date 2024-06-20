@@ -12,6 +12,7 @@ using Moq;
 using Ninject;
 using NUnit.Framework;
 using UnitTests;
+using Assert = NUnit.Framework.Assert;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 

@@ -475,7 +475,7 @@ EMIT CHANGES;");
   }
 
   [Test]
-  [Ignore("TODO:")]
+  [NUnit.Framework.Ignore("TODO:")]
   public void JoinWithSeveralOnConditions_BuildKSql_Prints()
   {
     //Arrange

@@ -9,6 +9,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
+using Assert = NUnit.Framework.Assert;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 

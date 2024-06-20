@@ -7,6 +7,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Visitors;
 using ksqlDb.RestApi.Client.Tests.Models;
 using NUnit.Framework;
 using UnitTests;
+using Assert = NUnit.Framework.Assert;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Visitors;
 
