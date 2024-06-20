@@ -10,68 +10,68 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 
 public static class HttpResponseMessageExtensions
 {
-  public static StatementResponse[] ToStatementResponses(this HttpResponseMessage httpResponseMessage, CancellationToken cancellationToken = default)
+  public static StatementResponse[] ToStatementResponses(this HttpResponseMessage httpResponseMessage)
   {
-    string responseContent = httpResponseMessage.Content.ReadAsStringAsync(cancellationToken).Result;
-      
+    string responseContent = httpResponseMessage.Content.ReadAsStringAsync().Result;
+
     var responseObjects = JsonSerializer.Deserialize<StatementResponse[]>(responseContent);
 
     return responseObjects ?? [];
   }
 
-  public static StatementResponse? ToStatementResponse(this HttpResponseMessage httpResponseMessage, CancellationToken cancellationToken = default)
+  public static StatementResponse? ToStatementResponse(this HttpResponseMessage httpResponseMessage)
   {
-    string responseContent = httpResponseMessage.Content.ReadAsStringAsync(cancellationToken).Result;
-      
+    string responseContent = httpResponseMessage.Content.ReadAsStringAsync().Result;
+
     var responseObject = JsonSerializer.Deserialize<StatementResponse>(responseContent);
 
     return responseObject;
   }
 
-  public static Task<StatementResponse[]> ToStatementResponsesAsync(this HttpResponseMessage httpResponseMessage, CancellationToken cancellationToken = default)
+  public static Task<StatementResponse[]> ToStatementResponsesAsync(this HttpResponseMessage httpResponseMessage)
   {
-    return httpResponseMessage.ToStatementResponsesAsync<StatementResponse>(cancellationToken);
+    return httpResponseMessage.ToStatementResponsesAsync<StatementResponse>();
   }
 
-  public static Task<StreamsResponse[]> ToStreamsResponseAsync(this HttpResponseMessage httpResponseMessage, CancellationToken cancellationToken = default)
+  public static Task<StreamsResponse[]> ToStreamsResponseAsync(this HttpResponseMessage httpResponseMessage)
   {
-    return httpResponseMessage.ToStatementResponsesAsync<StreamsResponse>(cancellationToken);
+    return httpResponseMessage.ToStatementResponsesAsync<StreamsResponse>();
   }
 
-  public static Task<TablesResponse[]> ToTablesResponseAsync(this HttpResponseMessage httpResponseMessage, CancellationToken cancellationToken = default)
+  public static Task<TablesResponse[]> ToTablesResponseAsync(this HttpResponseMessage httpResponseMessage)
   {
-    return httpResponseMessage.ToStatementResponsesAsync<TablesResponse>(cancellationToken);
+    return httpResponseMessage.ToStatementResponsesAsync<TablesResponse>();
   }
 
-  public static Task<QueriesResponse[]> ToQueriesResponseAsync(this HttpResponseMessage httpResponseMessage, CancellationToken cancellationToken = default)
+  public static Task<QueriesResponse[]> ToQueriesResponseAsync(this HttpResponseMessage httpResponseMessage)
   {
-    return httpResponseMessage.ToStatementResponsesAsync<QueriesResponse>(cancellationToken);
+    return httpResponseMessage.ToStatementResponsesAsync<QueriesResponse>();
   }
 
-  public static Task<TopicsResponse[]> ToTopicsResponseAsync(this HttpResponseMessage httpResponseMessage, CancellationToken cancellationToken = default)
+  public static Task<TopicsResponse[]> ToTopicsResponseAsync(this HttpResponseMessage httpResponseMessage)
   {
-    return httpResponseMessage.ToStatementResponsesAsync<TopicsResponse>(cancellationToken);
-  }
-	
-  public static Task<TopicsExtendedResponse[]> ToTopicsExtendedResponseAsync(this HttpResponseMessage httpResponseMessage, CancellationToken cancellationToken = default)
-  {
-    return httpResponseMessage.ToStatementResponsesAsync<TopicsExtendedResponse>(cancellationToken);
+    return httpResponseMessage.ToStatementResponsesAsync<TopicsResponse>();
   }
 
-  public static Task<ConnectorsResponse[]> ToConnectorsResponseAsync(this HttpResponseMessage httpResponseMessage, CancellationToken cancellationToken = default)
+  public static Task<TopicsExtendedResponse[]> ToTopicsExtendedResponseAsync(this HttpResponseMessage httpResponseMessage)
   {
-    return httpResponseMessage.ToStatementResponsesAsync<ConnectorsResponse>(cancellationToken);
+    return httpResponseMessage.ToStatementResponsesAsync<TopicsExtendedResponse>();
   }
 
-  internal static async Task<TResponse[]> ToStatementResponsesAsync<TResponse>(this HttpResponseMessage httpResponseMessage, CancellationToken cancellationToken = default)
+  public static Task<ConnectorsResponse[]> ToConnectorsResponseAsync(this HttpResponseMessage httpResponseMessage)
+  {
+    return httpResponseMessage.ToStatementResponsesAsync<ConnectorsResponse>();
+  }
+
+  internal static async Task<TResponse[]> ToStatementResponsesAsync<TResponse>(this HttpResponseMessage httpResponseMessage)
   {
     TResponse[]? statementResponses;
 
     if (httpResponseMessage.IsSuccessStatusCode)
-      statementResponses = await httpResponseMessage.ToStatementResponseAsync<TResponse[]>(cancellationToken).ConfigureAwait(false);
+      statementResponses = await httpResponseMessage.ToStatementResponseAsync<TResponse[]>().ConfigureAwait(false);
     else
     {
-      var statementResponse = await httpResponseMessage.ToStatementResponseAsync<TResponse>(cancellationToken).ConfigureAwait(false);
+      var statementResponse = await httpResponseMessage.ToStatementResponseAsync<TResponse>().ConfigureAwait(false);
       statementResponses = statementResponse != null ? [statementResponse] : [];
     }
 
@@ -82,11 +82,11 @@ public static class HttpResponseMessageExtensions
   {
     PropertyNameCaseInsensitive = true
   };
-    
-  private static async Task<TResponse?> ToStatementResponseAsync<TResponse>(this HttpResponseMessage httpResponseMessage, CancellationToken cancellationToken = default)
+
+  private static async Task<TResponse?> ToStatementResponseAsync<TResponse>(this HttpResponseMessage httpResponseMessage)
   {
-    string responseContent = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-      
+    string responseContent = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+
     var responseObject = JsonSerializer.Deserialize<TResponse>(responseContent, JsonSerializerOptions);
 
     return responseObject;
