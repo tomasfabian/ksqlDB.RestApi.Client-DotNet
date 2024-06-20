@@ -58,7 +58,7 @@ public class KSqlDbRestApiClientTests
     KSqlDbStatement ksqlDbStatement = new(CreateTableStatement());
     var cts = new CancellationTokenSource();
 
-    Assert.ThrowsAsync<TaskCanceledException>(() =>
+    NUnit.Framework.Assert.ThrowsAsync<TaskCanceledException>(() =>
     {
       //Act
       var httpResponseMessageTask = restApiClient.ExecuteStatementAsync(ksqlDbStatement, cts.Token);
