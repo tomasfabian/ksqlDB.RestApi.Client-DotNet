@@ -109,7 +109,7 @@ public static class Program
         Console.WriteLine();
       }, onError: error => { Console.WriteLine($"Exception: {error.Message}"); }, onCompleted: () => Console.WriteLine("Completed"));
 
-    await CreateOrReplaceTableStatement(context);
+    await CreateOrReplaceTableStatement(context, cancellationTokenSource.Token);
 
     await moviesProvider.InsertMovieAsync(MoviesProvider.Movie1);
     await moviesProvider.InsertMovieAsync(MoviesProvider.Movie2);
@@ -182,7 +182,7 @@ public static class Program
     }
   }
 
-  private static async Task ConfigureKSqlDbWithServicesCollection_AndTryAsync(string ksqlDbUrl)
+  private static async Task ConfigureKSqlDbWithServicesCollection_AndTryAsync(string ksqlDbUrl, CancellationToken cancellationToken = default)
   {
     var services = new ServiceCollection();
 
@@ -190,7 +190,7 @@ public static class Program
     {
       c.UseKSqlDb(ksqlDbUrl);
 
-      c.ReplaceHttpClient<ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory, ksqlDB.RestApi.Client.KSql.RestApi.Http.HttpClientFactory>(_ => { })
+      c.ReplaceHttpClient<KSql.RestApi.Http.IHttpClientFactory, KSql.RestApi.Http.HttpClientFactory>(_ => { })
         .AddHttpMessageHandler(_ => new DebugHandler());
     });
 
@@ -219,17 +219,17 @@ public static class Program
         Console.WriteLine("Completed");
       });
 
-    await semaphoreSlim.WaitAsync();
+    await semaphoreSlim.WaitAsync(cancellationToken);
 
     await context.DisposeAsync();
   }
 
-  private static async Task AddAndSaveChangesAsync(KSqlDBContext context)
+  private static async Task AddAndSaveChangesAsync(KSqlDBContext context, CancellationToken cancellationToken = default)
   {
     context.Add(MoviesProvider.Movie1);
     context.Add(MoviesProvider.Movie2);
 
-    var saveResponse = await context.SaveChangesAsync();
+    var saveResponse = await context.SaveChangesAsync(cancellationToken);
   }
 
   private static async Task SubscribeAsync(IKSqlDBContext context)
@@ -323,10 +323,10 @@ public static class Program
     return subscriptions;
   }
 
-  private static async Task DescribeFunction(IKSqlDbRestApiClient restApiProvider, string functionName)
+  private static async Task DescribeFunction(IKSqlDbRestApiClient restApiProvider, string functionName, CancellationToken cancellationToken = default)
   {
-    var httpResponseMessage = await restApiProvider.ExecuteStatementAsync(new KSqlDbStatement($"DESCRIBE FUNCTION {functionName};"));
-    var content = await httpResponseMessage.Content.ReadAsStringAsync();
+    var httpResponseMessage = await restApiProvider.ExecuteStatementAsync(new KSqlDbStatement($"DESCRIBE FUNCTION {functionName};"), cancellationToken);
+    var content = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
     Console.WriteLine(content);
   }
 
@@ -401,7 +401,7 @@ public static class Program
 
           Console.WriteLine($"{key} - {value}");
         }
-      }, error => { });
+      }, _ => { });
 
     return subscription;
   }
@@ -439,7 +439,7 @@ public static class Program
     public int ReleaseYear { get; set; }
   }
 
-  private static async Task InsertIntoSelectAsync(KSqlDbRestApiProvider restApiProvider, KSqlDBContext context)
+  private static async Task InsertIntoSelectAsync(KSqlDbRestApiProvider restApiProvider, KSqlDBContext context, CancellationToken cancellationToken = default)
   {
     string streamName = "book";
     EntityCreationMetadata metadata = new(streamName)
@@ -450,18 +450,18 @@ public static class Program
       ValueFormat = SerializationFormats.Json,
       ShouldPluralizeEntityName = false
     };
-    await restApiProvider.CreateOrReplaceStreamAsync<Book>(metadata);
+    await restApiProvider.CreateOrReplaceStreamAsync<Book>(metadata, cancellationToken);
    
     string streamNameFrom = "book_from";
     metadata.EntityName = streamNameFrom;
     metadata.KafkaTopic = streamNameFrom;
-    await restApiProvider.CreateOrReplaceStreamAsync<Book>(metadata);
+    await restApiProvider.CreateOrReplaceStreamAsync<Book>(metadata, cancellationToken);
 
     string queryId = "insert_query_book";
 
     var response = await context.CreatePushQuery<Book>(streamNameFrom)
       .Where(c => c.Title != "Apocalypse now")
-      .InsertIntoAsync(streamName, queryId);
+      .InsertIntoAsync(streamName, queryId, cancellationToken);
 
     var responses = await response.ToStatementResponsesAsync();
     Console.WriteLine($"QueryId: {responses[0].CommandStatus?.QueryId}");
