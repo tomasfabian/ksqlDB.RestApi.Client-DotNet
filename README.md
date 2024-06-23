@@ -162,7 +162,7 @@ run in command line:
 
 In [Blazor](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor), the application logic and UI rendering occur on the server. The client's web browser receives updates and UI changes through a **SignalR** connection.
 This ensures smooth integration with the `ksqlDB.RestApi.Client` library, allowing the **Apache Kafka broker** and **ksqlDB** to remain hidden from direct exposure to clients.
-The **server-side Blazor** application communicates with ksqlDB using the `ksqlDB.RestApi.Client`.
+The **server-side Blazor** application communicates with `ksqlDB` using the `ksqlDB.RestApi.Client`.
 Whenever an event in `ksqlDB` occurs, the server-side Blazor app responds and signals the UI in the client's browser to update. This setup allows a smooth and continuous update flow, creating a real-time, reactive user interface.
 
 - set `docker-compose.csproj` as startup project in [InsideOut.sln](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/Samples/InsideOut) for embedded Kafka connect integration and stream processing examples.
@@ -421,7 +421,7 @@ CREATE TABLE IF NOT EXISTS Accounts (
 ) WITH ( KAFKA_TOPIC='Account', VALUE_FORMAT='Json', PARTITIONS='3', REPLICAS='3' );
 ```
 
-The Description property within the `Payment` type has been customized to override the resulting column name as "Desc".
+The `Description` property within the `Payment` type has been customized to override the resulting column name as "Desc".
 Additionally, the `Id` property within the `Account` table has been designated as the **primary key**, while the `Secret` property is disregarded during code generation.
 
 ### Aggregation functions

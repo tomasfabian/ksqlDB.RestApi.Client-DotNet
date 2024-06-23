@@ -747,7 +747,6 @@ var properties = new DropFromItemProperties
   IdentifierEscaping = IdentifierEscaping.Always
 };
 
-//Act
 var response1 = await ksqlDbRestApiClient.DropTableAsync<TestTable>(properties);
 var response2 = await ksqlDbRestApiClient.DropStreamAsync<TestStream>(properties);
 ```
@@ -1245,7 +1244,6 @@ Expression<Func<string>> valueExpression = () => INITCAP("One little mouse");
 
 var insertValues = new InsertValues<Movie>(new Movie { Id = 5 });
 
-//Act
 insertValues.WithValue(c => c.Title, valueExpression);
 
 Context.Add(insertValues);

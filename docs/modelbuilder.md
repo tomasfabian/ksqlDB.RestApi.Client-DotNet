@@ -147,7 +147,7 @@ modelBuilder.AddConvention(decimalTypeConvention);
 ### WithHeader
 **v5.1.0**
 
-Properties of en entity can be marked as a [HEADER](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#headers) with the model builder's fluent API as demonstrated below:
+Properties of an entity can be marked as a [HEADER](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#headers) with the model builder's fluent API as demonstrated below:
 
 ```C#
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
@@ -181,7 +181,7 @@ The `WithHeader` function within the fluent API takes precedence over the `Heade
 ### WithHeaders
 **v5.1.0**
 
-Properties of en entity can be marked as a [HEADERS](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#headers) with the model builder's fluent API as demonstrated below:
+Properties of an entity can be marked as a [HEADERS](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#headers) with the model builder's fluent API as demonstrated below:
 
 ```C#
 using ksqlDb.RestApi.Client.Metadata;
@@ -239,7 +239,7 @@ modelBuilder.Entity<Payment>()
   .HasColumnName("Desc");
 
 var statement = new CreateInsert(modelBuilder)
-    .Generate(movie, new InsertProperties { IdentifierEscaping = IdentifierEscaping.Keywords });
+    .Generate(payment, new InsertProperties { IdentifierEscaping = IdentifierEscaping.Keywords });
 ```
 
 The KSQL snippet illustrates an example INSERT statement with the overridden column name, showing how it corresponds to the fluent API configuration:
