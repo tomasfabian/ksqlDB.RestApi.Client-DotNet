@@ -12,14 +12,18 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
 using ksqlDB.RestApi.Client.KSql.Query.Operators;
 
-const string ksqlDbUrl = @"http://localhost:8088";
+const string ksqlDbUrl = "http://localhost:8088";
 
 var servicesCollection = new ServiceCollection();
 servicesCollection.ConfigureKSqlDb(ksqlDbUrl);
 
-var serviceProvider = servicesCollection.BuildServiceProvider();
-IKSqlDbRestApiClient ksqlDbRestApiClient = serviceProvider.GetRequiredService<IKSqlDbRestApiClient>();
+var cancellationTokenSource = new CancellationTokenSource();
 
+var serviceProvider = servicesCollection.BuildServiceProvider();
+var ksqlDbRestApiClient = serviceProvider.GetRequiredService<IKSqlDbRestApiClient>();
+var context = serviceProvider.GetRequiredService<IKSqlDBContext>();
+
+await SubscriptionToAComplexTypeAsync(ksqlDbRestApiClient, context, cancellationTokenSource.Token);
 
 Console.WriteLine("Press any key to stop the subscription");
 
@@ -27,7 +31,7 @@ Console.ReadKey();
 
 #pragma warning disable CS8321 // Local function is declared but never used
 
-static async Task StructType(KSqlDBContext context)
+static async Task StructType(IKSqlDBContext context)
 {
   var moviesStream = context.CreatePushQuery<Movie>();
 
@@ -43,7 +47,7 @@ static async Task StructType(KSqlDBContext context)
   }
 }
 
-static IDisposable Arrays(KSqlDBContext context)
+static IDisposable Arrays(IKSqlDBContext context)
 {
   var subscription =
     context.CreatePushQuery<Movie>()
@@ -55,10 +59,12 @@ static IDisposable Arrays(KSqlDBContext context)
     .Select(_ => new[] { 1, 2, 3 }.Length)
     .ToQueryString();
 
+  Console.WriteLine(arrayLengthQuery);
+
   return subscription;
 }
 
-static IDisposable NestedTypes(KSqlDBContext context)
+static IDisposable NestedTypes(IKSqlDBContext context)
 {
   var disposable =
     context.CreatePushQuery<Movie>()
@@ -84,7 +90,7 @@ static IDisposable NestedTypes(KSqlDBContext context)
   return disposable;
 }
 
-static async Task DeeplyNestedTypes(KSqlDBContext context)
+static async Task DeeplyNestedTypes(IKSqlDBContext context)
 {
   var moviesStream = context.CreatePushQuery<Movie>();
 
@@ -126,7 +132,7 @@ static async Task DeeplyNestedTypes(KSqlDBContext context)
 
 #region TimeTypes
 
-static async Task TimeTypes(IKSqlDbRestApiClient restApiClient, IKSqlDBContext context)
+static async Task TimeTypes(IKSqlDbRestApiClient restApiClient, IKSqlDBContext context, CancellationToken cancellationToken = default)
 {
   EntityCreationMetadata metadata = new EntityCreationMetadata(nameof(Dates))
   {
@@ -135,7 +141,9 @@ static async Task TimeTypes(IKSqlDbRestApiClient restApiClient, IKSqlDBContext c
     ValueFormat = SerializationFormats.Json
   };
 
-  var httpResponseMessage = await restApiClient.CreateStreamAsync<Dates>(metadata);
+  var httpResponseMessage = await restApiClient.CreateStreamAsync<Dates>(metadata, cancellationToken: cancellationToken);
+  var content = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
+  Console.WriteLine(content);
 
   var from = new TimeSpan(1, 0, 0);
   var to = new TimeSpan(22, 0, 0);
@@ -161,7 +169,7 @@ static async Task TimeTypes(IKSqlDbRestApiClient restApiClient, IKSqlDBContext c
     DtOffset = new DateTimeOffset(2021, 7, 4, 13, 29, 45, 447, TimeSpan.FromHours(4))
   };
 
-  httpResponseMessage = await restApiClient.InsertIntoAsync(value);
+  httpResponseMessage = await restApiClient.InsertIntoAsync(value, cancellationToken:cancellationToken);
   var statementResponses = await httpResponseMessage.ToStatementResponsesAsync().ConfigureAwait(false);
 }
 
@@ -174,17 +182,19 @@ static void Bytes(IKSqlDBContext ksqlDbContext)
     .ToQueryString();
 }
 
-static async Task SubscriptionToAComplexTypeAsync(IKSqlDbRestApiClient restApiClient, IKSqlDBContext ksqlDbContext)
+static async Task SubscriptionToAComplexTypeAsync(IKSqlDbRestApiClient restApiClient, IKSqlDBContext ksqlDbContext, CancellationToken cancellationToken = default)
 {
   string typeName = nameof(EventCategory);
-  var httpResponseMessage = await restApiClient.DropTypeIfExistsAsync(typeName);
+  var httpResponseMessage = await restApiClient.DropTypeIfExistsAsync(typeName, cancellationToken);
+  var content = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
+  Console.WriteLine(content);
 
-  httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@$"
+  _ = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@$"
 Drop table {nameof(Event)};
 "));
 
-  httpResponseMessage = await restApiClient.CreateTypeAsync<EventCategory>();
-  httpResponseMessage = await restApiClient.CreateTableAsync<Event>(new EntityCreationMetadata("Events") { Partitions = 1 });
+  await restApiClient.CreateTypeAsync<EventCategory>();
+  await restApiClient.CreateTableAsync<Event>(new EntityCreationMetadata("Events") { Partitions = 1 });
 
   var subscription = ksqlDbContext.CreatePushQuery<Event>()
     .Subscribe(value =>
@@ -202,6 +212,8 @@ Drop table {nameof(Event)};
 
   httpResponseMessage = await restApiClient.ExecuteStatementAsync(new KSqlDbStatement(@"
 INSERT INTO Events (Id, Places, Categories) VALUES (1, ARRAY['Place1','Place2','Place3'], ARRAY[STRUCT(Name := 'Planet Earth'), STRUCT(Name := 'Discovery')]);"));
+  content = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
+  Console.WriteLine(content);
 }
 
 #pragma warning restore CS8321 // Local function is declared but never used
