@@ -295,9 +295,8 @@ public class KSqlDBContext : KSqlDBContextDependenciesProvider, IKSqlDBContext
   {
     cts.Dispose();
 
-#if !NETSTANDARD
     await base.OnDisposeAsync();
-#endif
+
     Dispose(false);
   }
 

@@ -1,5 +1,10 @@
 # ksqlDB.RestApi.Client
 
+# Unreleased changes
+
+# BugFix
+- `KSqlDBContext` removed `!NETSTANDARD` pragma from `OnDisposeAsync`
+
 # 6.1.0
 - added `HasColumnName` to the Fluent API to allow overriding property names during JSON deserialization and code generation.
 
