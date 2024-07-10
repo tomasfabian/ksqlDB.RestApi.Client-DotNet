@@ -30,7 +30,7 @@ public interface IKSqlDBContext : IKSqlDBStatementsContext, IAsyncDisposable, ID
   /// </summary>
   /// <typeparam name="TEntity">The type of the data in the data source.</typeparam>
   /// <param name="tableName">Overrides the name of the table which by default is derived from TEntity</param>
-  /// <returns>An IPullable for query composition and execution.</returns>
+  /// <returns>An <see cref="IPullable{TEntity}"/> for query composition and execution.</returns>
   IPullable<TEntity> CreatePullQuery<TEntity>(string? tableName = null);
 
   /// <summary>
