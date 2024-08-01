@@ -215,6 +215,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         {
           var setupParameters = options.UseKSqlDb(ksqlDbUrl);
 
+          setupParameters.Options.ShouldPluralizeFromItemName = false;
           setupParameters.SetAutoOffsetReset(AutoOffsetReset.Earliest);
 
         }, ServiceLifetime.Transient, restApiLifetime: ServiceLifetime.Transient);
