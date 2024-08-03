@@ -1254,3 +1254,60 @@ var response = await Context.SaveChangesAsync();
 ```SQL
 INSERT INTO Movies (Title, Id, Release_Year) VALUES (INITCAP('One little mouse'), 5, 0);
 ```
+
+### Default ShouldPluralizeFromItemName setting for KSqlDbRestApiClient
+**v6.2.0**
+
+Here's the improved version of the text:
+
+The `KSqlDbRestApiClient` class now includes `KSqlDBRestApiClientOptions` in its constructor arguments.
+Additionally, `EntityCreationMetadata.ShouldPluralizeEntityName` has been changed to a nullable boolean, and its default value of `true` has been removed.
+The methods in `KSqlDbRestApiClient` check if the `ShouldPluralizeEntityName` field in the `TypeProperties`, `DropTypeProperties`, `InsertProperties`, and `DropFromItemProperties` classes is null, and if so, set it using the value from `KSqlDBRestApiClientOptions`.
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+
+var ksqlDbUrl = "http://localhost:8088";
+
+var httpClient = new HttpClient
+{
+  BaseAddress = new Uri(ksqlDbUrl)
+};
+var httpClientFactory = new HttpClientFactory(httpClient);
+var restApiClientOptions = new KSqlDBRestApiClientOptions
+{
+  ShouldPluralizeFromItemName = true,
+};
+
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory, restApiClientOptions);
+```
+
+To use dependency injection (DI), first create and configure an instance of `KSqlDBRestApiClientOptions`.
+Then, register this configured instance with the service collection.
+
+```C#
+using ksqlDb.RestApi.Client.DependencyInjection;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+using Microsoft.Extensions.DependencyInjection;
+
+var servicesCollection = new ServiceCollection();
+
+servicesCollection.AddDbContext<IKSqlDBContext, KSqlDBContext>(
+  options =>
+  {
+    var ksqlDbUrl = "http://localhost:8088";
+    var setupParameters = options.UseKSqlDb(ksqlDbUrl);
+
+    setupParameters.SetAutoOffsetReset(AutoOffsetReset.Earliest);
+
+  }, contextLifetime: ServiceLifetime.Transient, restApiLifetime: ServiceLifetime.Transient);
+
+var restApiClientOptions = new KSqlDBRestApiClientOptions
+{
+  ShouldPluralizeFromItemName = false,
+};
+servicesCollection.AddSingleton(restApiClientOptions);
+```
