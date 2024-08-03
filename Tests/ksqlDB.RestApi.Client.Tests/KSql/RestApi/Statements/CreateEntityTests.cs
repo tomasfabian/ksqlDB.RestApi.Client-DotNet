@@ -25,6 +25,7 @@ public class CreateEntityTests
   {
     creationMetadata = new EntityCreationMetadata()
     {
+      ShouldPluralizeEntityName = true,
       KafkaTopic = nameof(MyMovie),
       Partitions = 1,
       Replicas = 1

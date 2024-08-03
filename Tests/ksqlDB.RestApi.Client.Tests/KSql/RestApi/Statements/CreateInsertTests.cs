@@ -276,7 +276,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert(modelBuilder).Generate(testEvent);
+    string statement = new CreateInsert(modelBuilder).Generate(testEvent, new InsertProperties());
 
     //Assert
     statement.Should().Be("INSERT INTO Events (Id, Places) VALUES (1, ARRAY['Place1', 'Place2', 'Place3']);");
@@ -513,7 +513,7 @@ public class CreateInsertTests
     var order = new Kafka_table_order2 { Id = 1, ItemsList = [] };
 
     //Act
-    string statement = new CreateInsert(modelBuilder).Generate(order);
+    string statement = new CreateInsert(modelBuilder).Generate(order, new InsertProperties());
 
     //Assert
     statement.Should().Be("INSERT INTO Kafka_table_order2s (Id, ItemsList) VALUES (1, ARRAY_REMOVE(ARRAY[0], 0));"); //ARRAY[] is not supported
@@ -526,7 +526,7 @@ public class CreateInsertTests
     var order = new Kafka_table_order2 { Id = 1, ItemsList = null };
 
     //Act
-    string statement = new CreateInsert(modelBuilder).Generate(order);
+    string statement = new CreateInsert(modelBuilder).Generate(order, new InsertProperties());
 
     //Assert
     statement.Should().Be("INSERT INTO Kafka_table_order2s (Id, ItemsList) VALUES (1, NULL);");
@@ -857,7 +857,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert(modelBuilder).Generate(value);
+    string statement = new CreateInsert(modelBuilder).Generate(value, new InsertProperties());
 
     //Assert
     statement.Should().Be("INSERT INTO TimeTypes (Dt, Ts, DtOffset) VALUES ('2021-02-03', '02:03:04', '0001-01-01T00:00:00.000+00:00');");
@@ -878,7 +878,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert(modelBuilder).Generate(value);
+    string statement = new CreateInsert(modelBuilder).Generate(value, new InsertProperties());
 
     //Assert
     statement.Should().Be("INSERT INTO TimeTypes (DtOffset) VALUES ('2021-07-04T13:29:45.447+04:00');");
@@ -917,7 +917,7 @@ public class CreateInsertTests
     var value = new Update();
 
     //Act
-    string statement = new CreateInsert(modelBuilder).Generate(value);
+    string statement = new CreateInsert(modelBuilder).Generate(value, new InsertProperties());
 
     //Assert
     statement.Should().Be($"INSERT INTO Updates ({nameof(Update.ExtraField)}) VALUES ('{value.ExtraField}');");
@@ -994,7 +994,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert(modelBuilder).Generate(value, insertProperties: null);
+    string statement = new CreateInsert(modelBuilder).Generate(value, new InsertProperties());
 
     //Assert
     statement.Should().Be($"INSERT INTO {nameof(IMyUpdate)}s ({nameof(IMyUpdate.Field)}) VALUES ('{value.Field}');");
@@ -1011,7 +1011,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert(modelBuilder).Generate(value, insertProperties: null);
+    string statement = new CreateInsert(modelBuilder).Generate(value, new InsertProperties());
 
     //Assert
     statement.Should().Be($"INSERT INTO {nameof(Port)}s ({nameof(Port.Id)}, {nameof(Port.PortType)}) VALUES (42, '{value.PortType}');");
@@ -1034,7 +1034,7 @@ public class CreateInsertTests
     };
 
     //Act
-    string statement = new CreateInsert(modelBuilder).Generate(amount);
+    string statement = new CreateInsert(modelBuilder).Generate(amount, new InsertProperties());
 
     //Assert
     statement.Should().Be($"INSERT INTO {nameof(Amount)}s ({nameof(Amount.Volume).ToLower()}) VALUES ({amount.Volume});");
