@@ -1,7 +1,21 @@
 # ksqlDB.RestApi.Client
 
-# Unreleased changes
+# 6.2.0
 
+1. **KSqlDbRestApiClient Constructor Update**:
+    - The `KSqlDbRestApiClient` class constructor now includes a parameter for `KSqlDBRestApiClientOptions`.
+    
+2. **EntityCreationMetadata Update**:
+    - The `EntityCreationMetadata.ShouldPluralizeEntityName` property was modified to be a nullable boolean (`bool?`), and the default value of `true` was removed.
+
+3. **Method Behavior Update in KSqlDbRestApiClient**:
+    - Methods within the `KSqlDbRestApiClient` class now check if the `ShouldPluralizeEntityName` field of the following types is null:
+        - `TypeProperties`
+        - `DropTypeProperties`
+        - `InsertProperties`
+        - `DropFromItemProperties`
+    - If `ShouldPluralizeEntityName` is null, the methods will set it using the value from the `KSqlDBRestApiClientOptions`.
+    
 # BugFix
 - `KSqlDBContext` removed `!NETSTANDARD` pragma from `OnDisposeAsync`
 
