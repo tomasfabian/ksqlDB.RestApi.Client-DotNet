@@ -18,16 +18,15 @@ internal sealed class CreateInsert : EntityInfo
     this.modelBuilder = modelBuilder;
   }
 
-  internal string Generate<T>(T entity, InsertProperties? insertProperties = null)
+  internal string Generate<T>(T entity, InsertProperties insertProperties)
   {
     return Generate(new InsertValues<T>(entity), insertProperties);
   }
 
-  internal string Generate<T>(InsertValues<T> insertValues, InsertProperties? insertProperties = null)
+  internal string Generate<T>(InsertValues<T> insertValues, InsertProperties insertProperties)
   {
-    if (insertValues == null) throw new ArgumentNullException(nameof(insertValues));
-
-    insertProperties ??= new InsertProperties();
+    if (insertProperties.ShouldPluralizeEntityName == null)
+      insertProperties = insertProperties with { ShouldPluralizeEntityName = true };
 
     var entityName = EntityProvider.GetFormattedName<T>(insertProperties);
 

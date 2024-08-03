@@ -42,7 +42,7 @@ internal sealed class CreateEntity(IMetadataProvider metadataProvider) : EntityI
   private void PrintProperties<T>(StatementContext statementContext, EntityCreationMetadata metadata)
   {
     var ksqlProperties = new List<string>();
-    metadata ??= new EntityCreationMetadata();
+
     foreach (var memberInfo in Members<T>(metadata.IncludeReadOnlyProperties))
     {
       var type = GetMemberType(memberInfo);

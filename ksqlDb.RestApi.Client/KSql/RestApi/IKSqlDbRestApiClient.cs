@@ -10,6 +10,9 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi;
 
+/// <summary>
+/// Represents a client for interacting with the KSQL REST API.
+/// </summary>
 public interface IKSqlDbRestApiClient : IKSqlDbCreateRestApiClient, IKSqlDbAssertionsRestApiClient, IKSqlDbDropRestApiClient
 {
   /// <summary>

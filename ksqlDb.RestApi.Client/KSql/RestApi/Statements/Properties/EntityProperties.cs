@@ -15,7 +15,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties
     /// <summary>
     /// Gets or sets a value indicating whether the entity name should be pluralized.
     /// </summary>
-    public bool ShouldPluralizeEntityName { get; init; } = true;
+    public bool? ShouldPluralizeEntityName { get; init; }
 
     /// <summary>
     /// Gets or sets the identifier escaping type.

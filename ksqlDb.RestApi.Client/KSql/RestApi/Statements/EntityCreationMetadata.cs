@@ -39,7 +39,7 @@ public record EntityCreationMetadata : CreationMetadata, IEntityProperties
   /// <summary>
   /// By setting the value of this field to "true" the entity name will be automatically pluralized during code generation. 
   /// </summary>
-  public bool ShouldPluralizeEntityName { get; set; } = true;
+  public bool? ShouldPluralizeEntityName { get; set; }
 
   /// <summary>
   /// By default, the topic is assumed to contain non-windowed data. If the data is windowed, i.e., was created using ksqlDB using a query that contains a WINDOW clause, then the WINDOW_TYPE property can be used to provide the window type. Valid values are SESSION, HOPPING, and TUMBLING.

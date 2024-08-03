@@ -105,6 +105,9 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators
     /// <returns>A string representing a KSQL statement for creating or replacing a stream or table.</returns>
     private string CreateOrReplace<T>(StatementContext statementContext, EntityCreationMetadata creationMetadata, bool? ifNotExists)
     {
+      if (creationMetadata.ShouldPluralizeEntityName == null)
+        creationMetadata = creationMetadata with { ShouldPluralizeEntityName = true };
+
       string ksql = new CreateEntity(modelBuilder).Print<T>(statementContext, creationMetadata, ifNotExists);
 
       return ksql;

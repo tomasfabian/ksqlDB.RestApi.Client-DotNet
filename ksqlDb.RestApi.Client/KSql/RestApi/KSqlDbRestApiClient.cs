@@ -22,26 +22,69 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.Extensions.Logging;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi;
 
+/// <summary>
+/// Represents a client for interacting with the KSQL REST API.
+/// </summary>
 public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 {
   private readonly EntityProvider entityProvider = new();
   private readonly IHttpClientFactory httpClientFactory;
   private readonly ModelBuilder modelBuilder;
+  private readonly KSqlDBRestApiClientOptions clientOptions;
   private readonly StatementGenerator statementGenerator;
   private readonly ILogger? logger;
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="KSqlDbRestApiClient"/> class.
+  /// </summary>
+  /// <param name="httpClientFactory">The factory to create <see cref="HttpClient"/> instances.</param>
+  /// <param name="loggerFactory">The factory to create <see cref="ILogger"/> instances. This parameter is optional.</param>
+  /// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClientFactory"/> is null.</exception>
   public KSqlDbRestApiClient(IHttpClientFactory httpClientFactory, ILoggerFactory? loggerFactory = null)
     : this(httpClientFactory, new ModelBuilder(), loggerFactory)
   {
   }
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="KSqlDbRestApiClient"/> class.
+  /// </summary>
+  /// <param name="httpClientFactory">The factory to create <see cref="HttpClient"/> instances.</param>
+  /// <param name="loggerFactory">The factory to create <see cref="ILogger"/> instances. This parameter is optional.</param>
+  /// <param name="clientOptions">The options for configuring the KSqlDB REST API client.</param>
+  /// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClientFactory"/> is null.</exception>
+  public KSqlDbRestApiClient(IHttpClientFactory httpClientFactory, KSqlDBRestApiClientOptions clientOptions, ILoggerFactory? loggerFactory = null)
+    : this(httpClientFactory, new ModelBuilder(), clientOptions, loggerFactory)
+  {
+  }
+
+  /// <summary>
+  /// Initializes a new instance of the <see cref="KSqlDbRestApiClient"/> class.
+  /// </summary>
+  /// <param name="httpClientFactory">The factory to create <see cref="HttpClient"/> instances.</param>
+  /// <param name="modelBuilder">The model builder used to construct the models.</param>
+  /// <param name="loggerFactory">The factory to create <see cref="ILogger"/> instances. This parameter is optional.</param>
   public KSqlDbRestApiClient(IHttpClientFactory httpClientFactory, ModelBuilder modelBuilder, ILoggerFactory? loggerFactory = null)
+    : this(httpClientFactory, modelBuilder, new KSqlDBRestApiClientOptions(), loggerFactory)
+  {
+  }
+
+  /// <summary>
+  /// Initializes a new instance of the <see cref="KSqlDbRestApiClient"/> class.
+  /// </summary>
+  /// <param name="httpClientFactory">The factory to create <see cref="HttpClient"/> instances.</param>
+  /// <param name="modelBuilder">The model builder used to construct the models.</param>
+  /// <param name="loggerFactory">The factory to create <see cref="ILogger"/> instances. This parameter is optional.</param>
+  /// <param name="clientOptions">The options for configuring the KSqlDB REST API client.</param>
+  /// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClientFactory"/> is null.</exception>
+  public KSqlDbRestApiClient(IHttpClientFactory httpClientFactory, ModelBuilder modelBuilder, KSqlDBRestApiClientOptions clientOptions, ILoggerFactory? loggerFactory = null)
   {
     this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
     this.modelBuilder = modelBuilder;
+    this.clientOptions = clientOptions;
 
     if (loggerFactory != null)
       logger = loggerFactory.CreateLogger(LoggingCategory.Name);
@@ -191,6 +234,9 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     ArgumentNullException.ThrowIfNull(creationMetadata);
 #endif
 
+    if (creationMetadata.ShouldPluralizeEntityName == null)
+      creationMetadata = creationMetadata with {ShouldPluralizeEntityName = clientOptions.ShouldPluralizeFromItemName};
+
     var ksql = statementGenerator.CreateStream<T>(creationMetadata, ifNotExists);
 
     return ExecuteAsync(ksql, cancellationToken);
@@ -210,6 +256,9 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 #else
     ArgumentNullException.ThrowIfNull(creationMetadata);
 #endif
+
+    if (creationMetadata.ShouldPluralizeEntityName == null)
+      creationMetadata = creationMetadata with { ShouldPluralizeEntityName = clientOptions.ShouldPluralizeFromItemName };
 
     var ksql = statementGenerator.CreateOrReplaceStream<T>(creationMetadata);
 
@@ -232,7 +281,12 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     ArgumentNullException.ThrowIfNull(creationMetadata);
 #endif
 
-    creationMetadata.IsReadOnly = true;
+    if (creationMetadata.ShouldPluralizeEntityName == null)
+      creationMetadata = creationMetadata with
+      {
+        ShouldPluralizeEntityName = clientOptions.ShouldPluralizeFromItemName,
+        IsReadOnly = true
+      };
 
     var ksql = statementGenerator.CreateStream<T>(creationMetadata, ifNotExists);
 
@@ -255,6 +309,9 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     ArgumentNullException.ThrowIfNull(creationMetadata);
 #endif
 
+    if (creationMetadata.ShouldPluralizeEntityName == null)
+      creationMetadata = creationMetadata with { ShouldPluralizeEntityName = clientOptions.ShouldPluralizeFromItemName };
+
     var ksql = statementGenerator.CreateTable<T>(creationMetadata, ifNotExists);
 
     return ExecuteAsync(ksql, cancellationToken);
@@ -276,7 +333,12 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     ArgumentNullException.ThrowIfNull(creationMetadata);
 #endif
 
-    creationMetadata.IsReadOnly = true;
+    if (creationMetadata.ShouldPluralizeEntityName == null)
+      creationMetadata = creationMetadata with
+      {
+        ShouldPluralizeEntityName = clientOptions.ShouldPluralizeFromItemName,
+        IsReadOnly = true
+      };
 
     var ksql = statementGenerator.CreateTable<T>(creationMetadata, ifNotExists);
 
@@ -297,6 +359,9 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
 #else
     ArgumentNullException.ThrowIfNull(creationMetadata);
 #endif
+
+    if (creationMetadata.ShouldPluralizeEntityName == null)
+      creationMetadata = creationMetadata with { ShouldPluralizeEntityName = clientOptions.ShouldPluralizeFromItemName };
 
     var ksql = statementGenerator.CreateOrReplaceTable<T>(creationMetadata);
 
@@ -321,6 +386,7 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   public Task<HttpResponseMessage> CreateTypeAsync<T>(CancellationToken cancellationToken = default)
   {
     var properties = new TypeProperties();
+
     return CreateTypeAsync<T>(properties, cancellationToken);
   }
 
@@ -335,7 +401,11 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> CreateTypeAsync<T>(string typeName, CancellationToken cancellationToken = default)
   {
-    var properties = new TypeProperties { EntityName = typeName };
+    var properties = new TypeProperties
+    {
+      EntityName = typeName
+    };
+
     return CreateTypeAsync<T>(properties, cancellationToken);
   }
 
@@ -350,6 +420,9 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> CreateTypeAsync<T>(TypeProperties properties, CancellationToken cancellationToken = default)
   {
+    if (properties.ShouldPluralizeEntityName == null)
+      properties = properties with { ShouldPluralizeEntityName = clientOptions.ShouldPluralizeFromItemName };
+
     var ksql = new TypeGenerator(modelBuilder).Print<T>(properties);
 
     return ExecuteAsync(ksql, cancellationToken);
@@ -363,6 +436,9 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> DropTypeAsync<T>(DropTypeProperties dropTypeProperties, CancellationToken cancellationToken = default)
   {
+    if (dropTypeProperties.ShouldPluralizeEntityName == null)
+      dropTypeProperties = dropTypeProperties with { ShouldPluralizeEntityName = clientOptions.ShouldPluralizeFromItemName };
+
     var typeName = entityProvider.GetFormattedName<T>(dropTypeProperties);
     string dropStatement = StatementTemplates.DropType(typeName);
 
@@ -413,6 +489,10 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>Http response object.</returns>
   public Task<HttpResponseMessage> InsertIntoAsync<T>(T entity, InsertProperties? insertProperties = null, CancellationToken cancellationToken = default)
   {
+    insertProperties ??= new InsertProperties();
+    if (insertProperties.ShouldPluralizeEntityName == null)
+      insertProperties = insertProperties with { ShouldPluralizeEntityName = clientOptions.ShouldPluralizeFromItemName };
+
     var insertStatement = ToInsertStatement(entity, insertProperties);
 
     var httpResponseMessage = ExecuteStatementAsync(insertStatement, cancellationToken);
@@ -429,6 +509,10 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>A <see cref="KSqlDbStatement"/></returns>
   public KSqlDbStatement ToInsertStatement<T>(InsertValues<T> insertValues, InsertProperties? insertProperties = null)
   {
+    insertProperties ??= new InsertProperties();
+    if (insertProperties.ShouldPluralizeEntityName == null)
+      insertProperties = insertProperties with { ShouldPluralizeEntityName = clientOptions.ShouldPluralizeFromItemName };
+
     var insertStatement = new CreateInsert(modelBuilder).Generate(insertValues, insertProperties);
 
     return new KSqlDbStatement(insertStatement);
@@ -443,6 +527,10 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns>A <see cref="KSqlDbStatement"/></returns>
   public KSqlDbStatement ToInsertStatement<T>(T entity, InsertProperties? insertProperties = null)
   {
+    insertProperties ??= new InsertProperties();
+    if (insertProperties.ShouldPluralizeEntityName == null)
+      insertProperties = insertProperties with { ShouldPluralizeEntityName = clientOptions.ShouldPluralizeFromItemName };
+
     var insertStatement = new CreateInsert(modelBuilder).Generate(entity, insertProperties);
 
     return new KSqlDbStatement(insertStatement);
@@ -746,6 +834,9 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   /// <returns></returns>
   public Task<HttpResponseMessage> DropTableAsync<T>(DropFromItemProperties dropFromItemProperties, CancellationToken cancellationToken = default)
   {
+    if (dropFromItemProperties.ShouldPluralizeEntityName == null)
+      dropFromItemProperties = dropFromItemProperties with { ShouldPluralizeEntityName = clientOptions.ShouldPluralizeFromItemName };
+
     var tableName = entityProvider.GetFormattedName<T>(dropFromItemProperties);
     string dropStatement = StatementTemplates.DropTable(tableName, dropFromItemProperties.UseIfExistsClause, dropFromItemProperties.DeleteTopic);
 
