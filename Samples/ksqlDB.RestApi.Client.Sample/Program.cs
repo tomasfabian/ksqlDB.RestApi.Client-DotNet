@@ -74,7 +74,13 @@ public static class Program
 
     var httpClientFactory = new HttpClientFactory(new Uri(ksqlDbUrl));
 
-    var restApiProvider = new KSqlDbRestApiProvider(httpClientFactory, loggerFactory)
+    var restApiClientOptions = new KSqlDBRestApiClientOptions
+    {
+      ShouldPluralizeFromItemName = true,
+    };
+    var restApiClient = new KSqlDbRestApiClient(httpClientFactory, restApiClientOptions, loggerFactory);
+
+    var restApiProvider = new KSqlDbRestApiProvider(httpClientFactory, restApiClientOptions, loggerFactory)
     {
       DisposeHttpClient = false
     };

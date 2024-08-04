@@ -16,7 +16,7 @@
         - `DropFromItemProperties`
     - If `ShouldPluralizeEntityName` is null, the methods will set it using the value from the `KSqlDBRestApiClientOptions`.
     
-# BugFix
+## BugFix
 - `KSqlDBContext` removed `!NETSTANDARD` pragma from `OnDisposeAsync`
 
 # 6.1.0

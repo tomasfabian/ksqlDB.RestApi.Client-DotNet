@@ -1,4 +1,5 @@
-﻿using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using Microsoft.Extensions.Logging;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
@@ -7,8 +8,8 @@ namespace ksqlDB.RestApi.Client.Samples.Providers;
 
 public class KSqlDbRestApiProvider : KSqlDbRestApiClient, IKSqlDbRestApiProvider
 {
-  public KSqlDbRestApiProvider(IHttpClientFactory httpClientFactory, ILoggerFactory? loggerFactory = null)
-    : base(httpClientFactory, loggerFactory)
+  public KSqlDbRestApiProvider(IHttpClientFactory httpClientFactory, KSqlDBRestApiClientOptions restApiClientOptions, ILoggerFactory? loggerFactory = null)
+    : base(httpClientFactory, restApiClientOptions, loggerFactory)
   {
   }
 
@@ -33,6 +34,6 @@ public class KSqlDbRestApiProvider : KSqlDbRestApiClient, IKSqlDbRestApiProvider
       BaseAddress = uri
     };
 
-    return new KSqlDbRestApiProvider(new HttpClientFactory(httpClient));
+    return new KSqlDbRestApiProvider(new HttpClientFactory(httpClient), new KSqlDBRestApiClientOptions());
   }
 }
