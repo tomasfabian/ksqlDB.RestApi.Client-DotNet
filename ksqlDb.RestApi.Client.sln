@@ -48,7 +48,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{0ABA2B0A-0
 		docs\protobuf.md = docs\protobuf.md
 		docs\pull_queries.md = docs\pull_queries.md
 		docs\push_queries.md = docs\push_queries.md
-		docs\statements.md = docs\statements.md
+		docs\ksqldbrestapiclient.md = docs\ksqldbrestapiclient.md
 		docs\streams_and_tables.md = docs\streams_and_tables.md
 		docs\stream_processing.md = docs\stream_processing.md
 	EndProjectSection
