@@ -6,6 +6,6 @@
 
     <ItemGroup>
         <PackageReference Include="ksqlDb.RestApi.Client" Version="6.0.0" />
-	<PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" Version="2.3.0" />
+	<PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" Version="2.5.1" />
     </ItemGroup>
 </Project>
