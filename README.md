@@ -1,6 +1,8 @@
-This package enables the generation of **KSQL** push and pull queries from LINQ queries in your .NET C# code. It allows you to perform server-side filtering, projection, limiting, and other operations on push notifications using [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
-You can continually process computations over unbounded (potentially never-ending) streams of data.
-It also allows you to execute SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the REST API such as inserting records into streams and creating tables, types, etc. or execute admin operations such as listing streams.
+This package enables seamless integration of **KSQL** push and pull queries with LINQ queries in your .NET C# applications.
+It allows you to perform server-side operations such as filtering, projection, limiting, and more directly on push notifications using [ksqlDB push queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-rest-api/streaming-endpoint/).
+This facilitates continuous processing of computations over unbounded, potentially never-ending, streams of data.
+
+In addition, the package supports executing SQL [statements](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/) via the REST API. You can use it to insert records into streams, create tables and types, and perform administrative tasks such as listing available streams.
 
 [ksqlDB.RestApi.Client](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet) is a contribution to [Confluent ksqldb-clients](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-clients/)
 
