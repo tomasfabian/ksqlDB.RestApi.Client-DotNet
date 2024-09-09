@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Net;
 using System.Text;
 using FluentAssertions;
 using ksqlDb.RestApi.Client.Infrastructure.Logging;
@@ -700,5 +701,53 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
     //Assert
     response[0].Exists.Should().BeFalse();
+  }
+
+  [Test]
+  public async Task CreateSourceTableAsync()
+  {
+    //Arrange
+    CreateHttpMocks(@"[{""@type"":""tables""}]");
+
+    var creationMetadata = new EntityCreationMetadata("moviesByTitle", 1)
+    {
+      Replicas = 1,
+      Partitions = 1,
+      ShouldPluralizeEntityName = true,
+    };
+
+    //Act
+    var response = await ClassUnderTest.CreateSourceTableAsync<Movie>(creationMetadata);
+
+    //Assert
+    var expectedContent = GetExpectedContent(@"CREATE SOURCE TABLE Movies (\r\n\tTitle VARCHAR,\r\n\tId INT PRIMARY KEY,\r\n\tRelease_Year INT\r\n) WITH ( KAFKA_TOPIC=\u0027moviesByTitle\u0027, VALUE_FORMAT=\u0027Json\u0027, PARTITIONS=\u00271\u0027, REPLICAS=\u00271\u0027 );".ReplaceLineEndings());
+
+    VerifySendAsync(expectedContent);
+
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
+  }
+
+  [Test]
+  public async Task CreateSourceStreamAsync()
+  {
+    //Arrange
+    CreateHttpMocks(@"[{""@type"":""streams""}]");
+
+    var creationMetadata = new EntityCreationMetadata("moviesByTitle", 1)
+    {
+      Replicas = 1,
+      Partitions = 1,
+      ShouldPluralizeEntityName = true,
+    };
+
+    //Act
+    var response = await ClassUnderTest.CreateSourceStreamAsync<Movie>(creationMetadata);
+
+    //Assert
+    var expectedContent = GetExpectedContent(@"CREATE SOURCE STREAM Movies (\r\n\tTitle VARCHAR,\r\n\tId INT KEY,\r\n\tRelease_Year INT\r\n) WITH ( KAFKA_TOPIC=\u0027moviesByTitle\u0027, VALUE_FORMAT=\u0027Json\u0027, PARTITIONS=\u00271\u0027, REPLICAS=\u00271\u0027 );".ReplaceLineEndings());
+
+    VerifySendAsync(expectedContent);
+
+    response.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 }

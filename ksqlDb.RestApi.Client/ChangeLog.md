@@ -1,5 +1,10 @@
 # ksqlDB.RestApi.Client
 
+# 6.2.1
+
+## BugFix
+- Source table can't be queried #87 - fixed `KSqlDbRestApiClient.CreateSourceTableAsync` and `KSqlDbRestApiClient.CreateSourceStreamAsync`
+
 # 6.2.0
 
 1. **KSqlDbRestApiClient Constructor Update**:

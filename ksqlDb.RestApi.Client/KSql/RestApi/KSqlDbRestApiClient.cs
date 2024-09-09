@@ -281,11 +281,15 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     ArgumentNullException.ThrowIfNull(creationMetadata);
 #endif
 
+    creationMetadata = creationMetadata with
+    {
+      IsReadOnly = true
+    };
+
     if (creationMetadata.ShouldPluralizeEntityName == null)
       creationMetadata = creationMetadata with
       {
         ShouldPluralizeEntityName = clientOptions.ShouldPluralizeFromItemName,
-        IsReadOnly = true
       };
 
     var ksql = statementGenerator.CreateStream<T>(creationMetadata, ifNotExists);
@@ -333,11 +337,15 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     ArgumentNullException.ThrowIfNull(creationMetadata);
 #endif
 
+    creationMetadata = creationMetadata with
+    {
+      IsReadOnly = true
+    };
+
     if (creationMetadata.ShouldPluralizeEntityName == null)
       creationMetadata = creationMetadata with
       {
         ShouldPluralizeEntityName = clientOptions.ShouldPluralizeFromItemName,
-        IsReadOnly = true
       };
 
     var ksql = statementGenerator.CreateTable<T>(creationMetadata, ifNotExists);
