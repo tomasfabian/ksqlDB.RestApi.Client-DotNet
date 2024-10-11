@@ -234,6 +234,37 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
 
       metadata.HasHeaders.Should().BeTrue();
     }
+
+    private record KeyValuePair
+    {
+      public string Key { get; set; } = null!;
+      public byte[] Value { get; set; } = null!;
+    }
+
+    private record Record
+    {
+      public KeyValuePair[] Headers { get; init; } = null!;
+    }
+
+    [Test]
+    public void AsStruct()
+    {
+      //Arrange
+
+      //Act
+      var fieldTypeBuilder = builder.Entity<Record>()
+        .Property(b => b.Headers)
+        .AsStruct();
+
+      //Assert
+      fieldTypeBuilder.Should().NotBeNull();
+
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Record));
+      entityMetadata.Should().NotBeNull();
+
+      var metadata = entityMetadata!.FieldsMetadata.First(c => c.IsStruct && c.Path == "Headers");
+      metadata.IsStruct.Should().BeTrue();
+    }
   }
 
   internal record Payment

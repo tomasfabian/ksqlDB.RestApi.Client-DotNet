@@ -1,4 +1,5 @@
 using FluentAssertions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
@@ -161,6 +162,36 @@ public class StatementGeneratorTests
 
     //Assert
     statement.Should().Contain($"{nameof(PortType)} VARCHAR");
+  }
+  private record KeyValuePair
+  {
+    public string Key { get; set; } = null!;
+    public byte[] Value { get; set; } = null!;
+  }
+
+  private record Record
+  {
+    public KeyValuePair[] Headers { get; init; } = null!;
+  }
+
+  [Test]
+  public void CreateTable_UseModelBuilder_WithFieldAsStruct()
+  {
+    //Arrange
+    var modelBuilder = new ModelBuilder();
+    modelBuilder.Entity<Record>()
+      .Property(b => b.Headers)
+      .AsStruct();
+
+    var creationMetadata = new EntityCreationMetadata("my_topic", partitions: 3);
+
+    //Act
+    var statement = new StatementGenerator(modelBuilder).CreateTable<Record>(creationMetadata, ifNotExists: true);
+
+    //Assert
+    statement.Should().Be(@"CREATE TABLE IF NOT EXISTS Records (
+	Headers ARRAY<STRUCT<Key VARCHAR, Value BYTES>>
+) WITH ( KAFKA_TOPIC='my_topic', VALUE_FORMAT='Json', PARTITIONS='3' );".ReplaceLineEndings());
   }
 }
 

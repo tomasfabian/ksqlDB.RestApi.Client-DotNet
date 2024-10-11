@@ -12,7 +12,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
   public class KSqlTypeTranslatorTests
   {
     private ModelBuilder modelBuilder = null!;
-    private KSqlTypeTranslator kSqlTypeTranslator = null!;
+    private KSqlTypeTranslator<Poco> kSqlTypeTranslator = null!;
 
     [SetUp]
     public void Init()
@@ -396,7 +396,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
         .Decimal(10, 2);
 
       //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
+      string ksqlType = kSqlTypeTranslator.Translate(type, type.GetMember(nameof(Poco.Amount))[0]);
 
       //Assert
       ksqlType.Should().Be($"{KSqlTypes.Struct}<{nameof(Poco.Amount)} {KSqlTypes.Decimal}(10,2)>");
