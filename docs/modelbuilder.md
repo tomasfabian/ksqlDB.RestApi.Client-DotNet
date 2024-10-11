@@ -277,12 +277,12 @@ INSERT INTO Payments (Id, Amount, Desc)
 VALUES ('1', 33, 'Purchase');
 ```
 
-### AsSource
+### AsStruct
 **v6.3.0**
 
-The `AsSource` function designates fields in entity types as ksqlDB struct types.
+The `AsStruct` function designates fields in entity types as ksqlDB struct types.
 
-The following code showcases how to use the `AsSource` method in the fluent API to infer the underlying `ksqlDB` type as a struct during code generation:
+The following code showcases how to use the `AsStruct` method in the fluent API to infer the underlying `ksqlDB` type as a struct during code generation:
 
 ```C#
 private record KeyValuePair
