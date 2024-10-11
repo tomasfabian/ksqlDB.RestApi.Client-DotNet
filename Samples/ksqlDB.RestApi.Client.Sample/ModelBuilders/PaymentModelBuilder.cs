@@ -34,6 +34,19 @@ public class PaymentModelBuilder
       .Property(c => c.Header)
       .WithHeader(header);
 
+    modelBuilder.Entity<Record>()
+      .Property(b => b.Headers)
+      .AsStruct()
+      .WithHeaders();
+
+    modelBuilder.Entity<KeyValuePair>()
+      .Property(c => c.Key)
+      .HasColumnName(nameof(KeyValuePair.Key).ToUpper());
+
+    modelBuilder.Entity<KeyValuePair>()
+      .Property(c => c.Value)
+      .HasColumnName(nameof(KeyValuePair.Value).ToUpper());
+
     var restApiProvider = ConfigureRestApiClientWithServicesCollection(new ServiceCollection(), modelBuilder);
 
     var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Payment), partitions: 1);
@@ -93,4 +106,15 @@ record Account
 record PocoWithHeader
 {
   public byte[] Header { get; init; } = null!;
+}
+
+record KeyValuePair
+{
+  public string Key { get; set; } = null!;
+  public byte[] Value { get; set; } = null!;
+}
+
+record Record
+{
+  public KeyValuePair[] Headers { get; init; } = null!;
 }
