@@ -278,7 +278,7 @@ VALUES ('1', 33, 'Purchase');
 ```
 
 ### AsSource
-**v6.2.0**
+**v6.3.0**
 
 The `AsSource` function designates fields in entity types as ksqlDB struct types.
 
