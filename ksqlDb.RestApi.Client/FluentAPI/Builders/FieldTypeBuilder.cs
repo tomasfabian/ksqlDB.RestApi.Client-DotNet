@@ -26,6 +26,12 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
     /// <param name="columnName">The name of the column in the record schema.</param>
     /// <returns>The same <see cref="IFieldTypeBuilder{TProperty}"/> instance so that multiple calls can be chained.</returns>
     IFieldTypeBuilder<TProperty> HasColumnName(string columnName);
+
+    /// <summary>
+    /// Marks the field as a ksqldb STRUCT type.
+    /// </summary>
+    /// <returns>The field type builder for chaining additional configuration.</returns>
+    IFieldTypeBuilder<TProperty> AsStruct();
   }
 
   internal class FieldTypeBuilder<TProperty>(FieldMetadata fieldMetadata)
@@ -34,6 +40,12 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
     public IFieldTypeBuilder<TProperty> HasColumnName(string columnName)
     {
       fieldMetadata.ColumnName = columnName;
+      return this;
+    }
+
+    public IFieldTypeBuilder<TProperty> AsStruct()
+    {
+      fieldMetadata.IsStruct = true;
       return this;
     }
 

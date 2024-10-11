@@ -9,12 +9,12 @@ using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 {
-  internal sealed class KSqlTypeTranslator(IMetadataProvider metadataProvider) : EntityInfo(metadataProvider)
+  internal sealed class KSqlTypeTranslator<TEntity>(IMetadataProvider metadataProvider) : EntityInfo(metadataProvider)
   {
     private readonly IMetadataProvider metadataProvider = metadataProvider;
     private readonly DecimalTypeTranslator decimalTypeTranslator = new(metadataProvider);
 
-    internal string Translate(Type type, IdentifierEscaping escaping = IdentifierEscaping.Never)
+    internal string Translate(Type type, MemberInfo? memberInfo = null, IdentifierEscaping escaping = IdentifierEscaping.Never)
     {
       var ksqlType = string.Empty;
 
@@ -25,7 +25,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
         var elementType = type.GetElementType();
         if (elementType == null)
           throw new InvalidOperationException(nameof(elementType));
-        var elementTypeName = Translate(elementType, escaping);
+        var elementTypeName = Translate(elementType, memberInfo, escaping);
 
         ksqlType = $"{KSqlTypes.Array}<{elementTypeName}>";
       }
@@ -33,8 +33,8 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       {
         Type[] typeParameters = type.GetGenericArguments();
 
-        var keyType = Translate(typeParameters[0], escaping);
-        var valueType = Translate(typeParameters[1], escaping);
+        var keyType = Translate(typeParameters[0], memberInfo, escaping);
+        var valueType = Translate(typeParameters[1], memberInfo, escaping);
 
         ksqlType = $"{KSqlTypes.Map}<{keyType}, {valueType}>";
       }
@@ -58,7 +58,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
         ksqlType = KSqlTypes.Time;
       else if (type == typeof(DateTimeOffset))
         ksqlType = KSqlTypes.Timestamp;
-      else if (!type.IsGenericType && type.TryGetAttribute<StructAttribute>() != null)
+      else if (!type.IsGenericType && IsStructType(type, memberInfo))
       {
         var ksqlProperties = GetProperties(type, escaping);
 
@@ -88,13 +88,29 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 
         if (elementType != null)
         {
-          string ksqlElementType = Translate(elementType, escaping);
+          string ksqlElementType = Translate(elementType, memberInfo, escaping);
 
           ksqlType = $"{KSqlTypes.Array}<{ksqlElementType}>";
         }
       }
 
       return ksqlType;
+    }
+
+    private bool IsStructType(Type type, MemberInfo? memberInfo)
+    {
+      if (type.TryGetAttribute<StructAttribute>() != null)
+        return true;
+
+      if (memberInfo == null)
+        return false;
+
+      var entityMetadata = metadataProvider.GetEntities().FirstOrDefault(c => c.Type == typeof(TEntity));
+      var fieldMetadata = entityMetadata?.GetFieldMetadataBy(memberInfo);
+      return fieldMetadata is
+      {
+        IsStruct: true
+      };
     }
 
     internal IEnumerable<string> GetProperties(Type type, IdentifierEscaping escaping)
@@ -105,7 +121,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       {
         var memberType = GetMemberType(memberInfo);
 
-        var ksqlType = Translate(memberType, escaping);
+        var ksqlType = Translate(memberType, memberInfo, escaping);
 
         string columnDefinition = $"{memberInfo.Format(escaping, metadataProvider as ModelBuilder)} {ksqlType}{ExploreAttributes(type, memberInfo, memberType)}";
 
