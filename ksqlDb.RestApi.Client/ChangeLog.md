@@ -1,5 +1,13 @@
 # ksqlDB.RestApi.Client
 
+# 6.4.0
+- added the `IgnoreInDML` function to the Fluent API to exclude fields from INSERT statements #90 (proposed by @mrt181)
+- added `IgnoreAttribute` to prevent properties or fields from being included in both DDL and DML statement
+- `Headers` property was marked as obsolete in the `Record` type
+
+## BugFix
+- `IgnoreByInsertsAttribute` no longer excludes fields or properties from DDL statements. For this purpose, a new `IgnoreAttribute` has been introduced.
+ 
 # 6.3.0
 - added `AsStruct` function to the Fluent API for marking fields as ksqldb `STRUCT` types #89 (proposed by @mrt181)
 
