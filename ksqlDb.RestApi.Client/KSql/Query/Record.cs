@@ -12,6 +12,7 @@ public class Record
   /// </summary>
   [IgnoreByInserts]
   [PseudoColumn]
+  [Obsolete("This property will be removed in the future. Headers need to be defined per use case and should have the type ARRAY<STRUCT<key STRING, value BYTES>>.")]
   public string? Headers { get; set; }
 
   /// <summary>
