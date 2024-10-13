@@ -96,6 +96,34 @@ CREATE TABLE IF NOT EXISTS Accounts (
 ) WITH ( KAFKA_TOPIC='Account', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='3' );
 ```
 
+## Dependency injection
+This setup ensures that the `ksqlDB` client, context, and model configuration are properly injected throughout your application.
+
+```C#
+using ksqlDb.RestApi.Client.DependencyInjection;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
+using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+
+var builder = WebApplication.CreateBuilder(args);
+
+ModelBuilder modelBuilder = new();
+
+builder.Services.ConfigureKSqlDb(
+  builder.Configuration.GetConnectionString("KafkaConnection")!,
+  parameters =>
+  {
+    parameters
+      .SetAutoOffsetReset(AutoOffsetReset.Latest)
+      .SetIdentifierEscaping(IdentifierEscaping.Always)
+      .SetJsonSerializerOptions(options =>
+      {
+        options.PropertyNameCaseInsensitive = true;
+      });
+  }
+).AddSingleton(modelBuilder);
+```
+
 ## IFromItemTypeConfiguration
 **v5.0.0**
 
@@ -247,4 +275,45 @@ The KSQL snippet illustrates an example INSERT statement with the overridden col
 ```SQL
 INSERT INTO Payments (Id, Amount, Desc)
 VALUES ('1', 33, 'Purchase');
+```
+
+### AsStruct
+**v6.3.0**
+
+The `AsStruct` function designates fields in entity types as ksqlDB struct types.
+
+The following code showcases how to use the `AsStruct` method in the fluent API to infer the underlying `ksqlDB` type as a struct during code generation:
+
+```C#
+private record KeyValuePair
+{
+  public string Key { get; set; } = null!;
+  public byte[] Value { get; set; } = null!;
+}
+
+private record Record
+{
+  public KeyValuePair[] Headers { get; init; } = null!;
+}
+```
+
+```C#
+ModelBuilder builder = new();
+ 
+builder.Entity<Record>()
+        .Property(b => b.Headers)
+        .AsStruct();
+        
+var creationMetadata = new EntityCreationMetadata("my_topic", partitions: 3);
+
+var ksql = new StatementGenerator(builder).CreateTable<Record>(creationMetadata, ifNotExists: true);
+```
+
+The KSQL snippet illustrates an example CREATE TABLE statement with the injected `STRUCT` type,
+showing how it corresponds to the fluent API configuration:
+
+```SQL
+CREATE TABLE IF NOT EXISTS Records (
+	  Headers ARRAY<STRUCT<Key VARCHAR, Value BYTES>>
+) WITH ( KAFKA_TOPIC='my_topic', VALUE_FORMAT='Json', PARTITIONS='3' );
 ```

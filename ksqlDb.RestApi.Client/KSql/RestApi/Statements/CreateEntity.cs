@@ -13,8 +13,6 @@ internal sealed class CreateEntity(IMetadataProvider metadataProvider) : EntityI
 {
   private readonly StringBuilder stringBuilder = new();
 
-  private readonly KSqlTypeTranslator typeTranslator = new(metadataProvider);
-
   internal string Print<T>(StatementContext statementContext, EntityCreationMetadata metadata, bool? ifNotExists)
   {
     stringBuilder.Clear();
@@ -42,12 +40,13 @@ internal sealed class CreateEntity(IMetadataProvider metadataProvider) : EntityI
   private void PrintProperties<T>(StatementContext statementContext, EntityCreationMetadata metadata)
   {
     var ksqlProperties = new List<string>();
+    KSqlTypeTranslator<T> typeTranslator = new(metadataProvider);
 
     foreach (var memberInfo in Members<T>(metadata.IncludeReadOnlyProperties))
     {
       var type = GetMemberType(memberInfo);
 
-      var ksqlType = typeTranslator.Translate(type, metadata.IdentifierEscaping);
+      var ksqlType = typeTranslator.Translate(type, memberInfo, metadata.IdentifierEscaping);
 
       var columnName = IdentifierUtil.Format(memberInfo, metadata.IdentifierEscaping, metadataProvider);
       string columnDefinition = $"\t{columnName} {ksqlType}{typeTranslator.ExploreAttributes(typeof(T), memberInfo, type)}";

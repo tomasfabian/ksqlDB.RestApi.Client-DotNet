@@ -7,6 +7,7 @@ namespace ksqlDb.RestApi.Client.Metadata
     internal MemberInfo MemberInfo { get; init; } = null!;
     public bool Ignore { get; internal set; }
     public bool HasHeaders { get; internal set; }
+    internal bool IsStruct { get; set; }
     internal string Path { get; init; } = null!;
     internal string FullPath { get; init; } = null!;
     public string? ColumnName { get; set; }

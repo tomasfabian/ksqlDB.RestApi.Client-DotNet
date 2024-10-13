@@ -11,8 +11,6 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 
 internal sealed class TypeGenerator(IMetadataProvider metadataProvider) : EntityInfo(metadataProvider)
 {
-  private readonly KSqlTypeTranslator typeTranslator = new(metadataProvider);
-
   internal string Print<T>(TypeProperties properties)
   {
     StringBuilder stringBuilder = new();
@@ -30,11 +28,13 @@ internal sealed class TypeGenerator(IMetadataProvider metadataProvider) : Entity
   {
     var ksqlProperties = new List<string>();
 
+    KSqlTypeTranslator<T> typeTranslator = new(metadataProvider);
+
     foreach (var memberInfo in Members<T>())
     {
       var type = GetMemberType(memberInfo);
 
-      var ksqlType = typeTranslator.Translate(type, escaping);
+      var ksqlType = typeTranslator.Translate(type, memberInfo, escaping);
 
       var memberName = memberInfo.GetMemberName(metadataProvider);
       var columnDefinition = $"{EscapeName(memberName, escaping)} {ksqlType}{typeTranslator.ExploreAttributes(typeof(T), memberInfo, type)}";

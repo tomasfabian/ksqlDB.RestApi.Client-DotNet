@@ -1,9 +1,12 @@
 # ksqlDB.RestApi.Client
 
+# 6.3.0
+- added `AsStruct` function to the Fluent API for marking fields as ksqldb `STRUCT` types #89 (proposed by @mrt181)
+
 # 6.2.1
 
 ## BugFix
-- Source table can't be queried #87 - fixed `KSqlDbRestApiClient.CreateSourceTableAsync` and `KSqlDbRestApiClient.CreateSourceStreamAsync`
+- source table can't be queried #87 - fixed `KSqlDbRestApiClient.CreateSourceTableAsync` and `KSqlDbRestApiClient.CreateSourceStreamAsync`
 
 # 6.2.0
 
