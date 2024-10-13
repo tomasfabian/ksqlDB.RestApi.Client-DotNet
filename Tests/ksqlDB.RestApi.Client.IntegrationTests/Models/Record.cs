@@ -1,9 +1,10 @@
-﻿using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
 namespace ksqlDb.RestApi.Client.IntegrationTests.Models;
 
 public record Record
 {
-  [IgnoreByInserts]
+  [ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations.Ignore]
+  [PseudoColumn]
   public long RowTime { get; set; }
 }

@@ -10,6 +10,7 @@ public class Record
   /// <summary>
   /// Columns that are populated by the Kafka record's header.
   /// </summary>
+  [Ignore]
   [IgnoreByInserts]
   [PseudoColumn]
   [Obsolete("This property will be removed in the future. Headers need to be defined per use case and should have the type ARRAY<STRUCT<key STRING, value BYTES>>.")]
@@ -18,6 +19,7 @@ public class Record
   /// <summary>
   /// The offset of the source record.
   /// </summary>
+  [Ignore]
   [IgnoreByInserts]
   [PseudoColumn]
   public long? RowOffset { get; set; }
@@ -25,6 +27,7 @@ public class Record
   /// <summary>
   /// The partition of the source record.
   /// </summary>
+  [Ignore]
   [IgnoreByInserts]
   [PseudoColumn]
   public short? RowPartition { get; set; }
@@ -32,6 +35,7 @@ public class Record
   /// <summary>
   /// Row timestamp, inferred from the underlying Kafka record if not overridden.
   /// </summary>
+  [Ignore]
   [IgnoreByInserts]
   [PseudoColumn]
   public long RowTime { get; set; }
