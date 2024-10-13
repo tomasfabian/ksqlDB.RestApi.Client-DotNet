@@ -5,17 +5,19 @@ using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
 internal sealed class CreateInsert : EntityInfo
 {
-  private readonly ModelBuilder modelBuilder;
+  private readonly IMetadataProvider metadataProvider;
 
-  public CreateInsert(ModelBuilder modelBuilder)
-    : base(modelBuilder)
+  public CreateInsert(ModelBuilder metadataProvider)
+    : base(metadataProvider)
   {
-    this.modelBuilder = modelBuilder;
+    this.metadataProvider = metadataProvider;
   }
 
   internal string Generate<T>(T entity, InsertProperties insertProperties)
@@ -50,11 +52,11 @@ internal sealed class CreateInsert : EntityInfo
         valuesStringBuilder.Append(", ");
       }
 
-      columnsStringBuilder.Append(memberInfo.Format(insertProperties.IdentifierEscaping, modelBuilder));
+      columnsStringBuilder.Append(memberInfo.Format(insertProperties.IdentifierEscaping, metadataProvider));
 
       var type = GetMemberType(memberInfo);
 
-      var value = GetValue(insertValues, insertProperties, memberInfo, type, mi => IdentifierUtil.Format(mi, insertProperties.IdentifierEscaping, modelBuilder));
+      var value = GetValue(insertValues, insertProperties, memberInfo, type, mi => IdentifierUtil.Format(mi, insertProperties.IdentifierEscaping, metadataProvider));
 
       valuesStringBuilder.Append(value);
     }
@@ -68,15 +70,24 @@ internal sealed class CreateInsert : EntityInfo
   private object GetValue<T>(InsertValues<T> insertValues, InsertProperties insertProperties,
     MemberInfo memberInfo, Type type, Func<MemberInfo, string> formatter)
   {
-    var hasValue = insertValues.PropertyValues.ContainsKey(memberInfo.Format(insertProperties.IdentifierEscaping, modelBuilder));
+    var hasValue = insertValues.PropertyValues.ContainsKey(memberInfo.Format(insertProperties.IdentifierEscaping, metadataProvider));
 
     object value;
     
     if (hasValue)
-      value = insertValues.PropertyValues[memberInfo.Format(insertProperties.IdentifierEscaping, modelBuilder)];
+      value = insertValues.PropertyValues[memberInfo.Format(insertProperties.IdentifierEscaping, metadataProvider)];
     else
-      value = new CreateKSqlValue(modelBuilder).ExtractValue(insertValues.Entity, insertProperties, memberInfo, type, formatter);
+      value = new CreateKSqlValue(metadataProvider).ExtractValue(insertValues.Entity, insertProperties, memberInfo, type, formatter);
 
     return value;
+  }
+
+  protected override bool IncludeMemberInfo(EntityMetadata? entityMetadata, MemberInfo memberInfo)
+  {
+    var fieldMetadata = entityMetadata?.GetFieldMetadataBy(memberInfo);
+    if (fieldMetadata is {IgnoreInDML: true})
+      return false;
+
+    return base.IncludeMemberInfo(entityMetadata, memberInfo) && !memberInfo.GetCustomAttributes().OfType<IgnoreByInsertsAttribute>().Any();
   }
 }

@@ -2,6 +2,7 @@ using System.Reflection;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers;
+using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
@@ -21,18 +22,19 @@ internal class EntityInfo(IMetadataProvider metadataProvider)
     var properties = type
       .GetProperties(BindingFlags.Public | BindingFlags.Instance)
       .Where(c => c.CanWrite || (includeReadOnly.HasValue && includeReadOnly.Value))
-      .OfType<MemberInfo>()
-      .Concat(fields);
+      .OfType<MemberInfo>();
+
+    var members = properties.Concat(fields);
 
     var entityMetadata = metadataProvider.GetEntities().FirstOrDefault(c => c.Type == type);
-    
-    return properties.Where(c =>
-    {
-      var fieldMetadata = entityMetadata?.GetFieldMetadataBy(c);
-      if (fieldMetadata is {Ignore: true}) return false;
 
-      return !c.GetCustomAttributes().OfType<IgnoreByInsertsAttribute>().Any();
-    });
+    return members.Where(memberInfo => IncludeMemberInfo(entityMetadata, memberInfo));
+  }
+
+  protected virtual bool IncludeMemberInfo(EntityMetadata? entityMetadata, MemberInfo memberInfo)
+  {
+    var fieldMetadata = entityMetadata?.GetFieldMetadataBy(memberInfo);
+    return fieldMetadata is not {Ignore: true} && !memberInfo.GetCustomAttributes().OfType<IgnoreAttribute>().Any();
   }
 
   protected static Type GetMemberType(MemberInfo memberInfo)
