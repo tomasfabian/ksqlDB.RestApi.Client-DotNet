@@ -149,6 +149,38 @@ public class CreateInsertTests
     statement.Should().Be($"INSERT INTO {insertProperties.EntityName} (Title, Id) VALUES ('Title', 1);");
   }
 
+  private class Actor
+  {
+    [Key]
+    public int Id { get; set; }
+    public string Name { get; set; } = null!;
+  }
+
+  public static IEnumerable<(IdentifierEscaping, string)> GenerateIgnoreByInsertsTestCases()
+  {
+    yield return (Never, "INSERT INTO Actors (Id) VALUES (1);");
+    yield return (Keywords, "INSERT INTO Actors (Id) VALUES (1);");
+    yield return (Always, "INSERT INTO `Actors` (`Id`) VALUES (1);");
+  }
+
+  [TestCaseSource(nameof(GenerateIgnoreByInsertsTestCases))]
+  public void Generate_UseModelBuilder_IgnoreByInserts((IdentifierEscaping escaping, string expected) testCase)
+  {
+    //Arrange
+    modelBuilder.Entity<Actor>()
+      .Property(c => c.Name)
+      .IgnoreInDML();
+
+    var (escaping, expected) = testCase;
+    var actor = new Actor { Id = 1, Name = "E.T." };
+
+    //Act
+    var statement = new CreateInsert(modelBuilder).Generate(actor, new InsertProperties { IdentifierEscaping = escaping });
+
+    //Assert
+    statement.Should().Be(expected);
+  }
+
   [Test]
   public void Generate_ShouldNotPluralizeEntityName()
   {

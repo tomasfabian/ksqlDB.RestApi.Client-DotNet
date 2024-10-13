@@ -68,6 +68,23 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
     }
 
     [Test]
+    public void Property_IgnoreByInsertsField()
+    {
+      //Arrange
+
+      //Act
+      var fieldTypeBuilder = builder.Entity<Payment>()
+        .Property(b => b.Description)
+        .IgnoreInDML();
+
+      //Assert
+      fieldTypeBuilder.Should().NotBeNull();
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      entityMetadata.Should().NotBeNull();
+      entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description)).IgnoreInDML.Should().BeTrue();
+    }
+
+    [Test]
     public void Property_HasColumnName()
     {
       //Arrange
@@ -233,6 +250,7 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
       var metadata = entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Header));
 
       metadata.HasHeaders.Should().BeTrue();
+      metadata.IgnoreInDML.Should().BeTrue();
     }
 
     private record KeyValuePair
