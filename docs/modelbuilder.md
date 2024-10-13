@@ -34,18 +34,18 @@ public static async Task InitModelAndCreateTableAsync(CancellationToken cancella
     BaseAddress = new Uri("http://localhost:8088")
   };
   var httpClientFactory = new HttpClientFactory(httpClient);
-  var restApiProvider = new KSqlDbRestApiClient(httpClientFactory, builder);
+  var restApiClient = new KSqlDbRestApiClient(httpClientFactory, builder);
   
   var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Payment), partitions: 3);
   
-  var responseMessage = await restApiProvider.CreateTableAsync<Payment>(entityCreationMetadata, true, cancellationToken);
+  var responseMessage = await restApiClient.CreateTableAsync<Payment>(entityCreationMetadata, true, cancellationToken);
   var content = await responseMessage.Content.ReadAsStringAsync(cancellationToken);
 
   entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(Account), partitions: 1)
   {
     Replicas = 3
   };
-  responseMessage = await restApiProvider.CreateTableAsync<Account>(entityCreationMetadata, true, cancellationToken);
+  responseMessage = await restApiClient.CreateTableAsync<Account>(entityCreationMetadata, true, cancellationToken);
 }
 ```
 
@@ -189,7 +189,7 @@ var entityCreationMetadata = new EntityCreationMetadata(kafkaTopic: nameof(PocoW
 {
   Replicas = 3
 };
-var responseMessage = await restApiProvider.CreateStreamAsync<PocoWithHeader>(entityCreationMetadata, true);
+var responseMessage = await restApiClient.CreateStreamAsync<PocoWithHeader>(entityCreationMetadata, true);
     
 private record PocoWithHeader
 {
@@ -317,3 +317,53 @@ CREATE TABLE IF NOT EXISTS Records (
 	  Headers ARRAY<STRUCT<Key VARCHAR, Value BYTES>>
 ) WITH ( KAFKA_TOPIC='my_topic', VALUE_FORMAT='Json', PARTITIONS='3' );
 ```
+
+### IgnoreInDML
+**v6.4.0**
+
+The purpose of the `IgnoreInDML` function is to exclude specific fields from INSERT statements.
+
+```C#
+using System.ComponentModel.DataAnnotations;
+
+public class Actor
+{
+  [Key]
+  public int Id { get; set; }
+  public string Name { get; set; } = null!;
+}
+```
+
+```C#
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+
+var ksqlDbUrl = "http://localhost:8088";
+
+var httpClientFactory = new HttpClientFactory(new HttpClient() { BaseAddress = new Uri(ksqlDbUrl) });
+
+var restApiClientOptions = new KSqlDBRestApiClientOptions
+{
+  ShouldPluralizeFromItemName = false,
+};
+
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory, restApiClientOptions);
+
+var modelBuilder = new ModelBuilder();
+modelBuilder.Entity<Actor>()
+  .Property(c => c.Name)
+  .IgnoreInDML();
+
+var actor = new Actor { Id = 1, Name = "Matthew David McConaughey" };
+
+var ksql = restApiClient.ToInsertStatement(actor);
+```
+
+Generated KSQL:
+```SQL
+INSERT INTO Actor (Id) VALUES (1);
+```
+
+`WithHeaders` internally automatically marks the property to be ignored in DML statements.

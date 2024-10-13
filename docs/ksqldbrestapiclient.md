@@ -1311,3 +1311,22 @@ var restApiClientOptions = new KSqlDBRestApiClientOptions
 };
 servicesCollection.AddSingleton(restApiClientOptions);
 ```
+
+
+## IgnoreAttribute
+**v6.4.0**
+
+Properties and fields decorated with the `IgnoreAttribute` are excluded from both DDL and DML statements.
+
+```C#
+public class Movie
+{
+  [ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations.Key]
+  public int Id { get; set; }
+  public string Title { get; set; }
+  public int Release_Year { get; set; }
+	
+  [ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations.Ignore]
+  public int IgnoredProperty { get; set; }
+}
+```
