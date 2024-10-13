@@ -1,6 +1,6 @@
 # ksqlDB.RestApi.Client
 
-# 6.3.0-rc.1
+# 6.3.0
 - added `AsStruct` function to the Fluent API for marking fields as ksqldb `STRUCT` types #89 (proposed by @mrt181)
 
 # 6.2.1
