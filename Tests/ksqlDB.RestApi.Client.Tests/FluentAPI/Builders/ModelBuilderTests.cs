@@ -50,7 +50,7 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
     }
 
     [Test]
-    public void Property_IgnoreField()
+    public void Property_Ignore()
     {
       //Arrange
 
@@ -68,7 +68,7 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
     }
 
     [Test]
-    public void Property_IgnoreByInsertsField()
+    public void Property_IgnoreInDML()
     {
       //Arrange
 

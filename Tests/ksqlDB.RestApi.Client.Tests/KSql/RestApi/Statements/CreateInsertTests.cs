@@ -156,15 +156,15 @@ public class CreateInsertTests
     public string Name { get; set; } = null!;
   }
 
-  public static IEnumerable<(IdentifierEscaping, string)> GenerateIgnoreByInsertsTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> GenerateIgnoreInDMLTestCases()
   {
     yield return (Never, "INSERT INTO Actors (Id) VALUES (1);");
     yield return (Keywords, "INSERT INTO Actors (Id) VALUES (1);");
     yield return (Always, "INSERT INTO `Actors` (`Id`) VALUES (1);");
   }
 
-  [TestCaseSource(nameof(GenerateIgnoreByInsertsTestCases))]
-  public void Generate_UseModelBuilder_IgnoreByInserts((IdentifierEscaping escaping, string expected) testCase)
+  [TestCaseSource(nameof(GenerateIgnoreInDMLTestCases))]
+  public void Generate_UseModelBuilder_IgnoreInDML((IdentifierEscaping escaping, string expected) testCase)
   {
     //Arrange
     modelBuilder.Entity<Actor>()
