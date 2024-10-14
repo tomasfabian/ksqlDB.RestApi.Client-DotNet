@@ -349,12 +349,12 @@ var restApiClientOptions = new KSqlDBRestApiClientOptions
   ShouldPluralizeFromItemName = false,
 };
 
-var restApiClient = new KSqlDbRestApiClient(httpClientFactory, restApiClientOptions);
-
 var modelBuilder = new ModelBuilder();
 modelBuilder.Entity<Actor>()
   .Property(c => c.Name)
   .IgnoreInDML();
+
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory, modelBuilder, restApiClientOptions);
 
 var actor = new Actor { Id = 1, Name = "Matthew David McConaughey" };
 
@@ -367,3 +367,65 @@ INSERT INTO Actor (Id) VALUES (1);
 ```
 
 `WithHeaders` internally automatically marks the property to be ignored in DML statements.
+
+
+### IgnoreInDDL
+**v6.4.0**
+
+The purpose of the `IgnoreInDDL` function is to exclude specific fields from CREATE statements.
+
+```C#
+using System.ComponentModel.DataAnnotations;
+
+public record Record
+{
+  public int Id { get; set; }
+
+  public string Title { get; set; }
+
+  [PseudoColumn]
+  public long RowTime { get; set; }
+}
+```
+
+```C#
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDB.RestApi.Client.KSql.RestApi;
+using ksqlDB.RestApi.Client.KSql.RestApi.Http;
+
+var ksqlDbUrl = "http://localhost:8088";
+
+var httpClientFactory = new HttpClientFactory(new HttpClient() { BaseAddress = new Uri(ksqlDbUrl) });
+
+var restApiClientOptions = new KSqlDBRestApiClientOptions
+{
+  ShouldPluralizeFromItemName = false,
+};
+
+var modelBuilder = new ModelBuilder();
+modelBuilder.Entity<Record>()
+  .HasKey(c => c.Id);
+
+modelBuilder.Entity<Record>()
+  .Property(c => c.RowTime)
+  .IgnoreInDDL();
+
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory, modelBuilder, restApiClientOptions);
+
+EntityCreationMetadata metadata = new(kafkaTopic: nameof(Record))
+{
+  Partitions = 3,
+  Replicas = 3
+};
+
+var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<Record>(metadata);
+```
+
+Generated DDL:
+```SQL
+CREATE OR REPLACE STREAM Record (
+	Id INT KEY,
+	Title VARCHAR
+) WITH ( KAFKA_TOPIC='Record', VALUE_FORMAT='Json', PARTITIONS='3', REPLICAS='3' );
+```
