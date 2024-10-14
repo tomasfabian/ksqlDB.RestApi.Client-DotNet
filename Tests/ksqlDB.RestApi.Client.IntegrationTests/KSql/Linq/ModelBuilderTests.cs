@@ -6,7 +6,6 @@ using ksqlDb.RestApi.Client.IntegrationTests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
-using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
@@ -105,7 +104,7 @@ namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq
         UseIfExistsClause = true,
         DeleteTopic = true,
       };
-      await kSqlDbRestApiClient.DropStreamAsync<Models.Tweet>(dropFromItemProperties);
+      await kSqlDbRestApiClient.DropStreamAsync<Tweet>(dropFromItemProperties);
     }
 
     [SetUp]
@@ -128,13 +127,16 @@ namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq
       var source = QuerySource
         .ToAsyncEnumerable();
 
+      var tweet1 = Tweet1 with { RowTime = 0 };
+      var tweet2 = Tweet2 with { RowTime = 0 };
+
       //Act
       var actualValues = await CollectActualValues(source, expectedItemsCount);
 
       //Assert
       var expectedValues = new List<Tweet>
       {
-        Tweet1, Tweet2
+        tweet1, tweet2
       };
       
       expectedItemsCount.Should().Be(actualValues.Count);

@@ -784,7 +784,7 @@ public class CreateEntityTests
     string statement = new CreateEntity(modelBuilder).Print<IgnoreInDDL>(statementContext, creationMetadata, null);
 
     //Assert
-    statement.Should().Be($@"CREATE OR REPLACE TABLE {nameof(IgnoreInDDL)}s (
+    statement.Should().Be($@"CREATE OR REPLACE TABLE {nameof(IgnoreInDDL)}S (
 	{nameof(IgnoreInDDL.Id)} INT PRIMARY KEY
 ) WITH ( KAFKA_TOPIC='{nameof(IgnoreInDDL)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
   }
