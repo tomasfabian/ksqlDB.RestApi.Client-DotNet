@@ -369,63 +369,25 @@ INSERT INTO Actor (Id) VALUES (1);
 `WithHeaders` internally automatically marks the property to be ignored in DML statements.
 
 
-### IgnoreInDDL
+### RowTime
 **v6.4.0**
 
-The purpose of the `IgnoreInDDL` function is to exclude specific fields from CREATE statements.
+The `RowTime` property in the registered `Record` entity will be automatically excluded from `CREATE` statements based on its name convention and `long` type.
 
 ```C#
-using System.ComponentModel.DataAnnotations;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 
-public record Record
+public class Record
 {
-  public int Id { get; set; }
-
-  public string Title { get; set; }
-
+  /// <summary>
+  /// Row timestamp, inferred from the underlying Kafka record if not overridden.
+  /// </summary>
   [PseudoColumn]
   public long RowTime { get; set; }
 }
 ```
 
 ```C#
-using ksqlDb.RestApi.Client.FluentAPI.Builders;
-using ksqlDB.RestApi.Client.KSql.Query.Context;
-using ksqlDB.RestApi.Client.KSql.RestApi;
-using ksqlDB.RestApi.Client.KSql.RestApi.Http;
-
-var ksqlDbUrl = "http://localhost:8088";
-
-var httpClientFactory = new HttpClientFactory(new HttpClient() { BaseAddress = new Uri(ksqlDbUrl) });
-
-var restApiClientOptions = new KSqlDBRestApiClientOptions
-{
-  ShouldPluralizeFromItemName = false,
-};
-
 var modelBuilder = new ModelBuilder();
-modelBuilder.Entity<Record>()
-  .HasKey(c => c.Id);
-
-modelBuilder.Entity<Record>()
-  .Property(c => c.RowTime)
-  .IgnoreInDDL();
-
-var restApiClient = new KSqlDbRestApiClient(httpClientFactory, modelBuilder, restApiClientOptions);
-
-EntityCreationMetadata metadata = new(kafkaTopic: nameof(Record))
-{
-  Partitions = 3,
-  Replicas = 3
-};
-
-var httpResponseMessage = await restApiClient.CreateOrReplaceStreamAsync<Record>(metadata);
-```
-
-Generated DDL:
-```SQL
-CREATE OR REPLACE STREAM Record (
-	Id INT KEY,
-	Title VARCHAR
-) WITH ( KAFKA_TOPIC='Record', VALUE_FORMAT='Json', PARTITIONS='3', REPLICAS='3' );
+modelBuilder.Entity<Record>();
 ```

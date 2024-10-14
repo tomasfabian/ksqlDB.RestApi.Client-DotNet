@@ -101,6 +101,26 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
       entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description)).IgnoreInDDL.Should().BeTrue();
     }
 
+    public class RecordExt : ksqlDB.RestApi.Client.KSql.Query.Record
+    {
+      public string Title { get; set; }
+    }
+
+    [Test]
+    public void RowTime_PropertyConvention_IgnoreInDDL()
+    {
+      //Arrange
+
+      //Act
+      var fieldTypeBuilder = builder.Entity<RecordExt>();
+
+      //Assert
+      fieldTypeBuilder.Should().NotBeNull();
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(RecordExt));
+      entityMetadata.Should().NotBeNull();
+      entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(RecordExt.RowTime)).IgnoreInDDL.Should().BeTrue();
+    }
+
     [Test]
     public void Property_HasColumnName()
     {
@@ -139,6 +159,30 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
       entityMetadata.Should().NotBeNull();
       entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description)).Ignore.Should().BeTrue();
       entityMetadata.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Amount)).Ignore.Should().BeTrue();
+    }
+
+    [Test]
+    public void MultipleMappingsForSameProperty()
+    {
+      //Arrange
+      string columnName = "alter";
+
+      //Act
+      var fieldTypeBuilder = builder.Entity<Payment>()
+        .Property(b => b.Description)
+        .HasColumnName(columnName);
+
+      builder.Entity<Payment>()
+        .Property(b => b.Description)
+        .IgnoreInDML();
+
+      //Assert
+      fieldTypeBuilder.Should().NotBeNull();
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      entityMetadata.Should().NotBeNull();
+      var fieldMetadata = entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description));
+      fieldMetadata.ColumnName.Should().Be(columnName);
+      fieldMetadata.IgnoreInDML.Should().BeTrue();
     }
 
     [Test]

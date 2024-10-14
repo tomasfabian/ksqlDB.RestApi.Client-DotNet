@@ -20,7 +20,7 @@ namespace ksqlDb.RestApi.Client.Metadata
     internal MemberInfo MemberInfo { get; init; } = null!;
     public bool Ignore { get; internal set; }
     public bool IgnoreInDML { get; internal set; }
-    public bool IgnoreInDDL { get; internal set; }
+    internal bool IgnoreInDDL { get; set; }
     public bool HasHeaders { get; internal set; }
     internal bool IsStruct { get; set; }
     internal string Path { get; init; } = null!;
