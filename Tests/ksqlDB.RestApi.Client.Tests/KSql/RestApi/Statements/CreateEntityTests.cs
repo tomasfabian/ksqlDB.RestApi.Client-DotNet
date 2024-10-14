@@ -758,4 +758,34 @@ public class CreateEntityTests
 	{nameof(Poco.Id)} INT PRIMARY KEY
 ) WITH ( KAFKA_TOPIC='{nameof(Poco)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
   }
+
+  internal class IgnoreInDDL
+  {
+    [Key]
+    public int Id { get; set; }
+    [IgnoreInDDL]
+    [PseudoColumn]
+    public string RowTime { get; set; }
+  }
+
+  [Test]
+  public void Print_IgnoreInDDLAttribute()
+  {
+    //Arrange
+    var statementContext = new StatementContext
+    {
+      CreationType = CreationType.CreateOrReplace,
+      KSqlEntityType = KSqlEntityType.Table,
+    };
+
+    creationMetadata.KafkaTopic = nameof(IgnoreInDDL);
+
+    //Act
+    string statement = new CreateEntity(modelBuilder).Print<IgnoreInDDL>(statementContext, creationMetadata, null);
+
+    //Assert
+    statement.Should().Be($@"CREATE OR REPLACE TABLE {nameof(IgnoreInDDL)}s (
+	{nameof(IgnoreInDDL.Id)} INT PRIMARY KEY
+) WITH ( KAFKA_TOPIC='{nameof(IgnoreInDDL)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+  }
 }

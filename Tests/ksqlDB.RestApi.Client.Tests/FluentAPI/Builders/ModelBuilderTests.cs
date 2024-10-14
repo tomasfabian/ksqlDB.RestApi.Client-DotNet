@@ -85,6 +85,23 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
     }
 
     [Test]
+    public void Property_IgnoreInDDL()
+    {
+      //Arrange
+
+      //Act
+      var fieldTypeBuilder = builder.Entity<Payment>()
+        .Property(b => b.Description)
+        .IgnoreInDDL();
+
+      //Assert
+      fieldTypeBuilder.Should().NotBeNull();
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      entityMetadata.Should().NotBeNull();
+      entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description)).IgnoreInDDL.Should().BeTrue();
+    }
+
+    [Test]
     public void Property_HasColumnName()
     {
       //Arrange
