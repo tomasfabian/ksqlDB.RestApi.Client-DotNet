@@ -14,10 +14,10 @@ internal sealed class CreateInsert : EntityInfo
 {
   private readonly IMetadataProvider metadataProvider;
 
-  public CreateInsert(ModelBuilder metadataProvider)
-    : base(metadataProvider)
+  public CreateInsert(ModelBuilder modelBuilder)
+    : base(modelBuilder)
   {
-    this.metadataProvider = metadataProvider;
+    this.metadataProvider = modelBuilder;
   }
 
   internal string Generate<T>(T entity, InsertProperties insertProperties)
