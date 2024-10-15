@@ -349,12 +349,12 @@ var restApiClientOptions = new KSqlDBRestApiClientOptions
   ShouldPluralizeFromItemName = false,
 };
 
-var restApiClient = new KSqlDbRestApiClient(httpClientFactory, restApiClientOptions);
-
 var modelBuilder = new ModelBuilder();
 modelBuilder.Entity<Actor>()
   .Property(c => c.Name)
   .IgnoreInDML();
+
+var restApiClient = new KSqlDbRestApiClient(httpClientFactory, modelBuilder, restApiClientOptions);
 
 var actor = new Actor { Id = 1, Name = "Matthew David McConaughey" };
 
@@ -367,3 +367,27 @@ INSERT INTO Actor (Id) VALUES (1);
 ```
 
 `WithHeaders` internally automatically marks the property to be ignored in DML statements.
+
+
+### RowTime
+**v6.4.0**
+
+The `RowTime` property in the registered `Record` entity will be automatically excluded from `CREATE` statements based on its name convention and `long` type.
+
+```C#
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
+
+public class Record
+{
+  /// <summary>
+  /// Row timestamp, inferred from the underlying Kafka record if not overridden.
+  /// </summary>
+  [PseudoColumn]
+  public long RowTime { get; set; }
+}
+```
+
+```C#
+var modelBuilder = new ModelBuilder();
+modelBuilder.Entity<Record>();
+```

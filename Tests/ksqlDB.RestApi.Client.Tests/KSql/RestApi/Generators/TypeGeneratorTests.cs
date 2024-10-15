@@ -69,6 +69,22 @@ public class TypeGeneratorTests
   }
 
   [Test]
+  public void CreateType_ModelBuilder_IgnoreInDDL()
+  {
+    //Arrange
+    modelBuilder.Entity<Address>()
+      .Property(b => b.Number)
+      .IgnoreInDDL();
+
+    //Act
+    var statement = new TypeGenerator(modelBuilder).Print<Address>(new TypeProperties());
+
+    //Assert
+    statement.Should()
+      .Be($"CREATE TYPE {nameof(Address)} AS STRUCT<Street VARCHAR, City VARCHAR>;");
+  }
+
+  [Test]
   public void CreateType_WithTypeName()
   {
     //Arrange
@@ -146,6 +162,8 @@ public class TypeGeneratorTests
     public int Number { get; set; }
     public string Street { get; set; } = null!;
     public string City { get; set; } = null!;
+    [IgnoreInDDL]
+    public string Secret { get; set; } = null!;
   }
 
   public class Person

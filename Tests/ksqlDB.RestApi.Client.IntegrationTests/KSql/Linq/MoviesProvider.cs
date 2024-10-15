@@ -55,26 +55,30 @@ public class MoviesProvider(KSqlDbRestApiProvider restApiProvider)
   {
     Id = 1,
     Release_Year = 1986,
-    Title = "Aliens"
+    Title = "Aliens",
+    RowTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
   };
 
   public static readonly Movie Movie2 = new()
   {
     Id = 2,
     Release_Year = 1988,
-    Title = "Die Hard"
+    Title = "Die Hard",
+    RowTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
   };
 
   public static readonly Lead_Actor LeadActor1 = new()
   {
     Actor_Name = "Sigourney Weaver",
-    Title = "Aliens"
+    Title = "Aliens",
+    RowTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
   };
 
   public static readonly Lead_Actor LeadActor2 = new()
   {
     Actor_Name = "Al Pacino",
-    Title = "The Godfather"
+    Title = "The Godfather",
+    RowTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
   };
 
   public async Task<bool> InsertMovieAsync(Movie movie)

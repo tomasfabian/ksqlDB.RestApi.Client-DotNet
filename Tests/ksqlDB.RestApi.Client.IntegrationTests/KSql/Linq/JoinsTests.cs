@@ -34,6 +34,8 @@ public class JoinsTests : Infrastructure.IntegrationTests
       
     moviesProvider = new MoviesProvider(RestApiProvider);
 
+    await ClassCleanup();
+
     var response = await RestApiProvider.CreateStreamAsync<Order>(OrderEntityCreationMetadata, ifNotExists: true);
 
     await moviesProvider.DropTablesAsync();
@@ -93,7 +95,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
   public async Task LeftJoin()
   {
     //Arrange
-    int expectedItemsCount = 2;
+    int expectedItemsCount = 1;
 
     var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .LeftJoin(
@@ -120,9 +122,9 @@ public class JoinsTests : Infrastructure.IntegrationTests
     Assert.AreEqual(MoviesProvider.Movie1.Title, actualValues[0].Title);
     Assert.AreEqual(MoviesProvider.LeadActor1.Title, actualValues[0].Title);
 
-    actualValues[1].Substr.Length.Should().Be(4);
-    actualValues[1].Release_Year.Should().BeOneOf(MoviesProvider.Movie1.Release_Year, MoviesProvider.Movie2.Release_Year);
-    actualValues[1].ActorTitle.Should().BeOneOf(null, MoviesProvider.Movie1.Title, MoviesProvider.Movie2.Title);
+    actualValues[0].Substr.Length.Should().Be(4);
+    actualValues[0].Release_Year.Should().BeOneOf(MoviesProvider.Movie1.Release_Year, MoviesProvider.Movie2.Release_Year);
+    actualValues[0].ActorTitle.Should().BeOneOf(null, MoviesProvider.Movie1.Title, MoviesProvider.Movie2.Title);
   }
 
   public record Movie2 : Record

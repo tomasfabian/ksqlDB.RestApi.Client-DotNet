@@ -6,6 +6,8 @@ using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
+using ksqlDb.RestApi.Client.Metadata;
+using System.Reflection;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 
@@ -53,4 +55,13 @@ internal sealed class TypeGenerator(IMetadataProvider metadataProvider) : Entity
       (Always, _) => $"`{name}`",
       _ => throw new ArgumentOutOfRangeException(nameof(escaping), escaping, "Non-exhaustive match")
     };
+
+  protected override bool IncludeMemberInfo(EntityMetadata? entityMetadata, MemberInfo memberInfo)
+  {
+    var fieldMetadata = entityMetadata?.GetFieldMetadataBy(memberInfo);
+    if (fieldMetadata is { IgnoreInDDL: true })
+      return false;
+
+    return base.IncludeMemberInfo(entityMetadata, memberInfo) && !memberInfo.GetCustomAttributes().OfType<IgnoreInDDLAttribute>().Any();
+  }
 }
