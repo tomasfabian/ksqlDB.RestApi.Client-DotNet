@@ -3,11 +3,8 @@ namespace ksqlDb.RestApi.Client.Metadata
   internal sealed record DecimalFieldMetadata : FieldMetadata
   {
     public DecimalFieldMetadata(FieldMetadata fieldMetadata)
+     : base(fieldMetadata)
     {
-      MemberInfo = fieldMetadata.MemberInfo;
-      Ignore = fieldMetadata.Ignore;
-      Path = fieldMetadata.Path;
-      FullPath = fieldMetadata.FullPath;
     }
 
     public short Precision { get; internal set; }

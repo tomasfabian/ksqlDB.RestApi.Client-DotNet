@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDb.RestApi.Client.FluentAPI.Builders
@@ -9,10 +10,16 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
   public interface IFieldTypeBuilder<TProperty>
   {
     /// <summary>
-    /// Marks the field as ignored, excluding it from the entity's schema.
+    /// Marks the field as ignored, excluding it from the entity's schema, preventing it from being included in both DDL and DML statements. 
     /// </summary>
     /// <returns>The field type builder for chaining additional configuration.</returns>
     public IFieldTypeBuilder<TProperty> Ignore();
+
+    /// <summary>
+    /// Marks the field to be excluded from data manipulation operations, preventing it from being included in DML statements such as INSERT.
+    /// </summary>
+    /// <returns>The field type builder for chaining additional configuration.</returns>
+    public IFieldTypeBuilder<TProperty> IgnoreInDML();
 
     /// <summary>
     /// Marks the field as HEADERS.
@@ -55,9 +62,16 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
       return this;
     }
 
+    public IFieldTypeBuilder<TProperty> IgnoreInDML()
+    {
+      fieldMetadata.IgnoreInDML = true;
+      return this;
+    }
+
     public IFieldTypeBuilder<TProperty> WithHeaders()
     {
       fieldMetadata.HasHeaders = true;
+      IgnoreInDML();
       return this;
     }
   }
