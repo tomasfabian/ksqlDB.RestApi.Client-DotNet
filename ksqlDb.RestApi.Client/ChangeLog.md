@@ -9,6 +9,7 @@
 - `IgnoreByInsertsAttribute` no longer excludes fields or properties from DDL statements. For this purpose, a new `IgnoreAttribute` has been introduced.
 - the `Record` type's fields `RowOffset` and `RowPartition` are decorated with `IgnoreAttribute` instead of `IgnoreByInsertsAttribute`
 - the `Record` type's field `RowTime` is decorated with an internal `IgnoreInDDLAttribute` instead of `IgnoreByInsertsAttribute`
+- fixed the issue of multiple mappings not working on the same property in the model builder
 
 # 6.3.0
 - added `AsStruct` function to the Fluent API for marking fields as ksqldb `STRUCT` types #89 (proposed by @mrt181)
