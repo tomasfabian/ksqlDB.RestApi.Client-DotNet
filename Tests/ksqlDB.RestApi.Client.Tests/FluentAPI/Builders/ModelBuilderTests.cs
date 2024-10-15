@@ -85,6 +85,43 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
     }
 
     [Test]
+    public void Property_IgnoreInDDL()
+    {
+      //Arrange
+
+      //Act
+      var fieldTypeBuilder = builder.Entity<Payment>()
+        .Property(b => b.Description)
+        .IgnoreInDDL();
+
+      //Assert
+      fieldTypeBuilder.Should().NotBeNull();
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      entityMetadata.Should().NotBeNull();
+      entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description)).IgnoreInDDL.Should().BeTrue();
+    }
+
+    public class RecordExt : ksqlDB.RestApi.Client.KSql.Query.Record
+    {
+      public string Title { get; set; }
+    }
+
+    [Test]
+    public void RowTime_PropertyConvention_IgnoreInDDL()
+    {
+      //Arrange
+
+      //Act
+      var fieldTypeBuilder = builder.Entity<RecordExt>();
+
+      //Assert
+      fieldTypeBuilder.Should().NotBeNull();
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(RecordExt));
+      entityMetadata.Should().NotBeNull();
+      entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(RecordExt.RowTime)).IgnoreInDDL.Should().BeTrue();
+    }
+
+    [Test]
     public void Property_HasColumnName()
     {
       //Arrange
@@ -122,6 +159,56 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
       entityMetadata.Should().NotBeNull();
       entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description)).Ignore.Should().BeTrue();
       entityMetadata.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Amount)).Ignore.Should().BeTrue();
+    }
+
+    [Test]
+    public void MultipleMappingsForSameProperty()
+    {
+      //Arrange
+      string columnName = "alter";
+
+      //Act
+      var fieldTypeBuilder = builder.Entity<Payment>()
+        .Property(b => b.Description)
+        .HasColumnName(columnName);
+
+      builder.Entity<Payment>()
+        .Property(b => b.Description)
+        .IgnoreInDML();
+
+      //Assert
+      fieldTypeBuilder.Should().NotBeNull();
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      entityMetadata.Should().NotBeNull();
+      var fieldMetadata = entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Description));
+      fieldMetadata.ColumnName.Should().Be(columnName);
+      fieldMetadata.IgnoreInDML.Should().BeTrue();
+    }
+
+
+    [Test]
+    public void MultipleMappingsForSameProperty_Decimal()
+    {
+      //Arrange
+      string columnName = "alter";
+      short precision = 2;
+      short scale = 3;
+
+      //Act
+      builder.Entity<Payment>()
+        .Property(b => b.Amount)
+        .Decimal(precision, scale);
+
+      builder.Entity<Payment>()
+        .Property(b => b.Amount)
+        .HasColumnName(columnName);
+
+      //Assert
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      entityMetadata.Should().NotBeNull();
+      var fieldMetadata = entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Amount));
+      fieldMetadata.ColumnName.Should().Be(columnName);
+      ((DecimalFieldMetadata)fieldMetadata).Precision.Should().Be(precision);
     }
 
     [Test]

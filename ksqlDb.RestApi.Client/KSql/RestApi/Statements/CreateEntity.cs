@@ -6,6 +6,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using static System.String;
+using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
@@ -99,5 +100,14 @@ internal sealed class CreateEntity(IMetadataProvider metadataProvider) : EntityI
     };
 
     return $" {key}";
+  }
+
+  protected override bool IncludeMemberInfo(EntityMetadata? entityMetadata, MemberInfo memberInfo)
+  {
+    var fieldMetadata = entityMetadata?.GetFieldMetadataBy(memberInfo);
+    if (fieldMetadata is { IgnoreInDDL: true })
+      return false;
+
+    return base.IncludeMemberInfo(entityMetadata, memberInfo) && !memberInfo.GetCustomAttributes().OfType<IgnoreInDDLAttribute>().Any();
   }
 }

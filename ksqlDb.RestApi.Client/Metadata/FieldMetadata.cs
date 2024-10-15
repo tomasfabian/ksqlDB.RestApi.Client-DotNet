@@ -9,6 +9,7 @@ namespace ksqlDb.RestApi.Client.Metadata
       MemberInfo = fieldMetadata.MemberInfo;
       Ignore = fieldMetadata.Ignore;
       IgnoreInDML = fieldMetadata.IgnoreInDML;
+      IgnoreInDDL = fieldMetadata.IgnoreInDDL;
       HasHeaders = fieldMetadata.HasHeaders;
       IsStruct = fieldMetadata.IsStruct;
       Path = fieldMetadata.Path;
@@ -19,6 +20,7 @@ namespace ksqlDb.RestApi.Client.Metadata
     internal MemberInfo MemberInfo { get; init; } = null!;
     public bool Ignore { get; internal set; }
     public bool IgnoreInDML { get; internal set; }
+    internal bool IgnoreInDDL { get; set; }
     public bool HasHeaders { get; internal set; }
     internal bool IsStruct { get; set; }
     internal string Path { get; init; } = null!;

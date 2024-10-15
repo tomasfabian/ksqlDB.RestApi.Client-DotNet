@@ -1,4 +1,6 @@
 using System.Linq.Expressions;
+using System.Reflection;
+using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDb.RestApi.Client.FluentAPI.Builders
@@ -37,6 +39,8 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
     public EntityTypeBuilder()
     {
       Metadata.Type = typeof(TEntity);
+
+      IgnoreRowTime();
     }
 
     public IEntityTypeBuilder<TEntity> HasKey<TProperty>(Expression<Func<TEntity, TProperty>> getProperty)
@@ -54,22 +58,26 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
       foreach (var (memberName, memberInfo) in members)
       {
         path += memberName;
-        var fieldMetadata = new FieldMetadata()
+
+        if (!Metadata.FieldsMetadataDict.TryGetValue(memberInfo, out var fieldMetadata))
         {
-          MemberInfo = memberInfo,
-          Path = memberName,
-          FullPath = path,
-        };
+          fieldMetadata = new FieldMetadata()
+          {
+            MemberInfo = memberInfo,
+            Path = memberName,
+            FullPath = path,
+          };
+        }
 
         switch (typeof(TProperty))
         {
           case { } type when type == typeof(decimal):
-            var decimalFieldMetadata = new DecimalFieldMetadata(fieldMetadata);
+            var decimalFieldMetadata = fieldMetadata as DecimalFieldMetadata ?? new DecimalFieldMetadata(fieldMetadata);
             builder = new DecimalFieldTypeBuilder<TProperty>(decimalFieldMetadata);
             fieldMetadata = decimalFieldMetadata;
             break;
           case { } type when type == typeof(byte[]):
-            var bytesArrayFieldMetadata = new BytesArrayFieldMetadata(fieldMetadata);
+            var bytesArrayFieldMetadata = fieldMetadata as BytesArrayFieldMetadata ?? new BytesArrayFieldMetadata(fieldMetadata);
             builder = new BytesArrayFieldTypeBuilder<TProperty>(bytesArrayFieldMetadata);
             fieldMetadata = bytesArrayFieldMetadata;
             break;
@@ -83,6 +91,46 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
       }
 
       return builder;
+    }
+
+    private readonly BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Instance;
+    private readonly Type longType = typeof(long);
+    private readonly string rowTime = nameof(Record.RowTime);
+
+    internal void IgnoreRowTime()
+    {
+      var props = Metadata.Type.GetProperties(bindingFlags)
+        .Where(p => p.Name == rowTime && p.PropertyType == longType);
+
+      MemberInfo? propertyInfo = props.FirstOrDefault();
+      if (propertyInfo != null)
+      {
+        AddFieldMetadata(propertyInfo, ignoreInDDL: true);
+        return;
+      }
+
+      var fields = Metadata.Type.GetFields(bindingFlags)
+        .Where(p => p.Name == rowTime && p.FieldType == longType);
+
+      MemberInfo? fieldInfo = fields.FirstOrDefault();
+
+      if (fieldInfo != null)
+      {
+        AddFieldMetadata(fieldInfo, ignoreInDDL: true);
+      }
+    }
+
+    private void AddFieldMetadata(MemberInfo memberInfo, bool ignoreInDDL)
+    {
+      var fieldMetadata = new FieldMetadata
+      {
+        MemberInfo = memberInfo,
+        Path = memberInfo.Name,
+        FullPath = memberInfo.Name,
+        IgnoreInDDL = ignoreInDDL
+      };
+
+      Metadata.FieldsMetadataDict[memberInfo] = fieldMetadata;
     }
   }
 }

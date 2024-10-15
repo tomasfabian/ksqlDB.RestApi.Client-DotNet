@@ -14,7 +14,7 @@ internal sealed class CreateInsert : EntityInfo
 {
   private readonly IMetadataProvider metadataProvider;
 
-  public CreateInsert(ModelBuilder metadataProvider)
+  public CreateInsert(IMetadataProvider metadataProvider)
     : base(metadataProvider)
   {
     this.metadataProvider = metadataProvider;

@@ -42,6 +42,7 @@ namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq
       Message = "Hello world",
       IsRobot = true,
       Amount = 0.00042,
+      RowTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
     };
 
     public static readonly Tweet Tweet2 = new()
@@ -50,6 +51,7 @@ namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq
       Message = "Wall-e",
       IsRobot = false,
       Amount = 1,
+      RowTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
     };
 
     protected static async Task InitializeDatabase()
@@ -67,6 +69,8 @@ namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq
         BaseAddress = new Uri(TestConfig.KSqlDbUrl)
       };
       kSqlDbRestApiClient = new KSqlDbRestApiClient(new HttpClientFactory(httpClient), modelBuilder);
+
+      await ClassCleanup();
 
       var entityCreationMetadata = new EntityCreationMetadata(TopicName, 1)
       {
@@ -100,7 +104,7 @@ namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq
         UseIfExistsClause = true,
         DeleteTopic = true,
       };
-      await kSqlDbRestApiClient.DropStreamAsync<Models.Tweet>(dropFromItemProperties);
+      await kSqlDbRestApiClient.DropStreamAsync<Tweet>(dropFromItemProperties);
     }
 
     [SetUp]
@@ -123,17 +127,40 @@ namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq
       var source = QuerySource
         .ToAsyncEnumerable();
 
+      var tweet1 = Tweet1 with { RowTime = 0 };
+      var tweet2 = Tweet2 with { RowTime = 0 };
+
       //Act
       var actualValues = await CollectActualValues(source, expectedItemsCount);
 
       //Assert
       var expectedValues = new List<Tweet>
       {
-        Tweet1, Tweet2
+        tweet1, tweet2
       };
       
       expectedItemsCount.Should().Be(actualValues.Count);
       CollectionAssert.AreEqual(expectedValues, actualValues);
+    }
+
+    [Test]
+    public async Task SelectPseudoColumns()
+    {
+      //Arrange
+      int expectedItemsCount = 2;
+
+      var source = QuerySource
+        .Select(c => new{ c.RowTime, c.RowOffset, c.Message })
+        .ToAsyncEnumerable();
+
+      //Act
+      var actualValues = await CollectActualValues(source, expectedItemsCount);
+
+      //Assert
+      expectedItemsCount.Should().Be(actualValues.Count);
+      actualValues[0].RowTime.Should().Be(Tweet1.RowTime);
+      actualValues[0].RowTime.Should().BeGreaterOrEqualTo(0);
+      actualValues[0].Message.Should().Be(Tweet1.Message);
     }
   }
 }

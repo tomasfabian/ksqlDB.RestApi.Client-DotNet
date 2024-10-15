@@ -19,7 +19,13 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
     /// Marks the field to be excluded from data manipulation operations, preventing it from being included in DML statements such as INSERT.
     /// </summary>
     /// <returns>The field type builder for chaining additional configuration.</returns>
-    public IFieldTypeBuilder<TProperty> IgnoreInDML();
+    internal IFieldTypeBuilder<TProperty> IgnoreInDML();
+
+    /// <summary>
+    /// Marks the field to be excluded from data definition operations, preventing it from being included in DDL statements such as CREATE STREAM or TABLE.
+    /// </summary>
+    /// <returns>The field type builder for chaining additional configuration.</returns>
+    public IFieldTypeBuilder<TProperty> IgnoreInDDL();
 
     /// <summary>
     /// Marks the field as HEADERS.
@@ -65,6 +71,12 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
     public IFieldTypeBuilder<TProperty> IgnoreInDML()
     {
       fieldMetadata.IgnoreInDML = true;
+      return this;
+    }
+
+    public IFieldTypeBuilder<TProperty> IgnoreInDDL()
+    {
+      fieldMetadata.IgnoreInDDL = true;
       return this;
     }
 
