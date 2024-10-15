@@ -185,6 +185,32 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
       fieldMetadata.IgnoreInDML.Should().BeTrue();
     }
 
+
+    [Test]
+    public void MultipleMappingsForSameProperty_Decimal()
+    {
+      //Arrange
+      string columnName = "alter";
+      short precision = 2;
+      short scale = 3;
+
+      //Act
+      builder.Entity<Payment>()
+        .Property(b => b.Amount)
+        .Decimal(precision, scale);
+
+      builder.Entity<Payment>()
+        .Property(b => b.Amount)
+        .HasColumnName(columnName);
+
+      //Assert
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Payment));
+      entityMetadata.Should().NotBeNull();
+      var fieldMetadata = entityMetadata!.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Payment.Amount));
+      fieldMetadata.ColumnName.Should().Be(columnName);
+      ((DecimalFieldMetadata)fieldMetadata).Precision.Should().Be(precision);
+    }
+
     [Test]
     public void Property_IgnoreNestedField()
     {

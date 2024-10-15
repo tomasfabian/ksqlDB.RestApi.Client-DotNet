@@ -72,12 +72,12 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
         switch (typeof(TProperty))
         {
           case { } type when type == typeof(decimal):
-            var decimalFieldMetadata = new DecimalFieldMetadata(fieldMetadata);
+            var decimalFieldMetadata = fieldMetadata as DecimalFieldMetadata ?? new DecimalFieldMetadata(fieldMetadata);
             builder = new DecimalFieldTypeBuilder<TProperty>(decimalFieldMetadata);
             fieldMetadata = decimalFieldMetadata;
             break;
           case { } type when type == typeof(byte[]):
-            var bytesArrayFieldMetadata = new BytesArrayFieldMetadata(fieldMetadata);
+            var bytesArrayFieldMetadata = fieldMetadata as BytesArrayFieldMetadata ?? new BytesArrayFieldMetadata(fieldMetadata);
             builder = new BytesArrayFieldTypeBuilder<TProperty>(bytesArrayFieldMetadata);
             fieldMetadata = bytesArrayFieldMetadata;
             break;
@@ -105,7 +105,7 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
       MemberInfo? propertyInfo = props.FirstOrDefault();
       if (propertyInfo != null)
       {
-        AddFieldMetadata(propertyInfo);
+        AddFieldMetadata(propertyInfo, ignoreInDDL: true);
         return;
       }
 
@@ -116,18 +116,18 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
 
       if (fieldInfo != null)
       {
-        AddFieldMetadata(fieldInfo);
+        AddFieldMetadata(fieldInfo, ignoreInDDL: true);
       }
     }
 
-    private void AddFieldMetadata(MemberInfo memberInfo)
+    private void AddFieldMetadata(MemberInfo memberInfo, bool ignoreInDDL)
     {
       var fieldMetadata = new FieldMetadata
       {
         MemberInfo = memberInfo,
         Path = memberInfo.Name,
         FullPath = memberInfo.Name,
-        IgnoreInDDL = true
+        IgnoreInDDL = ignoreInDDL
       };
 
       Metadata.FieldsMetadataDict[memberInfo] = fieldMetadata;
