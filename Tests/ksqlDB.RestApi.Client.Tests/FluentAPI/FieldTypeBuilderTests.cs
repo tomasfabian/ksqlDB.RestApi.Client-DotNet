@@ -32,6 +32,7 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI
 
       fieldMetadata.HasHeaders.Should().BeFalse();
       fieldMetadata.IsStruct.Should().BeFalse();
+      fieldMetadata.IsPseudoColumn.Should().BeFalse();
       fieldMetadata.ColumnName.Should().BeNull();
     }
 
@@ -91,6 +92,19 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI
       //Assert
       fieldTypeBuilder.Should().NotBeNull();
       fieldMetadata.IsStruct.Should().BeTrue();
+    }
+
+    [Test]
+    public void AsPseudoColumn()
+    {
+      //Arrange
+
+      //Act
+      var fieldTypeBuilder = builder.AsPseudoColumn();
+
+      //Assert
+      fieldTypeBuilder.Should().NotBeNull();
+      fieldMetadata.IsPseudoColumn.Should().BeTrue();
     }
 
     [Test]

@@ -367,8 +367,28 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
       var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Record));
       entityMetadata.Should().NotBeNull();
 
-      var metadata = entityMetadata!.FieldsMetadata.First(c => c.IsStruct && c.Path == "Headers");
+      var metadata = entityMetadata!.FieldsMetadata.First(c => c is {Path: nameof(Record.Headers)});
       metadata.IsStruct.Should().BeTrue();
+    }
+
+    [Test]
+    public void AsPseudoColumn()
+    {
+      //Arrange
+
+      //Act
+      var fieldTypeBuilder = builder.Entity<Record>()
+        .Property(b => b.Headers)
+        .AsPseudoColumn();
+
+      //Assert
+      fieldTypeBuilder.Should().NotBeNull();
+
+      var entityMetadata = ((IMetadataProvider)builder).GetEntities().FirstOrDefault(c => c.Type == typeof(Record));
+      entityMetadata.Should().NotBeNull();
+
+      var metadata = entityMetadata!.FieldsMetadata.First(c => c is {Path: nameof(Record.Headers)});
+      metadata.IsPseudoColumn.Should().BeTrue();
     }
   }
 
