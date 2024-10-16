@@ -1,5 +1,8 @@
 # ksqlDB.RestApi.Client
 
+# 6.5.0
+- added the `AsPseudoColumn` function to the Fluent API for mapping of C# fields or properties as `ksqldb` [pseudocolumns](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#pseudocolumns).
+
 # 6.4.0
 - added the `IgnoreInDML` function to the Fluent API to exclude fields from INSERT statements #90 (proposed by @mrt181)
 - added `IgnoreAttribute` to prevent properties or fields from being included in both DDL and DML statement
