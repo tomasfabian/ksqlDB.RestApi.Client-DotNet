@@ -23,6 +23,7 @@ namespace ksqlDb.RestApi.Client.Metadata
     internal bool IgnoreInDDL { get; set; }
     public bool HasHeaders { get; internal set; }
     internal bool IsStruct { get; set; }
+    public bool IsPseudoColumn { get; internal set; }
     internal string Path { get; init; } = null!;
     internal string FullPath { get; init; } = null!;
     public string? ColumnName { get; set; }

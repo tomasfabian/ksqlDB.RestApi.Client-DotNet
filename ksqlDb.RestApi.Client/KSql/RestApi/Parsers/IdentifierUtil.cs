@@ -56,10 +56,10 @@ namespace ksqlDb.RestApi.Client.KSql.RestApi.Parsers
       return escaping switch
       {
         Never => memberExpression.GetMemberName(metadataProvider),
-        Keywords when memberExpression.Member.GetCustomAttribute<PseudoColumnAttribute>() != null => memberExpression.Member.Name,
+        Keywords when IsPseudoColumn(memberExpression.Member, metadataProvider) => memberExpression.Member.Name,
         Keywords when IsValid(memberExpression.GetMemberName(metadataProvider)) && SystemColumns.IsValid(memberExpression.GetMemberName(metadataProvider)) => memberExpression.GetMemberName(metadataProvider),
         Keywords => string.Concat("`", memberExpression.GetMemberName(metadataProvider), "`"),
-        Always when memberExpression.Member.GetCustomAttribute<PseudoColumnAttribute>() != null => memberExpression.Member.Name,
+        Always when IsPseudoColumn(memberExpression.Member, metadataProvider) => memberExpression.Member.Name,
         Always => string.Concat("`", memberExpression.GetMemberName(metadataProvider), "`"),
         _ => throw new ArgumentOutOfRangeException(nameof(escaping), escaping, "Non-exhaustive match.")
       };
@@ -82,13 +82,26 @@ namespace ksqlDb.RestApi.Client.KSql.RestApi.Parsers
       return escaping switch
       {
         Never => memberInfo.GetMemberName(modelBuilder),
-        Keywords when memberInfo.GetCustomAttribute<PseudoColumnAttribute>() != null => memberInfo.Name,
+        Keywords when IsPseudoColumn(memberInfo, modelBuilder) => memberInfo.Name,
         Keywords when IsValid(memberInfo.GetMemberName(modelBuilder)) && SystemColumns.IsValid(memberInfo.GetMemberName(modelBuilder)) => memberInfo.GetMemberName(modelBuilder),
         Keywords => string.Concat("`", memberInfo.GetMemberName(modelBuilder), "`"),
-        Always when memberInfo.GetCustomAttribute<PseudoColumnAttribute>() != null => memberInfo.Name,
+        Always when IsPseudoColumn(memberInfo, modelBuilder) => memberInfo.Name,
         Always => string.Concat("`", memberInfo.GetMemberName(modelBuilder), "`"),
         _ => throw new ArgumentOutOfRangeException(nameof(escaping), escaping, "Non-exhaustive match.")
       };
+    }
+
+    private static bool IsPseudoColumn(MemberInfo memberInfo, IMetadataProvider? metadataProvider)
+    {
+      if (memberInfo.GetCustomAttribute<PseudoColumnAttribute>() != null)
+        return true;
+
+      var entityMetadata = metadataProvider?.GetEntities().FirstOrDefault(c => c.Type == memberInfo.DeclaringType);
+
+      var fieldMetadata =
+        entityMetadata?.FieldsMetadata.FirstOrDefault(c => c.MemberInfo.Name == memberInfo.Name);
+
+      return fieldMetadata is {IsPseudoColumn: true};
     }
   }
 }

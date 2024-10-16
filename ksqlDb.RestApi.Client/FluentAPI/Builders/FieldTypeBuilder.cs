@@ -45,6 +45,12 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
     /// </summary>
     /// <returns>The field type builder for chaining additional configuration.</returns>
     IFieldTypeBuilder<TProperty> AsStruct();
+
+    /// <summary>
+    /// Marks the field as a ksqldb pseudocolumn.
+    /// </summary>
+    /// <returns>The field type builder for chaining additional configuration.</returns>
+    IFieldTypeBuilder<TProperty> AsPseudoColumn();
   }
 
   internal class FieldTypeBuilder<TProperty>(FieldMetadata fieldMetadata)
@@ -59,6 +65,12 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
     public IFieldTypeBuilder<TProperty> AsStruct()
     {
       fieldMetadata.IsStruct = true;
+      return this;
+    }
+
+    public IFieldTypeBuilder<TProperty> AsPseudoColumn()
+    {
+      fieldMetadata.IsPseudoColumn = true;
       return this;
     }
 
