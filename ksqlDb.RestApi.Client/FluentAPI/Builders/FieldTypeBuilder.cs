@@ -1,4 +1,5 @@
-using System.Linq.Expressions;
+using ksqlDB.RestApi.Client.Infrastructure.Extensions;
+using ksqlDB.RestApi.Client.KSql.RestApi.Validation;
 using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDb.RestApi.Client.FluentAPI.Builders
@@ -68,8 +69,15 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
       return this;
     }
 
+    private readonly PseudoColumnValidator pseudoColumnValidator = new();
+
     public IFieldTypeBuilder<TProperty> AsPseudoColumn()
     {
+      var columnName = fieldMetadata.ColumnName ?? fieldMetadata.MemberInfo.GetMemberName(default(EntityMetadata?));
+
+      if (!pseudoColumnValidator.IsValid(columnName))
+        throw new InvalidOperationException($"{columnName} is not a valid pseudocolumn name");
+
       fieldMetadata.IsPseudoColumn = true;
       return this;
     }
