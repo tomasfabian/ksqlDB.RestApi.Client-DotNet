@@ -25,8 +25,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Parsers
     [TestCase(SystemColumns.ROWTIME, IdentifierEscaping.Always, ExpectedResult = $"`{SystemColumns.ROWTIME}`")]
     [TestCase(SystemColumns.ROWOFFSET, IdentifierEscaping.Keywords, ExpectedResult = $"`{SystemColumns.ROWOFFSET}`")]
     [TestCase(SystemColumns.ROWOFFSET, IdentifierEscaping.Always, ExpectedResult = $"`{SystemColumns.ROWOFFSET}`")]
-    [TestCase(SystemColumns.ROWPARTITION, IdentifierEscaping.Keywords,
-      ExpectedResult = $"`{SystemColumns.ROWPARTITION}`")]
+    [TestCase(SystemColumns.ROWPARTITION, IdentifierEscaping.Keywords, ExpectedResult = $"`{SystemColumns.ROWPARTITION}`")]
     [TestCase(SystemColumns.ROWPARTITION, IdentifierEscaping.Always, ExpectedResult = $"`{SystemColumns.ROWPARTITION}`")]
     [TestCase(SystemColumns.WINDOWSTART, IdentifierEscaping.Keywords, ExpectedResult = $"`{SystemColumns.WINDOWSTART}`")]
     [TestCase(SystemColumns.WINDOWSTART, IdentifierEscaping.Always, ExpectedResult = $"`{SystemColumns.WINDOWSTART}`")]
@@ -69,6 +68,21 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Parsers
 
     [TestCase(IdentifierEscaping.Keywords)]
     [TestCase(IdentifierEscaping.Always)]
+    public void Format_MemberExpression_PseudoColumnAttribute(IdentifierEscaping escaping)
+    {
+      //Arrange
+      Expression<Func<ksqlDB.RestApi.Client.KSql.Query.Record, short?>> expression = c => c.RowPartition;
+      var memberExpression = (MemberExpression)expression.Body;
+
+      //Act
+      var formattedIdentifier = IdentifierUtil.Format(memberExpression, escaping, builder);
+
+      //Assert
+      formattedIdentifier.Should().Be(nameof(ksqlDB.RestApi.Client.KSql.Query.Record.RowPartition));
+    }
+
+    [TestCase(IdentifierEscaping.Keywords)]
+    [TestCase(IdentifierEscaping.Always)]
     public void Format_MemberInfo_AsPseudoColumn(IdentifierEscaping escaping)
     {
       //Arrange
@@ -84,6 +98,21 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Parsers
 
       //Assert
       formattedIdentifier.Should().Be(nameof(Record.RowTime));
+    }
+
+    [TestCase(IdentifierEscaping.Keywords)]
+    [TestCase(IdentifierEscaping.Always)]
+    public void Format_MemberInfo_AsPseudoColumnAttribute(IdentifierEscaping escaping)
+    {
+      //Arrange
+      Expression<Func<ksqlDB.RestApi.Client.KSql.Query.Record, long?>> expression = c => c.RowOffset;
+      var memberInfo = ((MemberExpression)expression.Body).Member;
+
+      //Act
+      var formattedIdentifier = IdentifierUtil.Format(memberInfo, escaping, builder);
+
+      //Assert
+      formattedIdentifier.Should().Be(nameof(ksqlDB.RestApi.Client.KSql.Query.Record.RowOffset));
     }
   }
 }
