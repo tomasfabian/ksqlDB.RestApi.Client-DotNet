@@ -78,7 +78,6 @@ public static class Program
     {
       ShouldPluralizeFromItemName = true,
     };
-    var restApiClient = new KSqlDbRestApiClient(httpClientFactory, restApiClientOptions, loggerFactory);
 
     var restApiProvider = new KSqlDbRestApiProvider(httpClientFactory, restApiClientOptions, loggerFactory)
     {
