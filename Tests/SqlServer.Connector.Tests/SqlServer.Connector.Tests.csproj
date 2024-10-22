@@ -1,4 +1,4 @@
-<Project Sdk="MSTest.Sdk/3.3.1">
+<Project Sdk="MSTest.Sdk/3.5.0">
 
 	<PropertyGroup>
 		<IsPackable>false</IsPackable>
