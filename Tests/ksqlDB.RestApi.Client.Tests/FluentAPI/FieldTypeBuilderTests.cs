@@ -1,8 +1,11 @@
+using System.Linq.Expressions;
 using FluentAssertions;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDb.RestApi.Client.Metadata;
 using ksqlDb.RestApi.Client.Tests.Models;
 using NUnit.Framework;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace ksqlDb.RestApi.Client.Tests.FluentAPI
 {
@@ -32,6 +35,7 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI
 
       fieldMetadata.HasHeaders.Should().BeFalse();
       fieldMetadata.IsStruct.Should().BeFalse();
+      fieldMetadata.IsPseudoColumn.Should().BeFalse();
       fieldMetadata.ColumnName.Should().BeNull();
     }
 
@@ -91,6 +95,44 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI
       //Assert
       fieldTypeBuilder.Should().NotBeNull();
       fieldMetadata.IsStruct.Should().BeTrue();
+    }
+
+    [Test]
+    public void AsPseudoColumn_IsValid()
+    {
+      //Arrange
+      Expression<Func<Record, long>> expression = c => c.RowTime;
+      fieldMetadata = new()
+      {
+        MemberInfo = ((MemberExpression)expression.Body).Member
+      };
+      builder = new(fieldMetadata);
+
+      //Act
+      var fieldTypeBuilder = builder.AsPseudoColumn();
+
+      //Assert
+      fieldTypeBuilder.Should().NotBeNull();
+      fieldMetadata.IsPseudoColumn.Should().BeTrue();
+    }
+
+    [Test]
+    public void AsPseudoColumn_IsNotValid()
+    {
+      //Arrange
+      Expression<Func<Tweet, double>> expression = c => c.Amount;
+      fieldMetadata = new()
+      {
+        MemberInfo = ((MemberExpression)expression.Body).Member
+      };
+      builder = new(fieldMetadata);
+
+      //Act
+      Assert.ThrowsException<InvalidOperationException>(() =>
+      {
+        //Act
+        builder.AsPseudoColumn();
+      });
     }
 
     [Test]

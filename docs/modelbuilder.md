@@ -391,3 +391,30 @@ public class Record
 var modelBuilder = new ModelBuilder();
 modelBuilder.Entity<Record>();
 ```
+
+
+### AsPseudoColumn
+**v6.5.0**
+
+The `AsPseudoColumn` function designates fields or properties in entity types as `ksqlDB` [pseudocolumns](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#pseudocolumns)..
+Pseudocolumn [identifiers](https://docs.ksqldb.io/en/latest/reference/sql/syntax/lexical-structure/#identifiers)
+are not **backticked** in case of `IdentifierEscaping.Always` or `IdentifierEscaping.Keywords`. 
+
+```C#
+builder.Entity<Record>()
+  .Property(c => c.RowTime)
+  .AsPseudoColumn();
+```
+
+```C#
+public class Record
+{
+  public long RowTime { get; }
+}
+```
+
+Valid pseudocolumn names are:
+- Headers
+- RowOffset
+- RowPartition
+- RowTime 
