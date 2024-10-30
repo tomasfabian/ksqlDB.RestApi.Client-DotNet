@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
@@ -20,17 +21,16 @@ public class QueryEndpointParameters<T> : IKSqlDbParameters
   /// Property overrides to run the statements with.
   /// </summary>
   [JsonPropertyName("streamsProperties")]
-  public Dictionary<string, string> Properties { get; } = new();
+  public Dictionary<string, JsonValue> Properties { get; } = new();
 
-  /// <summary>
-  /// Indexer to access properties by key.
-  /// </summary>
-  /// <param name="key">The key of the property.</param>
-  /// <returns>The value of the property.</returns>
-  public string this[string key]
+  public TValue Get<TValue>(string key)
   {
-    get => Properties[key];
-    set => Properties[key] = value;
+    return Properties[key].GetValue<TValue>();
+  }
+
+  public void Set<TValue>(string key, TValue value)
+  {
+    Properties[key] = JsonValue.Create(value);
   }
 
   internal EndpointType EndpointType { get; set; } = EndpointType.Query;

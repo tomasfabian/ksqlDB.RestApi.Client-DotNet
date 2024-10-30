@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
@@ -25,10 +26,8 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
 
     Url = url;
 
-    QueryStreamParameters = new QueryStreamParameters
-    {
-      [QueryStreamParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Earliest.ToString().ToLower(),
-    };
+    QueryStreamParameters = new QueryStreamParameters();
+    QueryStreamParameters.Set(QueryStreamParameters.AutoOffsetResetPropertyName, AutoOffsetReset.Earliest);
 
     PullQueryParameters = new PullQueryParameters();
 
@@ -67,9 +66,7 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   /// <param name="processingGuarantee">Type of processing guarantee.</param>
   public void SetProcessingGuarantee(ProcessingGuarantee processingGuarantee)
   {
-    string guarantee = processingGuarantee.ToKSqlValue();
-
-    QueryStreamParameters[KSqlDbConfigs.ProcessingGuarantee] = guarantee; 
+    QueryStreamParameters.Set(KSqlDbConfigs.ProcessingGuarantee, processingGuarantee);
   }
 
   /// <summary>
@@ -78,8 +75,7 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   /// <param name="autoOffsetReset">The type of auto offset reset.</param>
   public void SetAutoOffsetReset(AutoOffsetReset autoOffsetReset)
   {
-    QueryStreamParameters[QueryStreamParameters.AutoOffsetResetPropertyName] =
-      autoOffsetReset.ToKSqlValue();
+    QueryStreamParameters.Set(QueryStreamParameters.AutoOffsetResetPropertyName, autoOffsetReset);
   }
 
   /// <summary>

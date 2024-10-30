@@ -12,10 +12,8 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.Query
     public void QueryStreamParameters_CloneIsReturned()
     {
       //Arrange
-      var queryStreamParameters = new QueryStreamParameters
-      {
-        [QueryStreamParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Latest.ToKSqlValue()
-      };
+      var queryStreamParameters = new QueryStreamParameters();
+      queryStreamParameters.Set(QueryStreamParameters.AutoOffsetResetPropertyName, AutoOffsetReset.Latest);
       var kStreamSetDependencies = new KStreamSetDependencies(null!, null!, null!, queryStreamParameters);
 
       //Act
@@ -30,10 +28,8 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.Query
     public void QueryStreamParameters_CloneIsReturned_SqlIsChanged()
     {
       //Arrange
-      var queryStreamParameters = new QueryStreamParameters
-      {
-        [QueryStreamParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Latest.ToKSqlValue()
-      };
+      var queryStreamParameters = new QueryStreamParameters();
+      queryStreamParameters.Set(QueryStreamParameters.AutoOffsetResetPropertyName, AutoOffsetReset.Latest);
       var kStreamSetDependencies = new KStreamSetDependencies(null!, null!, null!, queryStreamParameters);
 
       //Act

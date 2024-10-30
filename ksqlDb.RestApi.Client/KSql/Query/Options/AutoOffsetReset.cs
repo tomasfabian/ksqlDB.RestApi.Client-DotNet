@@ -1,8 +1,13 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using ksqlDb.RestApi.Client.Infrastructure.Attributes;
+
 namespace ksqlDB.RestApi.Client.KSql.Query.Options;
 
 /// <summary>
 /// Kafka offset reset policies define how a consumer should handle situations where it tries to read from a partition in Kafka but there is no valid offset available or the offset is out of range.
 /// </summary>
+[JsonSnakeCaseStringEnumConverter<AutoOffsetReset>]
 public enum AutoOffsetReset
 {
   /// <summary>

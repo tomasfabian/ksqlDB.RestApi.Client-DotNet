@@ -1,3 +1,4 @@
+using System.Text.Json;
 using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using NUnit.Framework;
@@ -13,10 +14,10 @@ public class AutoOffsetResetExtensionsTests
     //Arrange
 
     //Assert
-    Assert.Throws<ArgumentOutOfRangeException>(() =>
+    Assert.Throws<JsonException>(() =>
     {
       //Act
-      "xyz".ToAutoOffsetReset();
+      JsonSerializer.Deserialize<AutoOffsetReset>("\"xyz\"");
     });
   }
 
@@ -26,45 +27,45 @@ public class AutoOffsetResetExtensionsTests
     //Arrange
 
     //Act
-    var value = "earliest".ToAutoOffsetReset();
+    var value = JsonSerializer.Deserialize<AutoOffsetReset>("\"earliest\"");
 
     //Assert
     value.Should().Be(AutoOffsetReset.Earliest);
   }
-    
+
   [Test]
   public void ToAutoOffsetReset_Latest()
   {
     //Arrange
 
     //Act
-    var value = "latest".ToAutoOffsetReset();
+    var value = JsonSerializer.Deserialize<AutoOffsetReset>("\"latest\"");
 
     //Assert
     value.Should().Be(AutoOffsetReset.Latest);
   }
-    
+
   [Test]
   public void ToKSqlValue_Earliest()
   {
     //Arrange
 
     //Act
-    var value = AutoOffsetReset.Earliest.ToKSqlValue();
+    var value = JsonSerializer.Serialize(AutoOffsetReset.Earliest);
 
     //Assert
-    value.Should().BeEquivalentTo("earliest");
+    value.Should().Be("\"earliest\"");
   }
-    
+
   [Test]
   public void ToKSqlValue_Latest()
   {
     //Arrange
 
     //Act
-    var value = AutoOffsetReset.Latest.ToKSqlValue();
+    var value = JsonSerializer.Serialize(AutoOffsetReset.Latest);
 
     //Assert
-    value.Should().BeEquivalentTo("latest");
+    value.Should().Be("\"latest\"");
   }
 }

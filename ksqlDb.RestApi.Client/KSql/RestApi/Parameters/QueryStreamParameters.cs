@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 
@@ -16,13 +17,8 @@ public sealed class QueryStreamParameters : QueryStreamEndpointParameters<QueryS
   [JsonIgnore]
   public AutoOffsetReset AutoOffsetReset
   {
-    get
-    {
-      var value = this[AutoOffsetResetPropertyName];
+    get => Get<AutoOffsetReset>(AutoOffsetResetPropertyName);
 
-      return value.ToAutoOffsetReset();
-    }
-
-    set => this[AutoOffsetResetPropertyName] = value.ToKSqlValue();
+    set => Set(AutoOffsetResetPropertyName, value);
   }
 }

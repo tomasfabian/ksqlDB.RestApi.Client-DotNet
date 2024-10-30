@@ -35,7 +35,7 @@ public class KSqlDbServiceCollectionExtensionsTests
 
     //Assert
     var descriptor = ClassUnderTest.TryGetRegistration<IKSqlDBContext>();
-        
+
     descriptor.Should().NotBeNull();
     descriptor!.Lifetime.Should().Be(ServiceLifetime.Scoped);
   }
@@ -53,7 +53,7 @@ public class KSqlDbServiceCollectionExtensionsTests
 
     //Assert
     var descriptor = ClassUnderTest.TryGetRegistration<IKSqlDBContext>();
-        
+
     descriptor.Should().NotBeNull();
     descriptor!.Lifetime.Should().Be(ServiceLifetime.Scoped);
   }
@@ -72,7 +72,7 @@ public class KSqlDbServiceCollectionExtensionsTests
 
     //Assert
     context.Should().NotBeNull();
-    context?.ContextOptions.QueryStreamParameters[KSqlDbConfigs.ProcessingGuarantee].ToProcessingGuarantee().Should().Be(ProcessingGuarantee.AtLeastOnce);
+    context?.ContextOptions.QueryStreamParameters.Get<ProcessingGuarantee>(KSqlDbConfigs.ProcessingGuarantee).Should().Be(ProcessingGuarantee.AtLeastOnce);
   }
 
   [Test]
@@ -85,7 +85,7 @@ public class KSqlDbServiceCollectionExtensionsTests
 
     //Assert
     var descriptor = ClassUnderTest.TryGetRegistration<IKSqlDbRestApiClient>();
-        
+
     descriptor.Should().NotBeNull();
     descriptor!.Lifetime.Should().Be(ServiceLifetime.Scoped);
   }
@@ -113,7 +113,7 @@ public class KSqlDbServiceCollectionExtensionsTests
 
     //Assert
     var descriptor = ClassUnderTest.TryGetRegistration<IHttpClientFactory>();
-        
+
     descriptor.Should().NotBeNull();
     descriptor!.Lifetime.Should().Be(ServiceLifetime.Transient);
   }
@@ -128,7 +128,7 @@ public class KSqlDbServiceCollectionExtensionsTests
 
     //Assert
     var descriptor = ClassUnderTest.TryGetRegistration<KSqlDBContextOptions>();
-        
+
     descriptor.Should().NotBeNull();
     descriptor!.Lifetime.Should().Be(ServiceLifetime.Singleton);
   }
@@ -174,7 +174,7 @@ public class KSqlDbServiceCollectionExtensionsTests
     //Assert
     context.Should().NotBeNull();
   }
-    
+
   [Test]
   public void AddDbContext_KSqlDBContext_DefaultLifetimeIsScoped()
   {
@@ -188,7 +188,7 @@ public class KSqlDbServiceCollectionExtensionsTests
     descriptor.Should().NotBeNull();
     descriptor!.Lifetime.Should().Be(ServiceLifetime.Scoped);
   }
-    
+
   [Test]
   public void AddDbContext_KSqlDBContext_ContextLifetimeChangedToTransientScope()
   {
@@ -239,9 +239,9 @@ public class KSqlDbServiceCollectionExtensionsTests
     descriptor.Should().NotBeNull();
     descriptor!.Lifetime.Should().Be(ServiceLifetime.Transient);
   }
-    
+
   #endregion
-    
+
   #region ContextFactory
 
   [Test]

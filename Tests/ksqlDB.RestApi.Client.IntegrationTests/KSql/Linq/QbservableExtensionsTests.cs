@@ -445,8 +445,8 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     QueryStreamParameters queryParameters = new()
     {
       Sql = ksql,
-      [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
     };
+    queryParameters.Set(QueryStreamParameters.AutoOffsetResetPropertyName, AutoOffsetReset.Earliest);
 
     var source = Context.CreatePushQuery<Tweet>(queryParameters);
 
@@ -467,9 +467,9 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
 
     QueryStreamParameters queryStreamParameters = new()
     {
-      Sql = ksql,
-      [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
+      Sql = ksql
     };
+    queryStreamParameters.Set(QueryStreamParameters.AutoOffsetResetPropertyName, AutoOffsetReset.Earliest);
 
     var source = Context.CreatePushQuery<Tweet>(queryStreamParameters);
 
@@ -656,9 +656,9 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
 
     QueryStreamParameters queryStreamParameters = new()
     {
-      Sql = ksql,
-      [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
+      Sql = ksql
     };
+    queryStreamParameters.Set(QueryStreamParameters.AutoOffsetResetPropertyName, AutoOffsetReset.Earliest);
 
     var source = Context.CreatePushQuery<int>(queryStreamParameters);
 
@@ -680,9 +680,9 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
 
     QueryStreamParameters queryStreamParameters = new()
     {
-      Sql = ksql,
-      [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
+      Sql = ksql
     };
+    queryStreamParameters.Set(QueryStreamParameters.AutoOffsetResetPropertyName, AutoOffsetReset.Earliest);
 
     var source = Context.CreatePushQuery<int[]>(queryStreamParameters);
 
@@ -709,9 +709,9 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
 
     QueryStreamParameters queryStreamParameters = new()
     {
-      Sql = ksql,
-      [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
+      Sql = ksql
     };
+    queryStreamParameters.Set(QueryStreamParameters.AutoOffsetResetPropertyName, AutoOffsetReset.Earliest);
 
     var source = Context.CreatePushQuery<MyStruct>(queryStreamParameters);
 

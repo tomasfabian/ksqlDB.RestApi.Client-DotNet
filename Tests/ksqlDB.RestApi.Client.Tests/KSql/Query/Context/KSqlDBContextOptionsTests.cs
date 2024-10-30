@@ -32,7 +32,7 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
     //Assert
     url.Should().Be(TestParameters.KsqlDbUrl);
   }
-    
+
   [Test]
   public void NotSetBasicAuthCredentials()
   {
@@ -45,7 +45,7 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
     ClassUnderTest.BasicAuthUserName.Should().BeEmpty();
     ClassUnderTest.BasicAuthPassword.Should().BeEmpty();
   }
-    
+
   [Test]
   public void SetBasicAuthCredentials()
   {
@@ -73,7 +73,7 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
 
     //Assert
     Assert.ThrowsException<KeyNotFoundException>(() =>
-      ClassUnderTest.QueryStreamParameters[parameterName].Should().BeEmpty());
+      ClassUnderTest.QueryStreamParameters.Get<ProcessingGuarantee>(parameterName));
   }
 
   [Test]
@@ -87,9 +87,7 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
     ClassUnderTest.SetProcessingGuarantee(processingGuarantee);
 
     //Assert
-    string expectedValue = "at_least_once";
-
-    ClassUnderTest.QueryStreamParameters[parameterName].Should().Be(expectedValue);
+    ClassUnderTest.QueryStreamParameters.Get<ProcessingGuarantee>(parameterName).Should().Be(processingGuarantee);
   }
 
   [Test]
@@ -103,9 +101,7 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
     ClassUnderTest.SetProcessingGuarantee(processingGuarantee);
 
     //Assert
-    string expectedValue = "exactly_once";
-
-    ClassUnderTest.QueryStreamParameters[parameterName].Should().Be(expectedValue);
+    ClassUnderTest.QueryStreamParameters.Get<ProcessingGuarantee>(parameterName).Should().Be(processingGuarantee);
   }
 
   [Test]
@@ -119,9 +115,7 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
     ClassUnderTest.SetProcessingGuarantee(processingGuarantee);
 
     //Assert
-    string expectedValue = "exactly_once_v2";
-
-    ClassUnderTest.QueryStreamParameters[parameterName].Should().Be(expectedValue);
+    ClassUnderTest.QueryStreamParameters.Get<ProcessingGuarantee>(parameterName).Should().Be(processingGuarantee);
   }
 
   [Test]
@@ -134,12 +128,10 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
     ClassUnderTest.SetAutoOffsetReset(autoOffsetReset);
 
     //Assert
-    string expectedValue = autoOffsetReset.ToString().ToLower();
-
-    ClassUnderTest.QueryStreamParameters[QueryStreamParameters.AutoOffsetResetPropertyName].Should().Be(expectedValue);
+    ClassUnderTest.QueryStreamParameters.Get<AutoOffsetReset>(QueryStreamParameters.AutoOffsetResetPropertyName).Should().Be(autoOffsetReset);
   }
 
-    
+
   [Test]
   public void JsonSerializerOptions()
   {
