@@ -13,6 +13,8 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 
 internal sealed class TypeGenerator(IMetadataProvider metadataProvider) : EntityInfo(metadataProvider)
 {
+  private readonly IMetadataProvider _metadataProvider = metadataProvider;
+
   internal string Print<T>(TypeProperties properties)
   {
     StringBuilder stringBuilder = new();
@@ -30,7 +32,7 @@ internal sealed class TypeGenerator(IMetadataProvider metadataProvider) : Entity
   {
     var ksqlProperties = new List<string>();
 
-    KSqlTypeTranslator<T> typeTranslator = new(metadataProvider);
+    KSqlTypeTranslator<T> typeTranslator = new(_metadataProvider);
 
     foreach (var memberInfo in Members<T>())
     {
@@ -38,14 +40,14 @@ internal sealed class TypeGenerator(IMetadataProvider metadataProvider) : Entity
 
       var ksqlType = typeTranslator.Translate(type, memberInfo, escaping);
 
-      var memberName = memberInfo.GetMemberName(metadataProvider);
+      var memberName = memberInfo.GetMemberName(_metadataProvider);
       var columnDefinition = $"{EscapeName(memberName, escaping)} {ksqlType}{typeTranslator.ExploreAttributes(typeof(T), memberInfo, type)}";
       ksqlProperties.Add(columnDefinition);
     }
 
     stringBuilder.Append(string.Join(", ", ksqlProperties));
   }
-  
+
   private static string EscapeName(string name, IdentifierEscaping escaping) =>
     (escaping, IdentifierUtil.IsValid(name)) switch
     {

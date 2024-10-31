@@ -30,7 +30,7 @@ public class QueryEndpointParameters<T> : IKSqlDbParameters
 
   public void Set<TValue>(string key, TValue value)
   {
-    Properties[key] = JsonValue.Create(value);
+    Properties[key] = JsonValue.Create(value) ?? throw new InvalidOperationException("The value could not be converted to JSON");
   }
 
   internal EndpointType EndpointType { get; set; } = EndpointType.Query;

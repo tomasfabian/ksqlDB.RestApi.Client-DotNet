@@ -29,7 +29,7 @@ public class QueryStreamEndpointParameters<T> : IKSqlDbParameters
 
   public void Set<TValue>(string key, TValue value)
   {
-    Properties[key] = JsonValue.Create(value);
+    Properties[key] = JsonValue.Create(value) ?? throw new InvalidOperationException("The value could not be converted to JSON");
   }
 
   /// <summary>
