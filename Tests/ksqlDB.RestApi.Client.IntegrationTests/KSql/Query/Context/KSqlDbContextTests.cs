@@ -179,6 +179,7 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     // ";
   }
 
+  [Test]
   public async Task ContextOptions_EndpointParameters_NonStringParameter()
   {
     // Arrange
