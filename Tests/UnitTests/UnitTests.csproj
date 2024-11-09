@@ -1,4 +1,4 @@
-<Project Sdk="MSTest.Sdk/3.5.0">
+<Project Sdk="MSTest.Sdk/3.6.2">
 
   <PropertyGroup>
 	  <LangVersion>12.0</LangVersion>
