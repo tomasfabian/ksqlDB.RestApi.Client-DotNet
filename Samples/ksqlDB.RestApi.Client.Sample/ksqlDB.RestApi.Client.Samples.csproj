@@ -14,9 +14,9 @@
         <!-- <PackageReference Include="ksqlDb.RestApi.Client.ProtoBuf" Version="4.0.0" /> -->
         <ProjectReference Include="..\..\ksqlDb.RestApi.Client.ProtoBuf\ksqlDb.RestApi.Client.ProtoBuf.csproj" />
 
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
     </ItemGroup>
 
 </Project>
