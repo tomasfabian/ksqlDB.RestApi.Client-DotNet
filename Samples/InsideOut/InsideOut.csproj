@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0</TargetFrameworks>
+		<TargetFrameworks>net9.0</TargetFrameworks>
 		<Authors>Tomas Fabian</Authors>
 		<PackageLicenseFile>License.txt</PackageLicenseFile>
 		<Copyright>@tomasfabian</Copyright>
@@ -12,9 +12,9 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Confluent.Kafka" Version="2.3.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
 		<PackageReference Include="System.Reactive" Version="6.0.0" />
-		<PackageReference Include="System.Text.Json" Version="8.0.0" />
+		<PackageReference Include="System.Text.Json" Version="9.0.0" />
 	</ItemGroup>
 
 </Project>
