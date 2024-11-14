@@ -1,5 +1,12 @@
 # ksqlDB.RestApi.Client
 
+# 7.0.0
+- added .NET 9.0 target framework
+
+# ⚠️ Breaking changes
+- removed usupported .NET 6.0 target framework
+- upgraded Microsoft packages to v9.0.0: `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.Http`, and `Microsoft.Extensions.Logging.Abstractions`
+
 # 6.5.0
 - added the `AsPseudoColumn` function to the Fluent API for mapping of C# fields or properties as `ksqldb` [pseudocolumns](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#pseudocolumns).
 
