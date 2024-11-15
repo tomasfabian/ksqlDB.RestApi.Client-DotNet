@@ -1,4 +1,5 @@
-﻿using ksqlDB.RestApi.Client.KSql.Query.Context;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDb.RestApi.Client.ProtoBuf.KSql.RestApi;
@@ -6,17 +7,13 @@ using ksqlDb.RestApi.Client.ProtoBuf.Tests.Helpers;
 
 namespace ksqlDb.RestApi.Client.ProtoBuf.Tests.KSql.RestApi;
 
-internal class TestableKSqlDbQueryProvider : KSqlDbQueryProvider
+internal class TestableKSqlDbQueryProvider(IHttpV1ClientFactory httpClientFactory)
+  : KSqlDbQueryProvider(httpClientFactory, new ModelBuilder(), KSqlDbContextOptionsInstance)
 {
   public static readonly KSqlDBContextOptions KSqlDbContextOptionsInstance = new(TestParameters.KsqlDbUrl)
   {
     JsonSerializerOptions = KSqlDbJsonSerializerOptions.CreateInstance()
   };
-
-  public TestableKSqlDbQueryProvider(IHttpV1ClientFactory httpClientFactory)
-    : base(httpClientFactory, KSqlDbContextOptionsInstance)
-  {
-  }
 
   protected string QueryResponse =
     "[{\"header\":{\"queryId\":\"transient_MOVIES_8790538776625545898\",\"schema\":\"`ID` INTEGER, `TITLE` STRING, `RELEASE_YEAR` INTEGER\",\"protoSchema\":\"syntax = \\\"proto3\\\";\\n\\nmessage ConnectDefault1 {\\n  int32 ID = 1;\\n  string TITLE = 2;\\n  int32 RELEASE_YEAR = 3;\\n}\\n\"}}," +

@@ -1,5 +1,12 @@
 # ksqlDB.RestApi.Client.ProtoBuf
 
+# 5.0.0
+- added .NET 9.0 target framework
+
+# ⚠️ Breaking changes
+- removed unsupported .NET 6.0 target framework
+- upgraded `ksqlDb.RestApi.Client` to v7.0.0
+
 # 4.0.0
 - ksqlDb.RestApi.Client upgraded to v6.0.0
 

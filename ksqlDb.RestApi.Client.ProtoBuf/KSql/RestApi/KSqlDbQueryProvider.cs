@@ -1,5 +1,6 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.Json;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
@@ -11,10 +12,10 @@ using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFa
 
 namespace ksqlDb.RestApi.Client.ProtoBuf.KSql.RestApi;
 
-internal class KSqlDbQueryProvider : KSqlDbProvider 
+internal class KSqlDbQueryProvider : KSqlDbProvider
 {
-  public KSqlDbQueryProvider(IHttpClientFactory httpClientFactory, KSqlDbProviderOptions options, ILogger? logger = null)
-    : base(httpClientFactory, options, logger)
+  public KSqlDbQueryProvider(IHttpClientFactory httpClientFactory, IMetadataProvider metadataProvider, KSqlDbProviderOptions options, ILogger? logger = null)
+    : base(httpClientFactory, metadataProvider, options, logger)
   {
 #if NETCOREAPP3_1
     AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
