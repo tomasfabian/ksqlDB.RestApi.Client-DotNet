@@ -1,3 +1,4 @@
+using System.Text.Json;
 using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using NUnit.Framework;
@@ -5,19 +6,18 @@ using Assert = NUnit.Framework.Assert;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Options;
 
-public class ProcessingGuaranteeExtensionsTests
+public class ProcessingGuaranteeSerializationTests
 {
   [Test]
   public void ToProcessingGuarantee_UnknownValue()
   {
     //Arrange
 
-
     //Assert
-    Assert.Throws<ArgumentOutOfRangeException>(() =>
+    Assert.Throws<JsonException>(() =>
     {
       //Act
-      "xyz".ToProcessingGuarantee();
+      JsonSerializer.Deserialize<ProcessingGuarantee>("\"xyz\"");
     });
   }
 
@@ -27,7 +27,7 @@ public class ProcessingGuaranteeExtensionsTests
     //Arrange
 
     //Act
-    var value = ProcessingGuaranteeExtensions.ExactlyOnce.ToProcessingGuarantee();
+    var value = JsonSerializer.Deserialize<ProcessingGuarantee>("\"exactlyOnce\"");
 
     //Assert
     value.Should().Be(ProcessingGuarantee.ExactlyOnce);
@@ -39,45 +39,45 @@ public class ProcessingGuaranteeExtensionsTests
     //Arrange
 
     //Act
-    var value = ProcessingGuaranteeExtensions.ExactlyOnceV2.ToProcessingGuarantee();
+    var value = JsonSerializer.Deserialize<ProcessingGuarantee>("\"exactlyOnceV2\"");
 
     //Assert
     value.Should().Be(ProcessingGuarantee.ExactlyOnceV2);
   }
-    
+
   [Test]
   public void ToProcessingGuarantee_AtLeastOnce()
   {
     //Arrange
 
     //Act
-    var value = ProcessingGuaranteeExtensions.AtLeastOnce.ToProcessingGuarantee();
+    var value = JsonSerializer.Deserialize<ProcessingGuarantee>("\"atLeastOnce\"");
 
     //Assert
     value.Should().Be(ProcessingGuarantee.AtLeastOnce);
   }
-    
-  [Test]
-  public void ToKSqlValue_AtLeastOnce()
-  {
-    //Arrange
 
-    //Act
-    var value = ProcessingGuarantee.AtLeastOnce.ToKSqlValue();
-
-    //Assert
-    value.Should().BeEquivalentTo("at_least_once");
-  }
-    
   [Test]
   public void ToKSqlValue_ExactlyOnce()
   {
     //Arrange
 
     //Act
-    var value = ProcessingGuarantee.ExactlyOnce.ToKSqlValue();
+    var value = JsonSerializer.Serialize(ProcessingGuarantee.ExactlyOnce);
 
     //Assert
-    value.Should().BeEquivalentTo("exactly_once");
+    value.Should().Be("\"exactly_once\"");
+  }
+
+  [Test]
+  public void ToKSqlValue_ExactlyOnceV2()
+  {
+    //Arrange
+
+    //Act
+    var value = JsonSerializer.Serialize(ProcessingGuarantee.ExactlyOnceV2);
+
+    //Assert
+    value.Should().Be("\"exactly_once_v2\"");
   }
 }

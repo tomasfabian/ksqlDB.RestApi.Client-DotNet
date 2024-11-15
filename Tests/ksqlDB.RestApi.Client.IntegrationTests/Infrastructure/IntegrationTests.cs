@@ -33,13 +33,14 @@ public abstract class IntegrationTests : TestBase
     Context = CreateKSqlDbContext(EndpointType.QueryStream);
   }
 
-  protected KSqlDBContext CreateKSqlDbContext(EndpointType endpointType, ModelBuilder? modelBuilder = null)
+  protected KSqlDBContext CreateKSqlDbContext(EndpointType endpointType, ModelBuilder? modelBuilder = null, Action<KSqlDBContextOptions>? configureOptions = null)
   {
     ContextOptions = new KSqlDBContextOptions(KSqlDbRestApiProvider.KsqlDbUrl)
     {
       ShouldPluralizeFromItemName = false,
       EndpointType = endpointType
     };
+    configureOptions?.Invoke(ContextOptions);
 
     modelBuilder ??= new ModelBuilder();
     return new KSqlDBContext(ContextOptions, modelBuilder);
@@ -62,7 +63,7 @@ public abstract class IntegrationTests : TestBase
 
     if (expectedItemsCount.HasValue)
       source = source.Take(expectedItemsCount.Value);
-      
+
     await foreach (var item in source.WithCancellation(cts.Token))
     {
       actualValues.Add(item);

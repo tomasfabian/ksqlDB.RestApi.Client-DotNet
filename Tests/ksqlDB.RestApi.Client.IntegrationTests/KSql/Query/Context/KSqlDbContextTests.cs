@@ -15,6 +15,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using EndpointType = ksqlDB.RestApi.Client.KSql.Query.Options.EndpointType;
 
 namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Query.Context;
 
@@ -176,6 +177,27 @@ public class KSqlDbContextTests : Infrastructure.IntegrationTests
     // ,""DTOFFSET"": ""2021-07-04T09:29:45.447""
     // }
     // ";
+  }
+
+  [Test]
+  public async Task ContextOptions_EndpointParameters_NonStringParameter()
+  {
+    // Arrange
+    var context = CreateKSqlDbContext(EndpointType.Query, configureOptions: options =>
+    {
+      options.PullQueryParameters.Set("ksql.query.pull.table.scan.enabled", true);
+    });
+
+    var config = new InsertProperties { EntityName = EntityName, ShouldPluralizeEntityName = false };
+    var entity1 = new Movie { Id = 1, Title = "T1" };
+
+    //Act
+    context.Add(entity1, config);
+    var response = await context.SaveChangesAsync();
+
+    // Assert
+    response.Should().NotBeNull();
+    response!.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
   #endregion

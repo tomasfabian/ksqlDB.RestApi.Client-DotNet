@@ -5,6 +5,7 @@ using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
+using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
@@ -110,9 +111,9 @@ Drop table Events;
 
     QueryStreamParameters queryStreamParameters = new()
     {
-      Sql = ksql,
-      [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
+      Sql = ksql
     };
+    queryStreamParameters.Set(QueryStreamParameters.AutoOffsetResetPropertyName, AutoOffsetReset.Earliest);
 
     //Act
     var source = Context.CreatePushQuery<Foo>(queryStreamParameters)
@@ -147,9 +148,9 @@ Drop table Events;
 
     QueryStreamParameters queryStreamParameters = new()
     {
-      Sql = ksql,
-      [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
+      Sql = ksql
     };
+    queryStreamParameters.Set(QueryStreamParameters.AutoOffsetResetPropertyName, AutoOffsetReset.Earliest);
 
     //Act
     var source = Context.CreatePushQuery<Foo>(queryStreamParameters)

@@ -14,9 +14,9 @@ public class QueryParametersExtensionsTests
     //Arrange
     var source = new QueryStreamParameters
     {
-      Sql = "Select",
-      ["key"] = "value"
+      Sql = "Select"
     };
+    source.Set("key", "value");
     var destination = new QueryStreamParameters();
 
     //Act
@@ -54,7 +54,7 @@ public class QueryParametersExtensionsTests
     var result = queryParameters.ToLogInfo();
 
     //Assert
-    result.Should().Be(@"Sql: 
+    result.Should().Be(@"Sql:
 Parameters:
 ".ReplaceLineEndings());
   }
@@ -65,18 +65,18 @@ Parameters:
     //Arrange
     var queryParameters = new QueryStreamParameters
     {
-      AutoOffsetReset = AutoOffsetReset.Earliest,
-      [KSqlDbConfigs.ProcessingGuarantee] = ProcessingGuarantee.AtLeastOnce.ToKSqlValue()
+      AutoOffsetReset = AutoOffsetReset.Earliest
     };
+    queryParameters.Set(KSqlDbConfigs.ProcessingGuarantee, ProcessingGuarantee.AtLeastOnce);
 
     //Act
     var result = queryParameters.ToLogInfo();
 
     //Assert
-    result.Should().Be(@"Sql: 
+    result.Should().Be(@"Sql:
 Parameters:
-auto.offset.reset = earliest
-processing.guarantee = at_least_once
+auto.offset.reset = ""earliest""
+processing.guarantee = ""at_least_once""
 ".ReplaceLineEndings());
   }
 
@@ -107,17 +107,17 @@ Parameters:
     var queryParameters = new QueryParameters
     {
       AutoOffsetReset = AutoOffsetReset.Earliest,
-      [KSqlDbConfigs.ProcessingGuarantee] = ProcessingGuarantee.AtLeastOnce.ToKSqlValue()
     };
+    queryParameters.Set(KSqlDbConfigs.ProcessingGuarantee, ProcessingGuarantee.AtLeastOnce);
 
     //Act
     var result = queryParameters.ToLogInfo();
 
     //Assert
-    result.Should().Be(@"Sql: 
+    result.Should().Be(@"Sql:
 Parameters:
-ksql.streams.auto.offset.reset = earliest
-processing.guarantee = at_least_once
+ksql.streams.auto.offset.reset = ""earliest""
+processing.guarantee = ""at_least_once""
 ".ReplaceLineEndings());
   }
 }

@@ -13,9 +13,9 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Parameters
       //Arrange
       var source = new QueryStreamParameters
       {
-        Sql = "Select",
-        ["key"] = "value"
+        Sql = "Select"
       };
+      source.Set("key", "value");
 
       //Act
       var clone = source.Clone();
@@ -38,7 +38,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Parameters
       var clone = source.Clone();
 
       //Assert
-      clone.Properties[QueryStreamParameters.AutoOffsetResetPropertyName].Should().Be(nameof(AutoOffsetReset.Earliest).ToLower());
+      clone.Get<AutoOffsetReset>(QueryStreamParameters.AutoOffsetResetPropertyName).Should().Be(AutoOffsetReset.Earliest);
     }
 
     [Test]
@@ -54,7 +54,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Parameters
       var clone = source.Clone();
 
       //Assert
-      clone.Properties[QueryParameters.AutoOffsetResetPropertyName].Should().Be(nameof(AutoOffsetReset.Latest).ToLower());
+      clone.Get<AutoOffsetReset>(QueryParameters.AutoOffsetResetPropertyName).Should().Be(AutoOffsetReset.Latest);
     }
   }
 }

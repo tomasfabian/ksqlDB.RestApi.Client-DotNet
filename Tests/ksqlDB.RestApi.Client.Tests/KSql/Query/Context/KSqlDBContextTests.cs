@@ -41,13 +41,8 @@ public class KSqlDBContextTests : TestBase
   public void CreateStreamSet_Subscribe_QueryOptionsWereTakenFromContext()
   {
     //Arrange
-    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-    {
-      QueryStreamParameters =
-      {
-        [QueryParameters.AutoOffsetResetPropertyName] = AutoOffsetReset.Latest.ToString()
-      }
-    };
+    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDbUrl);
+    contextOptions.QueryStreamParameters.Set(QueryParameters.AutoOffsetResetPropertyName, AutoOffsetReset.Latest);
 
     var context = new TestableDbProvider<string>(contextOptions);
 
@@ -56,7 +51,7 @@ public class KSqlDBContextTests : TestBase
 
     //Assert
     context.KSqlDbProviderMock.Verify(
-      c => c.Run<string>(It.Is<QueryStreamParameters>(c => c[QueryParameters.AutoOffsetResetPropertyName] == "Latest"),
+      c => c.Run<string>(It.Is<QueryStreamParameters>(c => c.Get<AutoOffsetReset>(QueryParameters.AutoOffsetResetPropertyName) == AutoOffsetReset.Latest),
         It.IsAny<CancellationToken>()), Times.Once);
   }
 
@@ -97,7 +92,7 @@ public class KSqlDBContextTests : TestBase
 
     //Assert
     context.KSqlDbProviderMock.Verify(
-      c => c.Run<string>(It.Is<QueryStreamParameters>(c => c["auto.offset.reset"] == "latest"),
+      c => c.Run<string>(It.Is<QueryStreamParameters>(c => c.Get<AutoOffsetReset>("auto.offset.reset") == AutoOffsetReset.Latest),
         It.IsAny<CancellationToken>()), Times.Once);
   }
 
@@ -115,7 +110,7 @@ public class KSqlDBContextTests : TestBase
 
     //Assert
     context.KSqlDbProviderMock.Verify(
-      c => c.Run<string>(It.Is<QueryStreamParameters>(c => c[KSqlDbConfigs.ProcessingGuarantee] == "exactly_once"),
+      c => c.Run<string>(It.Is<QueryStreamParameters>(c => c.Get<ProcessingGuarantee>(KSqlDbConfigs.ProcessingGuarantee) == ProcessingGuarantee.ExactlyOnce),
         It.IsAny<CancellationToken>()), Times.Once);
   }
 
@@ -136,13 +131,8 @@ public class KSqlDBContextTests : TestBase
   public void CreateStreamSet_Subscribe_KSqlQueryGenerator()
   {
     //Arrange
-    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
-    {
-      QueryStreamParameters =
-      {
-        ["auto.offset.reset"] = "latest"
-      }
-    };
+    var contextOptions = new KSqlDBContextOptions(TestParameters.KsqlDbUrl);
+    contextOptions.QueryStreamParameters.Set("auto.offset.reset", AutoOffsetReset.Latest);
 
     var context = new TestableDbProvider<string>(contextOptions);
 
@@ -151,7 +141,7 @@ public class KSqlDBContextTests : TestBase
 
     //Assert
     context.KSqlDbProviderMock.Verify(
-      c => c.Run<string>(It.Is<QueryStreamParameters>(parameters => parameters["auto.offset.reset"] == "latest"),
+      c => c.Run<string>(It.Is<QueryStreamParameters>(parameters => parameters.Get<AutoOffsetReset>("auto.offset.reset") == AutoOffsetReset.Latest),
         It.IsAny<CancellationToken>()), Times.Once);
   }
 
@@ -190,9 +180,9 @@ public class KSqlDBContextTests : TestBase
 
     QueryStreamParameters queryStreamParameters = new QueryStreamParameters
     {
-      Sql = ksql,
-      [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
+      Sql = ksql
     };
+    queryStreamParameters.Set(QueryStreamParameters.AutoOffsetResetPropertyName, AutoOffsetReset.Earliest);
 
     var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
@@ -212,9 +202,9 @@ public class KSqlDBContextTests : TestBase
 
     var queryParameters = new QueryParameters
     {
-      Sql = ksql,
-      [QueryParameters.AutoOffsetResetPropertyName] = "earliest",
+      Sql = ksql
     };
+    queryParameters.Set(QueryStreamParameters.AutoOffsetResetPropertyName, AutoOffsetReset.Earliest);
 
     var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
@@ -234,9 +224,9 @@ public class KSqlDBContextTests : TestBase
 
     QueryStreamParameters queryParameters = new QueryStreamParameters
     {
-      Sql = ksql,
-      [QueryStreamParameters.AutoOffsetResetPropertyName] = "earliest",
+      Sql = ksql
     };
+    queryParameters.Set(QueryStreamParameters.AutoOffsetResetPropertyName, AutoOffsetReset.Earliest);
 
     var context = new TestableDbProvider<string>(TestParameters.KsqlDbUrl);
 
