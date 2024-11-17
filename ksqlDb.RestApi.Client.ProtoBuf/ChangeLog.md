@@ -4,7 +4,7 @@
 - added .NET 9.0 target framework
 
 # ⚠️ Breaking changes
-- removed unsupported .NET 6.0 target framework
+- removed unsupported .NET 6.0, and 7.0 target frameworks
 - upgraded `ksqlDb.RestApi.Client` to v7.0.0
 
 # 4.0.0
