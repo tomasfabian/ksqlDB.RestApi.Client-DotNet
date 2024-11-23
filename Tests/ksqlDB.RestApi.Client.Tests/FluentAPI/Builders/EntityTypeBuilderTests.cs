@@ -55,7 +55,7 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
       builder.Metadata.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Tweet.RowTime)).IgnoreInDDL.Should().BeTrue();
     }
 
-    public class Foo
+    public class Row
     {
       public long RowTime;
     }
@@ -66,10 +66,10 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
       //Arrange
 
       //Act
-      EntityTypeBuilder<Foo> fooBuilder = new();
+      EntityTypeBuilder<Row> rowBuilder = new();
 
       //Assert
-      fooBuilder.Metadata.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Foo.RowTime)).IgnoreInDDL.Should().BeTrue();
+      rowBuilder.Metadata.FieldsMetadata.First(c => c.MemberInfo.Name == nameof(Row.RowTime)).IgnoreInDDL.Should().BeTrue();
     }
 
     [Test]
@@ -86,6 +86,25 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI.Builders
         .OfType<DecimalFieldMetadata>()
         .First(c => c.MemberInfo.Name == nameof(Tweet.AccountBalance))
         .Should().NotBeNull();
+    }
+
+    public class MyValue : Row
+    {
+      public int Id { get; set; }
+    }
+
+    [Test]
+    public void RowTimeField_AsPseudoColumn_ShouldBeRegisteredOnce()
+    {
+      //Arrange
+      EntityTypeBuilder<MyValue> customBuilder = new();
+
+      //Act
+      customBuilder.Property(c => c.RowTime)
+        .AsPseudoColumn();
+
+      //Assert
+      customBuilder.Metadata.FieldsMetadata.Count(c => c.MemberInfo.Name == nameof(Row.RowTime)).Should().Be(1);
     }
   }
 }
