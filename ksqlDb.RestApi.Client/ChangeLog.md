@@ -1,5 +1,8 @@
 # ksqlDB.RestApi.Client
 
+# 6.5.1
+- fixed `IEntityTypeBuilder<TEntity>.Entity<TEntity>` automatically creates FieldMetadata for primitive field in Base class #102
+
 # 6.5.0
 - added the `AsPseudoColumn` function to the Fluent API for mapping of C# fields or properties as `ksqldb` [pseudocolumns](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#pseudocolumns).
 
