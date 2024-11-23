@@ -57,11 +57,7 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
       string path = string.Empty;
       foreach (var (memberName, memberInfo) in members)
       {
-        var memberInfoKey = new MemberInfoKey
-        {
-          Module = memberInfo.Module,
-          MetadataToken = memberInfo.MetadataToken
-        };
+        var memberInfoKey = memberInfo.ToMemberInfoKey();
         path += memberName;
 
         if (!Metadata.FieldsMetadataDict.TryGetValue(memberInfoKey, out var fieldMetadata))
@@ -127,11 +123,7 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
 
     private void AddFieldMetadata(MemberInfo memberInfo, bool ignoreInDDL)
     {
-      var memberInfoKey = new MemberInfoKey
-      {
-        Module = memberInfo.Module,
-        MetadataToken = memberInfo.MetadataToken
-      };
+      var memberInfoKey = memberInfo.ToMemberInfoKey();
 
       var fieldMetadata = new FieldMetadata
       {
