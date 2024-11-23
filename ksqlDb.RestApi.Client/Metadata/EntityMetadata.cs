@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 
 namespace ksqlDb.RestApi.Client.Metadata
 {
@@ -9,7 +10,7 @@ namespace ksqlDb.RestApi.Client.Metadata
 
     internal MemberInfo? PrimaryKeyMemberInfo { get; set; }
 
-    internal readonly IDictionary<MemberInfo, FieldMetadata> FieldsMetadataDict = new Dictionary<MemberInfo, FieldMetadata>();
+    internal readonly IDictionary<MemberInfoKey, FieldMetadata> FieldsMetadataDict = new Dictionary<MemberInfoKey, FieldMetadata>();
 
     public IEnumerable<FieldMetadata> FieldsMetadata => FieldsMetadataDict.Values;
 
