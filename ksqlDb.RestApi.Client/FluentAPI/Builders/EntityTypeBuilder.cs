@@ -57,9 +57,10 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
       string path = string.Empty;
       foreach (var (memberName, memberInfo) in members)
       {
+        var memberInfoKey = memberInfo.ToMemberInfoKey();
         path += memberName;
 
-        if (!Metadata.FieldsMetadataDict.TryGetValue(memberInfo, out var fieldMetadata))
+        if (!Metadata.FieldsMetadataDict.TryGetValue(memberInfoKey, out var fieldMetadata))
         {
           fieldMetadata = new FieldMetadata()
           {
@@ -86,7 +87,7 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
             break;
         }
 
-        Metadata.FieldsMetadataDict[memberInfo] = fieldMetadata;
+        Metadata.FieldsMetadataDict[memberInfoKey] = fieldMetadata;
         path += ".";
       }
 
@@ -122,6 +123,8 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
 
     private void AddFieldMetadata(MemberInfo memberInfo, bool ignoreInDDL)
     {
+      var memberInfoKey = memberInfo.ToMemberInfoKey();
+
       var fieldMetadata = new FieldMetadata
       {
         MemberInfo = memberInfo,
@@ -130,7 +133,7 @@ namespace ksqlDb.RestApi.Client.FluentAPI.Builders
         IgnoreInDDL = ignoreInDDL
       };
 
-      Metadata.FieldsMetadataDict[memberInfo] = fieldMetadata;
+      Metadata.FieldsMetadataDict[memberInfoKey] = fieldMetadata;
     }
   }
 }
