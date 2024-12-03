@@ -1,40 +1,52 @@
 # ksqlDB.RestApi.Client
 
 # 7.0.0 (unreleased)
+
+## 🚀 New Features
 - added .NET 9.0 target framework
 
-# ⚠️ Breaking changes
+# 💥 Breaking changes
 - removed usupported .NET 6.0, and 7.0 target frameworks
 - upgraded Microsoft packages to v9.0.0: `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.Http`, and `Microsoft.Extensions.Logging.Abstractions`
 - upgraded `System.Text.Json` to v9.0.0 
+- upgraded `System.Reactive` to v7.0.0 
 
 # 6.5.1
+
+## 🐛 Bug Fixes
 - fixed `IEntityTypeBuilder<TEntity>.Entity<TEntity>` automatically creates FieldMetadata for primitive field in Base class #102
 
 # 6.5.0
+
+## 🚀 New Features
 - added the `AsPseudoColumn` function to the Fluent API for mapping of C# fields or properties as `ksqldb` [pseudocolumns](https://docs.ksqldb.io/en/latest/reference/sql/data-definition/#pseudocolumns).
 
 # 6.4.0
+
+## 🚀 New Features
 - added the `IgnoreInDML` function to the Fluent API to exclude fields from INSERT statements #90 (proposed by @mrt181)
 - added `IgnoreAttribute` to prevent properties or fields from being included in both DDL and DML statement
 - `Headers` property was marked as obsolete in the `Record` type
 
-## BugFix
+## 🐛 Bug Fixes
 - `IgnoreByInsertsAttribute` no longer excludes fields or properties from DDL statements. For this purpose, a new `IgnoreAttribute` has been introduced.
 - the `Record` type's fields `RowOffset` and `RowPartition` are decorated with `IgnoreAttribute` instead of `IgnoreByInsertsAttribute`
 - the `Record` type's field `RowTime` is decorated with an internal `IgnoreInDDLAttribute` instead of `IgnoreByInsertsAttribute`
 - fixed the issue of multiple mappings not working on the same property in the model builder
 
 # 6.3.0
+
+## 🚀 New Features
 - added `AsStruct` function to the Fluent API for marking fields as ksqldb `STRUCT` types #89 (proposed by @mrt181)
 
 # 6.2.1
 
-## BugFix
+## 🐛 Bug Fix
 - source table can't be queried #87 - fixed `KSqlDbRestApiClient.CreateSourceTableAsync` and `KSqlDbRestApiClient.CreateSourceStreamAsync`
 
 # 6.2.0
 
+## 🚀 New Features
 1. **KSqlDbRestApiClient Constructor Update**:
     - The `KSqlDbRestApiClient` class constructor now includes a parameter for `KSqlDBRestApiClientOptions`.
     
@@ -49,33 +61,38 @@
         - `DropFromItemProperties`
     - If `ShouldPluralizeEntityName` is null, the methods will set it using the value from the `KSqlDBRestApiClientOptions`.
     
-## BugFix
+## 🐛 Bug Fix
 - `KSqlDBContext` removed `!NETSTANDARD` pragma from `OnDisposeAsync`
 
 # 6.1.0
+
+## 🚀 New Features
 - added `HasColumnName` to the Fluent API to allow overriding property names during JSON deserialization and code generation.
 
-## BugFix
+## 🐛 Bug Fixes
 - fixed missing usage/evaluation of the `JsonPropertyNameAttribute` during the creation of types.
 
 # 6.0.2
 
-# BugFix
+## 🐛 Bug Fix
 - C# decimal is mapped to STRUCT type #81
 
 # 6.0.1
 
-## BugFix
+## 🐛 Bug Fix
 - requests with `KSqlDbRestApiClient` can result in 431 error codes #80
 
 # 6.0.0
+
+## 🚀 New Features
+
 - added `SetEndpointType` to `KSqlDbContextOptionsBuilder` for configuring to use either "/query" or "/query-stream" endpoint
 - `CreateQuery` and `CreateQueryStream` were merged. `CreatePullQuery` by default uses **http/2** now.  Subsequently `CreateQueryStream` was renamed to `CreatePushQuery` to align with the nomenclature of `CreatePullQuery`.
 - removed `SetupQuery` from `KSqlDbContextOptionsBuilder`, it was unified with `SetupQueryStream`. Subsequently `SetupQueryStream` was renamed to `SetupPushQuery` to align with the nomenclature of `SetupPullQuery`.
 - introduced distinct parameters specifically tailored for pull queries. This modification results in a breaking change. Before this update, the parameters sent to both the 'query' and 'query-stream' endpoints were shared between pull and push queries. #77
 - see also [breakingchanges.md](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/breaking_changes.md#v600)
 
-## BugFix
+## 🐛 Bug Fix
 - CreateQueryStream doesn't always use configured parameters. The PullQuery functionality was overriding the options configured for the PushQuery. #75 reported by @jbkuczma 
 
 # 5.1.0
