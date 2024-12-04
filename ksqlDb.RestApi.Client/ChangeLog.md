@@ -1,5 +1,10 @@
 # ksqlDB.RestApi.Client
 
+# 6.5.2
+
+## 🐛 Bug Fixes
+- fixed `IdentifierUtil.IsPseudoColumn` to handle PseudoColumns that are set using `ModelBuilder` correctly
+
 # 6.5.1
 - fixed `IEntityTypeBuilder<TEntity>.Entity<TEntity>` automatically creates FieldMetadata for primitive field in Base class #102
 
@@ -29,7 +34,7 @@
 
 1. **KSqlDbRestApiClient Constructor Update**:
     - The `KSqlDbRestApiClient` class constructor now includes a parameter for `KSqlDBRestApiClientOptions`.
-    
+
 2. **EntityCreationMetadata Update**:
     - The `EntityCreationMetadata.ShouldPluralizeEntityName` property was modified to be a nullable boolean (`bool?`), and the default value of `true` was removed.
 
@@ -40,7 +45,7 @@
         - `InsertProperties`
         - `DropFromItemProperties`
     - If `ShouldPluralizeEntityName` is null, the methods will set it using the value from the `KSqlDBRestApiClientOptions`.
-    
+
 ## BugFix
 - `KSqlDBContext` removed `!NETSTANDARD` pragma from `OnDisposeAsync`
 
@@ -68,7 +73,7 @@
 - see also [breakingchanges.md](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/breaking_changes.md#v600)
 
 ## BugFix
-- CreateQueryStream doesn't always use configured parameters. The PullQuery functionality was overriding the options configured for the PushQuery. #75 reported by @jbkuczma 
+- CreateQueryStream doesn't always use configured parameters. The PullQuery functionality was overriding the options configured for the PushQuery. #75 reported by @jbkuczma
 
 # 5.1.0
 - added `InsertIntoAsync` Qbservable extension for executing `INSERT INTO <stream-name> SELECT` statements.
