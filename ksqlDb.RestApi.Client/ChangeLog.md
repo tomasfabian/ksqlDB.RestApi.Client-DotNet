@@ -8,7 +8,12 @@
 ## 💥 Breaking changes
 - removed usupported .NET 6.0, and 7.0 target frameworks
 - upgraded Microsoft packages to v9.0.0: `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.Http`, and `Microsoft.Extensions.Logging.Abstractions`
-- upgraded `System.Text.Json` to v9.0.0 
+- upgraded `System.Text.Json` to v9.0.0
+
+# 6.5.2
+
+## 🐛 Bug Fixes
+- fixed `IdentifierUtil.IsPseudoColumn` to handle PseudoColumns that are set using `ModelBuilder` correctly
 
 # 6.5.1
 
