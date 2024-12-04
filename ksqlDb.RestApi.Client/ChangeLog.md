@@ -5,11 +5,10 @@
 ## 🚀 New Features
 - added .NET 9.0 target framework
 
-# 💥 Breaking changes
+## 💥 Breaking changes
 - removed usupported .NET 6.0, and 7.0 target frameworks
 - upgraded Microsoft packages to v9.0.0: `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.Http`, and `Microsoft.Extensions.Logging.Abstractions`
 - upgraded `System.Text.Json` to v9.0.0 
-- upgraded `System.Reactive` to v7.0.0 
 
 # 6.5.1
 
