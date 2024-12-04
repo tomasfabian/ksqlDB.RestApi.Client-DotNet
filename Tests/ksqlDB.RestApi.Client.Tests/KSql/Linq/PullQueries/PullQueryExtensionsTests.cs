@@ -1,4 +1,5 @@
 using FluentAssertions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.Linq.PullQueries;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
@@ -240,6 +241,41 @@ WHERE `prop` = 'test';")]
     var ksql = dbContext.CreatePullQuery<SubProperty>()
       .Select(c => new {c.Property})
       .Where(c => c.Property == "test")
+      .ToQueryString();
+
+    //Assert
+    return ksql.ReplaceLineEndings();
+  }
+
+  private class Record
+  {
+    public long? RowOffset { get; set; }
+    public short? RowPartition { get; set; }
+    public long RowTime { get; set; }
+  }
+
+  private class Test : Record
+  {
+    public string Name { get; set; }
+  }
+
+  [TestCase(Never, ExpectedResult = $"SELECT RowTime, RowOffset, RowPartition, Name FROM {nameof(Test)};")]
+  [TestCase(Keywords, ExpectedResult = $"SELECT RowTime, RowOffset, RowPartition, Name FROM {nameof(Test)};")]
+  [TestCase(Always, ExpectedResult = $"SELECT RowTime, RowOffset, RowPartition, `Name` FROM `{nameof(Test)}`;")]
+  public string SelectColumnsUsingModelBuilderWithPseudoColum(IdentifierEscaping escaping)
+  {
+    //Arrange
+    var modelBuilder = new ModelBuilder();
+    modelBuilder.Entity<JsonPropertyNameTestData>().Property(i => i.RowOffset).AsPseudoColumn();
+    modelBuilder.Entity<JsonPropertyNameTestData>().Property(i => i.RowPartition).AsPseudoColumn();
+    modelBuilder.Entity<JsonPropertyNameTestData>().Property(i => i.RowTime).AsPseudoColumn();
+
+    var dbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
+      { IdentifierEscaping = escaping, ShouldPluralizeFromItemName = false }, modelBuilder);
+
+    //Act
+    var ksql = dbContext.CreatePullQuery<Test>()
+      .Select(c => new { c.RowTime, c.RowOffset, c.RowPartition, c.Name })
       .ToQueryString();
 
     //Assert

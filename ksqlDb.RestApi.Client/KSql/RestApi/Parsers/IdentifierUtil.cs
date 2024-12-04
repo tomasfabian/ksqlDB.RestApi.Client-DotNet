@@ -96,7 +96,8 @@ namespace ksqlDb.RestApi.Client.KSql.RestApi.Parsers
       if (memberInfo.GetCustomAttribute<PseudoColumnAttribute>() != null)
         return true;
 
-      var entityMetadata = metadataProvider?.GetEntities().FirstOrDefault(c => c.Type == memberInfo.DeclaringType);
+      var entityMetadata = metadataProvider?.GetEntities().FirstOrDefault(c =>
+        c.FieldsMetadata.FirstOrDefault(fmd => fmd.Path == memberInfo.Name)?.IsPseudoColumn ?? false);
 
       var fieldMetadata =
         entityMetadata?.FieldsMetadata.FirstOrDefault(c => c.MemberInfo.Name == memberInfo.Name);
