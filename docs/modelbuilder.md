@@ -318,6 +318,38 @@ CREATE TABLE IF NOT EXISTS Records (
 ) WITH ( KAFKA_TOPIC='my_topic', VALUE_FORMAT='Json', PARTITIONS='3' );
 ```
 
+For array fields that contain a type that is a struct and that again contains a type that is a struct, it's necessary to mark the inner type as a struct type as well:
+```C#
+
+private record Child : Record
+{
+  public First[] Firsts { get; init; } = null!;
+}
+
+private record First
+{
+  public Second[] Seconds { get; init; } = null!;
+}
+
+private record Second
+{
+  public string Test { get; init; } = null!;
+}
+```
+```C#
+ModelBuilder builder = new();
+
+builder.Entity<Child>()
+        .Property(b => b.Headers)
+        .AsStruct();
+builder.Entity<Child>()
+        .Property(b => b.Firsts)
+        .AsStruct();
+builder.Entity<Child>()
+        .Property(b => b.Firsts.FirstOrDefault()!.Seconds)
+        .AsStruct();
+```
+
 ### IgnoreInDML
 **v6.4.0**
 
@@ -417,4 +449,4 @@ Valid pseudocolumn names are:
 - Headers
 - RowOffset
 - RowPartition
-- RowTime 
+- RowTime
