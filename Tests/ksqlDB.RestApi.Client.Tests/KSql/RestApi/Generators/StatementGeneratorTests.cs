@@ -193,6 +193,97 @@ public class StatementGeneratorTests
 	Headers ARRAY<STRUCT<Key VARCHAR, Value BYTES>>
 ) WITH ( KAFKA_TOPIC='my_topic', VALUE_FORMAT='Json', PARTITIONS='3' );".ReplaceLineEndings());
   }
+
+  private record Child : Record
+  {
+    public First[] Firsts { get; init; } = null!;
+  }
+
+  private record First
+  {
+    public Second[] Seconds { get; init; } = null!;
+  }
+
+  private record Second
+  {
+    public string Test { get; init; } = null!;
+  }
+
+  [Test]
+  public void CreateTable_UseModelBuilder_WithNestedArrayFieldAsStruct()
+  {
+    //Arrange
+    var modelBuilder = new ModelBuilder();
+    modelBuilder.Entity<Child>().Property(b => b.Headers).AsStruct();
+    modelBuilder.Entity<Child>().Property(b => b.Firsts).AsStruct();
+    modelBuilder.Entity<Child>().Property(b => b.Firsts.FirstOrDefault()!.Seconds).AsStruct();
+
+    var creationMetadata = new EntityCreationMetadata("my_topic", partitions: 3);
+
+    //Act
+    var statement = new StatementGenerator(modelBuilder).CreateTable<Child>(
+      creationMetadata,
+      ifNotExists: true
+    );
+
+    //Assert
+    statement
+      .Should()
+      .Be(
+        @"CREATE TABLE IF NOT EXISTS Children (
+	Firsts ARRAY<STRUCT<Seconds ARRAY<STRUCT<Test VARCHAR>>>>,
+	Headers ARRAY<STRUCT<Key VARCHAR, Value BYTES>>
+) WITH ( KAFKA_TOPIC='my_topic', VALUE_FORMAT='Json', PARTITIONS='3' );".ReplaceLineEndings()
+      );
+  }
+
+  private class Child2
+  {
+    public First2[] Firsts { get; set; }
+  }
+
+  private class First2
+  {
+    public Second2[] Seconds { get; set; }
+  }
+
+  private class Second2
+  {
+    public Third[] Thirds { get; set; }
+  }
+
+  private class Third
+  {
+    public string Test1 { get; set; }
+    public string Test2 { get; set; }
+  }
+
+  [Test]
+  public void CreateTable_UseModelBuilder_WithNestedArrayFieldAsStruct_2()
+  {
+    //Arrange
+    var modelBuilder = new ModelBuilder();
+    modelBuilder.Entity<Child2>().Property(b => b.Firsts).AsStruct();
+    modelBuilder.Entity<Child2>().Property(b => b.Firsts.FirstOrDefault()!.Seconds).AsStruct();
+    modelBuilder.Entity<Child2>().Property(b => b.Firsts.FirstOrDefault()!.Seconds.FirstOrDefault()!.Thirds).AsStruct();
+
+    var creationMetadata = new EntityCreationMetadata("my_topic", partitions: 3);
+
+    //Act
+    var statement = new StatementGenerator(modelBuilder).CreateTable<Child2>(
+      creationMetadata,
+      ifNotExists: true
+    );
+
+    //Assert
+    statement
+      .Should()
+      .Be(
+        @"CREATE TABLE IF NOT EXISTS Child2s (
+	Firsts ARRAY<STRUCT<Seconds ARRAY<STRUCT<Thirds ARRAY<STRUCT<Test1 VARCHAR, Test2 VARCHAR>>>>>>
+) WITH ( KAFKA_TOPIC='my_topic', VALUE_FORMAT='Json', PARTITIONS='3' );".ReplaceLineEndings()
+      );
+  }
 }
 
 internal class Port
