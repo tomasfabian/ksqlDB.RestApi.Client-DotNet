@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net9.0</TargetFrameworks>
-        <!-- <TargetFrameworks>net8.0;net9.0</TargetFrameworks> -->
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
         <Authors>Tomas Fabian</Authors>
         <Company />
         <PackageProjectUrl>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/ksqlDb.RestApi.Client.ProtoBuf</PackageProjectUrl>
@@ -25,8 +24,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- <PackageReference Include="ksqlDb.RestApi.Client" Version="7.0.0" /> -->
-        <ProjectReference Include="..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />
+        <PackageReference Include="ksqlDb.RestApi.Client" Version="7.0.0" />
+        <!-- <ProjectReference Include="..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" /> -->
         <PackageReference Include="protobuf-net" Version="3.2.0" />
     </ItemGroup>
 
