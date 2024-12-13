@@ -1,6 +1,6 @@
 # ksqlDB.RestApi.Client
 
-# 7.0.0 (unreleased)
+# 7.0.0
 
 ## 🚀 New Features
 - added .NET 9.0 target framework
@@ -13,7 +13,7 @@
 # 6.5.2
 
 ## 🐛 Bug Fixes
-- fixed `IdentifierUtil.IsPseudoColumn` to handle PseudoColumns that are set using `ModelBuilder` correctly
+- fixed `IdentifierUtil.IsPseudoColumn` to handle PseudoColumns that are set using `ModelBuilder` correctly. (contributed by @mrt181)
 
 # 6.5.1
 

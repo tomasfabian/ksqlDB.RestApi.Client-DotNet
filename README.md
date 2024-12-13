@@ -18,7 +18,7 @@ dotnet add package ksqlDb.RestApi.Client
 ```
 This adds a `<PackageReference>` to your csproj file, similar to the following:
 ```XML
-<PackageReference Include="ksqlDb.RestApi.Client" Version="6.0.0" />
+<PackageReference Include="ksqlDb.RestApi.Client" Version="7.0.0" />
 ```
 
 Alternative option is to use [Protobuf content type](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/protobuf.md):
