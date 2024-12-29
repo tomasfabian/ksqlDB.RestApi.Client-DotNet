@@ -9,9 +9,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Azure.Identity" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" />
 	</ItemGroup>
@@ -20,6 +22,8 @@
 		<PackageReference Include="FluentAssertions" />
 		<PackageReference Include="Microsoft.Reactive.Testing" />
 		<PackageReference Include="Moq" />
+		<PackageReference Include="System.Formats.Asn1" />
+		<PackageReference Include="System.Text.Json" />
 	</ItemGroup>
 
 	<ItemGroup>

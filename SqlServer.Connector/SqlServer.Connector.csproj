@@ -27,15 +27,20 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Azure.Identity" Version="1.11.4" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
 		<PackageReference Include="ksqlDb.RestApi.Client" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
         <PackageReference Include="Microsoft.IdentityModel.Abstractions" Version="7.5.0" />
         <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.5.0" />
         <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.5.0" />
+        <PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.0" />
 	</ItemGroup>
 
 	<ItemGroup><!--<ProjectReference Include="..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />-->
+	
+	  <PackageReference Include="System.Text.Json" Version="9.0.0" />
 	</ItemGroup>
 
 </Project>
