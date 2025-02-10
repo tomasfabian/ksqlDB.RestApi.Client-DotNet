@@ -95,10 +95,10 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
   public bool UseBasicAuth => userName != null || password != null;
 
   private string? userName;
-  internal string? BasicAuthUserName => string.IsNullOrEmpty(userName) ? string.Empty : userName;
+  public string BasicAuthUserName => string.IsNullOrEmpty(userName) ? string.Empty : userName;
 
   private string? password;
-  internal string? BasicAuthPassword => string.IsNullOrEmpty(password) ? string.Empty : password;
+  public string BasicAuthPassword => string.IsNullOrEmpty(password) ? string.Empty : password;
 
   /// <summary>
   /// Gets or sets the identifier escaping type.
