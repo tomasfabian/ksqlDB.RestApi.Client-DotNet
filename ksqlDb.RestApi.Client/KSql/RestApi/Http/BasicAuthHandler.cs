@@ -1,22 +1,31 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Http;
 
 internal class BasicAuthHandler : DelegatingHandler
 {
-  private readonly BasicAuthCredentials basicAuthCredentials;
+  private readonly KSqlDBContextOptions options;
 
-  public BasicAuthHandler(BasicAuthCredentials basicAuthCredentials)
+  public BasicAuthHandler(KSqlDBContextOptions options)
   {
-    this.basicAuthCredentials = basicAuthCredentials ?? throw new ArgumentNullException(nameof(basicAuthCredentials));
+    this.options = options ?? throw new ArgumentNullException(nameof(options));
   }
-	
-  protected override Task<HttpResponseMessage> SendAsync(
-    HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
-  {
-    var token = basicAuthCredentials.CreateToken();
 
-    request.Headers.Authorization = new AuthenticationHeaderValue(basicAuthCredentials.Schema, token);
+  protected override Task<HttpResponseMessage> SendAsync(
+    HttpRequestMessage request,
+    CancellationToken cancellationToken
+  )
+  {
+    var token = new BasicAuthCredentials(
+      options.BasicAuthUserName,
+      options.BasicAuthPassword
+    ).CreateToken();
+
+    request.Headers.Authorization = new AuthenticationHeaderValue(
+      BasicAuthCredentials.Schema,
+      token
+    );
 
     return base.SendAsync(request, cancellationToken);
   }

@@ -89,7 +89,7 @@ public class KSqlDbContextOptionsBuilder : ISetupParameters
   }
 
   /// <summary>
-  /// Allows you to set basic authentication credentials for an HTTP client. 
+  /// Allows you to set basic authentication credentials for an HTTP client.
   /// </summary>
   /// <param name="username">User name</param>
   /// <param name="password">Password</param>
@@ -141,13 +141,24 @@ public class KSqlDbContextOptionsBuilder : ISetupParameters
   }
 
   /// <summary>
-  /// Allows you to configure the auto.offset.reset streams property. 
+  /// Allows you to configure the auto.offset.reset streams property.
   /// </summary>
   /// <param name="autoOffsetReset">The auto offset reset value to set.</param>
   /// <returns>Returns this instance.</returns>
   ISetupParameters ISetupParameters.SetAutoOffsetReset(AutoOffsetReset autoOffsetReset)
   {
     InternalOptions.SetAutoOffsetReset(autoOffsetReset);
+
+    return this;
+  }
+
+  /// <summary>
+  /// Allows you to set basic authentication usage through an DelegatingHandler
+  /// </summary>
+  /// <returns>Returns this instance.</returns>
+  public ISetupParameters SetBasicAuth()
+  {
+    InternalOptions.UseBasicAuth = true;
 
     return this;
   }

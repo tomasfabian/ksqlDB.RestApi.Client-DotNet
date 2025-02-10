@@ -15,7 +15,7 @@ public interface ISetupParameters : ICreateOptions
   ISetupParameters SetProcessingGuarantee(ProcessingGuarantee processingGuarantee);
 
   /// <summary>
-  /// Allows you to configure the auto.offset.reset streams property. 
+  /// Allows you to configure the auto.offset.reset streams property.
   /// </summary>
   /// <param name="autoOffsetReset">The auto offset reset value to set.</param>
   /// <returns>Returns this instance.</returns>
@@ -37,7 +37,7 @@ public interface ISetupParameters : ICreateOptions
   ISetupParameters SetupPullQuery(Action<IPullQueryParameters> configure);
 
   /// <summary>
-  /// Allows you to set basic authentication credentials for an HTTP client. 
+  /// Allows you to set basic authentication credentials for an HTTP client.
   /// </summary>
   /// <param name="username">User name</param>
   /// <param name="password">Password</param>
@@ -61,4 +61,10 @@ public interface ISetupParameters : ICreateOptions
   /// As ksqlDB automatically converts all identifiers to uppercase by default, it's crucial to enclose them within backticks to maintain the desired casing.
   /// </summary>
   ISetupParameters SetIdentifierEscaping(IdentifierEscaping escaping);
+
+  /// <summary>
+  /// Allows you to set basic authentication usage through a DelegatingHandler
+  /// </summary>
+  /// <returns>Returns this instance.</returns>
+  ISetupParameters SetBasicAuth();
 }

@@ -6,6 +6,11 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Http;
 public record BasicAuthCredentials
 {
   /// <summary>
+  /// Gets the schema for basic authentication.
+  /// </summary>
+  public const string Schema = "basic";
+
+  /// <summary>
   /// Initializes a new instance of the <see cref="BasicAuthCredentials"/> class.
   /// </summary>
   /// <param name="userName">The username.</param>
@@ -27,11 +32,6 @@ public record BasicAuthCredentials
   public string Password { get; internal set; }
 
   /// <summary>
-  /// Gets the schema for basic authentication.
-  /// </summary>
-  public string Schema => "basic";
-
-  /// <summary>
   /// Creates a token for basic authentication.
   /// </summary>
   /// <returns>A base64 encoded string representing the username and password.</returns>
@@ -42,7 +42,7 @@ public record BasicAuthCredentials
     var bytes = System.Text.Encoding.UTF8.GetBytes(credentials);
 
     string base64Credentials = Convert.ToBase64String(bytes, 0, bytes.Length);
-      
+
     return base64Credentials;
   }
 }

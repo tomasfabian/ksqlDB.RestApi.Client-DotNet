@@ -92,12 +92,18 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
     optionsAction.Invoke(JsonSerializerOptions);
   }
 
-  public bool UseBasicAuth => userName != null || password != null;
+  public bool UseBasicAuth
+  {
+    get { return (userName != null || password != null) || _useBasicAuth; }
+    set { _useBasicAuth = value; }
+  }
 
   private string? userName;
   public string BasicAuthUserName => string.IsNullOrEmpty(userName) ? string.Empty : userName;
 
   private string? password;
+  private bool _useBasicAuth;
+
   public string BasicAuthPassword => string.IsNullOrEmpty(password) ? string.Empty : password;
 
   /// <summary>
@@ -110,7 +116,7 @@ public sealed class KSqlDBContextOptions : KSqlDbProviderOptions
 
   /// <summary>
   /// Sets the basic authentication credentials.
-  /// Note: Credentials are stored only when using <see cref="UseBasicAuth"/>.
+  /// Note: Credentials are used when using <see cref="UseBasicAuth"/>.
   /// </summary>
   /// <param name="userName">The username.</param>
   /// <param name="password">The password.</param>

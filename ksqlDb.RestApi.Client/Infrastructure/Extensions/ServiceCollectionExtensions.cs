@@ -37,12 +37,9 @@ internal static class ServiceCollectionExtensions
         httpClient.BaseAddress = uri;
       });
 
-      if (contextOptions.UseBasicAuth && !string.IsNullOrEmpty(contextOptions.BasicAuthUserName) && !string.IsNullOrEmpty(contextOptions.BasicAuthPassword))
+      if (contextOptions.UseBasicAuth)
       {
-        var basicAuthCredentials =
-          new BasicAuthCredentials(contextOptions.BasicAuthUserName!, contextOptions.BasicAuthPassword!);
-
-        httpClientV1Builder.AddHttpMessageHandler(_ => new BasicAuthHandler(basicAuthCredentials));
+        httpClientV1Builder.AddHttpMessageHandler(_ => new BasicAuthHandler(contextOptions));
       }
     }
 
@@ -56,12 +53,9 @@ internal static class ServiceCollectionExtensions
 #endif
       });
 
-      if (contextOptions.UseBasicAuth && !string.IsNullOrEmpty(contextOptions.BasicAuthUserName) && !string.IsNullOrEmpty(contextOptions.BasicAuthPassword))
+      if (contextOptions.UseBasicAuth)
       {
-        var basicAuthCredentials =
-          new BasicAuthCredentials(contextOptions.BasicAuthUserName!, contextOptions.BasicAuthPassword!);
-
-        httpClientBuilder.AddHttpMessageHandler(_ => new BasicAuthHandler(basicAuthCredentials));
+        httpClientBuilder.AddHttpMessageHandler(_ => new BasicAuthHandler(contextOptions));
       }
     }
 
