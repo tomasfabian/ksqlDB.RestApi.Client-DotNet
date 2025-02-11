@@ -1,5 +1,12 @@
 # ksqlDB.RestApi.Client
 
+# 7.1.0
+
+## 🚀 New Features
+- the usage of the [Http-Basic authentication](https://docs.ksqldb.io/en/latest/operate-and-deploy/installation/server-config/security/#configuring-listener-for-http-basic-authenticationauthorization)
+mechanism can be activated directly when the credentials are provided to the `KSqlDbContextOptions`.
+This enables updating the credentials at runtime by setting them on the `KSqlDbContextOptions` singleton instance. #108 (contributed by @mrt181).
+
 # 7.0.0
 
 ## 🚀 New Features
