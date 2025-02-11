@@ -29,7 +29,7 @@ public class BasicAuthCredentialsTests : TestBase
     var credentials = new BasicAuthCredentials("fred", "letmein");
 
     //Act
-    var token = credentials.Schema;
+    var token = BasicAuthCredentials.Schema;
 
     //Assert
     token.Should().Be("basic");

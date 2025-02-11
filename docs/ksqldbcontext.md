@@ -105,6 +105,28 @@ var options = new KSqlDbContextOptionsBuilder()
 await using var context = new KSqlDBContext(options);
 ```
 
+**v7.1.0**
+
+You can also just activate the usage of the [Http-Basic authentication](https://docs.ksqldb.io/en/latest/operate-and-deploy/installation/server-config/security/#configuring-listener-for-http-basic-authenticationauthorization) mechanism but need to provide the credentials to the `KSqlDbContextOptions` directly. This allows to update the credentials at runtime by setting them on the `KSqlDbContextOptions` singleton instance.
+
+```C#
+using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
+
+string ksqlDbUrl = @"http://localhost:8088";
+
+string userName = "fred";
+string password = "letmein";
+
+var options = new KSqlDbContextOptionsBuilder()
+  .UseKSqlDb(ksqlDbUrl)
+  .SetBasicAuth()
+  .Options;
+
+options.SetBasicAuthCredentials(userName, password);
+
+await using var context = new KSqlDBContext(options);
+```
+
 See also how to [intercept http requests](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/wiki/Interception-of-HTTP-requests-in--ksqlDB.RestApi.Client-DotNet---Authentication)
 
 ### KSqlDbServiceCollectionExtensions - AddDbContext and AddDbContextFactory

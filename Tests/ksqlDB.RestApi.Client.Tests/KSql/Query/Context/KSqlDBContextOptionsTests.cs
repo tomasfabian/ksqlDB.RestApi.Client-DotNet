@@ -32,7 +32,7 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
     //Assert
     url.Should().Be(TestParameters.KsqlDbUrl);
   }
-    
+
   [Test]
   public void NotSetBasicAuthCredentials()
   {
@@ -45,7 +45,7 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
     ClassUnderTest.BasicAuthUserName.Should().BeEmpty();
     ClassUnderTest.BasicAuthPassword.Should().BeEmpty();
   }
-    
+
   [Test]
   public void SetBasicAuthCredentials()
   {
@@ -61,6 +61,20 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
     ClassUnderTest.UseBasicAuth.Should().BeTrue();
     ClassUnderTest.BasicAuthUserName.Should().Be(userName);
     ClassUnderTest.BasicAuthPassword.Should().Be(password);
+  }
+
+  [Test]
+  public void SetBasicAuthCredentialsDirectly()
+  {
+    //Arrange
+
+    //Act
+    ClassUnderTest.UseBasicAuth = true;
+
+    //Assert
+    ClassUnderTest.UseBasicAuth.Should().BeTrue();
+    ClassUnderTest.BasicAuthUserName.Should().BeEmpty();
+    ClassUnderTest.BasicAuthPassword.Should().BeEmpty();
   }
 
   [Test]

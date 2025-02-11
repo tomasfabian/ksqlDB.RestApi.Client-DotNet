@@ -3,12 +3,13 @@ using System.Text;
 using System.Text.Json;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDb.RestApi.Client.Infrastructure.Logging;
-using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
-using ksqlDb.RestApi.Client.KSql.RestApi.Responses.Asserts;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Generators;
+using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
+using ksqlDb.RestApi.Client.KSql.RestApi.Responses.Asserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Connectors;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Queries;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses.Query.Descriptors;
@@ -19,10 +20,9 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Connectors;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
+using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers;
 using Microsoft.Extensions.Logging;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
-using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Providers;
-using ksqlDB.RestApi.Client.KSql.Query.Context;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi;
 
@@ -177,7 +177,10 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
     {
       string basicAuthHeader = basicAuthCredentials.CreateToken();
 
-      httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue(basicAuthCredentials.Schema, basicAuthHeader);
+      httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue(
+        BasicAuthCredentials.Schema,
+        basicAuthHeader
+      );
     }
 
     return httpRequestMessage;

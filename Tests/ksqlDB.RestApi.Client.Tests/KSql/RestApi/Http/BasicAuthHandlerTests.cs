@@ -1,4 +1,5 @@
 using FluentAssertions;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using NUnit.Framework;
 using UnitTests;
@@ -11,9 +12,10 @@ public class BasicAuthHandlerTests : TestBase
   public async Task SendAsync()
   {
     //Arrange
-    var credentials = new BasicAuthCredentials("fred", "letmein");
+    var options = new KSqlDBContextOptions("https://tests.com/");
+    options.SetBasicAuthCredentials("fred", "letmein");
 
-    var handler = new BasicAuthHandler(credentials);
+    var handler = new BasicAuthHandler(options);
     handler.InnerHandler = new HttpClientHandler();
     var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://tests.com/");
     var invoker = new HttpMessageInvoker(handler);

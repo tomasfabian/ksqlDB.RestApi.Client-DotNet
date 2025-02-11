@@ -80,6 +80,20 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
   }
 
   [Test]
+  public void SetBasicAuth()
+  {
+    //Arrange
+
+    //Act
+    var options = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl).SetBasicAuth().Options;
+
+    //Assert
+    options.UseBasicAuth.Should().BeTrue();
+    options.BasicAuthUserName.Should().BeEmpty();
+    options.BasicAuthPassword.Should().BeEmpty();
+  }
+
+  [Test]
   public void SetProcessingGuarantee()
   {
     //Arrange

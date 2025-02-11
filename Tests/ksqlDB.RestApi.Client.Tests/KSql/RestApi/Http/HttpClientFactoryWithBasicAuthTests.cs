@@ -1,4 +1,5 @@
 using FluentAssertions;
+using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi.Http;
 using NUnit.Framework;
 using UnitTests;
@@ -12,9 +13,13 @@ public class HttpClientFactoryWithBasicAuthTests : TestBase
   public void CreateClient_BaseAddressWasSet()
   {
     //Arrange
-    var credentials = new BasicAuthCredentials("fred", "letmein");
+    var options = new KSqlDBContextOptions(TestParameters.KsqlDbUrl);
+    options.SetBasicAuthCredentials("fred", "letmein");
 
-    var httpClientFactory = new HttpClientFactoryWithBasicAuth(new Uri(TestParameters.KsqlDbUrl), credentials);
+    var httpClientFactory = new HttpClientFactoryWithBasicAuth(
+      new Uri(TestParameters.KsqlDbUrl),
+      options
+    );
 
     //Act
     var httpClient = httpClientFactory.CreateClient();
