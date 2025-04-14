@@ -13,7 +13,6 @@ using Microsoft.Reactive.Testing;
 using Moq;
 using NUnit.Framework;
 using UnitTests;
-using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Linq;
@@ -129,7 +128,7 @@ public class QbservableExtensionsTests : TestBase
 WHERE ({columnName} = '1') OR (({columnName} != '2') AND ({columnName} = '3')) EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expected);
-  }    
+  }
 
   [Test]
   public void OperatorPrecedenceInWhereClause_BuildKSql_PrintsParentheses()
@@ -304,7 +303,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
   {
     //Arrange
     var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
-      
+
     var query = context.CreatePushQuery<string>();
 
     //Act
@@ -350,7 +349,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
   {
     //Arrange
     var query = CreateTestableKStreamSet();
-      
+
     var testScheduler = new TestScheduler();
 
     var results = new List<string>();
@@ -364,7 +363,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     testScheduler.Start();
 
     //Assert
-    Assert.AreEqual(2, results.Count);
+    results.Count.Should().Be(2);
   }
 
   [Test]
@@ -372,7 +371,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
   {
     //Arrange
     var query = CreateTestableKStreamSet();
-      
+
     var testScheduler = new TestScheduler();
 
     var results = new List<string>();
@@ -386,7 +385,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     testScheduler.Start();
 
     //Assert
-    Assert.AreEqual(2, results.Count);
+    results.Count.Should().Be(2);
     subscription.QueryId.Should().Be("xyz");
   }
 
@@ -408,7 +407,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
   {
     //Arrange
     var query = CreateTestableKStreamSet();
-      
+
     var testScheduler = new TestScheduler();
 
     //Act
@@ -423,7 +422,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
   {
     //Arrange
     var query = CreateTestableKStreamSet();
-      
+
     var testScheduler = new TestScheduler();
 
     //Act
@@ -436,7 +435,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
   private static IQbservable<Location> CreateStreamSource()
   {
     var context = new TestableDbProvider(TestParameters.KsqlDbUrl);
-      
+
     return context.CreatePushQuery<Location>();
   }
 
@@ -454,10 +453,10 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
 
     context.KSqlDbRestApiClientMock.Setup(c => c.ExecuteStatementAsync(It.IsAny<KSqlDbStatement>(), It.IsAny<CancellationToken>()))
       .ReturnsAsync(new HttpResponseMessage());
-      
+
     return context.CreatePushQuery<string>();
   }
-    
+
   [Test]
   public void SelectPredicate_BuildKSql_PrintsPredicate()
   {
@@ -471,7 +470,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
     //Assert
     ksql.Should().BeEquivalentTo($"SELECT LCASE({nameof(Location.Latitude)}) != LCASE('HI') FROM Locations EMIT CHANGES;");
   }
-    
+
   [Test]
   public void WhereIsNotNull_BuildKSql_PrintsQuery()
   {
@@ -541,7 +540,7 @@ WHERE Id = '{uniqueId}' EMIT CHANGES;".ReplaceLineEndings();
   {
     return context.CreatePushQuery<T>(tableName).Where(l => l.Id == uniqueId);
   }
-  
+
   [Test]
   public async Task InsertIntoAsync()
   {

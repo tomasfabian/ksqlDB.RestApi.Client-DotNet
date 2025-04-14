@@ -1,7 +1,6 @@
 using FluentAssertions;
-using ksqlDb.RestApi.Client.ProtoBuf.Tests.Models;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ksqlDb.RestApi.Client.ProtoBuf.Tests.Models;
 using Ninject;
 using NUnit.Framework;
 using UnitTests;
@@ -9,10 +8,10 @@ using UnitTests;
 namespace ksqlDb.RestApi.Client.ProtoBuf.Tests.KSql.RestApi;
 
 public class KSqlDbQueryProviderTests : TestBase
-{  
+{
   private TestableKSqlDbQueryProvider ClassUnderTest { get; set; } = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();

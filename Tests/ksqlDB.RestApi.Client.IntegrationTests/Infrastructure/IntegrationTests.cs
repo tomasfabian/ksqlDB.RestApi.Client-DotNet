@@ -2,12 +2,12 @@ using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDb.RestApi.Client.IntegrationTests.Infrastructure;
 
-[TestClass]
+[TestFixture]
 public abstract class IntegrationTests : TestBase
 {
   protected static KSqlDbRestApiProvider RestApiProvider = null!;
@@ -25,7 +25,7 @@ public abstract class IntegrationTests : TestBase
     }
   }
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -45,10 +45,11 @@ public abstract class IntegrationTests : TestBase
     return new KSqlDBContext(ContextOptions, modelBuilder);
   }
 
-  [TestCleanup]
+  [TearDown]
   public override void TestCleanup()
   {
     Context.DisposeAsync().GetAwaiter().GetResult();
+    Context.Dispose();
 
     base.TestCleanup();
   }
@@ -62,7 +63,7 @@ public abstract class IntegrationTests : TestBase
 
     if (expectedItemsCount.HasValue)
       source = source.Take(expectedItemsCount.Value);
-      
+
     await foreach (var item in source.WithCancellation(cts.Token))
     {
       actualValues.Add(item);

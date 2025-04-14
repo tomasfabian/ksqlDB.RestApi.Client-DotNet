@@ -1,81 +1,63 @@
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Functions;
 
-[TestClass]
+[TestFixture]
 public class KSqlInvocationFunctionsExtensionsTests : TestBase
 {
-  [TestMethod]
-  [ExpectedException(typeof(InvalidOperationException))]
+  [Test]
   public void Transform_ThrowsInvalidOperationException()
   {
-    //Arrange
-
-    //Act
-    var kSqlFunctions = K.Functions.Transform(Array.Empty<int>(), c => c);
-
     //Assert
+    Assert.Throws<InvalidOperationException>(
+      () => K.Functions.Transform(Array.Empty<int>(), c => c)
+    );
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(InvalidOperationException))]
+  [Test]
   public void Filter_ThrowsInvalidOperationException()
   {
-    //Arrange
-
-    //Act
-    var kSqlFunctions = K.Functions.Filter(Array.Empty<int>(), c => true);
-
     //Assert
+    Assert.Throws<InvalidOperationException>(
+      () => K.Functions.Filter(Array.Empty<int>(), c => true)
+    );
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(InvalidOperationException))]
+  [Test]
   public void Reduce_ThrowsInvalidOperationException()
   {
-    //Arrange
-
-    //Act
-    var kSqlFunctions = K.Functions.Reduce(Array.Empty<int>(), 0, (x, y) => x);
-
     //Assert
+    Assert.Throws<InvalidOperationException>(
+      () => K.Functions.Reduce(Array.Empty<int>(), 0, (x, y) => x)
+    );
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(InvalidOperationException))]
+  [Test]
   public void TransformMap_ThrowsInvalidOperationException()
   {
-    //Arrange
-
-    //Act
-    var kSqlFunctions = K.Functions.Transform(new Dictionary<int, string>(), c => c);
-
     //Assert
+    Assert.Throws<InvalidOperationException>(
+      () => K.Functions.Transform(new Dictionary<int, string>(), c => c)
+    );
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(InvalidOperationException))]
+  [Test]
   public void FilterMap_ThrowsInvalidOperationException()
   {
-    //Arrange
-
-    //Act
-    var kSqlFunctions = K.Functions.Filter(new Dictionary<int, string>(), c => true);
-
     //Assert
+    Assert.Throws<InvalidOperationException>(
+      () => K.Functions.Filter(new Dictionary<int, string>(), c => true)
+    );
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(InvalidOperationException))]
+  [Test]
   public void ReduceMap_ThrowsInvalidOperationException()
   {
-    //Arrange
-
-    //Act
-    var kSqlFunctions = K.Functions.Reduce(new Dictionary<int, string>(), 0, (x, y) => x);
-
     //Assert
+    Assert.Throws<InvalidOperationException>(
+      () => K.Functions.Reduce(new Dictionary<int, string>(), 0, (x, y) => x)
+    );
   }
 }

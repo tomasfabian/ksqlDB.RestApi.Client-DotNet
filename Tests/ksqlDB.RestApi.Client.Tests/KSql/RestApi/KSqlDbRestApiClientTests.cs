@@ -95,7 +95,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     httpRequestMessage.RequestUri.Should().Be("/ksql");
     httpRequestMessage.Content!.Headers!.ContentType!.MediaType.Should().Be(KSqlDbRestApiClient.MediaType);
   }
-    
+
   [Test]
   public async Task CreateHttpRequestMessage_HttpRequestMessage_ContentWasSet()
   {
@@ -227,7 +227,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
     //Assert
     var expectedContent = GetExpectedContent(StatementTemplates.ShowQueries);
-      
+
     VerifySendAsync(expectedContent);
 
     queriesResponses[0].StatementText.Should().Be(StatementTemplates.ShowQueries);
@@ -251,7 +251,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
     //Assert
     var expectedContent = GetExpectedContent(StatementTemplates.ShowTopics);
-      
+
     VerifySendAsync(expectedContent);
 
     topicsResponses[0].StatementText.Should().Be(StatementTemplates.ShowTopics);
@@ -271,7 +271,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
     //Assert
     var expectedContent = GetExpectedContent(StatementTemplates.ShowAllTopics);
-      
+
     VerifySendAsync(expectedContent);
 
     topicsResponses[0].StatementText.Should().Be(StatementTemplates.ShowAllTopics);
@@ -291,7 +291,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     //Assert
     responses.Should().NotBeNull();
     var expectedContent = GetExpectedContent(StatementTemplates.ShowTopicsExtended);
-      
+
     VerifySendAsync(expectedContent);
   }
 
@@ -329,7 +329,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     string terminateStatement = StatementTemplates.TerminatePersistentQuery(queryId);
 
     var expectedContent = GetExpectedContent(terminateStatement);
-      
+
     VerifySendAsync(expectedContent);
 
     string expectedStatement = StatementTemplates.TerminatePersistentQuery(queryId);
@@ -389,7 +389,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
     //Assert
     var expectedContent = GetExpectedContent(StatementTemplates.ShowStreams);
-      
+
     VerifySendAsync(expectedContent);
 
     streamsResponses[0].StatementText.Should().Be(StatementTemplates.ShowStreams);
@@ -410,7 +410,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
     //Assert
     var expectedContent = GetExpectedContent(StatementTemplates.ShowTables);
-      
+
     VerifySendAsync(expectedContent);
 
     tablesResponses[0].StatementText.Should().Be(StatementTemplates.ShowTables);
@@ -432,7 +432,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     //Assert
     response.Should().NotBeNull();
     var expectedContent = GetExpectedContent(StatementTemplates.DropStream(streamName));
-      
+
     VerifySendAsync(expectedContent);
   }
 
@@ -472,7 +472,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     string streamName = nameof(TestStream);
     bool useIfExistsClause = true;
     bool deleteTopic = true;
-      
+
     //Act
     var response = await ClassUnderTest.DropStreamAsync(streamName, useIfExistsClause, deleteTopic);
 
@@ -497,7 +497,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     //Assert
     response.Should().NotBeNull();
     var expectedContent = GetExpectedContent(StatementTemplates.DropTable(tableName));
-      
+
     VerifySendAsync(expectedContent);
   }
 
@@ -597,6 +597,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     [IgnoreByInserts]
     public long RowTime { get; set; }
     public string Title { get; set; }
+
     [Key]
     public int Id { get; set; }
     public string Release_Date { get; set; }
@@ -638,7 +639,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     response[0].TopicName.Should().Be(topicName);
     response[0].Exists.Should().BeTrue();
   }
-  
+
   [Test]
   public async Task AssertTopicExistsAsync_ReturnsFalse()
   {

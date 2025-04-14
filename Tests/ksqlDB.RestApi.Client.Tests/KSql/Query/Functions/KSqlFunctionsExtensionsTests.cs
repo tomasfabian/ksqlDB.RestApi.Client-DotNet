@@ -1,84 +1,54 @@
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using UnitTests;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Functions;
 
-[TestClass]
+[TestFixture]
 public class KSqlFunctionsExtensionsTests : TestBase
 {
-  [TestMethod]
-  [ExpectedException(typeof(InvalidOperationException))]
+  [Test]
   public void Like_ThrowsInvalidOperationException()
   {
-    //Arrange
-
-    //Act
-    var kSqlFunctions = KSqlFunctions.Instance.Like("", "");
-
     //Assert
+    Assert.Throws<InvalidOperationException>(() => KSqlFunctions.Instance.Like("", ""));
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(InvalidOperationException))]
+  [Test]
   public void Trim_ThrowsInvalidOperationException()
   {
-    //Arrange
-
-    //Act
-    string kSqlFunctions = KSqlFunctions.Instance.Trim("");
-
     //Assert
+    Assert.Throws<InvalidOperationException>(() => KSqlFunctions.Instance.Trim(""));
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(InvalidOperationException))]
+  [Test]
   public void LPad_ThrowsInvalidOperationException()
   {
-    //Arrange
-
-    //Act
-    var kSqlFunctions = KSqlFunctions.Instance.LPad("", 2, "");
-
     //Assert
+    Assert.Throws<InvalidOperationException>(() => KSqlFunctions.Instance.LPad("", 2, ""));
   }
-    
-  [TestMethod]
-  [ExpectedException(typeof(InvalidOperationException))]
+
+  [Test]
   public void RPad_ThrowsInvalidOperationException()
   {
-    //Arrange
-
-    //Act
-    var kSqlFunctions = KSqlFunctions.Instance.RPad("", 2, "");
-
     //Assert
+    Assert.Throws<InvalidOperationException>(() => KSqlFunctions.Instance.RPad("", 2, ""));
   }
 
-  [TestMethod]
-  [ExpectedException(typeof(InvalidOperationException))]
+  [Test]
   public void Substring_ThrowsInvalidOperationException()
   {
-    //Arrange
-
-    //Act
-    var kSqlFunctions = KSqlFunctions.Instance.Substring("", 2, 2);
-
     //Assert
+    Assert.Throws<InvalidOperationException>(() => KSqlFunctions.Instance.Substring("", 2, 2));
   }
 
   #region Date and time
 
-  [TestMethod]
-  [ExpectedException(typeof(InvalidOperationException))]
+  [Test]
   public void DateToString_ThrowsInvalidOperationException()
   {
-    //Arrange
-
-    //Act
-    string kSqlFunctions = KSqlFunctions.Instance.DateToString(1, "");
-
     //Assert
+    Assert.Throws<InvalidOperationException>(() => KSqlFunctions.Instance.DateToString(1, ""));
   }
 
   #endregion

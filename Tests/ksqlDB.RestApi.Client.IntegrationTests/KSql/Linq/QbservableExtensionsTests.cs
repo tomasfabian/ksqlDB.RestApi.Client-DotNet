@@ -12,9 +12,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Exceptions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
-using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq;
 
@@ -86,8 +84,8 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
       Tweet1, Tweet2
     };
 
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
-    CollectionAssert.AreEqual(expectedValues, actualValues);
+    actualValues.Count.Should().Be(expectedItemsCount);
+    actualValues.Should().BeEquivalentTo(expectedValues);
   }
 
   [Test]
@@ -109,8 +107,8 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
       Tweet1
     };
 
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
-    CollectionAssert.AreEqual(expectedValues, actualValues);
+    actualValues.Count.Should().Be(expectedItemsCount);
+    actualValues.Should().BeEquivalentTo(expectedValues);
   }
 
   [Test]
@@ -127,8 +125,8 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
-    Assert.AreEqual(actualValues[0].Message, Tweet2.Message);
+    actualValues.Count.Should().Be(expectedItemsCount);
+    actualValues[0].Message.Should().Be(Tweet2.Message);
   }
 
   [Test]
@@ -145,8 +143,8 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
-    Assert.AreEqual(actualValues[0].Amount, Tweet2.Amount);
+    actualValues.Count.Should().Be(expectedItemsCount);
+    actualValues[0].Amount.Should().Be(Tweet2.Amount);
   }
 
   [Test]
@@ -166,7 +164,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     await semaphore.WaitAsync(timeOut);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
   }
 
   [Test]
@@ -185,7 +183,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     await semaphore.WaitAsync(timeOut);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     subscription.QueryId.Should().NotBeNullOrEmpty();
   }
 
@@ -242,12 +240,12 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     await cts.CancelAsync();
 
     //Assert
-    Assert.AreEqual(0, actualValues.Count);
+    actualValues.Count.Should().Be(0);
     subscription.QueryId.Should().NotBeNullOrEmpty();
   }
 
   [Test]
-  [NUnit.Framework.Ignore("TODO")]
+  [Ignore("TODO")]
   public async Task SubscribeOn_Blocks()
   {
     //Arrange
@@ -264,7 +262,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
 
     //Assert
     subscription.QueryId.Should().NotBeNullOrEmpty();
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
   }
 
   [Test]
@@ -287,7 +285,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     //Assert
     observeOnThread.Should().NotBeNull();
     subscription.QueryId.Should().NotBeNullOrEmpty();
-    Assert.AreNotEqual(currentThread, observeOnThread!.Value);
+    observeOnThread!.Value.Should().NotBe(currentThread);
   }
 
   [Test]
@@ -331,7 +329,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     await semaphore.WaitAsync(timeOut);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
   }
 
   [Test]
@@ -349,13 +347,13 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
 
-    Assert.AreEqual(1, actualValues[0].Count);
-    Assert.AreEqual(Tweet1.Id, actualValues[0].Id);
+    actualValues[0].Count.Should().Be(1);
+    actualValues[0].Id.Should().Be(Tweet1.Id);
 
-    Assert.AreEqual(1, actualValues[1].Count);
-    Assert.AreEqual(Tweet2.Id, actualValues[1].Id);
+    actualValues[1].Count.Should().Be(1);
+    actualValues[1].Id.Should().Be(Tweet2.Id);
   }
 
   [Test]
@@ -374,13 +372,13 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
 
-    Assert.AreEqual(1, actualValues[0].Count);
-    Assert.AreEqual(Tweet1.Id, actualValues[0].Id);
+    actualValues[0].Count.Should().Be(1);
+    actualValues[0].Id.Should().Be(Tweet1.Id);
 
-    Assert.AreEqual(1, actualValues[1].Count);
-    Assert.AreEqual(Tweet2.Id, actualValues[1].Id);
+    actualValues[1].Count.Should().Be(1);
+    actualValues[1].Id.Should().Be(Tweet2.Id);
   }
 
   [Test]
@@ -399,17 +397,17 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
 
-    Assert.AreEqual(1, actualValues[0].Count);
-    Assert.AreEqual(Tweet1.Id, actualValues[0].Id);
+    actualValues[0].Count.Should().Be(1);
+    actualValues[0].Id.Should().Be(Tweet1.Id);
 
-    Assert.AreEqual(1, actualValues[1].Count);
-    Assert.AreEqual(Tweet2.Id, actualValues[1].Id);
+    actualValues[1].Count.Should().Be(1);
+    actualValues[1].Id.Should().Be(Tweet2.Id);
   }
 
   [Test]
-  [NUnit.Framework.Ignore("fix test")]
+  [Ignore("fix test")]
   public async Task WindowedBy_WithFinalOutputRefinement()
   {
     //Arrange
@@ -454,7 +452,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
   }
 
   [Test]
@@ -477,7 +475,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
   }
 
   [Test]
@@ -496,8 +494,8 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
-    Assert.AreEqual(actualValues[0].Id, 1);
+    actualValues.Count.Should().Be(expectedItemsCount);
+    actualValues[0].Id.Should().Be(1);
   }
 
   [Test]
@@ -516,7 +514,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Should().BeTrue();
   }
 
@@ -554,7 +552,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
       tweet3
     };
 
-    CollectionAssert.AreEqual(expectedValues, actualValues);
+    actualValues.Should().BeEquivalentTo(expectedValues);
   }
 
   [Test]
@@ -600,7 +598,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Should().Be(name);
   }
 
@@ -622,7 +620,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Name.Should().Be("E.T.");
   }
 
@@ -641,7 +639,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Year.Should().Be(year);
   }
 
@@ -690,7 +688,7 @@ WHERE MESSAGE = 'ET' EMIT CHANGES;");
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    CollectionAssert.AreEqual(new[] { 1, 2 }, actualValues[0]);
+    actualValues[0].Should().BeEquivalentTo(new[] { 1, 2 });
   }
 
   private record MyStruct

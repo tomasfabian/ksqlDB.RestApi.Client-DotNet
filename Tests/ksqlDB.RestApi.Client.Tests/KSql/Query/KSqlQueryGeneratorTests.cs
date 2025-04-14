@@ -122,11 +122,12 @@ WHERE {idColumnName} = '1' EMIT CHANGES;";
   {
     public int Id { get; set; }
   }
+
   private class Derived : Base
   {
     public string Description { get; set; }
   }
-  
+
   [Test]
   public void BuildKSql_ModelBuilder_HasColumnNameOverride_ForPropertyInBaseClass()
   {
@@ -140,7 +141,7 @@ WHERE {idColumnName} = '1' EMIT CHANGES;";
       .CreatePushQuery<Derived>()
       .Where(c => c.Id == 1)
       .Select(c => c.Id);
-    
+
     //Act
     var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
 
@@ -220,7 +221,7 @@ EMIT CHANGES;".ReplaceLineEndings();
   }
 
   [Test]
-  [NUnit.Framework.Ignore("TODO")]
+  [Ignore("TODO")]
   public void BuildKSql_SelectFrom3MultiJoinSameTypePropertyWithJsonPropertyNameAttribute()
   {
     //Arrange
@@ -646,7 +647,7 @@ WHERE Dt BETWEEN '0001-01-01' AND '9999-12-31' EMIT CHANGES;".ReplaceLineEndings
 
     ksql.Should().BeEquivalentTo(expectedKsql);
   }
-    
+
   #endregion
 
   #endregion

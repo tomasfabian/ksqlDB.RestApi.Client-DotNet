@@ -1,6 +1,6 @@
 using ksqlDb.RestApi.Client.Tests.Fakes.Http;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using NUnit.Framework;
 using UnitTests;
 using IHttpClientFactory = ksqlDB.RestApi.Client.KSql.RestApi.Http.IHttpClientFactory;
 
@@ -12,12 +12,19 @@ public abstract class KSqlDbRestApiClientTestsBase : TestBase
   protected HttpClient HttpClient = null!;
   protected Mock<HttpMessageHandler> HttpMessageHandlerMock = null!;
 
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
 
     HttpClientFactory = Mock.Of<IHttpClientFactory>();
+  }
+
+  [TearDown]
+  public override void TestCleanup()
+  {
+    HttpClient?.Dispose();
+    base.TestCleanup();
   }
 
   protected void CreateHttpMocks(string responseContents)

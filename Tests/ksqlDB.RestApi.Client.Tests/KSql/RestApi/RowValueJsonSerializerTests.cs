@@ -1,16 +1,15 @@
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using FluentAssertions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDb.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Responses;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
+using ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators;
 using NUnit.Framework;
 using UnitTests;
-using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
-using ksqlDb.RestApi.Client.Tests.KSql.RestApi.Generators;
-using System.Text.Json.Serialization.Metadata;
-using ksqlDb.RestApi.Client.FluentAPI.Builders;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 
@@ -218,6 +217,7 @@ public class RowValueJsonSerializerTests : TestBase
   {
     public string Title { get; set; } = null!;
     public int Id { get; set; }
+
     [JsonPropertyName("RELEASE_YEAR")]
     public int ReleaseYear { get; set; }
   }
@@ -421,7 +421,7 @@ public class RowValueJsonSerializerTests : TestBase
     };
 
     //Assert
-    Assert.ThrowsException<InvalidOperationException>(() =>
+    Assert.Throws<InvalidOperationException>(() =>
     {
       //Act
       ClassUnderTest = new RowValueJsonSerializer(queryStreamHeader);

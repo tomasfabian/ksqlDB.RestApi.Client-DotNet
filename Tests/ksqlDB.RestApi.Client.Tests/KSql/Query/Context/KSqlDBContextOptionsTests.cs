@@ -3,17 +3,15 @@ using ksqlDB.RestApi.Client.KSql.Config;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 using UnitTests;
-using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Context;
 
 public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
 {
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -86,8 +84,9 @@ public class KSqlDBContextOptionsTests : TestBase<KSqlDBContextOptions>
     //Act
 
     //Assert
-    Assert.ThrowsException<KeyNotFoundException>(() =>
-      ClassUnderTest.QueryStreamParameters[parameterName].Should().BeEmpty());
+    Assert.Throws<KeyNotFoundException>(
+      () => ClassUnderTest.QueryStreamParameters[parameterName].Should().BeEmpty()
+    );
   }
 
   [Test]

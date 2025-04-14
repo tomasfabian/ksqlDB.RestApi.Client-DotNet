@@ -28,6 +28,12 @@ public class PullQueryExtensionsTests : TestBase
     DbProvider.ContextOptions.EndpointType = EndpointType.Query;
   }
 
+  [TearDown]
+  public void TearDown()
+  {
+    DbProvider.Dispose();
+  }
+
   [Test]
   public async Task CreatePullQuery()
   {
@@ -40,7 +46,7 @@ public class PullQueryExtensionsTests : TestBase
     var result = await DbProvider.CreatePullQuery<IoTSensorStats>()
       .Where(c => c.SensorId == sensorId)
       .FirstOrDefaultAsync();
-      
+
     //Assert
     result.Should().NotBeNull();
     result!.SensorId.Should().Be(sensorId);
@@ -57,7 +63,7 @@ public class PullQueryExtensionsTests : TestBase
       .Where(c => c.SensorId == sensorId)
       .Select(c => new { c.SensorId, Avg = c.AvgValue })
       .ToQueryString();
-      
+
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT {nameof(IoTSensorStats.SensorId)}, AvgValue AS Avg FROM {nameof(IoTSensorStats)}
 WHERE SensorId = '{sensorId}';".ReplaceLineEndings());
@@ -67,7 +73,7 @@ WHERE SensorId = '{sensorId}';".ReplaceLineEndings());
   public void CreatePullQuery_ToQueryString()
   {
     //Arrange
-    string sensorId = "sensor-1";      
+    string sensorId = "sensor-1";
     var query = DbProvider.CreatePullQuery<IoTSensorStats>()
       .Where(c => c.SensorId == sensorId);
 
@@ -88,7 +94,7 @@ WHERE SensorId = '{sensorId}';".ReplaceLineEndings());
   public void CreatePullQuery_TableNameWasOverriden()
   {
     //Arrange
-    string sensorId = "sensor-1";      
+    string sensorId = "sensor-1";
     var query = DbProvider.CreatePullQuery<IoTSensorStats>(MaterializedViewName)
       .Where(c => c.SensorId == sensorId);
 
@@ -104,7 +110,7 @@ WHERE SensorId = '{sensorId}';".ReplaceLineEndings());
   public void CreatePullQuery_WindowBounds_LongTypeDateFormat()
   {
     //Arrange
-    string sensorId = "sensor-1";      
+    string sensorId = "sensor-1";
     var query = DbProvider.CreatePullQuery<IoTSensorStats>(MaterializedViewName)
       .Where(c => c.SensorId == sensorId);
 
@@ -123,7 +129,7 @@ WHERE SensorId = '{sensorId}' AND (WINDOWSTART > {windowStart}) AND (WINDOWEND <
   public void CreatePullQuery_WindowBounds_StringTypeDateFormat()
   {
     //Arrange
-    string sensorId = "sensor-1";      
+    string sensorId = "sensor-1";
     var query = DbProvider.CreatePullQuery<IoTSensorStats>(MaterializedViewName)
       .Where(c => c.SensorId == sensorId);
 
@@ -225,15 +231,24 @@ WHERE SensorId = '{sensorId}' AND (WINDOWSTART > '{windowStart}') AND (WINDOWEND
     return ksql.ReplaceLineEndings();
   }
 
-  [TestCase(Never, ExpectedResult = @$"SELECT prop FROM {nameof(SubProperty)}
-WHERE prop = 'test';")]
-  [TestCase(Keywords, ExpectedResult = @$"SELECT prop FROM {nameof(SubProperty)}
-WHERE prop = 'test';")]
-  [TestCase(Always, ExpectedResult = @$"SELECT `prop` FROM `{nameof(SubProperty)}`
-WHERE `prop` = 'test';")]
-  public string SelectColumnsUsingPullQueryThatHaveJsonPropertyNameAndWhere(IdentifierEscaping escaping)
+  public static IEnumerable<(IdentifierEscaping, string)> SelectColumnsUsingPullQueryThatHaveJsonPropertyNameAndWhereTestCases()
+  {
+    yield return (Never,
+      @$"SELECT prop FROM {nameof(SubProperty)}
+WHERE prop = 'test';".ReplaceLineEndings());
+    yield return (Keywords,
+      @$"SELECT prop FROM {nameof(SubProperty)}
+WHERE prop = 'test';".ReplaceLineEndings());
+    yield return (Always,
+      @$"SELECT `prop` FROM `{nameof(SubProperty)}`
+WHERE `prop` = 'test';".ReplaceLineEndings());
+  }
+
+  [TestCaseSource(nameof(SelectColumnsUsingPullQueryThatHaveJsonPropertyNameAndWhereTestCases))]
+  public void SelectColumnsUsingPullQueryThatHaveJsonPropertyNameAndWhere((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
+    var (escaping, expectedQuery) = testCase;
     var dbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
       {IdentifierEscaping = escaping, ShouldPluralizeFromItemName = false});
 
@@ -244,7 +259,8 @@ WHERE `prop` = 'test';")]
       .ToQueryString();
 
     //Assert
-    return ksql.ReplaceLineEndings();
+    var actualQuery =  ksql.ReplaceLineEndings();
+    actualQuery.Should().Be(expectedQuery);
   }
 
   private class Record

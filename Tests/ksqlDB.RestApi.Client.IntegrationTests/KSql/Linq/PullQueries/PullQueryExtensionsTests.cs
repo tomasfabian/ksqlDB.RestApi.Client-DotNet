@@ -44,6 +44,7 @@ public class PullQueryExtensionsTests
   public static async Task ClassCleanup()
   {
     await pullQueryProvider.DropEntitiesAsync();
+    context.Dispose();
   }
 
   [Test]
@@ -56,7 +57,7 @@ public class PullQueryExtensionsTests
     var result = await context.CreatePullQuery<IoTSensorStats>(SensorsPullQueryProvider.MaterializedViewName)
       .Where(c => c.SensorId == sensorId)
       .FirstOrDefaultAsync();
-      
+
     //Assert
     result.Should().NotBeNull();
     result!.SensorId.Should().Be(sensorId);
@@ -95,7 +96,7 @@ public class PullQueryExtensionsTests
       .Where(c => c.SensorId == sensorId)
       .Select(c => c.SensorId)
       .FirstOrDefaultAsync();
-      
+
     //Assert
     result.Should().NotBeNull();
     result.Should().Be(sensorId);
@@ -131,7 +132,7 @@ public class PullQueryExtensionsTests
       .Where(c => c.SensorId == sensorId)
       .Where(c => Bounds.WindowStart > windowStart && Bounds.WindowEnd <= windowEnd)
       .FirstOrDefaultAsync();
-      
+
     //Assert
     result.Should().NotBeNull();
     result!.SensorId.Should().Be(sensorId);
@@ -148,7 +149,7 @@ public class PullQueryExtensionsTests
 
     //Act
     var result = await context.ExecutePullQuery<IoTSensorStats>(ksql);
-      
+
     //Assert
     result.Should().NotBeNull();
     result!.SensorId.Should().Be(sensorId);

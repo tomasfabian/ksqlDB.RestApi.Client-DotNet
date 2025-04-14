@@ -8,9 +8,7 @@ using ksqlDb.RestApi.Client.IntegrationTests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
-using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Query.Functions;
 
@@ -22,7 +20,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
   public static async Task ClassInitialize()
   {
     RestApiProvider = KSqlDbRestApiProvider.Create();
-      
+
     moviesProvider = new MoviesProvider(RestApiProvider);
     await moviesProvider.CreateTablesAsync();
 
@@ -54,7 +52,7 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
   {
     //Arrange
     int expectedItemsCount = 1;
-      
+
     int epochDays = 18672;
     string format = "yyyy-MM-dd";
     Expression<Func<Movie, string>> expression = _ => KSqlFunctions.Instance.DateToString(epochDays, format);
@@ -65,9 +63,9 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
       //.Select(c => new { DTS = KSqlFunctions.Instance.DateToString(epochDays, format) })
       .ToAsyncEnumerable();
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Should().BeEquivalentTo("2021-02-14");
   }
 
@@ -83,14 +81,14 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     Context = CreateKSqlDbContext(EndpointType.Query);
     await EntriesTest(Context.CreatePushQuery<Movie>(MoviesTableName));
   }
-    
+
   public async Task EntriesTest(IQbservable<Movie> querySource)
   {
     //Arrange
     int expectedItemsCount = 1;
-      
+
     bool sorted = true;
-      
+
     //Act
     var source = querySource
       .Select(c => new { Col = KSqlFunctions.Instance.Entries(new Dictionary<string, string>()
@@ -98,11 +96,11 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
         { "a", "value" }
       }, sorted)})
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Col[0].K.Should().BeEquivalentTo("a");
     actualValues[0].Col[0].V.Should().BeEquivalentTo("value");
   }
@@ -112,16 +110,16 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
   {
     //Arrange
     int expectedItemsCount = 1;
-      
+
     //Act
     var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = KSqlFunctions.Instance.ArrayIntersect(new [] { 1, 2 }, new []{ 1 } )})
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Col.Length.Should().Be(1);
     actualValues[0].Col[0].Should().Be(1);
   }
@@ -131,16 +129,16 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
   {
     //Arrange
     int expectedItemsCount = 1;
-      
+
     //Act
     var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = KSqlFunctions.Instance.ArrayJoin(new [] { 1, 2 }, ";" )})
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues.Count.Should().Be(1);
     actualValues[0].Col.Should().Be("1;2");
   }
@@ -150,112 +148,112 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
   {
     //Arrange
     int expectedItemsCount = 1;
-      
+
     //Act
     var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = KSqlFunctions.Instance.ArrayLength(new [] { 1, 2 } )})
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues.Count.Should().Be(1);
     actualValues[0].Col.Should().Be(2);
   }
-    
+
   [Test]
   public async Task ArrayMin()
   {
     //Arrange
     int expectedItemsCount = 1;
-      
+
     //Act
     var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = KSqlFunctions.Instance.ArrayMin(new [] { 1, 2 } )})
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues.Count.Should().Be(1);
     actualValues[0].Col.Should().Be(1);
   }
 
   [Test]
-  [NUnit.Framework.Ignore("Cannot construct an array with all NULL elements")]
+  [Ignore("Cannot construct an array with all NULL elements")]
   public async Task ArrayMin_Null()
   {
     //Arrange
     int expectedItemsCount = 1;
-      
+
     //Act
     var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = KSqlFunctions.Instance.ArrayMin(new string [] { })})
       .ToAsyncEnumerable();
 
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues.Count.Should().Be(1);
     actualValues[0].Col.Should().BeNull();
   }
-    
+
   [Test]
   public async Task ArrayRemove()
   {
     //Arrange
     int expectedItemsCount = 1;
-      
+
     //Act
     var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = KSqlFunctions.Instance.ArrayRemove(new [] { 1, 2 }, 2)})
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues.Count.Should().Be(1);
     actualValues[0].Col.Length.Should().Be(1);
   }
-    
+
   [Test]
   public async Task ArraySort()
   {
     //Arrange
     int expectedItemsCount = 1;
-      
+
     //Act
     var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.ArraySort(new int?[]{ 3, null, 1}, ListSortDirection.Ascending)})
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    CollectionAssert.AreEquivalent(new int?[] { 1, 3, null}, actualValues[0].Col);
+    actualValues[0].Col.Should().BeEquivalentTo(new int?[] { 1, 3, null });
   }
-    
+
   [Test]
   public async Task ArrayUnion()
   {
     //Arrange
     int expectedItemsCount = 1;
-      
+
     //Act
     var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.ArrayUnion(new int?[]{ 3, null, 1}, new int?[]{ 4, null})})
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    CollectionAssert.AreEquivalent(new int?[] { 3, null, 1, 4}, actualValues[0].Col);
+    actualValues[0].Col.Should().BeEquivalentTo(new int?[] { 3, null, 1, 4 });
   }
-    
+
   [Test]
   public async Task Concat()
   {
@@ -267,15 +265,15 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.Concat(c.Title, message), ColWS = K.Functions.ConcatWS(" - ", c.Title, message) })
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Col.Should().Be($"{MoviesProvider.Movie1.Title}{message}");
     actualValues[0].ColWS.Should().Be($"{MoviesProvider.Movie1.Title} - {message}");
   }
-    
+
   [Test]
   public async Task ToBytes()
   {
@@ -283,19 +281,20 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
 
     //Act
-    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
+    var source = Context
+      .CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.ToBytes(c.Title, "utf8") })
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
 
     string result = Encoding.UTF8.GetString(actualValues[0].Col);
     result.Should().Be(MoviesProvider.Movie1.Title);
   }
-    
+
   [Test]
   public async Task FromBytes()
   {
@@ -306,17 +305,17 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.FromBytes(K.Functions.ToBytes(c.Title, "utf8"), "utf8") })
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
 
     actualValues[0].Col.Should().BeEquivalentTo(MoviesProvider.Movie1.Title);
   }
-    
+
   [Test]
-  [NUnit.Framework.Ignore("TODO")]
+  [Ignore("TODO")]
   public async Task FromBytes_CapturedVariable()
   {
     //Arrange
@@ -328,11 +327,11 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.FromBytes(bytes, "utf8") })
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
 
     actualValues[0].Col.Should().BeEquivalentTo(MoviesProvider.Movie1.Title);
   }
@@ -347,14 +346,14 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.AsMap(new []{ "1", "2" }, new []{ 11, 22 }) })
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Col["1"].Should().Be(11);
   }
-    
+
   [Test]
   public async Task JsonArrayContains()
   {
@@ -362,17 +361,18 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     int expectedItemsCount = 1;
 
     //Act
-    var source = Context.CreatePushQuery<Movie>(MoviesTableName)
+    var source = Context
+      .CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Col = K.Functions.JsonArrayContains("[1, 2, 3]", 2) })
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Col.Should().BeTrue();
   }
-    
+
   [Test]
   public async Task MapKeys()
   {
@@ -387,11 +387,11 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
         {"banana", 20}
       }) })
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Col[0].Should().Be("banana");
     actualValues[0].Col[1].Should().Be("apple");
   }
@@ -410,11 +410,11 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(expression)
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Should().Be(MoviesProvider.Movie1.Title);
   }
 
@@ -433,11 +433,11 @@ public class KSqlFunctionsExtensionsTests : Infrastructure.IntegrationTests
     var source = Context.CreatePushQuery<Movie>(MoviesTableName)
       .Select(c => new { Extracted = K.Functions.ExtractJsonField(json, jsonPath) })
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Extracted.Should().Be("gcp836Csd");
   }
 }

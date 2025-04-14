@@ -4,7 +4,6 @@ using ksqlDb.RestApi.Client.IntegrationTests.Models;
 using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 
 namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq;
@@ -50,7 +49,7 @@ public class AggregationTimeTests : Infrastructure.IntegrationTests
     await RestApiProvider.InsertIntoAsync(Times2, insertProperties);
   }
 
-  [ClassCleanup]
+  [OneTimeTearDown]
   public static async Task ClassCleanup()
   {
 

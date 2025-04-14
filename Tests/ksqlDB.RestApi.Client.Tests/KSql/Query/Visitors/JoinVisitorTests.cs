@@ -28,6 +28,13 @@ public class JoinVisitorTests : TestBase
     KSqlDbContext = new KSqlDBContext(contextOptions, new ModelBuilder());
   }
 
+  [TearDown]
+  public override void TestCleanup()
+  {
+    KSqlDbContext.Dispose();
+    base.TestCleanup();
+  }
+
   private static string MovieAlias => "movie";
   private static string ActorAlias => "actor";
 
@@ -39,17 +46,17 @@ public class JoinVisitorTests : TestBase
       @$"SELECT {MovieAlias}.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
 INNER JOIN LeadActors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords,
       @$"SELECT {MovieAlias}.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
 INNER JOIN LeadActors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always,
       @$"SELECT `{MovieAlias}`.`Id` `Id`, `{MovieAlias}`.`Title` `Title`, `{MovieAlias}`.`Release_Year` `Release_Year`, TRIM(`{ActorAlias}`.`Actor_Name`) `ActorName`, UCASE(`{ActorAlias}`.`Actor_Name`) `UpperActorName`, `{ActorAlias}`.`Title` AS `ActorTitle` FROM `Movies` `{MovieAlias}`
 INNER JOIN `LeadActors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(JoinTestCases))]
@@ -88,17 +95,17 @@ EMIT CHANGES;");
       @$"SELECT {MovieAlias}.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
 INNER JOIN Lead_Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords,
       @$"SELECT {MovieAlias}.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
 INNER JOIN Lead_Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always,
       @$"SELECT `{MovieAlias}`.`Id` `Id`, `{MovieAlias}`.`Title` `Title`, `{MovieAlias}`.`Release_Year` `Release_Year`, TRIM(`{ActorAlias}`.`Actor_Name`) `ActorName`, UCASE(`{ActorAlias}`.`Actor_Name`) `UpperActorName`, `{ActorAlias}`.`Title` AS `ActorTitle` FROM `Movies` `{MovieAlias}`
 INNER JOIN `Lead_Actors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(JoinPluralizedJointItemTestCases))]
@@ -137,17 +144,17 @@ EMIT CHANGES;");
       @$"SELECT myMovie.Title Title, LEN({ActorAlias}.Actor_Name) Length FROM Movies myMovie
 INNER JOIN Lead_Actors {ActorAlias}
 ON myMovie.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords,
       @$"SELECT myMovie.Title Title, LEN({ActorAlias}.Actor_Name) Length FROM Movies myMovie
 INNER JOIN Lead_Actors {ActorAlias}
 ON myMovie.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always,
       @$"SELECT `myMovie`.`Title` `Title`, LEN(`{ActorAlias}`.`Actor_Name`) `Length` FROM `Movies` `myMovie`
 INNER JOIN `Lead_Actors` `{ActorAlias}`
 ON `myMovie`.`Title` = `{ActorAlias}`.`Title`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(JoinAndSelectWithAliasesPrintsInnerJoinTestCases))]
@@ -185,15 +192,15 @@ EMIT CHANGES;");
     yield return (Never, @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
 INNER JOIN MovieExts ext
 ON {MovieAlias}.Title = ext.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords, @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
 INNER JOIN MovieExts ext
 ON {MovieAlias}.Title = ext.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always, @$"SELECT `{MovieAlias}`.`Title` `Title` FROM `Movies` `{MovieAlias}`
 INNER JOIN `MovieExts` `ext`
 ON `{MovieAlias}`.`Title` = `ext`.`Title`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(SameStreamNameDifferentAliasesTestCases))]
@@ -226,15 +233,15 @@ EMIT CHANGES;");
     yield return (Never, @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
 INNER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords, @$"SELECT {MovieAlias}.Title Title FROM Movies {MovieAlias}
 INNER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always, @$"SELECT `{MovieAlias}`.`Title` `Title` FROM `Movies` `{MovieAlias}`
 INNER JOIN `Actors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(InnerJoinOverrideStatementNoProjectionFromJoinTableTestCases))]
@@ -268,17 +275,17 @@ EMIT CHANGES;");
       @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 INNER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords,
       @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 INNER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always,
       @$"SELECT `{MovieAlias}`.`Title` `Title`, `{ActorAlias}`.`Actor_Name` AS `ActorName` FROM `Movies` `{MovieAlias}`
 INNER JOIN `Actors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(InnerJoinOverrideStatementTestCases))]
@@ -312,15 +319,15 @@ EMIT CHANGES;");
     yield return (Never, @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 INNER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords, @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 INNER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always, @$"SELECT `{MovieAlias}`.`Title` `Title`, `{ActorAlias}`.`Actor_Name` AS `ActorName` FROM `Movies` `{MovieAlias}`
 INNER JOIN `Actors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(InnerJoinQuerySyntaxTestCases))]
@@ -349,10 +356,12 @@ EMIT CHANGES;");
   {
     public int Id { get; set; }
   }
+
   private record Shipment
   {
     public int Id { get; set; }
   }
+
   struct Foo
   {
     public int Prop { get; set; }
@@ -366,21 +375,21 @@ INNER JOIN Shipments S1
 ON O.OrderId = S1.Id
 INNER JOIN Payments P1
 ON O.OrderId = P1.Id
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords,
       @"SELECT STRUCT(Prop := 42) value, O.OrderId AS orderId, S1.Id AS shipmentId, P1.Id AS paymentId FROM Orders O
 INNER JOIN Shipments S1
 ON O.OrderId = S1.Id
 INNER JOIN Payments P1
 ON O.OrderId = P1.Id
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always,
       @"SELECT STRUCT(`Prop` := 42) `value`, `O`.`OrderId` AS `orderId`, `S1`.`Id` AS `shipmentId`, `P1`.`Id` AS `paymentId` FROM `Orders` `O`
 INNER JOIN `Shipments` `S1`
 ON `O`.`OrderId` = `S1`.`Id`
 INNER JOIN `Payments` `P1`
 ON `O`.`OrderId` = `P1`.`Id`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(MultipleInnerJoinsQuerySyntaxTestCases))]
@@ -415,6 +424,7 @@ EMIT CHANGES;");
     public IDictionary<string, City> Dictionary { get; set; } = null!;
     public Nested Nested { get; set; } = null!;
   }
+
   private class City
   {
     public int[] Values { get; set; } = null!;
@@ -433,21 +443,21 @@ INNER JOIN Shipments s1
 ON O.OrderId = s1.Id
 INNER JOIN LambdaMaps lm
 ON O.OrderId = lm.Id
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords,
       @$"SELECT TRANSFORM(lm.{nameof(LambdaMap.Dictionary)}, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->`Values`, (x) => x * x)) A, O.OrderId AS orderId, s1.Id AS shipmentId FROM Orders O
 INNER JOIN Shipments s1
 ON O.OrderId = s1.Id
 INNER JOIN LambdaMaps lm
 ON O.OrderId = lm.Id
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always,
       @$"SELECT TRANSFORM(`lm`.`{nameof(LambdaMap.Dictionary)}`, (k, v) => CONCAT(k, '_new'), (k, v) => TRANSFORM(v->`Values`, (x) => x * x)) `A`, `O`.`OrderId` AS `orderId`, `s1`.`Id` AS `shipmentId` FROM `Orders` `O`
 INNER JOIN `Shipments` `s1`
 ON `O`.`OrderId` = `s1`.`Id`
 INNER JOIN `LambdaMaps` `lm`
 ON `O`.`OrderId` = `lm`.`Id`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(TestCasesJoinWithInvocation))]
@@ -475,7 +485,7 @@ EMIT CHANGES;");
   }
 
   [Test]
-  [NUnit.Framework.Ignore("TODO:")]
+  [Ignore("TODO:")]
   public void JoinWithSeveralOnConditions_BuildKSql_Prints()
   {
     //Arrange
@@ -499,15 +509,15 @@ EMIT CHANGES;");
     yield return (Never, @$"SELECT lm.Nested->Prop Prop, O.OrderId AS orderId FROM Orders O
 INNER JOIN LambdaMaps lm
 ON O.OrderId = lm.Id
-WHERE lm.Nested->Prop = 'Nested' EMIT CHANGES;");
+WHERE lm.Nested->Prop = 'Nested' EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords, @$"SELECT lm.Nested->Prop Prop, O.OrderId AS orderId FROM Orders O
 INNER JOIN LambdaMaps lm
 ON O.OrderId = lm.Id
-WHERE lm.Nested->Prop = 'Nested' EMIT CHANGES;");
+WHERE lm.Nested->Prop = 'Nested' EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always, @$"SELECT `lm`.`Nested`->`Prop` `Prop`, `O`.`OrderId` AS `orderId` FROM `Orders` `O`
 INNER JOIN `LambdaMaps` `lm`
 ON `O`.`OrderId` = `lm`.`Id`
-WHERE `lm`.`Nested`->`Prop` = 'Nested' EMIT CHANGES;");
+WHERE `lm`.`Nested`->`Prop` = 'Nested' EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(JoinWithNestedTypeTestCases))]
@@ -539,17 +549,17 @@ WHERE `lm`.`Nested`->`Prop` = 'Nested' EMIT CHANGES;");
       @$"SELECT CONCAT(lm.Nested->Prop, '_new') Concat, o.OrderId AS orderId FROM Orders o
 INNER JOIN LambdaMaps lm
 ON o.OrderId = lm.Id
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords,
       @$"SELECT CONCAT(lm.Nested->Prop, '_new') Concat, o.OrderId AS orderId FROM Orders o
 INNER JOIN LambdaMaps lm
 ON o.OrderId = lm.Id
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always,
       @$"SELECT CONCAT(`lm`.`Nested`->`Prop`, '_new') `Concat`, `o`.`OrderId` AS `orderId` FROM `Orders` `o`
 INNER JOIN `LambdaMaps` `lm`
 ON `o`.`OrderId` = `lm`.`Id`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(JoinWithFunctionAndNestedTypeTestCases))]
@@ -582,21 +592,21 @@ INNER JOIN Shipments S1
 ON O.OrderId = S1.Id
 INNER JOIN Payments P1
 ON O.OrderId = P1.Id
-EMIT CHANGES LIMIT 2;");
+EMIT CHANGES LIMIT 2;".ReplaceLineEndings());
     yield return (Keywords,
       @"SELECT O.OrderId AS orderId, S1.Id AS shipmentId, P1.Id AS paymentId FROM Orders O
 INNER JOIN Shipments S1
 ON O.OrderId = S1.Id
 INNER JOIN Payments P1
 ON O.OrderId = P1.Id
-EMIT CHANGES LIMIT 2;");
+EMIT CHANGES LIMIT 2;".ReplaceLineEndings());
     yield return (Always,
       @"SELECT `O`.`OrderId` AS `orderId`, `S1`.`Id` AS `shipmentId`, `P1`.`Id` AS `paymentId` FROM `Orders` `O`
 INNER JOIN `Shipments` `S1`
 ON `O`.`OrderId` = `S1`.`Id`
 INNER JOIN `Payments` `P1`
 ON `O`.`OrderId` = `P1`.`Id`
-EMIT CHANGES LIMIT 2;");
+EMIT CHANGES LIMIT 2;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(MultipleInnerJoinsQuerySyntaxWithTakeTestCase))]
@@ -632,19 +642,19 @@ LEFT JOIN Shipments sa
 ON o.OrderId = sa.Id
 INNER JOIN Payments p1
 ON o.OrderId = p1.Id
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords, @$"SELECT o.OrderId AS orderId, sa.Id AS shipmentId, p1.Id AS paymentId FROM Orders o
 LEFT JOIN Shipments sa
 ON o.OrderId = sa.Id
 INNER JOIN Payments p1
 ON o.OrderId = p1.Id
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always, @$"SELECT `o`.`OrderId` AS `orderId`, `sa`.`Id` AS `shipmentId`, `p1`.`Id` AS `paymentId` FROM `Orders` `o`
 LEFT JOIN `Shipments` `sa`
 ON `o`.`OrderId` = `sa`.`Id`
 INNER JOIN `Payments` `p1`
 ON `o`.`OrderId` = `p1`.`Id`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(JoinAndLeftJoinWithTakeTestCases))]
@@ -680,21 +690,21 @@ INNER JOIN Shipments s
 WITHIN 5 DAYS ON o.OrderId = s.Id
 INNER JOIN Payments p
 WITHIN 1 HOURS ON o.OrderId = p.Id
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords,
       @$"SELECT o.OrderId AS orderId, s.Id AS shipmentId, p.Id AS paymentId FROM Orders o
 INNER JOIN Shipments s
 WITHIN 5 DAYS ON o.OrderId = s.Id
 INNER JOIN Payments p
 WITHIN 1 HOURS ON o.OrderId = p.Id
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always,
       @$"SELECT `o`.`OrderId` AS `orderId`, `s`.`Id` AS `shipmentId`, `p`.`Id` AS `paymentId` FROM `Orders` `o`
 INNER JOIN `Shipments` `s`
 WITHIN 5 DAYS ON `o`.`OrderId` = `s`.`Id`
 INNER JOIN `Payments` `p`
 WITHIN 1 HOURS ON `o`.`OrderId` = `p`.`Id`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(JoinWithinTimeUnitTestCases))]
@@ -726,15 +736,15 @@ EMIT CHANGES;");
     yield return (Never, @$"SELECT o.OrderId AS orderId, p.Id AS paymentId FROM Orders o
 INNER JOIN Payments p
 WITHIN (1 HOURS, 5 DAYS) ON o.OrderId = p.Id
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords, @$"SELECT o.OrderId AS orderId, p.Id AS paymentId FROM Orders o
 INNER JOIN Payments p
 WITHIN (1 HOURS, 5 DAYS) ON o.OrderId = p.Id
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always, @$"SELECT `o`.`OrderId` AS `orderId`, `p`.`Id` AS `paymentId` FROM `Orders` `o`
 INNER JOIN `Payments` `p`
 WITHIN (1 HOURS, 5 DAYS) ON `o`.`OrderId` = `p`.`Id`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(JoinWithTimeUnitBeforeAfterTestCases))]
@@ -764,15 +774,15 @@ EMIT CHANGES;");
     yield return (Never, @"SELECT actor.Title AS EnduserId, actor.Actor_Name AS Name, movie.Title AS Raw FROM movies movie
 INNER JOIN actors actor
 WITHIN 1 DAYS ON EXTRACTJSONFIELD(movie.Title, '$.movie_title') = EXTRACTJSONFIELD(actor.Actor_Name, '$.actor_name')
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords, @"SELECT actor.Title AS EnduserId, actor.Actor_Name AS Name, movie.Title AS Raw FROM movies movie
 INNER JOIN actors actor
 WITHIN 1 DAYS ON EXTRACTJSONFIELD(movie.Title, '$.movie_title') = EXTRACTJSONFIELD(actor.Actor_Name, '$.actor_name')
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always, @"SELECT `actor`.`Title` AS `EnduserId`, `actor`.`Actor_Name` AS `Name`, `movie`.`Title` AS `Raw` FROM `movies` `movie`
 INNER JOIN `actors` `actor`
 WITHIN 1 DAYS ON EXTRACTJSONFIELD(`movie`.`Title`, '$.movie_title') = EXTRACTJSONFIELD(`actor`.`Actor_Name`, '$.actor_name')
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(JoinKSqlFunctionKeySelectorTestCases))]
@@ -805,17 +815,17 @@ EMIT CHANGES;");
       @$"SELECT movie.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Lead_Actors {ActorAlias}
 ON movie.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords,
       @$"SELECT movie.Id Id, {MovieAlias}.Title Title, {MovieAlias}.Release_Year Release_Year, TRIM({ActorAlias}.Actor_Name) ActorName, UCASE({ActorAlias}.Actor_Name) UpperActorName, {ActorAlias}.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Lead_Actors {ActorAlias}
 ON movie.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always,
       @$"SELECT `movie`.`Id` `Id`, `{MovieAlias}`.`Title` `Title`, `{MovieAlias}`.`Release_Year` `Release_Year`, TRIM(`{ActorAlias}`.`Actor_Name`) `ActorName`, UCASE(`{ActorAlias}`.`Actor_Name`) `UpperActorName`, `{ActorAlias}`.`Title` AS `ActorTitle` FROM `Movies` `{MovieAlias}`
 LEFT JOIN `Lead_Actors` `{ActorAlias}`
 ON `movie`.`Title` = `{ActorAlias}`.`Title`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(LeftJoinTestCases))]
@@ -854,17 +864,17 @@ EMIT CHANGES;");
       @$"SELECT {MovieAlias}.Id Id, UCASE(a.Actor_Name) UpperActorName, a.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Actors a
 ON {MovieAlias}.Title = a.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords,
       @$"SELECT {MovieAlias}.Id Id, UCASE(a.Actor_Name) UpperActorName, a.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Actors a
 ON {MovieAlias}.Title = a.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always,
       @$"SELECT `{MovieAlias}`.`Id` `Id`, UCASE(`a`.`Actor_Name`) `UpperActorName`, `a`.`Title` AS `ActorTitle` FROM `Movies` `{MovieAlias}`
 LEFT JOIN `Actors` `a`
 ON `{MovieAlias}`.`Title` = `a`.`Title`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(LeftJoinQuerySyntaxTestCases))]
@@ -899,17 +909,17 @@ EMIT CHANGES;");
       @$"SELECT {MovieAlias}.Id Id, UCASE(a.Actor_Name) UpperActorName, a.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Actors a
 ON {MovieAlias}.Title = a.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords,
       @$"SELECT {MovieAlias}.Id Id, UCASE(a.Actor_Name) UpperActorName, a.Title AS ActorTitle FROM Movies {MovieAlias}
 LEFT JOIN Actors a
 ON {MovieAlias}.Title = a.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always,
       @$"SELECT `{MovieAlias}`.`Id` `Id`, UCASE(`a`.`Actor_Name`) `UpperActorName`, `a`.`Title` AS `ActorTitle` FROM `Movies` `{MovieAlias}`
 LEFT JOIN `Actors` `a`
 ON `{MovieAlias}`.`Title` = `a`.`Title`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(TestCasesGroupJoinSelectMany))]
@@ -944,10 +954,12 @@ EMIT CHANGES;");
     public int CustomerId { get; set; }
     public int ItemId { get; set; }
   }
+
   private sealed class Customer
   {
     public int CustomerId { get; set; }
   }
+
   private sealed class Item
   {
     public int ItemId { get; set; }
@@ -962,21 +974,21 @@ LEFT JOIN Items items
 ON orders.ItemId = items.ItemId
 LEFT JOIN Customers customers
 ON orders.CustomerId = customers.CustomerId
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords,
       @"SELECT customers.CustomerId AS customerid, orders.OrderId OrderId, items.ItemId ItemId, items.ItemName ItemName FROM Orders orders
 LEFT JOIN Items items
 ON orders.ItemId = items.ItemId
 LEFT JOIN Customers customers
 ON orders.CustomerId = customers.CustomerId
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always,
       @"SELECT `customers`.`CustomerId` AS `customerid`, `orders`.`OrderId` `OrderId`, `items`.`ItemId` `ItemId`, `items`.`ItemName` `ItemName` FROM `Orders` `orders`
 LEFT JOIN `Items` `items`
 ON `orders`.`ItemId` = `items`.`ItemId`
 LEFT JOIN `Customers` `customers`
 ON `orders`.`CustomerId` = `customers`.`CustomerId`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(MultipleLeftJoinsQuerySyntax))]
@@ -1015,17 +1027,17 @@ EMIT CHANGES;");
       @$"SELECT {ActorAlias}.RowTime RowTime, {MovieAlias}.Title Title FROM Movies {MovieAlias}
 LEFT JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords,
       @$"SELECT {ActorAlias}.RowTime `RowTime`, {MovieAlias}.Title Title FROM Movies {MovieAlias}
 LEFT JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always,
       @$"SELECT `{ActorAlias}`.RowTime `RowTime`, `{MovieAlias}`.`Title` `Title` FROM `Movies` `{MovieAlias}`
 LEFT JOIN `Actors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(LeftJoinOverrideStreamNameTestCases))]
@@ -1064,17 +1076,17 @@ EMIT CHANGES;");
       @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 FULL OUTER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords,
       @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 FULL OUTER JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always,
       @$"SELECT `{MovieAlias}`.`Title` `Title`, `{ActorAlias}`.`Actor_Name` AS `ActorName` FROM `Movies` `{MovieAlias}`
 FULL OUTER JOIN `Actors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(FullOuterJoinOverrideStatementTestCases))]
@@ -1113,17 +1125,17 @@ EMIT CHANGES;");
       @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 RIGHT JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords,
       @$"SELECT {MovieAlias}.Title Title, {ActorAlias}.Actor_Name AS ActorName FROM Movies {MovieAlias}
 RIGHT JOIN Actors {ActorAlias}
 ON {MovieAlias}.Title = {ActorAlias}.Title
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always,
       @$"SELECT `{MovieAlias}`.`Title` `Title`, `{ActorAlias}`.`Actor_Name` AS `ActorName` FROM `Movies` `{MovieAlias}`
 RIGHT JOIN `Actors` `{ActorAlias}`
 ON `{MovieAlias}`.`Title` = `{ActorAlias}`.`Title`
-EMIT CHANGES;");
+EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(RightJoinOverrideStreamNameTestCases))]

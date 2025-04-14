@@ -1,15 +1,15 @@
-﻿using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
+using NUnit.Framework;
 using SqlServer.Connector.Cdc;
 using SqlServer.Connector.Cdc.Extensions;
 using UnitTests;
 
 namespace SqlServer.Connector.Tests.Cdc.Extensions;
 
-[TestClass]
+[TestFixture]
 public class OperationTypeExtensionsTests : TestBase
 {
-  [TestMethod]
+  [Test]
   public void ToChangeDataCaptureType_r_Read()
   {
     //Arrange
@@ -22,7 +22,7 @@ public class OperationTypeExtensionsTests : TestBase
     cdcTpe.Should().Be(ChangeDataCaptureType.Read);
   }
 
-  [TestMethod]
+  [Test]
   public void ToChangeDataCaptureType_c_Created()
   {
     //Arrange
@@ -35,7 +35,7 @@ public class OperationTypeExtensionsTests : TestBase
     cdcTpe.Should().Be(ChangeDataCaptureType.Created);
   }
 
-  [TestMethod]
+  [Test]
   public void ToChangeDataCaptureType_u_Updated()
   {
     //Arrange
@@ -48,7 +48,7 @@ public class OperationTypeExtensionsTests : TestBase
     cdcTpe.Should().Be(ChangeDataCaptureType.Updated);
   }
 
-  [TestMethod]
+  [Test]
   public void ToChangeDataCaptureType_d_Deleted()
   {
     //Arrange

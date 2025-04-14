@@ -28,6 +28,13 @@ public class CreateStatementExtensionsTests : TestBase
     DbProvider = new TestableDbProvider(TestParameters.KsqlDbUrl, StatementResponse);
   }
 
+  [TearDown]
+  public override void TestCleanup()
+  {
+    DbProvider.Dispose();
+    base.TestCleanup();
+  }
+
   private const string StreamName = "TestStream";
 
   [Test]
@@ -54,7 +61,7 @@ AS SELECT * FROM {nameof(Location)}s EMIT CHANGES;".ReplaceLineEndings());
     //Arrange
     var creationMetadata = new CreationMetadata
     {
-      KafkaTopic = "moviesByTitle",		
+      KafkaTopic = "moviesByTitle",
       KeyFormat = SerializationFormats.Json,
       ValueFormat = SerializationFormats.Json,
       Replicas = 1,
@@ -153,7 +160,7 @@ AS SELECT * FROM Movies WINDOW TUMBLING (SIZE 2 MINUTES) GROUP BY Title EMIT CHA
   {
     //Arrange
     var query = DbProvider.CreateOrReplaceStreamStatement(StreamName)
-      .As<Movie>()        
+      .As<Movie>()
       .Join(
         Source.Of<Lead_Actor>("Actors"),
         movie => movie.Title,
@@ -180,7 +187,7 @@ EMIT CHANGES;".ReplaceLineEndings());
   {
     //Arrange
     var query = DbProvider.CreateOrReplaceStreamStatement(StreamName)
-      .As<Movie>()        
+      .As<Movie>()
       .FullOuterJoin(
         Source.Of<Lead_Actor>("Actors"),
         movie => movie.Title,
@@ -207,7 +214,7 @@ EMIT CHANGES;".ReplaceLineEndings());
   {
     //Arrange
     var query = DbProvider.CreateOrReplaceStreamStatement(StreamName)
-      .As<Movie>()        
+      .As<Movie>()
       .LeftJoin(
         Source.Of<Lead_Actor>("Actors"),
         movie => movie.Title,
