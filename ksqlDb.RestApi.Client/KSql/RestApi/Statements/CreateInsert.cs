@@ -73,7 +73,7 @@ internal sealed class CreateInsert : EntityInfo
     var hasValue = insertValues.PropertyValues.ContainsKey(memberInfo.Format(insertProperties.IdentifierEscaping, metadataProvider));
 
     object value;
-    
+
     if (hasValue)
       value = insertValues.PropertyValues[memberInfo.Format(insertProperties.IdentifierEscaping, metadataProvider)];
     else
@@ -82,12 +82,12 @@ internal sealed class CreateInsert : EntityInfo
     return value;
   }
 
-  protected override bool IncludeMemberInfo(EntityMetadata? entityMetadata, MemberInfo memberInfo)
+  protected override bool IncludeMemberInfo(Type type, EntityMetadata? entityMetadata, MemberInfo memberInfo, bool? includeReadOnly = null)
   {
     var fieldMetadata = entityMetadata?.GetFieldMetadataBy(memberInfo);
     if (fieldMetadata is {IgnoreInDML: true})
       return false;
 
-    return base.IncludeMemberInfo(entityMetadata, memberInfo) && !memberInfo.GetCustomAttributes().OfType<IgnoreByInsertsAttribute>().Any();
+    return base.IncludeMemberInfo(type, entityMetadata, memberInfo) && !memberInfo.GetCustomAttributes().OfType<IgnoreByInsertsAttribute>().Any();
   }
 }
