@@ -31,8 +31,9 @@ Vagrant.configure("2") do |config|
 
     # Update packages
     sudo apt update
-    sudo apt install -y dotnet-sdk-8.0
+    sudo apt install -y dotnet-sdk-9.0
     sudo apt install -y nuget
+    sudo dotnet workload update
 
     cd /vagrant
 
