@@ -721,8 +721,9 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     var response = await ClassUnderTest.CreateSourceTableAsync<Movie>(creationMetadata);
 
     //Assert
-    var expectedContent = GetExpectedContent(@"CREATE SOURCE TABLE Movies (\r\n\tTitle VARCHAR,\r\n\tId INT PRIMARY KEY,\r\n\tRelease_Year INT\r\n) WITH ( KAFKA_TOPIC=\u0027moviesByTitle\u0027, VALUE_FORMAT=\u0027Json\u0027, PARTITIONS=\u00271\u0027, REPLICAS=\u00271\u0027 );".ReplaceLineEndings());
-
+    var expectedContent = GetExpectedContent(
+      @"CREATE SOURCE TABLE Movies (Title VARCHAR,Id INT PRIMARY KEY,Release_Year INT) WITH ( KAFKA_TOPIC=\u0027moviesByTitle\u0027, VALUE_FORMAT=\u0027Json\u0027, PARTITIONS=\u00271\u0027, REPLICAS=\u00271\u0027 );".ReplaceLineEndings()
+    );
     VerifySendAsync(expectedContent);
 
     response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -745,7 +746,9 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     var response = await ClassUnderTest.CreateSourceStreamAsync<Movie>(creationMetadata);
 
     //Assert
-    var expectedContent = GetExpectedContent(@"CREATE SOURCE STREAM Movies (\r\n\tTitle VARCHAR,\r\n\tId INT KEY,\r\n\tRelease_Year INT\r\n) WITH ( KAFKA_TOPIC=\u0027moviesByTitle\u0027, VALUE_FORMAT=\u0027Json\u0027, PARTITIONS=\u00271\u0027, REPLICAS=\u00271\u0027 );".ReplaceLineEndings());
+    var expectedContent = GetExpectedContent(
+      @"CREATE SOURCE STREAM Movies (Title VARCHAR,Id INT KEY,Release_Year INT) WITH ( KAFKA_TOPIC=\u0027moviesByTitle\u0027, VALUE_FORMAT=\u0027Json\u0027, PARTITIONS=\u00271\u0027, REPLICAS=\u00271\u0027 );".ReplaceLineEndings()
+    );
 
     VerifySendAsync(expectedContent);
 

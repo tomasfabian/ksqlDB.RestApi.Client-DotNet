@@ -165,7 +165,7 @@ public static class QbservableExtensions
 
     var kStreamSet = (KStreamSet<TSource>)source;
 
-    var explainStatement = CreateExplainStatement(kStreamSet);
+    var explainStatement = CreateExplainStatement(kStreamSet).Replace("\r", " ").Replace("\n", " ");
 
     var httpClientFactory = kStreamSet.GetHttpClientFactory();
 
@@ -205,7 +205,7 @@ public static class QbservableExtensions
   #endregion
 
   #region ExplainAsync
-    
+
   /// <summary>
   /// Show the execution plan for a SQL expression, show the execution plan plus additional runtime information and metrics.
   /// </summary>
@@ -446,7 +446,7 @@ public static class QbservableExtensions
         source.Expression, Expression.Quote(keySelector))
     );
   }
-    
+
   private static MethodInfo? groupByTSourceTKeyTElement3;
 
   private static MethodInfo GroupBy_TSource_TKey_TElement_3(Type source, Type key, Type element) =>
@@ -497,19 +497,19 @@ public static class QbservableExtensions
   {
     if (outer == null)
       throw new ArgumentNullException(nameof(outer));
-      
+
     if (inner == null)
       throw new ArgumentNullException(nameof(inner));
-      
+
     if (outerKeySelector == null)
       throw new ArgumentNullException(nameof(outerKeySelector));
-      
+
     if (innerKeySelector == null)
       throw new ArgumentNullException(nameof(innerKeySelector));
-      
+
     if (resultSelector == null)
       throw new ArgumentNullException(nameof(resultSelector));
-      
+
     return outer.Provider.CreateQuery<TResult>(
       Expression.Call(
         null,
@@ -574,7 +574,7 @@ public static class QbservableExtensions
       throw new ArgumentNullException(nameof(collectionSelector));
     if (resultSelector == null)
       throw new ArgumentNullException(nameof(resultSelector));
-      
+
     return source.Provider.CreateQuery<TResult>(
       Expression.Call(
         null,

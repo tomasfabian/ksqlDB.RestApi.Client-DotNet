@@ -565,8 +565,7 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     var description = await query.ExplainAsync();
 
     //Assert
-    description[0].StatementText.Should().Be(@"EXPLAIN SELECT * FROM tweetsTest
-WHERE MESSAGE = 'ET' EMIT CHANGES;");
+    description[0].StatementText.Should().Be(@"EXPLAIN SELECT * FROM tweetsTest WHERE MESSAGE = 'ET' EMIT CHANGES;");
     description[0].QueryDescription!.QueryType.Should().Be("PUSH");
     description[0].QueryDescription!.ExecutionPlan.Should().NotBeNullOrEmpty();
   }
