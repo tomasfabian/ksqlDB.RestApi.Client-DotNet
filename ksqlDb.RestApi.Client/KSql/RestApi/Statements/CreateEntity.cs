@@ -10,9 +10,15 @@ using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
-internal sealed class CreateEntity(IMetadataProvider metadataProvider) : EntityInfo(metadataProvider)
+internal sealed class CreateEntity : EntityInfo
 {
   private readonly StringBuilder stringBuilder = new();
+  private readonly IMetadataProvider metadataProvider;
+
+  public CreateEntity(IMetadataProvider metadataProvider) : base(metadataProvider)
+  {
+    this.metadataProvider = metadataProvider;
+  }
 
   internal string Print<T>(StatementContext statementContext, EntityCreationMetadata metadata, bool? ifNotExists)
   {
