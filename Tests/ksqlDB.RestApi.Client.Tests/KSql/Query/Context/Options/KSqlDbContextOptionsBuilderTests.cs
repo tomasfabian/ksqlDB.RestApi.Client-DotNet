@@ -4,18 +4,16 @@ using ksqlDB.RestApi.Client.KSql.Query.Context.Options;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 using UnitTests;
 using static System.String;
-using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Context.Options;
 
 public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBuilder>
 {
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -29,7 +27,7 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     //Arrange
 
     //Assert
-    Assert.ThrowsException<ArgumentNullException>(() =>
+    Assert.Throws<ArgumentNullException>(() =>
     {
       //Act
       _ = ClassUnderTest.UseKSqlDb(Empty).Options;

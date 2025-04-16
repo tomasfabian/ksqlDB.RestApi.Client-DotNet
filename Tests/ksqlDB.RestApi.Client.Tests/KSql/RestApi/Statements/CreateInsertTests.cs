@@ -26,8 +26,10 @@ public class CreateInsertTests
   private class Movie
   {
     public string Title { get; set; } = null!;
+
     [Key]
     public int Id { get; set; }
+
     [JsonPropertyName("ReleaseYear")]
     public int ReleaseYear { get; set; }
 

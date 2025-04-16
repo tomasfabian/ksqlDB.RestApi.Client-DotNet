@@ -32,6 +32,7 @@ public abstract class TestBase
   [TearDown]
   public virtual void TestCleanup()
   {
+    MockingKernel.Dispose();
   }
 
   #region RunSchedulers
@@ -39,7 +40,7 @@ public abstract class TestBase
   public void RunSchedulers()
   {
     TestScheduler.Start();
-      
+
     SchedulersFactory.ThreadPool.Start();
     SchedulersFactory.TaskPool.Start();
     SchedulersFactory.Dispatcher.Start();
@@ -52,24 +53,24 @@ public abstract class TestBase
   public void AdvanceSchedulers(long time)
   {
     TestScheduler.AdvanceBy(time);
-      
+
     SchedulersFactory.ThreadPool.AdvanceBy(time);
     SchedulersFactory.TaskPool.AdvanceBy(time);
     SchedulersFactory.Dispatcher.AdvanceBy(time);
   }
 
-  #endregion    
-    
+  #endregion
+
   protected void Schedule(TestScheduler testScheduler, TimeSpan timeSpan, Action action)
   {
     testScheduler.Schedule(timeSpan, action);
   }
-    
+
   protected void ScheduleOnTaskPool(TimeSpan timeSpan, Action action)
   {
     Schedule(SchedulersFactory.TaskPool, timeSpan, action);
   }
-    
+
   protected void ScheduleOnThreadPool(TimeSpan timeSpan, Action action)
   {
     Schedule(SchedulersFactory.ThreadPool, timeSpan, action);

@@ -1,14 +1,14 @@
-﻿using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
 using SqlServer.Connector.Cdc.Connectors;
+using NUnit.Framework;
 using UnitTests;
 
 namespace SqlServer.Connector.Tests.Cdc.Connectors;
 
-[TestClass]
+[TestFixture]
 public class ConnectorMetadataTests : TestBase<ConnectorMetadata>
-{    
-  [TestInitialize]
+{
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -16,7 +16,7 @@ public class ConnectorMetadataTests : TestBase<ConnectorMetadata>
     ClassUnderTest = new ConnectorMetadata();
   }
 
-  [TestMethod]
+  [Test]
   public void JsonKeyConverter()
   {
     //Arrange
@@ -28,7 +28,7 @@ public class ConnectorMetadataTests : TestBase<ConnectorMetadata>
     ClassUnderTest.KeyConverter.Should().Be("org.apache.kafka.connect.json.JsonConverter");
   }
 
-  [TestMethod]
+  [Test]
   public void ValueConverter()
   {
     //Arrange
@@ -40,7 +40,7 @@ public class ConnectorMetadataTests : TestBase<ConnectorMetadata>
     ClassUnderTest.ValueConverter.Should().Be("org.apache.kafka.connect.json.JsonConverter");
   }
 
-  [TestMethod]
+  [Test]
   public void SetProperty()
   {
     //Arrange

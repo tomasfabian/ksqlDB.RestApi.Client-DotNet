@@ -5,7 +5,6 @@ using ksqlDB.RestApi.Client.KSql.Linq;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using NUnit.Framework;
-using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Query.Functions;
 
@@ -66,12 +65,12 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     var source = Context.CreatePushQuery<Lambda>(StreamName)
       .Select(c => new { Col = KSqlFunctions.Instance.Transform(c.Arr, x => x + 1) })
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
-    actualValues[0].Col.Should().BeEquivalentTo(new[] {2,3,4});
+    actualValues.Count.Should().Be(expectedItemsCount);
+    actualValues[0].Col.Should().BeEquivalentTo(new[] { 2, 3, 4 });
   }
 
   private class LambdaMap
@@ -80,27 +79,27 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     public IDictionary<string, int[]> Map { get; set; } = null!;
     public IDictionary<string, int> Dictionary2 { get; set; } = null!;
   }
-    
+
   private readonly string streamNameWithMap = "stream4";
 
   [Test]
   public async Task TransformMap()
   {
     //Arrange
-    int expectedItemsCount = 1;      
-      
+    int expectedItemsCount = 1;
+
     //Act
     var source = Context.CreatePushQuery<LambdaMap>(streamNameWithMap)
       .Select(c => new { Col = K.Functions.Transform(c.Map, (k, v) => K.Functions.Concat(k, "_new"), (k, v) => K.Functions.Transform(v, x => x * x)) })
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Col.Keys.First().Should().Be("goodbye_new");
     actualValues[0].Col.Values.Count.Should().Be(2);
-    actualValues[0].Col.Values.First().Should().BeEquivalentTo(new [] {1,4,9});
+    actualValues[0].Col.Values.First().Should().BeEquivalentTo(new[] { 1, 4, 9 });
   }
 
   [Test]
@@ -113,31 +112,31 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     var source = Context.CreatePushQuery<Lambda>(StreamName)
       .Select(c => new { Col = KSqlFunctions.Instance.Filter(c.Arr, x => x > 1) })
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Col.Should().BeEquivalentTo(new[] { 2, 3 });
   }
-    
+
   [Test]
   public async Task FilterMap()
   {
     //Arrange
-    int expectedItemsCount = 1;      
-      
+    int expectedItemsCount = 1;
+
     //Act
     var source = Context.CreatePushQuery<LambdaMap>(streamNameWithMap)
       .Select(c => new { Col = K.Functions.Filter(c.Map, (k, v) => k != "E.T" && v[1] > 0) })
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Col.Values.Count.Should().Be(1);
-    actualValues[0].Col.Values.First().Should().BeEquivalentTo(new [] {1,2,3});
+    actualValues[0].Col.Values.First().Should().BeEquivalentTo(new[] { 1, 2, 3 });
   }
 
   [Test]
@@ -150,29 +149,29 @@ public class KSqlInvocationFunctionsTests : Infrastructure.IntegrationTests
     var source = Context.CreatePushQuery<Lambda>(StreamName)
       .Select(c => new { Acc = K.Functions.Reduce(c.Arr, 0, (x,y) => x + y) })
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Acc.Should().Be(6);
   }
-    
+
   [Test]
   public async Task ReduceMap()
   {
     //Arrange
-    int expectedItemsCount = 1;      
-      
+    int expectedItemsCount = 1;
+
     //Act
     var source = Context.CreatePushQuery<LambdaMap>(streamNameWithMap)
       .Select(c => new { Col = K.Functions.Reduce(c.Map, 2, (s, k, v) => K.Functions.Ceil(s / v[1])) })
       .ToAsyncEnumerable();
-      
+
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-      
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
     actualValues[0].Col.Should().Be(-2);
   }
 }

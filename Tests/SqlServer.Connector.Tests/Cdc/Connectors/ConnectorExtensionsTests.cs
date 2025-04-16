@@ -1,11 +1,11 @@
-﻿using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
 using SqlServer.Connector.Cdc.Connectors;
+using NUnit.Framework;
 using UnitTests;
 
 namespace SqlServer.Connector.Tests.Cdc.Connectors;
 
-[TestClass]
+[TestFixture]
 public class ConnectorExtensionsTests : TestBase
 {
   private SqlServerConnectorMetadata CreateConnector()
@@ -15,10 +15,10 @@ public class ConnectorExtensionsTests : TestBase
 
     return new SqlServerConnectorMetadata(connectionString);
   }
-    
+
   string connectorName = "myConnector";
 
-  [TestMethod]
+  [Test]
   public void ToCreateSourceConnectorStatement()
   {
     //Arrange
@@ -31,7 +31,7 @@ public class ConnectorExtensionsTests : TestBase
     statement.Should().Be(ExpectedStatement("CREATE SOURCE CONNECTOR"));
   }
 
-  [TestMethod]
+  [Test]
   public void ToCreateSourceConnectorStatement_IfNotExists()
   {
     //Arrange
@@ -44,7 +44,7 @@ public class ConnectorExtensionsTests : TestBase
     statement.Should().Be(ExpectedStatement("CREATE SOURCE CONNECTOR IF NOT EXISTS"));
   }
 
-  [TestMethod]
+  [Test]
   public void ToCreateSinkConnectorStatement()
   {
     //Arrange
@@ -53,7 +53,7 @@ public class ConnectorExtensionsTests : TestBase
 
     //Act
     var statement = connector.ToCreateConnectorStatement(connectorName);
-      
+
     //Assert
     statement.Should().Be(ExpectedStatement("CREATE SINK CONNECTOR"));
   }

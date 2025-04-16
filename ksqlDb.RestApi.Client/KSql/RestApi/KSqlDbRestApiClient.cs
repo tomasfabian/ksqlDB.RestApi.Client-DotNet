@@ -122,7 +122,13 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   {
     logger?.LogInformation("Executing command: {SQL}", ksqlDbStatement.Sql);
 
-    return ExecuteStatementAsync(ksqlDbStatement, ksqlDbStatement.EndpointType, ksqlDbStatement.ContentEncoding, cancellationToken);
+    ksqlDbStatement.Sql = ksqlDbStatement.CompactSql();
+    return ExecuteStatementAsync(
+      ksqlDbStatement,
+      ksqlDbStatement.EndpointType,
+      ksqlDbStatement.ContentEncoding,
+      cancellationToken
+    );
   }
 
   private async Task<HttpResponseMessage> ExecuteStatementAsync(object content, EndpointType endPointType, Encoding encoding, CancellationToken cancellationToken = default)

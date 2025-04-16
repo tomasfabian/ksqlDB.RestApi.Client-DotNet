@@ -7,7 +7,6 @@ using ksqlDb.RestApi.Client.Tests.KSql.Query.Context;
 using ksqlDb.RestApi.Client.Tests.Models;
 using NUnit.Framework;
 using UnitTests;
-using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 using TestParameters = ksqlDb.RestApi.Client.Tests.Helpers.TestParameters;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.Linq;
@@ -111,7 +110,7 @@ public class QbservableExtensionsWindowsTests : TestBase
     var context = new TransactionsDbProvider(TestParameters.KsqlDbUrl);
 
     //Assert
-    Assert.ThrowsException<InvalidOperationException>(() =>
+    Assert.Throws<InvalidOperationException>(() =>
     {
       //Act
       var grouping = context.CreatePushQuery<Transaction>()

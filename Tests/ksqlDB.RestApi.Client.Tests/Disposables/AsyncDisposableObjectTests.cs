@@ -2,12 +2,12 @@ using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Disposables;
 using NUnit.Framework;
 using UnitTests;
-using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace ksqlDb.RestApi.Client.Tests.Disposables;
 
 public class AsyncDisposableObjectTests : TestBase<AsyncDisposableObjectTests.TestableAsyncDisposableObject>
 {
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -33,11 +33,10 @@ public class AsyncDisposableObjectTests : TestBase<AsyncDisposableObjectTests.Te
     //Arrange
     await ClassUnderTest.DisposeAsync().ConfigureAwait(false);
 
-
     //Assert
-    await Assert.ThrowsExceptionAsync<ObjectDisposedException>(() => ClassUnderTest.InitializeAsync());
+    Assert.ThrowsAsync<ObjectDisposedException>(async () => await ClassUnderTest.InitializeAsync());
   }
-    
+
   [Test]
   public async Task InitializeAsyncDisposed_IsCancellationRequested()
   {
@@ -89,10 +88,10 @@ public class AsyncDisposableObjectTests : TestBase<AsyncDisposableObjectTests.Te
       InitializationCounter++;
 
       CancellationToken = cancellationToken;
-        
-      if(ShouldDispose)
+
+      if (ShouldDispose)
         await DisposeAsync().ConfigureAwait(false);
-        
+
       await base.OnInitializeAsync(cancellationToken);
     }
   }

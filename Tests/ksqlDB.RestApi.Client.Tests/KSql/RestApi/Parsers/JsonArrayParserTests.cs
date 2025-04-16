@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parsers;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using UnitTests;
 
@@ -33,13 +33,13 @@ public class JsonArrayParserTests : TestBase
     //Assert
     json.Should().NotBeEmpty();
 
-    var jObject = JObject.Parse(json);
-      
-    JProperty property = (JProperty)jObject.First!;
-    property.Name.Should().BeEquivalentTo(headerColumns[0]);
-      
-    property = (JProperty)jObject.Last!;
-    property.Name.Should().BeEquivalentTo(headerColumns[1]);
+    var jObject = JsonNode.Parse(json)!.AsObject();
+
+    var property = jObject.First();
+    property.Key.Should().BeEquivalentTo(headerColumns[0]);
+
+    property = jObject.Last();
+    property.Key.Should().BeEquivalentTo(headerColumns[1]);
   }
 
   [Test]
@@ -54,14 +54,14 @@ public class JsonArrayParserTests : TestBase
     var json = ClassUnderTest.CreateJson(headerColumns, row);
 
     //Assert
-    var jObject = JObject.Parse(json);
+    var jObject = JsonNode.Parse(json)!.AsObject();
 
-    var expectedJson = JObject.Parse(mapValue);
-    JProperty property = (JProperty)jObject.First!;
-    property.Value.ToString().Should().BeEquivalentTo(expectedJson.ToString());
+    var expectedJson = JsonNode.Parse(mapValue);
+    var property = jObject.First();
+    property.Value!.ToJsonString().Should().BeEquivalentTo(expectedJson!.ToJsonString());
 
-    property = (JProperty)jObject.Last!;
-    property.Value.ToString().Should().BeEquivalentTo("True");
+    property = jObject.Last();
+    property.Value!.ToJsonString().Should().BeEquivalentTo("true");
   }
 
   [Test]
@@ -78,14 +78,14 @@ public class JsonArrayParserTests : TestBase
     var json = ClassUnderTest.CreateJson(headerColumns, row);
 
     //Assert
-    var jObject = JObject.Parse(json);
+    var jObject = JsonNode.Parse(json)!.AsObject();
 
-    var expectedJson = JObject.Parse(arrayValue);
-    JProperty property = (JProperty)jObject.First!;
-    property.Value.ToString().Should().BeEquivalentTo(expectedJson.ToString());
+    var expectedJson = JsonNode.Parse(arrayValue);
+    var property = jObject.First();
+    property.Value!.ToJsonString().Should().BeEquivalentTo(expectedJson!.ToJsonString());
 
-    property = (JProperty)jObject.Last!;
-    property.Value.ToString().Should().BeEquivalentTo("1");
+    property = jObject.Last();
+    property.Value!.ToJsonString().Should().BeEquivalentTo("1");
   }
 
   [Test]
@@ -139,25 +139,26 @@ public class JsonArrayParserTests : TestBase
     //Arrange
     //{"queryId":"b3fd9708-c4c1-437c-9fc8-ae99ae72a1d7","columnNames":["ORDER_ID","NAME","CREATED_AT"],"columnTypes":["INTEGER","STRING","INTEGER"]}
     //[1,"Test1.8,8 ",18833]
-
-    string[] headerColumns = { "ORDER_ID","NAME","CREATED_AT" };
+    string[] headerColumns = { "ORDER_ID", "NAME", "CREATED_AT" };
     string row = "1,\"Test1.8,8\",18833";
 
     //Act
     var json = ClassUnderTest.CreateJson(headerColumns, row);
 
     //Assert
-    var jObject = JObject.Parse(json);
+    var jObject = JsonNode.Parse(json)!.AsObject();
 
-    var expectedJson = JObject.Parse(@"{
-""ORDER_ID"": 1
-,""NAME"": ""Test1.8,8""
-,""CREATED_AT"": 18833
-}");
-    JProperty property = jObject.Property("NAME")!;
-    property!.Value.ToString().Should().BeEquivalentTo("Test1.8,8");
+    var nameProperty = jObject["NAME"];
+    nameProperty!.GetValue<string>().Should().BeEquivalentTo("Test1.8,8");
 
-    JObject.Parse(json).ToString().Should().BeEquivalentTo(expectedJson.ToString());
+    var expectedJson = JsonNode.Parse(
+      @"{
+""ORDER_ID"": 1,
+""NAME"": ""Test1.8,8"",
+""CREATED_AT"": 18833
+}"
+    );
+    jObject.ToJsonString().Should().BeEquivalentTo(expectedJson!.ToJsonString());
   }
 
   [Test]
@@ -172,16 +173,15 @@ public class JsonArrayParserTests : TestBase
     var json = ClassUnderTest.CreateJson(headerColumns, row);
 
     //Assert
-    string expectedJson = JObject.Parse($"{{\"Value\": 1,\"Arr\": {arrayValue}}}").ToString();
-    JObject.Parse(json).ToString().Should().BeEquivalentTo(expectedJson);
+    var expectedJson = JsonNode.Parse($"{{\"Value\": 1,\"Arr\": {arrayValue}}}");
+    JsonNode.Parse(json)!.ToJsonString().Should().BeEquivalentTo(expectedJson!.ToJsonString());
   }
-
 
   [Test]
   public void CreateJson_Map_JsonWithCommaSeparatedValues()
   {
     //Arrange
-    string[] headerColumns = {"KSQL_COL_0", "IsRobot"};
+    string[] headerColumns = { "KSQL_COL_0", "IsRobot" };
     var mapValue = "{\"d\":\"Test1.8,1\",\"c\":\"Test1.8,2\"}";
     string row = $"{mapValue}, true";
 
@@ -189,8 +189,8 @@ public class JsonArrayParserTests : TestBase
     var json = ClassUnderTest.CreateJson(headerColumns, row);
 
     //Assert
-    string expectedJson = JObject.Parse($"{{\"KSQL_COL_0\": {mapValue},\"IsRobot\": true}}").ToString();
-    JObject.Parse(json).ToString().Should().BeEquivalentTo(expectedJson);
+    var expectedJson = JsonNode.Parse($"{{\"KSQL_COL_0\": {mapValue},\"IsRobot\": true}}");
+    JsonNode.Parse(json)!.ToJsonString().Should().BeEquivalentTo(expectedJson!.ToJsonString());
   }
 
   [Test]
@@ -198,14 +198,24 @@ public class JsonArrayParserTests : TestBase
   {
     //Arrange
     string[] headerColumns = { "INTERNALID", "FILENAME", "TYPE", "NAME" };
-    string row = "\"7775dee282f011724d3108f25302b999\",\"test.json\",\"Monitor\",\"27\\\" XZ272UVBMIIPHX Black\",\"\"";
+    string row =
+      "\"7775dee282f011724d3108f25302b999\",\"test.json\",\"Monitor\",\"27\\\" XZ272UVBMIIPHX Black\",\"\"";
+    var options = new JsonSerializerOptions(JsonSerializerDefaults.General)
+    {
+      WriteIndented = false,
+    };
 
     //Act
     var json = ClassUnderTest.CreateJson(headerColumns, row);
 
     //Assert
-    string expectedJson = JObject.Parse($$$"""{{{{Environment.NewLine}}}"INTERNALID": "7775dee282f011724d3108f25302b999"{{{Environment.NewLine}}},"FILENAME": "test.json"{{{Environment.NewLine}}},"TYPE": "Monitor"{{{Environment.NewLine}}},"NAME": "27\" XZ272UVBMIIPHX Black"{{{Environment.NewLine}}}}""").ToString();
-    JObject.Parse(json).ToString().Should().BeEquivalentTo(expectedJson);
+    string expectedJson = JsonNode
+      .Parse(
+        $$$"""{"INTERNALID":"7775dee282f011724d3108f25302b999","FILENAME":"test.json","TYPE":"Monitor","NAME":"27\" XZ272UVBMIIPHX Black"}"""
+      )
+      .ToJsonString(options);
+    var actual = JsonNode.Parse(json).ToJsonString(options);
+    actual.Should().BeEquivalentTo(expectedJson);
   }
 
   private record IoTSensor

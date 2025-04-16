@@ -29,6 +29,7 @@ namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq
     public record Tweet : Record
     {
       public int Id { get; set; }
+
       [JsonPropertyName("MESSAGE")]
       public string Message { get; set; } = null!;
       public bool IsRobot { get; set; }
@@ -140,7 +141,7 @@ namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq
       };
       
       expectedItemsCount.Should().Be(actualValues.Count);
-      CollectionAssert.AreEqual(expectedValues, actualValues);
+      actualValues.Should().BeEquivalentTo(expectedValues);
     }
 
     [Test]

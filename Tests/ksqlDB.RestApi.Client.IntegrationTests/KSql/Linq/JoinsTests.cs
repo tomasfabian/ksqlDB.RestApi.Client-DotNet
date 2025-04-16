@@ -11,8 +11,6 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using NUnit.Framework;
-using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
-
 
 namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq;
 
@@ -83,12 +81,12 @@ public class JoinsTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
-    
-    Assert.AreEqual(MoviesProvider.Movie1.Title, actualValues[0].Title);
-    Assert.AreEqual(MoviesProvider.LeadActor1.Title, actualValues[0].Title);
-    Assert.AreEqual("lien", actualValues[0].Substr);
-    Assert.AreEqual(MoviesProvider.Movie1.Release_Year, actualValues[0].Release_Year);
+    actualValues.Count.Should().Be(expectedItemsCount);
+
+    actualValues[0].Title.Should().Be(MoviesProvider.Movie1.Title);
+    actualValues[0].Title.Should().Be(MoviesProvider.LeadActor1.Title);
+    actualValues[0].Substr.Should().Be("lien");
+    actualValues[0].Release_Year.Should().Be(MoviesProvider.Movie1.Release_Year);
   }
 
   [Test]
@@ -117,11 +115,10 @@ public class JoinsTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
 
-    Assert.AreEqual(MoviesProvider.Movie1.Title, actualValues[0].Title);
-    Assert.AreEqual(MoviesProvider.LeadActor1.Title, actualValues[0].Title);
-
+    actualValues[0].Title.Should().Be(MoviesProvider.Movie1.Title);
+    actualValues[0].Title.Should().Be(MoviesProvider.LeadActor1.Title);
     actualValues[0].Substr.Length.Should().Be(4);
     actualValues[0].Release_Year.Should().BeOneOf(MoviesProvider.Movie1.Release_Year, MoviesProvider.Movie2.Release_Year);
     actualValues[0].ActorTitle.Should().BeOneOf(null, MoviesProvider.Movie1.Title, MoviesProvider.Movie2.Title);
@@ -151,7 +148,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
   {
     //Arrange
     int expectedItemsCount = 3;
-        
+
     await moviesProvider.InsertLeadAsync(MoviesProvider.LeadActor2);
 
     var source = querySource
@@ -171,9 +168,9 @@ public class JoinsTests : Infrastructure.IntegrationTests
 
     //Act
     var actualValues = await CollectActualValues(source, expectedItemsCount);
-        
+
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
 
     actualValues[2].Title.Should().BeOneOf(MoviesProvider.Movie1.Title, MoviesProvider.Movie2.Title, null);
   }
@@ -213,10 +210,10 @@ public class JoinsTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(source, expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
 
-    Assert.AreEqual(MoviesProvider.Movie1.Title, actualValues[0].Title);
-    Assert.AreEqual(MoviesProvider.LeadActor1.Title, actualValues[0].Title);
+    actualValues[0].Title.Should().Be(MoviesProvider.Movie1.Title);
+    actualValues[0].Title.Should().Be(MoviesProvider.LeadActor1.Title);
 
     actualValues[0].Substr.Length.Should().Be(4);
     actualValues[0].Release_Year.Should().BeOneOf(MoviesProvider.Movie1.Release_Year, MoviesProvider.Movie2.Release_Year);
@@ -285,7 +282,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(query.ToAsyncEnumerable(), expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
 
     actualValues[0].orderId.Should().Be(1);
     actualValues[0].paymentId.Should().Be(1);
@@ -329,7 +326,7 @@ public class JoinsTests : Infrastructure.IntegrationTests
     var actualValues = await CollectActualValues(query.ToAsyncEnumerable(), expectedItemsCount);
 
     //Assert
-    Assert.AreEqual(expectedItemsCount, actualValues.Count);
+    actualValues.Count.Should().Be(expectedItemsCount);
 
     actualValues[0].orderId.Should().Be(1);
   }

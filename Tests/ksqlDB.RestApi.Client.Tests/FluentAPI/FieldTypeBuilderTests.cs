@@ -5,7 +5,6 @@ using ksqlDB.RestApi.Client.KSql.Query;
 using ksqlDb.RestApi.Client.Metadata;
 using ksqlDb.RestApi.Client.Tests.Models;
 using NUnit.Framework;
-using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace ksqlDb.RestApi.Client.Tests.FluentAPI
 {
@@ -128,7 +127,7 @@ namespace ksqlDb.RestApi.Client.Tests.FluentAPI
       builder = new(fieldMetadata);
 
       //Act
-      Assert.ThrowsException<InvalidOperationException>(() =>
+      Assert.Throws<InvalidOperationException>(() =>
       {
         //Act
         builder.AsPseudoColumn();

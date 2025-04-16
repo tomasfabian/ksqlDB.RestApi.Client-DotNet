@@ -1,14 +1,14 @@
-﻿using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
+using NUnit.Framework;
 using SqlServer.Connector.Cdc.Connectors;
 using UnitTests;
 
 namespace SqlServer.Connector.Tests.Cdc.Connectors;
 
-[TestClass]
+[TestFixture]
 public class SqlServerConnectorMetadataTests : TestBase<SqlServerConnectorMetadata>
 {
-  [TestInitialize]
+  [SetUp]
   public override void TestInitialize()
   {
     base.TestInitialize();
@@ -19,7 +19,7 @@ public class SqlServerConnectorMetadataTests : TestBase<SqlServerConnectorMetada
     ClassUnderTest = new SqlServerConnectorMetadata(connectionString);
   }
 
-  [TestMethod]
+  [Test]
   public void ConnectorClass()
   {
     //Arrange
@@ -30,7 +30,7 @@ public class SqlServerConnectorMetadataTests : TestBase<SqlServerConnectorMetada
     ClassUnderTest.ConnectorClass.Should().Be("io.debezium.connector.sqlserver.SqlServerConnector");
   }
 
-  [TestMethod]
+  [Test]
   public void DatabaseHostnameName()
   {
     //Arrange
@@ -41,7 +41,7 @@ public class SqlServerConnectorMetadataTests : TestBase<SqlServerConnectorMetada
     ClassUnderTest.DatabaseHostname.Should().Be("127.0.0.1");
   }
 
-  [TestMethod]
+  [Test]
   public void DatabaseUser()
   {
     //Arrange
@@ -52,7 +52,7 @@ public class SqlServerConnectorMetadataTests : TestBase<SqlServerConnectorMetada
     ClassUnderTest.DatabaseUser.Should().Be("SA");
   }
 
-  [TestMethod]
+  [Test]
   public void DefaultCtor_Port()
   {
     //Arrange
@@ -64,7 +64,7 @@ public class SqlServerConnectorMetadataTests : TestBase<SqlServerConnectorMetada
     ClassUnderTest.DatabasePort.Should().Be("1433");
   }
 
-  [TestMethod]
+  [Test]
   public void Port()
   {
     //Arrange
@@ -75,7 +75,7 @@ public class SqlServerConnectorMetadataTests : TestBase<SqlServerConnectorMetada
     ClassUnderTest.DatabasePort.Should().Be("1433");
   }
 
-  [TestMethod]
+  [Test]
   public void DatabasePassword()
   {
     //Arrange
@@ -86,7 +86,7 @@ public class SqlServerConnectorMetadataTests : TestBase<SqlServerConnectorMetada
     ClassUnderTest.DatabasePassword.Should().Be("<YourNewStrong@Passw0rd>");
   }
 
-  [TestMethod]
+  [Test]
   public void DatabaseDbname()
   {
     //Arrange
@@ -97,7 +97,7 @@ public class SqlServerConnectorMetadataTests : TestBase<SqlServerConnectorMetada
     ClassUnderTest.DatabaseDbname.Should().Be("Sensors");
   }
 
-  [TestMethod]
+  [Test]
   public void TrySetDatabaseHistoryKafkaTopic()
   {
     //Arrange
@@ -110,7 +110,7 @@ public class SqlServerConnectorMetadataTests : TestBase<SqlServerConnectorMetada
     ClassUnderTest.DatabaseHistoryKafkaTopic.Should().Be($"dbhistory.{ClassUnderTest.DatabaseServerName}");
   }
 
-  [TestMethod]
+  [Test]
   public void TrySetConnectorName()
   {
     //Arrange
@@ -122,7 +122,7 @@ public class SqlServerConnectorMetadataTests : TestBase<SqlServerConnectorMetada
     ClassUnderTest.Name.Should().Be($"{ClassUnderTest.DatabaseDbname}-connector");
   }
 
-  [TestMethod]
+  [Test]
   public void KafkaBootstrapServers()
   {
     //Arrange

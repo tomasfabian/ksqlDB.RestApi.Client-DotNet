@@ -11,8 +11,15 @@ using System.Reflection;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 
-internal sealed class TypeGenerator(IMetadataProvider metadataProvider) : EntityInfo(metadataProvider)
+internal sealed class TypeGenerator : EntityInfo
 {
+  private readonly IMetadataProvider metadataProvider;
+
+  public TypeGenerator(IMetadataProvider metadataProvider) : base(metadataProvider)
+  {
+    this.metadataProvider = metadataProvider;
+  }
+
   internal string Print<T>(TypeProperties properties)
   {
     StringBuilder stringBuilder = new();
@@ -45,7 +52,7 @@ internal sealed class TypeGenerator(IMetadataProvider metadataProvider) : Entity
 
     stringBuilder.Append(string.Join(", ", ksqlProperties));
   }
-  
+
   private static string EscapeName(string name, IdentifierEscaping escaping) =>
     (escaping, IdentifierUtil.IsValid(name)) switch
     {

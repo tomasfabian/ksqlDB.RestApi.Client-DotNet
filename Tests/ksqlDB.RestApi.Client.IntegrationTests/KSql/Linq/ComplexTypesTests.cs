@@ -35,6 +35,12 @@ public class ComplexTypesTests
     Context = new KSqlDBContext(contextOptions);
   }
 
+  [TearDown]
+  public void TearDown()
+  {
+    Context.Dispose();
+  }
+
   [Test]
   public async Task ReceiveArrayWithComplexElements()
   {

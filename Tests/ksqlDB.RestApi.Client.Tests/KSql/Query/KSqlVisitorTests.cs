@@ -919,7 +919,7 @@ public class KSqlVisitorTests : TestBase
   }
 
   [Test]
-  [NUnit.Framework.Ignore("TODO")]
+  [Ignore("TODO")]
   public void NegateBooleanConstant_BuildKSql_PrintsFalse()
   {
     //Arrange
