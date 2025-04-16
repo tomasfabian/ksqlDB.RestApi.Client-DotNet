@@ -759,6 +759,85 @@ public class CreateEntityTests
 ) WITH ( KAFKA_TOPIC='{nameof(Poco)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
   }
 
+  private class PocoWithNullable : Poco
+  {
+    public InnerPoco InnerPoco { get; init; }
+  }
+
+  private class InnerPoco
+  {
+    public string Value { get; init; }
+    public InnerPoco2? InnerPoco2 { get; init; }
+  }
+
+  private class InnerPoco2
+  {
+    public int Value { get; init; }
+  }
+
+  [Test]
+  public void ModelBuilder_IgnoreStructProperty()
+  {
+    //Arrange
+    modelBuilder.Entity<PocoWithNullable>()
+      .HasKey(x => x.Id);
+    modelBuilder.Entity<PocoWithNullable>()
+      .Property(c => c.InnerPoco).AsStruct();
+    modelBuilder.Entity<PocoWithNullable>()
+      .Property(c => c.InnerPoco.InnerPoco2).Ignore();
+    modelBuilder.Entity<PocoWithNullable>()
+      .Property(c => c.InnerPoco.Value);
+
+    var statementContext = new StatementContext
+    {
+      CreationType = CreationType.CreateOrReplace,
+      KSqlEntityType = KSqlEntityType.Table,
+    };
+
+    creationMetadata.KafkaTopic = nameof(Poco);
+
+    //Act
+    string statement = new CreateEntity(modelBuilder).Print<PocoWithNullable>(statementContext, creationMetadata, null);
+
+    //Assert
+    statement.Should().Be($@"CREATE OR REPLACE TABLE {nameof(PocoWithNullable)}s (
+	{nameof(PocoWithNullable.InnerPoco)} STRUCT<Value VARCHAR>,
+	{nameof(Poco.Id)} INT PRIMARY KEY,
+	{nameof(Poco.Description)} VARCHAR
+) WITH ( KAFKA_TOPIC='{nameof(Poco)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+  }
+
+  [Test]
+  public void ModelBuilder_IgnoreStructWithAllIgnoredFieldsProperty()
+  {
+    // STRUCT<> is an invalid ksql statement
+
+    //Arrange
+    modelBuilder.Entity<PocoWithNullable>()
+      .HasKey(x => x.Id)
+      .Property(c => c.InnerPoco).AsStruct();
+    modelBuilder.Entity<PocoWithNullable>()
+      .Property(c => c.InnerPoco.InnerPoco2).Ignore();
+    modelBuilder.Entity<PocoWithNullable>()
+      .Property(c => c.InnerPoco.Value).Ignore();
+
+    var statementContext = new StatementContext
+    {
+      CreationType = CreationType.CreateOrReplace,
+      KSqlEntityType = KSqlEntityType.Table,
+    };
+
+    creationMetadata.KafkaTopic = nameof(Poco);
+
+    //Act
+    string statement = new CreateEntity(modelBuilder).Print<PocoWithNullable>(statementContext, creationMetadata, null);
+
+    //Assert
+    statement.Should().Be($@"CREATE OR REPLACE TABLE {nameof(PocoWithNullable)}s (
+	{nameof(Poco.Id)} INT PRIMARY KEY,
+	{nameof(Poco.Description)} VARCHAR
+) WITH ( KAFKA_TOPIC='{nameof(Poco)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+  }
   internal class IgnoreInDDL
   {
     [Key]
@@ -766,6 +845,38 @@ public class CreateEntityTests
     [IgnoreInDDL]
     [PseudoColumn]
     public string RowTime { get; set; }
+  }
+
+  [Test]
+  public void ModelBuilder_SubPropertiesOfAnIgnoredMemberAreSkipped()
+  {
+    // STRUCT<> is an invalid ksql statement
+
+    //Arrange
+    modelBuilder.Entity<PocoWithNullable>()
+      .HasKey(x => x.Id)
+      .Property(c => c.InnerPoco).Ignore();
+    modelBuilder.Entity<PocoWithNullable>()
+      .Property(c => c.InnerPoco.InnerPoco2);
+    modelBuilder.Entity<PocoWithNullable>()
+      .Property(c => c.InnerPoco.Value);
+
+    var statementContext = new StatementContext
+    {
+      CreationType = CreationType.CreateOrReplace,
+      KSqlEntityType = KSqlEntityType.Table,
+    };
+
+    creationMetadata.KafkaTopic = nameof(Poco);
+
+    //Act
+    string statement = new CreateEntity(modelBuilder).Print<PocoWithNullable>(statementContext, creationMetadata, null);
+
+    //Assert
+    statement.Should().Be($@"CREATE OR REPLACE TABLE {nameof(PocoWithNullable)}s (
+	{nameof(Poco.Id)} INT PRIMARY KEY,
+	{nameof(Poco.Description)} VARCHAR
+) WITH ( KAFKA_TOPIC='{nameof(Poco)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
   }
 
   [Test]

@@ -63,12 +63,12 @@ internal sealed class TypeGenerator : EntityInfo
       _ => throw new ArgumentOutOfRangeException(nameof(escaping), escaping, "Non-exhaustive match")
     };
 
-  protected override bool IncludeMemberInfo(EntityMetadata? entityMetadata, MemberInfo memberInfo)
+  protected override bool IncludeMemberInfo(Type type, EntityMetadata? entityMetadata, MemberInfo memberInfo, bool? includeReadOnly = null)
   {
     var fieldMetadata = entityMetadata?.GetFieldMetadataBy(memberInfo);
     if (fieldMetadata is { IgnoreInDDL: true })
       return false;
 
-    return base.IncludeMemberInfo(entityMetadata, memberInfo) && !memberInfo.GetCustomAttributes().OfType<IgnoreInDDLAttribute>().Any();
+    return base.IncludeMemberInfo(type, entityMetadata, memberInfo) && !memberInfo.GetCustomAttributes().OfType<IgnoreInDDLAttribute>().Any();
   }
 }
