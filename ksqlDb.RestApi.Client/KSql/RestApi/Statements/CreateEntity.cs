@@ -114,6 +114,6 @@ internal sealed class CreateEntity : EntityInfo
     if (fieldMetadata is { IgnoreInDDL: true })
       return false;
 
-    return base.IncludeMemberInfo(type, entityMetadata, memberInfo) && !memberInfo.GetCustomAttributes().OfType<IgnoreInDDLAttribute>().Any();
+    return base.IncludeMemberInfo(type, entityMetadata, memberInfo, includeReadOnly) && !memberInfo.GetCustomAttributes().OfType<IgnoreInDDLAttribute>().Any();
   }
 }

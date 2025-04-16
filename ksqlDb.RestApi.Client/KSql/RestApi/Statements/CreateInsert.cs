@@ -88,6 +88,6 @@ internal sealed class CreateInsert : EntityInfo
     if (fieldMetadata is {IgnoreInDML: true})
       return false;
 
-    return base.IncludeMemberInfo(type, entityMetadata, memberInfo) && !memberInfo.GetCustomAttributes().OfType<IgnoreByInsertsAttribute>().Any();
+    return base.IncludeMemberInfo(type, entityMetadata, memberInfo, includeReadOnly) && !memberInfo.GetCustomAttributes().OfType<IgnoreByInsertsAttribute>().Any();
   }
 }
