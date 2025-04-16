@@ -46,6 +46,7 @@ public class KsqlDbConnectTests : TestBase<KsqlDbConnect>
   public static async Task ClassCleanup()
   {
     await DropDependenciesAsync(ApplicationDbContext.Database);
+    await ApplicationDbContext.DisposeAsync();
   }
 
   private static async Task DropConnectorAsync()
