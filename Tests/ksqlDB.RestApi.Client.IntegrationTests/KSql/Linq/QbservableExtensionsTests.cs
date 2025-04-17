@@ -13,6 +13,7 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 using NUnit.Framework;
+using System.Text.RegularExpressions;
 
 namespace ksqlDb.RestApi.Client.IntegrationTests.KSql.Linq;
 
@@ -565,7 +566,8 @@ public class QbservableExtensionsTests : Infrastructure.IntegrationTests
     var description = await query.ExplainAsync();
 
     //Assert
-    description[0].StatementText.Should().Be(@"EXPLAIN SELECT * FROM tweetsTest WHERE MESSAGE = 'ET' EMIT CHANGES;");
+    string trimmedStatement = Regex.Replace(description[0].StatementText!, @"\s+", " ").Trim();
+    trimmedStatement.Should().Be("EXPLAIN SELECT * FROM tweetsTest WHERE MESSAGE = 'ET' EMIT CHANGES;".Replace("\r", " ").Replace("\n", " "));
     description[0].QueryDescription!.QueryType.Should().Be("PUSH");
     description[0].QueryDescription!.ExecutionPlan.Should().NotBeNullOrEmpty();
   }
