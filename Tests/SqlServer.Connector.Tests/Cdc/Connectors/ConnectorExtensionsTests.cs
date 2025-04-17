@@ -16,7 +16,7 @@ public class ConnectorExtensionsTests : TestBase
     return new SqlServerConnectorMetadata(connectionString);
   }
 
-  string connectorName = "myConnector";
+  private readonly string connectorName = "myConnector";
 
   [Test]
   public void ToCreateSourceConnectorStatement()
@@ -68,6 +68,6 @@ public class ConnectorExtensionsTests : TestBase
 	'database.password'= '<YourNewStrong@Passw0rd>', 
 	'database.dbname'= 'Sensors'
 );
-";
+".ReplaceLineEndings();
   }
 }
