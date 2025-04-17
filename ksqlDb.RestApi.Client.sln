@@ -43,12 +43,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{0ABA2B0A-0
 		docs\functions.md = docs\functions.md
 		docs\joins.md = docs\joins.md
 		docs\ksqldbcontext.md = docs\ksqldbcontext.md
+		docs\ksqldbrestapiclient.md = docs\ksqldbrestapiclient.md
 		docs\modelbuilder.md = docs\modelbuilder.md
 		docs\operators.md = docs\operators.md
 		docs\protobuf.md = docs\protobuf.md
 		docs\pull_queries.md = docs\pull_queries.md
 		docs\push_queries.md = docs\push_queries.md
-		docs\ksqldbrestapiclient.md = docs\ksqldbrestapiclient.md
 		docs\streams_and_tables.md = docs\streams_and_tables.md
 		docs\stream_processing.md = docs\stream_processing.md
 	EndProjectSection
@@ -74,6 +74,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitWorkflows", "GitWorkflow
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL", "Samples\GraphQL\GraphQL.csproj", "{25FD72C9-7292-4911-9B74-C562DE312690}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\Directory.Packages.props = Tests\Directory.Packages.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -156,6 +161,7 @@ Global
 		{EDEBF0B8-1A4B-4092-A5D4-E8103DC1527F} = {AA5681E8-1682-47E9-9159-4AE95A92E694}
 		{5D9DDA2E-69B0-44D1-A125-95DDC79E2D2B} = {999C8EEC-CCFA-4183-805A-1804367D8F75}
 		{25FD72C9-7292-4911-9B74-C562DE312690} = {AA5681E8-1682-47E9-9159-4AE95A92E694}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {999C8EEC-CCFA-4183-805A-1804367D8F75}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {08C8585D-5006-4484-AC12-72B1F42058D7}

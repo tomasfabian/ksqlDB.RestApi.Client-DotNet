@@ -3,7 +3,7 @@
 # 7.1.1
 
 ## 🐛 Bug Fixes
-- fixed `EntityInfo.Members` to handle nested metadata definitions and `CreateEntity.PrintProperties` to ignore empty and invalid STRUCT columns. (contributed by @mrt181)
+- fixed `EntityInfo.Members` to handle nested metadata definitions and `CreateEntity.PrintProperties` to ignore empty and invalid STRUCT columns. #109 (contributed by @mrt181)
 
 # 7.1.0
 

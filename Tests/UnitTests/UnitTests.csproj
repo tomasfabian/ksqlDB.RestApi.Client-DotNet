@@ -1,26 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-<PropertyGroup>
-	  <LangVersion>12.0</LangVersion>
-	  <ImplicitUsings>enable</ImplicitUsings>
-	  <IsPackable>false</IsPackable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <LangVersion>12.0</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
 
-  <PropertyGroup>
-	  <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-  </PropertyGroup>
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
 
-  <ItemGroup>
-	  <PackageReference Include="FluentAssertions" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-	  <PackageReference Include="Microsoft.Reactive.Testing" />
-	  <PackageReference Include="Moq" />
-	  <PackageReference Include="Ninject.MockingKernel.Moq" />
-	  <PackageReference Include="NUnit" />
-	  <PackageReference Include="NUnit3TestAdapter" />
-	  <PackageReference Include="NUnit.Analyzers" />
-	  <PackageReference Include="Microsoft.Extensions.Logging" />
-	  <PackageReference Include="Joker" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="Microsoft.Reactive.Testing" />
+        <PackageReference Include="Moq" />
+        <PackageReference Include="Ninject.MockingKernel.Moq" />
+        <PackageReference Include="NUnit" />
+        <PackageReference Include="NUnit3TestAdapter" />
+        <PackageReference Include="NUnit.Analyzers" />
+        <PackageReference Include="Microsoft.Extensions.Logging" />
+        <PackageReference Include="Joker" />
+    </ItemGroup>
 
 </Project>
