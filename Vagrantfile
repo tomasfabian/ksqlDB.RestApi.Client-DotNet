@@ -35,11 +35,11 @@ Vagrant.configure("2") do |config|
     sudo apt install -y nuget
     sudo dotnet workload update
 
-    cd /vagrant
+    #cd /vagrant
 
     #dotnet clean ksqlDb.RestApi.Client.sln --configuration Release && dotnet nuget locals all --clear
     #dotnet restore ksqlDb.RestApi.Client.sln
     #dotnet build ksqlDb.RestApi.Client.sln --configuration Release
-    #dotnet test ./Tests/ksqlDB.RestApi.Client.Tests/ksqlDb.RestApi.Client.Tests.csproj
+    #dotnet test ./Tests/ksqlDB.RestApi.Client.Tests/ksqlDb.RestApi.Client.Tests.csproj --configuration Release
   SHELL
 end
