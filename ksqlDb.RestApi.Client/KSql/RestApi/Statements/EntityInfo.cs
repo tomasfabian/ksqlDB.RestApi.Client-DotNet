@@ -38,16 +38,24 @@ internal class EntityInfo(IMetadataProvider metadataProvider)
   {
     var fieldMetadata = entityMetadata?.GetFieldMetadataBy(memberInfo);
 
+    if (IsEmptyStruct<TEntity>(type, memberInfo, includeReadOnly))
+      return false;
+
+    return fieldMetadata is not {Ignore: true} && !memberInfo.GetCustomAttributes().OfType<IgnoreAttribute>().Any();
+  }
+
+  private bool IsEmptyStruct<TEntity>(Type type, MemberInfo memberInfo, bool? includeReadOnly)
+  {
     var subType = GetMemberType(memberInfo);
     if (!type.IsGenericType && IsStructType<TEntity>(subType, memberInfo))
     {
       var subMembers = Members<TEntity>(subType, includeReadOnly);
 
       if(!subMembers.Any())
-        return false;
+        return true;
     }
 
-    return fieldMetadata is not {Ignore: true} && !memberInfo.GetCustomAttributes().OfType<IgnoreAttribute>().Any();
+    return false;
   }
 
   protected bool IsStructType<TEntity>(Type type, MemberInfo? memberInfo)
