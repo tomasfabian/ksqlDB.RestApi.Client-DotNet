@@ -3,7 +3,7 @@
 # 7.1.2
 
 ## 🐛 Bug Fixes
-- fixed `EntityInfo.Members` to isolate fieldmetadata lookup between entities that share fields with same types.
+- fixed `EntityInfo.Members` to isolate field metadata lookup between entities that share fields with the same types. #111 (contributed by @mrt181)
 
 # 7.1.1
 
