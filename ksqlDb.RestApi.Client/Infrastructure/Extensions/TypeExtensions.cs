@@ -33,8 +33,8 @@ internal static class TypeExtensions
 
     return null;
   }
-    
-  internal static bool IsStruct(this Type source) 
+
+  internal static bool IsStruct(this Type source)
   {
     return source.IsValueType && !source.IsEnum && !source.IsPrimitive;
   }
@@ -84,7 +84,7 @@ internal static class TypeExtensions
   {
     return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IKSqlGrouping<,>);
   }
-    
+
   internal static string ExtractTypeName(this Type type)
   {
     var name = type.Name;
@@ -94,7 +94,7 @@ internal static class TypeExtensions
 
     return name;
   }
-    
+
   internal static TAttribute? TryGetAttribute<TAttribute>(this MemberInfo memberInfo)
     where TAttribute : Attribute
   {

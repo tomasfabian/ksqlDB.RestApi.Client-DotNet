@@ -117,7 +117,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
     {
       var ksqlProperties = new List<string>();
 
-      foreach (var memberInfo in Members(type, false))
+      foreach (var memberInfo in Members<TEntity>(type, false))
       {
         var memberType = GetMemberType(memberInfo);
 

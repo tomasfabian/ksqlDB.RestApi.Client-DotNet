@@ -1,11 +1,11 @@
 using System.Reflection;
 using System.Text;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
-using ksqlDb.RestApi.Client.FluentAPI.Builders;
-using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDb.RestApi.Client.Metadata;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
@@ -40,7 +40,7 @@ internal sealed class CreateInsert : EntityInfo
 
     bool isFirst = true;
 
-    foreach (var memberInfo in Members(entityType, insertProperties.IncludeReadOnlyProperties))
+    foreach (var memberInfo in Members<T>(entityType, insertProperties.IncludeReadOnlyProperties))
     {
       if (isFirst)
       {
@@ -82,12 +82,12 @@ internal sealed class CreateInsert : EntityInfo
     return value;
   }
 
-  protected override bool IncludeMemberInfo(Type type, EntityMetadata? entityMetadata, MemberInfo memberInfo, bool? includeReadOnly = null)
+  protected override bool IncludeMemberInfo<TEntity>(Type type, EntityMetadata? entityMetadata, MemberInfo memberInfo, bool? includeReadOnly = null)
   {
     var fieldMetadata = entityMetadata?.GetFieldMetadataBy(memberInfo);
-    if (fieldMetadata is {IgnoreInDML: true})
+    if (fieldMetadata is { IgnoreInDML: true })
       return false;
 
-    return base.IncludeMemberInfo(type, entityMetadata, memberInfo, includeReadOnly) && !memberInfo.GetCustomAttributes().OfType<IgnoreByInsertsAttribute>().Any();
+    return base.IncludeMemberInfo<TEntity>(type, entityMetadata, memberInfo, includeReadOnly) && !memberInfo.GetCustomAttributes().OfType<IgnoreByInsertsAttribute>().Any();
   }
 }

@@ -1,5 +1,10 @@
 # ksqlDB.RestApi.Client
 
+# 7.1.2
+
+## 🐛 Bug Fixes
+- fixed `EntityInfo.Members` to isolate fieldmetadata lookup between entities that share fields with same types.
+
 # 7.1.1
 
 ## 🐛 Bug Fixes

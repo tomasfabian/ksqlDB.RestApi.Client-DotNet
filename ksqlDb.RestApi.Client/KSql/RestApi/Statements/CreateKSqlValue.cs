@@ -85,7 +85,7 @@ internal sealed class CreateKSqlValue(IMetadataProvider metadataProvider) : Enti
     }
     else if (!type.IsGenericType && (type.IsClass || type.IsStruct()))
     {
-      GenerateStruct(valueFormatters, type, formatter, ref value);
+      GenerateStruct<T>(valueFormatters, type, formatter, ref value);
     }
     else
     {
@@ -130,7 +130,7 @@ internal sealed class CreateKSqlValue(IMetadataProvider metadataProvider) : Enti
     value = sb.ToString();
   }
 
-  private void GenerateStruct(IValueFormatters valueFormatters, Type type, Func<MemberInfo, string> formatter,
+  private void GenerateStruct<T>(IValueFormatters valueFormatters, Type type, Func<MemberInfo, string> formatter,
     ref object value)
   {
     var sb = new StringBuilder();
@@ -139,7 +139,7 @@ internal sealed class CreateKSqlValue(IMetadataProvider metadataProvider) : Enti
 
     bool isFirst = true;
 
-    foreach (var memberInfo2 in Members(type))
+    foreach (var memberInfo2 in Members<T>(type))
     {
       if (isFirst)
         isFirst = false;

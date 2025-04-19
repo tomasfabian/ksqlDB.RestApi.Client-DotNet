@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDB.RestApi.Client.Infrastructure.Extensions;
@@ -5,9 +6,8 @@ using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
-using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
 using ksqlDb.RestApi.Client.Metadata;
-using System.Reflection;
+using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Generators;
 
@@ -63,12 +63,12 @@ internal sealed class TypeGenerator : EntityInfo
       _ => throw new ArgumentOutOfRangeException(nameof(escaping), escaping, "Non-exhaustive match")
     };
 
-  protected override bool IncludeMemberInfo(Type type, EntityMetadata? entityMetadata, MemberInfo memberInfo, bool? includeReadOnly = null)
+  protected override bool IncludeMemberInfo<TEntity>(Type type, EntityMetadata? entityMetadata, MemberInfo memberInfo, bool? includeReadOnly = null)
   {
     var fieldMetadata = entityMetadata?.GetFieldMetadataBy(memberInfo);
     if (fieldMetadata is { IgnoreInDDL: true })
       return false;
 
-    return base.IncludeMemberInfo(type, entityMetadata, memberInfo, includeReadOnly) && !memberInfo.GetCustomAttributes().OfType<IgnoreInDDLAttribute>().Any();
+    return base.IncludeMemberInfo<TEntity>(type, entityMetadata, memberInfo, includeReadOnly) && !memberInfo.GetCustomAttributes().OfType<IgnoreInDDLAttribute>().Any();
   }
 }
