@@ -58,7 +58,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
         ksqlType = KSqlTypes.Time;
       else if (type == typeof(DateTimeOffset))
         ksqlType = KSqlTypes.Timestamp;
-      else if (!type.IsGenericType && IsStructType(type, memberInfo))
+      else if (!type.IsGenericType && IsStructType<TEntity>(type, memberInfo))
       {
         var ksqlProperties = GetProperties(type, escaping);
 
@@ -95,22 +95,6 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
       }
 
       return ksqlType;
-    }
-
-    private bool IsStructType(Type type, MemberInfo? memberInfo)
-    {
-      if (type.TryGetAttribute<StructAttribute>() != null)
-        return true;
-
-      if (memberInfo == null)
-        return false;
-
-      var entityMetadata = metadataProvider.GetEntities().FirstOrDefault(c => c.Type == typeof(TEntity));
-      var fieldMetadata = entityMetadata?.GetFieldMetadataBy(memberInfo);
-      return fieldMetadata is
-      {
-        IsStruct: true
-      };
     }
 
     internal IEnumerable<string> GetProperties(Type type, IdentifierEscaping escaping)
