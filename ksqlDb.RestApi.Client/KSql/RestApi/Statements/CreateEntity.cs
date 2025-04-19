@@ -5,8 +5,8 @@ using ksqlDB.RestApi.Client.Infrastructure.Extensions;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
-using static System.String;
 using ksqlDb.RestApi.Client.Metadata;
+using static System.String;
 
 namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 
@@ -108,12 +108,12 @@ internal sealed class CreateEntity : EntityInfo
     return $" {key}";
   }
 
-  protected override bool IncludeMemberInfo(Type type, EntityMetadata? entityMetadata, MemberInfo memberInfo, bool? includeReadOnly = null)
+  protected override bool IncludeMemberInfo<TEntity>(Type type, EntityMetadata? entityMetadata, MemberInfo memberInfo, bool? includeReadOnly = null)
   {
     var fieldMetadata = entityMetadata?.GetFieldMetadataBy(memberInfo);
     if (fieldMetadata is { IgnoreInDDL: true })
       return false;
 
-    return base.IncludeMemberInfo(type, entityMetadata, memberInfo, includeReadOnly) && !memberInfo.GetCustomAttributes().OfType<IgnoreInDDLAttribute>().Any();
+    return base.IncludeMemberInfo<TEntity>(type, entityMetadata, memberInfo, includeReadOnly) && !memberInfo.GetCustomAttributes().OfType<IgnoreInDDLAttribute>().Any();
   }
 }

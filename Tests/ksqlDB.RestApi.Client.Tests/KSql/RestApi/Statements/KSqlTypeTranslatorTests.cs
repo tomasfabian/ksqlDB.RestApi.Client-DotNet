@@ -426,6 +426,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
     public void Translate_UseModelBuilderConfiguration_Ignore()
     {
       //Arrange
+      var kSqlTypeTranslator = new KSqlTypeTranslator<PocoEx>(modelBuilder);
       var type = typeof(PocoEx);
       modelBuilder.Entity<PocoEx>()
         .Property(c => c.Description)
@@ -442,6 +443,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
     public void Translate_UseModelBuilderConfiguration_IgnorePropertyFromBaseType()
     {
       //Arrange
+      var kSqlTypeTranslator  = new KSqlTypeTranslator<PocoEx>(modelBuilder);
       var type = typeof(PocoEx);
       modelBuilder.Entity<PocoEx>()
         .Property(c => c.Amount)

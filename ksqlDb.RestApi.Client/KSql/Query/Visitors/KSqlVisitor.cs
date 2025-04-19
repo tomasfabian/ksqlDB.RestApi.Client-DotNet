@@ -439,7 +439,7 @@ internal class KSqlVisitor : ExpressionVisitor
 
       return memberExpression;
     }
-    
+
     var memberName2 = memberExpression.GetMemberName(QueryMetadata.ModelBuilder);
 
     switch (memberExpression.Expression.NodeType)
