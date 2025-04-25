@@ -19,46 +19,33 @@ services:
     volumes:
       - sqlserver2019data:/var/opt/mssql
 
-  zookeeper:
-    image: 'bitnami/zookeeper:latest'
+  broker:
+    image: bitnami/kafka:4.0
     ports:
-      - '2181:2181'
-    networks: 
+      - 29092:29092
+    networks:
       - kafkanetwork
     environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
-
-  broker01:
-    image: 'bitnami/kafka:latest'
-    ports:
-      - '29092:29092'
-    networks: 
-      - kafkanetwork
-    environment:
-      - KAFKA_BROKER_ID=1
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://broker01:9092,PLAINTEXT_HOST://broker01:29092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://broker01:9092,PLAINTEXT_HOST://localhost:29092
-      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
-      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-    depends_on:
-      - zookeeper
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: EXTERNAL://0.0.0.0:29092,PLAINTEXT://broker:9092,CONTROLLER://broker:9093
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:29092,PLAINTEXT://broker:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:9093
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:6.0.0
-    networks: 
+    image: confluentinc/cp-schema-registry:7.9.0
+    networks:
       - kafkanetwork
     depends_on:
-      - zookeeper
-      - broker01
+      - broker
     ports:
-      - "8081:8081"
+      - 8081:8081
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "broker:9092"
 
   ksqldb-server:
     image: confluentinc/ksqldb-server:${CONFLUENT_VERSION}
@@ -68,7 +55,7 @@ services:
     networks: 
       - kafkanetwork
     depends_on:
-      - broker01
+      - broker
       - schema-registry
     volumes:
      - "./debezium-connector-sqlserver/:/usr/share/kafka/plugins/"
@@ -79,12 +66,12 @@ services:
         retries: 5
     environment:
       KSQL_LISTENERS: "http://0.0.0.0:8088"
-      KSQL_BOOTSTRAP_SERVERS: broker01:9092
+      KSQL_BOOTSTRAP_SERVERS: broker:9092
       KSQL_HOST_NAME: ksqldb-server
       KSQL_KSQL_SERVICE_ID: ksql-connect-cluster
       KSQL_KSQL_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       KSQL_KSQL_CONNECT_WORKER_CONFIG: "/etc/ksqldb/connect.properties"
-      KSQL_CONNECT_BOOTSTRAP_SERVERS: 'broker01:9092'
+      KSQL_CONNECT_BOOTSTRAP_SERVERS: 'broker:9092'
       KSQL_CONNECT_REST_ADVERTISED_HOST_NAME: 'ksqldb-server'
       KSQL_CONNECT_REST_PORT: 8083
       KSQL_CONNECT_GROUP_ID: ksqldb-kafka-connect-group-01
@@ -105,25 +92,24 @@ services:
       KSQL_CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: '1'
       KSQL_CONNECT_PLUGIN_PATH: '/usr/share/kafka/plugins/'
 
-  kafdrop:
-    image: obsidiandynamics/kafdrop:3.27.0
-    environment:
-      - KAFKA_BROKERCONNECT=broker01:9092
-      - JVM_OPTS=-Xms32M -Xms64M
-      - SERVER_SERVLET_CONTEXTPATH=/
-    ports:
-      - "9000:9000"
+  kafka-ui:
+    image: provectuslabs/kafka-ui:v0.7.2
     networks: 
       - kafkanetwork
-    depends_on:
-      - broker01
+    ports:
+      - 8080:8080
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "broker:9092"
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: "http://schema-registry:8081"
+      DYNAMIC_CONFIG_ENABLED: 'true'
 
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:${CONFLUENT_VERSION}
     networks: 
       - kafkanetwork
     depends_on:
-      - broker01
+      - broker
       - ksqldb-server
     entrypoint: /bin/sh
     tty: true
