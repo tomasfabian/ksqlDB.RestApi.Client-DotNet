@@ -47,8 +47,8 @@ internal class CreateStatement<TEntity> : KSet, ICreateStatement<TEntity>
 
     var ksqlQuery = dependencies.KSqlQueryGenerator.BuildKSql(Expression, StatementContext);
       
-    ksqlQuery = @$"{StatementContext.Statement}
-AS {ksqlQuery}";
+    ksqlQuery = @$"{StatementContext.Statement} AS 
+{ksqlQuery}";
 
     serviceScope.Dispose();
 

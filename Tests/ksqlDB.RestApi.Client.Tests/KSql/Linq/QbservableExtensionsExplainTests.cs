@@ -76,7 +76,7 @@ public class QbservableExtensionsExplainTests : TestBase
 
     //Assert
     explainStatement.Should().Be(@"EXPLAIN SELECT * FROM Strings
-WHERE c = 'ET' EMIT CHANGES;".ReplaceLineEndings());
+ WHERE c = 'ET' EMIT CHANGES;".ReplaceLineEndings());
   }
 
   class TestableDbProviderForExplain : TestableDbProvider<QbservableGroupByExtensionsTests.City>

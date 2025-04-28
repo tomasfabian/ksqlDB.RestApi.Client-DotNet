@@ -35,6 +35,7 @@ internal class SensorsPullQueryProvider
       .WindowedBy(new TimeWindows(windowDuration).WithGracePeriod(Duration.OfHours(2)))
       .Select(c => new {SensorId = c.Key, AvgValue = c.Avg(g => g.Value)});
 
+    var s = statement.ToStatementString();
     var response = await statement.ExecuteStatementAsync();
     var statementResponses = await response.ToStatementResponsesAsync();
 

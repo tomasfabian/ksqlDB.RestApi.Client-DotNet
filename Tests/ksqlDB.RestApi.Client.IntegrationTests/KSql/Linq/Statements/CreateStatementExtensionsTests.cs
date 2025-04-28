@@ -25,8 +25,8 @@ public class CreateStatementExtensionsTests : Infrastructure.IntegrationTests
     var ksql2 = query.ToStatementString();
 
     //Assert
-    ksql1.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
-AS SELECT * FROM {nameof(Movie)} EMIT CHANGES;");
+    ksql1.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName} AS 
+SELECT * FROM {nameof(Movie)} EMIT CHANGES;");
 
     ksql1.Should().BeEquivalentTo(ksql2);
   }
@@ -73,10 +73,10 @@ AS SELECT * FROM {nameof(Movie)} EMIT CHANGES;");
     httpResponseMessage = await createStatement.ExecuteStatementAsync();
 
     //Assert
-    ksql.Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
- WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' )
-AS SELECT Id, Title, Release_Year AS ReleaseYear FROM {StreamEntityName}
-WHERE Id < 3 PARTITION BY Id EMIT CHANGES;");
+    ksql.ReplaceLineEndings().Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
+ WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' ) AS 
+SELECT Id, Title, Release_Year AS ReleaseYear FROM {StreamEntityName}
+ WHERE Id < 3 PARTITION BY Id EMIT CHANGES;".ReplaceLineEndings());
 
     var responses = await httpResponseMessage.ToStatementResponsesAsync();
     responses[0].CommandStatus!.Status.Should().BeOneOf("SUCCESS", "EXECUTING");

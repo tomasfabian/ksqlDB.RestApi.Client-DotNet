@@ -178,7 +178,7 @@ Drop type {nameof(Address)};
   {
     //Arrange
     var connectorConfig = new Dictionary<string, string> {
-      { "connector.class", "org.apache.kafka.connect.tools.MockSinkConnector" },
+      { "connector.class", "io.debezium.connector.jdbc.JdbcSinkConnector" },
       { "topics.regex", "mock-sink*"},
     };
 
@@ -199,11 +199,13 @@ Drop type {nameof(Address)};
   {
     //Arrange
     var connectorConfig = new Dictionary<string, string> {
-      { "connector.class", "org.apache.kafka.connect.tools.MockSourceConnector" },
+      { "connector.class", "org.apache.kafka.connect.mirror.MirrorSourceConnector" },
+      { "source.cluster.alias", "mock" },
     };
 
     //Act
     var httpResponseMessage = await restApiClient.CreateSourceConnectorAsync(connectorConfig, SourceConnectorName);
+    var r = await httpResponseMessage.ToStatementResponsesAsync();
 
     var connectorsResponse = await restApiClient.GetConnectorsAsync();
 

@@ -125,7 +125,7 @@ public class QbservableExtensionsTests : TestBase
     string columnName = nameof(Location.Latitude);
 
     string expected = @$"SELECT * FROM Locations
-WHERE ({columnName} = '1') OR (({columnName} != '2') AND ({columnName} = '3')) EMIT CHANGES;".ReplaceLineEndings();
+ WHERE ({columnName} = '1') OR (({columnName} != '2') AND ({columnName} = '3')) EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expected);
   }
@@ -144,7 +144,7 @@ WHERE ({columnName} = '1') OR (({columnName} != '2') AND ({columnName} = '3')) E
     string columnName = nameof(Location.Latitude);
 
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM Locations
-WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') EMIT CHANGES;".ReplaceLineEndings());
+ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') EMIT CHANGES;".ReplaceLineEndings());
   }
 
   #endregion
@@ -486,7 +486,7 @@ WHERE (({columnName} = '1') OR ({columnName} != '2')) AND ({columnName} = '3') E
 
     //Assert
     string expectedKSql = @"SELECT IP_ADDRESS, URL, TIMESTAMP FROM Clicks
-WHERE IP_ADDRESS IS NOT NULL EMIT CHANGES;".ReplaceLineEndings();
+ WHERE IP_ADDRESS IS NOT NULL EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKSql);
   }
@@ -506,7 +506,7 @@ WHERE IP_ADDRESS IS NOT NULL EMIT CHANGES;".ReplaceLineEndings();
 
     //Assert
     string expectedKSql = @"SELECT IP_ADDRESS, URL, TIMESTAMP FROM Clicks
-WHERE IP_ADDRESS IS NULL EMIT CHANGES;".ReplaceLineEndings();
+ WHERE IP_ADDRESS IS NULL EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKSql);
   }
@@ -530,7 +530,7 @@ WHERE IP_ADDRESS IS NULL EMIT CHANGES;".ReplaceLineEndings();
 
     //Assert
     string expectedKSql = $@"SELECT * FROM {tableName}s
-WHERE Id = '{uniqueId}' EMIT CHANGES;".ReplaceLineEndings();
+ WHERE Id = '{uniqueId}' EMIT CHANGES;".ReplaceLineEndings();
 
     ksql.Should().BeEquivalentTo(expectedKSql);
   }

@@ -320,7 +320,7 @@ public class QbservableGroupByExtensionsTests : TestBase
 
     //Assert
     ksql.Should().BeEquivalentTo(@"SELECT RegionCode, STATE->Name, COUNT(*) num_times FROM Cities
-WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES;".ReplaceLineEndings());
+ WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [Test]
@@ -344,7 +344,7 @@ WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES;".ReplaceLineEndings(
 
     //Assert
     ksql.Should().BeEquivalentTo(@"SELECT RegionCode, STATE->Name, COUNT(*) num_times FROM Cities
-WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES LIMIT 2;".ReplaceLineEndings());
+ WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES LIMIT 2;".ReplaceLineEndings());
   }
 
   [Test]
@@ -366,7 +366,7 @@ WHERE RegionCode != 'xx' GROUP BY State->Name EMIT CHANGES LIMIT 2;".ReplaceLine
 
     //Assert
     ksql.Should().BeEquivalentTo(@"SELECT RegionCode, COUNT(*) num_times FROM Cities
-WHERE RegionCode != 'xx' GROUP BY RegionCode EMIT CHANGES;".ReplaceLineEndings());
+ WHERE RegionCode != 'xx' GROUP BY RegionCode EMIT CHANGES;".ReplaceLineEndings());
   }
 
   #endregion

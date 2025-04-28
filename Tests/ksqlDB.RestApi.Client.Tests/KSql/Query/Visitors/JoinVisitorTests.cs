@@ -509,15 +509,15 @@ EMIT CHANGES;".ReplaceLineEndings());
     yield return (Never, @$"SELECT lm.Nested->Prop Prop, O.OrderId AS orderId FROM Orders O
 INNER JOIN LambdaMaps lm
 ON O.OrderId = lm.Id
-WHERE lm.Nested->Prop = 'Nested' EMIT CHANGES;".ReplaceLineEndings());
+ WHERE lm.Nested->Prop = 'Nested' EMIT CHANGES;".ReplaceLineEndings());
     yield return (Keywords, @$"SELECT lm.Nested->Prop Prop, O.OrderId AS orderId FROM Orders O
 INNER JOIN LambdaMaps lm
 ON O.OrderId = lm.Id
-WHERE lm.Nested->Prop = 'Nested' EMIT CHANGES;".ReplaceLineEndings());
+ WHERE lm.Nested->Prop = 'Nested' EMIT CHANGES;".ReplaceLineEndings());
     yield return (Always, @$"SELECT `lm`.`Nested`->`Prop` `Prop`, `O`.`OrderId` AS `orderId` FROM `Orders` `O`
 INNER JOIN `LambdaMaps` `lm`
 ON `O`.`OrderId` = `lm`.`Id`
-WHERE `lm`.`Nested`->`Prop` = 'Nested' EMIT CHANGES;".ReplaceLineEndings());
+ WHERE `lm`.`Nested`->`Prop` = 'Nested' EMIT CHANGES;".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(JoinWithNestedTypeTestCases))]

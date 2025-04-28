@@ -91,7 +91,7 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
       if (isFirst)
       {
         kSqlVisitor.Append(HasJoins ? string.Empty : Environment.NewLine);
-        kSqlVisitor.Append("WHERE ");
+        kSqlVisitor.Append(" WHERE ");
 
         isFirst = false;
       }

@@ -66,7 +66,7 @@ public class PullQueryExtensionsTests : TestBase
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT {nameof(IoTSensorStats.SensorId)}, AvgValue AS Avg FROM {nameof(IoTSensorStats)}
-WHERE SensorId = '{sensorId}';".ReplaceLineEndings());
+ WHERE SensorId = '{sensorId}';".ReplaceLineEndings());
   }
 
   [Test]
@@ -83,7 +83,7 @@ WHERE SensorId = '{sensorId}';".ReplaceLineEndings());
 
     //Assert
     ksql1.Should().BeEquivalentTo(@$"SELECT * FROM {nameof(IoTSensorStats)}
-WHERE SensorId = '{sensorId}';".ReplaceLineEndings());
+ WHERE SensorId = '{sensorId}';".ReplaceLineEndings());
 
     ksql1.Should().BeEquivalentTo(ksql2);
   }
@@ -103,7 +103,7 @@ WHERE SensorId = '{sensorId}';".ReplaceLineEndings());
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM {MaterializedViewName}
-WHERE SensorId = '{sensorId}';".ReplaceLineEndings());
+ WHERE SensorId = '{sensorId}';".ReplaceLineEndings());
   }
 
   [Test]
@@ -122,7 +122,7 @@ WHERE SensorId = '{sensorId}';".ReplaceLineEndings());
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM {MaterializedViewName}
-WHERE SensorId = '{sensorId}' AND (WINDOWSTART > {windowStart}) AND (WINDOWEND <= {windowEnd});".ReplaceLineEndings());
+ WHERE SensorId = '{sensorId}' AND (WINDOWSTART > {windowStart}) AND (WINDOWEND <= {windowEnd});".ReplaceLineEndings());
   }
 
   [Test]
@@ -141,7 +141,7 @@ WHERE SensorId = '{sensorId}' AND (WINDOWSTART > {windowStart}) AND (WINDOWEND <
 
     //Assert
     ksql.Should().BeEquivalentTo(@$"SELECT * FROM {MaterializedViewName}
-WHERE SensorId = '{sensorId}' AND (WINDOWSTART > '{windowStart}') AND (WINDOWEND <= '{windowEnd}');".ReplaceLineEndings());
+ WHERE SensorId = '{sensorId}' AND (WINDOWSTART > '{windowStart}') AND (WINDOWEND <= '{windowEnd}');".ReplaceLineEndings());
   }
 
   [Test]
@@ -235,13 +235,13 @@ WHERE SensorId = '{sensorId}' AND (WINDOWSTART > '{windowStart}') AND (WINDOWEND
   {
     yield return (Never,
       @$"SELECT prop FROM {nameof(SubProperty)}
-WHERE prop = 'test';".ReplaceLineEndings());
+ WHERE prop = 'test';".ReplaceLineEndings());
     yield return (Keywords,
       @$"SELECT prop FROM {nameof(SubProperty)}
-WHERE prop = 'test';".ReplaceLineEndings());
+ WHERE prop = 'test';".ReplaceLineEndings());
     yield return (Always,
       @$"SELECT `prop` FROM `{nameof(SubProperty)}`
-WHERE `prop` = 'test';".ReplaceLineEndings());
+ WHERE `prop` = 'test';".ReplaceLineEndings());
   }
 
   [TestCaseSource(nameof(SelectColumnsUsingPullQueryThatHaveJsonPropertyNameAndWhereTestCases))]
