@@ -1,5 +1,10 @@
 # ksqlDB.RestApi.Client
 
+# 7.1.3
+
+## 🐛 Bug Fixes
+- fixed `KSqlTypeTranslator.Translate` to check for nullable enum types. #112 (contributed by @mrt181)
+
 # 7.1.2
 
 ## 🐛 Bug Fixes

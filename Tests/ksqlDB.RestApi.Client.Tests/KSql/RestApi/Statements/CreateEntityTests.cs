@@ -759,29 +759,28 @@ public class CreateEntityTests
 ) WITH ( KAFKA_TOPIC='{nameof(Poco)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
   }
 
-  private class PocoWithNullable : Poco
+  private class Poco2 : Poco
   {
     public InnerPoco InnerPoco { get; init; }
   }
 
-  private class PocoWithNullable2 : Poco
+  private class Poco3 : Poco
   {
     public InnerPoco InnerPoco { get; init; }
   }
 
-  private class PocoWithNullable3 : Poco
+  private class Poco4 : Poco
   {
     public InnerPoco InnerPoco { get; init; }
   }
 
-  private class PocoWithNullable4 : Poco
+  private class Poco5 : Poco
   {
     public InnerPoco InnerPoco { get; init; }
   }
 
   private class OuterPoco : Poco
   {
-
     public InnerPoco InnerPoco { get; init; }
   }
 
@@ -796,17 +795,61 @@ public class CreateEntityTests
     public int Value { get; init; }
   }
 
+  private class OuterPoco2 : Poco
+  {
+     public InnerPoco3 InnerPoco { get; init; }
+  }
+
+  private class InnerPoco3
+  {
+    public int Value { get; init; }
+    public PocoEnum? ValueNullable { get; init; }
+  }
+
+  private enum PocoEnum
+  {
+    MemberA,
+  }
+
+  [Test]
+  public void ModelBuilder_SetTypeOfNullableEnum()
+  {
+    //Arrange
+    modelBuilder.Entity<OuterPoco2>()
+      .HasKey(x => x.Id);
+    modelBuilder.Entity<OuterPoco2>()
+      .Property(c => c.InnerPoco).AsStruct();
+
+    var statementContext = new StatementContext
+    {
+      CreationType = CreationType.CreateOrReplace,
+      KSqlEntityType = KSqlEntityType.Table,
+    };
+
+    creationMetadata.KafkaTopic = nameof(Poco);
+
+    //Act
+    string statement = new CreateEntity(modelBuilder).Print<OuterPoco2>(statementContext, creationMetadata, null);
+
+    //Assert
+    statement.Should().Be($@"CREATE OR REPLACE TABLE {nameof(OuterPoco2)}s (
+	{nameof(OuterPoco2.InnerPoco)} STRUCT<Value INT, ValueNullable VARCHAR>,
+	{nameof(OuterPoco2.Id)} INT PRIMARY KEY,
+	{nameof(OuterPoco2.Description)} VARCHAR
+) WITH ( KAFKA_TOPIC='{nameof(Poco)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
+  }
+
   [Test]
   public void ModelBuilder_IgnoreStructProperty()
   {
     //Arrange
-    modelBuilder.Entity<PocoWithNullable>()
+    modelBuilder.Entity<Poco2>()
       .HasKey(x => x.Id);
-    modelBuilder.Entity<PocoWithNullable>()
+    modelBuilder.Entity<Poco2>()
       .Property(c => c.InnerPoco).AsStruct();
-    modelBuilder.Entity<PocoWithNullable>()
+    modelBuilder.Entity<Poco2>()
       .Property(c => c.InnerPoco.InnerPoco2).Ignore();
-    modelBuilder.Entity<PocoWithNullable>()
+    modelBuilder.Entity<Poco2>()
       .Property(c => c.InnerPoco.Value);
 
     var statementContext = new StatementContext
@@ -818,11 +861,11 @@ public class CreateEntityTests
     creationMetadata.KafkaTopic = nameof(Poco);
 
     //Act
-    string statement = new CreateEntity(modelBuilder).Print<PocoWithNullable>(statementContext, creationMetadata, null);
+    string statement = new CreateEntity(modelBuilder).Print<Poco2>(statementContext, creationMetadata, null);
 
     //Assert
-    statement.Should().Be($@"CREATE OR REPLACE TABLE {nameof(PocoWithNullable)}s (
-	{nameof(PocoWithNullable.InnerPoco)} STRUCT<Value VARCHAR>,
+    statement.Should().Be($@"CREATE OR REPLACE TABLE {nameof(Poco2)}s (
+	{nameof(Poco2.InnerPoco)} STRUCT<Value VARCHAR>,
 	{nameof(Poco.Id)} INT PRIMARY KEY,
 	{nameof(Poco.Description)} VARCHAR
 ) WITH ( KAFKA_TOPIC='{nameof(Poco)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
@@ -832,36 +875,36 @@ public class CreateEntityTests
   public void ModelBuilder_IgnoreStructPropertyOnOneEntityButNotOnAnother()
   {
     //Arrange
-    modelBuilder.Entity<PocoWithNullable>()
+    modelBuilder.Entity<Poco2>()
       .HasKey(x => x.Id);
-    modelBuilder.Entity<PocoWithNullable>()
+    modelBuilder.Entity<Poco2>()
       .Property(c => c.InnerPoco).AsStruct();
-    modelBuilder.Entity<PocoWithNullable>()
+    modelBuilder.Entity<Poco2>()
       .Property(c => c.InnerPoco.InnerPoco2).Ignore();
 
-    modelBuilder.Entity<PocoWithNullable2>()
+    modelBuilder.Entity<Poco3>()
       .HasKey(x => x.Id);
-    modelBuilder.Entity<PocoWithNullable2>()
+    modelBuilder.Entity<Poco3>()
       .Property(c => c.InnerPoco).AsStruct();
-    modelBuilder.Entity<PocoWithNullable2>()
+    modelBuilder.Entity<Poco3>()
       .Property(c => c.InnerPoco.Value).Ignore();
-    modelBuilder.Entity<PocoWithNullable2>()
+    modelBuilder.Entity<Poco3>()
       .Property(c => c.InnerPoco.InnerPoco2).AsStruct();
 
-    modelBuilder.Entity<PocoWithNullable3>()
+    modelBuilder.Entity<Poco4>()
       .HasKey(x => x.Id);
-    modelBuilder.Entity<PocoWithNullable3>()
+    modelBuilder.Entity<Poco4>()
       .Property(c => c.InnerPoco).AsStruct();
-    modelBuilder.Entity<PocoWithNullable3>()
+    modelBuilder.Entity<Poco4>()
       .Property(c => c.InnerPoco.InnerPoco2).AsStruct();
-    modelBuilder.Entity<PocoWithNullable3>()
+    modelBuilder.Entity<Poco4>()
       .Property(c => c.InnerPoco.InnerPoco2!.FirstOrDefault()!.Value).Ignore();
 
-    modelBuilder.Entity<PocoWithNullable4>()
+    modelBuilder.Entity<Poco5>()
       .HasKey(x => x.Id);
-    modelBuilder.Entity<PocoWithNullable4>()
+    modelBuilder.Entity<Poco5>()
       .Property(c => c.InnerPoco).AsStruct();
-    modelBuilder.Entity<PocoWithNullable4>()
+    modelBuilder.Entity<Poco5>()
       .Property(c => c.InnerPoco.InnerPoco2).AsStruct();
 
     var statementContext = new StatementContext
@@ -873,32 +916,32 @@ public class CreateEntityTests
     creationMetadata.KafkaTopic = nameof(Poco);
 
     //Act
-    var statement1 = new CreateEntity(modelBuilder).Print<PocoWithNullable>(statementContext, creationMetadata, null);
-    var statement2 = new CreateEntity(modelBuilder).Print<PocoWithNullable2>(statementContext, creationMetadata, null);
-    var statement3 = new CreateEntity(modelBuilder).Print<PocoWithNullable3>(statementContext, creationMetadata, null);
-    var statement4 = new CreateEntity(modelBuilder).Print<PocoWithNullable4>(statementContext, creationMetadata, null);
+    var statement1 = new CreateEntity(modelBuilder).Print<Poco2>(statementContext, creationMetadata, null);
+    var statement2 = new CreateEntity(modelBuilder).Print<Poco3>(statementContext, creationMetadata, null);
+    var statement3 = new CreateEntity(modelBuilder).Print<Poco4>(statementContext, creationMetadata, null);
+    var statement4 = new CreateEntity(modelBuilder).Print<Poco5>(statementContext, creationMetadata, null);
 
     //Assert
-    statement1.Should().Be($@"CREATE OR REPLACE TABLE {nameof(PocoWithNullable)}s (
-	{nameof(PocoWithNullable.InnerPoco)} STRUCT<Value VARCHAR>,
+    statement1.Should().Be($@"CREATE OR REPLACE TABLE {nameof(Poco2)}s (
+	{nameof(Poco2.InnerPoco)} STRUCT<Value VARCHAR>,
 	{nameof(Poco.Id)} INT PRIMARY KEY,
 	{nameof(Poco.Description)} VARCHAR
 ) WITH ( KAFKA_TOPIC='{nameof(Poco)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
 
-    statement2.Should().Be($@"CREATE OR REPLACE TABLE {nameof(PocoWithNullable2)}s (
-	{nameof(PocoWithNullable2.InnerPoco)} STRUCT<{nameof(PocoWithNullable2.InnerPoco.InnerPoco2)} ARRAY<STRUCT<{nameof(InnerPoco2.Value)} INT>>>,
+    statement2.Should().Be($@"CREATE OR REPLACE TABLE {nameof(Poco3)}s (
+	{nameof(Poco3.InnerPoco)} STRUCT<{nameof(Poco3.InnerPoco.InnerPoco2)} ARRAY<STRUCT<{nameof(InnerPoco2.Value)} INT>>>,
 	{nameof(Poco.Id)} INT PRIMARY KEY,
 	{nameof(Poco.Description)} VARCHAR
 ) WITH ( KAFKA_TOPIC='{nameof(Poco)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
 
-    statement3.Should().Be($@"CREATE OR REPLACE TABLE {nameof(PocoWithNullable3)}s (
-	{nameof(PocoWithNullable3.InnerPoco)} STRUCT<Value VARCHAR>,
+    statement3.Should().Be($@"CREATE OR REPLACE TABLE {nameof(Poco4)}s (
+	{nameof(Poco4.InnerPoco)} STRUCT<Value VARCHAR>,
 	{nameof(Poco.Id)} INT PRIMARY KEY,
 	{nameof(Poco.Description)} VARCHAR
 ) WITH ( KAFKA_TOPIC='{nameof(Poco)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
 
-    statement4.Should().Be($@"CREATE OR REPLACE TABLE {nameof(PocoWithNullable4)}s (
-	{nameof(PocoWithNullable4.InnerPoco)} STRUCT<{nameof(PocoWithNullable4.InnerPoco.Value)} VARCHAR, {nameof(PocoWithNullable4.InnerPoco.InnerPoco2)} ARRAY<STRUCT<{nameof(InnerPoco2.Value)} INT>>>,
+    statement4.Should().Be($@"CREATE OR REPLACE TABLE {nameof(Poco5)}s (
+	{nameof(Poco5.InnerPoco)} STRUCT<{nameof(Poco5.InnerPoco.Value)} VARCHAR, {nameof(Poco5.InnerPoco.InnerPoco2)} ARRAY<STRUCT<{nameof(InnerPoco2.Value)} INT>>>,
 	{nameof(Poco.Id)} INT PRIMARY KEY,
 	{nameof(Poco.Description)} VARCHAR
 ) WITH ( KAFKA_TOPIC='{nameof(Poco)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
@@ -960,12 +1003,12 @@ public class CreateEntityTests
     // STRUCT<> is an invalid ksql statement
 
     //Arrange
-    modelBuilder.Entity<PocoWithNullable>()
+    modelBuilder.Entity<Poco2>()
       .HasKey(x => x.Id)
       .Property(c => c.InnerPoco).AsStruct();
-    modelBuilder.Entity<PocoWithNullable>()
+    modelBuilder.Entity<Poco2>()
       .Property(c => c.InnerPoco.InnerPoco2).Ignore();
-    modelBuilder.Entity<PocoWithNullable>()
+    modelBuilder.Entity<Poco2>()
       .Property(c => c.InnerPoco.Value).Ignore();
 
     var statementContext = new StatementContext
@@ -977,10 +1020,10 @@ public class CreateEntityTests
     creationMetadata.KafkaTopic = nameof(Poco);
 
     //Act
-    string statement = new CreateEntity(modelBuilder).Print<PocoWithNullable>(statementContext, creationMetadata, null);
+    string statement = new CreateEntity(modelBuilder).Print<Poco2>(statementContext, creationMetadata, null);
 
     //Assert
-    statement.Should().Be($@"CREATE OR REPLACE TABLE {nameof(PocoWithNullable)}s (
+    statement.Should().Be($@"CREATE OR REPLACE TABLE {nameof(Poco2)}s (
 	{nameof(Poco.Id)} INT PRIMARY KEY,
 	{nameof(Poco.Description)} VARCHAR
 ) WITH ( KAFKA_TOPIC='{nameof(Poco)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());
@@ -1000,12 +1043,12 @@ public class CreateEntityTests
     // STRUCT<> is an invalid ksql statement
 
     //Arrange
-    modelBuilder.Entity<PocoWithNullable>()
+    modelBuilder.Entity<Poco2>()
       .HasKey(x => x.Id)
       .Property(c => c.InnerPoco).Ignore();
-    modelBuilder.Entity<PocoWithNullable>()
+    modelBuilder.Entity<Poco2>()
       .Property(c => c.InnerPoco.InnerPoco2);
-    modelBuilder.Entity<PocoWithNullable>()
+    modelBuilder.Entity<Poco2>()
       .Property(c => c.InnerPoco.Value);
 
     var statementContext = new StatementContext
@@ -1017,10 +1060,10 @@ public class CreateEntityTests
     creationMetadata.KafkaTopic = nameof(Poco);
 
     //Act
-    string statement = new CreateEntity(modelBuilder).Print<PocoWithNullable>(statementContext, creationMetadata, null);
+    string statement = new CreateEntity(modelBuilder).Print<Poco2>(statementContext, creationMetadata, null);
 
     //Assert
-    statement.Should().Be($@"CREATE OR REPLACE TABLE {nameof(PocoWithNullable)}s (
+    statement.Should().Be($@"CREATE OR REPLACE TABLE {nameof(Poco2)}s (
 	{nameof(Poco.Id)} INT PRIMARY KEY,
 	{nameof(Poco.Description)} VARCHAR
 ) WITH ( KAFKA_TOPIC='{nameof(Poco)}', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings());

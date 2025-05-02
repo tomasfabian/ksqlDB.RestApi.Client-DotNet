@@ -21,363 +21,67 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Statements
       kSqlTypeTranslator = new(modelBuilder);
     }
 
-    [Test]
-    public void Translate_StringType()
+    [TestCase(typeof(string), KSqlTypes.Varchar)]
+    [TestCase(typeof(short), KSqlTypes.Int)]
+    [TestCase(typeof(int), KSqlTypes.Int)]
+    [TestCase(typeof(long), KSqlTypes.BigInt)]
+    [TestCase(typeof(double), KSqlTypes.Double)]
+    [TestCase(typeof(decimal), KSqlTypes.Decimal)]
+    [TestCase(typeof(bool), KSqlTypes.Boolean)]
+    [TestCase(typeof(short?), KSqlTypes.Int)]
+    [TestCase(typeof(int?), KSqlTypes.Int)]
+    [TestCase(typeof(long?), KSqlTypes.BigInt)]
+    [TestCase(typeof(double?), KSqlTypes.Double)]
+    [TestCase(typeof(decimal?), KSqlTypes.Decimal)]
+    [TestCase(typeof(bool?), KSqlTypes.Boolean)]
+    [TestCase(typeof(Dictionary<string, int>), $"{KSqlTypes.Map}<{KSqlTypes.Varchar}, {KSqlTypes.Int}>")]
+    [TestCase(typeof(Dictionary<string, int?>), $"{KSqlTypes.Map}<{KSqlTypes.Varchar}, {KSqlTypes.Int}>")]
+    [TestCase(typeof(IDictionary<string, long>), $"{KSqlTypes.Map}<{KSqlTypes.Varchar}, {KSqlTypes.BigInt}>")]
+    [TestCase(typeof(IDictionary<string, long?>), $"{KSqlTypes.Map}<{KSqlTypes.Varchar}, {KSqlTypes.BigInt}>")]
+    [TestCase(typeof(double[]), $"{KSqlTypes.Array}<{KSqlTypes.Double}>")]
+    [TestCase(typeof(IEnumerable<string>), $"{KSqlTypes.Array}<{KSqlTypes.Varchar}>")]
+    [TestCase(typeof(List<string>), $"{KSqlTypes.Array}<{KSqlTypes.Varchar}>")]
+    [TestCase(typeof(IList<string>), $"{KSqlTypes.Array}<{KSqlTypes.Varchar}>")]
+    [TestCase(typeof(IDictionary<string, int>[]), $"{KSqlTypes.Array}<{KSqlTypes.Map}<{KSqlTypes.Varchar}, {KSqlTypes.Int}>>")]
+    [TestCase(typeof(IDictionary<string, int?>[]), $"{KSqlTypes.Array}<{KSqlTypes.Map}<{KSqlTypes.Varchar}, {KSqlTypes.Int}>>")]
+    [TestCase(typeof(IDictionary<string, int[]>), $"{KSqlTypes.Map}<{KSqlTypes.Varchar}, {KSqlTypes.Array}<{KSqlTypes.Int}>>")]
+    [TestCase(typeof(IDictionary<string, int[]?>), $"{KSqlTypes.Map}<{KSqlTypes.Varchar}, {KSqlTypes.Array}<{KSqlTypes.Int}>>")]
+    [TestCase(typeof(byte[]), KSqlTypes.Bytes)]
+    [TestCase(typeof(Guid), KSqlTypes.Varchar)]
+    [TestCase(typeof(Guid?), KSqlTypes.Varchar)]
+    [TestCase(typeof(DateTime), KSqlTypes.Date)]
+    [TestCase(typeof(DateTime?), KSqlTypes.Date)]
+    [TestCase(typeof(TimeSpan), KSqlTypes.Time)]
+    [TestCase(typeof(TimeSpan?), KSqlTypes.Time)]
+    [TestCase(typeof(DateTimeOffset), KSqlTypes.Timestamp)]
+    [TestCase(typeof(DateTimeOffset?), KSqlTypes.Timestamp)]
+    [TestCase(typeof(ConsoleColor), KSqlTypes.Varchar)]
+    [TestCase(typeof(ConsoleColor?), KSqlTypes.Varchar)]
+    [TestCase(typeof(Account), $"{KSqlTypes.Struct}<{nameof(Account.Amount)} {KSqlTypes.Decimal}(10,4)>")]
+    public void Translate_TypeToKsqlType(Type type, string expectedKsqlType)
     {
-      //Arrange
-      var type = typeof(string);
+        // Act
+        string ksqlType = kSqlTypeTranslator.Translate(type);
 
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be(KSqlTypes.Varchar);
+        // Assert
+        ksqlType.Should().Be(expectedKsqlType);
     }
 
-    [Test]
-    public void Translate_IntType()
+    [TestCase(typeof(StringBuilder), nameof(StringBuilder))]
+    [TestCase(typeof(Point), nameof(Point))]
+    public void Translate_TypeToKsqlType_2(Type type, string expectedKsqlType)
     {
-      //Arrange
-      var type = typeof(int);
+        // Act
+        string ksqlType = kSqlTypeTranslator.Translate(type);
 
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be(KSqlTypes.Int);
+        // Assert
+        ksqlType.Should().Be(expectedKsqlType.ToUpperInvariant());
     }
-
-    [Test]
-    public void Translate_LongType()
-    {
-      //Arrange
-      var type = typeof(long);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be(KSqlTypes.BigInt);
-    }
-
-    [Test]
-    public void Translate_DoubleType()
-    {
-      //Arrange
-      var type = typeof(double);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be(KSqlTypes.Double);
-    }
-
-    [Test]
-    public void Translate_DecimalType()
-    {
-      //Arrange
-      var type = typeof(decimal);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be(KSqlTypes.Decimal);
-    }
-
-    [Test]
-    public void Translate_BoolType()
-    {
-      //Arrange
-      var type = typeof(bool);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be(KSqlTypes.Boolean);
-    }
-
-    [Test]
-    public void Translate_DictionaryType()
-    {
-      //Arrange
-      var type = typeof(Dictionary<string, int>);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be($"{KSqlTypes.Map}<{KSqlTypes.Varchar}, {KSqlTypes.Int}>");
-    }
-
-    [Test]
-    public void Translate_DictionaryInterface()
-    {
-      //Arrange
-      var type = typeof(IDictionary<string, long>);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be($"{KSqlTypes.Map}<{KSqlTypes.Varchar}, {KSqlTypes.BigInt}>");
-    }
-
-    [Test]
-    public void Translate_ArrayType()
-    {
-      //Arrange
-      var type = typeof(double[]);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be($"{KSqlTypes.Array}<{KSqlTypes.Double}>");
-    }
-
-    [Test]
-    public void Translate_EnumerableType()
-    {
-      //Arrange
-      var type = typeof(IEnumerable<string>);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be($"{KSqlTypes.Array}<{KSqlTypes.Varchar}>");
-    }
-
-    [Test]
-    public void Translate_ListType()
-    {
-      //Arrange
-      var type = typeof(List<string>);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be($"{KSqlTypes.Array}<{KSqlTypes.Varchar}>");
-    }
-
-    [Test]
-    public void Translate_IListInterface()
-    {
-      //Arrange
-      var type = typeof(IList<string>);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be($"{KSqlTypes.Array}<{KSqlTypes.Varchar}>");
-    }
-
-    [Test]
-    public void Translate_IEnumerable()
-    {
-      //Arrange
-      var type = typeof(IEnumerable<string>);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be($"{KSqlTypes.Array}<{KSqlTypes.Varchar}>");
-    }
-
-    [Test]
-    public void Translate_NestedMapInArray()
-    {
-      //Arrange
-      var type = typeof(IDictionary<string, int>[]);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be($"{KSqlTypes.Array}<{KSqlTypes.Map}<{KSqlTypes.Varchar}, {KSqlTypes.Int}>>");
-    }
-
-    [Test]
-    public void Translate_NestedArrayInMap()
-    {
-      //Arrange
-      var type = typeof(IDictionary<string, int[]>);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be($"{KSqlTypes.Map}<{KSqlTypes.Varchar}, {KSqlTypes.Array}<{KSqlTypes.Int}>>");
-    }
-
-    [Test]
-    public void Translate_BytesType()
-    {
-      //Arrange
-      var type = typeof(byte[]);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be(KSqlTypes.Bytes);
-    }
-
-    [Test]
-    public void Translate_GuidType()
-    {
-      //Arrange
-      var type = typeof(Guid);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be(KSqlTypes.Varchar);
-    }
-
-    [Test]
-    public void Translate_DateTimeType()
-    {
-      //Arrange
-      var type = typeof(DateTime);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be(KSqlTypes.Date);
-    }
-
-    [Test]
-    public void Translate_TimeSpanType()
-    {
-      //Arrange
-      var type = typeof(TimeSpan);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be(KSqlTypes.Time);
-    }
-
-    [Test]
-    public void Translate_DateTimeOffsetType()
-    {
-      //Arrange
-      var type = typeof(DateTimeOffset);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be(KSqlTypes.Timestamp);
-    }
-
-    [Test]
-    public void Translate_EnumType()
-    {
-      //Arrange
-      var type = typeof(ConsoleColor);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be(KSqlTypes.Varchar);
-    }
-
-    [Test]
-    public void Translate_ClassType()
-    {
-      //Arrange
-      var type = typeof(StringBuilder);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be(nameof(StringBuilder).ToUpper());
-    }
-
-    [Test]
-    public void Translate_StructType()
-    {
-      //Arrange
-      var type = typeof(Point);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be(nameof(Point).ToUpper());
-    }
-
-    [Struct]
-    private class Decorated
-    {
-      public required int Foo { get; set; }
-      public required string Bzr { get; set; }
-    }
-
-    [Test]
-    public void Translate_StructAttributeType()
-    {
-      //Arrange
-      var type = typeof(Decorated);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be($"{KSqlTypes.Struct}<{nameof(Decorated.Foo)} {KSqlTypes.Int}, {nameof(Decorated.Bzr)} {KSqlTypes.Varchar}>");
-    }
-
-    [Struct]
-    private record IoTSensor
-    {
-      [Headers("abc")]
-      public byte[] Header { get; set; } = null!;
-    }
-
-    [Test]
-    public void Translate_HeadersAttributeType()
-    {
-      //Arrange
-      var type = typeof(IoTSensor);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be($"{KSqlTypes.Struct}<{nameof(IoTSensor.Header)} {KSqlTypes.Bytes} HEADER('abc')>");
-    }
-
     [Struct]
     private record Account
     {
       [Decimal(10,4)]
       public decimal Amount { get; set; }
-    }
-
-    [Test]
-    public void Translate_DecimalAttributeType()
-    {
-      //Arrange
-      var type = typeof(Account);
-
-      //Act
-      string ksqlType = kSqlTypeTranslator.Translate(type);
-
-      //Assert
-      ksqlType.Should().Be($"{KSqlTypes.Struct}<{nameof(Account.Amount)} {KSqlTypes.Decimal}(10,4)>");
     }
 
     [Struct]
