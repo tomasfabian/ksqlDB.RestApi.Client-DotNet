@@ -44,7 +44,7 @@ internal class MethodCallVisitor : KSqlVisitor
   {
     if(node.Name != null && QueryMetadata.IsInNestedFunctionScope)
       Append(node.Name);
-  
+
     return node;
   }
 

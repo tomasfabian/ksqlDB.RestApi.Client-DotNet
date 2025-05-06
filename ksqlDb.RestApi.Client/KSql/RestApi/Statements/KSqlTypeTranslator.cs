@@ -38,17 +38,22 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
 
         ksqlType = $"{KSqlTypes.Map}<{keyType}, {valueType}>";
       }
+      else if (Nullable.GetUnderlyingType(type) != null)
+      {
+        var underlyingType = Nullable.GetUnderlyingType(type)!;
+        ksqlType = Translate(underlyingType, memberInfo, escaping);
+      }
       else if (type == typeof(string))
         ksqlType = KSqlTypes.Varchar;
       else if (type == typeof(Guid))
         ksqlType = KSqlTypes.Varchar;
-      else if (type.IsOneOfFollowing(typeof(int), typeof(int?), typeof(short), typeof(short?)))
+      else if (type.IsOneOfFollowing(typeof(int), typeof(short)))
         ksqlType = KSqlTypes.Int;
-      else if (type.IsOneOfFollowing(typeof(long), typeof(long?)))
+      else if (type.IsOneOfFollowing(typeof(long)))
         ksqlType = KSqlTypes.BigInt;
-      else if (type.IsOneOfFollowing(typeof(double), typeof(double?)))
+      else if (type.IsOneOfFollowing(typeof(double)))
         ksqlType = KSqlTypes.Double;
-      else if (type.IsOneOfFollowing(typeof(bool), typeof(bool?)))
+      else if (type.IsOneOfFollowing(typeof(bool)))
         ksqlType = KSqlTypes.Boolean;
       else if (type == typeof(decimal))
         ksqlType = KSqlTypes.Decimal;
