@@ -15,5 +15,6 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements
     internal const string Array = "ARRAY";
     internal const string Struct = "STRUCT";
     internal const string Map = "MAP";
+    internal const string Null = "NULL";
   }
 }

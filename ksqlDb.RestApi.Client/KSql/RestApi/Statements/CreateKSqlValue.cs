@@ -13,6 +13,8 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 #nullable disable
 internal sealed class CreateKSqlValue(IMetadataProvider metadataProvider) : EntityInfo(metadataProvider)
 {
+  private const string CREATE_EMPTY_ARRAY = "ARRAY_REMOVE(ARRAY[0], 0)";
+
   public object ExtractValue<T>(T inputValue, IValueFormatters valueFormatters, MemberInfo memberInfo, Type type, Func<MemberInfo, string> formatter)
   {
     Type valueType = inputValue.GetType();
@@ -25,7 +27,7 @@ internal sealed class CreateKSqlValue(IMetadataProvider metadataProvider) : Enti
       value = valueType.GetField(memberInfo.Name)?.GetValue(inputValue);
 
     if (value == null)
-      return "NULL";
+      return KSqlTypes.Null;
 
     if (type == typeof(decimal))
     {
@@ -79,9 +81,7 @@ internal sealed class CreateKSqlValue(IMetadataProvider metadataProvider) : Enti
       GenerateMap(valueFormatters, type, formatter, ref value);
     else if (type.IsArray)
     {
-      var source = ((IEnumerable)value).Cast<object>();
-      var array = source.Select(c => ExtractValue(c, valueFormatters, null, type.GetElementType(), formatter)).ToArray();
-      value = PrintArray(array);
+      value = GenerateEnumerableValue(type, value, valueFormatters, formatter);
     }
     else if (!type.IsGenericType && (type.IsClass || type.IsStruct()))
     {
@@ -150,7 +150,11 @@ internal sealed class CreateKSqlValue(IMetadataProvider metadataProvider) : Enti
 
       var innerValue = ExtractValue(value, valueFormatters, memberInfo2, type, formatter);
       var name = formatter(memberInfo2);
-      sb.Append($"{name} := {innerValue}");
+      if (type.IsArray && KSqlTypes.Null.Equals(innerValue))
+        sb.Append($"{name} := {CREATE_EMPTY_ARRAY}");
+      else
+        sb.Append($"{name} := {innerValue}");
+
     }
 
     sb.Append(')');
@@ -162,21 +166,21 @@ internal sealed class CreateKSqlValue(IMetadataProvider metadataProvider) : Enti
     Func<MemberInfo, string> formatter)
   {
     if (value == null)
-      return "NULL";
+      return KSqlTypes.Null;
 
     var enumerableType = type.GetEnumerableTypeDefinition();
 
     if (enumerableType == null || !enumerableType.Any())
       return value;
 
-    type = enumerableType.First();
-    type = type.GetGenericArguments()[0];
+    var elementType = type.IsArray ? type.GetElementType() : enumerableType.First();
+    elementType = type.IsArray ? elementType : elementType.GetGenericArguments()[0];
 
     var source = ((IEnumerable)value).Cast<object>();
-    var array = source.Select(c => ExtractValue(c, valueFormatters, null, type, formatter)).ToArray();
+    var array = source.Select(c => ExtractValue(c, valueFormatters, null, elementType, formatter)).ToArray();
 
     if (array.Length == 0)
-      return "ARRAY_REMOVE(ARRAY[0], 0)";
+      return CREATE_EMPTY_ARRAY;
 
     return PrintArray(array);
   }
