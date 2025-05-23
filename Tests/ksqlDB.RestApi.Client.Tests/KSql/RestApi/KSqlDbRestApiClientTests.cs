@@ -19,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
 using NUnit.Framework;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 
@@ -153,7 +154,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
     //Assert
     var content = await GetContent(stringContent);
-      
+
     content.Should().Be(@$"{{""ksql"":""{createOrReplaceTableStatement}"",""streamsProperties"":{{}}}}");
   }
 
@@ -307,7 +308,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     //Assert
     responses.Should().NotBeNull();
     var expectedContent = GetExpectedContent(StatementTemplates.ShowAllTopicsExtended);
-      
+
     VerifySendAsync(expectedContent);
   }
 
@@ -355,7 +356,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     {
       QueryId = queryId
     };
-      
+
     var expectedContent = await KSqlDbRestApiClient.CreateContent(closeQuery, Encoding.UTF8).ReadAsStringAsync();
 
     VerifySendAsync(expectedContent, "/close-query");
@@ -459,7 +460,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     //Assert
     response.Should().NotBeNull();
     var expectedContent = GetExpectedContent(StatementTemplates.DropStream(streamName, properties.UseIfExistsClause, properties.DeleteTopic));
-      
+
     VerifySendAsync(expectedContent);
   }
 
@@ -479,7 +480,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     //Assert
     response.Should().NotBeNull();
     var expectedContent = GetExpectedContent(StatementTemplates.DropStream(streamName, useIfExistsClause, deleteTopic));
-      
+
     VerifySendAsync(expectedContent);
   }
 
@@ -517,7 +518,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     //Assert
     response.Should().NotBeNull();
     var expectedContent = GetExpectedContent(StatementTemplates.DropTable(tableName, useIfExistsClause, deleteTopic));
-      
+
     VerifySendAsync(expectedContent);
   }
 
@@ -543,7 +544,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     //Assert
     response.Should().NotBeNull();
     var expectedContent = GetExpectedContent(StatementTemplates.DropTable(tableName, properties.UseIfExistsClause, properties.DeleteTopic));
-      
+
     VerifySendAsync(expectedContent);
   }
 
@@ -581,6 +582,54 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
     //Assert
     insertStatement.Sql.Should().Be("INSERT INTO Movies (Title, Id, Release_Year) VALUES (NULL, 1, 0);");
+  }
+
+  public class POC
+  {
+    public int Id { get; init; }
+    public string? Description { get; init; }
+    public POC2[]? Entities { get; init; }
+  }
+
+  public class POC2
+  {
+    public POC3[]? Poc3 { get; set; }
+    public POC4[]? Poc4 { get; set; }
+  }
+
+  public class POC3
+  {
+    public string? Description { get; init; }
+  }
+
+  public class POC4
+  {
+    public string? Description { get; init; }
+  }
+
+  public static IEnumerable<(POC, string)> NullTestCases()
+  { // empty array constructors are invalid
+    yield return (new POC { Id = 1 }, "INSERT INTO POCS (Id, Description, Entities) VALUES (1, NULL, NULL);");
+    yield return (new POC { Id = 1, Entities = new POC2[0] }, "INSERT INTO POCS (Id, Description, Entities) VALUES (1, NULL, ARRAY_REMOVE(ARRAY[0], 0));");
+    yield return (new POC { Id = 1, Entities = new POC2[] { new POC2 { Poc3 = new POC3[0] } } }, "INSERT INTO POCS (Id, Description, Entities) VALUES (1, NULL, ARRAY[STRUCT(Poc3 := ARRAY_REMOVE(ARRAY[0], 0), Poc4 := ARRAY_REMOVE(ARRAY[0], 0))]);");
+    yield return (new POC { Id = 1, Entities = new POC2[] { new POC2 { Poc3 = new POC3[0], Poc4 = new POC4[0] } } }, "INSERT INTO POCS (Id, Description, Entities) VALUES (1, NULL, ARRAY[STRUCT(Poc3 := ARRAY_REMOVE(ARRAY[0], 0), Poc4 := ARRAY_REMOVE(ARRAY[0], 0))]);");
+  }
+
+  [TestCaseSource(nameof(NullTestCases))]
+  public void ToInsertStatement_WithNullHandling((POC, string) testCase)
+  {
+    //Arrange
+    var (entity, expected) = testCase;
+    var modelBuilder = new ModelBuilder();
+    modelBuilder.Entity<POC>().HasKey(i => i.Id);
+    modelBuilder.Entity<POC>().Property(c => c.Entities).AsStruct();
+    var sut = new KSqlDbRestApiClient(HttpClientFactory, modelBuilder, LoggerFactoryMock.Object);
+
+    //Act
+    var actual = sut.ToInsertStatement(entity);
+
+    //Assert
+    actual.Sql.Should().Be(expected);
   }
 
   [KSqlFunction]
