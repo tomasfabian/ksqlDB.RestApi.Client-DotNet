@@ -1,5 +1,10 @@
 # ksqlDB.RestApi.Client
 
+# 7.1.4
+
+## 🐛 Bug Fixes
+- fixed empty array constructors are not valid. #113 (contributed by @mrt181)
+
 # 7.1.3
 
 ## 🐛 Bug Fixes
