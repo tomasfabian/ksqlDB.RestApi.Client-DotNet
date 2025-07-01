@@ -37,10 +37,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="ksqlDb.RestApi.Client.Tests" />
-        <InternalsVisibleTo Include="ksqlDb.RestApi.Client.IntegrationTests" />
-        <InternalsVisibleTo Include="ksqlDb.RestApi.Client.ProtoBuf" />
-        <InternalsVisibleTo Include="ksqlDb.RestApi.Client.ProtoBuf.Tests" />
+        <InternalsVisibleTo Include="$(AssemblyName).Tests" />
+        <InternalsVisibleTo Include="$(AssemblyName).IntegrationTests" />
+        <InternalsVisibleTo Include="$(AssemblyName).ProtoBuf" />
+        <InternalsVisibleTo Include="$(AssemblyName).ProtoBuf.Tests" />
     </ItemGroup>
 
     <ItemGroup>
