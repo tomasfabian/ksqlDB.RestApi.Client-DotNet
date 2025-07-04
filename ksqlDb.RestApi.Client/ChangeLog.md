@@ -1,5 +1,10 @@
 # ksqlDB.RestApi.Client
 
+# 7.1.5
+
+## 🐛 Bug Fixes
+- casting nulls while generating insert statement. #115 (contributed by @vidyaranya92)
+
 # 7.1.4
 
 ## 🐛 Bug Fixes
@@ -80,7 +85,7 @@ This enables updating the credentials at runtime by setting them on the `KSqlDbC
 ## 🚀 New Features
 1. **KSqlDbRestApiClient Constructor Update**:
     - The `KSqlDbRestApiClient` class constructor now includes a parameter for `KSqlDBRestApiClientOptions`.
-    
+
 2. **EntityCreationMetadata Update**:
     - The `EntityCreationMetadata.ShouldPluralizeEntityName` property was modified to be a nullable boolean (`bool?`), and the default value of `true` was removed.
 
@@ -91,7 +96,7 @@ This enables updating the credentials at runtime by setting them on the `KSqlDbC
         - `InsertProperties`
         - `DropFromItemProperties`
     - If `ShouldPluralizeEntityName` is null, the methods will set it using the value from the `KSqlDBRestApiClientOptions`.
-    
+
 ## 🐛 Bug Fix
 - `KSqlDBContext` removed `!NETSTANDARD` pragma from `OnDisposeAsync`
 
@@ -124,7 +129,7 @@ This enables updating the credentials at runtime by setting them on the `KSqlDbC
 - see also [breakingchanges.md](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/breaking_changes.md#v600)
 
 ## 🐛 Bug Fix
-- CreateQueryStream doesn't always use configured parameters. The PullQuery functionality was overriding the options configured for the PushQuery. #75 reported by @jbkuczma 
+- CreateQueryStream doesn't always use configured parameters. The PullQuery functionality was overriding the options configured for the PushQuery. #75 reported by @jbkuczma
 
 # 5.1.0
 - added `InsertIntoAsync` Qbservable extension for executing `INSERT INTO <stream-name> SELECT` statements.
