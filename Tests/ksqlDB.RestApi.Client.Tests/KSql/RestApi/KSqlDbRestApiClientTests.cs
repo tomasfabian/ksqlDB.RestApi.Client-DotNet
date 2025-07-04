@@ -595,6 +595,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
   {
     public POC3[]? Poc3 { get; set; }
     public POC4[]? Poc4 { get; set; }
+    public POC5? Poc5 { get; set; }
   }
 
   public class POC3
@@ -606,13 +607,24 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
   {
     public string? Description { get; init; }
   }
+  public class POC5
+  {
+    public double? Amount { get; init; }
+  }
 
   public static IEnumerable<(POC, string)> NullTestCases()
-  { // empty array constructors are invalid
+  {
+    // empty array constructors are invalid
     yield return (new POC { Id = 1 }, "INSERT INTO POCS (Id, Description, Entities) VALUES (1, NULL, NULL);");
     yield return (new POC { Id = 1, Entities = new POC2[0] }, "INSERT INTO POCS (Id, Description, Entities) VALUES (1, NULL, ARRAY_REMOVE(ARRAY[0], 0));");
-    yield return (new POC { Id = 1, Entities = new POC2[] { new POC2 { Poc3 = new POC3[0] } } }, "INSERT INTO POCS (Id, Description, Entities) VALUES (1, NULL, ARRAY[STRUCT(Poc3 := ARRAY_REMOVE(ARRAY[0], 0), Poc4 := ARRAY_REMOVE(ARRAY[0], 0))]);");
-    yield return (new POC { Id = 1, Entities = new POC2[] { new POC2 { Poc3 = new POC3[0], Poc4 = new POC4[0] } } }, "INSERT INTO POCS (Id, Description, Entities) VALUES (1, NULL, ARRAY[STRUCT(Poc3 := ARRAY_REMOVE(ARRAY[0], 0), Poc4 := ARRAY_REMOVE(ARRAY[0], 0))]);");
+    yield return (new POC { Id = 1, Entities = new POC2[] { new POC2 { Poc3 = new POC3[0]} } },
+      "INSERT INTO POCS (Id, Description, Entities) VALUES (1, NULL, ARRAY[STRUCT(Poc3 := ARRAY_REMOVE(ARRAY[0], 0), Poc4 := ARRAY_REMOVE(ARRAY[0], 0), Poc5 := CAST(NULL AS STRUCT<Amount DOUBLE>))]);");
+    yield return (new POC { Id = 1, Entities = new POC2[] { new POC2 { Poc3 = new POC3[0], Poc4 = new POC4[0] } } },
+      "INSERT INTO POCS (Id, Description, Entities) VALUES (1, NULL, ARRAY[STRUCT(Poc3 := ARRAY_REMOVE(ARRAY[0], 0), Poc4 := ARRAY_REMOVE(ARRAY[0], 0), Poc5 := CAST(NULL AS STRUCT<Amount DOUBLE>))]);");
+    yield return (new POC { Id = 1, Entities = new POC2[] { new POC2 { Poc3 = new[] { new POC3() {Description = null}}, Poc4 = new POC4[0] } } },
+      "INSERT INTO POCS (Id, Description, Entities) VALUES (1, NULL, ARRAY[STRUCT(Poc3 := ARRAY[STRUCT(Description := CAST(NULL AS VARCHAR))], Poc4 := ARRAY_REMOVE(ARRAY[0], 0), Poc5 := CAST(NULL AS STRUCT<Amount DOUBLE>))]);");
+    yield return (new POC { Id = 1, Entities = new POC2[] { new POC2 { Poc3 = new[] { new POC3() {Description = null}}, Poc4 = new POC4[0], Poc5 = new POC5() {Amount = 10.05}} } },
+      "INSERT INTO POCS (Id, Description, Entities) VALUES (1, NULL, ARRAY[STRUCT(Poc3 := ARRAY[STRUCT(Description := CAST(NULL AS VARCHAR))], Poc4 := ARRAY_REMOVE(ARRAY[0], 0), Poc5 := STRUCT(Amount := 10.05))]);");
   }
 
   [TestCaseSource(nameof(NullTestCases))]
@@ -623,6 +635,7 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     var modelBuilder = new ModelBuilder();
     modelBuilder.Entity<POC>().HasKey(i => i.Id);
     modelBuilder.Entity<POC>().Property(c => c.Entities).AsStruct();
+    modelBuilder.Entity<POC>().Property(c => c.Entities!.FirstOrDefault()!.Poc5).AsStruct();
     var sut = new KSqlDbRestApiClient(HttpClientFactory, modelBuilder, LoggerFactoryMock.Object);
 
     //Act

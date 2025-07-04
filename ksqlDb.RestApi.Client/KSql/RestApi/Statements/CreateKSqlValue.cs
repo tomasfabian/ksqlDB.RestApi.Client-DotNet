@@ -15,7 +15,7 @@ internal sealed class CreateKSqlValue(IMetadataProvider metadataProvider) : Enti
 {
   private const string CREATE_EMPTY_ARRAY = "ARRAY_REMOVE(ARRAY[0], 0)";
 
-  public object ExtractValue<T>(T inputValue, IValueFormatters valueFormatters, MemberInfo memberInfo, Type type, Func<MemberInfo, string> formatter)
+  public object ExtractValue<T>(T inputValue, IValueFormatters valueFormatters, MemberInfo memberInfo, Type type, Func<MemberInfo, string> formatter, bool castNulls = false)
   {
     Type valueType = inputValue.GetType();
 
@@ -27,7 +27,15 @@ internal sealed class CreateKSqlValue(IMetadataProvider metadataProvider) : Enti
       value = valueType.GetField(memberInfo.Name)?.GetValue(inputValue);
 
     if (value == null)
+    {
+      if (castNulls && !type.IsArray)
+      {
+        KSqlTypeTranslator<T> typeTranslator = new(metadataProvider);
+        var ksqlType = typeTranslator.Translate(type, memberInfo);
+        return $"CAST({KSqlTypes.Null} AS {ksqlType})";
+      }
       return KSqlTypes.Null;
+    }
 
     if (type == typeof(decimal))
     {
@@ -148,7 +156,7 @@ internal sealed class CreateKSqlValue(IMetadataProvider metadataProvider) : Enti
 
       type = GetMemberType(memberInfo2);
 
-      var innerValue = ExtractValue(value, valueFormatters, memberInfo2, type, formatter);
+      var innerValue = ExtractValue(value, valueFormatters, memberInfo2, type, formatter, true);
       var name = formatter(memberInfo2);
       if (type.IsArray && KSqlTypes.Null.Equals(innerValue))
         sb.Append($"{name} := {CREATE_EMPTY_ARRAY}");
