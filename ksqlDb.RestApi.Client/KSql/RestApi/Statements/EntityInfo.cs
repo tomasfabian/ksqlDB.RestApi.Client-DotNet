@@ -66,12 +66,17 @@ internal class EntityInfo(IMetadataProvider metadataProvider)
     if (memberInfo == null)
       return false;
 
+    // First check if the exact type is directly marked as struct in metadata
     var entityMetadata = metadataProvider.GetEntities().FirstOrDefault(c => c.Type == typeof(TEntity));
     var fieldMetadata = entityMetadata?.GetFieldMetadataBy(memberInfo);
-    return fieldMetadata is
-    {
-      IsStruct: true
-    };
+
+    if (fieldMetadata is { IsStruct: true })
+      return true;
+
+    // Check all entities for any struct field using this type
+    return metadataProvider.GetEntities()
+      .SelectMany(metadata => metadata.FieldsMetadataDict.Values)
+      .Any(field => field.IsStruct && GetMemberType(field.MemberInfo) == type);
   }
 
   protected static Type GetMemberType(MemberInfo memberInfo)
