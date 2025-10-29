@@ -45,9 +45,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
     {
       var (methodInfo, e, groupJoin) = join;
 
-      var expressions = e.ToArray();
-
-      expressions = expressions.Select(StripQuotes).ToArray();
+      var expressions = e.Select(StripQuotes).ToArray();
 
       Visit(expressions[0]);
 
@@ -55,23 +53,12 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
       var itemAlias = IdentifierUtil.Format(joinAliasGenerator.GenerateAlias(fromItemName), QueryMetadata.IdentifierEscaping);
 
-      if (groupJoin != null)
-      {
-        var prop = GetPropertyType(groupJoin.Parameters[0].Type);
-
-        outerItemAlias = IdentifierUtil.Format(prop.Name, QueryMetadata.IdentifierEscaping);
-
-        itemAlias = IdentifierUtil.Format(groupJoin.Parameters[1].Name!, QueryMetadata.IdentifierEscaping);
-      }
-
-      var lambdaExpression = expressions[3] as LambdaExpression;
-
       bool isFirst = i == 0;
-
       if (isFirst)
       {
         Append("SELECT ");
 
+        var lambdaExpression = expressions[3] as LambdaExpression;
         var body = QueryMetadata.Select?.Body ?? lambdaExpression?.Body;
 
         body = groupJoin != null ? groupJoin.Body : body;
@@ -83,6 +70,15 @@ internal class KSqlJoinsVisitor : KSqlVisitor
         outerItemAlias = fromItemAlias ?? outerItemAlias;
 
         AppendLine($" FROM {queryContext.FromItemName} {outerItemAlias}");
+      }
+
+      if (groupJoin != null)
+      {
+        var prop = GetPropertyType(groupJoin.Parameters[0].Type);
+
+        outerItemAlias = IdentifierUtil.Format(prop.Name, QueryMetadata.IdentifierEscaping);
+
+        itemAlias = IdentifierUtil.Format(groupJoin.Parameters[1].Name!, QueryMetadata.IdentifierEscaping);
       }
 
       var joinType = methodInfo.Name switch
