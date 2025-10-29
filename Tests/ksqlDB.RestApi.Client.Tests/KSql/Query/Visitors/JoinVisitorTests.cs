@@ -1,11 +1,12 @@
 using FluentAssertions;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
+using ksqlDb.RestApi.Client.Tests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Linq;
+using ksqlDB.RestApi.Client.KSql.Linq.Statements;
 using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
-using ksqlDb.RestApi.Client.Tests.Models.Movies;
 using NUnit.Framework;
 using UnitTests;
 using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
@@ -853,6 +854,45 @@ EMIT CHANGES;".ReplaceLineEndings());
 
     //Act
     var ksql = query.ToQueryString();
+
+    //Assert
+    ksql.Should().Be(expectedQuery);
+  }
+
+  private class Alpha
+  {
+    public int AlphaId { get; set; }
+  }
+  private class Beta
+  {
+    public int BetaId { get; set; }
+  }
+  private class Gama
+  {
+    public int GamaId { get; set; }
+  }
+
+  [Test]
+  public void MultipleLeftJoin_BuildKSql()
+  {
+    //Arrange
+    var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl) {ShouldPluralizeFromItemName = false});
+
+    var expectedQuery = @"CREATE OR REPLACE STREAM Order AS 
+SELECT orders2.AlphaId AlphaId, status.GamaId AS StatusCode FROM order_stream ord
+LEFT JOIN Gama status
+ON ord.AlphaId = status.GamaId
+LEFT JOIN Beta ev
+ON ord.AlphaId = ev.BetaId
+EMIT CHANGES;";
+
+    //Act
+    var ksql = kSqlDbContext.CreateOrReplaceStreamStatement("Order").As<Alpha>("order_stream")
+      .LeftJoin(Source.Of<Beta>(), ord => ord.AlphaId, ev => ev.BetaId, (order, ev) => new {order.AlphaId, ev.BetaId })
+      .LeftJoin(Source.Of<Gama>(), orderG => orderG.AlphaId, status3 => status3.GamaId,
+    (orders2, status) => new { orders2.AlphaId, StatusCode = status.GamaId })
+      .ToStatementString()
+      .ReplaceLineEndings();
 
     //Assert
     ksql.Should().Be(expectedQuery);
