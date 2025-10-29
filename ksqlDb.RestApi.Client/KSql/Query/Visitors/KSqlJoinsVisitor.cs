@@ -65,7 +65,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
         new KSqlVisitor(StringBuilder, QueryMetadata).Visit(body);
 
-        var fromItemAlias = QueryMetadata.Joins?.Skip(i).Where(c => c.Type == QueryMetadata.FromItemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).LastOrDefault();
+        var fromItemAlias = GetFromItemAlias();
 
         outerItemAlias = fromItemAlias ?? outerItemAlias;
 
@@ -101,6 +101,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
       TryAppendWithin(join);
 
+      outerItemAlias = GetFromItemAlias() ?? outerItemAlias;
       Append(GetOn(outerItemAlias, expressions));
       Visit(expressions[1]);
 
@@ -111,6 +112,11 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
       i++;
     }
+  }
+
+  private string? GetFromItemAlias()
+  {
+    return QueryMetadata.Joins?.Where(c => c.Type == QueryMetadata.FromItemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).LastOrDefault();
   }
 
   private string GetOn(string outerItemAlias, Expression[] expressions)
