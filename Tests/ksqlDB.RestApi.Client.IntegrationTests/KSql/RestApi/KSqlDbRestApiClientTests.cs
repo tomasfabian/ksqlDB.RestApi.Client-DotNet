@@ -171,7 +171,7 @@ Drop type {nameof(Address)};
 
   #region Connectors
 
-  private static string SinkConnectorName => "mock-sink-connector";
+  private static string SinkConnectorName => "test-mock-sink-connector";
 
   [Test]
   public async Task CreateSinkConnectorAsync()

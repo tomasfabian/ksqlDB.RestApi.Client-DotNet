@@ -872,30 +872,54 @@ EMIT CHANGES;".ReplaceLineEndings());
     public int GamaId { get; set; }
   }
 
-  [Test]
-  public void MultipleLeftJoin_BuildKSql()
+  public static IEnumerable<(IdentifierEscaping, string)> MultipleLeftJoinTestCases()
   {
-    //Arrange
-    var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl) {ShouldPluralizeFromItemName = false});
-
-    var expectedQuery = @"CREATE OR REPLACE STREAM Order AS 
-SELECT orders2.AlphaId AlphaId, status.GamaId AS StatusCode FROM order_stream ord
+    yield return (Never,
+      @"CREATE OR REPLACE STREAM Order AS 
+SELECT ord.AlphaId AlphaId, ev.BetaId BetaId, status.GamaId AS StatusCode FROM order_stream ord
 LEFT JOIN Gama status
 ON ord.AlphaId = status.GamaId
 LEFT JOIN Beta ev
 ON ord.AlphaId = ev.BetaId
-EMIT CHANGES;";
+EMIT CHANGES;".ReplaceLineEndings());
+    yield return (Keywords, 
+      @"CREATE OR REPLACE STREAM Order AS 
+SELECT ord.AlphaId AlphaId, ev.BetaId BetaId, status.GamaId AS StatusCode FROM order_stream ord
+LEFT JOIN Gama status
+ON ord.AlphaId = status.GamaId
+LEFT JOIN Beta ev
+ON ord.AlphaId = ev.BetaId
+EMIT CHANGES;".ReplaceLineEndings());
+    yield return (Always, 
+      @"CREATE OR REPLACE STREAM Order AS 
+SELECT `ord`.`AlphaId` `AlphaId`, `ev`.`BetaId` `BetaId`, `status`.`GamaId` AS `StatusCode` FROM `order_stream` `ord`
+LEFT JOIN `Gama` `status`
+ON `ord`.`AlphaId` = `status`.`GamaId`
+LEFT JOIN `Beta` `ev`
+ON `ord`.`AlphaId` = `ev`.`BetaId`
+EMIT CHANGES;".ReplaceLineEndings());
+  }
+
+  [TestCaseSource(nameof(MultipleLeftJoinTestCases))]
+  public void MultipleLeftJoin_BuildKSql((IdentifierEscaping escaping, string expectedQuery) testCase)
+  {
+    //Arrange
+    var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
+    {
+      ShouldPluralizeFromItemName = false,
+      IdentifierEscaping = testCase.escaping
+    });
 
     //Act
     var ksql = kSqlDbContext.CreateOrReplaceStreamStatement("Order").As<Alpha>("order_stream")
       .LeftJoin(Source.Of<Beta>(), ord => ord.AlphaId, ev => ev.BetaId, (order, ev) => new {order.AlphaId, ev.BetaId })
       .LeftJoin(Source.Of<Gama>(), orderG => orderG.AlphaId, status3 => status3.GamaId,
-    (orders2, status) => new { orders2.AlphaId, StatusCode = status.GamaId })
+    (orders2, status) => new { orders2.AlphaId, orders2.BetaId, StatusCode = status.GamaId })
       .ToStatementString()
       .ReplaceLineEndings();
 
     //Assert
-    ksql.Should().Be(expectedQuery);
+    ksql.Should().Be(testCase.expectedQuery);
   }
 
   public static IEnumerable<(IdentifierEscaping, string)> LeftJoinQuerySyntaxTestCases()

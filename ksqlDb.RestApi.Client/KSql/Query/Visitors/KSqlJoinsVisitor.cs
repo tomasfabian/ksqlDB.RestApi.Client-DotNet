@@ -8,6 +8,7 @@ using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.RestApi.Extensions;
 using ksqlDb.RestApi.Client.KSql.RestApi.Parsers;
 using Pluralize.NET;
+using ksqlDb.RestApi.Client.KSql.Query.Metadata;
 
 namespace ksqlDB.RestApi.Client.KSql.Query.Visitors;
 
@@ -15,12 +16,14 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 {
   private readonly KSqlDBContextOptions contextOptions;
   private readonly QueryContext queryContext;
+  private readonly AnonymousPropertyMapper anonymousPropertyMapper;
 
   public KSqlJoinsVisitor(StringBuilder stringBuilder, KSqlDBContextOptions contextOptions, QueryContext queryContext, KSqlQueryMetadata queryMetadata)
     : base(stringBuilder, queryMetadata)
   {
     this.contextOptions = contextOptions ?? throw new ArgumentNullException(nameof(contextOptions));
     this.queryContext = queryContext ?? throw new ArgumentNullException(nameof(queryContext));
+    anonymousPropertyMapper = new AnonymousPropertyMapper(QueryMetadata);
   }
 
   private readonly JoinAliasGenerator joinAliasGenerator = new();
@@ -39,8 +42,15 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
   internal void VisitJoinTable(IEnumerable<(MethodInfo, IEnumerable<Expression>, LambdaExpression?)> joins)
   {
-    int i = 0;
+    foreach (var join in joins)
+    {
+      var expressions = join.Item2.Select(StripQuotes).ToArray();
 
+      if(expressions[3] is LambdaExpression lambdaExpression)
+        anonymousPropertyMapper.AddLambda(lambdaExpression);
+    }
+
+    bool isFirst = true;
     foreach (var join in joins)
     {
       var (methodInfo, e, groupJoin) = join;
@@ -53,7 +63,6 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
       var itemAlias = IdentifierUtil.Format(joinAliasGenerator.GenerateAlias(fromItemName), QueryMetadata.IdentifierEscaping);
 
-      bool isFirst = i == 0;
       if (isFirst)
       {
         Append("SELECT ");
@@ -63,9 +72,10 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
         body = groupJoin != null ? groupJoin.Body : body;
 
-        new KSqlVisitor(StringBuilder, QueryMetadata).Visit(body);
+        var kSqlVisitor = new KSqlVisitor(StringBuilder, QueryMetadata);
+        kSqlVisitor.Visit(body);
 
-        var fromItemAlias = GetFromItemAlias();
+        var fromItemAlias = QueryMetadata.GetFromItemAlias();
 
         outerItemAlias = fromItemAlias ?? outerItemAlias;
 
@@ -101,7 +111,7 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
       TryAppendWithin(join);
 
-      outerItemAlias = GetFromItemAlias() ?? outerItemAlias;
+      outerItemAlias = QueryMetadata.GetFromItemAlias() ?? outerItemAlias;
       Append(GetOn(outerItemAlias, expressions));
       Visit(expressions[1]);
 
@@ -110,13 +120,8 @@ internal class KSqlJoinsVisitor : KSqlVisitor
 
       Append(Environment.NewLine);
 
-      i++;
+      isFirst = false;
     }
-  }
-
-  private string? GetFromItemAlias()
-  {
-    return QueryMetadata.Joins?.Where(c => c.Type == QueryMetadata.FromItemType && !string.IsNullOrEmpty(c.Alias)).Select(c => c.Alias).LastOrDefault();
   }
 
   private string GetOn(string outerItemAlias, Expression[] expressions)
