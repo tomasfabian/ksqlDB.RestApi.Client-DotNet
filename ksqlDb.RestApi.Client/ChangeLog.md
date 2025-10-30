@@ -1,5 +1,10 @@
 # ksqlDB.RestApi.Client
 
+# 7.1.6
+
+## 🐛 Bug Fixes
+- Issue with joinned queries translation #116. Fixed join visitor alias assignment.
+
 # 7.1.5
 
 ## 🐛 Bug Fixes
