@@ -23,7 +23,7 @@ public sealed class KSqlDbStatement : QueryParameters
   /// <summary>
   /// Returns the sql statement as a compact one line string without formatting characters.
   /// </summary>
-  public string CompactSql() => Sql.Replace("\n", string.Empty).Replace("\r", string.Empty).Replace("\t", string.Empty).Trim();
+  public string CompactSql() => Sql.Replace("\n", " ").Replace("\r", string.Empty).Replace("\t", string.Empty).Trim();
 
   /// <summary>
   /// Dictionary (map) of string variable names and values of any type as initial variable substitution values.
