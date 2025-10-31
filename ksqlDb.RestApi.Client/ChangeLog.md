@@ -4,6 +4,7 @@
 
 ## 🐛 Bug Fixes
 - Issue with joinned queries translation #116. Fixed join visitor alias assignment.
+- fixed missing white space characters in `KSqlDbStatement.Sql` statements #116
 
 # 7.1.5
 
