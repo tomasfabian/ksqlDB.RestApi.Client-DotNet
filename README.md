@@ -175,7 +175,7 @@ While the first two are executed locally the latter two are executed server side
 
 Both `IObservable<T>` and `IQbservable<T>` represent **push-based** sequences of asynchronous and potentially infinite events, while `IEnumerable<T>` and `IQueryable<T>` represent collections or **pull-based** sequences of items that can be iterated or queried, respectively.
 
-<img src="https://www.codeproject.com/KB/cs/646361/WhatHowWhere.jpg" />
+<img src="https://i.sstatic.net/2DAqv.jpg" />
 
 List of supported [push query](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/push_queries.md) extension methods:
 - [Select](https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/docs/push_queries.md#select)
