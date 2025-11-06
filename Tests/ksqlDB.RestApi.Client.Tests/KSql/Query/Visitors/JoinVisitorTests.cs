@@ -915,8 +915,7 @@ EMIT CHANGES;".ReplaceLineEndings());
       .LeftJoin(Source.Of<Beta>(), ord => ord.AlphaId, ev => ev.BetaId, (order, ev) => new {order.AlphaId, ev.BetaId })
       .LeftJoin(Source.Of<Gama>(), orderG => orderG.AlphaId, status3 => status3.GamaId,
     (orders2, status) => new { orders2.AlphaId, orders2.BetaId, StatusCode = status.GamaId })
-      .ToStatementString()
-      .ReplaceLineEndings();
+      .ToStatementString();
 
     //Assert
     ksql.Should().Be(testCase.expectedQuery);

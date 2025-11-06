@@ -68,4 +68,27 @@ public class KSqlDbStatementTests : TestBase
     //Assert
     json.Should().Contain(@"""sessionVariables"":{""key1"":""value1"",""key2"":""value2""}");
   }
+
+  [Test]
+  public void CompactSql()
+  {
+    //Arrange
+    string topicName = "topic_exploded_tops";
+    string streamName = "exploded_tops_stream";
+    string fromItemName = "OrderAudit_stream";
+    string joinedItemName = "top_topic_table";
+    string statement = $@"CREATE OR REPLACE STREAM {streamName}
+ WITH ( KAFKA_TOPIC='{topicName}', KEY_FORMAT='Kafka', VALUE_FORMAT='Json' ) AS 
+SELECT ord.Id Id, EXPLODE(tops.TOPS) TOPS FROM {fromItemName} ord
+INNER JOIN {joinedItemName} tops
+ON ord.Part = tops.Key
+EMIT CHANGES;";
+    var ksqlDbStatement = new KSqlDbStatement(statement);
+
+    //Act
+    var compactedStatement = ksqlDbStatement.CompactSql();
+
+    //Assert
+    compactedStatement.Should().Be($"CREATE OR REPLACE STREAM {streamName}  WITH ( KAFKA_TOPIC='{topicName}', KEY_FORMAT='Kafka', VALUE_FORMAT='Json' ) AS  SELECT ord.Id Id, EXPLODE(tops.TOPS) TOPS FROM {fromItemName} ord INNER JOIN {joinedItemName} tops ON ord.Part = tops.Key EMIT CHANGES;");
+  }
 }
