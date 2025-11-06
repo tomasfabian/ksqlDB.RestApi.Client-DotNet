@@ -82,7 +82,8 @@ SELECT * FROM {nameof(Location)}s EMIT CHANGES;".ReplaceLineEndings());
     ksql.ReplaceLineEndings().Should().BeEquivalentTo(@$"CREATE OR REPLACE STREAM {StreamName}
  WITH ( KAFKA_TOPIC='moviesByTitle', KEY_FORMAT='Json', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' ) AS 
 SELECT Title, Release_Year AS ReleaseYear FROM Movies
- WHERE Id < 3 PARTITION BY Title EMIT CHANGES;".ReplaceLineEndings());
+ WHERE Id < 3 PARTITION BY Title
+ EMIT CHANGES;".ReplaceLineEndings());
   }
 
   private const string TableName = "TestTable";

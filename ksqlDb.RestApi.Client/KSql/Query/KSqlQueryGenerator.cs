@@ -119,6 +119,7 @@ internal class KSqlQueryGenerator(KSqlDBContextOptions options) : ExpressionVisi
     {
       kSqlVisitor.Append(" PARTITION BY ");
       kSqlVisitor.Visit(partitionBy.Body);
+      kSqlVisitor.Append(Environment.NewLine);
     }
 
     if (ShouldEmitChanges)
