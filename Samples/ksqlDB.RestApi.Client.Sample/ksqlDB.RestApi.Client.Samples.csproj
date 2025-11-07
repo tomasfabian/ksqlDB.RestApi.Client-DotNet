@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ksqlDb.RestApi.Client" Version="7.1.0" />
+        <PackageReference Include="ksqlDb.RestApi.Client" Version="7.1.7" />
         <!-- <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" /> -->
         <!-- <PackageReference Include="ksqlDb.RestApi.Client.ProtoBuf" Version="4.0.0" /> -->
         <ProjectReference Include="..\..\ksqlDb.RestApi.Client.ProtoBuf\ksqlDb.RestApi.Client.ProtoBuf.csproj" />
