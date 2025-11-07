@@ -15,9 +15,11 @@ internal class AnonymousPropertyMapper(KSqlQueryMetadata queryMetadata)
       return;
     }
 
-    foreach (var argument in newExpression.Arguments)
+    for (int i = 0; i < newExpression.Arguments.Count; i++)
     {
-      if (argument is not MemberExpression {Expression: not null} memberExpression ||
+      var argument = newExpression.Arguments[i];
+      var member = newExpression.Members?[i];
+      if (argument is not MemberExpression { Expression: not null } memberExpression ||
           memberExpression.Expression.Type.IsAnonymousType())
       {
         continue;
@@ -35,7 +37,8 @@ internal class AnonymousPropertyMapper(KSqlQueryMetadata queryMetadata)
       {
         DeclaringType = declaringType,
         PropertyName = propertyName,
-        ParameterName = parameterExpression.Name
+        ParameterName = parameterExpression.Name,
+        ProjectedName = member?.Name
       };
       if (queryMetadata.NewAnonymousTypeMappings.TryGetValue(propertyName, out var mappings))
       {
