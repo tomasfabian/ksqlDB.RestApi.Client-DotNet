@@ -1,5 +1,10 @@
 # ksqlDB.RestApi.Client
 
+# 7.1.7
+
+## 🐛 Bug Fixes
+- added NewLine after PARTITION BY #116
+
 # 7.1.6
 
 ## 🐛 Bug Fixes
