@@ -33,7 +33,7 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Metadata
     public void AddLambda_AllAnonymousPropertiesAreMapped()
     {
       //Arrange
-      Expression<Func<Order, object>> lambda = c => new {c.Id, Desc = c.Description };
+      Expression<Func<Order, object>> lambda = c => new {c.Id, Description = c.Description };
 
       //Act
       Mapper.AddLambda(lambda);
@@ -46,14 +46,16 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Metadata
       {
         PropertyName = nameof(Order.Id),
         DeclaringType = typeof(Order),
-        ParameterName = "c"
+        ParameterName = "c",
+        ProjectedName = nameof(Order.Id)
       });
       mappings = Mapper.QueryMetadata.NewAnonymousTypeMappings[nameof(Order.Description)];
       mappings[0].Should().Be(new AnonymousTypeMapping
       {
         PropertyName = nameof(Order.Description),
         DeclaringType = typeof(Order),
-        ParameterName = "c"
+        ParameterName = "c",
+        ProjectedName = nameof(Order.Description)
       });
     }
 
@@ -74,13 +76,15 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Metadata
       {
         PropertyName = nameof(Order.Id),
         DeclaringType = typeof(Order),
-        ParameterName = "o"
+        ParameterName = "o",
+        ProjectedName = nameof(Order.Id)
       });
       mappings[1].Should().Be(new AnonymousTypeMapping
       {
         PropertyName = nameof(OrderItem.Id),
         DeclaringType = typeof(OrderItem),
-        ParameterName = "oi"
+        ParameterName = "oi",
+        ProjectedName = "OrderItemId"
       });
 
       mappings = Mapper.QueryMetadata.NewAnonymousTypeMappings[nameof(OrderItem.Description)];
@@ -89,7 +93,30 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.Query.Metadata
       {
         PropertyName = nameof(OrderItem.Description),
         DeclaringType = typeof(OrderItem),
-        ParameterName = "oi"
+        ParameterName = "oi",
+        ProjectedName = "Desc"
+      });
+    }
+
+    [Test]
+    public void AddLambda_ProjectedPropertyWasMapped()
+    {
+      //Arrange
+      Expression<Func<Order, object>> lambda = c => new { Desc = c.Description };
+
+      //Act
+      Mapper.AddLambda(lambda);
+
+      //Assert
+      Mapper.QueryMetadata.NewAnonymousTypeMappings.Count.Should().Be(1);
+      var mappings = Mapper.QueryMetadata.NewAnonymousTypeMappings[nameof(Order.Description)];
+      mappings.Count.Should().Be(1);
+      mappings[0].Should().Be(new AnonymousTypeMapping
+      {
+        PropertyName = nameof(Order.Description),
+        DeclaringType = typeof(Order),
+        ParameterName = "c",
+        ProjectedName = "Desc"
       });
     }
   }
