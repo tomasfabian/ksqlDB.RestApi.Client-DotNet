@@ -1,5 +1,12 @@
 # ksqlDB.RestApi.Client
 
+# 8.0.0
+
+## 🚀 New Features
+- added net10 target framework moniker
+- upgraded Microsoft.* packages the v10
+- added `IAsyncEnumerable<T>.ToObservable` extension method
+
 # 7.1.7
 
 ## 🐛 Bug Fixes

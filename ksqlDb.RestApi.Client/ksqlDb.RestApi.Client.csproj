@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
         <Authors>Tomas Fabian</Authors>
         <Company />
         <PackageProjectUrl>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/tree/main/ksqlDb.RestApi.Client</PackageProjectUrl>
@@ -11,12 +11,12 @@
             ksqlDB.RestApi.Client is a C# LINQ-enabled client API for issuing and consuming ksqlDB push queries.
             You can continually process computations over unbounded streams of data.
             It also enables the execution of SQL statements via the Rest API such as inserting records into streams and creating tables, types, etc. or executing admin operations such as listing streams.
-            Targets .NET 8, .NET 9, and .NET Standard 2.0.
+            Targets .NET 8, .NET 9, .NET 10, and .NET Standard 2.0.
             Documentation for the library can be found at https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/README.md.
         </Description>
         <PackageTags>ksql ksqlDB LINQ .NET csharp push query</PackageTags>
-        <Version>7.1.7</Version>
-        <AssemblyVersion>7.1.7.0</AssemblyVersion>
+        <Version>8.0.0</Version>
+        <AssemblyVersion>8.0.0.0</AssemblyVersion>
         <LangVersion>13.0</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <PackageReleaseNotes>https://github.com/tomasfabian/ksqlDB.RestApi.Client-DotNet/blob/main/ksqlDb.RestApi.Client/ChangeLog.md</PackageReleaseNotes>
@@ -26,14 +26,18 @@
 
     <ItemGroup>
         <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
-        <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+        <PackageReference Include="Antlr4BuildTasks" Version="12.11.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
         <PackageReference Include="System.Interactive.Async" Version="6.0.1" />
-        <PackageReference Include="System.Reactive" Version="6.0.0" />
-        <PackageReference Include="System.Text.Json" Version="9.0.0" />
+        <PackageReference Include="System.Reactive" Version="6.1.0" />
+        <PackageReference Include="System.Text.Json" Version="10.0.0" />
         <PackageReference Include="Pluralize.NET" Version="1.0.2" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+        <PackageReference Include="System.Linq.Async" Version="6.0.1" ExcludeAssets="compile" />
     </ItemGroup>
 
     <ItemGroup>

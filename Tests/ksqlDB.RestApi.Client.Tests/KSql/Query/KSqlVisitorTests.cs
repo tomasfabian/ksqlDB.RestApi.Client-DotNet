@@ -987,7 +987,7 @@ public class KSqlVisitorTests : TestBase
   public void VisitNewArrayContains()
   {
     //Arrange
-    Expression<Func<OrderData, bool>> expression = o => new []{ 1, 3 }.Contains(o.OrderType);
+    Expression<Func<OrderData, bool>> expression = o => ((IEnumerable<int>) new []{ 1, 3 }).Contains(o.OrderType);
 
     //Act
     var query = ClassUnderTest.BuildKSql(expression);

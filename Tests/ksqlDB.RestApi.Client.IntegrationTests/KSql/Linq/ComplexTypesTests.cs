@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Joker.Extensions;
 using ksqlDb.RestApi.Client.IntegrationTests.Helpers;
 using ksqlDb.RestApi.Client.IntegrationTests.Http;
 using ksqlDb.RestApi.Client.IntegrationTests.KSql.RestApi;
@@ -100,7 +101,7 @@ Drop table Events;
   private class Foo : Dictionary<string, int>;
 
   [Test]
-  public void TransformMap_WithNestedMap()
+  public async Task TransformMap_WithNestedMap()
   {
     //Arrange
     var value = new Dictionary<string, IDictionary<string, int>>()
@@ -121,10 +122,11 @@ Drop table Events;
     };
 
     //Act
-    var source = Context.CreatePushQuery<Foo>(queryStreamParameters)
+    var source = await Context.CreatePushQuery<Foo>(queryStreamParameters)
       .Take(1)
       .ToEnumerable()
-      .First();
+      .First()
+      .FirstAsync();
 
     //Assert
     source["A"].Should().Be(2);
@@ -137,7 +139,7 @@ Drop table Events;
   }
 
   [Test]
-  public void TransformMap_WithNestedStruct()
+  public async Task TransformMap_WithNestedStruct()
   {
     //Arrange
     var value = new Dictionary<string, MyType>
@@ -158,10 +160,11 @@ Drop table Events;
     };
 
     //Act
-    var source = Context.CreatePushQuery<Foo>(queryStreamParameters)
+    var source = await Context.CreatePushQuery<Foo>(queryStreamParameters)
       .Take(1)
       .ToEnumerable()
-      .First();
+      .First()
+      .FirstAsync();
 
     //Assert
     source["A"].Should().Be(2);

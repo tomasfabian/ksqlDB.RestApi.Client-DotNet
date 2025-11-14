@@ -31,6 +31,7 @@ using K = ksqlDB.RestApi.Client.KSql.Query.Functions.KSql;
 using HttpClientFactory = ksqlDB.RestApi.Client.Samples.Http.HttpClientFactory;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using EndpointType = ksqlDB.RestApi.Client.KSql.Query.Options.EndpointType;
+using ksqlDb.RestApi.Client.KSql.Linq;
 
 namespace ksqlDB.RestApi.Client.Samples;
 

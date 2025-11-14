@@ -74,7 +74,7 @@ public class PullQueryExample
       Console.WriteLine(
         $"Pull query - GetMany result => Id: {item?.SensorId} - Avg Value: {item?.AvgValue} - Window Start {item?.WindowStart}");
 
-    var list = await pullQuery.GetManyAsync().OrderBy(c => c.SensorId).ToListAsync();
+    var list = pullQuery.GetManyAsync().OrderBy(c => c.SensorId).ToListAsync();
     var ksql = "SELECT * FROM avg_sensor_values WHERE SensorId = 'sensor-1';";
 
     var result2 = await context.ExecutePullQuery<IoTSensorStats>(ksql);

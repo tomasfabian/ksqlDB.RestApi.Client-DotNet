@@ -802,7 +802,7 @@ EMIT CHANGES;".ReplaceLineEndings();
 
     var query = new TestableDbProvider(contextOptions)
       .CreatePushQuery<OrderData>()
-      .Where(c => orderTypes.Contains(c.OrderType));
+      .Where(c => ((IEnumerable<int>) orderTypes).Contains(c.OrderType));
 
     //Act
     var ksql = ClassUnderTest.BuildKSql(query.Expression, queryContext);
