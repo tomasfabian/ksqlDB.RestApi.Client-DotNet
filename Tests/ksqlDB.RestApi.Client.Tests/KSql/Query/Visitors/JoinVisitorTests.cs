@@ -7,6 +7,8 @@ using ksqlDB.RestApi.Client.KSql.Query.Context;
 using ksqlDB.RestApi.Client.KSql.Query.Functions;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
+using ksqlDB.RestApi.Client.KSql.RestApi.Serialization;
+using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 using NUnit.Framework;
 using UnitTests;
 using static ksqlDB.RestApi.Client.KSql.RestApi.Enums.IdentifierEscaping;
@@ -872,7 +874,7 @@ EMIT CHANGES;".ReplaceLineEndings());
     public int GamaId { get; set; }
   }
 
-  public static IEnumerable<(IdentifierEscaping, string)> MultipleLeftJoinTestCases()
+  public static IEnumerable<(IdentifierEscaping, string)> MultipleLeftJoinsTestCases()
   {
     yield return (Never,
       @"CREATE OR REPLACE STREAM Order AS 
@@ -900,8 +902,8 @@ ON `ord`.`AlphaId` = `ev`.`BetaId`
 EMIT CHANGES;".ReplaceLineEndings());
   }
 
-  [TestCaseSource(nameof(MultipleLeftJoinTestCases))]
-  public void MultipleLeftJoin_BuildKSql((IdentifierEscaping escaping, string expectedQuery) testCase)
+  [TestCaseSource(nameof(MultipleLeftJoinsTestCases))]
+  public void MultipleLeftJoins_BuildKSql((IdentifierEscaping escaping, string expectedQuery) testCase)
   {
     //Arrange
     var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
@@ -919,6 +921,64 @@ EMIT CHANGES;".ReplaceLineEndings());
 
     //Assert
     ksql.Should().Be(testCase.expectedQuery);
+  }
+
+  internal record Order2
+  {
+    public int Id { get; set; }
+    public int EventTypeCode { get; set; }
+    public int StatusCode { get; set; }
+    public int OriginOrderCode { get; set; }
+    public int OriginRootOrderCode { get; set; }
+  }
+  internal record Status
+  {
+    public string Id { get; set; } = null!;
+    public int Code { get; set; }
+  }
+  public record Event
+  {
+    public string Id { get; set; } = null!;
+    public int Code { get; set; }
+  }
+
+  [Test]
+  public void MultipleLeftJoins_PartitionBy_BuildKSql()
+  {
+    //Arrange
+    string expectedQuery =
+      @"CREATE OR REPLACE STREAM OrderEvenTest
+ WITH ( KAFKA_TOPIC='TestTopicLibrary', KEY_FORMAT='Kafka', VALUE_FORMAT='Json', PARTITIONS='1' ) AS 
+SELECT e.Id Id FROM order_stream o
+LEFT JOIN ref_status_table s
+ON o.StatusCode = s.Code
+LEFT JOIN ref_events_table e
+ON o.EventTypeCode = e.Code
+ PARTITION BY e.Id
+EMIT CHANGES;".ReplaceLineEndings();
+
+    var kSqlDbContext = new KSqlDBContext(new KSqlDBContextOptions(TestParameters.KsqlDbUrl)
+    {
+      ShouldPluralizeFromItemName = false
+    });
+    var metadata = new EntityCreationMetadata("TestTopicLibrary", 1)
+    {
+      ShouldPluralizeEntityName = false,
+      KeyFormat = SerializationFormats.Kafka
+    };
+
+    //Act
+    var ksql = kSqlDbContext.CreateOrReplaceStreamStatement("OrderEvenTest")
+      .With(metadata)
+      .As<Order2>("order_stream")
+      .LeftJoin(Source.Of<Event>("ref_events_table"), o => o.EventTypeCode, e => e.Code, (o, e) => new { o.StatusCode, e.Code, e.Id })
+      .LeftJoin(Source.Of<Status>("ref_status_table"), oe => oe.StatusCode, s => s.Code, (oe, s) => new { oe.Id })
+      .Select(joined => new { joined.Id})
+      .PartitionBy(joined => joined.Id)
+      .ToStatementString();
+
+    //Assert
+    ksql.Should().Be(expectedQuery);
   }
 
   public static IEnumerable<(IdentifierEscaping, string)> LeftJoinQuerySyntaxTestCases()
