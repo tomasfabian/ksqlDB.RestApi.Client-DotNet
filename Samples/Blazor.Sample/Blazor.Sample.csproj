@@ -1,9 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
         <Nullable>disable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
 		<UserSecretsId>df205641-c0bc-4548-b48b-9a0a25941283</UserSecretsId>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<DockerfileContext>..\..</DockerfileContext>
@@ -23,17 +21,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ksqlDb.RestApi.Client" Version="7.0.0" />
+		<!-- <PackageReference Include="ksqlDb.RestApi.Client" Version="7.0.0" /> -->
 		<PackageReference Include="SqlServer.Connector" Version="1.0.0" />
 		<PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.0" />
 		<PackageReference Include="System.Text.Json" Version="9.0.0" />
 	</ItemGroup>
 
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+        <PackageReference Include="System.Linq.Async" ExcludeAssets="compile" />
+    </ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\..\Samples\InsideOut\InsideOut.csproj" />
 		<!-- <ProjectReference Include="..\..\SqlServer.Connector\SqlServer.Connector.csproj" /> -->
-        <!-- <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" /> -->
+        <ProjectReference Include="..\..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />
 	</ItemGroup>
 
 </Project>
