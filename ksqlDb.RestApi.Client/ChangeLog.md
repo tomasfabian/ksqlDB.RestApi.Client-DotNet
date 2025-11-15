@@ -4,7 +4,7 @@
 
 ## 🚀 New Features
 - added net10 target framework moniker
-- upgraded Microsoft.* packages the v10
+- upgraded Microsoft.* packages to v10
 - added `IAsyncEnumerable<T>.ToObservable` extension method
 
 # 7.1.7
