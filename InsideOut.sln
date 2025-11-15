@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 	ProjectSection(SolutionItems) = preProject
 		.env = .env
 		Directory.Build.props = Directory.Build.props
-		Directory.Packages.props = Directory.Packages.props
+		Tests\Directory.Packages.props = Tests\Directory.Packages.props
 		README.md = README.md
 	EndProjectSection
 EndProject
