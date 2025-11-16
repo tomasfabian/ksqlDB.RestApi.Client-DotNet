@@ -24,6 +24,10 @@
 		<PackageReference Include="System.Text.Json" />
 	</ItemGroup>
 
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+        <PackageReference Include="System.Linq.Async" ExcludeAssets="compile" />
+    </ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\..\SqlServer.Connector\SqlServer.Connector.csproj" />
 		<ProjectReference Include="..\..\Samples\InsideOut\InsideOut.csproj" />
