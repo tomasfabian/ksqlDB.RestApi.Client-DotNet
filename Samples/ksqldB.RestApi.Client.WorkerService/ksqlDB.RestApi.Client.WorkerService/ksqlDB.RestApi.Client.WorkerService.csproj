@@ -1,16 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk.Worker">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-ksqldB.RestApi.Client.WorkerService-C9138ED6-2AB5-44F3-A873-9FCD6EAA7B8E</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <DockerfileRunArguments>--network ksqldbrestapiclientsample_ksqldbnetwork</DockerfileRunArguments>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ksqlDb.RestApi.Client" Version="7.1.0" />
+        <PackageReference Include="ksqlDb.RestApi.Client" Version="8.0.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     </ItemGroup>

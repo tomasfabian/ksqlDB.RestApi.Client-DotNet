@@ -1,46 +1,46 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net9.0</TargetFrameworks>
-		<Authors>Tomas Fabian</Authors>
-		<PackageLicenseFile>License.txt</PackageLicenseFile>
-		<Copyright>@tomasfabian</Copyright>
-		<Version>1.0.0</Version>
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net9.0;net10.0</TargetFrameworks>
+        <Authors>Tomas Fabian</Authors>
+        <PackageLicenseFile>License.txt</PackageLicenseFile>
+        <Copyright>@tomasfabian</Copyright>
+        <Version>1.0.0</Version>
         <LangVersion>10.0</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
-		<NuspecFile>Package.nuspec</NuspecFile>
-		<Description>
+        <NuspecFile>Package.nuspec</NuspecFile>
+        <Description>
             SqlServer.Connector is a client API for consuming row-level table changes (CDC - Change Data Capture) from a Sql Server database with the Debezium connector streaming platform.
 
-            Targets .NET 8.0, .NET 9.0 and .NET Standard 2.0.
+            Targets .NET 8.0, .NET 9.0, .NET 10.0 and .NET Standard 2.0.
         </Description>
-		<UserSecretsId>59d2cdd2-cd5f-4bc9-a5ee-4527789d4a53</UserSecretsId>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	</PropertyGroup>
+        <UserSecretsId>59d2cdd2-cd5f-4bc9-a5ee-4527789d4a53</UserSecretsId>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<None Include="License.txt">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
-		</None>
-	</ItemGroup>
+    <ItemGroup>
+        <None Include="License.txt">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
+    </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Azure.Identity" Version="1.11.4" />
-		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
-		<PackageReference Include="ksqlDb.RestApi.Client" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
-        <PackageReference Include="Microsoft.IdentityModel.Abstractions" Version="7.5.0" />
-        <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.5.0" />
-        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.5.0" />
-        <PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
-        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.0" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Azure.Identity" Version="1.17.0" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
+        <PackageReference Include="ksqlDb.RestApi.Client" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.0" />
+        <PackageReference Include="Microsoft.IdentityModel.Abstractions" Version="8.14.0" />
+        <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.14.0" />
+        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.14.0" />
+        <PackageReference Include="System.Formats.Asn1" Version="10.0.0" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+    </ItemGroup>
 
-	<ItemGroup><!--<ProjectReference Include="..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />-->
-	
-	  <PackageReference Include="System.Text.Json" Version="9.0.0" />
-	</ItemGroup>
+    <ItemGroup>
+        <!--<ProjectReference Include="..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" />-->
+        <PackageReference Include="System.Text.Json" Version="10.0.0" />
+    </ItemGroup>
 
 </Project>
