@@ -24,8 +24,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ksqlDb.RestApi.Client" Version="7.1.0" />
+        <PackageReference Include="ksqlDb.RestApi.Client" Version="8.0.0" />
         <!-- <ProjectReference Include="..\ksqlDb.RestApi.Client\ksqlDb.RestApi.Client.csproj" /> -->
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" />
         <PackageReference Include="protobuf-net" Version="3.2.0" />
     </ItemGroup>
 
