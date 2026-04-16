@@ -26,8 +26,7 @@
 
     <ItemGroup>
         <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
-        <PackageReference Include="Antlr4BuildTasks" Version="12.11.0" />
-        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" />
+        <PackageReference Include="Antlr4BuildTasks" Version="12.11.0" PrivateAssets="all" />
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
