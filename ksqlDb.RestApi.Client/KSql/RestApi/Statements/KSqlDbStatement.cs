@@ -9,7 +9,6 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements;
 /// </summary>
 public sealed class KSqlDbStatement : QueryParameters
 {
-
   public KSqlDbStatement(string statement)
   {
     if (string.IsNullOrEmpty(statement))
@@ -19,11 +18,6 @@ public sealed class KSqlDbStatement : QueryParameters
 
     EndpointType = EndpointType.KSql;
   }
-
-  /// <summary>
-  /// Returns the sql statement as a compact one line string without formatting characters.
-  /// </summary>
-  public string CompactSql() => Sql.Replace("\r", string.Empty).Replace("\n", " ").Replace("\t", string.Empty).Trim();
 
   /// <summary>
   /// Dictionary (map) of string variable names and values of any type as initial variable substitution values.

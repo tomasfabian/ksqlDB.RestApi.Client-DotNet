@@ -122,7 +122,6 @@ public class KSqlDbRestApiClient : IKSqlDbRestApiClient
   {
     logger?.LogInformation("Executing command: {SQL}", ksqlDbStatement.Sql);
 
-    ksqlDbStatement.Sql = ksqlDbStatement.CompactSql();
     return ExecuteStatementAsync(
       ksqlDbStatement,
       ksqlDbStatement.EndpointType,
