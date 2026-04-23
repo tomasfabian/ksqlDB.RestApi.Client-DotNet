@@ -1,5 +1,10 @@
 # ksqlDB.RestApi.Client
 
+# 8.0.1
+
+## 🐛 Bug Fixes
+- Mark `Antlr4BuildTasks` as `PrivateAssets="all"` to prevent transitive dependency issues for consumers. #119 (contributed by )
+
 # 8.0.0
 
 ## 🚀 New Features
