@@ -1,25 +1,26 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using FluentAssertions;
+using ksqlDb.RestApi.Client.FluentAPI.Builders;
 using ksqlDb.RestApi.Client.Infrastructure.Logging;
+using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
+using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Annotations;
+using ksqlDb.RestApi.Client.Tests.Fakes.Logging;
+using ksqlDb.RestApi.Client.Tests.Models.Movies;
 using ksqlDB.RestApi.Client.KSql.Query.Windows;
 using ksqlDB.RestApi.Client.KSql.RestApi;
 using ksqlDB.RestApi.Client.KSql.RestApi.Enums;
-using ksqlDb.RestApi.Client.KSql.RestApi.Generators.Asserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Query;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements;
-using ksqlDb.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Annotations;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Inserts;
 using ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
-using ksqlDb.RestApi.Client.Tests.Fakes.Logging;
-using ksqlDb.RestApi.Client.Tests.Models.Movies;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
 using NUnit.Framework;
-using ksqlDb.RestApi.Client.FluentAPI.Builders;
 
 namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi;
 
@@ -364,14 +365,16 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
 
   private static string GetExpectedContent(string statement)
   {
-    string parameters = @$"{{""ksql"":""{statement}"",""streamsProperties"":{{}}}}";
-
-    return parameters;
+    var ksqldbStatement = new KSqlDbStatement(statement);
+    return JsonSerializer.Serialize(ksqldbStatement, new JsonSerializerOptions
+    {
+      PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    });
   }
 
   private void VerifySendAsync(string content, string requestUri = "/ksql")
   {
-    var request = ItExpr.Is<HttpRequestMessage>(c => c.Method == HttpMethod.Post && c.RequestUri!.PathAndQuery == requestUri /*&& c.Content!.ReadAsStringAsync().Result == content*/);
+    var request = ItExpr.Is<HttpRequestMessage>(c => c.Method == HttpMethod.Post && c.RequestUri!.PathAndQuery == requestUri && c.Content!.ReadAsStringAsync().Result == content);
 
     HttpMessageHandlerMock.Protected()
       .Verify(nameof(HttpClient.SendAsync), Times.Once(), exactParameterMatch: true, request, ItExpr.IsAny<CancellationToken>());
@@ -784,10 +787,14 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     var response = await ClassUnderTest.CreateSourceTableAsync<Movie>(creationMetadata);
 
     //Assert
-    var expectedContent = GetExpectedContent(
-      @"CREATE SOURCE TABLE Movies ( Title VARCHAR, Id INT PRIMARY KEY, Release_Year INT ) WITH ( KAFKA_TOPIC=\u0027moviesByTitle\u0027, VALUE_FORMAT=\u0027Json\u0027, PARTITIONS=\u00271\u0027, REPLICAS=\u00271\u0027 );".ReplaceLineEndings()
+    var expectedContentJson = GetExpectedContent(
+      @"CREATE SOURCE TABLE Movies (
+	Title VARCHAR,
+	Id INT PRIMARY KEY,
+	Release_Year INT
+) WITH ( KAFKA_TOPIC='moviesByTitle', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings()
     );
-    VerifySendAsync(expectedContent);
+    VerifySendAsync(expectedContentJson);
 
     response.StatusCode.Should().Be(HttpStatusCode.OK);
   }
@@ -809,11 +816,15 @@ public class KSqlDbRestApiClientTests : KSqlDbRestApiClientTestsBase
     var response = await ClassUnderTest.CreateSourceStreamAsync<Movie>(creationMetadata);
 
     //Assert
-    var expectedContent = GetExpectedContent(
-      @"CREATE SOURCE STREAM Movies ( Title VARCHAR, Id INT KEY, Release_Year INT ) WITH ( KAFKA_TOPIC=\u0027moviesByTitle\u0027, VALUE_FORMAT=\u0027Json\u0027, PARTITIONS=\u00271\u0027, REPLICAS=\u00271\u0027 );".ReplaceLineEndings()
+    var expectedContentJson = GetExpectedContent(
+      @"CREATE SOURCE STREAM Movies (
+	Title VARCHAR,
+	Id INT KEY,
+	Release_Year INT
+) WITH ( KAFKA_TOPIC='moviesByTitle', VALUE_FORMAT='Json', PARTITIONS='1', REPLICAS='1' );".ReplaceLineEndings()
     );
-    
-    VerifySendAsync(expectedContent);
+
+    VerifySendAsync(expectedContentJson);
 
     response.StatusCode.Should().Be(HttpStatusCode.OK);
   }
