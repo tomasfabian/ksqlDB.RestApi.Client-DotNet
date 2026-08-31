@@ -421,7 +421,7 @@ public static KSqlDBContextOptions CreatePushQueryOptions(string ksqlDbUrl)
 contextOptions
   .SetupPullQuery(options =>
   {
-    options[KSqlDbConfigs.KsqlQueryPullTableScanEnabled] = "true";
+    options.Properties[KSqlDbConfigs.KsqlQueryPullTableScanEnabled] = true;
   })
 ```
 

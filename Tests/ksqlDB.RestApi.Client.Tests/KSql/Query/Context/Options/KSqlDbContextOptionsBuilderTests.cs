@@ -276,5 +276,21 @@ public class KSqlDbContextOptionsBuilderTests : TestBase<KSqlDbContextOptionsBui
     //Assert
     options.PullQueryParameters.Properties[KSqlDbConfigs.KsqlQueryPullTableScanEnabled].Should().BeEquivalentTo("true");
   }
+
+  [Test]
+  public void SetupPullQuery_BooleanPropertyWasSet()
+  {
+    //Arrange
+    var setupParameters = ClassUnderTest.UseKSqlDb(TestParameters.KsqlDbUrl);
+
+    //Act
+    var options = setupParameters.SetupPullQuery(opt =>
+    {
+      opt.Properties[KSqlDbConfigs.KsqlQueryPullTableScanEnabled] = true;
+    }).Options;
+
+    //Assert
+    options.PullQueryParameters.Properties[KSqlDbConfigs.KsqlQueryPullTableScanEnabled].Should().Be(true);
+  }
   #endregion
 }

@@ -180,7 +180,7 @@ public static async Task<List<OrderData>> GetOrdersAsync()
 {
   var ksqlDbUrl = @"http://localhost:8088";
   var options = new KSqlDBContextOptions(ksqlDbUrl) { ShouldPluralizeFromItemName = false };
-  options.QueryParameters.Properties["ksql.query.pull.table.scan.enabled"] = "true";
+  options.PullQueryParameters.Properties["ksql.query.pull.table.scan.enabled"] = true;
 
   await using var context = new KSqlDBContext(options);
   var tableName = "queryable_order";
