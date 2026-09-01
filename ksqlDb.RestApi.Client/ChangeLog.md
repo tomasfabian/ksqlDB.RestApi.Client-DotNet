@@ -1,5 +1,10 @@
 # ksqlDB.RestApi.Client
 
+# 9.0.0
+
+## 💥 Breaking changes
+- `IQueryOptions.Properties` changed from `Dictionary<string, string>` to `Dictionary<string, object>`. Direct reads now require a cast or the existing string indexer; string assignments still work. #123 preserve JSON types in query properties (contributed by @mrt181)
+
 # 8.0.1
 
 ## 🐛 Bug Fixes

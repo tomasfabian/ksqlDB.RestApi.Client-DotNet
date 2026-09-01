@@ -1,6 +1,6 @@
 # Breaking changes
 
-# Upcoming
+# v9.0.0
 - `IQueryOptions.Properties` changed from `Dictionary<string, string>` to `Dictionary<string, object>`. Direct reads now require a cast or the existing string indexer; string assignments still work.
 
 # v6.0.0
