@@ -243,7 +243,7 @@ var contextOptions = new KSqlDbContextOptionsBuilder()
   .SetIdentifierEscaping(IdentifierEscaping.Keywords)
   .SetupPushQuery(options =>
   {
-    options.Properties["ksql.query.push.v2.enabled"] = "true";
+    options.Properties["ksql.query.push.v2.enabled"] = true;
   })
   .Options;
 ```

@@ -19,7 +19,7 @@ public class QueryStreamEndpointParameters<T> : IKSqlDbParameters
   /// Property overrides to run the statements with.
   /// </summary>
   [JsonPropertyName("properties")]
-  public Dictionary<string, string> Properties { get; } = new();
+  public Dictionary<string, object> Properties { get; } = new();
 
   /// <summary>
   /// Indexer to access properties by key.
@@ -28,7 +28,7 @@ public class QueryStreamEndpointParameters<T> : IKSqlDbParameters
   /// <returns>The value of the property.</returns>
   public string this[string key]
   {
-    get => Properties[key];
+    get => Properties[key].ToString()!;
     set => Properties[key] = value;
   }
 

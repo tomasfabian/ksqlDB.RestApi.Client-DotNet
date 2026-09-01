@@ -1,3 +1,4 @@
+using System.Text.Json;
 using FluentAssertions;
 using ksqlDB.RestApi.Client.KSql.Query.Options;
 using ksqlDB.RestApi.Client.KSql.RestApi.Parameters;
@@ -7,6 +8,8 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Parameters
 {
   public class QueryStreamEndpointParametersTests
   {
+    private const string BooleanPropertyName = "ksql.query.pull.table.scan.enabled";
+
     [Test]
     public void Clone()
     {
@@ -55,6 +58,42 @@ namespace ksqlDb.RestApi.Client.Tests.KSql.RestApi.Parameters
 
       //Assert
       clone.Properties[QueryParameters.AutoOffsetResetPropertyName].Should().Be(nameof(AutoOffsetReset.Latest).ToLower());
+    }
+
+    [Test]
+    public void BooleanProperty_IsSerializedAsJsonBoolean()
+    {
+      //Arrange
+      var parameters = new PullQueryStreamParameters
+      {
+        Sql = "Select",
+        Properties = { [BooleanPropertyName] = true }
+      };
+
+      //Act
+      var json = JsonSerializer.Serialize(parameters);
+
+      //Assert
+      using var document = JsonDocument.Parse(json);
+      document.RootElement.GetProperty("properties").GetProperty(BooleanPropertyName)
+        .ValueKind.Should().Be(JsonValueKind.True);
+    }
+
+    [Test]
+    public void Clone_PreservesBooleanProperty()
+    {
+      //Arrange
+      var source = new PullQueryStreamParameters
+      {
+        Sql = "Select",
+        Properties = { [BooleanPropertyName] = true }
+      };
+
+      //Act
+      var clone = source.Clone();
+
+      //Assert
+      clone.Properties[BooleanPropertyName].Should().Be(true);
     }
   }
 }
