@@ -34,17 +34,24 @@ public abstract class KSqlDBContextDependenciesProvider : AsyncDisposableObject,
   protected ServiceProvider? ServiceProvider { get; private set; }
 
   private IServiceScopeFactory? serviceScopeFactory;
+  private readonly object serviceScopeFactoryLock = new();
 
   internal IServiceScopeFactory ServiceScopeFactory()
   {
     if (serviceScopeFactory != null)
       return serviceScopeFactory;
 
-    RegisterDependencies(kSqlDbContextOptions);
+    lock (serviceScopeFactoryLock)
+    {
+      if (serviceScopeFactory != null)
+        return serviceScopeFactory;
 
-    ServiceProvider = ServiceCollection.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+      RegisterDependencies(kSqlDbContextOptions);
 
-    serviceScopeFactory = ServiceProvider.GetRequiredService<IServiceScopeFactory>();
+      ServiceProvider = ServiceCollection.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+
+      serviceScopeFactory = ServiceProvider.GetRequiredService<IServiceScopeFactory>();
+    }
 
     return serviceScopeFactory;
   }

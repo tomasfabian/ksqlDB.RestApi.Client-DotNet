@@ -390,4 +390,18 @@ public class KSqlDBContextTests : TestBase
     pushQueryParameters.Should().BeOfType<QueryStreamParameters>();
     pullQueryParameters.Should().BeOfType<PullQueryStreamParameters>();
   }
+
+  [Test]
+  public async Task CreatePullQuery_CalledConcurrentlyOnFreshContext_DoesNotThrow()
+  {
+    //Arrange
+    var context = new KSqlDBContext(TestParameters.KsqlDbUrl);
+
+    //Act
+    var tasks = Enumerable.Range(0, 50).Select(_ => Task.Run(() => context.CreatePullQuery<int>("tableName")));
+
+    //Assert
+    var act = async () => await Task.WhenAll(tasks);
+    await act.Should().NotThrowAsync();
+  }
 }
