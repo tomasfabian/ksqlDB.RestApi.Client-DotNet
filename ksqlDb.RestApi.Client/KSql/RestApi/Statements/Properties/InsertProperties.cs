@@ -3,7 +3,7 @@ namespace ksqlDB.RestApi.Client.KSql.RestApi.Statements.Properties;
 /// <summary>
 /// Represents a configuration for insert statements.
 /// </summary>
-public record InsertProperties : EntityProperties, IValueFormatters
+public record InsertProperties : EntityProperties, IValueFormatters, IEnumValueFormatter
 {
   /// <summary>
   /// Determines whether to use the instance type for inferring the entity name instead of utilizing typeof(T).
@@ -18,4 +18,6 @@ public record InsertProperties : EntityProperties, IValueFormatters
   public Func<decimal, string>? FormatDecimalValue { get; set; }
 
   public Func<double, string>? FormatDoubleValue { get; set; }
+
+  public Func<Enum, string>? FormatEnumValue { get; set; }
 }

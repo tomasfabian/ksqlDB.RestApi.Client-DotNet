@@ -1,4 +1,6 @@
 using System.Globalization;
+using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 using FluentAssertions;
 using ksqlDb.RestApi.Client.FluentAPI.Builders;
@@ -1049,6 +1051,219 @@ public class CreateInsertTests
 
     //Assert
     statement.Should().Be($"INSERT INTO {nameof(Port)}s ({nameof(Port.Id)}, {nameof(Port.PortType)}) VALUES (42, '{value.PortType}');");
+  }
+
+  private static string FormatPortType(Enum value) => value is PortType.Snowflake ? "snow flake" : value.ToString();
+
+  [Test]
+  public void Generate_EnumWithFormatEnumValue_UsesFormattedText()
+  {
+    //Arrange
+    var value = new Port
+    {
+      Id = 42,
+      PortType = PortType.Snowflake,
+    };
+
+    var insertProperties = new InsertProperties { FormatEnumValue = FormatPortType };
+
+    //Act
+    string statement = new CreateInsert(modelBuilder).Generate(value, insertProperties);
+
+    //Assert
+    statement.Should().Be($"INSERT INTO {nameof(Port)}s ({nameof(Port.Id)}, {nameof(Port.PortType)}) VALUES (42, 'snow flake');");
+  }
+
+  private enum EnumMemberPortType
+  {
+    Kafka = 0,
+    [EnumMember(Value = "snow flake")]
+    Snowflake = 1,
+  }
+
+  private record EnumMemberPort
+  {
+    [Key]
+    public int Id { get; init; }
+    public EnumMemberPortType PortType { get; init; }
+  }
+
+  [Test]
+  public void Generate_EnumWithEnumMemberFormatter_UsesEnumMemberValue()
+  {
+    //Arrange
+    var port = new EnumMemberPort
+    {
+      Id = 42,
+      PortType = EnumMemberPortType.Snowflake,
+    };
+
+    var insertProperties = new InsertProperties
+    {
+      FormatEnumValue = value => value.GetType().GetField(value.ToString())!
+        .GetCustomAttribute<EnumMemberAttribute>()?.Value ?? value.ToString()
+    };
+
+    //Act
+    string statement = new CreateInsert(modelBuilder).Generate(port, insertProperties);
+
+    //Assert
+    statement.Should().Be($"INSERT INTO {nameof(EnumMemberPort)}s ({nameof(EnumMemberPort.Id)}, {nameof(EnumMemberPort.PortType)}) VALUES (42, 'snow flake');");
+  }
+
+  private record PortList
+  {
+    [Key]
+    public int Id { get; init; }
+    public PortType[] PortTypes { get; init; } = null!;
+  }
+
+  [Test]
+  public void Generate_EnumArrayWithFormatEnumValue_UsesFormattedText()
+  {
+    //Arrange
+    var value = new PortList
+    {
+      Id = 1,
+      PortTypes = [PortType.Kafka, PortType.Snowflake],
+    };
+
+    var insertProperties = new InsertProperties { FormatEnumValue = FormatPortType };
+
+    //Act
+    string statement = new CreateInsert(modelBuilder).Generate(value, insertProperties);
+
+    //Assert
+    statement.Should().Be($"INSERT INTO {nameof(PortList)}s ({nameof(PortList.Id)}, {nameof(PortList.PortTypes)}) VALUES (1, ARRAY['Kafka', 'snow flake']);");
+  }
+
+  private record PortHolder
+  {
+    [Key]
+    public int Id { get; init; }
+    public Port Port { get; init; } = null!;
+  }
+
+  [Test]
+  public void Generate_EnumInStructWithFormatEnumValue_UsesFormattedText()
+  {
+    //Arrange
+    var value = new PortHolder
+    {
+      Id = 1,
+      Port = new Port { Id = 2, PortType = PortType.Snowflake },
+    };
+
+    var insertProperties = new InsertProperties { FormatEnumValue = FormatPortType };
+
+    //Act
+    string statement = new CreateInsert(modelBuilder).Generate(value, insertProperties);
+
+    //Assert
+    statement.Should().Contain("PortType := 'snow flake'");
+  }
+
+  [Test]
+  public void Generate_EnumArrayWithoutFormatEnumValue_UsesToString()
+  {
+    //Arrange
+    var value = new PortList
+    {
+      Id = 1,
+      PortTypes = [PortType.Kafka, PortType.Snowflake],
+    };
+
+    //Act
+    string statement = new CreateInsert(modelBuilder).Generate(value, new InsertProperties());
+
+    //Assert
+    statement.Should().Contain("ARRAY['Kafka', 'Snowflake']");
+  }
+
+  private record PortValueMap
+  {
+    [Key]
+    public int Id { get; init; }
+    public Dictionary<string, PortType> Map { get; init; } = null!;
+  }
+
+  [Test]
+  public void Generate_EnumMapValueWithFormatEnumValue_UsesFormattedText()
+  {
+    //Arrange
+    var value = new PortValueMap
+    {
+      Id = 1,
+      Map = new Dictionary<string, PortType> { ["a"] = PortType.Snowflake },
+    };
+
+    var insertProperties = new InsertProperties { FormatEnumValue = FormatPortType };
+
+    //Act
+    string statement = new CreateInsert(modelBuilder).Generate(value, insertProperties);
+
+    //Assert
+    statement.Should().Contain("MAP('a' := 'snow flake')");
+  }
+
+  [Test]
+  public void Generate_EnumMapValueWithoutFormatEnumValue_UsesToString()
+  {
+    //Arrange
+    var value = new PortValueMap
+    {
+      Id = 1,
+      Map = new Dictionary<string, PortType> { ["a"] = PortType.Snowflake },
+    };
+
+    //Act
+    string statement = new CreateInsert(modelBuilder).Generate(value, new InsertProperties());
+
+    //Assert
+    statement.Should().Contain("MAP('a' := 'Snowflake')");
+  }
+
+  private record PortKeyMap
+  {
+    [Key]
+    public int Id { get; init; }
+    public Dictionary<PortType, string> Map { get; init; } = null!;
+  }
+
+  [Test]
+  public void Generate_EnumMapKeyWithFormatEnumValue_UsesFormattedText()
+  {
+    //Arrange
+    var value = new PortKeyMap
+    {
+      Id = 1,
+      Map = new Dictionary<PortType, string> { [PortType.Snowflake] = "a" },
+    };
+
+    var insertProperties = new InsertProperties { FormatEnumValue = FormatPortType };
+
+    //Act
+    string statement = new CreateInsert(modelBuilder).Generate(value, insertProperties);
+
+    //Assert
+    statement.Should().Contain("MAP('snow flake' := 'a')");
+  }
+
+  [Test]
+  public void Generate_EnumMapKeyWithoutFormatEnumValue_UsesToString()
+  {
+    //Arrange
+    var value = new PortKeyMap
+    {
+      Id = 1,
+      Map = new Dictionary<PortType, string> { [PortType.Snowflake] = "a" },
+    };
+
+    //Act
+    string statement = new CreateInsert(modelBuilder).Generate(value, new InsertProperties());
+
+    //Assert
+    statement.Should().Contain("MAP('Snowflake' := 'a')");
   }
 
   private record Amount
