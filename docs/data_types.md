@@ -368,3 +368,29 @@ The generated SQL insert statement inserts the values 42 and 'Snowflake' into th
 ```SQL
 INSERT INTO Ports (Id, PortType) VALUES (42, 'Snowflake');
 ```
+
+By default `Enum.ToString()` is used. To customize the text (for example to use the `EnumMember` value), set the opt-in `FormatEnumValue` on `InsertProperties`. The formatter returns the raw text without quotes; it also applies to enums nested in arrays, structs and maps.
+
+```C#
+using System.Reflection;
+using System.Runtime.Serialization;
+
+internal enum PortType
+{
+  Kafka = 0,
+  [EnumMember(Value = "snow flake")]
+  Snowflake = 1,
+}
+
+var insertProperties = new InsertProperties
+{
+  FormatEnumValue = value => value.GetType().GetField(value.ToString())!
+    .GetCustomAttribute<EnumMemberAttribute>()?.Value ?? value.ToString()
+};
+
+string statement = new CreateInsert().Generate(port, insertProperties);
+```
+
+```SQL
+INSERT INTO Ports (Id, PortType) VALUES (42, 'snow flake');
+```

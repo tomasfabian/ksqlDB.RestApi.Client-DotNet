@@ -84,7 +84,9 @@ internal sealed class CreateKSqlValue(IMetadataProvider metadataProvider) : Enti
     else if (type.IsPrimitive)
       value = value.ToString();
     else if (type.IsEnum)
-      value = $"'{value}'";
+      value = valueFormatters is IEnumValueFormatter { FormatEnumValue: not null } enumFormatter
+        ? $"'{enumFormatter.FormatEnumValue((Enum)value)}'"
+        : $"'{value}'";
     else if (type.IsDictionary())
       GenerateMap(valueFormatters, type, formatter, ref value);
     else if (type.IsArray)
