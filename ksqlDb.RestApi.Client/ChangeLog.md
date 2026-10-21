@@ -1,5 +1,10 @@
 # ksqlDB.RestApi.Client
 
+# 9.1.0
+
+## 🚀 New Features
+- opt-in enum value formatter (`IEnumValueFormatter`) for insert statements #124 (contributed by @mrt181)
+
 # 9.0.1
 
 ## 🐛 Bug Fixes
